@@ -1,0 +1,879 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Revisionary\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-04-02 20:51-0500\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Kevin Behrens <kevin@publishpress.com>\n"
+"Language-Team: PublishPress <help@publishpress.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: English\n"
+"X-Poedit-Country: UNITED STATES\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-KeywordsList: __;_e;_c;__ngettext;_n;rvy_po_trigger;__awp\n"
+"X-Poedit-Basepath: F:\\www\\wp50\\wp-content\\plugins\\revisionary\n"
+"X-Poedit-SearchPath-0: F:\\www\\wp50\\wp-content\\plugins\\revisionary\n"
+"X-Poedit-SearchPath-1: F:\\www\\wp50\\wp-content\\plugins\\revisionary\\admin\n"
+"X-Poedit-SearchPath-2: F:\\www\\wp50\\wp-content\\plugins\\revisionary\\hardway\n"
+"X-Poedit-SearchPath-3: F:\\www\\wp50\\wp-content\\plugins\\revisionary\\lib\n"
+
+#: F:\www\wp50\wp-content\plugins\revisionary/front_rvy.php:158
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:270
+msgid "M j, Y @ g:i a"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/front_rvy.php:183
+#, php-format
+msgid "This Revision was Published on %s"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/front_rvy.php:189
+#, php-format
+msgid "(for publication on %s%s%s)"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/front_rvy.php:190
+msgid "Schedule this Pending Revision"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/front_rvy.php:194
+msgid "Publish this Pending Revision now."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/front_rvy.php:201
+#, php-format
+msgid "(already scheduled for publication on %s%s%s)"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/front_rvy.php:202
+msgid "Publish now"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/front_rvy.php:207
+#, php-format
+msgid "(dated %s)"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/front_rvy.php:208
+msgid "Restore this Past Revision"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/front_rvy.php:238
+msgid "Current Revision"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:33
+#, php-format
+msgid "[%s] Pending Revision Notification"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:35
+#, php-format
+msgid "A pending revision to the %1$s \"%2$s\" has been submitted."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:39
+#, php-format
+msgid "It was submitted by %1$s."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:44
+msgid "Preview and Approval: "
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:46
+msgid "Management Screen: "
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:137
+msgid "Sorry, an error occurred while attempting to save your revision."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:167
+msgid "Your modification was saved as a Scheduled Revision."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:172
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:196
+msgid "Preview it"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:174
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:198
+msgid "Go to Revisions Manager"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:176
+msgid "Go back to schedule another revision"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:185
+msgid "Your modification has been saved for editorial review."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:188
+msgid "If approved by an editor, it will be published on the date you specified."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:190
+msgid "It will be published when an editor approves it."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:202
+msgid "Go back to submit another revision"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:220
+msgid "Return to Edit Posts"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:223
+msgid "Return to Edit Pages"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revision-workflow_rvy.php:227
+#, php-format
+msgid "Return to Edit %s"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revisionary.php:47
+#, php-format
+msgid "Another copy of Revisionary is already activated (version %1$s in \"%2$s\")"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revisionary.php:49
+#, php-format
+msgid "Another copy of Revisionary is already activated (version %1$s)"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revisionary_main.php:368
+msgid "Autosave disabled when editing a published post/page to create a pending revision."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revisionary_main.php:412
+#: F:\www\wp50\wp-content\plugins\revisionary/revisionary_main.php:531
+msgid "Sorry, an error occurred while attempting to save your modification for editorial review!"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revisionary_main.php:426
+msgid "Pending Revision Created"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/revisionary_main.php:543
+msgid "Scheduled Revision Created"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/rvy_init.php:120
+msgid "Revisor"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/rvy_init.php:498
+msgid "Revision Workflow"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/submittee_rvy.php:11
+#: F:\www\wp50\wp-content\plugins\revisionary/submittee_rvy.php:14
+msgid "Cheatin&#8217; uh?"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin-dashboard_rvy.php:19
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin-dashboard_rvy.php:21
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin-dashboard_rvy.php:55
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin-dashboard_rvy.php:57
+#, php-format
+msgid "Pending %1$s"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin-init_rvy.php:109
+msgid "<strong>Welcome to Revisionary!</strong> To allow a user to submit revisions to your published posts and pages, set their role to \"Revisor\""
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin-init_rvy.php:121
+msgid "Dismiss"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_lib-mu_rvy.php:12
+msgid "Revisionary Network Settings"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_lib-mu_rvy.php:12
+msgid "Revisionary Network"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_lib-mu_rvy.php:23
+msgid "Revisionary Network Defaults"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_lib-mu_rvy.php:23
+msgid "Revisionary Defaults"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:134
+msgid "The revision was restored."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:137
+msgid "The revision was scheduled for publication."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:140
+msgid "The revision was published."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:214
+#, php-format
+msgid "Preview & Approve &#8220;%s&#8221;"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:214
+msgid "Approval"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:216
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:221
+#, php-format
+msgid "Preview &#8220;%s&#8221;"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:216
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:221
+msgid "Preview"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:273
+#, php-format
+msgid "Scheduled for: <b>%1$s</b>"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:275
+#, php-format
+msgid "Published on: <b>%1$s</b>"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:277
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:285
+msgid "Publish <b>immediately</b>"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:279
+#, php-format
+msgid "Schedule for: <b>%1$s</b>"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:281
+#, php-format
+msgid "Publish on: <b>%1$s</b>"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:292
+msgid "Edit"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:313
+msgid "Send to Approval Queue"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:333
+msgid "Settings"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:372
+msgid "Current Time"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:373
+msgid "Publication History:"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:499
+msgid "Revisions"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:512
+msgid "Revisionary Settings"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:512
+msgid "Revisionary"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:628
+msgid "Delete"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/admin_rvy.php:664
+#, php-format
+msgid "%s (revision)"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/agents_checklist_rvy.php:43
+msgid "Enter additional User Names or IDs (comma-separate)"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/agents_checklist_rvy.php:98
+#, php-format
+msgid "show current users (%d)"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/agents_checklist_rvy.php:98
+#, php-format
+msgid "show eligible users (%d)"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/agents_checklist_rvy.php:116
+msgid "filter:"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/agents_checklist_rvy.php:125
+msgid "select"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/agents_checklist_rvy.php:130
+msgid "unselect"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/filters-admin-ui-item_rvy.php:36
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/post-edit-block-ui_rvy.php:36
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/post-edit-block-ui_rvy.php:48
+msgid "Schedule Revision"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/filters-admin-ui-item_rvy.php:58
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/filters-admin-ui-item_rvy.php:59
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/post-edit-block-ui_rvy.php:61
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/post-edit-block-ui_rvy.php:62
+msgid "Submit Revision"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/filters-admin-ui-item_rvy.php:60
+msgid "Submit Scheduled Revision"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/filters-admin-ui-item_rvy.php:80
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:89
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:591
+msgid "Pending Revisions"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/filters-admin-ui-item_rvy.php:86
+msgid "Publishers to Notify of Your Revision"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/filters-admin-ui-item_rvy.php:93
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:90
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:594
+msgid "Scheduled Revisions"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:76
+msgid "Setting Scope"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:80
+msgid "Role Definition"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:82
+msgid "Email Notification"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:91
+msgid "Prevent Revisors from editing others&apos; revisions"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:92
+msgid "Strip html tags out of difference display"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:93
+msgid "Asynchronous Publishing"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:94
+msgid "Update Publish Date"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:95
+msgid "Email original Author when a Pending Revision is submitted"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:96
+msgid "Email the original Author when a Pending Revision is approved"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:97
+msgid "Email the Revisor when a Pending Revision is approved"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:98
+msgid "Email the original Author when a Scheduled Revision is published"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:99
+msgid "Email the Revisor when a Scheduled Revision is published"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:100
+msgid "Include capabilities for all custom post types in the WordPress Revisor role"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:101
+msgid "Prevent Revisors from editing other user&apos;s drafts"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:102
+msgid "Display Hints"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:106
+msgid "Email designated Publishers when a Pending Revision is submitted"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:107
+msgid "Email designated Publishers when a Scheduled Revision is published"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:109
+msgid "Email Editors and Administrators when a Pending Revision is submitted"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:110
+msgid "Email Editors and Administrators when a Scheduled Revision is published"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:163
+msgid "Revisionary Site Settings"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:171
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:518
+msgid "Update &raquo;"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:182
+msgid "These are the <strong>default</strong> settings for options which can be adjusted per-site."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:219
+#, php-format
+msgid "You can also specify %1$sdefaults for site-specific settings%2$s."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:220
+#, php-format
+msgid "Use this tab to make <strong>NETWORK-WIDE</strong> changes to Revisionary settings. %s"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:222
+msgid "Here you can change the default value for settings which are controlled separately on each site."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:240
+#, php-format
+msgid "Note that %1$s network-wide settings%2$s may also be available."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:245
+#, php-format
+msgid "Thanks for using the %1$sPublishPress%2$s family of professional publishing tools."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:249
+msgid "<strong>Getting Started:</strong> To allow a user to submit Revisions to your published posts and pages, set their role to \"Revisor\""
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:273
+msgid "If checked, users lacking site-wide publishing capabilities will also be checked for the edit_others_drafts capability"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:295
+msgid "If a currently published post or page is edited and a future date set, the change will not be applied until the selected date."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:299
+msgid "When a scheduled revision is published, also update the publish date."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:302
+msgid "Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:306
+msgid "Enable some users to submit a revision for an existing published post or page which they cannot otherwise edit.  Contributors can submit revisions to their own published content, and users who have the edit_others (but not edit_published) capability for the post type can submit revisions to other user's content.<br /><br />These Pending Revisions are listed alongside regular pending content, but link to a Revisions management form.  There the pending revision can be viewed, compared to other revisions, and approved or deleted by qualified editors.  If the submitter set a future publish date, approval schedules delayed publication of the revised content."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:315
+msgid "Show descriptive captions for Revisionary settings"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:332
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:386
+msgid "select recipients"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:341
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:359
+msgid "Never"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:341
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:359
+msgid "By default"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:341
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:359
+msgid "Always"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:403
+msgid "Note: \"by default\" means Pending Revision creators can customize email notification recipients before submitting.  Eligibile \"Publisher\" email recipients are members of the Pending Revision Monitors group who <strong>also</strong> have the ability to publish the revision.  If not explicitly defined, the Monitors group is all users with a primary WP role of Administrator or Editor."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:405
+#, php-format
+msgid "Note: \"by default\" means Pending Revision creators can customize email notification recipients before submitting.  For more flexibility in moderation and notification, install the %1$s Press Permit%2$s plugin."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:435
+#, php-format
+msgid "network-wide control of \"%s\""
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:440
+msgid "Specify which Revisionary Settings to control network-wide. Unselected settings are controlled separately on each site."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:522
+msgid "All settings in this form (including those on unselected tabs) will be reset to DEFAULTS.  Are you sure?"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/options.php:527
+msgid "Revert to Defaults"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/post-edit-block-ui_rvy.php:49
+msgid "Update"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/post-edit-block-ui_rvy.php:63
+msgid "Workflow&hellip;"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:150
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:183
+#, php-format
+msgid "[%s] Revision Approval Notice"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:151
+#, php-format
+msgid "A revision to your %1$s \"%2$s\" has been approved."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:154
+#, php-format
+msgid "The submitter was %1$s."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:158
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:188
+#, php-format
+msgid "It will be published on %s"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:161
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:191
+msgid "Preview it here: "
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:165
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:195
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:648
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:663
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:678
+msgid "View it online: "
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:184
+#, php-format
+msgid "The revision you submitted for the %1$s \"%2$s\" has been approved."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:644
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:656
+#, php-format
+msgid "[%s] Scheduled Revision Publication Notice"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:645
+#, php-format
+msgid "The scheduled revision you submitted for the %1$s \"%2$s\" has been published."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:657
+#, php-format
+msgid "A scheduled revision to your %1$s \"%2$s\" has been published."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:670
+#, php-format
+msgid "[%s] Scheduled Revision Publication"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-action_rvy.php:672
+#, php-format
+msgid "A scheduled revision to the %1$s \"%2$s\" has been published."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:138
+msgid "Publishers will be notified (but cannot be selected here)."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:140
+msgid "No email notifications will be sent."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:295
+#, php-format
+msgid "%1$s (Currently Published)"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:299
+#, php-format
+msgid "%1$s (Autosave)"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:309
+#, php-format
+msgid "%1$s <span class=\"rvy-revision-pubish-date\">(Requested publication: %2$s)</span>"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:311
+#, php-format
+msgid "%1$s <span class=\"rvy-revision-pubish-date\">(Publish date: %2$s)</span>"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:411
+msgid "The revision will be deleted. Are you sure?"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:473
+msgid "Unschedule"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:549
+msgid "Compare Selected HTML"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:568
+msgid "Modified Date (click to view/restore)"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:571
+msgid "Modified Date (click to view/approve)"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:574
+msgid "Modified Date (click to view/publish)"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:578
+msgid "Publish Date"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:580
+msgid "Author"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:581
+msgid "Actions"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:596
+msgid "Bulk Actions"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:599
+msgid "Apply"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:638
+msgid "Date as:"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:639
+msgid "Schedule for:"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:640
+msgid "Published on:"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:641
+msgid "Privately Published:"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:642
+msgid "Published:"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revision-ui_rvy.php:643
+msgid "Unsaved Date Selection:"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:20
+msgid "<strong>Note:</strong> For visual display of revisions, add the following code to foliopress-wysiwyg.php:<br />&nbsp;&nbsp;if ( strpos( $_SERVER['REQUEST_URI'], 'admin.php?page=rvy-revisions' ) ) return;"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:53
+msgid "No revision specified."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:58
+msgid "Past"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:58
+msgid "Pending"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:58
+msgid "Scheduled"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:132
+#, php-format
+msgid "%1$s Revisions for &#8220;%2$s&#8221;"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:198
+#, php-format
+msgid "Revision of &#8220;%1$s&#8221;"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:200
+#, php-format
+msgid "Past Revision of &#8220;%1$s&#8221;"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:203
+#, php-format
+msgid "Pending Revision of &#8220;%1$s&#8221;"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:206
+#, php-format
+msgid "Scheduled Revision of &#8220;%1$s&#8221;"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:214
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:221
+msgid "Publish Now"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:219
+msgid "Schedule Now"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:227
+msgid "Restore Now"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:244
+#, php-format
+msgid "&#8220;%1$s&#8221; (Currently Published)"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:262
+msgid "The requested revision does not exist."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:324
+msgid "The revision was deleted."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:327
+#, php-format
+msgid "%s revision was deleted"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:330
+msgid "The revision was updated."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:344
+msgid "To delete the revision, click the link below."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:346
+msgid "You do not have permission to delete that revision."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:349
+msgid "The revision was unscheduled."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:368
+#, php-format
+msgid "Published on: <strong>%1$s</strong>"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:370
+#, php-format
+msgid "Scheduled for: <strong>%1$s</strong>"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:373
+#, php-format
+msgid "Requested Publish Date: <strong>%1$s</strong>"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:375
+msgid "Requested Publish Date: <strong>Immediate</strong>"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:377
+#, php-format
+msgid "Modified on: <strong>%1$s</strong>"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:431
+msgid "Title"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:510
+#, php-format
+msgid "Older: modified %s"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:512
+#, php-format
+msgid "Newer: modified %s"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:556
+msgid "These revisions are identical."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:588
+msgid "Past Revisions"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:599
+#, php-format
+msgid "%1$s <span class=\"count\"> (%2$s)</span>"
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/admin/revisions.php:613
+#, php-format
+msgid "no %s revisions available."
+msgstr ""
+
+#: F:\www\wp50\wp-content\plugins\revisionary/lib/debug.php:182
+#, php-format
+msgid "%1$s queries in %2$s seconds. %3$s MB used."
+msgstr ""
+
