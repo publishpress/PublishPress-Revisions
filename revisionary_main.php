@@ -210,6 +210,10 @@ class Revisionary
 		else
 			$object_type = rvy_detect_post_type();
 			
+		if (!empty($_REQUEST['action']) && ('inline-save' == $_REQUEST['action']) && ('revision' != $post->post_type)) {
+			$this->skip_revision_allowance = true;
+		}
+
 		if ( rvy_get_option( 'revisor_lock_others_revisions' ) ) {
 			if ( $post ) {
 				// Revisors are enabled to edit other users' posts for revision, but cannot edit other users' revisions unless cap is explicitly set sitewide
