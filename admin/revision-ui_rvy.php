@@ -1,26 +1,12 @@
 <?php
 /**
- * @package     Revisionary\RevisionManagerUI
+ * @package     PublishPress\Revisions\RevisionManagerUI
  * @author      PublishPress <help@publishpress.com>
  * @copyright   Copyright (c) 2019 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
  */
 
- // clear TinyMCE plugin conflicts (this is only applied for the Revision Manager url)
-function rvy_clear_mce_plugins( $mce_plugins ) {
-	if ( is_array( $mce_plugins ) ) {
-		$mce_offenders = array( 'cforms' );
-		$mce_plugins = array_diff_key( $mce_plugins, array_fill_keys( $mce_offenders, true ) );
-	}
-		
-	return $mce_plugins;
-}
-
-if( false !== strpos( urldecode($_SERVER['REQUEST_URI']), 'admin.php?page=rvy-revisions' ) ) {	// todo: move tinymce function to separate file
-	add_filter( 'mce_external_plugins', 'rvy_clear_mce_plugins', 99 );
-}
- 
 function rvy_metabox_notification_list() {
 		global $revisionary;
 		
@@ -158,104 +144,15 @@ function rvy_metabox_revisions( $status ) {
 }
 
 function rvy_metabox_revisions_pending() {
-	rvy_metabox_revisions( 'pending' );
+	rvy_metabox_revisions( 'pending-revision' );
 }
 
 function rvy_metabox_revisions_future() {
-	rvy_metabox_revisions( 'future' );
+	rvy_metabox_revisions( 'future-revision' );
 }
-
-// Work around conflict with WP Super Edit and any other plugins which wipe out default TinyMCE parameters
-function rvy_log_tiny_mce_params( $initArray, $editor_id = '' ) {
-	global $rvy_tiny_mce_params;
-	$rvy_tiny_mce_params = $initArray;
-	return $initArray;
-}
-
-
-// adjust TinyMCE parameters for Revision viewing / edit
-function rvy_tiny_mce_params( $initArray, $editor_id = '' ) {
-	global $rvy_tiny_mce_params;
-	if ( ! empty($rvy_tiny_mce_params) && is_array($initArray) )	// Restore default TinyMCE parameters in case another plugin wiped them.  This is only done for the Revision Management form.
-		$initArray = array_merge($rvy_tiny_mce_params, $initArray);
-	else
-		$initArray = $rvy_tiny_mce_params;
-	
-	// $editor_id: 'content' or 'classic-block'
-	
-	$mce_buttons_1 = apply_filters('mce_buttons', array('bold', 'italic', 'strikethrough', '|', 'bullist', 'numlist', 'blockquote', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'link', 'unlink', 'wp_more', '|', 'spellchecker', 'fullscreen', 'wp_adv' ), $editor_id );
-	$mce_buttons_1 = implode(',', $mce_buttons_1);
-
-	$mce_buttons_2 = apply_filters('mce_buttons_2', array('formatselect', 'underline', 'justifyfull', 'forecolor', '|', 'pastetext', 'pasteword', 'removeformat', '|', 'media', 'charmap', '|', 'outdent', 'indent', '|', 'undo', 'redo', 'wp_help' ), $editor_id );
-	$mce_buttons_2 = implode( ',', $mce_buttons_2);
-
-	$mce_buttons_3 = apply_filters('mce_buttons_3', array(), $editor_id );
-	$mce_buttons_3 = implode( ',', $mce_buttons_3);
-
-	$mce_buttons_4 = apply_filters('mce_buttons_4', array(), $editor_id );
-	$mce_buttons_4 = implode(',', $mce_buttons_4);
-	
-	$mce_locale = ( '' == get_locale() ) ? 'en' : strtolower( substr(get_locale(), 0, 2) ); // only ISO 639-1
-	
-	// note custom save_callback
-	$arr = array (
-		'mode' => 'specific_textareas',
-		'editor_selector' => 'theEditor',
-		'width' => '100%',
-		'theme' => 'advanced',
-		'skin' => 'wp_theme',
-		'language' => "$mce_locale",
-		'theme_advanced_toolbar_location' => 'top',
-		'theme_advanced_toolbar_align' => 'left',
-		'theme_advanced_statusbar_location' => 'bottom',
-		'theme_advanced_resizing' => true,
-		'theme_advanced_resize_horizontal' => false,
-		'dialog_type' => 'modal',
-		'apply_source_formatting' => false,
-		'remove_linebreaks' => true,
-		'gecko_spellcheck' => true,
-		'entities' => '38,amp,60,lt,62,gt',
-		'accessibility_focus' => true,
-		'tabfocus_elements' => 'major-publishing-actions',
-		'media_strict' => false,
-		'save_callback' => 'tmCallbackRvy',
-		'wpeditimage_disable_captions' => true,
-		'plugins' => '',
-		'theme_advanced_buttons1' => $mce_buttons_1,
-		'theme_advanced_buttons2' => $mce_buttons_2,
-		'theme_advanced_buttons3' => $mce_buttons_3,
-		'theme_advanced_buttons4' => $mce_buttons_4
-	);
-	
-	foreach ( $arr as $key => $val ) {
-		if ( ! isset($initArray[$key]) )
-			$initArray[$key] = $val;
-	}
-
-	//$url = parse_url( RVY_URLPATH . '/admin/revisions-rs.css' );
-	//$initArray['content_css'] = $url['path'];
-	
-	//$initArray['skin'] = 'rvy_view_revision'; 
-	
-	return $initArray;
-}
-
-
-function rvy_tiny_mce_readonly( $initArray, $editor_id = '' ) {
-	$initArray[ 'readonly'] = 'readonly';
-	
-	return $initArray;
-}
-
 
 /**
  * Retrieve formatted date timestamp of a revision (linked to that revisions's page).
- *
- * @package WordPress
- * @subpackage Post_Revisions
- * @since 2.6.0
- *
- * @uses date_i18n()
  *
  * @param int|object $revision Revision ID or revision object.
  * @param bool $link Optional, default is true. Link to revisions's page?
@@ -292,20 +189,20 @@ function rvy_post_revision_title( $revision, $link = true, $date_field = 'post_d
 	$status_obj = get_post_status_object( $revision->post_status );
 	
 	if ( $status_obj && ( $status_obj->public || $status_obj->private ) ) {
-		$currentf  = __( '%1$s (Currently Published)', 'revisionary' );
+		$currentf  = __( '%1$s (Current)', 'revisionary' );
 		$date = sprintf( $currentf, $date );
 		
-	} elseif ( "{$revision->post_parent}-autosave" === $revision->post_name ) {
+	} elseif ( rvy_post_id($revision->ID) . "-autosave" === $revision->post_name ) {
 		$autosavef = __( '%1$s (Autosave)', 'revisionary' );
 		$date = sprintf( $autosavef, $date );
 	}
 
-	if ( in_array( $revision->post_status, array( 'inherit', 'pending' ) ) && $post && ( 'list' == $format ) && ( 'post_modified' == $date_field ) ) {
+	if ( in_array( $revision->post_status, array( 'inherit', 'pending-revision' ) ) && $post && ( 'list' == $format ) && ( 'post_modified' == $date_field ) ) {
 		if ( $post->post_date != $revision->post_date ) {
 			$datef = _x( 'j F, Y, g:i a', 'revision schedule date format', 'revisionary' );
 			$revision_date = agp_date_i18n( $datef, strtotime( $revision->post_date ) );
 		
-			if ( 'pending' == $revision->post_status ) {
+			if ( 'pending-revision' == $revision->post_status ) {
 				$currentf  = __( '%1$s <span class="rvy-revision-pubish-date">(Requested publication: %2$s)</span>', 'revisionary' );
 			} else {
 				$currentf  = __( '%1$s <span class="rvy-revision-pubish-date">(Publish date: %2$s)</span>', 'revisionary' );
@@ -360,7 +257,7 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 	// link to publish date in Edit Form metaboxes, but modification date in Revisions Manager table
 	if ( ! $date_field  ) {
 		if ( 'list' == $format ) {
-			$date_field = ( in_array( $status, array( 'inherit', 'pending' ) ) ) ? 'post_modified' : 'post_date';
+			$date_field = ( in_array( $status, array( 'inherit', 'pending-revision' ) ) ) ? 'post_modified' : 'post_date';
 			$date_field = 'post_modified';
 			$sort_field = $date_field;
 		} else {
@@ -418,17 +315,15 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 	
 	foreach ( $revisions as $revision ) {
 		if ( $status && ( $status != $revision->post_status ) ) 		 // support arg to display only past / pending / future revisions
-			if ( 'revision' == $revision->post_type )					// but always display current rev
+			if ( ('revision' == $revision->post_type) || rvy_is_revision_status($revision->post_status) )  // but always display current rev
 				continue;
-					
+		
 		if ( 'revision' === $type && wp_is_post_autosave( $revision ) )
 			continue;
 			
-		if ( $hide_others_revisions && ( 'revision' == $revision->post_type ) && ( $revision->post_author != $current_user->ID ) )
+		if ( $hide_others_revisions && ( ( 'revision' == $revision->post_type ) || rvy_is_revision_status($revision->post_status) ) && ( $revision->post_author != $current_user->ID ) )
 			continue;
-
-
-			
+		
 		// todo: set up buffering to restore this in case we (or some other plugin) impose revision-specific read capability
 		//if ( ! current_user_can( "read_{$post->post_type}", $revision->ID ) )
 		//	continue;
@@ -463,24 +358,33 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 			$datef = __awp( 'M j, Y @ g:i a' );
 			
 			if ( $post->ID != $revision->ID ) {
-				$preview_link = '<a href="' . esc_url( add_query_arg( 'preview', '1', get_post_permalink( $revision->ID ) . '&post_type=revision' ) ) . '" title="' . esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $revision->post_title ) ) . '" rel="permalink">' . __( 'Preview' ) . '</a>';
+				if ('inherit' == $revision->post_status) {
+					$preview_url = add_query_arg( 'preview', '1', get_post_permalink( $revision->ID ) . '&post_type=revision' );
+				} else {
+					$_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
+					$preview_url = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink($revision) ) );
+				}
+
+				$preview_link = '<a href="' . esc_url($preview_url) . '" title="' . esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $revision->post_title ) ) . '" rel="permalink">' . __( 'Preview' ) . '</a>';
 				
-				if ( $can_edit_post 
-				|| ( ( 'pending' == $status ) && ( $revision->post_author == $current_user->ID ) )	// allow submitters to delete their own still-pending revisions
-				 ) {
-					if ( 'future' == $status ) {
+				if ( $can_edit_post ) {
+					if ( 'future-revision' == $status ) {
 						$link = "admin.php?page=rvy-revisions&amp;action=unschedule&amp;revision={$revision->ID}";
 						$actions .= '<a href="' . wp_nonce_url( $link, 'unschedule-revision_' . $revision->ID ) . '" class="rvy-unschedule">' . __('Unschedule') . '</a>&nbsp;|&nbsp;';
 					}
 					
-					$link = "admin.php?page=rvy-revisions&amp;action=delete&amp;revision={$revision->ID}";
-					$actions .= '<a href="' . wp_nonce_url( $link, 'delete-revision_' . $revision->ID ) . '" class="rvy-delete" onclick="' . $js_delete_call . '" >' . __awp('Delete') . '</a>';
+					if ('inherit' == $status) {
+						$link = "admin.php?page=rvy-revisions&amp;action=delete&amp;revision={$revision->ID}";
+						$actions .= '<a href="' . wp_nonce_url( $link, 'delete-revision_' . $revision->ID ) . '" class="rvy-delete" onclick="' . $js_delete_call . '" >' . __awp('Delete') . '</a>';
+					}
 				}
 				
+				/*
 				if ( ( strtotime($revision->post_date_gmt) > agp_time_gmt() ) && ( 'inherit' != $revision->post_status ) )
 					$publish_date = '(' . agp_date_i18n( $datef, strtotime($revision->post_date) ) . ')';
 				else
 					$publish_date = '';
+				*/
 					
 			} else {
 				$preview_link = '<a href="' . site_url("?p={$revision->ID}&amp;mark_current_revision=1") . '" target="_blank">' . __awp( 'Preview' ) . '</a>';
@@ -499,20 +403,18 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 					$date = str_replace( '&amp;revision=', "&amp;revision_status=$status&amp;revision=", $date );
 				}
 				
-				$publish_date = agp_date_i18n( $datef, strtotime($revision->post_date) );
+				//$publish_date = agp_date_i18n( $datef, strtotime($revision->post_date) );
 			}
 
 			$rows .= "<tr$class>\n";
-			$rows .= "\t<th scope='row'><input type='radio' name='left' value='$revision->ID'$left_checked /><input type='radio' name='right' value='$revision->ID'$right_checked /></th>\n";
 			$rows .= "\t<td>$date</td>\n";
-			$rows .= "\t<td>$publish_date</td>\n";
 			$rows .= "\t<td>$preview_link</td>\n";
 			$rows .= "\t<td>$name</td>\n";
 			$rows .= "\t<td class='action-links'>$actions</td>\n";
 			if ( $post->ID != $revision->ID 
-			&& ( $can_edit_post || ( ( 'pending' == $status ) && ( $revision->post_author == $current_user->ID ) ) )	// allow submitters to delete their own still-pending revisions
+			&& ( $can_edit_post || ( ( 'pending-revision' == $status ) && ( $revision->post_author == $current_user->ID ) ) )	// allow submitters to delete their own still-pending revisions
 			) {
-				$rows .= "\t<td><input class='rvy-rev-chk' type='checkbox' name='delete_revisions[]' value='" . $revision->ID . "' /></td>\n";
+				$rows .= "\t<td style='text-align:right'><input class='rvy-rev-chk' type='checkbox' name='delete_revisions[]' value='" . $revision->ID . "' /></td>\n";
 				$can_delete_any = true;
 			} else
 				$rows .= "\t<td></td>\n";
@@ -544,16 +446,8 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 <?php
 wp_nonce_field( 'rvy-revisions' ); 
 ?>
-<div class="tablenav">
-	<div class="alignleft">
-		<input type="submit" name="rvy_compare_revs" class="button-secondary" value="<?php _e( 'Compare Selected HTML', 'revisionary' ); ?>" />
-	</div>
-</div>
-
-<br class="clear" />
 
 <table class="widefat post-revisions" cellspacing="0">
-	<col />
 	<col class="rvy-col1" />
 	<col class="rvy-col2" />
 	<col class="rvy-col3" />
@@ -561,25 +455,26 @@ wp_nonce_field( 'rvy-revisions' );
 	<col class="rvy-col5" />
 <thead>
 <tr>
-	<th scope="col"></th>
 	<th scope="col"><?php 
+/*
 switch( $status ) :
 case 'inherit' :
 	_e( 'Modified Date (click to view/restore)', 'revisionary' ); 
 	break;
-case 'pending' :
+case 'pending-revision' :
 	_e( 'Modified Date (click to view/approve)', 'revisionary' ); 
 	break;
-case 'future' :
+case 'future-revision' :
 	_e( 'Modified Date (click to view/publish)', 'revisionary' );
 	break;
 endswitch;
+*/
+_e( 'Modified Date', 'revisionary' ); 
 ?></th>
-	<th scope="col"><?php _e( 'Publish Date', 'revisionary' ); ?></th>
 	<th scope="col"></th>
 	<th scope="col"><?php echo __awp( 'Author' ); ?></th>
 	<th scope="col" class="action-links"><?php _e( 'Actions' ); ?></th>
-	<th scope="col"><input id='rvy-rev-checkall' type='checkbox' name='rvy-rev-checkall' value='' /></th>
+	<th scope="col"  style='text-align:right'><input id='rvy-rev-checkall' type='checkbox' name='rvy-rev-checkall' value='' /></th>
 </tr>
 </thead>
 <tbody>
@@ -620,29 +515,3 @@ endswitch;
 	endif; // list or table
 
 } // END FUNCTION rvy_list_post_revisions
-
-
-function rvy_revisions_js() {
-	$ajax_url = site_url( 'wp-admin/admin-ajax.php' );
-?>
-<script type="text/javascript">
-/* <![CDATA[ */
-try{convertEntities(wpAjax);}catch(e){};
-var wpListL10n = {
-	url: "<?php echo $ajax_url?>"
-};
-var postboxL10n = {
-	requestFile: "<?php echo $ajax_url?>"
-};
-var revL10n = {
-	publishOn: "<?php _e('Date as:', 'revisionary')?>",
-	publishOnFuture: "<?php _e('Schedule for:', 'revisionary')?>",
-	publishOnPast: "<?php _e('Published on:', 'revisionary')?>",
-	privatelyPublished: "<?php _e('Privately Published:', 'revisionary')?>",
-	published: "<?php _e('Published:', 'revisionary')?>",
-	unsavedDate: "<?php _e('Unsaved Date Selection:', 'revisionary')?>"
-};
-/* ]]> */
-</script>
-<?php	
-} // end function rvy_revisions_js

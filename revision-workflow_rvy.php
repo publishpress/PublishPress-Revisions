@@ -4,7 +4,7 @@ class Rvy_Revision_Workflow_UI {
     function do_notifications( $notification_type, $status, $post_arr, $args ) {
         global $revisionary;
         
-        if ( 'pending' != $notification_type ) {
+        if ( 'pending-revision' != $notification_type ) {
             return;
         }
 
@@ -40,10 +40,12 @@ class Rvy_Revision_Workflow_UI {
                 }
 
                 if ( $revision_id ) {
-                    $preview_link = add_query_arg( array( 'preview' => '1', 'post_type' => 'revision' ), get_post_permalink( $revision_id ) );
+                    $preview_link = add_query_arg( array( 'preview' => '1', 'rvy_revision' => true ), get_post_permalink( $revision_id ) );
                     $message .= __( 'Preview and Approval: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
 
-                    $message .= __( 'Management Screen: ', 'revisionary' ) . admin_url("admin.php?page=rvy-revisions&action=view&revision={$revision_id}") . "\r\n";
+                    //$message .= __( 'Management Screen: ', 'revisionary' ) . admin_url("admin.php?page=rvy-revisions&action=view&revision={$revision_id}") . "\r\n";
+                    
+                    $message .= __( 'Edit Revision: ', 'revisionary' ) . admin_url("post.php?action=edit&post={$revision_id}") . "\r\n";
                 }
 
                 // establish the publisher recipients
@@ -137,7 +139,8 @@ class Rvy_Revision_Workflow_UI {
             $msg = __('Sorry, an error occurred while attempting to save your revision.', 'revisionary'); 
         } else {
             if ( is_scalar ( $revision ) ) {
-                $revision = wp_get_post_revision( $revision );
+                //$revision = wp_get_post_revision( $revision );
+                $revision = get_post($revision);
             }
 
             if ( ! $post_arr ) {
@@ -145,7 +148,7 @@ class Rvy_Revision_Workflow_UI {
             }
 
             if ( ! $post_id ) {
-                $post_id = $revision->post_parent;
+                $post_id = rvy_post_id($revision->ID);
             }
 
             if ( ! $object_type ) {
@@ -161,26 +164,31 @@ class Rvy_Revision_Workflow_UI {
             $manage_link = $this->get_manage_link( $object_type );
             
             switch( $revision->post_status ) {
-            case 'future':
+            case 'future-revision':
                 delete_post_meta( $post_id, "_new_scheduled_revision_{$current_user->ID}" );  // clear the flag which triggered a redirect from Gutenberg editor
 
                 $msg = __('Your modification was saved as a Scheduled Revision.', 'revisionary') . ' ';
             
-                $preview_link = add_query_arg( array( 'preview' => '1', 'post_type' => 'revision' ), get_post_permalink( $revision->ID ) );
+                $_arg = ('page' == $revision->post_type) ? 'page_id=' : 'p=';
+                $preview_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $revision ) ) );
 			   
                 $msg .= '<ul><li>';
                 $msg .= sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link );
                 $msg .= '<br /><br /></li><li>';
-                $msg .= sprintf( '<a href="%s">' . __('Go to Revisions Manager', 'revisionary') . '</a>', "admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=view" );
+                //$msg .= sprintf( '<a href="%s">' . __('Go to Revisions Manager', 'revisionary') . '</a>', "admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=view" );
+                //$msg .= '<br /><br /></li><li>';
+                $msg .= sprintf( '<a href="%s">' . __('Keep editing the revision', 'revisionary') . '</a>', "post.php?post={$revision->ID}&amp;action=edit" );
                 $msg .= '<br /><br /></li><li>';
                 $msg .= sprintf( '<a href="%s">' . __('Go back to schedule another revision', 'revisionary') . '</a>', "javascript:history.back(1);" );
+                $msg .= '<br /><br /></li><li>';
+                $msg .= sprintf( '<a href="%s">' . __('View Revision Queue', 'revisionary') . '</a>', "admin.php?page=revisionary-q&published_post=$post_id" );
                 $msg .= '<br /><br /></li><li>';
                 $msg .= sprintf( '<a href="%s">' . $manage_link->caption . '</a>', admin_url($manage_link->uri) );
                 $msg .= '</li></ul>';
 
                 break;
 
-            case 'pending':
+            case 'pending-revision':
             default:
                 $msg = __('Your modification has been saved for editorial review.', 'revisionary') . ' <br /><br />';
                 
@@ -190,18 +198,24 @@ class Rvy_Revision_Workflow_UI {
                     $msg .= __('It will be published when an editor approves it.', 'revisionary') . ' ';
                 }
 
-                $preview_link = add_query_arg( array( 'preview' => '1', 'post_type' => 'revision' ), get_post_permalink( $revision->ID ) );
+                $_arg = ('page' == $revision->post_type) ? 'page_id=' : 'p=';
+                $preview_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $revision ) ) );
 
                 $msg .= '<ul><li>';
                 $msg .= sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link );
                 $msg .= '<br /><br /></li><li>';
-                $msg .= sprintf( '<a href="%s">' . __('Go to Revisions Manager', 'revisionary') . '</a>', "admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=view" );
+                //$msg .= sprintf( '<a href="%s">' . __('Go to Revisions Manager', 'revisionary') . '</a>', "admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=view" );
+                //$msg .= '<br /><br /></li><li>';
+                $msg .= sprintf( '<a href="%s">' . __('Keep editing the revision', 'revisionary') . '</a>', "post.php?post={$revision->ID}&amp;action=edit" );
                 $msg .= '<br /><br /></li><li>';
-                        
+                
                 if ( $future_date ) {
                     $msg .= sprintf( '<a href="%s">' . __('Go back to submit another revision', 'revisionary') . '</a>', "javascript:history.back(1);" );
                     $msg .= '<br /><br /></li><li>';
                 }
+
+                $msg .= sprintf( '<a href="%s">' . __('View Revision Queue', 'revisionary') . '</a>', "admin.php?page=revisionary-q&published_post=$post_id" );
+                $msg .= '<br /><br /></li><li>';
 
                 $msg .= sprintf( '<a href="%s">' . $manage_link->caption . '</a>', admin_url($manage_link->uri) );
                 $msg .= '</li></ul>';

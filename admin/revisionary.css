@@ -2,6 +2,7 @@
  * This file is licensed under the GNU GPL.
  */
 
+
 #submitdiv a.now-timestamp {
 margin-left:10px;
 }
@@ -50,12 +51,16 @@ color: blue;
 background-color: #FFFEEB;
 }
 
+.rs-settings {
+background-color: #FFFEEB;
+}
+
 .rs-backgray {
-background-color: #E8E8E8;
+background-color: #d8d8d8;
 }
 
 .rs-backgreen {
-background-color: #E8FFE8;
+background-color: #CDD7BA;
 }
 
 .rs-options {
@@ -83,13 +88,14 @@ padding: 0.2em 0.5em 0.2em 0.5em;
 border: none;	
 }
 
-.agp-selected_agent {
+#wpbody-content .agp-selected_agent {
 border-left: 1px solid #ccc;
 border-right: 1px solid #ccc;
 border-top: 1px solid #ccc;
+border-bottom: none;
 }
 	
-.agp-selected_agent a{
+#wpbody-content .agp-selected_agent a{
 color: black;
 text-decoration: none;
 font-weight: bold;
@@ -234,10 +240,18 @@ width: 100%;
 }
 
 #rs-admin_table tr, #rs-realm_table tr, #realm_adjustments tr, #rs-advanced_table tr {
-background-color: #CFEBF7;
+background-color: #f1f1f1;
 border-bottom: 4px solid #FFFEEB;
 }
 
+.rs-backgreen #rs-admin_table tr, .rs-backgreen #rs-realm_table tr, .rs-backgreen #realm_adjustments tr, .rs-backgreen #rs-advanced_table tr {
+border-bottom: 4px solid #CDD7BA;
+}
+
+.rs-backgray #rs-admin_table tr, .rs-backgray #rs-realm_table tr, .rs-backgray #realm_adjustments tr, .rs-backgray #rs-advanced_table tr {
+border-bottom: 4px solid #d8d8d8;
+}
+    
 #rs-admin_table tr td, #rs-realm_table tr td, #realm_adjustments tr td, #rs-advanced_table tr td {
 padding: 1em 0 1em 0;
 }
@@ -248,7 +262,7 @@ font-weight: bold;
 
 .rs-form-table tr th span a {
 color: #333;
-background-color: #CFEBF7;
+background-color: #eee;
 }
 
 .rs-optionhint {
@@ -395,6 +409,14 @@ width: 99%;
 vertical-align: top;
 }
 
+body.toplevel_page_revisionary-q h1 span.dashicons, body.revisions_page_revisionary-settings h1 span.dashicons, body.revisions_page_rvy-net_options h1 span.dashicons, body.revisions_page_rvy-default_options h1 span.dashicons {
+padding-top:5px;
+}
+
+body.revisions_page_revisionary-settings div.submit, body.revisions_page_rvy-net_options div.submit, body.revisions_page_rvy-default_options div.submit {
+padding-top:0;
+}
+
 body.admin_page_rvy-revisions table.diff td, table.diff th {
 max-width: 400px;
 }
@@ -458,4 +480,38 @@ margin-right:120px;
 }
 #rvy_dashboard_message, .rvy-admin-notice, .rvy-admin-notice-plugin{
 padding:10px;	
+}
+
+span.rvy-requested-date {
+color: #aaa;
+font-style: italic;
+}
+
+.pressshack-admin-wrapper p.submit {
+padding-bottom:0;
+}
+
+.pressshack-admin-wrapper .button-primary {
+text-shadow: none;
+}
+
+#wpbody-content .pressshack-admin-wrapper > footer > div.pp-rating {
+margin-top:5px;
+}
+
+div.revision-q .column-author, div.revision-q .column-date, div.revision-q .column-parent, div.revision-q .column-posts {
+width:auto;
+}
+
+#revisions-pro-descript {
+    border-width: 1px;
+    border-style: solid;
+    padding: 5px;
+    margin: 0 10px 10px 0;
+    -moz-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    background-color: #ffffe0;
+    border-color: #e6db55;
 }

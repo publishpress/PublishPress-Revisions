@@ -3,7 +3,7 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 	die();
 
 /**
- * @package     Revisionary\RevisionaryOptions
+ * @package     PublishPress\Revisions\RevisionaryOptions
  * @author      PublishPress <help@publishpress.com>
  * @copyright   Copyright (c) 2019 PublishPress. All rights reserved.
  * @license     GPLv2 or later
@@ -29,6 +29,8 @@ function rvy_default_options_sitewide() {
 		'require_edit_others_drafts' => true,
 		'diff_display_strip_tags' => false,
 		'scheduled_revision_update_post_date' => true,
+		'pending_revision_update_post_date' => true,
+		'edd_key' => true,
 	);
 
 	if ( $other_options = array_diff_key( rvy_default_options(), $def ) ) {
@@ -57,6 +59,8 @@ function rvy_default_options() {
 		'require_edit_others_drafts' => 1,
 		'diff_display_strip_tags' => 0,
 		'scheduled_revision_update_post_date' => 1,
+		'pending_revision_update_post_date' => 0,
+		'edd_key' => '',
 	);
 
 	return $def;

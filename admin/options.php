@@ -2,7 +2,6 @@
 if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 	die( 'This page cannot be called directly.' );
 
-
 class RvyOptionUI {
 	var $sitewide;
 	var $customize_defaults;
@@ -57,12 +56,16 @@ class RvyOptionUI {
 		return $return;
 	}
 }
-	
+
 	
 function rvy_options( $sitewide = false, $customize_defaults = false ) {
 
 if ( ! current_user_can( 'manage_options' ) || ( $sitewide && ! is_super_admin() ) )
 	wp_die(__awp('Cheatin&#8217; uh?'));
+
+?>
+<div class="wrap pressshack-admin-wrapper">
+<?php
 
 if ( $sitewide )
 	$customize_defaults = false;	// this is intended only for storing custom default values for site-specific options
@@ -77,27 +80,33 @@ $ui->tab_captions = array( 'features' => __( 'Settings', 'revisionary' ), 'optsc
 
 $ui->section_captions = array(
 	'features' => array(
-		'role_definition' => __('Role Definition', 'revisionary'),
-		'revisions'		=> __('Revisions', 'revisionary'),
-		'notification'	=> __('Email Notification', 'revisionary')
+		'role_definition' 	  	=> __('Role Definition', 'revisionary'),
+		'scheduled_revisions' 	=> __('Scheduled Revisions', 'revisionary'),
+		'pending_revisions'		=> __('Pending Revisions', 'revisionary'),
+		'revisions'				=> __('Revision Options', 'revisionary'),
+		'notification'			=> __('Email Notification', 'revisionary')
 	)
 );
 
+if (defined('REVISIONARY_PRO_VERSION')) {
+	$ui->section_captions = ['license' => __('License Key', 'revisionary')] + $ui->section_captions;
+}
 
 // TODO: replace individual _e calls with these (and section, tab captions)
 $ui->option_captions = array(
-	'pending_revisions' => __('Pending Revisions', 'revisionary'),
-	'scheduled_revisions' => __('Scheduled Revisions', 'revisionary'),
+	'pending_revisions' => __('Enable Pending Revisions', 'revisionary'),
+	'scheduled_revisions' => __('Enable Scheduled Revisions', 'revisionary'),
 	'revisor_lock_others_revisions' => __("Prevent Revisors from editing others&apos; revisions", 'revisionary'),
 	'diff_display_strip_tags' => __('Strip html tags out of difference display', 'revisionary'),
 	'async_scheduled_publish' => __('Asynchronous Publishing', 'revisionary'),
 	'scheduled_revision_update_post_date' => __('Update Publish Date', 'revisionary'),
+	'pending_revision_update_post_date' => __('Update Publish Date', 'revisionary'),
 	'pending_rev_notify_author' => __('Email original Author when a Pending Revision is submitted', 'revisionary'),
 	'rev_approval_notify_author' => __('Email the original Author when a Pending Revision is approved', 'revisionary'),
 	'rev_approval_notify_revisor' => __('Email the Revisor when a Pending Revision is approved', 'revisionary'),
 	'publish_scheduled_notify_author' => __('Email the original Author when a Scheduled Revision is published', 'revisionary'),
 	'publish_scheduled_notify_revisor' => __('Email the Revisor when a Scheduled Revision is published', 'revisionary'),
-	'revisor_role_add_custom_rolecaps' => __('Include capabilities for all custom post types in the WordPress Revisor role', 'revisionary' ),
+	'revisor_role_add_custom_rolecaps' => __('All custom post types available to Revisors', 'revisionary' ),
 	'require_edit_others_drafts' => __('Prevent Revisors from editing other user&apos;s drafts', 'revisionary' ),
 	'display_hints' => __('Display Hints'),
 );
@@ -113,12 +122,14 @@ if ( defined('RVY_CONTENT_ROLES') ) {
 
 $ui->form_options = array( 
 'features' => array(
-	'role_definition' => 	array( 'revisor_role_add_custom_rolecaps', 'require_edit_others_drafts' ),
-	'revisions'		=>		array( 'scheduled_revisions', 'pending_revisions', 'revisor_lock_others_revisions', 'diff_display_strip_tags', 'async_scheduled_publish', 'scheduled_revision_update_post_date', 'display_hints' ),
-	'notification'	=>		array( 'pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor' )
+	'license' =>			 array( 'edd_key' ),
+	'role_definition' => 	 array( 'revisor_role_add_custom_rolecaps', 'require_edit_others_drafts' ),
+	'scheduled_revisions' => array( 'scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date', ),
+	'pending_revisions'	=> 	 array( 'pending_revisions', 'pending_revision_update_post_date', ),
+	'revisions'		=>		 array( 'revisor_lock_others_revisions', 'diff_display_strip_tags', 'display_hints' ),
+	'notification'	=>		 array( 'pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor' )
 )
 );
-
 
 if ( RVY_NETWORK ) {
 	if ( $sitewide )
@@ -140,7 +151,8 @@ if ( RVY_NETWORK ) {
 				unset( $ui->form_options[$tab_name][$section_name] );
 }
 ?>
-<div class='wrap'>
+<header>
+<!-- <div class='wrap'> -->
 <?php
 echo '<form action="" method="post">';
 wp_nonce_field( 'rvy-update-options' );
@@ -155,14 +167,17 @@ if ( $customize_defaults )
 <table width = "100%"><tr>
 <td width = "90%">
 <h1><?php 
+
+echo '<span class="dashicons dashicons-backup"></span>&nbsp;';
+
 if ( $sitewide )
-	_e('Revisionary Network Settings', 'revisionary');
+	_e('PublishPress Revisions Network Settings', 'revisionary');
 elseif ( $customize_defaults )
-	_e('Revisionary Network Defaults', 'revisionary');
+	_e('PublishPress Revisions Network Defaults', 'revisionary');
 elseif ( RVY_NETWORK )
-	_e('Revisionary Site Settings', 'revisionary');
+	_e('PublishPress Revisions Site Settings', 'revisionary');
 else
-	_e('Revisionary Settings', 'revisionary');
+	_e('PublishPress Revisions Settings', 'revisionary');
 ?>
 </h1>
 </td>
@@ -172,32 +187,35 @@ else
 </div>
 </td>
 </tr></table>
+
+</header>
+
 <?php
 if ( $sitewide ) {
-	$color_class = 'rs-backgreen';
+	$color_class = 'rs-backgray';
 	
 } elseif ( $customize_defaults ) {
-	$color_class = 'rs-backgray';
+	$color_class = 'rs-backgreen';
 	echo '<p style="margin-top:0">';
 	_e( 'These are the <strong>default</strong> settings for options which can be adjusted per-site.', 'revisionary' );
 	echo '</p>';
 	
 } else
-	$color_class = 'rs-backtan';
+	$color_class = 'rs-settings';
 
 if ( $sitewide || $customize_defaults ) {
 	$class_selected = "agp-selected_agent agp-agent $color_class";
 	$class_unselected = "agp-unselected_agent agp-agent";
 
 	// todo: prevent line breaks in these links
-	$js_call = "agp_swap_display('rs-features', 'rs-optscope', 'rvy_show_features', 'rvy_show_optscope', '$class_selected', '$class_unselected');";
+	$js_call = "agp_swap_display('rvy-features', 'rvy-optscope', 'rvy_show_features', 'rvy_show_optscope', '$class_selected', '$class_unselected');";
 	echo "<ul class='rs-list_horiz' style='margin-bottom:-0.1em'>"
 		. "<li class='$class_selected'>"
 		. "<a id='rvy_show_features' href='javascript:void(0)' onclick=\"$js_call\">" . $ui->tab_captions['features'] . '</a>'
 		. '</li>';
 
 	if ( $sitewide ) {
-		$js_call = "agp_swap_display('rs-optscope', 'rs-features', 'rvy_show_optscope', 'rvy_show_features', '$class_selected', '$class_unselected');";
+		$js_call = "agp_swap_display('rvy-optscope', 'rvy-features', 'rvy_show_optscope', 'rvy_show_features', '$class_selected', '$class_unselected');";
 		echo "<li class='$class_unselected'>"
 			. "<a id='rvy_show_optscope' href='javascript:void(0)' onclick=\"$js_call\">" . $ui->tab_captions['optscope'] . '</a>'
 			. '</li>';
@@ -209,7 +227,7 @@ if ( $sitewide || $customize_defaults ) {
 // ------------------------- BEGIN Features tab ---------------------------------
 
 $tab = 'features';
-echo "<div id='rs-features' style='clear:both;margin:0' class='rs-options $color_class'>";
+echo "<div id='rvy-features' style='clear:both;margin:0' class='rs-options $color_class'>";
 	
 if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 	echo '<div class="rs-optionhint publishpress-headline"><span>';
@@ -217,20 +235,16 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 	if ( $sitewide ) {
 		global $rvy_options_sitewide, $rvy_default_options;
 		$site_defaults_caption = ( count( $rvy_options_sitewide ) < count( $rvy_default_options ) ) ? sprintf( __( 'You can also specify %1$sdefaults for site-specific settings%2$s.', 'revisionary' ), '<a href="admin.php?page=rvy-default_options">', '</a>' ) : '';
-		printf( __('Use this tab to make <strong>NETWORK-WIDE</strong> changes to Revisionary settings. %s', 'revisionary'), $site_defaults_caption );
+		printf( __('Use this tab to make <strong>NETWORK-WIDE</strong> changes to PublishPress Revisions settings. %s', 'revisionary'), $site_defaults_caption );
 	} elseif ( $customize_defaults ) {
 		_e('Here you can change the default value for settings which are controlled separately on each site.', 'revisionary');
-	} else {
-		/*
-		_e('This page enables <strong>optional</strong> adjustment of Revisionary\'s features. For most installations, the default settings are fine.', 'revisionary');
-		*/
 	}
 
 	if ( RVY_NETWORK && is_super_admin() ) {
 		if ( ! $sitewide ) {
 			global $blog_id;
 			if ( 1 == $blog_id ) {
-				$link_open = "<a href='admin.php?page=rvy-site_options'>";
+				$link_open = "<a href='admin.php?page=rvy-net_options'>";
 				$link_close = '</a>';
 			} else {
 				$link_open = '';
@@ -242,12 +256,9 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 	}
 	?>
 	</span>
-	<span class="publishpress-thanks"> <?php printf( __( 'Thanks for using the %1$sPublishPress%2$s family of professional publishing tools.', 'capsman-enhanced'), '<a href="https://publishpress.com/" target="_blank">', '</a>' );?></span>
+
 	</div>
 	<?php
-
-	$message = __( '<strong>Getting Started:</strong> To allow a user to submit Revisions to your published posts and pages, set their role to "Revisor"', 'revisionary' );
-	rvy_dismissable_notice( 'intro_revisor_role_settings', $message );
 }
 
 $table_class = 'form-table rs-form-table';
@@ -258,6 +269,12 @@ $table_class = 'form-table rs-form-table';
 <?php
 // possible TODO: replace redundant hardcoded IDs with $id
 
+	if (defined('REVISIONARY_PRO_VERSION')) {
+		require_once(RVY_ABSPATH . '/includes-pro/SettingsLicense.php');
+		$license_ui = new RevisionaryLicenseSettings();
+		$license_ui->display($sitewide, $customize_defaults);
+	}
+
 	$section = 'role_definition';			// --- ROLE DEFINITION SECTION ---
 
 	if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
@@ -266,7 +283,8 @@ $table_class = 'form-table rs-form-table';
 		</th><td>
 		
 		<?php 
-		$ui->option_checkbox( 'revisor_role_add_custom_rolecaps', $tab, $section, '', '' );
+		$hint = __('The user role "Revisor" role is now available. Include capabilities for all custom post types in this role?', 'revisor');
+		$ui->option_checkbox( 'revisor_role_add_custom_rolecaps', $tab, $section, $hint, '' );
 		?>
 		
 		<?php
@@ -277,9 +295,56 @@ $table_class = 'form-table rs-form-table';
 		</td></tr>
 	<?php endif; // any options accessable in this section
 
-
 $pending_revisions_available = ! RVY_NETWORK || $sitewide || empty( $rvy_options_sitewide['pending_revisions'] ) || rvy_get_option( 'pending_revisions', true );
 $scheduled_revisions_available = ! RVY_NETWORK || $sitewide || empty( $rvy_options_sitewide['scheduled_revisions'] ) || rvy_get_option( 'scheduled_revisions', true );
+
+if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
+$scheduled_revisions_available ) :
+
+	$section = 'scheduled_revisions';			// --- SCHEDULED REVISIONS SECTION ---
+
+	if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
+		<tr valign="top"><th scope="row">
+		<?php echo $ui->section_captions[$tab][$section]; ?>
+		</th><td>
+		
+		<?php 
+		$hint = __( 'If a currently published post or page is edited and a future date set, the change will not be applied until the selected date.', 'revisionary' );
+		$ui->option_checkbox( 'scheduled_revisions', $tab, $section, $hint, '' );
+		
+		$hint = __( 'When a scheduled revision is published, also update the publish date.', 'revisionary' );
+		$ui->option_checkbox( 'scheduled_revision_update_post_date', $tab, $section, $hint, '' );
+
+		$hint = __( 'Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
+		$ui->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
+		?>
+		</td></tr>
+	<?php endif; // any options accessable in this section
+endif;
+
+if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
+$pending_revisions_available ) :
+	$section = 'pending_revisions';			// --- PENDING REVISIONS SECTION ---
+
+	if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
+		<tr valign="top"><th scope="row">
+		<?php echo $ui->section_captions[$tab][$section]; ?>
+		</th><td>
+		
+		<?php 
+		$hint = sprintf(
+			__( 'Enable Contributors to submit revisions to their own published content. Revisors and users who have the edit_others (but not edit_published) capability for the post type can submit revisions to other user\'s content. These Pending Revisions are listed in %sRevision Queue%s.', 'revisionary' ),
+			"<a href='" . admin_url('admin.php?page=revisionary-q') . "'>",
+			'</a>'	
+		);
+		$ui->option_checkbox( 'pending_revisions', $tab, $section, $hint, '' );
+		
+		$hint = __( 'When a pending revision is published, also update the publish date.', 'revisionary' );
+		$ui->option_checkbox( 'pending_revision_update_post_date', $tab, $section, $hint, '' );
+		?>
+		</td></tr>
+	<?php endif; // any options accessable in this section
+endif;
 
 if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
 $pending_revisions_available || $scheduled_revisions_available ) :
@@ -291,28 +356,25 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		<?php echo $ui->section_captions[$tab][$section]; ?>
 		</th><td>
 		
-		<?php 
-		$hint = __( 'If a currently published post or page is edited and a future date set, the change will not be applied until the selected date.', 'revisionary' );
-		$ui->option_checkbox( 'scheduled_revisions', $tab, $section, $hint, '' );
-		
-		echo "<div style='display:margin-top: 1em;margin-left:2em;'>";	
-		$hint = __( 'When a scheduled revision is published, also update the publish date.', 'revisionary' );
-		$ui->option_checkbox( 'scheduled_revision_update_post_date', $tab, $section, $hint, '' );
+		<?php
+		if (!defined('REVISIONARY_PRO_VERSION')) :
+		$descript = sprintf(
+			__('For compatibility with Advanced Custom Fields, Beaver Builder and WPML, upgrade to <a href="%s" target="_blank">PublishPress Revisions Pro</a>.', 'revisionary'),
+			'https://publishpress.com/revisionary/'
+		);
+		?>
 
-		$hint = __( 'Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
-		$ui->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '<br />' );
-		echo '</div>';
-		
-		$hint = __( 'Enable some users to submit a revision for an existing published post or page which they cannot otherwise edit.  Contributors can submit revisions to their own published content, and users who have the edit_others (but not edit_published) capability for the post type can submit revisions to other user\'s content.<br /><br />These Pending Revisions are listed alongside regular pending content, but link to a Revisions management form.  There the pending revision can be viewed, compared to other revisions, and approved or deleted by qualified editors.  If the submitter set a future publish date, approval schedules delayed publication of the revised content.', 'revisionary' );
-		$ui->option_checkbox( 'pending_revisions', $tab, $section, $hint, '<br />' );
-		
+		<div id="revisions-pro-descript" class="activating"><?php echo $descript; ?></div>
+		<?php endif;?>
+
+		<?php 
 		$hint = '';
 		$ui->option_checkbox( 'revisor_lock_others_revisions', $tab, $section, $hint, '' );
 		
 		$hint = '';
 		$ui->option_checkbox( 'diff_display_strip_tags', $tab, $section, $hint, '' );
 
-		$hint = __( 'Show descriptive captions for Revisionary settings', 'revisionary' );
+		$hint = __( 'Show descriptive captions for PublishPress Revisions settings', 'revisionary' );
 		$ui->option_checkbox( 'display_hints', $tab, $section, $hint, '' );
 		?>
 		</td></tr>
@@ -402,13 +464,26 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 					if ( defined('RVY_CONTENT_ROLES') )
 						_e('Note: "by default" means Pending Revision creators can customize email notification recipients before submitting.  Eligibile "Publisher" email recipients are members of the Pending Revision Monitors group who <strong>also</strong> have the ability to publish the revision.  If not explicitly defined, the Monitors group is all users with a primary WP role of Administrator or Editor.', 'revisionary');
 					else
-						printf( __('Note: "by default" means Pending Revision creators can customize email notification recipients before submitting.  For more flexibility in moderation and notification, install the %1$s Press Permit%2$s plugin.', 'revisionary'), "<a href='https://presspermit.com'>", '</a>' );
+						printf( __('Note: "by default" means Pending Revision creators can customize email notification recipients before submitting.  For more flexibility in moderation and notification, install the %1$s PressPermit Pro%2$s plugin.', 'revisionary'), "<a href='https://publishpress.com/presspermit/'>", '</a>' );
 					echo '</div>';
 				}
 			}
 		}
+
 		?>
 		</td></tr>
+		<!--
+		<tr valign="top"><th scope="row">
+		<?php _e('Documentation', 'revisionary') ?>
+		</th></td>
+		<td>
+		<p>
+		<?php
+		/* echo rvy_intro_message(true); */
+		?>
+		</p>
+		</td></tr>
+		-->
 	<?php endif; // any options accessable in this section
 	
 endif;
@@ -427,17 +502,19 @@ $tab = 'optscope';
 
 if ( $sitewide ) : ?>
 <?php
-echo "<div id='rs-optscope' style='clear:both;margin:0' class='rs-options agp_js_hide $color_class'>";
+echo "<div id='rvy-optscope' style='clear:both;margin:0' class='rs-options agp_js_hide $color_class'>";
 
 echo '<ul>';
 $all_movable_options = array();
 
 $option_scope_stamp = __( 'network-wide control of "%s"', 'revisionary' );
 
+unset($available_form_options['features']['license']);
+
 foreach ( $available_form_options as $tab_name => $sections ) {
 	echo '<li>';
 	
-	$explanatory_caption = __( 'Specify which Revisionary Settings to control network-wide. Unselected settings are controlled separately on each site.', 'revisionary' );
+	$explanatory_caption = __( 'Specify which PublishPress Revisions Settings to control network-wide. Unselected settings are controlled separately on each site.', 'revisionary' );
 
 	if ( isset( $ui->tab_captions[$tab_name] ) )
 		$tab_caption = $ui->tab_captions[$tab_name];
@@ -527,9 +604,16 @@ $js_call = "javascript:if (confirm('$msg')) {return true;} else {return false;}"
 <input type="submit" name="rvy_defaults" value="<?php _e('Revert to Defaults', 'revisionary') ?>" onclick="<?php echo $js_call;?>" />
 </p>
 </form>
-<p style='clear:both'>
-</p>
+<p style='clear:both'></p>
+
+<?php 
+global $revisionary;
+$revisionary->admin->publishpressFooter();
+?>
+
 </div>
+
+<!--</div>-->
 
 <?php
 } // end function

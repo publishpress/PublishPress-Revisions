@@ -6,7 +6,7 @@ class RvyError {
 		/*
 		switch( $err ) {
 			case 'old_php' :
-				$this->add_notice('Sorry, Revisionary requires PHP 5.4 or higher. Please upgrade your server or deactivate Revisionary.');
+				$this->add_notice('Sorry, PublishPress Revisions requires PHP 5.4 or higher. Please upgrade your server or deactivate PublishPress Revisions.');
 				break;
 			
 			default :
