@@ -22,15 +22,7 @@ addLoadEvent(function() {
 	agp_display_marked_elements('ul', 'agp_js_show', 'block');
 	agp_display_marked_elements('li', 'agp_js_hide', 'none');
 	agp_display_marked_elements('li', 'agp_js_show', 'block');
-
-	maybe_hide_quickedit('rs_hide_quickedit');
 });
-
-function maybe_hide_quickedit(flag_id) {
-	var got_flag = document.getElementById(flag_id);
-	if ( got_flag )
-		agp_setcss('.editinline', 'display', 'none');
-}
 
 function agp_display_marked_elements(tag_name, class_name, display_mode) {
 	var elems = document.getElementsByTagName(tag_name);
@@ -173,43 +165,4 @@ function agp_check_by_name(elem_name, check_it, visibility_check, click_event, r
 			}
 		}
 	}
-}
-
-function agp_setcss(class_name,set_property,set_display){
-	var rule_exists = false;
-	
-	num_sheets = document.styleSheets.length;
-	for (var i = 0; i < num_sheets; i++) {
-		sheet = document.styleSheets[i];
-		if (sheet.rules) {
-			sheet_length = sheet.rules.length;
-			for (var r = 0; r < sheet_length; r++) {
-				if (sheet.rules[r].selectorText == class_name) {
-					if ( sheet.rules[r].style[set_property] ) {
-						if ( sheet.rules[r].style[set_property] != set_display )
-							sheet.rules[r].style[set_property] = set_display;
-						rule_exists = true;
-					}
-				}
-			}
-		}
-		else if (sheet.cssRules) {
-			sheet_length = sheet.cssRules.length;
-			for (var r = 0; r < sheet_length; r++) {
-				if (sheet.cssRules[r].selectorText == class_name) {
-					if ( sheet.cssRules[r].style[set_property] ) {
-						if ( sheet.cssRules[r].style[set_property] != set_display )
-							sheet.cssRules[r].style[set_property] = set_display;
-						rule_exists = true;
-					}
-				}
-			}
-		}
-		
-		/* Rule insertion code by Shawn Olson
-		http://www.shawnolson.net/a/503/altering-css-class-attributes-with-javascript.html */
-		if(! rule_exists){if(sheet.insertRule){sheet.insertRule(class_name+" { "+set_property+": "+set_display+"; }",sheet_length)}else{if(sheet.addRule){sheet.addRule(class_name,set_property+": "+set_display+";")}}}
-	}
-	
-	return null;
 }

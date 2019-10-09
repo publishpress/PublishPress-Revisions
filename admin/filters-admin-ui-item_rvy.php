@@ -52,6 +52,19 @@ class RevisionaryAdminFiltersItemUI {
 <?php
 global $revisionary;
 if ( ! $revisionary->isBlockEditorActive() ) :?>
+	<?php if (rvy_is_revision_status($post->post_status)):?>
+<script type="text/javascript">
+/* <![CDATA[ */
+jQuery(document).ready( function($) {
+	$('#publish').val("<?php _e('Publish Revision', 'revisionary' )?>");
+	postL10n.update = "<?php _e('Save Revision', 'revisionary' )?>";
+	postL10n.schedule = "<?php _e('Publish Scheduled Revision', 'revisionary' )?>";
+	var rvyNowCaption = "<?php _e( 'Current Time', 'revisionary' );?>";
+	$('#publishing-action #publish').show();
+});
+/* ]]> */
+</script>
+	<?php else: ?>
 <script type="text/javascript">
 /* <![CDATA[ */
 jQuery(document).ready( function($) {
@@ -63,6 +76,7 @@ jQuery(document).ready( function($) {
 });
 /* ]]> */
 </script>
+	<?php endif;?>
 <?php endif;?>
 
 <style>
@@ -123,11 +137,11 @@ div.num-revisions, #post-preview{ display:none; }
 					// Remove Scheduled / Pending Revisions metabox if none will be listed
 					// If a listing does exist, buffer it for subsequent display
 					if ( 'pending_revisions' == $box_id ) {
-						if ( ! $object_id || ! $this->pending_revisions = rvy_list_post_revisions( $object_id, 'pending', array( 'format' => 'list', 'parent' => false, 'echo' => false ) ) )
+						if ( ! $object_id || ! $this->pending_revisions = rvy_list_post_revisions( $object_id, 'pending-revision', array( 'format' => 'list', 'parent' => false, 'echo' => false ) ) )
 							unset( $wp_meta_boxes[$object_type][$context][$priority][$box_id] );
 					
 					} elseif ( 'future_revisions' == $box_id ) {
-						if ( ! $object_id || ! $this->future_revisions = rvy_list_post_revisions( $object_id, 'future', array( 'format' => 'list', 'parent' => false, 'echo' => false ) ) )
+						if ( ! $object_id || ! $this->future_revisions = rvy_list_post_revisions( $object_id, 'future-revision', array( 'format' => 'list', 'parent' => false, 'echo' => false ) ) )
 							unset( $wp_meta_boxes[$object_type][$context][$priority][$box_id] );
 							
 					// Remove Revision Notification List metabox if this user is NOT submitting a pending revision

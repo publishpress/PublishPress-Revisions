@@ -1,13 +1,11 @@
 <?php
 /**
- * @package     Revisionary\RevisionaryAdmin
+ * @package     PublishPress\Revisions\RevisionaryAdmin
  * @author      PublishPress <help@publishpress.com>
  * @copyright   Copyright (c) 2019 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
  */
-
-// menu icons by Jonas Rask: http://www.jonasraskdesign.com/
 
 // @todo: separate out functions specific to Classic Editor
 
@@ -19,24 +17,24 @@ define ('RVY_URLPATH', $wp_content . '/plugins/' . RVY_FOLDER);
 
 class RevisionaryAdmin
 {
-	var $tinymce_readonly;
-
 	var $revision_save_in_progress;
-	
+	var $post_revision_count = array();
+	var $hide_quickedit = array();
+
 	function __construct() {
-		global $pagenow;
+		global $pagenow, $post;
 
 		$script_name = $_SERVER['SCRIPT_NAME'];
 		$request_uri = $_SERVER['REQUEST_URI'];
 		
 		add_action('admin_head', array(&$this, 'admin_head'));
-		
+		add_action('admin_enqueue_scripts', array(&$this, 'admin_scripts'));
+
 		if ( ! defined('XMLRPC_REQUEST') && ! strpos($script_name, 'p-admin/async-upload.php' ) ) {
 			global $blog_id;
 			if ( RVY_NETWORK && ( 1 == $blog_id ) ) {
 				require_once( dirname(__FILE__).'/admin_lib-mu_rvy.php' );
-				add_action('network_admin_menu', 'rvy_mu_site_menu' );
-				add_action('admin_menu', 'rvy_mu_site_menu' );
+				add_action('admin_menu', 'rvy_mu_site_menu', 15 );
 			}
 			
 			add_action('admin_menu', array(&$this,'build_menu'));
@@ -45,10 +43,10 @@ class RevisionaryAdmin
 				add_filter( 'plugin_row_meta', array(&$this, 'flt_plugin_action_links'), 10, 2 );
 			}
 		}
-		
-		add_action('admin_footer-edit.php', array(&$this, 'act_hide_quickedit_for_revisions') );
-		add_action('admin_footer-edit-pages.php', array(&$this, 'act_hide_quickedit_for_revisions') );
-		
+
+		add_action('admin_footer-edit.php', array(&$this, 'act_hide_quickedit') );
+		add_action('admin_footer-edit-pages.php', array(&$this, 'act_hide_quickedit') );
+
 		add_action('admin_head', array(&$this, 'add_editor_ui') );
 		add_action('admin_head', array(&$this, 'act_hide_admin_divs') );
 		
@@ -59,7 +57,7 @@ class RevisionaryAdmin
 		// log this action so we know when to ignore the save_post action
 		add_action('inherit_revision', array(&$this, 'act_log_revision_save') );
 
-		add_action('pre_post_type', array(&$this, 'flt_detect_revision_save') );
+		add_action('pre_post_status', array(&$this, 'flt_detect_revision_save'), 50 );
 	
 		if ( rvy_get_option( 'pending_revisions' ) ) {
 			if ( strpos( $script_name, 'p-admin/edit.php') 
@@ -67,8 +65,13 @@ class RevisionaryAdmin
 			|| ( strpos( $script_name, 'p-admin/post.php') )
 			|| ( strpos( $script_name, 'p-admin/page.php') )
 			|| false !== strpos( urldecode($request_uri), 'admin.php?page=rvy-revisions')
+			|| false !== strpos( urldecode($_SERVER['REQUEST_URI']), 'admin.php?page=revisionary-q')
 			) {
-				add_filter( 'the_title', array(&$this, 'flt_post_title'), 10, 2 );
+
+				if ( false === strpos( urldecode($_SERVER['REQUEST_URI']), 'admin.php?page=revisionary-q') ) {
+					add_filter( 'the_title', array(&$this, 'flt_post_title'), 10, 2 );
+				}
+
 				add_filter( 'get_delete_post_link', array(&$this, 'flt_delete_post_link'), 10, 2 );
 				add_filter( 'post_link', array(&$this, 'flt_preview_post_link'), 10, 2 );
 				
@@ -78,7 +81,10 @@ class RevisionaryAdmin
 		}
 
 		if ( rvy_get_option( 'pending_revisions' ) || rvy_get_option( 'scheduled_revisions' ) ) {
-			add_filter( 'get_edit_post_link', array(&$this, 'flt_edit_post_link'), 10, 3 );
+			if ('revision.php' == $pagenow) {
+				require_once( dirname(__FILE__).'/history_rvy.php' );
+				new RevisionaryHistory();
+			}
 		}
 
 		if ( rvy_get_option( 'scheduled_revisions' ) ) {
@@ -87,12 +93,18 @@ class RevisionaryAdmin
 
 		// ===== Special early exit if this is a plugin install script
 		if ( strpos($script_name, 'p-admin/plugins.php') || strpos($script_name, 'p-admin/plugin-install.php') || strpos($script_name, 'p-admin/plugin-editor.php') ) {
+			if (strpos($script_name, 'p-admin/plugin-install.php') && !empty($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], '=rvy')) {
+				add_action('admin_print_scripts', function(){
+					echo '<style type="text/css">#plugin_update_from_iframe {display:none;}</style>';
+				});
+			}
+			
 			return; // no further filtering on WP plugin maintenance scripts
 		}
 
 		// low-level filtering for miscellaneous admin operations which are not well supported by the WP API
 		$hardway_uris = array(
-		'p-admin/index.php',		'p-admin/revision.php',		'admin.php?page=rvy-revisions',
+		'p-admin/index.php',		'p-admin/revision.php',		'admin.php?page=rvy-revisions', 'admin.php?page=revisionary-q',
 		'p-admin/post.php', 		'p-admin/post-new.php', 		'p-admin/page.php', 		'p-admin/page-new.php', 
 		'p-admin/link-manager.php', 'p-admin/edit.php', 			'p-admin/edit-pages.php', 	'p-admin/edit-comments.php', 
 		'p-admin/categories.php', 	'p-admin/link-category.php', 	'p-admin/edit-link-categories.php', 'p-admin/upload.php',
@@ -123,10 +135,87 @@ class RevisionaryAdmin
 		add_action( 'post_submitbox_start', array( &$this, 'pending_rev_checkbox' ) );
 		add_action( 'post_submitbox_misc_actions', array( &$this, 'publish_metabox_time_display' ) );
 
+		add_action('admin_enqueue_scripts', [$this, 'fltAdminPostsListing'], 50);  // 'the_posts' filter is not applied on edit.php for hierarchical types
+
+		add_filter( 'page_row_actions', array($this, 'revisions_row_action_link' ) );
+		add_filter( 'post_row_actions', array($this, 'revisions_row_action_link' ) );
+
 		if ( in_array( $pagenow, array( 'plugins.php', 'plugin-install.php' ) ) ) {
 			require_once( dirname(__FILE__).'/admin-plugins_rvy.php' );
 			$rvy_plugin_admin = new Rvy_Plugin_Admin();
 		}
+
+		add_action('admin_menu', [$this, 'actSettingsPageMaybeRedirect'], 999);
+	}
+
+	public function fltAdminPostsListing() {
+		global $wpdb, $wp_query, $typenow;
+
+		$listed_ids = array();
+
+		if ( ! empty( $wp_query->posts ) ) {
+			foreach ($wp_query->posts as $row) {
+				$listed_ids[] = $row->ID;
+			}	
+		}
+
+		if ($listed_ids) {
+			$id_csv = implode("','", $listed_ids);
+			$results = $wpdb->get_results("SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN('$id_csv') GROUP BY comment_count");
+			
+			foreach($results as $row) {
+				$this->post_revision_count[$row->published_post] = $row->num_revisions;
+			}
+		}
+
+		static $limit_quickedit;
+		static $listed_post_statuses;
+
+		if (is_null($limit_quickedit) && ! empty( $wp_query->posts ) ) {
+			if (!$type_obj = get_post_type_object($typenow)) {
+				$limit_quickedit = false;
+				return;
+			}
+	
+			$limit_quickedit = !agp_user_can($type_obj->cap->edit_others_posts, 0, '', array('skip_revision_allowance' => true))
+							|| !agp_user_can($type_obj->cap->edit_published_posts, 0, '', array('skip_revision_allowance' => true));
+		
+			$listed_post_statuses = array();
+			$ids = array();
+			foreach ($wp_query->posts as $row) {
+				$ids []= $row->ID;
+			}
+
+			$id_csv = implode("','", $ids);
+			$results = $wpdb->get_results("SELECT ID, post_status FROM $wpdb->posts WHERE ID IN ('$id_csv')");
+			foreach($results as $row ) {
+				$listed_post_statuses[$row->ID] = $row->post_status;
+			}
+		} elseif(!$limit_quickedit) {
+			return;
+		}
+
+		$published_stati = get_post_stati(array('public' => true, 'private' => true), 'names', 'OR');
+
+        foreach ($wp_query->posts as $row) {
+            if (in_array($listed_post_statuses[$row->ID], $published_stati)) {
+				$this->hide_quickedit []= $row->ID;
+			}
+		}
+	}
+
+	function revisions_row_action_link($actions = array()) {
+		global $post;
+
+		if (empty($this->post_revision_count[$post->ID])) {
+			return $actions;
+		}
+
+		if ( 'trash' != $post->post_status && current_user_can( 'edit_post', $post->ID ) && wp_check_post_lock( $post->ID ) === false ) {
+			$actions['revision_queue'] = "<a href='admin.php?page=revisionary-q&published_post=$post->ID'>" . __('Revision Queue') . '</a>';
+		}
+
+		return $actions;
 	}
 
 	function revision_action_notice() {
@@ -150,6 +239,8 @@ class RevisionaryAdmin
 
 	function flt_dashboard_recent_posts_query_args( $query_args ) {
 		if ( 'future' == $query_args['post_status'] ) {
+			$query_args['post_status'] = array('future', 'future-revision');
+
 			add_filter( 'posts_clauses_request', array( &$this, 'flt_dashboard_query_clauses' ) );
 		}
 
@@ -159,7 +250,7 @@ class RevisionaryAdmin
 	function flt_dashboard_query_clauses( $clauses ) {
 		global $wpdb;
 
-		$types = array_merge( get_post_types( array( 'public' => true ), 'names' ), array( 'revision' ) );
+		$types = array_merge( get_post_types( array( 'public' => true ), 'names' ) );
 		$post_types_csv = implode( "','", $types );
 		$clauses['where'] = str_replace( "$wpdb->posts.post_type = 'post'", "$wpdb->posts.post_type IN ('$post_types_csv')", $clauses['where'] );
 
@@ -193,7 +284,7 @@ class RevisionaryAdmin
 	}
 
 	function add_preview_action( $actions, $post ) {
-		if ( 'revision' == $post->post_type ) {
+		if ( rvy_is_revision_status($post->post_status) ) {
 			if ( current_user_can( 'edit_post', $post->ID ) ) {
 				global $revisionary;
 				static $block_editor;
@@ -206,20 +297,25 @@ class RevisionaryAdmin
 				$url_query = ( ! empty( $url['query'] ) ) ? $url['query'] : '';
 				$redirect_url = admin_url('edit.php?' . $url_query);
 
+				/*
 				if ( $block_editor ) {
 					$type_obj = get_post_type_object( $post->post_type );
 					$edit_metacap = ( $type_obj ) ? $type_obj->cap->edit_post : 'edit_post';
 
 					if ( agp_user_can( $edit_metacap, $post->ID, '', array( 'skip_revision_allowance' => true ) ) ) {
-						$preview_link = '<a href="' . esc_url( add_query_arg( array( 'preview' => '1', 'post_type' => 'revision', 'rvy_redirect' => esc_url($redirect_url) ), get_post_permalink( $post->ID ) ) )  . '" title="' . esc_attr( sprintf( __( 'Preview & Approve &#8220;%s&#8221;' ), $post->post_title ) ) . '" rel="permalink">' . __( 'Approval' ) . '</a>';
+						$preview_link = '<a href="' . esc_url( add_query_arg( array( 'preview' => '1', 'rvy_revision' => true, 'rvy_redirect' => esc_url($redirect_url) ), get_post_permalink( $post->ID ) ) )  . '" title="' . esc_attr( sprintf( __( 'Preview & Approve &#8220;%s&#8221;' ), $post->post_title ) ) . '" rel="permalink">' . __( 'Approval' ) . '</a>';
 					} else {
-						$preview_link = '<a href="' . esc_url( add_query_arg( array( 'preview' => '1', 'post_type' => 'revision', 'rvy_redirect' => esc_url($redirect_url) ), get_post_permalink( $post->ID ) ) ) . '" title="' . esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $post->post_title ) ) . '" rel="permalink">' . __( 'Preview' ) . '</a>';
+						$preview_link = '<a href="' . esc_url( add_query_arg( array( 'preview' => '1', 'rvy_revision' => true, 'rvy_redirect' => esc_url($redirect_url) ), get_post_permalink( $post->ID ) ) ) . '" title="' . esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $post->post_title ) ) . '" rel="permalink">' . __( 'Preview' ) . '</a>';
 					}
 
 					$actions = array_merge( array( 'view' => $preview_link ), $actions );
 				} else {
-					$actions['view'] = '<a href="' . esc_url( add_query_arg( array( 'preview' => '1', 'post_type' => 'revision', 'rvy_redirect' => esc_url($redirect_url) ), get_post_permalink( $post->ID ) ) ) . '" title="' . esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $post->post_title ) ) . '" rel="permalink">' . __( 'Preview' ) . '</a>';
+					$actions['view'] = '<a href="' . esc_url( add_query_arg( array( 'preview' => '1', 'rvy_revision' => true, 'rvy_redirect' => esc_url($redirect_url) ), get_post_permalink( $post->ID ) ) ) . '" title="' . esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $post->post_title ) ) . '" rel="permalink">' . __( 'Preview' ) . '</a>';
 				}
+				*/
+
+				// @todo
+				unset($actions['inline hide-if-no-js']);
 			}
 		}
 		
@@ -228,10 +324,11 @@ class RevisionaryAdmin
 		
 	function add_editor_ui() {
 		global $revisionary;
-		
+
 		if ( in_array( $GLOBALS['pagenow'], array( 'post.php', 'post-new.php' ) ) ) {
 			global $post;
-			if ( $post ) {
+
+			if ( $post && rvy_is_supported_post_type($post->post_type)) {
 				if ( $revisionary->isBlockEditorActive() ) {
 					if ( ! $post->ID && ! is_content_administrator_rvy() ) {
 						$type_obj = get_post_type_object( $post->post_type );
@@ -266,7 +363,7 @@ class RevisionaryAdmin
 			return;
 		}
 	
-		if ( ! empty($post) && in_array( $post->post_status, $stati ) && ! current_user_can( $type_obj->cap->publish_posts ) ) :
+		if ( ! empty($post) && in_array( $post->post_status, $stati ) && ! current_user_can( $type_obj->cap->publish_posts ) && rvy_is_supported_post_type($post->post_type) ) :
 			$datef = __( 'M j, Y @ g:i a' );
 			if ( 0 != $post->ID ) {
 				if ( 'future' == $post->post_status ) { // scheduled for publishing at a future date
@@ -300,7 +397,7 @@ class RevisionaryAdmin
 
 		$status_obj = get_post_status_object( $post->post_status );
 		
-		if ( ! $status_obj || ( ! $status_obj->public && ! $status_obj->private && ( 'future' != $post->post_status ) ) ) {
+		if ( ! $status_obj || ( ! $status_obj->public && ! $status_obj->private && ( 'future' != $post->post_status ) ) || !rvy_is_supported_post_type($post->post_type) ) {
 			return;
 		}
 
@@ -310,57 +407,52 @@ class RevisionaryAdmin
 			}
 		}
 
-		$caption = __( 'Send to Approval Queue', 'revisionary' );
+		$caption = __( 'Save as Pending Revision', 'revisionary' );
 		$checked = (apply_filters('revisionary_default_pending_revision', false, $post )) ? "checked='checked'" : '';
-
-		echo "<div style='margin: 0.5em'><label for='rvy_save_as_pending_rev'><input type='checkbox' style='width: 1em; min-width: 1em; text-align: right;' name='rvy_save_as_pending_rev' value='1' $checked id='rvy_save_as_pending_rev' /> $caption</label></div>";
+		
+		$title = esc_attr(__('Do not publish current changes yet, but save to Revision Queue', 'revisionary'));
+		echo "<div style='margin: 0.5em'><label for='rvy_save_as_pending_rev' title='" . $title . "'><input type='checkbox' style='width: 1em; min-width: 1em; text-align: right;' name='rvy_save_as_pending_rev' value='1' $checked id='rvy_save_as_pending_rev' /> $caption</label></div>";
 	}
 	
 	function act_log_revision_save() {
 		$this->revision_save_in_progress = true;
 	}
 	
-	function flt_detect_revision_save( $post_type ) {
-		if ( 'revision' == $post_type )
+	function flt_detect_revision_save( $post_status ) {
+		if (rvy_is_revision_status($post_status)) {
 			$this->revision_save_in_progress = true;
+		}
 	
-		return $post_type;
+		return $post_status;
 	}
 	
 	// adds an Options link next to Deactivate, Edit in Plugins listing
 	function flt_plugin_action_links($links, $file) {
 		if ( $file == RVY_BASENAME ) {
-			$page = ( RVY_NETWORK ) ? 'rvy-site_options' : 'rvy-options';
+			$page = ( RVY_NETWORK ) ? 'rvy-net_options' : 'revisionary-settings';
 			$links[] = "<a href='admin.php?page=$page'>" . __awp('Settings') . "</a>";
 		}
 			
 		return $links;
 	}
 	
-	/*
-	// if a revision id or post object is passed in, returns parent post object
-	function get_published_post( $_post ) {
-		if ( is_object( $_post ) ) {
-			if ( ! in_array( $_post->post_type, array( 'revision', '_revision' ) ) && ( 'inherit' != $_post->post_status ) )
-				return $_post;
-			else
-				$_post = $_post->ID;
+	function admin_scripts() {
+		wp_enqueue_style('revisionary', RVY_URLPATH . '/admin/revisionary.css', [], REVISIONARY_VERSION);
+
+		global $pagenow, $post;
+		if ( ('post.php' == $pagenow) && (('revision' == $post->post_type) || rvy_is_revision_status($post->post_status)) ) {
+			wp_enqueue_style('rvy-revision-edit', RVY_URLPATH . '/admin/rvy-revision-edit.css', [], REVISIONARY_VERSION);
 		}
 
-		global $wpdb;
-		
-		$__post = $wpdb->get_row( "SELECT * FROM $wpdb->posts WHERE ID = '$_post'" ); // direct query so we don't fool ourself with subverted cache entry
+		wp_enqueue_style('revisionary-admin-common', RVY_URLPATH . '/common/css/pressshack-admin.css', [], REVISIONARY_VERSION);
 
-		if ( in_array( $__post->post_type, array( 'revision', '_revision' ) ) || ( 'inherit' == $__post->post_status ) ) {
-			$__post = get_post( $__post->post_parent );
+		if (defined('REVISIONARY_PRO_VERSION') && ('admin.php' == $pagenow) && !empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options']) ) {
+			wp_enqueue_style('revisionary-settings', RVY_URLPATH . '/includes-pro/settings-pro.css', [], REVISIONARY_VERSION);
 		}
+ 	}
 
-		return $__post;
-	}
-	*/
-	
 	function admin_head() {
-		echo '<link rel="stylesheet" href="' . RVY_URLPATH . '/admin/revisionary.css" type="text/css" />'."\n";
+		//echo '<link rel="stylesheet" href="' . RVY_URLPATH . '/admin/revisionary.css" type="text/css" />'."\n";
 
 		add_filter( 'contextual_help_list', array(&$this, 'flt_contextual_help_list'), 10, 2 );
 		
@@ -371,23 +463,10 @@ class RevisionaryAdmin
 
 			$args = array(
 				'nowCaption' => 			 __( 'Current Time', 'revisionary' ),
-				'pubHistoryCaption' => __( 'Publication History:', 'revisionary' ) 
+				/*'pubHistoryCaption' => __( 'Publication History:', 'revisionary' ) */
 			);
 			wp_localize_script( 'rvy_post', 'rvyPostEdit', $args );
 		}
-
-		// Gutenberg defaults to pending revision approval via front end preview
-		if ( ( 'edit.php' == $pagenow ) && $revisionary->isBlockEditorActive() ) :?>
-			<script type="text/javascript">
-			/* <![CDATA[ */
-			jQuery(document).ready( function($) {
-				$('table.wp-list-table a.row-title').each(function() {
-					$(this).attr('href', $(this).attr('href').replace('wp-admin/admin.php?page=rvy-revisions&action=view&revision=','?post_type=revision&p=') + '&preview=1');
-				});
-			});
-			/* ]]> */
-			</script>
-		<?php endif;
 
 		if( false !== strpos( urldecode($_SERVER['REQUEST_URI']), 'admin.php?page=rvy-revisions' ) ) {
 			
@@ -403,67 +482,18 @@ class RevisionaryAdmin
 			/* ]]> */
 			</script>
 			<?php
-			wp_enqueue_script( 'rvy_edit', RVY_URLPATH . "/admin/revision-edit.js", array('jquery'), RVY_VERSION, true );
-			
+
 			if ( ( empty( $_GET['action'] ) || in_array( $_GET['action'], array( 'view', 'edit' ) ) ) && ! empty( $_GET['revision'] ) ) {
 				if ( $revision = get_post( $_GET['revision'] ) ) {
-					if ( ( 'revision' != $revision->post_type ) || $post = get_post( $revision->post_parent ) ) {
-				
-						// determine if tinymce textarea should be editable for displayed revision
-						global $current_user;
+					$published_id = rvy_post_id($revision->ID);
 
-						if ( 'revision' != $revision->post_type ) // we retrieved the parent (current revision) that corresponds to requested revision
-							$read_only = true;
-
-						elseif ( ( 'pending' == $revision->post_status ) && ( $revision->post_author == $current_user->ID ) )
-							$read_only = false;
-						else {
-							if ( $type_obj = get_post_type_object( $post->post_type ) )
-								$read_only = ! current_user_can( $type_obj->cap->edit_post, $revision->post_parent );
-						}
-
-						$this->tinymce_readonly = $read_only;
-						
+					if ( !rvy_is_revision_status($revision->post_status) || $post = get_post($published_id) ) {
 						require_once( dirname(__FILE__).'/revision-ui_rvy.php' );
-						
-						add_filter( 'tiny_mce_before_init', 'rvy_log_tiny_mce_params', 1, 2 );
-						add_filter( 'tiny_mce_before_init', 'rvy_tiny_mce_params', 998 );	// this is only applied to revisionary admin URLs, so not shy about dropping the millennial hammer
-
-						if ( $read_only )
-							add_filter( 'tiny_mce_before_init', 'rvy_tiny_mce_readonly', 999 );
-						
-						// WP Super Edit Workaround - $wp_super_edit->is_tinymce property is currently set true only if URI matches unfilterable list: '/tiny_mce_config\.php|page-new\.php|page\.php|post-new\.php|post\.php/'
-						global $wp_super_edit;
-						
-						if ( ! empty($wp_super_edit) && ! $wp_super_edit->is_tinymce )
-							include_once( dirname(__FILE__).'/super-edit-helper_rvy.php' );
-						//
 					}
 				}
 			}
-			
-			// need this for editor swap from visual to html
-			if ( empty($read_only) )
-				wp_print_scripts( 'editor', 'quicktags' );
-			else {
-				wp_print_scripts( 'editor' );
-				
-// if the revision is read-only, also disable the HTML editing area and kill the toolbar which the_editor() forces in
-?>
-<script type="text/javascript">
-/* <![CDATA[ */
-jQuery(document).ready( function($) {
-	$('#ed_toolbar').hide();
-	$('#content').attr('disabled', 'disabled');
-});
-/* ]]> */
-</script>
-<?php	
-			} // endif read_only
 
 			require_once( dirname(__FILE__).'/revision-ui_rvy.php' );
-
-			rvy_revisions_js();
 		}
 		
 		// all required JS functions are present in Role Scoper JS; TODO: review this for future version changes as necessary
@@ -476,17 +506,21 @@ jQuery(document).ready( function($) {
 		if ( is_object($screen) )
 			$screen = $screen->id;
 		
-		if ( in_array( $screen, array( 'edit', 'post', 'settings_page_rvy-revisions', 'settings_page_rvy-options' ) ) ) {
+		if ( in_array( $screen, array( 'edit', 'post', 'settings_page_rvy-revisions', 'revisionary_page_revisionary-settings' ) ) ) {
 			if ( ! isset($help[$screen]) )
 				$help[$screen] = '';
 
 			//$doc_url =
-			//$help[$screen] .= sprintf(__('%1$s Revisionary Documentation%2$s', 'revisionary'), "<a href='$doc_url' target='_blank'>", '</a>')
+			//$help[$screen] .= sprintf(__('%1$s PublishPress Revisions Documentation%2$s', 'revisionary'), "<a href='$doc_url' target='_blank'>", '</a>')
 			//$forum_url =
-			//$help[$screen] .= ' ' . sprintf(__('%1$s Revisionary Support Forum%2$s', 'revisionary'), "<a href='$forum_url' target='_blank'>", '</a>');
+			//$help[$screen] .= ' ' . sprintf(__('%1$s PublishPress Revisions Support Forum%2$s', 'revisionary'), "<a href='$forum_url' target='_blank'>", '</a>');
 		}
 
 		return $help;
+	}
+
+	function moderation_queue() {
+		require_once( dirname(__FILE__).'/revision-queue_rvy.php');
 	}
 
 	function build_menu() {
@@ -500,6 +534,13 @@ jQuery(document).ready( function($) {
 			add_submenu_page( 'none', __('Revisions', 'revisionary'), __('Revisions', 'revisionary'), 'read', 'rvy-revisions', 'rvy_include_admin_revisions' );
 		}
 
+		if ( rvy_get_manageable_types() ) {
+			$_menu_caption = ( defined( 'RVY_MODERATION_MENU_CAPTION' ) ) ? RVY_MODERATION_MENU_CAPTION : __('Revisions');
+			add_menu_page( __($_menu_caption, 'pp'), __($_menu_caption, 'pp'), 'read', 'revisionary-q', array(&$this, 'moderation_queue'), 'dashicons-backup', 29 );
+
+			add_submenu_page('revisionary-q', __('Revision Queue', 'revisionary'), __('Revision Queue', 'revisionary'), 'read', 'revisionary-q', [$this, 'moderation_queue']);
+		}
+
 		if ( ! current_user_can( 'manage_options' ) )
 			return;
 
@@ -510,15 +551,13 @@ jQuery(document).ready( function($) {
 
 		global $blog_id;
 		if ( ! RVY_NETWORK || ( count($rvy_options_sitewide) != count($rvy_default_options) ) ) {
-			add_options_page( __('Revisionary Settings', 'revisionary'), __('Revisionary', 'revisionary'), 'read', 'rvy-options');
-			add_action('settings_page_rvy-options', 'rvy_omit_site_options' );	
+			add_submenu_page( 'revisionary-q', __('PublishPress Revisions Settings', 'revisionary'), __('Settings', 'revisionary'), 'read', 'revisionary-settings', 'rvy_omit_site_options');
+			add_action('revisionary_page_revisionary-settings', 'rvy_omit_site_options' );	
 		}
 	}
 
-	function act_hide_quickedit_for_revisions() {
-		global $rvy_any_listed_revisions;
-		
-		if ( empty( $rvy_any_listed_revisions ) )
+	function act_hide_quickedit() {
+		if ( empty( $this->hide_quickedit ) )
 			return;
 
 		$post_type = awp_post_type_from_uri();
@@ -527,7 +566,7 @@ jQuery(document).ready( function($) {
 		<script type="text/javascript">
 		/* <![CDATA[ */
 		jQuery(document).ready( function($) {
-		<?php foreach( $rvy_any_listed_revisions as $id ): ?>
+		<?php foreach( $this->hide_quickedit as $id ): ?>
 			$( '#<?php echo( 'post-' . $id );?> span.inline' ).hide();
 		<?php endforeach; ?>
 		});
@@ -536,8 +575,8 @@ jQuery(document).ready( function($) {
 		<?php
 	}
 
-	
 	function act_hide_admin_divs() {
+
 		// Hide unrevisionable elements if editing for revisions, regardless of Limited Editing Element settings
 		//
 		// TODO: allow revisioning of slug, menu order, comment status, ping status ?
@@ -554,17 +593,23 @@ jQuery(document).ready( function($) {
 			if ( $object_id ) {
 				$type_obj = get_post_type_object( $object_type );
 
-				if ( $type_obj && ! agp_user_can( $type_obj->cap->edit_post, $object_id, '', array( 'skip_revision_allowance' => true ) ) ) { 
+				if ( $type_obj && !empty($post) && (rvy_is_revision_status($post->post_status) || ! agp_user_can( $type_obj->cap->edit_post, $object_id, '', array( 'skip_revision_allowance' => true ) ) ) ) { 
 					//if ( 'page' == $object_type )
-						$unrevisable_css_ids = array( 'pageparentdiv', 'pageauthordiv', 'pagecustomdiv', 'pageslugdiv', 'pagecommentstatusdiv' );
+						//$unrevisable_css_ids = array( 'pageauthordiv', 'pagecustomdiv', 'pageslugdiv', 'pagecommentstatusdiv' );
 				 	//else
-						$unrevisable_css_ids = array_merge( $unrevisable_css_ids, array( 'categorydiv', 'authordiv', 'postcustom', 'customdiv', 'slugdiv', 'commentstatusdiv', 'password-span', 'trackbacksdiv',  'tagsdiv-post_tag', 'visibility', 'edit-slug-box', 'postimagediv', 'ef_editorial_meta' ) );
+						//$unrevisable_css_ids = array_merge( $unrevisable_css_ids, array( 'categorydiv', 'authordiv', 'postcustom', 'customdiv', 'slugdiv', 'commentstatusdiv', 'password-span', 'trackbacksdiv',  'tagsdiv-post_tag', 'visibility', 'edit-slug-box', 'postimagediv', 'ef_editorial_meta' ) );
 
-					foreach( get_taxonomies( array(), 'object' ) as $taxonomy => $tx_obj )
-						$unrevisable_css_ids []= ( $tx_obj->hierarchical ) ? "{$taxonomy}div" : "tagsdiv-$taxonomy";
+					$unrevisable_css_ids = array( 'authordiv', 'visibility', 'slugdiv', 'edit-slug-box', 'postcustom', 'pagecustom' );  // todo: filter custom fields queries for revision_id
+
+					//foreach( get_taxonomies( array(), 'object' ) as $taxonomy => $tx_obj )
+					//	$unrevisable_css_ids []= ( $tx_obj->hierarchical ) ? "{$taxonomy}div" : "tagsdiv-$taxonomy";
 
 					$unrevisable_css_ids = apply_filters( 'rvy_hidden_meta_boxes', $unrevisable_css_ids );
 						
+					if (rvy_is_revision_status($post->post_status)) {
+						$unrevisable_css_ids []= 'publish';
+					}
+
 					echo( "\n<style type='text/css'>\n<!--\n" );
 						
 					foreach ( $unrevisable_css_ids as $id ) {
@@ -600,22 +645,19 @@ jQuery(document).ready( function($) {
 			return $link;
 		
 		if ( 'revision' == $topic ) {
-			if ( 'manage' == $operation ) {
-				if ( strpos( $link, 'revision.php' ) ) {
-					$link = str_replace( 'revision.php', 'admin.php?page=rvy-revisions&action=view', $link );
-					$link = str_replace( '?revision=', "&amp;revision=", $link );
-				}
-			
-			} elseif ( 'preview' == $operation ) {
-				$link = add_query_arg( array( 'preview' => 1, 'post_type' => 'revision' ), $link );
+			if ( 'preview' == $operation ) {
+				$link = add_query_arg( array( 'preview' => 1, 'rvy_revision' => true ), $link );
 
-			} elseif ( 'delete' == $operation ) {
+			} 
+			/*
+			elseif ( 'delete' == $operation ) {
 				if ( $object_type && $id ) {
 					$link = str_replace( "$object_type.php", 'admin.php?page=rvy-revisions', $link );
 					$link = str_replace( '?post=', "&amp;revision=", $link );
 					$link = wp_nonce_url( $link, 'delete-revision_' . $id );
 				}
-			} 
+			}
+			*/ 
 		}
 		
 		return $link;
@@ -633,25 +675,8 @@ jQuery(document).ready( function($) {
 		return $link;
     }
 	
-	function flt_edit_post_link( $link, $id, $context ) {
-		if ( $post = get_post( $id ) ) {
-			if ( ( 'revision' == $post->post_type ) && in_array( $post->post_status, array( 'pending', 'future' ) ) ) {
-				$link = $this->convert_link( $link, 'revision', 'manage' );
-
-				global $rvy_any_listed_revisions;
-				
-				if ( ! isset( $rvy_any_listed_revisions ) )
-					$rvy_any_listed_revisions = array();
-				
-				$rvy_any_listed_revisions []= $id;
-			}
-		}
-
-		return $link;
-	}
-	
 	function flt_preview_post_link( $link, $post ) {
-		if ( 'revision' == $post->post_type ) {
+		if (rvy_is_revision_status($post->post_status)) {
 			$link = $this->convert_link( $link, 'revision', 'preview' );
 		}
 
@@ -660,9 +685,11 @@ jQuery(document).ready( function($) {
 	
 	function flt_post_title ( $title, $id = '' ) {
 		if ( $id )
-			if ( $post = get_post( $id ) )
-				if ( 'revision' == $post->post_type )
+			if ( $post = get_post( $id ) ) {
+				if (rvy_is_revision_status($post->post_status)) {
 					$title = sprintf( __( '%s (revision)', 'revisionary' ), $title );
+				}
+			}
 
 		return $title;
 	}
@@ -671,7 +698,7 @@ jQuery(document).ready( function($) {
 	function flt_get_post_time( $time, $format, $gmt ) {
 		if ( function_exists('get_the_ID') && $post_id = get_the_ID() ) {
 			if ( $post = get_post( $post_id ) ) {
-				if ( ( 'revision' == $post->post_type ) && ( 'pending' == $post->post_status ) ) {
+				if ( 'pending-revision' == $post->post_status ) {
 					if ( $gmt )
 						$time = mysql2date($format, $post->post_modified_gmt, $gmt);
 					else
@@ -682,4 +709,73 @@ jQuery(document).ready( function($) {
 		
 		return $time;
 	}
+
+	function publishpressFooter() {
+		?>
+		<footer>
+
+		<div class="pp-rating">
+		<a href="https://wordpress.org/support/plugin/revisionary/reviews/#new-post" target="_blank" rel="noopener noreferrer">
+		<?php printf( 
+			__('If you like %s, please leave us a %s rating. Thank you!', 'revisionary'),
+			'<strong>PublishPress Revisions</strong>',
+			'<span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span>'
+			);
+		?>
+		</a>
+		</div>
+
+		<hr>
+		<nav>
+		<ul>
+		<li><a href="https://publishpress.com/revisionary" target="_blank" rel="noopener noreferrer" title="<?php _e('About PublishPress Revisions', 'revisionary');?>"><?php _e('About', 'revisionary');?>
+		</a></li>
+		<li><a href="https://publishpress.com/documentation/revisions-start" target="_blank" rel="noopener noreferrer" title="<?php _e('PublishPress Revisions Documentation', 'revisionary');?>"><?php _e('Documentation', 'revisionary');?>
+		</a></li>
+		<li><a href="https://publishpress.com/contact" target="_blank" rel="noopener noreferrer" title="<?php _e('Contact the PublishPress team', 'revisionary');?>"><?php _e('Contact', 'revisionary');?>
+		</a></li>
+		<li><a href="https://twitter.com/publishpresscom" target="_blank" rel="noopener noreferrer"><span class="dashicons dashicons-twitter"></span>
+		</a></li>
+		<li><a href="https://facebook.com/publishpress" target="_blank" rel="noopener noreferrer"><span class="dashicons dashicons-facebook"></span>
+		</a></li>
+		</ul>
+		</nav>
+
+		<div class="pp-pressshack-logo">
+		<a href="https://publishpress.com" target="_blank" rel="noopener noreferrer">
+
+		<img src="<?php echo plugins_url('', REVISIONARY_FILE) . '/common/img/publishpress-logo.png';?>" />
+		</a>
+		</div>
+
+		</footer>
+		<?php
+	}
+
+    public function actSettingsPageMaybeRedirect()
+    {
+        foreach ([
+                    'rvy-options' => 'revisionary-settings',
+                 ] as $old_slug => $new_slug) {
+            if (
+                strpos($_SERVER['REQUEST_URI'], "page=$old_slug")
+                && (false !== strpos($_SERVER['REQUEST_URI'], 'admin.php'))
+            ) {
+                global $submenu;
+
+                // Don't redirect if pp-settings is registered by another plugin or theme
+                foreach (array_keys($submenu) as $i) {
+                    foreach (array_keys($submenu[$i]) as $j) {
+                        if (isset($submenu[$i][$j][2]) && ($old_slug == $submenu[$i][$j][2])) {
+                            return;
+                        }
+                    }
+                }
+
+                $arr_url = parse_url($_SERVER['REQUEST_URI']);
+                wp_redirect(admin_url('admin.php?' . str_replace("page=$old_slug", "page=$new_slug", $arr_url['query'])));
+                exit;
+            }
+        }
+    }
 } // end class RevisionaryAdmin

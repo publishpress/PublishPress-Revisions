@@ -1,42 +1,5 @@
 <?php
-add_action ( 'right_now_table_end', 'rvy_right_now_pending' );
 add_action ( 'dashboard_glance_items', 'rvy_glance_pending' );
-
-function rvy_right_now_pending() {
-	if ( ( defined( 'SCOPER_VERSION' ) || defined( 'PP_VERSION' ) || defined( 'PPCE_VERSION' ) || defined( 'RVY_CONTENT_ROLES' ) ) && ! defined( 'USE_RVY_RIGHTNOW' ) )
-		return;
-
-	$post_types = array_diff_key( get_post_types( array( 'public' => true ), 'object' ), array( 'attachment' => true ) );
-	
-	foreach ( $post_types as $post_type => $post_type_obj ) {
-		if ( $num_posts = wp_count_posts( $post_type ) ) {
-			if ( ! empty($num_posts->pending) ) {
-				echo "\n\t".'<tr>';
-		
-				$num = number_format_i18n( $num_posts->pending );
-
-				if ( intval($num_posts->pending) <= 1 )
-					$text = sprintf( __('Pending %1$s', 'revisionary'),$post_type_obj->labels->singular_name);
-				else
-					$text = sprintf( __('Pending %1$s', 'revisionary'), $post_type_obj->labels->name);
-					
-				$type_clause = ( 'post' == $post_type ) ? '' : "&post_type=$post_type";
-					
-				$url = "edit.php?post_status=pending{$type_clause}";
-				$num = "<a href='$url'><span class='pending-count'>$num</span></a>";
-				$text = "<a class='waiting' href='$url'>$text</a>";
-		
-				$type_class = ( $post_type_obj->hierarchical ) ? 'b-pages' : 'b-posts';
-				
-				echo '<td class="first b ' . $type_class . ' b-waiting">' . $num . '</td>';
-				echo '<td class="t posts">' . $text . '</td>';
-				echo '<td class="b"></td>';
-				echo '<td class="last t"></td>';
-				echo "</tr>\n\t";
-			}
-		}
-	}
-}
 
 function rvy_glance_pending() {
 	if ( ( defined( 'SCOPER_VERSION' ) || defined( 'PP_VERSION' ) || defined( 'PPCE_VERSION' ) || defined( 'RVY_CONTENT_ROLES' ) ) && ! defined( 'USE_RVY_RIGHTNOW' ) )
@@ -45,22 +8,38 @@ function rvy_glance_pending() {
 	$post_types = array_diff_key( get_post_types( array( 'public' => true ), 'object' ), array( 'attachment' => true ) );
 
 	foreach ( $post_types as $post_type => $post_type_obj ) {
-		if ( $num_posts = wp_count_posts( $post_type ) ) {
-			if ( ! empty($num_posts->pending) ) {
-				echo '<div class="rvy-glance-pending">';
-		
-				$num = number_format_i18n( $num_posts->pending );
+		$cache_key = _count_posts_cache_key( $post_type );
+		wp_cache_delete( $cache_key, 'counts' );
 
-				if ( intval($num_posts->pending) <= 1 )
-					$text = sprintf( __('Pending %1$s', 'revisionary'),$post_type_obj->labels->singular_name);
-				else
-					$text = sprintf( __('Pending %1$s', 'revisionary'), $post_type_obj->labels->name);
+		if ( $num_posts = wp_count_posts( $post_type ) ) {   // @todo: PressPermit compat for count_posts filtering with revision statuses
+			
+			foreach( array( 'pending-revision', 'future-revision' ) as $status ) {
+				if ( ! empty($num_posts->$status) ) {
+					$status_obj = get_post_status_object($status);
+
+					echo '<div class="rvy-glance-pending">';
+			
+					$num = number_format_i18n( $num_posts->$status );
+
+					$status_label = str_replace('(%s)', '', reset($status_obj->label_count));
+
+					if ( intval($num_posts->$status) <= 1 )
+						$text = sprintf( __('%1$s %2$s Revision', 'revisionary'), $status_label, $post_type_obj->labels->singular_name);
+					else
+						$text = sprintf( __('%1$s %2$s Revisions', 'revisionary'), $status_label, $post_type_obj->labels->singular_name);
+						
+					$type_clause = ( 'post' == $post_type ) ? '' : "&post_type=$post_type";
+						
+					$url = "admin.php?page=revisionary-q&post_status=$status{$type_clause}";
+
+					if (current_user_can('administrator') || (current_user_can($post_type_obj->cap->edit_published_posts) && current_user_can($post_type_obj->cap->edit_others_posts))) {  // hide count from non-Admins until it is properly filtered
+						echo "<a class='waiting' href='$url'><span class='pending-count'>$num</span> $text</a>";
+					} else {
+						echo "<a class='waiting' href='$url'>" . sprintf( __("View %s", 'revisionary'), $text) . "</a>";
+					}
 					
-				$type_clause = ( 'post' == $post_type ) ? '' : "&post_type=$post_type";
-					
-				$url = "edit.php?post_status=pending{$type_clause}";
-				echo "<a class='waiting' href='$url'><span class='pending-count'>$num</span> $text</a>";
-				echo "</div>";
+					echo "</div>";
+				}
 			}
 		}
 	}

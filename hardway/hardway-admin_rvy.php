@@ -3,8 +3,7 @@
 if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 	die();
 
-// TODO: only for edit / write post/page URIs and dashboard ?
-add_filter('query', array('RevisionaryAdminHardway', 'flt_include_pending_revisions'), 13 ); // allow regular hardway filter to apply scoping first
+//add_filter('query', array('RevisionaryAdminHardway', 'flt_include_pending_revisions'), 13 ); // allow regular hardway filter to apply scoping first
 
 if ( ! is_content_administrator_rvy() ) {
 	// URIs ending in specified filename will not be subjected to low-level query filtering
@@ -33,6 +32,9 @@ if ( ! is_content_administrator_rvy() ) {
 class RevisionaryAdminHardway {
 	
 	public static function flt_include_pending_revisions($query) {
+		return $query;
+
+		/*
 		global $wpdb;
 		
 		if ( strpos( $query, 'num_comments' ) )
@@ -47,9 +49,26 @@ class RevisionaryAdminHardway {
 			if ( strpos($query, "GROUP BY post_status") ) {
 				$p = ( strpos( $query, 'p.post_type' ) ) ? 'p.' : '';
 	
-				foreach ( $post_types as $post_type )
-					$query = str_replace("{$p}post_type = '$post_type'", "( {$p}post_type = '$post_type' OR ( {$p}post_type = 'revision' AND ( {$p}post_status = 'pending' OR {$p}post_status = 'future' ) AND {$p}post_parent IN ( SELECT ID from $wpdb->posts WHERE post_type = '$post_type' ) ) )", $query);
+				if ( defined('ICL_SITEPRESS_VERSION') ) {
+					global $sitepress;
+					
+					$lang = !empty($_REQUEST['lang']) ? $_REQUEST['lang'] : $sitepress->get_default_language();
+					
+					$icl_translations = $wpdb->prefix . 'icl_translations';
+					
+					$query = preg_replace( "/WHERE post_type\s*=\s*'([a-z_\-]+)'/", "LEFT JOIN $icl_translations AS t ON $wpdb->posts.ID = t.element_id AND t.language_code = '$lang' WHERE post_type = '$1'", $query );
 
+					$where = (strpos($query, "translations AS t")) ? "AND t.language_code = '$lang'" : '';
+					$subquery_join = "INNER JOIN $icl_translations AS t ON $wpdb->posts.ID = t.element_id AND t.language_code = '$lang'";
+				} else {
+					$where = '';
+					$subquery_join = '';
+				}
+	
+				foreach ( $post_types as $post_type ) {
+					$query = str_replace("{$p}post_type = '$post_type'", "( {$p}post_type = '$post_type' $where OR ( {$p}post_type = 'revision' AND ( {$p}post_status = 'pending' OR {$p}post_status = 'future' ) AND {$p}post_parent IN ( SELECT ID from $wpdb->posts $subquery_join WHERE post_type = '$post_type' ) ) )", $query);
+				}
+				
 			} elseif ( strpos($query, "GROUP BY $wpdb->posts.post_status") && strpos($query, "ELECT $wpdb->posts.post_status," ) ) {
 				
 				// also post-process the scoped equivalent 
@@ -90,5 +109,6 @@ class RevisionaryAdminHardway {
 		} // endif query pertains in any way to pending status and/or revisions
 		
 		return $query;
+		*/
 	}
 }

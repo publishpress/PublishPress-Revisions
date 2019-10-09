@@ -23,7 +23,7 @@ jQuery(document).ready( function($) {
 						if ( goodsave ) {
 							var redirectProp = 'redirectURL';
 							
-							if ( typeof rvyObjEdit[redirectProp] != undefined ) {
+							if ( typeof rvyObjEdit[redirectProp] != 'undefined' ) {
 								var rurl = rvyObjEdit[redirectProp];
 								var recipients = $('input[name="prev_cc_user[]"]:checked');
 								
@@ -45,13 +45,7 @@ jQuery(document).ready( function($) {
 	});
 	/*******************************************************************************************************/
 
-
-	/******************** JQUERY SUPPORT FOR RECAPTIONING PUBLISH AND PRE-PUBLISH BUTTONS **************************/
-	/*
-	 * The goal is to allow recaptioning "Publish..." to "Workflow...",  "Submit for Review" to "Submit as Pitch" etc.
-	 *
-	 */
-	function RvyRecaptionButton( btnName, btnSelector, btnCaption ) {
+	function RvyRecaptionElement(btnSelector, btnCaption) {
 		let node = document.querySelector(btnSelector);
 
 		if (node) {
@@ -61,7 +55,7 @@ jQuery(document).ready( function($) {
 
 	// Update main publish ("Publish" / "Submit Pending") button width and span caption
 	function RvySetPublishButtonCaption(caption,waitForSaveDraftButton,forceRegen,timeout) {
-		if ( caption == '' && ( typeof rvyObjEdit['publishCaptionCurrent'] != undefined )  ) {
+		if ( caption == '' && ( typeof rvyObjEdit['publishCaptionCurrent'] != 'undefined' )  ) {
 			caption = rvyObjEdit.publishCaptionCurrent;
 		} else {
 			rvyObjEdit.publishCaptionCurrent = caption;
@@ -72,7 +66,7 @@ jQuery(document).ready( function($) {
 		}
 
 		if ( ( ! waitForSaveDraftButton || $('button.editor-post-switch-to-draft').filter(':visible').length || $('button.editor-post-save-draft').filter(':visible').length ) && $('button.editor-post-publish-button').length ) {  // indicates save operation (or return from Pre-Publish) is done
-			RvyRecaptionButton('publish', 'button.editor-post-publish-button', caption);
+			RvyRecaptionElement('button.editor-post-publish-button', caption);
 		} else {
 			if ( ( typeof timeout == 'undefined' ) || parseInt(timeout) < 50 ) { timeout = 15000;}
 			var RecaptionInterval = setInterval(RvyWaitForRecaption, 100);
@@ -83,7 +77,7 @@ jQuery(document).ready( function($) {
 					if ( $('button.editor-post-publish-button').length ) {			  // indicates Pre-Publish is disabled
 						clearInterval(RvyRecaptionInterval);
 						clearTimeout(RvyRecaptionTimeout);
-						RvyRecaptionButton('publish', 'button.editor-post-publish-button', caption);
+						RvyRecaptionElement('button.editor-post-publish-button', caption);
 					} else {
 						if ( waitForSaveDraftButton ) {  // case of execution following publish click with Pre-Publish active
 							clearInterval(RvyRecaptionInterval);
@@ -121,7 +115,7 @@ jQuery(document).ready( function($) {
 	/*****************************************************************************************************************/
 
 
-	/************* RECAPTION PRE-PUBLISH AND PUBLISH BUTTONS (high level logic to retain even if jQuery hack is replaced) ****************/
+	/************* RECAPTION PRE-PUBLISH AND PUBLISH BUTTONS ****************/
 	rvyObjEdit.publishCaptionCurrent = rvyObjEdit.publish;
 	
 	// Initialization operations to perform once React loads the relevant elements
@@ -131,7 +125,7 @@ jQuery(document).ready( function($) {
 			
 			if ( $('button.editor-post-publish-panel__toggle').length ) {
 				if ( typeof rvyObjEdit.prePublish != 'undefined' && rvyObjEdit.prePublish ) {
-					RvyRecaptionButton( 'prePublish', 'button.editor-post-publish-panel__toggle', rvyObjEdit.prePublish );
+					RvyRecaptionElement('button.editor-post-publish-panel__toggle', rvyObjEdit.prePublish);
 				}
 
 				// Presence of pre-publish button means publish button is not loaded yet. Start looking for it once Pre-Publish button is clicked.
@@ -142,15 +136,15 @@ jQuery(document).ready( function($) {
 				RvySetPublishButtonCaption(rvyObjEdit.publish, false, true);
 			}
 			
-			//RevisionaryQueueCorrectDefaultSaveAsCaption();
-
 			$('select.editor-post-author__select').parent().hide();
+			$('div.edit-post-last-revision__panel').hide();
+			$('div.editor-post-link').parent().hide();
 			$('div.edit-post-post-visibility').hide();
 			$('button.editor-post-trash').hide();
-			$('div.components-panel div.components-panel__body').not(':first').hide();
 			$('button.editor-post-switch-to-draft').hide();
 
 			$('div.components-notice-list').hide();	// autosave notice
+			$('div.edit-post-post-status div.components-base-control__field input[type="checkbox"]').hide().next('label').hide(); // stick to top
 		}
 	}
 	var RvyInitInterval = setInterval(RvyInitializeBlockEditorModifications, 50);
@@ -158,18 +152,17 @@ jQuery(document).ready( function($) {
 	var RvyHideElements = function() {
 		var ediv = 'div.edit-post-sidebar ';
 
-		if ( $(ediv + 'div.edit-post-post-visibility,' + ediv + 'select.editor-post-author__select:visible,' + ediv + 'div.components-base-control__field input[type="checkbox"]:visible,' + ediv + 'button.editor-post-switch-to-draft,' + ediv + 'button.editor-post-trash').length ) {
+		if ( $(ediv + 'div.edit-post-post-visibility,' + ediv + 'div.edit-post-last-revision__panel,' + ediv + 'div.editor-post-link,' + ediv + 'select.editor-post-author__select:visible,' + ediv + 'div.components-base-control__field input[type="checkbox"]:visible,' + ediv + 'button.editor-post-switch-to-draft,' + ediv + 'button.editor-post-trash').length ) {
 			$(ediv + 'select.editor-post-author__select').parent().hide();
-			$(ediv + 'div.components-base-control__field input[type="checkbox"]').parent().hide();
+			$(ediv + 'div.edit-post-last-revision__panel').hide();
+			$(ediv + 'div.editor-post-link').parent().hide();
 			$(ediv + 'div.edit-post-post-visibility').hide();
 			$(ediv + 'button.editor-post-trash').hide();
-			$(ediv + 'div.components-panel div.components-panel__body').not(':first').hide();
 			$(ediv + 'button.editor-post-switch-to-draft').hide();
+			$(ediv + 'div.components-notice-list').hide();	// autosave notice
+			$(ediv + 'div.edit-post-post-status div.components-base-control__field input[type="checkbox"]').hide().next('label').hide();
 		}
 		
-		if ( $(ediv + 'div.components-panel > div:not(.edit-post-post-status):visible').length ) {
-			$(ediv + 'div.components-panel > div:not(.edit-post-post-status)').hide();
-		}
 	}
 	var RvyHideInterval = setInterval(RvyHideElements, 50);
 
