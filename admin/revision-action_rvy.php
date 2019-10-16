@@ -81,6 +81,9 @@ function rvy_revision_approve() {
 						$approval_error = true;
 						break;
 					}
+
+					clean_post_cache($post->ID);
+					$published_url = get_permalink($post->ID);
 				}
 			}
 
