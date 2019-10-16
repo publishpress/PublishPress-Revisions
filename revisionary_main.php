@@ -131,7 +131,7 @@ class Revisionary
 	function get_last_revision($post_id, $user_id) {
 		if ( $revisions = rvy_get_post_revisions( $post_id, 'pending-revision', array( 'order' => 'DESC', 'orderby' => 'ID' ) ) ) {  // @todo: retrieve revision_id in block editor js, pass as redirect arg
 			foreach( $revisions as $revision ) {
-				if ( $revision->post_author == $user_id ) {
+				if (rvy_is_post_author($revision, $user_id)) {
 					return $revision;
 				}
 			}
@@ -311,11 +311,9 @@ class Revisionary
 
 		if ( $post = get_post( $object_id ) ) {
 			//if ( ('revision' != $post->post_type) && ! rvy_is_revision_status($post->post_status) ) {
-				global $current_user;
-			
 				$status_obj = get_post_status_object( $post->post_status );
 
-				if ( ( $current_user->ID != $post->post_author ) && $status_obj && ! $status_obj->public && ! $status_obj->private ) {
+				if (!rvy_is_post_author($post) && $status_obj && ! $status_obj->public && ! $status_obj->private) {
 					$post_type_obj = get_post_type_object( $post->post_type );
 					if ( agp_user_can( $post_type_obj->cap->edit_published_posts, 0, '', array('skip_revision_allowance' => true) ) ) {	// don't require any additional caps for sitewide Editors
 						return $caps;
@@ -498,7 +496,7 @@ class Revisionary
 			if ( $post ) {
 				// Revisors are enabled to edit other users' posts for revision, but cannot edit other users' revisions unless cap is explicitly set sitewide
 				if ( rvy_is_revision_status($post->post_type) && ! $this->skip_revision_allowance ) {
-					if ( $post->post_author != $GLOBALS['current_user']->ID ) {
+					if (!rvy_is_post_author($post)) {
 						if ( empty( $GLOBALS['current_user']->allcaps['edit_others_revisions'] ) ) {
 							$this->skip_revision_allowance = 1;
 						}
@@ -571,7 +569,7 @@ class Revisionary
 			$post_id = rvy_detect_post_id();
 		} 
 		
-		if ( empty( $post_id ) ) {
+		if ( empty( $post_id ) || !is_scalar($post_id) ) {
 			return $status;
 		}
 
@@ -747,6 +745,9 @@ class Revisionary
 			$post = get_post($revision_id);
 		}
 
+		// Pro: better compatibility in third party action handlers
+		$revision_id = (int) $revision_id;
+
 		unset($this->impose_pending_rev[ $published_post->ID ]);
 		
 		if ( $revision_id ) {
@@ -768,6 +769,24 @@ class Revisionary
 			do_action( "save_post_{$post->post_type}", $revision_id, $post, false );
 			do_action( 'save_post', $revision_id, $post, false );
 			do_action( 'wp_insert_post', $revision_id, $post, false );
+		}
+
+		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
+			// Make sure Multiple Authors plugin does not change post_author value for revisor. Authors taxonomy terms can be revisioned for published post.
+			$wpdb->update($wpdb->posts, ['post_author' => $current_user->ID], ['ID' => $revision_id]);
+			
+			// On some sites, MA autosets Authors to current user. Temporary workaround: if Authors are set to current user, revert to published post terms.
+			$_authors = get_multiple_authors($revision_id);
+			if (count($_authors) == 1) {
+				$_author = reset($_authors);
+			}
+
+			if (empty($_authors) || ($_author->ID == $current_user->ID)) {
+				// restore original authors from published post
+				if ($published_authors = wp_get_post_terms($published_post->ID, 'author', ['fields' => 'ids'])) {
+					wp_set_post_terms($revision_id, $published_authors, 'author', false);
+				}
+			}
 		}
 
 		if ( $this->doing_rest || apply_filters('revisionary_limit_revision_fields', false, $post, $published_post) ) {
@@ -890,6 +909,9 @@ class Revisionary
 		}
 		*/
 
+		// Pro: better compatibility in third party action handlers
+		$revision_id = (int) $revision_id;
+
 		if (!empty($revision_id) && $post = get_post($revision_id)) {
 			$post_ID = $revision_id;
 			$post_arr['post_ID'] = $revision_id;
@@ -924,6 +946,11 @@ class Revisionary
 			do_action( "save_post_{$post->post_type}", $revision_id, $post, false );
 			do_action( 'save_post', $revision_id, $post, false );
 			do_action( 'wp_insert_post', $revision_id, $post, false );
+		}
+
+		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
+			// Make sure Multiple Authors plugin does not change post_author value for revisor. Authors taxonomy terms can be revisioned for published post. 
+			$wpdb->update($wpdb->posts, ['post_author' => $current_user->ID], ['ID' => $revision_id]);
 		}
 
 		require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
@@ -1076,7 +1103,7 @@ class Revisionary
 			return $data;
 		}
 
-		return $revision_id; // only return array in calling function should return
+		return (int) $revision_id; // only return array in calling function should return
 	}
 
 	/**

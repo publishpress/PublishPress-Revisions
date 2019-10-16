@@ -14,6 +14,19 @@ class RvyPostEdit {
         add_action('admin_head', array($this, 'act_admin_head') );
 
         add_action('post_submitbox_misc_actions', array($this, 'act_post_submit_revisions_links'), 5);
+
+        add_action('admin_head', [$this, 'actAdminBarPreventPostClobber'], 5);
+    }
+
+    function actAdminBarPreventPostClobber() {
+        global $post;
+
+        // prevent PHP Notice from Multiple Authors code:
+        // Notice: Trying to get property of non-object in F:\www\wp50\wp-content\plugins\publishpress-multiple-authors\core\Classes\Utils.php on line 309
+        // @todo: address within MA
+        if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && !empty($_REQUEST['post'])) {
+            $post = get_post($_REQUEST['post']);
+        }
     }
 
     function act_admin_head() {

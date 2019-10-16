@@ -84,7 +84,7 @@ function agp_user_can($reqd_caps, $object_id = 0, $user_id = 0, $args = array() 
 		global $current_user;
 	
 		if ( defined( 'PPC_VERSION' ) || defined( 'PRESSPERMIT_VERSION' ) ) { // temp workaround
-			global $current_user, $pp, $cap_interceptor;
+			global $pp, $cap_interceptor;
 			
 			if ( $current_user->ID != $user_id ) {
 				$buffer_user_id = $current_user->ID;

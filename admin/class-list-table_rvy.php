@@ -26,8 +26,14 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		add_action('manage_posts_custom_column', [$this, 'rvy_pending_custom_col'], 10, 2);
 		add_action('manage_pages_custom_column', [$this, 'rvy_pending_custom_col'], 10, 2);
+
+		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
+			// Don't allow MA to change revision author display. Authors taxonomy storage is only for application to published post.
+			global $multiple_authors_addon;
+			remove_action('the_post', [$multiple_authors_addon, 'fix_post'], 10);
+		}
 	}
-	
+
 	function do_query( $q = false ) {
 		if ( false === $q ) $q = $_GET;
 
@@ -311,10 +317,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			case 'post_author':
 				$parent_post = get_post(rvy_post_id($post->ID));
 
-				$author_caption = get_the_author_meta('display_name', $parent_post->post_author);
-
-				echo $this->apply_edit_link( add_query_arg('post_author', $parent_post->post_author, $_SERVER['REQUEST_URI']), $author_caption );
-
+				if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
+					do_action("manage_{$parent_post->post_type}_posts_custom_column", 'authors', $parent_post->ID);
+				} else {
+					$author_caption = get_the_author_meta('display_name', $parent_post->post_author);
+					echo $this->apply_edit_link(add_query_arg('post_author', $parent_post->post_author, $_SERVER['REQUEST_URI']), $author_caption);
+				}
 		} // end switch
 	}
 
@@ -854,11 +862,14 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	}
 
 	public function column_author( $post ) {
-		$args = array(
-			'author'    => get_the_author_meta( 'ID' ),
-		);
+		// Just track single post_author for revision. Authors taxonomy is applied to revise
 
-		echo $this->apply_edit_link( add_query_arg('author', $args['author'], $_SERVER['REQUEST_URI']), get_the_author() );
+		//if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
+		//	do_action("manage_{$post->post_type}_posts_custom_column", 'authors', $post->ID);
+		//} else {
+			$args = ['author' => get_the_author_meta( 'ID' )];
+			echo $this->apply_edit_link( add_query_arg('author', $args['author'], $_SERVER['REQUEST_URI']), get_the_author() );
+		//}
 	}
 
 	/**
@@ -907,6 +918,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if ( is_post_type_viewable( $post_type_object ) ) {
 			if ( $can_read_post ) {
 				$_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
+
 				$preview_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $post ) ) );
 				$preview_link = remove_query_arg( 'post_type', $preview_link );
 				$actions['view'] = sprintf(

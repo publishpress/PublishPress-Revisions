@@ -2,9 +2,9 @@
 Contributors: publishpress, kevinB, stevejburge, andergmartins
 Tags: revision, access, permissions, cms, user, groups, members, admin, pages, posts, page, Post
 Requires at least: 4.9.7
-Tested up to: 5.2.3
+Tested up to: 5.2.4
 Requires PHP: 5.6.20
-Stable Tag: 2.0.4
+Stable Tag: 2.0.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -34,6 +34,8 @@ To moderate or schedule changes to published posts, just install PublishPress Re
 = Additional Features in the Pro Version =
 * Advanced Custom Fields integration
 * BeaverBuilder integration
+* The Events Calendar compatibility
+* WooCommerce compatibility
 * WPML integration
 
 For more details about both the free and pro version, see our <a href="https://publishpress.com/revisionary/">Plugin Overview</a> and <a href="https://publishpress.com/documentation/revisionary-start/">Plugin Documentation</a>.
@@ -58,7 +60,19 @@ For more details about both the free and pro version, see our <a href="https://p
 
 == Changelog ==
 
+= 2.0.5 - 16 Oct 2019 =
+* Fixed : Import script for Revisionary 1.x revisions did not run on plugin activation 
+* Fixed : Administrators, Editors and Authors were blocked from Quick Edit
+* Compat : Multiple Authors plugin
+* Fixed : Scheduled Revisions - If "Update Publish Date" enabled, 404 Not Found redirect after manually publishing a scheduled revision if the post type uses post date in permalink structure
+* Fixed : Pending Revisions - Published post date was not updated even if "Update Publish Date" setting enabled
+* Change : Pending Revision Notification - Include link to Revision Queue
+* Fixed : Pending Revision Notification - If enabled for author only, email was sent with a blank title and message
+* Fixed : Empty Revision Queue was displayed to Subscribers with no Revision capabilities
+* Fixed : PHP notices on Revision Queue screen
+
 = 2.0.4 - 9 Oct 2019 =
+* Change : On installation over Revisionary 1.x, display a "heads up" notice about plugin name change, admin menu and Revision Queue
 * Fixed : Classic Editor - Revision Preview did not always include top bar (for Edit / Compare / Publish) if PressPermit Pro active
 * Fixed : Revision Preview - Edit url did not work on installations with non-conventional admin paths, due to hardcoded /wp-admin
 * Fixed : Schedule Revision notifications sent redundantly under some conditions

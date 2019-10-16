@@ -5,7 +5,7 @@
  * Description: Maintain published content with teamwork and precision using the Revisions model to submit, approve and schedule changes.
  * Author: PublishPress
  * Author URI: https://publishpress.com
- * Version: 2.0.4
+ * Version: 2.0.5
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 4.9.7
@@ -92,6 +92,23 @@ if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1
 
 define('REVISIONARY_FILE', __FILE__);
 
+// register these functions before any early exits so normal activation/deactivation can still run with RS_DEBUG
+register_activation_hook(__FILE__, function() 
+	{
+		// mirror to REVISIONARY_VERSION
+		update_option('revisionary_last_version', '2.0.5');
+
+		// force this timestamp to be regenerated, in case something went wrong before
+		delete_option( 'rvy_next_rev_publish_gmt' );
+
+		if (!class_exists('RevisionaryActivation')) {
+			require_once(dirname(__FILE__).'/activation_rvy.php');
+		}
+
+		new RevisionaryActivation(['import_legacy' => true]);
+	}
+);
+
 // negative priority to precede any default WP action handlers
 add_action(
 	'plugins_loaded', 
@@ -135,8 +152,7 @@ add_action(
 			return;
 		}
 
-		define('REVISIONARY_VERSION', 	  '2.0.4');
-		define('REVISIONARY_EDD_ITEM_ID', 40280);
+		define('REVISIONARY_VERSION', 	  '2.0.5');
 
 		if ( ! defined( 'RVY_VERSION' ) ) {
 			define( 'RVY_VERSION', REVISIONARY_VERSION );  // back compat
@@ -197,24 +213,4 @@ add_action(
 		revisionary();
 	}
 	, -10
-);
-
-register_activation_hook(
-	__FILE__, 
-	function()
-	{
-		// run the migration script after regular plugin init so we have the plugin version constant defined
-		add_action(
-			'plugins_loaded',
-			function() 
-			{
-				// force this timestamp to be regenerated, in case something went wrong before
-				delete_option( 'rvy_next_rev_publish_gmt' );
-
-				require_once( dirname(__FILE__).'/activation_rvy.php' );
-				new RevisionaryActivation(['import_legacy' => true]);
-			},
-			20
-		);
-	}
 );

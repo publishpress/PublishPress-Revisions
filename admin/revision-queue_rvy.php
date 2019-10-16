@@ -63,9 +63,7 @@ if ( $doaction ) {
 					continue;
 				
 				if ( ! current_user_can('administrator') && ! current_user_can( 'delete_post', rvy_post_id($revision->ID) ) ) {  // @todo: review Administrator cap check
-					global $current_user;
-		
-					if ( ( 'pending-revision' != $revision->post_status ) || ( $revision->post_author != $current_user->ID ) ) {	// allow submitters to delete their own still-pending revisions
+					if (('pending-revision' != $revision->post_status) || !rvy_is_post_author($revision)) {	// allow submitters to delete their own still-pending revisions
 						wp_die( __('Sorry, you are not allowed to delete this revision.') );
 					}
 				} 
@@ -89,6 +87,11 @@ $wp_list_table->prepare_items();
 
 $bulk_counts = array(
 	'deleted'   => isset( $_REQUEST['deleted'] )   ? absint( $_REQUEST['deleted'] )   : 0,
+	'updated' => 0,
+	'locked' => 0,
+	'deleted' => 0,
+	'trashed' => 0,
+	'untrashed' => 0,
 );
 
 $bulk_messages = array();

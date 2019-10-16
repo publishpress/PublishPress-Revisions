@@ -92,23 +92,34 @@ function rvy_metabox_notification_list() {
 		if ( '1' === $notify_author ) {
 			global $post;
 	
-			if ( empty( $default_ids[$post->post_author] ) ) {
-				if ( defined('RVY_CONTENT_ROLES') ) {
-					$revisionary->skip_revision_allowance = true;
-					$cols = ( defined('COLS_ALL_RS') ) ? COLS_ALL_RS : 'all';
-					$author_notify = (bool) $revisionary->content_roles->users_who_can( 'edit_post', $object_id, array( 'cols' => $cols, 'force_refresh' => true, 'user_ids' => (array) $post->post_author ) );
-					$revisionary->skip_revision_allowance = false;
-				} else {
-					$_user = new WP_User($post->post_author);
-					$reqd_caps = map_meta_cap( $type_obj->cap->edit_post, $_user->ID, $object_id );
-					$author_notify = ! array_diff( $reqd_caps, array_keys( array_intersect( $_user->allcaps, array( true, 1, '1' ) ) ) );
-				}
+			if (function_exists('get_multiple_authors')) {
+				$author_ids = [];
+				foreach(get_multiple_authors($post) as $_author) {
+					$author_ids []= $_author->ID;
+				}	
+			} else {
+				$author_ids = [$post->post_author];
+			}
 
-				if ( $author_notify ) {
-					$default_ids[$post->post_author] = true;
-	
-					$user = new WP_User( $post->post_author );
-					$post_publishers[] = $user;
+			foreach($author_ids as $author_id) {
+				if ( empty( $default_ids[$author_id] ) ) {
+					if ( defined('RVY_CONTENT_ROLES') ) {
+						$revisionary->skip_revision_allowance = true;
+						$cols = ( defined('COLS_ALL_RS') ) ? COLS_ALL_RS : 'all';
+						$author_notify = (bool) $revisionary->content_roles->users_who_can( 'edit_post', $object_id, array( 'cols' => $cols, 'force_refresh' => true, 'user_ids' => (array) $author_id ) );
+						$revisionary->skip_revision_allowance = false;
+					} else {
+						$_user = new WP_User($author_id);
+						$reqd_caps = map_meta_cap( $type_obj->cap->edit_post, $_user->ID, $object_id );
+						$author_notify = ! array_diff( $reqd_caps, array_keys( array_intersect( $_user->allcaps, array( true, 1, '1' ) ) ) );
+					}
+
+					if ( $author_notify ) {
+						$default_ids[$author_id] = true;
+
+						$user = new WP_User( $author_id );
+						$post_publishers[] = $user;
+					}
 				}
 			}
 		}
@@ -321,7 +332,7 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 		if ( 'revision' === $type && wp_is_post_autosave( $revision ) )
 			continue;
 			
-		if ( $hide_others_revisions && ( ( 'revision' == $revision->post_type ) || rvy_is_revision_status($revision->post_status) ) && ( $revision->post_author != $current_user->ID ) )
+		if ( $hide_others_revisions && ( ( 'revision' == $revision->post_type ) || rvy_is_revision_status($revision->post_status) ) && !rvy_is_post_author($revision) )
 			continue;
 		
 		// todo: set up buffering to restore this in case we (or some other plugin) impose revision-specific read capability
@@ -330,7 +341,16 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 
 		$date = rvy_post_revision_title( $revision, true, $date_field, compact( 'post', 'format' ) );
 
-		$name = get_the_author_meta( 'display_name', $revision->post_author );
+		// Just track single post_author for revision. Changes to Authors taxonomy will be applied to published post.
+		//
+		//if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
+		//	ob_start();
+		//	do_action("manage_{$revision->post_type}_posts_custom_column", 'authors', $revision->ID);
+		//	$name = ob_get_contents();
+		//	ob_end_clean();
+		//} else {
+			$name = get_the_author_meta( 'display_name', $revision->post_author );
+		//}
 
 		if ( 'form-table' == $format ) {
 			if ( ! $left_checked_done ) {
@@ -412,7 +432,7 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 			$rows .= "\t<td>$name</td>\n";
 			$rows .= "\t<td class='action-links'>$actions</td>\n";
 			if ( $post->ID != $revision->ID 
-			&& ( $can_edit_post || ( ( 'pending-revision' == $status ) && ( $revision->post_author == $current_user->ID ) ) )	// allow submitters to delete their own still-pending revisions
+			&& ( $can_edit_post || ( ('pending-revision' == $status) && rvy_is_post_author($revision) ) )	// allow submitters to delete their own still-pending revisions
 			) {
 				$rows .= "\t<td style='text-align:right'><input class='rvy-rev-chk' type='checkbox' name='delete_revisions[]' value='" . $revision->ID . "' /></td>\n";
 				$can_delete_any = true;

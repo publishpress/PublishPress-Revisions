@@ -168,38 +168,48 @@ class RevisionaryAdmin
 			}
 		}
 
-		static $limit_quickedit;
+		static $can_edit_published;
+		static $can_edit_others;
 		static $listed_post_statuses;
 
-		if (is_null($limit_quickedit) && ! empty( $wp_query->posts ) ) {
+		if (is_null($can_edit_others) && ! empty( $wp_query->posts ) ) {
 			if (!$type_obj = get_post_type_object($typenow)) {
 				$limit_quickedit = false;
 				return;
 			}
 	
-			$limit_quickedit = !agp_user_can($type_obj->cap->edit_others_posts, 0, '', array('skip_revision_allowance' => true))
-							|| !agp_user_can($type_obj->cap->edit_published_posts, 0, '', array('skip_revision_allowance' => true));
-		
-			$listed_post_statuses = array();
-			$ids = array();
-			foreach ($wp_query->posts as $row) {
-				$ids []= $row->ID;
-			}
+			$can_edit_others = agp_user_can($type_obj->cap->edit_others_posts, 0, '', array('skip_revision_allowance' => true));
 
-			$id_csv = implode("','", $ids);
-			$results = $wpdb->get_results("SELECT ID, post_status FROM $wpdb->posts WHERE ID IN ('$id_csv')");
-			foreach($results as $row ) {
-				$listed_post_statuses[$row->ID] = $row->post_status;
+			$can_edit_published = agp_user_can($type_obj->cap->edit_published_posts, 0, '', array('skip_revision_allowance' => true));
+			
+			if (!$can_edit_others || !$can_edit_published) {
+				$listed_post_statuses = array();
+				$ids = array();
+				foreach ($wp_query->posts as $row) {
+					$ids []= $row->ID;
+				}
+
+				$id_csv = implode("','", $ids);
+				$results = $wpdb->get_results("SELECT ID, post_status FROM $wpdb->posts WHERE ID IN ('$id_csv')");
+				foreach($results as $row ) {
+					$listed_post_statuses[$row->ID] = $row->post_status;
+				}
 			}
-		} elseif(!$limit_quickedit) {
+		}
+		
+		if ($can_edit_others && $can_edit_published) {
 			return;
 		}
 
 		$published_stati = get_post_stati(array('public' => true, 'private' => true), 'names', 'OR');
 
-        foreach ($wp_query->posts as $row) {
-            if (in_array($listed_post_statuses[$row->ID], $published_stati)) {
-				$this->hide_quickedit []= $row->ID;
+		if (!empty($wp_query->posts)) {
+			foreach ($wp_query->posts as $row) {
+				if (in_array($listed_post_statuses[$row->ID], $published_stati)) {
+					if (!$can_edit_published || (!$can_edit_others && !rvy_is_post_author($row))) {
+						$this->hide_quickedit []= $row->ID;
+					}
+				}
 			}
 		}
 	}
@@ -259,14 +269,14 @@ class RevisionaryAdmin
 	}
 
 	function handle_submission_redirect() {
-		global $revisionary, $current_user;
+		global $revisionary;
 
 		if ( $revised_post = get_post( (int) $_REQUEST['post_id'] ) ) {
 			$status = sanitize_key( $_REQUEST['revision_submitted'] );
 
 			if ( $revisions = rvy_get_post_revisions( $revised_post->ID, $status, array( 'order' => 'DESC', 'orderby' => 'ID' ) ) ) {  // @todo: retrieve revision_id in block editor js, pass as redirect arg
 				foreach( $revisions as $revision ) {
-					if ( $revision->post_author == $current_user->ID ) {
+					if (rvy_is_post_author($revision)) {
 						if ( time() - strtotime( $revision->post_modified_gmt ) < 90 ) { // sanity check in finding the revision that was just submitted
 							$args = array( 'revision_id' => $revision->ID, 'published_post' => $revised_post, 'object_type' => $revised_post->post_type );
 							if ( ! empty( $_REQUEST['cc'] ) ) {
@@ -524,6 +534,8 @@ class RevisionaryAdmin
 	}
 
 	function build_menu() {
+		global $current_user;
+
 		if ( strpos( $_SERVER['REQUEST_URI'], 'wp-admin/network/' ) )
 			return;
 	
@@ -534,11 +546,24 @@ class RevisionaryAdmin
 			add_submenu_page( 'none', __('Revisions', 'revisionary'), __('Revisions', 'revisionary'), 'read', 'rvy-revisions', 'rvy_include_admin_revisions' );
 		}
 
-		if ( rvy_get_manageable_types() ) {
-			$_menu_caption = ( defined( 'RVY_MODERATION_MENU_CAPTION' ) ) ? RVY_MODERATION_MENU_CAPTION : __('Revisions');
-			add_menu_page( __($_menu_caption, 'pp'), __($_menu_caption, 'pp'), 'read', 'revisionary-q', array(&$this, 'moderation_queue'), 'dashicons-backup', 29 );
+		if ($types = rvy_get_manageable_types()) {
+			$can_edit_any = false;
 
-			add_submenu_page('revisionary-q', __('Revision Queue', 'revisionary'), __('Revision Queue', 'revisionary'), 'read', 'revisionary-q', [$this, 'moderation_queue']);
+			foreach ($types as $_post_type) {
+				if ($type_obj = get_post_type_object($_post_type)) {
+					if (!empty($current_user->allcaps[$type_obj->cap->edit_posts])) {
+						$can_edit_any = true;
+						break;
+					}
+				}
+			}
+
+			if (apply_filters('revisionary_add_menu', $can_edit_any)) {
+				$_menu_caption = ( defined( 'RVY_MODERATION_MENU_CAPTION' ) ) ? RVY_MODERATION_MENU_CAPTION : __('Revisions');
+				add_menu_page( __($_menu_caption, 'pp'), __($_menu_caption, 'pp'), 'read', 'revisionary-q', array(&$this, 'moderation_queue'), 'dashicons-backup', 29 );
+
+				add_submenu_page('revisionary-q', __('Revision Queue', 'revisionary'), __('Revision Queue', 'revisionary'), 'read', 'revisionary-q', [$this, 'moderation_queue']);
+			}
 		}
 
 		if ( ! current_user_can( 'manage_options' ) )

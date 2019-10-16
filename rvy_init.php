@@ -754,3 +754,27 @@ function rvy_init() {
 	global $revisionary;
 	$revisionary = new Revisionary();
 }
+
+function rvy_is_post_author($post, $user = false) {
+	if (!is_object($post)) {
+		if (!$post = get_post($post)) {
+			return false;
+		}
+	}
+
+	if (false === $user) {
+		global $current_user;
+		$user_id = $current_user->ID;
+	} else {
+		$user_id = (is_object($user)) ? $user->ID : $user;
+	}
+
+	if ($post->post_author == $user_id) {
+		return true;
+
+	} elseif (function_exists('is_multiple_author_for_post') && is_multiple_author_for_post($user_id, $post->ID)) {
+		return true;
+	}
+
+	return false;
+}

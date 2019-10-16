@@ -4,6 +4,8 @@ class RevisionaryHistory
     var $published_post_ids = [];
     var $post_status = 'pending-revision';
 
+    private $authors = [];
+
 	function __construct() {
         add_action('load-revision.php', [$this, 'actLoadRevision']);
 
@@ -701,6 +703,47 @@ class RevisionaryHistory
         return $return;
     }
 
+    private function loadAuthorInfo($revision, $use_multiple_authors, $args = []) {
+        $show_avatars = !empty($args['show_avatars']);
+
+        if ($use_multiple_authors = $use_multiple_authors && function_exists('get_multiple_authors')) {
+            $author_ids = [];
+            $authors = get_multiple_authors($revision);
+            foreach($authors as $_author) {
+                $author_ids []= $_author->ID;
+            }
+        } else {
+            $author_ids = [$revision->post_author];
+            
+            if ($_author = new WP_User($revision->post_author)) {
+                $authors = [$_author];
+            }
+        }
+        
+        $author_key = implode(",", $author_ids);
+
+        if ( ! isset( $this->authors[ $author_key ] ) ) {
+            $author_captions = [];
+            $avatars = '';
+            foreach($authors as $_author) {
+                $author_captions []= ($use_multiple_authors) ? esc_html($_author->display_name) : get_the_author_meta('display_name', $_author->ID);
+                $avatars .= $show_avatars ? get_avatar( $_author->ID, 32 ) : '';
+            }
+
+            if (empty($author_captions)) {
+                $author_captions[] =  __('No author', 'revisionary');
+            }
+
+            $this->authors[ $author_key ] = array(
+                'id'     => (int) $revision->post_author,
+                'avatar' => $avatars,
+                'name'   => implode(', ', $author_captions),
+            );
+        }
+
+        return $author_key;
+    }
+
     /**
      * Prepare revisions for JavaScript.
 
@@ -714,7 +757,6 @@ class RevisionaryHistory
     // Port of wp_prepare_revisions_for_js() to support pending, scheduled revisions
     private function prepare_revisions_for_js( $post, $selected_revision_id, $from = null, $revisions = null ) {
         $post    = get_post( $post );
-        $authors = array();
         $now_gmt = time();
 
         if (is_null($revisions)) {
@@ -749,14 +791,6 @@ class RevisionaryHistory
         foreach ( $revisions as $revision ) {
             $modified     = strtotime( $revision->post_modified );
             $modified_gmt = strtotime( $revision->post_modified_gmt . ' +0000' );
-            
-            if ( ! isset( $authors[ $revision->post_author ] ) ) {
-                $authors[ $revision->post_author ] = array(
-                    'id'     => (int) $revision->post_author,
-                    'avatar' => $show_avatars ? get_avatar( $revision->post_author, 32 ) : '',
-                    'name'   => get_the_author_meta( 'display_name', $revision->post_author ),
-                );
-            }
 
             //$autosave = (bool) wp_is_post_autosave( $revision );
             //$current  = ! $autosave && $revision->post_modified_gmt === $post->post_modified_gmt;
@@ -804,10 +838,13 @@ class RevisionaryHistory
 
             $time_diff_label = ($now_gmt > $modified_gmt) ? __( '%s%s ago' ) : __( '%s%s from now', 'revisionary');
 
+            // Just track single post_author for revision.  Changes to Authors taxonomy will be applied to published post.
+            $author_key = $this->loadAuthorInfo($revision, false, compact('show_avatars'));
+
             $revisions_data = [
                 'id'         => $revision->ID,
                 'title'      => get_the_title( $revision->ID ),
-                'author'     => $authors[ $revision->post_author ],
+                'author'     => $this->authors[ $author_key ],
                 'date'       => sprintf('%s%s', $date_prefix, date_i18n( __( 'M j, Y @ g:i a' ), $modified )),
                 'dateShort'  => date_i18n( _x( 'j M @ g:i a', 'revision date short format' ), $modified ),
                 'timeAgo'    => sprintf( $time_diff_label, $date_prefix, human_time_diff( $modified_gmt, $now_gmt ) ),
@@ -846,10 +883,12 @@ class RevisionaryHistory
          * when we have an autsosave and the user has clicked 'View the Autosave'
          */
         if ( 1 === sizeof( $revisions ) ) {
+            $author_key = $this->loadAuthorInfo($post, true, compact('show_avatars'));
+
             $revisions[ $post->ID ] = array(
                 'id'         => $post->ID,
                 'title'      => get_the_title( $post->ID ),
-                'author'     => $authors[ $post->post_author ],
+                'author'     => $this->authors[ $author_key ],
                 'date'       => date_i18n( __( 'M j, Y @ H:i' ), strtotime( $post->post_modified ) ),
                 'dateShort'  => date_i18n( _x( 'j M @ H:i', 'revision date short format' ), strtotime( $post->post_modified ) ),
                 'timeAgo'    => sprintf( __( '%s ago' ), human_time_diff( strtotime( $post->post_modified_gmt ), $now_gmt ) ),

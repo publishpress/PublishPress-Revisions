@@ -20,6 +20,8 @@ class Rvy_Revision_Workflow_UI {
             $post_arr = array_merge( $revisionary->rest->request->get_params(), $post_arr );
         }
 
+        $recipient_ids = [];
+
         $admin_notify = rvy_get_option( 'pending_rev_notify_admin' );
         $author_notify = rvy_get_option( 'pending_rev_notify_author' );
         if ( ( $admin_notify || $author_notify ) && $revision_id ) {
@@ -29,27 +31,26 @@ class Rvy_Revision_Workflow_UI {
             
             $blogname = wp_specialchars_decode( get_option('blogname'), ENT_QUOTES );
             
+            $title = sprintf( __('[%s] Pending Revision Notification', 'revisionary'), $blogname );
+            
+            $message = sprintf( __('A pending revision to the %1$s "%2$s" has been submitted.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
+            
+
+            if ( $author = new WP_User( $post_arr['post_author'] ) ) {
+                $message .= sprintf( __('It was submitted by %1$s.', 'revisionary' ), $author->display_name ) . "\r\n\r\n";
+            }
+
+            if ( $revision_id ) {
+                $preview_link = add_query_arg( array( 'preview' => '1', 'rvy_revision' => true ), get_post_permalink( $revision_id ) );
+                $message .= __( 'Preview and Approval: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
+
+                $message .= __( 'Revision Queue: ', 'revisionary' ) . admin_url("admin.php?page=revisionary-q&published_post={$published_post->ID}") . "\r\n";
+                
+                $message .= __( 'Edit Revision: ', 'revisionary' ) . admin_url("post.php?action=edit&post={$revision_id}") . "\r\n";
+            }
+
             if ( $admin_notify ) {
-                $title = sprintf( __('[%s] Pending Revision Notification', 'revisionary'), $blogname );
-                
-                $message = sprintf( __('A pending revision to the %1$s "%2$s" has been submitted.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
-                
-
-                if ( $author = new WP_User( $post_arr['post_author'] ) ) {
-                    $message .= sprintf( __('It was submitted by %1$s.', 'revisionary' ), $author->display_name ) . "\r\n\r\n";
-                }
-
-                if ( $revision_id ) {
-                    $preview_link = add_query_arg( array( 'preview' => '1', 'rvy_revision' => true ), get_post_permalink( $revision_id ) );
-                    $message .= __( 'Preview and Approval: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
-
-                    //$message .= __( 'Management Screen: ', 'revisionary' ) . admin_url("admin.php?page=rvy-revisions&action=view&revision={$revision_id}") . "\r\n";
-                    
-                    $message .= __( 'Edit Revision: ', 'revisionary' ) . admin_url("post.php?action=edit&post={$revision_id}") . "\r\n";
-                }
-
                 // establish the publisher recipients
-                $recipient_ids = array();
                 
                 if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') ) {
                     $monitor_groups_enabled = true;
@@ -110,9 +111,20 @@ class Rvy_Revision_Workflow_UI {
             }
 
             if ( $author_notify ) {
-                if ( ( 'always' == $author_notify ) || ( $selected_recipients && in_array( $published_post->post_author, $selected_recipients ) ) ) {
-                    $recipient_ids []= $published_post->post_author;
+                if (function_exists('get_multiple_authors')) {
+                    $author_ids = [];
+                    foreach(get_multiple_authors($published_post) as $_author) {
+                        $author_ids []= $_author->ID;
+                    }	
+                } else {
+                    $author_ids = [$published_post->post_author];
                 }
+
+                if ('always' != $author_notify) {
+                    $author_ids = $selected_recipients ? array_intersect($author_ids, $selected_recipients) : [];
+                }
+
+                $recipient_ids = array_merge($recipient_ids, $author_ids);
             }
 
             if ( $recipient_ids ) {
