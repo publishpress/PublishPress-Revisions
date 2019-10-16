@@ -524,6 +524,8 @@ class RevisionaryAdmin
 	}
 
 	function build_menu() {
+		global $current_user;
+
 		if ( strpos( $_SERVER['REQUEST_URI'], 'wp-admin/network/' ) )
 			return;
 	
@@ -534,11 +536,24 @@ class RevisionaryAdmin
 			add_submenu_page( 'none', __('Revisions', 'revisionary'), __('Revisions', 'revisionary'), 'read', 'rvy-revisions', 'rvy_include_admin_revisions' );
 		}
 
-		if ( rvy_get_manageable_types() ) {
-			$_menu_caption = ( defined( 'RVY_MODERATION_MENU_CAPTION' ) ) ? RVY_MODERATION_MENU_CAPTION : __('Revisions');
-			add_menu_page( __($_menu_caption, 'pp'), __($_menu_caption, 'pp'), 'read', 'revisionary-q', array(&$this, 'moderation_queue'), 'dashicons-backup', 29 );
+		if ($types = rvy_get_manageable_types()) {
+			$can_edit_any = false;
 
-			add_submenu_page('revisionary-q', __('Revision Queue', 'revisionary'), __('Revision Queue', 'revisionary'), 'read', 'revisionary-q', [$this, 'moderation_queue']);
+			foreach ($types as $_post_type) {
+				if ($type_obj = get_post_type_object($_post_type)) {
+					if (!empty($current_user->allcaps[$type_obj->cap->edit_posts])) {
+						$can_edit_any = true;
+						break;
+					}
+				}
+			}
+
+			if (apply_filters('revisionary_add_menu', $can_edit_any)) {
+				$_menu_caption = ( defined( 'RVY_MODERATION_MENU_CAPTION' ) ) ? RVY_MODERATION_MENU_CAPTION : __('Revisions');
+				add_menu_page( __($_menu_caption, 'pp'), __($_menu_caption, 'pp'), 'read', 'revisionary-q', array(&$this, 'moderation_queue'), 'dashicons-backup', 29 );
+
+				add_submenu_page('revisionary-q', __('Revision Queue', 'revisionary'), __('Revision Queue', 'revisionary'), 'read', 'revisionary-q', [$this, 'moderation_queue']);
+			}
 		}
 
 		if ( ! current_user_can( 'manage_options' ) )
