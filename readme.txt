@@ -64,6 +64,8 @@ For more details about both the free and pro version, see our <a href="https://p
 * Fixed : Import script for Revisionary 1.x revisions did not run on plugin activation 
 * Fixed : Administrators, Editors and Authors were blocked from Quick Edit
 * Compat : Multiple Authors plugin
+* Fixed : Scheduled Revisions - If "Update Publish Date" enabled, 404 Not Found redirect after manually publishing a scheduled revision if the post type uses post date in permalink structure
+* Fixed : Pending Revisions - Published post date was not updated even if "Update Publish Date" setting enabled
 * Change : Pending Revision Notification - Include link to Revision Queue
 * Fixed : Pending Revision Notification - If enabled for author only, email was sent with a blank title and message
 * Fixed : Empty Revision Queue was displayed to Subscribers with no Revision capabilities
