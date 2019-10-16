@@ -745,6 +745,9 @@ class Revisionary
 			$post = get_post($revision_id);
 		}
 
+		// Pro: better compatibility in third party action handlers
+		$revision_id = (int) $revision_id;
+
 		unset($this->impose_pending_rev[ $published_post->ID ]);
 		
 		if ( $revision_id ) {
@@ -905,6 +908,9 @@ class Revisionary
 			}
 		}
 		*/
+
+		// Pro: better compatibility in third party action handlers
+		$revision_id = (int) $revision_id;
 
 		if (!empty($revision_id) && $post = get_post($revision_id)) {
 			$post_ID = $revision_id;
@@ -1097,7 +1103,7 @@ class Revisionary
 			return $data;
 		}
 
-		return $revision_id; // only return array in calling function should return
+		return (int) $revision_id; // only return array in calling function should return
 	}
 
 	/**
