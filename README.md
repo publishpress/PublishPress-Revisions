@@ -8,13 +8,13 @@ WordPress Revisions are a powerful way to track where your site has been. But wh
 
 To moderate or schedule changes to published posts, just install PublishPress Revisions and let the teamwork begin.  There is no need to learn or configure complex new screens. Users gain new abilities through the familiar UI of the Edit Posts screen and Gutenberg or Classic Editor. 
 
-= New Editorial Capabilities, Smoothly Integrated =
+### New Editorial Capabilities, Smoothly Integrated
 * "Contributors" can submit revisions to their own published posts.
 * "Revisors" can submit revisions to posts and pages published by others.
 * "Authors", "Editors" and "Administrators" can approve revisions or schedule their own revisions.
 * To schedule changes to a published post, just set the desired future date before hitting Update.
 
-= Features =
+### Features
 * Schedule or request changes to published posts and pages using the Gutenberg (or Classic) Editor
 * Revision fields include Content, Title, Excerpt, Categories, Tags, Custom Taxonomy Terms, Page Parent or Page Template
 * Display changes using the familiar Compare Revisions interface
@@ -23,7 +23,7 @@ To moderate or schedule changes to published posts, just install PublishPress Re
 * New WordPress role, "Revisor" is a moderated Editor.
 * Works with site-wide WordPress Roles, or in conjunction with <a href="https://publishpress.com/presspermit/">PressPermit Pro</a> for page-specific or category-specific permissions.
 
-= Additional Features in the Pro Version =
+### Additional Features in the Pro Version
 * Advanced Custom Fields integration
 * BeaverBuilder integration
 * The Events Calendar compatibility
