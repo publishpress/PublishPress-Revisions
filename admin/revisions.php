@@ -11,8 +11,6 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
  * @since       1.0.0
  */
 
-global $current_user, $revisionary; 
- 
 include_once( dirname(__FILE__).'/revision-ui_rvy.php' ); 
 
 if ( defined( 'FV_FCK_NAME' ) && current_user_can('activate_plugins') ) {
@@ -100,7 +98,7 @@ default :
 		if ( ! $revision_status )
 			$revision_status = 'inherit';
 
-		if ( !current_user_can( 'edit_post', $rvy_post->ID ) && ( $rvy_post->post_author != $current_user->ID ) )
+		if (!current_user_can('edit_post', $rvy_post->ID) && !rvy_is_post_author($rvy_post))
 			wp_die();
 
 	} else {
@@ -110,8 +108,9 @@ default :
 		// actual status of compared objects overrides any revision_Status arg passed in
 		$revision_status = $revision->post_status;
 
-		if ( !current_user_can( 'edit_post', $rvy_post->ID ) && ( $revision->post_author != $current_user->ID ) )
+		if (!current_user_can( 'edit_post', $rvy_post->ID ) && !rvy_is_post_author($revision)) {
 			wp_die();
+		}
 	}
 
 	if ( $type_obj = get_post_type_object( $rvy_post->post_type ) ) {
@@ -168,8 +167,8 @@ if ( ! $can_fully_edit_post = agp_user_can( $edit_cap, $rvy_post->ID, '', array(
 if ( 'diff' != $action ) {
 	$can_edit = ( ( 'revision' == $revision->post_type ) || rvy_is_revision_status($revision->post_status) ) && (
 		$can_fully_edit_post || 
-		( ( $revision->post_author == $current_user->ID || $_can_edit_others ) && ( 'pending-revision' == $revision->post_status ) ) 
-		 );
+		( (rvy_is_post_author($revision) || $_can_edit_others) && ('pending-revision' == $revision->post_status) ) 
+		);
 }
 ?>
 

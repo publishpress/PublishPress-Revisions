@@ -111,9 +111,20 @@ class Rvy_Revision_Workflow_UI {
             }
 
             if ( $author_notify ) {
-                if ( ( 'always' == $author_notify ) || ( $selected_recipients && in_array( $published_post->post_author, $selected_recipients ) ) ) {
-                    $recipient_ids []= $published_post->post_author;
+                if (function_exists('get_multiple_authors')) {
+                    $author_ids = [];
+                    foreach(get_multiple_authors($published_post) as $_author) {
+                        $author_ids []= $_author->ID;
+                    }	
+                } else {
+                    $author_ids = [$published_post->post_author];
                 }
+
+                if ('always' != $author_notify) {
+                    $author_ids = $selected_recipients ? array_intersect($author_ids, $selected_recipients) : [];
+                }
+
+                $recipient_ids = array_merge($recipient_ids, $author_ids);
             }
 
             if ( $recipient_ids ) {

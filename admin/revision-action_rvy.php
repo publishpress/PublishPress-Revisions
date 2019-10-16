@@ -128,9 +128,18 @@ function rvy_revision_approve() {
 				$message .= __( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";	
 			}
 			
-			if ( $db_action && ( $post->post_author != $revision->post_author ) && rvy_get_option( 'rev_approval_notify_author' ) ) {
-				if ( $author = new WP_User( $post->post_author ) ) {
-					rvy_mail( $author->user_email, $title, $message );
+			if ( $db_action && rvy_get_option( 'rev_approval_notify_author' ) ) {
+				if (function_exists('get_multiple_authors')) {
+					$authors = get_multiple_authors($post);
+				} else {
+					$author = new WP_User($post->post_author);
+					$authors = [$author];
+				}
+
+				foreach($authors as $author) {
+					if ($author) {
+						rvy_mail($author->user_email, $title, $message);
+					}
 				}
 			}
 			
@@ -342,6 +351,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		revisionary_copy_meta_field('_page_template', $revision->ID, $post->ID);
 	}
 
+	// Allow Multiple Authors revisions to be applied to published post. Revision post_author is forced to actual submitting user.
+	//$skip_taxonomies = (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) ? ['author'] : [];
 	revisionary_copy_terms($revision_id, $post_id);
 
 	// @todo save change as past revision?
@@ -434,7 +445,6 @@ function rvy_revision_delete() {
 }
 
 function rvy_revision_bulk_delete() {
-	global $current_user;
 	require_once( ABSPATH . 'wp-admin/admin.php');
 
 	check_admin_referer( 'rvy-revisions' );
@@ -656,9 +666,19 @@ function rvy_publish_scheduled_revisions($args = array()) {
 
 					if ( ! empty($post->ID) )
 						$message .= __( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";
-						
-					if ( $author = new WP_User( $post->post_author ) )
-						rvy_mail( $author->user_email, $title, $message );
+				
+					if (function_exists('get_multiple_authors')) {
+						$authors = get_multiple_authors($post);
+					} else {
+						$author = new WP_User($post->post_author);
+						$authors = [$author];
+					}
+	
+					foreach($authors as $author) {
+						if ($author) {
+							rvy_mail( $author->user_email, $title, $message );
+						}
+					}
 				}
 				
 				if ( rvy_get_option( 'publish_scheduled_notify_admin' ) ) {

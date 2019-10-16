@@ -269,14 +269,14 @@ class RevisionaryAdmin
 	}
 
 	function handle_submission_redirect() {
-		global $revisionary, $current_user;
+		global $revisionary;
 
 		if ( $revised_post = get_post( (int) $_REQUEST['post_id'] ) ) {
 			$status = sanitize_key( $_REQUEST['revision_submitted'] );
 
 			if ( $revisions = rvy_get_post_revisions( $revised_post->ID, $status, array( 'order' => 'DESC', 'orderby' => 'ID' ) ) ) {  // @todo: retrieve revision_id in block editor js, pass as redirect arg
 				foreach( $revisions as $revision ) {
-					if ( $revision->post_author == $current_user->ID ) {
+					if (rvy_is_post_author($revision)) {
 						if ( time() - strtotime( $revision->post_modified_gmt ) < 90 ) { // sanity check in finding the revision that was just submitted
 							$args = array( 'revision_id' => $revision->ID, 'published_post' => $revised_post, 'object_type' => $revised_post->post_type );
 							if ( ! empty( $_REQUEST['cc'] ) ) {
