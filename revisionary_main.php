@@ -569,7 +569,7 @@ class Revisionary
 			$post_id = rvy_detect_post_id();
 		} 
 		
-		if ( empty( $post_id ) ) {
+		if ( empty( $post_id ) || !is_scalar($post_id) ) {
 			return $status;
 		}
 
