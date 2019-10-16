@@ -1,4 +1,4 @@
-# Revisionary
+# PublishPress Revisions
 
 Maintain published content with teamwork and precision using the Revisions model to submit, moderate and schedule changes.
 
