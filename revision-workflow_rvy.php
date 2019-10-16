@@ -29,25 +29,25 @@ class Rvy_Revision_Workflow_UI {
             
             $blogname = wp_specialchars_decode( get_option('blogname'), ENT_QUOTES );
             
-            if ( $admin_notify ) {
-                $title = sprintf( __('[%s] Pending Revision Notification', 'revisionary'), $blogname );
-                
-                $message = sprintf( __('A pending revision to the %1$s "%2$s" has been submitted.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
-                
+            $title = sprintf( __('[%s] Pending Revision Notification', 'revisionary'), $blogname );
+            
+            $message = sprintf( __('A pending revision to the %1$s "%2$s" has been submitted.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
+            
 
-                if ( $author = new WP_User( $post_arr['post_author'] ) ) {
-                    $message .= sprintf( __('It was submitted by %1$s.', 'revisionary' ), $author->display_name ) . "\r\n\r\n";
-                }
+            if ( $author = new WP_User( $post_arr['post_author'] ) ) {
+                $message .= sprintf( __('It was submitted by %1$s.', 'revisionary' ), $author->display_name ) . "\r\n\r\n";
+            }
 
-                if ( $revision_id ) {
-                    $preview_link = add_query_arg( array( 'preview' => '1', 'rvy_revision' => true ), get_post_permalink( $revision_id ) );
-                    $message .= __( 'Preview and Approval: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
+            if ( $revision_id ) {
+                $preview_link = add_query_arg( array( 'preview' => '1', 'rvy_revision' => true ), get_post_permalink( $revision_id ) );
+                $message .= __( 'Preview and Approval: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
 
                     //$message .= __( 'Management Screen: ', 'revisionary' ) . admin_url("admin.php?page=rvy-revisions&action=view&revision={$revision_id}") . "\r\n";
                     
                     $message .= __( 'Edit Revision: ', 'revisionary' ) . admin_url("post.php?action=edit&post={$revision_id}") . "\r\n";
                 }
 
+            if ( $admin_notify ) {
                 // establish the publisher recipients
                 $recipient_ids = array();
                 
