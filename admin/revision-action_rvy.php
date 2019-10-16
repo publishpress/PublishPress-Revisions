@@ -344,6 +344,21 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		return $post_id;
 	}
 
+	if (
+		(('pending-revision' == $revision->post_status) && rvy_get_option('pending_revision_update_post_date'))
+		|| (('future-revision' == $revision->post_status) && rvy_get_option('scheduled_revision_update_post_date'))
+	) {
+		if ($_post = get_post($post_id)) {
+			if ($_post->post_date_gmt != $_post->post_modified_gmt) {
+				$wpdb->update(
+					$wpdb->posts, 
+					['post_date' => $_post->post_modified, 'post_date_gmt' => $_post->post_modified_gmt], 
+					['ID' => $post_id]
+				);
+			}
+		}
+	}
+
 	$post_modified_gmt = get_post_field('post_modified_gmt', $post_id);
 
 	// also copy all stored postmeta from revision
