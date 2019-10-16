@@ -15,9 +15,9 @@ class RevisionaryActivation {
             set_site_transient('_revisionary_1x_migration', true, 86400);
         }
 
-        update_option('revisionary_last_version', REVISIONARY_VERSION);
-
-        if ($imported_ids = (array) get_option('revisionary_imported_ids')) {
+        if (defined('REVISIONARY_FORCE_REIMPORT') && REVISIONARY_FORCE_REIMPORT) {
+            $id_csv = '';
+        } elseif ($imported_ids = (array) get_option('revisionary_imported_ids')) {
             $id_csv = implode("','", $imported_ids);
         } else {
             $imported_ids = [];
