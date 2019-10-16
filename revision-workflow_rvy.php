@@ -20,6 +20,8 @@ class Rvy_Revision_Workflow_UI {
             $post_arr = array_merge( $revisionary->rest->request->get_params(), $post_arr );
         }
 
+        $recipient_ids = [];
+
         $admin_notify = rvy_get_option( 'pending_rev_notify_admin' );
         $author_notify = rvy_get_option( 'pending_rev_notify_author' );
         if ( ( $admin_notify || $author_notify ) && $revision_id ) {
@@ -49,7 +51,6 @@ class Rvy_Revision_Workflow_UI {
 
             if ( $admin_notify ) {
                 // establish the publisher recipients
-                $recipient_ids = array();
                 
                 if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') ) {
                     $monitor_groups_enabled = true;

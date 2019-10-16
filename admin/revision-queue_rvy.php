@@ -89,6 +89,11 @@ $wp_list_table->prepare_items();
 
 $bulk_counts = array(
 	'deleted'   => isset( $_REQUEST['deleted'] )   ? absint( $_REQUEST['deleted'] )   : 0,
+	'updated' => 0,
+	'locked' => 0,
+	'deleted' => 0,
+	'trashed' => 0,
+	'untrashed' => 0,
 );
 
 $bulk_messages = array();
