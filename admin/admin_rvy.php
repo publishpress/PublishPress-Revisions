@@ -168,38 +168,48 @@ class RevisionaryAdmin
 			}
 		}
 
-		static $limit_quickedit;
+		static $can_edit_published;
+		static $can_edit_others;
 		static $listed_post_statuses;
 
-		if (is_null($limit_quickedit) && ! empty( $wp_query->posts ) ) {
+		if (is_null($can_edit_others) && ! empty( $wp_query->posts ) ) {
 			if (!$type_obj = get_post_type_object($typenow)) {
 				$limit_quickedit = false;
 				return;
 			}
 	
-			$limit_quickedit = !agp_user_can($type_obj->cap->edit_others_posts, 0, '', array('skip_revision_allowance' => true))
-							|| !agp_user_can($type_obj->cap->edit_published_posts, 0, '', array('skip_revision_allowance' => true));
-		
-			$listed_post_statuses = array();
-			$ids = array();
-			foreach ($wp_query->posts as $row) {
-				$ids []= $row->ID;
-			}
+			$can_edit_others = agp_user_can($type_obj->cap->edit_others_posts, 0, '', array('skip_revision_allowance' => true));
 
-			$id_csv = implode("','", $ids);
-			$results = $wpdb->get_results("SELECT ID, post_status FROM $wpdb->posts WHERE ID IN ('$id_csv')");
-			foreach($results as $row ) {
-				$listed_post_statuses[$row->ID] = $row->post_status;
+			$can_edit_published = agp_user_can($type_obj->cap->edit_published_posts, 0, '', array('skip_revision_allowance' => true));
+			
+			if (!$can_edit_others || !$can_edit_published) {
+				$listed_post_statuses = array();
+				$ids = array();
+				foreach ($wp_query->posts as $row) {
+					$ids []= $row->ID;
+				}
+
+				$id_csv = implode("','", $ids);
+				$results = $wpdb->get_results("SELECT ID, post_status FROM $wpdb->posts WHERE ID IN ('$id_csv')");
+				foreach($results as $row ) {
+					$listed_post_statuses[$row->ID] = $row->post_status;
+				}
 			}
-		} elseif(!$limit_quickedit) {
+		}
+		
+		if ($can_edit_others && $can_edit_published) {
 			return;
 		}
 
 		$published_stati = get_post_stati(array('public' => true, 'private' => true), 'names', 'OR');
 
-        foreach ($wp_query->posts as $row) {
-            if (in_array($listed_post_statuses[$row->ID], $published_stati)) {
-				$this->hide_quickedit []= $row->ID;
+		if (!empty($wp_query->posts)) {
+			foreach ($wp_query->posts as $row) {
+				if (in_array($listed_post_statuses[$row->ID], $published_stati)) {
+					if (!$can_edit_published || (!$can_edit_others && !rvy_is_post_author($row))) {
+						$this->hide_quickedit []= $row->ID;
+					}
+				}
 			}
 		}
 	}
