@@ -8,7 +8,7 @@ Stable Tag: 2.0.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-You can use PublishPress Revisions submit, moderate and schedule changes to your published WordPress content.
+You can use PublishPress Revisions to submit, moderate and schedule changes to your published WordPress content.
 
 == Description ==
 
