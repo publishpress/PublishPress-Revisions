@@ -383,8 +383,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	}
 
 	if (!defined('REVISIONARY_PRO_VERSION') || apply_filters('revisionary_copy_core_postmeta', true, $revision, $published, !$is_imported)) {
-		revisionary_copy_meta_field('_post_thumbnail', $revision->ID, $published->ID, !$is_imported);
-		revisionary_copy_meta_field('_page_template', $revision->ID, $published->ID, !$is_imported);
+		revisionary_copy_meta_field('_thumbnail_id', $revision->ID, $published->ID, !$is_imported);
+		revisionary_copy_meta_field('_wp_page_template', $revision->ID, $published->ID, !$is_imported);
 	}
 
 	// Allow Multiple Authors revisions to be applied to published post. Revision post_author is forced to actual submitting user.

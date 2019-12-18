@@ -274,6 +274,14 @@ class RevisionaryAdmin
 		if ( $revised_post = get_post( (int) $_REQUEST['post_id'] ) ) {
 			$status = sanitize_key( $_REQUEST['revision_submitted'] );
 
+			// Workaround for Gutenberg stripping published thumbnail, page template on revision creation
+			foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
+				if ($archived_val = get_post_meta($revised_post->ID, "_archive_{$meta_key}", true)) {
+					update_post_meta($revised_post->ID, $meta_key, $archived_val);
+					delete_post_meta($revised_post->ID, "_archive_{$meta_key}");
+				}
+			}
+
 			if ( $revisions = rvy_get_post_revisions( $revised_post->ID, $status, array( 'order' => 'DESC', 'orderby' => 'ID' ) ) ) {  // @todo: retrieve revision_id in block editor js, pass as redirect arg
 				foreach( $revisions as $revision ) {
 					if (rvy_is_post_author($revision)) {

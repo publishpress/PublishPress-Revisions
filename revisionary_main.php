@@ -74,9 +74,53 @@ class Revisionary
 		add_action('save_post', array($this, 'actSavePost'), 20, 2);
 		add_action('delete_post', [$this, 'actDeletePost'], 10, 3);
 
+		if (!defined('REVISIONARY_PRO_VERSION')) {
+			add_action('revisionary_saved_revision', [$this, 'act_save_revision_followup'], 5);
+		}
+
 		do_action( 'rvy_init', $this );
 	}
 	
+	function act_save_revision_followup($revision) {
+		global $wpdb;
+
+		// To ensure no postmeta is dropped from revision, copy any missing keys from published post
+		$fields = ['_thumbnail_id', '_wp_page_template'];
+
+		if ($can_remove_empty_fields = apply_filters('revisionary_removable_meta_fields', [], $revision->ID)) {
+			if (!$fields = array_diff(['_thumbnail_id', '_wp_page_template'], $can_remove_meta_fields)) {
+				return;
+			}
+		}
+
+		if (!$published_post_id = rvy_post_id($revision->ID)) {
+			return;
+		}
+
+		$field_csv = implode("','", array_map('sanitize_key', $fields));
+
+		$target_meta = $wpdb->get_results( 
+			$wpdb->prepare(
+				"SELECT meta_key, meta_value, meta_id FROM $wpdb->postmeta WHERE post_id = %d AND meta_key IN ('$field_csv') GROUP BY meta_key",
+				$revision->ID
+			)
+			, ARRAY_A 
+		);
+
+		foreach($fields as $meta_key) {
+			foreach($target_meta as $row) {
+				if ($row['meta_key'] == $meta_key) {
+					continue 2;
+				}
+			}
+
+			// revision was stored without a post_meta entry for this meta key, so copy it from published post
+			if ($published_val = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s AND post_id = %d", $meta_key, $published_post_id))) {
+				update_post_meta($revision->ID, $meta_key, $published_val);
+			}
+		}
+	}
+
 	function actSavePost($post_id, $post) {
 		if (strtotime($post->post_date_gmt) > agp_time_gmt()) {
 			require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
@@ -999,6 +1043,14 @@ class Revisionary
 		$post_ID = (int) $wpdb->insert_id; // revision_id
 		$revision_id = $post_ID;
 
+		$published_post_id = rvy_post_id($data['comment_count']);
+
+		// Workaround for Gutenberg stripping post thumbnail, page template on revision creation
+		$archived_meta = [];
+		foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
+			$archived_meta[$meta_key] = get_post_meta($published_post_id, $meta_key, true);
+		}
+
 		// Use the newly generated $post_ID.
 		$where = array( 'ID' => $post_ID );
 		
@@ -1096,6 +1148,14 @@ class Revisionary
 			}
 		}
 	
+		// Workaround for Gutenberg stripping post thumbnail, page template on revision creation
+		foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
+			if (!empty($archived_meta[$meta_key])) {
+				update_post_meta($published_post_id, $meta_key, $archived_meta[$meta_key]);
+				update_post_meta($published_post_id, "_archive_{$meta_key}", $archived_meta[$meta_key]);
+			}
+		}
+
 		if ( 'attachment' !== $postarr['post_type'] ) {
 			$previous_status = '';
 			wp_transition_post_status( $data['post_status'], $previous_status, $post );
