@@ -915,9 +915,6 @@ class Revisionary
 		}
 		*/
 
-		// Pro: better compatibility in third party action handlers
-		$revision_id = (int) $revision_id;
-
 		if (!empty($revision_id) && $post = get_post($revision_id)) {
 			$post_ID = $revision_id;
 			$post_arr['post_ID'] = $revision_id;
