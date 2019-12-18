@@ -4,7 +4,7 @@ Tags: revision, access, permissions, cms, user, groups, members, admin, pages, p
 Requires at least: 4.9.7
 Tested up to: 5.2.4
 Requires PHP: 5.6.20
-Stable Tag: 2.0.9
+Stable Tag: 2.0.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -61,6 +61,14 @@ For more details about both the free and pro version, see our <a href="https://p
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.0.10 - 25 Oct 2019 =
+* Fixed : Post Preview showed last stored copy, not unsaved changes
+* Fixed : Post Preview (to view unsaved changes) was not available when editing a revision
+* Fixed : Revision Preview - Buttons were not clickable with some themes
+* Fixed : Filter revisionary_default_pending_revision was not effective in Gutenberg (check Save as Revision checkbox by default)
+* Compat : Multiple Authors - Incorrect author display in revision previews on some sites
+* Compat : PressPermit - Database error on Revision Queue screen under some configurations
 
 = 2.0.9 - 18 Oct 2019 =
 * Fixed : Compare Pending Revisions screen - link redirected to Edit Posts screen for some post types
