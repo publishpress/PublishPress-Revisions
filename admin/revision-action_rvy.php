@@ -602,8 +602,6 @@ function rvy_revision_publish() {
 			break;
 		}
 
-		$redirect = get_permalink($post->ID); // published URL
-
 		if ( $type_obj = get_post_type_object( $post->post_type ) ) {
 			if ( ! agp_user_can( $type_obj->cap->edit_post, $post->ID, '', array( 'skip_revision_allowance' => true ) ) )
 				break;
@@ -615,6 +613,11 @@ function rvy_revision_publish() {
 	} while (0);
 	
 	rvy_publish_scheduled_revisions(array('force_revision_id' => $revision->ID));
+
+	if ($post) {
+		clean_post_cache($post->ID);
+		$redirect = get_permalink($post->ID); // published URL
+	}
 
 	wp_redirect( $redirect );
 	exit;
