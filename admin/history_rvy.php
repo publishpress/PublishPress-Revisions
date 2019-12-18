@@ -420,6 +420,8 @@ class RevisionaryHistory
             return false;
         }
 
+        $strip_tags = rvy_get_option('diff_display_strip_tags');
+
         // If comparing revisions, make sure we're dealing with the right post parent.
         // The parent post may be a 'revision' when revisions are disabled and we're looking at autosaves.
         /*
@@ -492,7 +494,7 @@ class RevisionaryHistory
              */
             $args = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
     
-            if ( rvy_get_option('diff_display_strip_tags') ) {
+            if ($strip_tags) {
                 $content_from = strip_tags($content_from);
                 $content_to = strip_tags($content_to);
             }
@@ -570,7 +572,7 @@ class RevisionaryHistory
 
             $args = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
     
-            if ( rvy_get_option('diff_display_strip_tags') ) {
+            if ($strip_tags) {
                 $content_from = strip_tags($content_from);
                 $content_to = strip_tags($content_to);
             }
@@ -686,7 +688,7 @@ class RevisionaryHistory
 
             $args = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
 
-            if ( rvy_get_option('diff_display_strip_tags') ) {
+            if ($strip_tags) {
                 $content_from = strip_tags($content_from);
                 $content_to = strip_tags($content_to);
             }
