@@ -413,10 +413,6 @@ class RevisionaryAdmin
 	function pending_rev_checkbox() {
 		global $post;
 
-		if (!rvy_get_option('pending_revisions')) {
-			return;
-		}
-
 		$status_obj = get_post_status_object( $post->post_status );
 		
 		if ( ! $status_obj || ( ! $status_obj->public && ! $status_obj->private && ( 'future' != $post->post_status ) ) || !rvy_is_supported_post_type($post->post_type) ) {
