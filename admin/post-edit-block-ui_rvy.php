@@ -92,6 +92,7 @@ class RVY_PostBlockEditUI {
                 'UpdateCaption' => __('Update'),
                 'revision' => ($do_pending_revisions) ? __('Pending Revision', 'revisionary') : '',
                 'revisionTitle' => attribute_escape(__('Do not publish current changes yet, but save to Revision Queue', 'revisionary')), 
+                'defaultPending' => apply_filters('revisionary_default_pending_revision', false, $post ),
                 'revisionTitleFuture' => attribute_escape(__('Do not schedule current changes yet, but save to Revision Queue', 'revisionary')), 
                 'ajaxurl' => admin_url(''),
                 'SaveCaption' => ($do_pending_revisions) ? __('Save Revision', 'revisionary') : '',
