@@ -610,7 +610,7 @@ function revisionary_copy_meta_field( $meta_key, $from_post_id, $to_post_id, $mi
 	
 	if ( $_post = $wpdb->get_row( "SELECT * FROM $wpdb->posts WHERE ID = '$from_post_id'" ) ) {
 		if ( $source_meta = $wpdb->get_row( 
-				$wpdb->prepare("SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s post_id = %d", $meta_key, $from_post_id )
+				$wpdb->prepare("SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s AND post_id = %d", $meta_key, $from_post_id )
 			)
 		) {
 			update_post_meta($to_post_id, $meta_key, $source_meta->meta_value);
