@@ -107,7 +107,7 @@ class RevisionaryHistory
                 }
 
                 // Revisions disabled and we're not looking at an autosave
-                if ( ! wp_revisions_enabled( $published_post ) && ! wp_is_post_autosave( $revision ) ) {
+                if ( apply_filters('revisionary_revisions_disabled', false, $revision) && ! wp_is_post_autosave( $revision ) ) {
                     return;
                 }
 
@@ -779,7 +779,7 @@ class RevisionaryHistory
         }
 
         // If revisions are disabled, we only want autosaves and the current post.
-        if ( ! wp_revisions_enabled( $post ) ) {
+        if ( apply_filters('revisionary_revisions_disabled', false, $post) ) {
             foreach ( $revisions as $revision_id => $revision ) {
                 if ( ! wp_is_post_autosave( $revision ) ) {
                     unset( $revisions[ $revision_id ] );
