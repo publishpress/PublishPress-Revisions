@@ -57,7 +57,7 @@ if ( ! $revisionary->isBlockEditorActive() ) :?>
 /* <![CDATA[ */
 jQuery(document).ready( function($) {
 	$('#publish').val("<?php _e('Publish Revision', 'revisionary' )?>");
-	postL10n.update = "<?php _e('Save Revision', 'revisionary' )?>";
+	postL10n.update = "<?php _e('Update Revision', 'revisionary' )?>";
 	postL10n.schedule = "<?php _e('Publish Scheduled Revision', 'revisionary' )?>";
 	var rvyNowCaption = "<?php _e( 'Current Time', 'revisionary' );?>";
 	$('#publishing-action #publish').show();
