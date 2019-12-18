@@ -25,7 +25,8 @@ class Revisionary
 		rvy_refresh_options_sitewide();
 
 		// NOTE: $_GET['preview'] and $_GET['post_type'] arguments are set by rvy_init() at response to ?p= request when the requested post is a revision.
-		if ( ! is_admin() && ( ! defined('REST_REQUEST') || ! REST_REQUEST ) && ( ! empty( $_GET['preview'] ) || ! empty( $_GET['mark_current_revision'] ) ) ) { // && empty($_GET['preview_id']) ) { // preview_id indicates a regular preview via WP core, based on autosave revision
+		if ( ! is_admin() && ( ! defined('REST_REQUEST') || ! REST_REQUEST ) && ((!empty( $_GET['preview']) && empty($_REQUEST['preview_id'])) || ! empty( $_GET['mark_current_revision'] ) ) ) { // && empty($_GET['preview_id']) ) { // preview_id indicates a regular preview via WP core, based on autosave revision
+			
 			require_once( dirname(__FILE__).'/front_rvy.php' );
 			$this->front = new RevisionaryFront();
 		}
@@ -838,12 +839,17 @@ class Revisionary
 			$_authors = get_multiple_authors($revision_id);
 			if (count($_authors) == 1) {
 				$_author = reset($_authors);
+				$_author = MultipleAuthors\Classes\Objects\Author::get_by_term_id($_author->term_id);
 			}
 
+			// If multiple authors could not be stored, restore original authors from published post
 			if (empty($_authors) || ($_author->ID == $current_user->ID)) {
-				// restore original authors from published post
-				if ($published_authors = wp_get_post_terms($published_post->ID, 'author', ['fields' => 'ids'])) {
-					wp_set_post_terms($revision_id, $published_authors, 'author', false);
+				if ($published_authors = get_multiple_authors($published_post->ID)) {
+					// This sets author taxonomy terms and meta field ppma_author_name
+					MultipleAuthors\Classes\Utils::set_post_authors($revision_id, $published_authors);
+
+					// Also ensure meta field is set for published post
+					MultipleAuthors\Classes\Utils::set_post_authors($published_post->ID, $published_authors);
 				}
 			}
 		}

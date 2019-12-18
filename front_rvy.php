@@ -6,6 +6,36 @@ class RevisionaryFront {
 			add_filter( 'posts_request', array( &$this, 'flt_view_revision' ) );
 			add_action('template_redirect', array( &$this, 'act_template_redirect' ), 5 );
 		}
+
+		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
+			add_filter('the_author', [$this, 'fltAuthor'], 20);
+		}
+	}
+
+	public function fltAuthor($display_name) {
+		if ($_post = get_post(rvy_detect_post_id())) {
+			if (rvy_is_revision_status($_post->post_status)) {
+				// we only need this workaround when multiple authors were not successfully stored
+				if ($authors = get_multiple_authors($_post->ID, false)) {
+					return $display_name;
+				}
+
+				if ($authors = get_multiple_authors(rvy_post_id($_post->ID), false)) {
+					$author_displays = [];
+					foreach($authors as $author) {
+						$author_displays []= $author->display_name;
+					}
+
+					if (in_array($display_name,$author_displays)) {
+						return $display_name;
+					}
+
+					return implode(', ', $author_displays);
+				}
+			}
+		}
+
+		return $display_name;
 	}
 
 	function flt_revision_preview_url($redirect_url, $requested_url) {

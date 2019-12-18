@@ -33,15 +33,17 @@ class RVY_PostBlockEditUI {
             wp_enqueue_script( 'rvy_object_edit', RVY_URLPATH . "/admin/rvy_revision-block-edit{$suffix}.js", array('jquery', 'jquery-form'), RVY_VERSION, true );
 
             $_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
-			$preview_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $post ) ) );
+			$view_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $post ) ) );
 
             if ($can_publish = agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true))) {
-                $preview_caption = ('future-revision' == $post->post_status) ? __('View / Publish') : __('View / Approve');
-                $preview_title = __('View / moderate saved revision', 'revisionary');
+                $view_caption = ('future-revision' == $post->post_status) ? __('View / Publish') : __('View / Approve');
+                $view_title = __('View / moderate saved revision', 'revisionary');
             } else {
-                $preview_caption = __('View');
-                $preview_title = __('View saved revision', 'revisionary');
+                $view_caption = __('View');
+                $view_title = __('View saved revision', 'revisionary');
             }
+
+            $preview_title = __('View unsaved changes', 'revisionary');
 
             $_revisions = wp_get_post_revisions($post_id);
             if ($_revisions && count($_revisions) > 1) {
@@ -52,8 +54,9 @@ class RVY_PostBlockEditUI {
 
             $args = array(
                 'saveRevision' => __('Update Revision'),
-                'previewURL' => $preview_link,
-                'previewCaption' => $preview_caption,
+                'viewURL' => $view_link,
+                'viewCaption' => $view_caption,
+                'viewTitle' => $view_title,
                 'previewTitle' => $preview_title,
                 'revisionEdits' => $revisions_caption,
             );  
@@ -89,6 +92,7 @@ class RVY_PostBlockEditUI {
                 'UpdateCaption' => __('Update'),
                 'revision' => ($do_pending_revisions) ? __('Pending Revision', 'revisionary') : '',
                 'revisionTitle' => attribute_escape(__('Do not publish current changes yet, but save to Revision Queue', 'revisionary')), 
+                'defaultPending' => apply_filters('revisionary_default_pending_revision', false, $post ),
                 'revisionTitleFuture' => attribute_escape(__('Do not schedule current changes yet, but save to Revision Queue', 'revisionary')), 
                 'ajaxurl' => admin_url(''),
                 'SaveCaption' => ($do_pending_revisions) ? __('Save Revision', 'revisionary') : '',

@@ -123,7 +123,11 @@ jQuery(document).ready( function($) {
     
     var RvySaveAsRevision = function() {
 		if (rvyObjEdit.revision && !$('#rvy_save_as_revision').length) {
-			$('button.editor-post-publish-button').after('<label style="-webkit-touch-callout: none;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;" title="' + rvyObjEdit.revisionTitle + '"><input type="checkbox" class="rvy_save_as_revision" id="rvy_save_as_revision">' + rvyObjEdit.revision + '&nbsp;</label>');
+			var attribs = rvyObjEdit.defaultPending ? ' checked="checked"' : '';
+			if (rvyObjEdit.defaultPending) {
+				RvyRecaptionElement('button.editor-post-publish-button', rvyObjEdit.SaveCaption);
+			}
+			$('button.editor-post-publish-button').after('<label style="-webkit-touch-callout: none;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;" title="' + rvyObjEdit.revisionTitle + '"><input type="checkbox" class="rvy_save_as_revision" id="rvy_save_as_revision"' + attribs + '>' + rvyObjEdit.revision + '&nbsp;</label>');
 		}
 	}
     var RvyRecaptionSaveDraftInterval = setInterval(RvySaveAsRevision, 100);

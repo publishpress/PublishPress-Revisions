@@ -538,11 +538,16 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			['alias' => 'r', 'status_count' => true]
 		);
 
-		if ($my_post_count = $wpdb->get_var( 
-			apply_filters('presspermit_posts_request',
+		$count_query = apply_filters('presspermit_posts_request',
 				"SELECT COUNT(r.ID) FROM $wpdb->posts AS r INNER JOIN $wpdb->posts AS p ON r.comment_count = p.ID WHERE $where", 
 				['has_cap_check' => true, 'source_alias' => 'p']
-			)
+		);
+
+		// work around some versions of PressPermit inserting non-aliased post_type reference into where clause under some configurations
+		$count_query = str_replace("$wpdb->posts.post_type", "p.post_type", $count_query);
+
+		if ($my_post_count = $wpdb->get_var( 
+			$count_query
 		)) {
 			if (!empty($_REQUEST['post_author']) && ($current_user->ID == $_REQUEST['post_author']) && empty($_REQUEST['post_type']) && empty($_REQUEST['author']) && empty($_REQUEST['published_post']) && empty($_REQUEST['post_status'])) {
 				$current_link_class = 'my_posts';
