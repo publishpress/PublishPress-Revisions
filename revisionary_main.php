@@ -436,6 +436,10 @@ class Revisionary
 		//if ( ! rvy_get_option('pending_revisions') )
 		//	return $wp_blogcaps;
 
+		if (!rvy_get_option('pending_revisions')) {
+			return $wp_blogcaps;
+		}
+
 		$script_name = $_SERVER['SCRIPT_NAME'];
 		
 		if ( ( defined( 'PRESSPERMIT_VERSION' ) || defined( 'PP_VERSION' ) || defined( 'PPC_VERSION' ) ) && ( strpos( $script_name, 'p-admin/post.php' ) || rvy_wp_api_request() ) ) {
