@@ -843,6 +843,14 @@ class Revisionary
 			return $data;
 		}
 
+		if ( $this->doing_rest && $this->rest->is_posts_request && ! empty( $this->rest->request ) ) {
+			$post_arr = array_merge( $this->rest->request->get_params(), $post_arr );
+			
+			if (isset($post_arr['featured_media'])) {
+				$post_arr['_thumbnail_id'] = $post_arr['featured_media'];
+			}
+		}
+
 		if ( $this->isBlockEditorActive() && !$this->doing_rest ) {
 			if (!empty($_REQUEST['meta-box-loader']) && !empty($_REQUEST['action']) && ('editpost' == $_REQUEST['action'])) {
 				// Use logged revision ID from preceding REST query
@@ -890,8 +898,6 @@ class Revisionary
 				return $data;
 		}
 		
-		$post_arr = array_intersect_key( $post_arr, array_fill_keys( array( 'post_type', 'post_content', 'post_title', 'post_parent', 'ID', 'post_date_gmt', 'post_date' ), true ) );
-
 		// @todo: need to filter post parent?
 
 		$data['post_status'] = 'future-revision';
@@ -908,9 +914,6 @@ class Revisionary
 			}
 		}
 		*/
-
-		// Pro: better compatibility in third party action handlers
-		$revision_id = (int) $revision_id;
 
 		if (!empty($revision_id) && $post = get_post($revision_id)) {
 			$post_ID = $revision_id;

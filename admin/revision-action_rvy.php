@@ -344,11 +344,18 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		return $post_id;
 	}
 
+	$_post = get_post($post_id);
+
+	// prevent published post status being set to future when a scheduled revision is manually published before the stored post_date
+	if ($_post && ($_post->post_status != $published->post_status)) {
+		$wpdb->update($wpdb->posts, array('post_status' => $published->post_status), array('ID' => $post_id));
+	}
+
 	if (
 		(('pending-revision' == $revision->post_status) && rvy_get_option('pending_revision_update_post_date'))
 		|| (('future-revision' == $revision->post_status) && rvy_get_option('scheduled_revision_update_post_date'))
 	) {
-		if ($_post = get_post($post_id)) {
+		if ($_post) {
 			if ($_post->post_date_gmt != $_post->post_modified_gmt) {
 				$wpdb->update(
 					$wpdb->posts, 
@@ -365,6 +372,15 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	global $revisionary;
 
 	$is_imported = get_post_meta($revision_id, '_rvy_imported_revision', true);
+
+	// work around bug in < 2.0.7 that saved all scheduled revisions without terms
+	if (!$is_imported && ('future-revision' == $revision->post_status)) {
+		if ($install_time = get_option('revisionary_2_install_time')) {
+			if (strtotime($revision->post_modified_gmt) < $install_time) {
+				$is_imported = true;
+			}
+		}
+	}
 
 	if (!defined('REVISIONARY_PRO_VERSION') || apply_filters('revisionary_copy_core_postmeta', true, $revision, $published, !$is_imported)) {
 		revisionary_copy_meta_field('_post_thumbnail', $revision->ID, $published->ID, !$is_imported);

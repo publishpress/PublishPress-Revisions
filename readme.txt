@@ -4,7 +4,7 @@ Tags: revision, access, permissions, cms, user, groups, members, admin, pages, p
 Requires at least: 4.9.7
 Tested up to: 5.2.4
 Requires PHP: 5.6.20
-Stable Tag: 2.0.6
+Stable Tag: 2.0.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -59,6 +59,10 @@ For more details about both the free and pro version, see our <a href="https://p
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.0.7 - 17 Oct 2019 =
+* Fixed : Scheduled Revisions - published post tags and categories were stripped out on scheduled revision publication
+* Fixed : Scheduled Revisions - manually publishing prior to scheduled time caused published post status to be set to Future (unpublished)
 
 = 2.0.6 - 17 Oct 2019 =
 * Fixed : Featured Image and Page Template revisions were not applied (but did work in PublishPress Revisions Pro)
