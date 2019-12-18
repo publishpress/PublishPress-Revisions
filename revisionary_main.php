@@ -66,6 +66,7 @@ class Revisionary
 		// REST logging
 		add_filter( 'rest_pre_dispatch', array( &$this, 'rest_pre_dispatch' ), 10, 3 );
 
+		// This is needed, implemented for pending revisions only
 		if (!empty($_REQUEST['get_new_revision'])) {
 			add_action('template_redirect', array($this, 'act_new_revision_redirect'));
 		}
@@ -819,10 +820,14 @@ class Revisionary
 		}
 	
 		if (!$this->doing_rest) {
+			$_POST['ID'] = $revision_id;
+			$_REQUEST['ID'] = $revision_id;
+
 			do_action( 'revisionary_save_revision', $post );
 			do_action( "save_post_{$post->post_type}", $revision_id, $post, false );
 			do_action( 'save_post', $revision_id, $post, false );
 			do_action( 'wp_insert_post', $revision_id, $post, false );
+			do_action( 'revisionary_saved_revision', $post );
 		}
 
 		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {

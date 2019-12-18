@@ -46,6 +46,7 @@ function rvy_revision_approve() {
 
 		check_admin_referer( "approve-post_$post->ID|$revision->ID" );
 		
+		clean_post_cache($post->ID);
 		$published_url = get_permalink($post->ID);
 
 		$db_action = false;
