@@ -62,6 +62,11 @@ For more details about both the free and pro version, see our <a href="https://p
 
 == Changelog ==
 
+= 2.0.11 - 28 Oct 2019 =
+* Fixed : Classic Editor - Post Preview showed last stored copy, not unsaved changes
+* Fixed : Revision Preview top bar covered admin menu dropdown
+* Fixed : Revision Edit - live preview showed revision author instead of published author (if Multiple Authors plugin not active)
+
 = 2.0.10 - 25 Oct 2019 =
 * Fixed : Post Preview showed last stored copy, not unsaved changes
 * Fixed : Post Preview (to view unsaved changes) was not available when editing a revision
