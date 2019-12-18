@@ -17,7 +17,8 @@ class Revisionary
 	var $content_roles;			// object ref - instance of RevisionaryContentRoles subclass, set by external plugin
 	var $doing_rest = false;
 	var $rest = '';				// object ref - Revisionary_REST
-	var $impose_pending_rev = array();
+	var $impose_pending_rev = [];
+	var $save_future_rev = [];
 
 	// minimal config retrieval to support pre-init usage by WP_Scoped_User before text domain is loaded
 	function __construct() {
@@ -223,16 +224,20 @@ class Revisionary
 
 		$this->flt_pendingrev_post_status($post->post_status);
 
-		if (!empty($this->impose_pending_rev[$post->ID])) {
+		if (!empty($this->impose_pending_rev[$post->ID]) || !empty($this->save_future_rev[$post->ID])) {
 			// todo: better revision id logging
 
 			//$revision_id = $this->impose_pending_rev[$post->ID];
 
 			$revision_id = $wpdb->get_var(
-				"SELECT ID FROM $wpdb->posts WHERE post_status = 'pending-revision' AND "
-				. "post_author = '$current_user->ID' AND ID IN ( "
-				. "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_base_post_id' ) " 
-				. "ORDER BY ID DESC LIMIT 1");
+				$wpdb->prepare(
+					"SELECT ID FROM $wpdb->posts WHERE post_status IN ('pending-revision', 'future-revision') AND "
+					. "post_author = %s AND comment_count = %d "
+					. "ORDER BY ID DESC LIMIT 1",
+					$current_user->ID,
+					$post->ID
+				)
+			);
 
 			// store selected meta array, featured image, template, format and stickiness to revision
 
@@ -264,7 +269,8 @@ class Revisionary
 			}
 	
 			//if ( ! empty( $schema['properties']['meta'] ) && isset( $request['meta'] ) ) {
-			if (isset($request['meta']) && post_type_supports($post->post_type, 'custom-fields')) {
+			//if (isset($request['meta']) && post_type_supports($post->post_type, 'custom-fields')) {
+			if (isset($request['meta'])) {
 				$meta = new WP_REST_Post_Meta_Fields( $this->rest->post_type );
 
 				$meta_update = $meta->update_value( $request['meta'], $revision_id );
@@ -963,6 +969,8 @@ class Revisionary
 		}
 		*/
 
+		$this->save_future_rev[$published_post->ID] = true;
+
 		if (!empty($revision_id) && $post = get_post($revision_id)) {
 			$post_ID = $revision_id;
 			$post_arr['post_ID'] = $revision_id;
@@ -992,11 +1000,18 @@ class Revisionary
 			$post = get_post($revision_id);
 		}
 	
+		// Pro: better compatibility in third party action handlers
+		$revision_id = (int) $revision_id;
+
 		if (!$this->doing_rest) {
+			$_POST['ID'] = $revision_id;
+			$_REQUEST['ID'] = $revision_id;
+
 			do_action( 'revisionary_save_revision', $post );
 			do_action( "save_post_{$post->post_type}", $revision_id, $post, false );
 			do_action( 'save_post', $revision_id, $post, false );
 			do_action( 'wp_insert_post', $revision_id, $post, false );
+			do_action( 'revisionary_saved_revision', $post );
 		}
 
 		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
@@ -1057,9 +1072,11 @@ class Revisionary
 		$data['post_name'] = wp_unique_post_slug( sanitize_title( $data['post_title'], $post_ID ), $post_ID, $data['post_status'], $data['post_type'], $data['post_parent'] );
 		$wpdb->update( $wpdb->posts, array( 'post_name' => $data['post_name'] ), $where );
 
+		if ( ! empty( $postarr['post_category'] ) ) {
 		if ( is_object_in_taxonomy( $post_type, 'category' ) ) {
 			$post_category = $postarr['post_category'];
 			wp_set_post_categories( $post_ID, $post_category );
+			}
 		}
 	
 		if ( isset( $postarr['tags_input'] ) && is_object_in_taxonomy( $post_type, 'post_tag' ) ) {
