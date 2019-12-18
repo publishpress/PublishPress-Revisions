@@ -4,7 +4,7 @@ Tags: revision, access, permissions, cms, user, groups, members, admin, pages, p
 Requires at least: 4.9.7
 Tested up to: 5.2.4
 Requires PHP: 5.6.20
-Stable Tag: 2.0.7
+Stable Tag: 2.0.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -59,6 +59,15 @@ For more details about both the free and pro version, see our <a href="https://p
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.0.8 - 18 Oct 2019 =
+* Change : PostMeta Failsafe: to avoid the possibility of accidental clearance, Featured Image removal is not revisioned, until further testing. API filter available for experimental usage with specified meta keys.
+* Fixed : Featured Image, Page Template revisioning failed under some conditions
+* Fixed : Scheduled Revisions created with Gutenberg stored selected terms to published post, previous terms to revision
+* Fixed : Scheduled Revisions - If "Update Publish Date" enabled, 404 Not Found redirect after manually publishing a scheduled revision if the post type uses post date in permalink structure
+* Fixed : Revision Preview - Buttons were not clickable with some themes
+* Fixed : Settings - Disabling Pending or Scheduled Revisions did not remove UI from post editor
+* Fixed : Settings - If Pending Revisions disabled, Revisor could still edit published posts
 
 = 2.0.7 - 17 Oct 2019 =
 * Fixed : Scheduled Revisions - published post tags and categories were stripped out on scheduled revision publication

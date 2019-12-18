@@ -17,7 +17,8 @@ class Revisionary
 	var $content_roles;			// object ref - instance of RevisionaryContentRoles subclass, set by external plugin
 	var $doing_rest = false;
 	var $rest = '';				// object ref - Revisionary_REST
-	var $impose_pending_rev = array();
+	var $impose_pending_rev = [];
+	var $save_future_rev = [];
 
 	// minimal config retrieval to support pre-init usage by WP_Scoped_User before text domain is loaded
 	function __construct() {
@@ -65,6 +66,7 @@ class Revisionary
 		// REST logging
 		add_filter( 'rest_pre_dispatch', array( &$this, 'rest_pre_dispatch' ), 10, 3 );
 
+		// This is needed, implemented for pending revisions only
 		if (!empty($_REQUEST['get_new_revision'])) {
 			add_action('template_redirect', array($this, 'act_new_revision_redirect'));
 		}
@@ -74,9 +76,53 @@ class Revisionary
 		add_action('save_post', array($this, 'actSavePost'), 20, 2);
 		add_action('delete_post', [$this, 'actDeletePost'], 10, 3);
 
+		if (!defined('REVISIONARY_PRO_VERSION')) {
+			add_action('revisionary_saved_revision', [$this, 'act_save_revision_followup'], 5);
+		}
+
 		do_action( 'rvy_init', $this );
 	}
 	
+	function act_save_revision_followup($revision) {
+		global $wpdb;
+
+		// To ensure no postmeta is dropped from revision, copy any missing keys from published post
+		$fields = ['_thumbnail_id', '_wp_page_template'];
+
+		if ($can_remove_empty_fields = apply_filters('revisionary_removable_meta_fields', [], $revision->ID)) {
+			if (!$fields = array_diff(['_thumbnail_id', '_wp_page_template'], $can_remove_meta_fields)) {
+				return;
+			}
+		}
+
+		if (!$published_post_id = rvy_post_id($revision->ID)) {
+			return;
+		}
+
+		$field_csv = implode("','", array_map('sanitize_key', $fields));
+
+		$target_meta = $wpdb->get_results( 
+			$wpdb->prepare(
+				"SELECT meta_key, meta_value, meta_id FROM $wpdb->postmeta WHERE post_id = %d AND meta_key IN ('$field_csv') GROUP BY meta_key",
+				$revision->ID
+			)
+			, ARRAY_A 
+		);
+
+		foreach($fields as $meta_key) {
+			foreach($target_meta as $row) {
+				if ($row['meta_key'] == $meta_key) {
+					continue 2;
+				}
+			}
+
+			// revision was stored without a post_meta entry for this meta key, so copy it from published post
+			if ($published_val = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s AND post_id = %d", $meta_key, $published_post_id))) {
+				update_post_meta($revision->ID, $meta_key, $published_val);
+			}
+		}
+	}
+
 	function actSavePost($post_id, $post) {
 		if (strtotime($post->post_date_gmt) > agp_time_gmt()) {
 			require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
@@ -179,16 +225,20 @@ class Revisionary
 
 		$this->flt_pendingrev_post_status($post->post_status);
 
-		if (!empty($this->impose_pending_rev[$post->ID])) {
+		if (!empty($this->impose_pending_rev[$post->ID]) || !empty($this->save_future_rev[$post->ID])) {
 			// todo: better revision id logging
 
 			//$revision_id = $this->impose_pending_rev[$post->ID];
 
 			$revision_id = $wpdb->get_var(
-				"SELECT ID FROM $wpdb->posts WHERE post_status = 'pending-revision' AND "
-				. "post_author = '$current_user->ID' AND ID IN ( "
-				. "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_base_post_id' ) " 
-				. "ORDER BY ID DESC LIMIT 1");
+				$wpdb->prepare(
+					"SELECT ID FROM $wpdb->posts WHERE post_status IN ('pending-revision', 'future-revision') AND "
+					. "post_author = %s AND comment_count = %d "
+					. "ORDER BY ID DESC LIMIT 1",
+					$current_user->ID,
+					$post->ID
+				)
+			);
 
 			// store selected meta array, featured image, template, format and stickiness to revision
 
@@ -220,7 +270,8 @@ class Revisionary
 			}
 	
 			//if ( ! empty( $schema['properties']['meta'] ) && isset( $request['meta'] ) ) {
-			if (isset($request['meta']) && post_type_supports($post->post_type, 'custom-fields')) {
+			//if (isset($request['meta']) && post_type_supports($post->post_type, 'custom-fields')) {
+			if (isset($request['meta'])) {
 				$meta = new WP_REST_Post_Meta_Fields( $this->rest->post_type );
 
 				$meta_update = $meta->update_value( $request['meta'], $revision_id );
@@ -435,6 +486,10 @@ class Revisionary
 	private function filter_caps($wp_blogcaps, $reqd_caps, $args, $internal_args = array()) {
 		//if ( ! rvy_get_option('pending_revisions') )
 		//	return $wp_blogcaps;
+
+		if (!rvy_get_option('pending_revisions')) {
+			return $wp_blogcaps;
+		}
 
 		$script_name = $_SERVER['SCRIPT_NAME'];
 		
@@ -765,10 +820,14 @@ class Revisionary
 		}
 	
 		if (!$this->doing_rest) {
+			$_POST['ID'] = $revision_id;
+			$_REQUEST['ID'] = $revision_id;
+
 			do_action( 'revisionary_save_revision', $post );
 			do_action( "save_post_{$post->post_type}", $revision_id, $post, false );
 			do_action( 'save_post', $revision_id, $post, false );
 			do_action( 'wp_insert_post', $revision_id, $post, false );
+			do_action( 'revisionary_saved_revision', $post );
 		}
 
 		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
@@ -915,6 +974,8 @@ class Revisionary
 		}
 		*/
 
+		$this->save_future_rev[$published_post->ID] = true;
+
 		if (!empty($revision_id) && $post = get_post($revision_id)) {
 			$post_ID = $revision_id;
 			$post_arr['post_ID'] = $revision_id;
@@ -944,11 +1005,18 @@ class Revisionary
 			$post = get_post($revision_id);
 		}
 	
+		// Pro: better compatibility in third party action handlers
+		$revision_id = (int) $revision_id;
+
 		if (!$this->doing_rest) {
+			$_POST['ID'] = $revision_id;
+			$_REQUEST['ID'] = $revision_id;
+
 			do_action( 'revisionary_save_revision', $post );
 			do_action( "save_post_{$post->post_type}", $revision_id, $post, false );
 			do_action( 'save_post', $revision_id, $post, false );
 			do_action( 'wp_insert_post', $revision_id, $post, false );
+			do_action( 'revisionary_saved_revision', $post );
 		}
 
 		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
@@ -995,15 +1063,25 @@ class Revisionary
 		$post_ID = (int) $wpdb->insert_id; // revision_id
 		$revision_id = $post_ID;
 
+		$published_post_id = rvy_post_id($data['comment_count']);
+
+		// Workaround for Gutenberg stripping post thumbnail, page template on revision creation
+		$archived_meta = [];
+		foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
+			$archived_meta[$meta_key] = get_post_meta($published_post_id, $meta_key, true);
+		}
+
 		// Use the newly generated $post_ID.
 		$where = array( 'ID' => $post_ID );
 		
 		$data['post_name'] = wp_unique_post_slug( sanitize_title( $data['post_title'], $post_ID ), $post_ID, $data['post_status'], $data['post_type'], $data['post_parent'] );
 		$wpdb->update( $wpdb->posts, array( 'post_name' => $data['post_name'] ), $where );
 
+		if ( ! empty( $postarr['post_category'] ) ) {
 		if ( is_object_in_taxonomy( $post_type, 'category' ) ) {
 			$post_category = $postarr['post_category'];
 			wp_set_post_categories( $post_ID, $post_category );
+			}
 		}
 	
 		if ( isset( $postarr['tags_input'] ) && is_object_in_taxonomy( $post_type, 'post_tag' ) ) {
@@ -1092,6 +1170,14 @@ class Revisionary
 			}
 		}
 	
+		// Workaround for Gutenberg stripping post thumbnail, page template on revision creation
+		foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
+			if (!empty($archived_meta[$meta_key])) {
+				update_post_meta($published_post_id, $meta_key, $archived_meta[$meta_key]);
+				update_post_meta($published_post_id, "_archive_{$meta_key}", $archived_meta[$meta_key]);
+			}
+		}
+
 		if ( 'attachment' !== $postarr['post_type'] ) {
 			$previous_status = '';
 			wp_transition_post_status( $data['post_status'], $previous_status, $post );

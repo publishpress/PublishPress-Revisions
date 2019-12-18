@@ -156,8 +156,19 @@ class RevisionaryFront {
 					
 					case 'future-revision' :
 						$class = 'future';
+
+						// work around quirk of new scheduled revision preview not displaying page template and post thumbnail when accessed immediately after creation
+						if (time() < strtotime($post->post_modified_gmt) + 15) {
+							$current_url = set_url_scheme( 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+							$title = esc_attr(__('This revision is very new, preview may not be synchronized with theme.', 'revisionary'));
+							$reload_link = " <a href='$current_url' title='$title'>" . __('Reload', 'revisionary') . '</a>';
+						} else {
+							$reload_link = '';
+						}
+
 						$edit_url = admin_url("post.php?action=edit&amp;post=$revision_id");
 						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . __( 'Publish now', 'revisionary' ) . '</a></span>' : '';
+						$publish_button .= $reload_link;
 						$message = sprintf( __('This is a Scheduled Revision (for publication on %s). %s %s %s', 'revisionary'), $date, $view_published, $edit_button, $publish_button );
 						break;
 

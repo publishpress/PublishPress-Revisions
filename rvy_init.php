@@ -610,11 +610,13 @@ function revisionary_copy_meta_field( $meta_key, $from_post_id, $to_post_id, $mi
 	
 	if ( $_post = $wpdb->get_row( "SELECT * FROM $wpdb->posts WHERE ID = '$from_post_id'" ) ) {
 		if ( $source_meta = $wpdb->get_row( 
-				$wpdb->prepare("SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s post_id = %d", $meta_key, $from_post_id )
+				$wpdb->prepare("SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s AND post_id = %d", $meta_key, $from_post_id )
 			)
 		) {
 			update_post_meta($to_post_id, $meta_key, $source_meta->meta_value);
-		} elseif ($mirror_empty) {
+
+		} elseif ($mirror_empty && in_array($meta_key, apply_filters('revisionary_removable_meta_fields', [], $to_post_id))) {
+			// Disable postmeta deletion until further testing
 			delete_post_meta($to_post_id, $meta_key);
 		}
 	}

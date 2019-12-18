@@ -128,7 +128,7 @@ class RvyPostEditSubmitMetabox
         <?php
         // @todo: confirm we don't need a hidden save button when current status is private */
         if (!$post_status_obj->public && !$post_status_obj->private && empty($post_status_obj->moderation) && ('future' != $post_status_obj->name)) :
-            $draft_label = __('Save Revision', 'revisionary');
+            $draft_label = __('Update Revision', 'revisionary');
             ?>
             <input type="submit" name="save" id="save-post" value="<?php echo $draft_label ?>"
                    tabindex="4" class="button button-highlighted"/>
@@ -142,7 +142,7 @@ class RvyPostEditSubmitMetabox
                    class="button button-highlighted" style="display:none"/>
         <?php endif; ?>
 
-        <span class="spinner"></span>
+        <span class="spinner" style="margin:2px 2px 0"></span>
         <?php
     }
 

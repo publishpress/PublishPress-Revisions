@@ -46,6 +46,7 @@ function rvy_revision_approve() {
 
 		check_admin_referer( "approve-post_$post->ID|$revision->ID" );
 		
+		clean_post_cache($post->ID);
 		$published_url = get_permalink($post->ID);
 
 		$db_action = false;
@@ -383,8 +384,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	}
 
 	if (!defined('REVISIONARY_PRO_VERSION') || apply_filters('revisionary_copy_core_postmeta', true, $revision, $published, !$is_imported)) {
-		revisionary_copy_meta_field('_post_thumbnail', $revision->ID, $published->ID, !$is_imported);
-		revisionary_copy_meta_field('_page_template', $revision->ID, $published->ID, !$is_imported);
+		revisionary_copy_meta_field('_thumbnail_id', $revision->ID, $published->ID, !$is_imported);
+		revisionary_copy_meta_field('_wp_page_template', $revision->ID, $published->ID, !$is_imported);
 	}
 
 	// Allow Multiple Authors revisions to be applied to published post. Revision post_author is forced to actual submitting user.
@@ -602,8 +603,6 @@ function rvy_revision_publish() {
 			break;
 		}
 
-		$redirect = get_permalink($post->ID); // published URL
-
 		if ( $type_obj = get_post_type_object( $post->post_type ) ) {
 			if ( ! agp_user_can( $type_obj->cap->edit_post, $post->ID, '', array( 'skip_revision_allowance' => true ) ) )
 				break;
@@ -615,6 +614,11 @@ function rvy_revision_publish() {
 	} while (0);
 	
 	rvy_publish_scheduled_revisions(array('force_revision_id' => $revision->ID));
+
+	if ($post) {
+		clean_post_cache($post->ID);
+		$redirect = get_permalink($post->ID); // published URL
+	}
 
 	wp_redirect( $redirect );
 	exit;

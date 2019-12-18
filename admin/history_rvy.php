@@ -420,6 +420,8 @@ class RevisionaryHistory
             return false;
         }
 
+        $strip_tags = rvy_get_option('diff_display_strip_tags');
+
         // If comparing revisions, make sure we're dealing with the right post parent.
         // The parent post may be a 'revision' when revisions are disabled and we're looking at autosaves.
         /*
@@ -449,7 +451,7 @@ class RevisionaryHistory
     
         $return = array();
     
-        foreach ( _wp_post_revision_fields( $compare_to ) as $field => $name ) {
+        foreach ( $all_meta_fields = _wp_post_revision_fields( $compare_to ) as $field => $name ) {
             /**
              * Contextually filter a post revision field.
              *
@@ -492,7 +494,7 @@ class RevisionaryHistory
              */
             $args = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
     
-            if ( rvy_get_option('diff_display_strip_tags') ) {
+            if ($strip_tags) {
                 $content_from = strip_tags($content_from);
                 $content_to = strip_tags($content_to);
             }
@@ -570,7 +572,7 @@ class RevisionaryHistory
 
             $args = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
     
-            if ( rvy_get_option('diff_display_strip_tags') ) {
+            if ($strip_tags) {
                 $content_from = strip_tags($content_from);
                 $content_to = strip_tags($content_to);
             }
@@ -594,7 +596,7 @@ class RevisionaryHistory
             }
         }
         
-        foreach( apply_filters('revisionary_compare_post_fields', $taxonomies) as $taxonomy => $name) {
+        foreach( apply_filters('revisionary_compare_taxonomies', $taxonomies) as $taxonomy => $name) {
             $field = $taxonomy;
             
             if (!$terms = get_the_terms($compare_from, $taxonomy)) {
@@ -686,7 +688,7 @@ class RevisionaryHistory
 
             $args = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
 
-            if ( rvy_get_option('diff_display_strip_tags') ) {
+            if ($strip_tags) {
                 $content_from = strip_tags($content_from);
                 $content_to = strip_tags($content_to);
             }
@@ -699,6 +701,9 @@ class RevisionaryHistory
                 );
             }
         }
+
+        $args = compact('to_meta', 'native_fields', 'meta_fields', 'strip_tags');
+        $return = apply_filters('revisionary_diff_ui', $return, $compare_from, $compare_to, $args);
 
         return $return;
     }
@@ -1005,7 +1010,7 @@ class RevisionaryHistory
         ?  __('Preview / Restore', 'revisionary')
         : __('Preview', 'revisionary');
 
-        $_arg = ('page' == $revision->post_type) ? 'page_id=' : 'p=';
+        $_arg = ('page' == $post_type) ? 'page_id=' : 'p=';
         $preview_url = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $post_id ) ) );
 
         $manage_label = (empty($type_obj) || agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true])) 

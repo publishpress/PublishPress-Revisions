@@ -13,6 +13,7 @@
     font-weight: normal;
     font-size: 0.9em;
     z-index: 99;
+    position: relative;
 }
 
 .rvy_preview_msgspan {
