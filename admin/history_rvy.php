@@ -18,6 +18,10 @@ class RevisionaryHistory
         add_action('wp_ajax_get-revision-diffs', [$this, 'actAjaxRevisionDiffs'], 1);
 
         add_action('parse_query', [$this, 'actDisableProblemQueries'], 5);
+		
+	   if (did_action('load-revision.php')) {
+		$this->actLoadRevision();
+	   }
     }
 
     function actDisableProblemQueries(WP_Query $query) {
