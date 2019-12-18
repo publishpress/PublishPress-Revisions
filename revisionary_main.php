@@ -30,6 +30,13 @@ class Revisionary
 			$this->front = new RevisionaryFront();
 		}
 		
+		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && (!empty($_GET['preview']) && !empty($_REQUEST['preview_id']))) {
+			if (!defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
+				require_once(dirname(__FILE__).'/classes/PublishPress/Revisions/PostPreview.php');
+				new PublishPress\Revisions\PostPreview();
+			}
+		}
+		
 		if ( ! is_content_administrator_rvy() ) {
 			add_filter( 'map_meta_cap', array(&$this, 'flt_post_map_meta_cap'), 5, 4);
 			add_filter( 'user_has_cap', array( &$this, 'flt_user_has_cap' ), 98, 3 );
