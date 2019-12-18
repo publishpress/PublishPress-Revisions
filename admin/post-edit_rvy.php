@@ -65,8 +65,12 @@ class RvyPostEdit {
     public function fltPreviewLink($url) {
         global $post;
 
+        if ($post && rvy_is_revision_status($post->post_status)) {
         $_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
-        return add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $post ) ) );
+            $url = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $post ) ) );
+        }
+
+        return $url;
     }
 
     public function fltPreviewLabel($preview_caption) {

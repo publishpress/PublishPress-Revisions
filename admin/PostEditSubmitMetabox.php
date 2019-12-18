@@ -174,17 +174,8 @@ class RvyPostEditSubmitMetabox
             tabindex="4" title="<?php echo esc_attr($preview_title);?>"><?php echo $preview_button; ?></a>
             <?php
         } else { 
-            if ($post_status_obj->public) {
-                $preview_link = esc_url(get_permalink($post->ID));
+            $preview_link = esc_url( get_preview_post_link( $post ) );
                 $preview_button =__('Preview Changes');
-            } else {
-                $preview_link = esc_url(apply_filters(
-                    'preview_post_link', 
-                    add_query_arg('preview', 'true', get_permalink($post->ID))
-                ));
-                
-                $preview_button =__('Preview');
-            }
             ?>
             <a class="preview button" href="<?php echo $preview_link; ?>" target="wp-preview" id="post-preview"
             tabindex="4"><?php echo $preview_button; ?></a>

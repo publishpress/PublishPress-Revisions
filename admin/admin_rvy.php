@@ -73,7 +73,6 @@ class RevisionaryAdmin
 				}
 
 				add_filter( 'get_delete_post_link', array(&$this, 'flt_delete_post_link'), 10, 2 );
-				add_filter( 'post_link', array(&$this, 'flt_preview_post_link'), 10, 2 );
 				
 				add_filter( 'page_row_actions', array(&$this, 'add_preview_action'), 10, 2 );
 				add_filter( 'post_row_actions', array(&$this, 'add_preview_action'), 10, 2 );
@@ -711,14 +710,6 @@ class RevisionaryAdmin
 
 		return $link;
     }
-	
-	function flt_preview_post_link( $link, $post ) {
-		if (rvy_is_revision_status($post->post_status)) {
-			$link = $this->convert_link( $link, 'revision', 'preview' );
-		}
-
-		return $link;
-	}
 	
 	function flt_post_title ( $title, $id = '' ) {
 		if ( $id )
