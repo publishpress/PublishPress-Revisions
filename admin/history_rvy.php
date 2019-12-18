@@ -451,7 +451,7 @@ class RevisionaryHistory
     
         $return = array();
     
-        foreach ( _wp_post_revision_fields( $compare_to ) as $field => $name ) {
+        foreach ( $all_meta_fields = _wp_post_revision_fields( $compare_to ) as $field => $name ) {
             /**
              * Contextually filter a post revision field.
              *
@@ -596,7 +596,7 @@ class RevisionaryHistory
             }
         }
         
-        foreach( apply_filters('revisionary_compare_post_fields', $taxonomies) as $taxonomy => $name) {
+        foreach( apply_filters('revisionary_compare_taxonomies', $taxonomies) as $taxonomy => $name) {
             $field = $taxonomy;
             
             if (!$terms = get_the_terms($compare_from, $taxonomy)) {
@@ -701,6 +701,9 @@ class RevisionaryHistory
                 );
             }
         }
+
+        $args = compact('to_meta', 'native_fields', 'meta_fields', 'strip_tags');
+        $return = apply_filters('revisionary_diff_ui', $return, $compare_from, $compare_to, $args);
 
         return $return;
     }
