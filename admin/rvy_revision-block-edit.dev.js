@@ -176,30 +176,32 @@ jQuery(document).ready( function($) {
 		}
 
 		if ($('div.edit-post-header__settings a.editor-post-preview:visible').length && !$('div.edit-post-header__settings a.rvy-post-preview').length) {
-			if (rvyObjEdit.previewURL) {
+			if (rvyObjEdit.viewURL) {
 				// remove preview event handlers
 				original = $('div.edit-post-header__settings a.editor-post-preview');
-				$('div.edit-post-header__settings a.editor-post-preview').after(original.clone().attr('href', rvyObjEdit.previewURL).attr('target', '_blank').removeClass('editor-post-preview').addClass('rvy-post-preview')).hide();
-				original.hide();
+				$(original).after(original.clone().attr('href', rvyObjEdit.viewURL).attr('target', '_blank').removeClass('editor-post-preview').addClass('rvy-post-preview'));
 			}
 
-			if (rvyObjEdit.previewCaption) {
-				RvyRecaptionElement('div.edit-post-header__settings a.rvy-post-preview', rvyObjEdit.previewCaption);
+			if (rvyObjEdit.viewCaption) {
+				RvyRecaptionElement('div.edit-post-header__settings a.rvy-post-preview', rvyObjEdit.viewCaption);
 			}
 
-			if (rvyObjEdit.previewTitle) {
-				$('div.edit-post-header__settings a.rvy-post-preview').attr('title', rvyObjEdit.previewTitle);
+			if (rvyObjEdit.viewTitle) {
+				$('div.edit-post-header__settings a.rvy-post-preview').attr('title', rvyObjEdit.viewTitle);
+			}
+		} else {
+			if (!$('a.editor-post-preview').next('a.rvy-post-preview').length) {
+				$('a.rvy-post-preview').insertAfter($('a.editor-post-preview'));
+			}
+
+			if (rvyObjEdit.previewTitle && !$('a.editor-post-preview').attr('title')) {
+				$('div.edit-post-header__settings a.editor-post-preview').attr('title', rvyObjEdit.previewTitle);
 			}
 		}
 
 		if (rvyObjEdit.revisionEdits && $('div.edit-post-sidebar a.editor-post-last-revision__title:visible').length && !$('div.edit-post-sidebar a.editor-post-last-revision__title.rvy-recaption').length) {
 			$('div.edit-post-sidebar a.editor-post-last-revision__title').html(rvyObjEdit.revisionEdits);
 			$('div.edit-post-sidebar a.editor-post-last-revision__title').addClass('rvy-recaption');
-		}
-
-		if ($('div.edit-post-header__settings a.editor-post-preview:not(.rvy-hidden)').length) {
-			$('div.edit-post-header__settings a.editor-post-preview').after($('a.rvy-post-preview'));
-			$('div.edit-post-header__settings a.editor-post-preview').hide().addClass('rvy-hidden');
 		}
 	}
 	var RvyRecaptionSaveDraftInterval = setInterval(RvyRecaptionSaveDraft, 100);
