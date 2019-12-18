@@ -4,7 +4,7 @@ Tags: revision, access, permissions, cms, user, groups, members, admin, pages, p
 Requires at least: 4.9.7
 Tested up to: 5.2.4
 Requires PHP: 5.6.20
-Stable Tag: 2.0.8
+Stable Tag: 2.0.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -33,10 +33,12 @@ To moderate or schedule changes to published posts, just install PublishPress Re
 
 = Additional Features in the Pro Version =
 * Advanced Custom Fields integration
-* BeaverBuilder integration
+* BeaverBuilder integration (front end revision submission)
+* WPML integration (revision queue follows language filter)
+* Pods compatibility
 * The Events Calendar compatibility
 * WooCommerce compatibility
-* WPML integration
+* Yoast SEO compatibility
 
 For more details about both the free and pro version, see our <a href="https://publishpress.com/revisionary/">Plugin Overview</a> and <a href="https://publishpress.com/documentation/revisionary-start/">Plugin Documentation</a>.
 
@@ -60,6 +62,9 @@ For more details about both the free and pro version, see our <a href="https://p
 
 == Changelog ==
 
+= 2.0.9 - 18 Oct 2019 =
+* Fixed : Compare Pending Revisions screen - link redirected to Edit Posts screen for some post types
+
 = 2.0.8 - 18 Oct 2019 =
 * Change : PostMeta Failsafe: to avoid the possibility of accidental clearance, Featured Image removal is not revisioned, until further testing. API filter available for experimental usage with specified meta keys.
 * Fixed : Featured Image, Page Template revisioning failed under some conditions
@@ -81,7 +86,6 @@ For more details about both the free and pro version, see our <a href="https://p
 * Fixed : Import script for Revisionary 1.x revisions did not run on plugin activation 
 * Fixed : Administrators, Editors and Authors were blocked from Quick Edit
 * Compat : Multiple Authors plugin
-* Fixed : Scheduled Revisions - If "Update Publish Date" enabled, 404 Not Found redirect after manually publishing a scheduled revision if the post type uses post date in permalink structure
 * Fixed : Pending Revisions - Published post date was not updated even if "Update Publish Date" setting enabled
 * Change : Pending Revision Notification - Include link to Revision Queue
 * Fixed : Pending Revision Notification - If enabled for author only, email was sent with a blank title and message
