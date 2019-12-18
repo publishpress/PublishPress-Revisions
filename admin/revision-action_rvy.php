@@ -344,11 +344,18 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		return $post_id;
 	}
 
+	$_post = get_post($post_id);
+
+	// prevent published post status being set to future when a scheduled revision is manually published before the stored post_date
+	if ($_post && ($_post->post_status != $published->post_status)) {
+		$wpdb->update($wpdb->posts, array('post_status' => $published->post_status), array('ID' => $post_id));
+	}
+
 	if (
 		(('pending-revision' == $revision->post_status) && rvy_get_option('pending_revision_update_post_date'))
 		|| (('future-revision' == $revision->post_status) && rvy_get_option('scheduled_revision_update_post_date'))
 	) {
-		if ($_post = get_post($post_id)) {
+		if ($_post) {
 			if ($_post->post_date_gmt != $_post->post_modified_gmt) {
 				$wpdb->update(
 					$wpdb->posts, 
