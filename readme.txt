@@ -4,11 +4,11 @@ Tags: revision, access, permissions, cms, user, groups, members, admin, pages, p
 Requires at least: 4.9.7
 Tested up to: 5.2.4
 Requires PHP: 5.6.20
-Stable Tag: 2.0.5
+Stable Tag: 2.0.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-You can use PublishPress Revisions to submit, moderate and schedule changes to your published WordPress content.
+Maintain published content with teamwork and precision using the Revisions model to submit, moderate and schedule changes.
 
 == Description ==
 
@@ -23,11 +23,11 @@ To moderate or schedule changes to published posts, just install PublishPress Re
 * To schedule changes to a published post, just set the desired future date before hitting Update.
 
 = Features =
-* Schedule or request changes to published posts and pages using the Gutenberg or Classic Editor.
-* Revision fields include Content, Title, Excerpt, Categories, Tags, Custom Taxonomy Terms, Page Parent or Page Template.
-* Display changes using the familiar Compare Revisions interface.
+* Schedule or request changes to published posts and pages using the Gutenberg (or Classic) Editor
+* Revision fields include Content, Title, Excerpt, Categories, Tags, Custom Taxonomy Terms, Page Parent or Page Template
+* Display changes using the familiar Compare Revisions interface
 * Front-end preview display of Pending / Scheduled Revisions with Compare, Approve, and Edit buttons.
-* Make further changes to Pending Revisions and Scheduled Revisions with Gutenberg or Classic Editor.
+* Make further changes to Pending Revisions and Scheduled Revisions with Gutenberg or Classic Editor
 * New WordPress role, "Revisor" is a moderated Editor.
 * Works with site-wide WordPress Roles, or in conjunction with <a href="https://publishpress.com/presspermit/">PressPermit Pro</a> for page-specific or category-specific permissions.
 
@@ -42,10 +42,6 @@ For more details about both the free and pro version, see our <a href="https://p
 
 = Support =
 * PublishPress Revisions is professionally supported by both the original author (Kevin Behrens) and the experienced <a href="https://publishpress.com">PublishPress</a> team.
-
-= Clarification =
-
-PublishPress Revisions was previously called Revisionary. People sometimes also call it Publish Press Revisions. Whatever you call this plugin, it really is the best way to manage WordPress revisions.
 
 == Screenshots ==
 
@@ -63,6 +59,10 @@ PublishPress Revisions was previously called Revisionary. People sometimes also 
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.0.6 - 17 Oct 2019 =
+* Fixed : Featured Image and Page Template revisions were not applied (but did work in PublishPress Revisions Pro)
+* Fixed : Publishing a revision imported from Revisionary 1.x caused tags and categories to be stripped out
 
 = 2.0.5 - 16 Oct 2019 =
 * Fixed : Import script for Revisionary 1.x revisions did not run on plugin activation 

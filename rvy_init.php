@@ -602,7 +602,7 @@ if ( in_array( basename($_SERVER['PHP_SELF']), array('admin.php', 'admin-ajax.ph
 	add_action( 'wp_ajax_rvy_dismiss_msg', '_revisionary_dashboard_dismiss_msg' );
 }
 
-function revisionary_copy_meta_field( $meta_key, $from_post_id, $to_post_id ) {
+function revisionary_copy_meta_field( $meta_key, $from_post_id, $to_post_id, $mirror_empty = true ) {
 	global $wpdb;
 
 	if ( ! $to_post_id )
@@ -614,21 +614,21 @@ function revisionary_copy_meta_field( $meta_key, $from_post_id, $to_post_id ) {
 			)
 		) {
 			update_post_meta($to_post_id, $meta_key, $source_meta->meta_value);
-		} else {
-			update_post_meta($to_post_id, $meta_key);
+		} elseif ($mirror_empty) {
+			delete_post_meta($to_post_id, $meta_key);
 		}
 	}
 }
 
-function revisionary_copy_terms( $from_post_id, $to_post_id, $skip_taxonomies = false ) {
+function revisionary_copy_terms( $from_post_id, $to_post_id, $mirror_empty = false ) {
 	global $wpdb;
 
 	if ( ! $to_post_id )
 		return;
 	
-	if (false===$skip_taxonomies) {
+	//if (false===$skip_taxonomies) { @todo: $args
 		$skip_taxonomies = array();	
-	}
+	//}
 
 	if ($skip_taxonomies = apply_filters('revisionary_skip_taxonomies', $skip_taxonomies, $from_post_id, $to_post_id)) {
 		$tx_join = "INNER JOIN $wpdb->term_taxonomy AS tt ON tt.term_taxonomy_id = tr.term_taxonomy_id ";
@@ -650,10 +650,12 @@ function revisionary_copy_terms( $from_post_id, $to_post_id, $skip_taxonomies = 
 			}
 		}
 		
+		if ($source_terms || $mirror_empty) {
 		if ( $delete_terms = array_diff($target_terms, $source_terms) ) {
 			// todo: single query
 			foreach($delete_terms as $tt_id) {
 				$wpdb->query("DELETE FROM $wpdb->term_relationships WHERE object_id = '$to_post_id' AND term_taxonomy_id = '$tt_id'");
+				}
 			}
 		}
 	}	
