@@ -26,6 +26,9 @@ class RVY_PostBlockEditUI {
         
         global $post;
 
+        $do_pending_revisions = rvy_get_option('pending_revisions');
+        $do_scheduled_revisions = rvy_get_option('scheduled_revisions');
+
         if ( ('revision' == $post_type) || rvy_is_revision_status($post->post_status) ) {
             wp_enqueue_script( 'rvy_object_edit', RVY_URLPATH . "/admin/rvy_revision-block-edit{$suffix}.js", array('jquery', 'jquery-form'), RVY_VERSION, true );
 
@@ -82,17 +85,17 @@ class RVY_PostBlockEditUI {
                 'redirectURLscheduled' => admin_url("edit.php?post_type={$post_type}&revision_submitted={$future_status}&post_id={$post_id}"),
                 'redirectURLpending' => admin_url("edit.php?post_type={$post_type}&revision_submitted={$pending_status}&post_id={$post_id}"),
                 'userID' => $current_user->ID,
-                'ScheduleCaption' => __('Schedule Revision', 'revisionary'),
+                'ScheduleCaption' => ($do_scheduled_revisions) ? __('Schedule Revision', 'revisionary') : '',
                 'UpdateCaption' => __('Update'),
-                'revision' => __('Pending Revision', 'revisionary'),
+                'revision' => ($do_pending_revisions) ? __('Pending Revision', 'revisionary') : '',
                 'revisionTitle' => attribute_escape(__('Do not publish current changes yet, but save to Revision Queue', 'revisionary')), 
                 'revisionTitleFuture' => attribute_escape(__('Do not schedule current changes yet, but save to Revision Queue', 'revisionary')), 
                 'ajaxurl' => admin_url(''),
-                'SaveCaption' => __('Save Revision', 'revisionary'),
+                'SaveCaption' => ($do_pending_revisions) ? __('Save Revision', 'revisionary') : '',
                 'previewURL' => $preview_url,
             );
 
-            if ($_revisions = rvy_get_post_revisions($post_id, 'pending-revision', ['orderby' => 'ID', 'order' => 'ASC'])) {
+            if ($do_pending_revisions && $_revisions = rvy_get_post_revisions($post_id, 'pending-revision', ['orderby' => 'ID', 'order' => 'ASC'])) {
                 $status_obj = get_post_status_object('pending-revision');
                 $args['pendingRevisionsCaption'] = sprintf(_n('<span class="dashicons dashicons-edit"></span>&nbsp;%s Pending Revision', '<span class="dashicons dashicons-edit"></span>&nbsp;%s Pending Revisions', count($_revisions), 'revisionary'), count($_revisions));
 
@@ -103,7 +106,7 @@ class RVY_PostBlockEditUI {
                 $args['pendingRevisionsURL'] = '';
             }
 
-            if ($_revisions = rvy_get_post_revisions($post_id, 'future-revision', ['orderby' => 'ID', 'order' => 'ASC'])) {
+            if ($do_scheduled_revisions && $_revisions = rvy_get_post_revisions($post_id, 'future-revision', ['orderby' => 'ID', 'order' => 'ASC'])) {
                 $status_obj = get_post_status_object('future-revision');
                 $args['scheduledRevisionsCaption'] = sprintf(_n('<span class="dashicons dashicons-clock"></span>&nbsp;%s Scheduled Revision', '<span class="dashicons dashicons-clock"></span>&nbsp;%s Scheduled Revisions', count($_revisions), 'revisionary'), count($_revisions));
                 
@@ -118,7 +121,7 @@ class RVY_PostBlockEditUI {
             delete_post_meta( $post_id, "_new_scheduled_revision_{$current_user->ID}" );
             delete_post_meta( $post_id, "_save_as_revision_{$current_user->ID}" );
 
-        } else {
+        } elseif($do_pending_revisions) {
             //div.editor-post-publish-panel button.editor-post-publish-button
             wp_enqueue_script( 'rvy_object_edit', RVY_URLPATH . "/admin/rvy_post-block-edit-revisor{$suffix}.js", array('jquery', 'jquery-form'), RVY_VERSION, true );
             

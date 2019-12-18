@@ -127,42 +127,46 @@ class RvyPostEdit {
             return;
         }
 
-        if ($_revisions = rvy_get_post_revisions($post->ID, 'future-revision', ['orderby' => 'ID', 'order' => 'ASC'])) {
-            $status_obj = get_post_status_object('future-revision');
-            $caption = sprintf(__('%sScheduled Revisions: %s', 'revisionary'), '<span class="dashicons dashicons-clock"></span>&nbsp;', '<b>' . count($_revisions) . '</b>');
-            
-            $num_revisions = count($_revisions);
-            //$last_revision = array_pop($_revisions);
-            //$url = admin_url("revision.php?revision=$last_revision->ID");   // @todo: fix i8n
-            $url = admin_url("revision.php?post_id=$post->ID&revision=future-revision");
-            ?>
-            <div class="misc-pub-section">
-            <?php
-            echo $caption;
-            ?>
-            <a class="hide-if-no-js"
-                href="<?php echo esc_url($url); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions'); ?></a>
-            </div>
-            <?php
+        if (rvy_get_option('scheduled_revisions')) {
+	        if ($_revisions = rvy_get_post_revisions($post->ID, 'future-revision', ['orderby' => 'ID', 'order' => 'ASC'])) {
+	            $status_obj = get_post_status_object('future-revision');
+	            $caption = sprintf(__('%sScheduled Revisions: %s', 'revisionary'), '<span class="dashicons dashicons-clock"></span>&nbsp;', '<b>' . count($_revisions) . '</b>');
+	            
+	            $num_revisions = count($_revisions);
+	            //$last_revision = array_pop($_revisions);
+	            //$url = admin_url("revision.php?revision=$last_revision->ID");   // @todo: fix i8n
+	            $url = admin_url("revision.php?post_id=$post->ID&revision=future-revision");
+	            ?>
+	            <div class="misc-pub-section">
+	            <?php
+	            echo $caption;
+	            ?>
+	            <a class="hide-if-no-js"
+	                href="<?php echo esc_url($url); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions'); ?></a>
+	            </div>
+	            <?php
+	        }
         }
 
-        if ($_revisions = rvy_get_post_revisions($post->ID, 'pending-revision', ['orderby' => 'ID', 'order' => 'ASC'])) {
-            $status_obj = get_post_status_object('pending-revision');
-            $caption = sprintf(__('%sPending Revisions: %s', 'revisionary'), '<span class="dashicons dashicons-edit"></span>&nbsp;', '<b>' . count($_revisions) . '</b>');
-            
-            $num_revisions = count($_revisions);
-            //$last_revision = array_pop($_revisions);
-            //$url = admin_url("revision.php?revision=$last_revision->ID");   // @todo: fix i8n
-            $url = admin_url("revision.php?post_id=$post->ID&revision=pending-revision");
-            ?>
-            <div class="misc-pub-section">
-            <?php
-            echo $caption;
-            ?>
-            <a class="hide-if-no-js"
-                href="<?php echo esc_url($url); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions'); ?></a>
-            </div>
-            <?php
-        }
-    }
+        if (rvy_get_option('pending_revisions')) {
+	        if ($_revisions = rvy_get_post_revisions($post->ID, 'pending-revision', ['orderby' => 'ID', 'order' => 'ASC'])) {
+	            $status_obj = get_post_status_object('pending-revision');
+	            $caption = sprintf(__('%sPending Revisions: %s', 'revisionary'), '<span class="dashicons dashicons-edit"></span>&nbsp;', '<b>' . count($_revisions) . '</b>');
+	            
+	            $num_revisions = count($_revisions);
+	            //$last_revision = array_pop($_revisions);
+	            //$url = admin_url("revision.php?revision=$last_revision->ID");   // @todo: fix i8n
+	            $url = admin_url("revision.php?post_id=$post->ID&revision=pending-revision");
+	            ?>
+	            <div class="misc-pub-section">
+	            <?php
+	            echo $caption;
+	            ?>
+	            <a class="hide-if-no-js"
+	                href="<?php echo esc_url($url); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions'); ?></a>
+	            </div>
+	            <?php
+	           }
+	        }
+    	}
 }
