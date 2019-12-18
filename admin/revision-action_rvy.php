@@ -241,12 +241,12 @@ function rvy_revision_restore() {
 
 		// restore previous meta fields
 
-		if (!defined('REVISIONARY_PRO_VERSION') || apply_filters('revisionary_copy_core_postmeta', true, $revision, $post)) {
-			revisionary_copy_meta_field('_thumbnail_id', $revision->ID, $post->ID);
-			revisionary_copy_meta_field('_wp_page_template', $revision->ID, $post->ID);
+		if (!defined('REVISIONARY_PRO_VERSION') || apply_filters('revisionary_copy_core_postmeta', true, $revision, $post, false)) {
+			revisionary_copy_meta_field('_thumbnail_id', $revision->ID, $post->ID, false);
+			revisionary_copy_meta_field('_wp_page_template', $revision->ID, $post->ID, false);
 		}
 
-		revisionary_copy_terms($revision->ID, $post->ID);
+		revisionary_copy_terms($revision->ID, $post->ID, false);
 
 		/*
 		if ( $postmeta = $wpdb->get_results( "SELECT meta_key, meta_value FROM $wpdb->postmeta WHERE post_id = '$revision_id'", ARRAY_A ) ) {
@@ -364,14 +364,16 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	// also copy all stored postmeta from revision
 	global $revisionary;
 
-	if (!defined('REVISIONARY_PRO_VERSION') || apply_filters('revisionary_copy_core_postmeta', true, $revision, $published)) {
-		revisionary_copy_meta_field('_post_thumbnail', $revision->ID, $post->ID);
-		revisionary_copy_meta_field('_page_template', $revision->ID, $post->ID);
+	$is_imported = get_post_meta($revision_id, '_rvy_imported_revision', true);
+
+	if (!defined('REVISIONARY_PRO_VERSION') || apply_filters('revisionary_copy_core_postmeta', true, $revision, $published, !$is_imported)) {
+		revisionary_copy_meta_field('_post_thumbnail', $revision->ID, $published->ID, !$is_imported);
+		revisionary_copy_meta_field('_page_template', $revision->ID, $published->ID, !$is_imported);
 	}
 
 	// Allow Multiple Authors revisions to be applied to published post. Revision post_author is forced to actual submitting user.
 	//$skip_taxonomies = (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) ? ['author'] : [];
-	revisionary_copy_terms($revision_id, $post_id);
+	revisionary_copy_terms($revision_id, $post_id, !$is_imported);
 
 	// @todo save change as past revision?
 	//$wpdb->delete($wpdb->posts, array('ID' => $revision_id));
