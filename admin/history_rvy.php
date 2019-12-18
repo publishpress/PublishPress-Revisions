@@ -1010,7 +1010,7 @@ class RevisionaryHistory
         ?  __('Preview / Restore', 'revisionary')
         : __('Preview', 'revisionary');
 
-        $_arg = ('page' == $revision->post_type) ? 'page_id=' : 'p=';
+        $_arg = ('page' == $post_type) ? 'page_id=' : 'p=';
         $preview_url = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $post_id ) ) );
 
         $manage_label = (empty($type_obj) || agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true])) 
