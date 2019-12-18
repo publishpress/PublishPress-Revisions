@@ -12,7 +12,7 @@
     font-family: sans-serif;
     font-weight: normal;
     font-size: 0.9em;
-    z-index: 99;
+    z-index: 999999;
     position: relative;
 }
 
@@ -41,7 +41,7 @@
     border: 1px solid;
     cursor: pointer;
     color: #333;
-    z-index: 99;
+    z-index: 999999;
 }
 
 .rvy_view_published {
