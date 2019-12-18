@@ -25,8 +25,7 @@ class Revisionary
 		rvy_refresh_options_sitewide();
 
 		// NOTE: $_GET['preview'] and $_GET['post_type'] arguments are set by rvy_init() at response to ?p= request when the requested post is a revision.
-		if ( ! is_admin() && ( ! defined('REST_REQUEST') || ! REST_REQUEST ) && ((!empty( $_GET['preview']) && empty($_REQUEST['preview_id'])) || ! empty( $_GET['mark_current_revision'] ) ) ) { // && empty($_GET['preview_id']) ) { // preview_id indicates a regular preview via WP core, based on autosave revision
-			
+		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && ((!empty($_GET['preview']) && empty($_REQUEST['preview_id'])) || !empty($_GET['mark_current_revision']))) { // preview_id indicates a regular preview via WP core, based on autosave revision
 			require_once( dirname(__FILE__).'/front_rvy.php' );
 			$this->front = new RevisionaryFront();
 		}
