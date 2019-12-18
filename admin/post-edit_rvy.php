@@ -127,6 +127,7 @@ class RvyPostEdit {
             return;
         }
 
+        if (rvy_get_option('scheduled_revisions')) {
         if ($_revisions = rvy_get_post_revisions($post->ID, 'future-revision', ['orderby' => 'ID', 'order' => 'ASC'])) {
             $status_obj = get_post_status_object('future-revision');
             $caption = sprintf(__('%sScheduled Revisions: %s', 'revisionary'), '<span class="dashicons dashicons-clock"></span>&nbsp;', '<b>' . count($_revisions) . '</b>');
@@ -145,7 +146,9 @@ class RvyPostEdit {
             </div>
             <?php
         }
+        }
 
+        if (rvy_get_option('pending_revisions')) {
         if ($_revisions = rvy_get_post_revisions($post->ID, 'pending-revision', ['orderby' => 'ID', 'order' => 'ASC'])) {
             $status_obj = get_post_status_object('pending-revision');
             $caption = sprintf(__('%sPending Revisions: %s', 'revisionary'), '<span class="dashicons dashicons-edit"></span>&nbsp;', '<b>' . count($_revisions) . '</b>');
@@ -163,6 +166,7 @@ class RvyPostEdit {
                 href="<?php echo esc_url($url); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions'); ?></a>
             </div>
             <?php
+            }
         }
     }
 }
