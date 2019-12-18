@@ -373,6 +373,15 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	$is_imported = get_post_meta($revision_id, '_rvy_imported_revision', true);
 
+	// work around bug in < 2.0.7 that saved all scheduled revisions without terms
+	if (!$is_imported && ('future-revision' == $revision->post_status)) {
+		if ($install_time = get_option('revisionary_2_install_time')) {
+			if (strtotime($revision->post_modified_gmt) < $install_time) {
+				$is_imported = true;
+			}
+		}
+	}
+
 	if (!defined('REVISIONARY_PRO_VERSION') || apply_filters('revisionary_copy_core_postmeta', true, $revision, $published, !$is_imported)) {
 		revisionary_copy_meta_field('_post_thumbnail', $revision->ID, $published->ID, !$is_imported);
 		revisionary_copy_meta_field('_page_template', $revision->ID, $published->ID, !$is_imported);
