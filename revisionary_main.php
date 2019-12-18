@@ -839,12 +839,17 @@ class Revisionary
 			$_authors = get_multiple_authors($revision_id);
 			if (count($_authors) == 1) {
 				$_author = reset($_authors);
+				$_author = MultipleAuthors\Classes\Objects\Author::get_by_term_id($_author->term_id);
 			}
 
+			// If multiple authors could not be stored, restore original authors from published post
 			if (empty($_authors) || ($_author->ID == $current_user->ID)) {
-				// restore original authors from published post
-				if ($published_authors = wp_get_post_terms($published_post->ID, 'author', ['fields' => 'ids'])) {
-					wp_set_post_terms($revision_id, $published_authors, 'author', false);
+				if ($published_authors = get_multiple_authors($published_post->ID)) {
+					// This sets author taxonomy terms and meta field ppma_author_name
+					MultipleAuthors\Classes\Utils::set_post_authors($revision_id, $published_authors);
+
+					// Also ensure meta field is set for published post
+					MultipleAuthors\Classes\Utils::set_post_authors($published_post->ID, $published_authors);
 				}
 			}
 		}
