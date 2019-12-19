@@ -623,8 +623,7 @@ function rvy_revision_unschedule() {
 		
 		rvy_update_next_publish_date();
 
-		$_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
-		$redirect = add_query_arg( 'preview', true, str_replace( 'p=', $arg, get_post_permalink( $revision_id ) ) );
+		$redirect = rvy_preview_url($revision);
 	} while (0);
 	
 	if ( ! $redirect ) {
