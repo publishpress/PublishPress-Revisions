@@ -524,6 +524,14 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		$hint = __('To avoid notification failures, buffer emails for delayed sending once minute, hour or day limits are exceeded', 'revisionary');
 		$ui->option_checkbox( 'use_notification_queue', $tab, $section, $hint, '' );
 		
+		if (!empty($_REQUEST['truncate_mail_log'])) {
+			delete_option('revisionary_sent_mail');
+		}
+
+		if (!empty($_REQUEST['clear_mail_buffer'])) {
+			delete_option('revisionary_mail_queue');
+		}
+
 		if (!empty($_REQUEST['mailinfo'])) {
 			$verbose = !empty($_REQUEST['verbose']);
 
@@ -593,6 +601,21 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 				<a href="<?php echo(add_query_arg('truncate_mail_log', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Truncate Notification Log', 'revisionary');?></a>
 			<?php endif;
 		} 
+
+		if (defined('WP_DEBUG') 
+			|| class_exists('EmailLog') 				// "Email Log" plugin
+			|| defined('POST_SMTP_VER') 				// "Post SMTP" plugin
+			|| rvy_is_plugin_active('wp-mail-logging') 	// WP Mail Logging by MailPoet
+			|| defined('LOG_EMAILS_PLUGIN_VERSION')		// "Log Emails" plugin
+		) {
+			if (empty($_REQUEST['mailinfo'])):?>
+				<br />
+				<div style="padding-left:22px">
+				<a href="<?php echo(add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Show Notification Log / Buffer', 'revisionary');?></a>
+				<br /><br />
+				<a href="<?php echo(add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI'])));?>"><?php _e('Show with message content', 'revisionary');?></a>
+				</div>
+			<?php endif;
 		}
 		
 		?>
@@ -742,3 +765,24 @@ $revisionary->admin->publishpressFooter();
 
 <?php
 } // end function
+
+function rvy_is_plugin_active($check_plugin_file)
+    {
+        $plugins = (array)get_option('active_plugins');
+        foreach ($plugins as $plugin_file) {
+            if (false !== strpos($plugin_file, $check_plugin_file)) {
+                return $plugin_file;
+            }
+        }
+
+        if (is_multisite()) {
+            $plugins = (array)get_site_option('active_sitewide_plugins');
+
+            // network activated plugin names are array keys
+            foreach (array_keys($plugins) as $plugin_file) {
+                if (false !== strpos($plugin_file, $check_plugin_file)) {
+                    return $plugin_file;
+                }
+            }
+        }
+    }
