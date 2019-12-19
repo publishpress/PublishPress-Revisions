@@ -2,9 +2,21 @@
 namespace PublishPress\Revisions;
 
 class RevisionCreation {
+	var $revisionary;
+
+	function __construct($args = []) {
+		// Support instantiation downstream from Revisionary constructor (before its return value sets global variable)
+		if (!empty($args) && is_array($args) && !empty($args['revisionary'])) {
+			$this->revisionary = $args['revisionary'];
+		}
+	}
 
     function flt_maybe_insert_revision($data, $postarr) {
+		if (!empty($this->revisionary)) {
+			$revisionary = $this->revisionary;
+		} else {
         global $revisionary;
+		}
 
         if ( isset($_POST['wp-preview']) && ( 'dopreview' == $_POST['wp-preview'] ) ) {
             return $data;
@@ -37,7 +49,11 @@ class RevisionCreation {
     }
 
     function flt_pendingrev_post_status($status) {
+        if (!empty($this->revisionary)) {
+			$revisionary = $this->revisionary;
+		} else {
         global $revisionary;
+		}
         
         if (rvy_is_revision_status($status) || ('inherit' == $status)) {
 			return $status;
@@ -103,7 +119,13 @@ class RevisionCreation {
 
     // impose pending revision
     function flt_pending_revision_data( $data, $postarr ) {
-        global $revisionary, $wpdb, $current_user;
+        global $wpdb, $current_user;
+		
+		if (!empty($this->revisionary)) {
+			$revisionary = $this->revisionary;
+		} else {
+			global $revisionary;
+		}
         
         if ( $revisionary->doing_rest && $revisionary->rest->is_posts_request && ! empty( $revisionary->rest->request ) ) {
             $postarr = array_merge( $revisionary->rest->request->get_params(), $postarr );
@@ -319,7 +341,13 @@ class RevisionCreation {
     }
 
     function flt_create_scheduled_rev( $data, $post_arr ) {
-		global $revisionary, $current_user, $wpdb;
+		global $current_user, $wpdb;
+
+		if (!empty($this->revisionary)) {
+			$revisionary = $this->revisionary;
+		} else {
+			global $revisionary;
+		}
 
 		if ( empty( $post_arr['ID'] ) ) {
 			return $data;

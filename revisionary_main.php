@@ -716,13 +716,13 @@ class Revisionary
 
 	function flt_pendingrev_post_status($status) {
 		require_once( dirname(__FILE__).'/revision-creation_rvy.php' );
-		$rvy_creation = new PublishPress\Revisions\RevisionCreation();
+		$rvy_creation = new PublishPress\Revisions\RevisionCreation(['revisionary' => $this]);
 		return $rvy_creation->flt_pendingrev_post_status($status);
 	}
 
 	function flt_maybe_insert_revision($data, $postarr) {
 		require_once( dirname(__FILE__).'/revision-creation_rvy.php' );
-		$rvy_creation = new PublishPress\Revisions\RevisionCreation();
+		$rvy_creation = new PublishPress\Revisions\RevisionCreation(['revisionary' => $this]);
 		return $rvy_creation->flt_maybe_insert_revision($data, $postarr);
 	}
 
@@ -742,7 +742,7 @@ class Revisionary
 	
 	function flt_create_scheduled_rev( $data, $post_arr ) {
 		require_once( dirname(__FILE__).'/revision-creation_rvy.php' );
-		$rvy_creation = new PublishPress\Revisions\RevisionCreation();
+		$rvy_creation = new PublishPress\Revisions\RevisionCreation(['revisionary' => $this]);
 		return $rvy_creation->flt_create_scheduled_rev( $data, $post_arr );
 	}
 
