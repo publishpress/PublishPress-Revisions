@@ -366,6 +366,14 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		$wpdb->prepare("SELECT * FROM $wpdb->posts WHERE ID = %d", $published_id)
 	);
 
+	if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
+		if (!$published_authors = get_multiple_authors($published_id)) {
+			if ($author = MultipleAuthors\Classes\Objects\Author::get_by_user_id((int) $published->post_author)) {
+				$published_authors = [$author];
+			}
+		}
+	}
+
 	// published post columns which should not be overwritten by revision values
 	//$update = array_diff_key($update, array_fill_keys(array('post_status', 'comment_count', 'post_name', 'guid', 'post_date', 'post_date_gmt' ), true));
 	$update = array_merge(
@@ -447,6 +455,13 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	// Allow Multiple Authors revisions to be applied to published post. Revision post_author is forced to actual submitting user.
 	//$skip_taxonomies = (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) ? ['author'] : [];
 	revisionary_copy_terms($revision_id, $post_id, !$is_imported);
+
+	if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && $published_authors) {
+		// Make sure Multiple Authors values were not wiped due to incomplete revision data
+		if (!get_multiple_authors($post_id)) {
+			MultipleAuthors\Classes\Utils::set_post_authors($post_id, $published_authors);
+		}
+	}
 
 	// @todo save change as past revision?
 	//$wpdb->delete($wpdb->posts, array('ID' => $revision_id));

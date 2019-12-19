@@ -934,18 +934,28 @@ class Revisionary
 			// Make sure Multiple Authors plugin does not change post_author value for revisor. Authors taxonomy terms can be revisioned for published post.
 			$wpdb->update($wpdb->posts, ['post_author' => $current_user->ID], ['ID' => $revision_id]);
 			
+			// Make sure Multiple Authors plugin does not change post_author value for published post on revision submission.
+			$wpdb->update($wpdb->posts, ['post_author' => $published_post->post_author], ['ID' => $published_post->ID]);
+			
 			// On some sites, MA autosets Authors to current user. Temporary workaround: if Authors are set to current user, revert to published post terms.
 			$_authors = get_multiple_authors($revision_id);
 			
 			if (count($_authors) == 1) {
 				$_author = reset($_authors);
+
+				if ($_author && empty($_author->ID)) { // @todo: is this still necessary?
 				$_author = MultipleAuthors\Classes\Objects\Author::get_by_term_id($_author->term_id);
 			}
+			}
+
+			$published_authors = get_multiple_authors($published_post->ID);
 
 			// If multiple authors could not be stored, restore original authors from published post
 			if (empty($_authors) || (!empty($_author) && $_author->ID == $current_user->ID)) {
-				if (!$published_authors = get_multiple_authors($published_post->ID)) {
-					$published_authors = (array) MultipleAuthors\Classes\Objects\Author::get_by_user_id($published_post->post_author);
+				if (!$published_authors) {
+					if ($author = MultipleAuthors\Classes\Objects\Author::get_by_user_id((int) $published_post->post_author)) {
+						$published_authors = [$author];
+					}
 				}
 
 				if ($published_authors) {
@@ -954,6 +964,23 @@ class Revisionary
 
 					// Also ensure meta field is set for published post
 					MultipleAuthors\Classes\Utils::set_post_authors($published_post->ID, $published_authors);
+				}
+			}
+			
+			if (!defined('REVISIONARY_DISABLE_MA_AUTHOR_RESTORATION')) {
+				// Fix past overwrites of published post_author field by copying correct author ID back from multiple authors array
+				if ($published_authors && $published_post->post_author) {
+					$author_user_ids = [];
+					foreach($published_authors as $author) {
+						$author_user_ids []= $author->user_id;
+					}
+
+					if (!in_array($published_post->post_author, $author_user_ids)) {
+						$author = reset($published_authors);
+						if (is_object($author) && !empty($author->user_id)) {
+							$wpdb->update($wpdb->posts, ['post_author' => $author->user_id], ['ID' => $published_post->ID]);
+						}
+					}
 				}
 			}
 		}
@@ -1132,6 +1159,9 @@ class Revisionary
 		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
 			// Make sure Multiple Authors plugin does not change post_author value for revisor. Authors taxonomy terms can be revisioned for published post. 
 			$wpdb->update($wpdb->posts, ['post_author' => $current_user->ID], ['ID' => $revision_id]);
+
+			// Make sure Multiple Authors plugin does not change post_author value for published post on revision submission.
+			$wpdb->update($wpdb->posts, ['post_author' => $published_post->post_author], ['ID' => $published_post->ID]);
 		}
 
 		require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
