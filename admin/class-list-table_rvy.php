@@ -942,9 +942,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		if ( is_post_type_viewable( $post_type_object ) ) {
 			if ( $can_read_post ) {
-				$_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
+				$preview_link = rvy_preview_url($post);
 
-				$preview_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $post ) ) );
 				//$preview_link = remove_query_arg( 'post_type', $preview_link );
 				$preview_link = remove_query_arg( 'preview_id', $preview_link );
 				$actions['view'] = sprintf(

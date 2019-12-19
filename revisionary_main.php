@@ -33,8 +33,7 @@ class Revisionary
 		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && (!empty($_GET['preview']) && !empty($_REQUEST['preview_id']))) {
 			if ($_post = get_post($_REQUEST['preview_id'])) {
 				if (in_array($_post->post_status, ['pending-revision', 'future-revision']) && !$this->isBlockEditorActive()) {
-					$_arg = ('page' == $_post->post_type) ? 'page_id=' : 'p=';
-					$preview_url = add_query_arg('preview', true, str_replace('p=', $_arg, get_post_permalink($_post->ID)));
+					$preview_url = rvy_preview_url($_post);
 					wp_redirect($preview_url);
 					exit;
 				}
@@ -262,8 +261,7 @@ class Revisionary
 		}
 
 		if ($revision && ($usec < $limit)) {
-			$_arg = ('page' == $revision->post_type) ? 'page_id=' : 'p=';
-			$preview_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $revision ) ) );
+			$preview_link = rvy_preview_url($revision);
 			wp_redirect($preview_link);
 			exit;
 		}

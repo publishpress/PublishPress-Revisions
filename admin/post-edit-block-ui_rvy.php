@@ -32,8 +32,7 @@ class RVY_PostBlockEditUI {
         if ( ('revision' == $post_type) || rvy_is_revision_status($post->post_status) ) {
             wp_enqueue_script( 'rvy_object_edit', RVY_URLPATH . "/admin/rvy_revision-block-edit{$suffix}.js", array('jquery', 'jquery-form'), RVY_VERSION, true );
 
-            $_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
-			$view_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $post ) ) );
+            $view_link = rvy_preview_url($post);
 
             if ($can_publish = agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true))) {
                 $view_caption = ('future-revision' == $post->post_status) ? __('View / Publish') : __('View / Approve');

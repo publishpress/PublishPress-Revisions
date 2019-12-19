@@ -31,6 +31,7 @@ function rvy_default_options_sitewide() {
 		'scheduled_revision_update_post_date' => true,
 		'pending_revision_update_post_date' => true,
 		'edd_key' => true,
+		'preview_link_type' => true,
 	);
 
 	if ( $other_options = array_diff_key( rvy_default_options(), $def ) ) {
@@ -61,6 +62,7 @@ function rvy_default_options() {
 		'scheduled_revision_update_post_date' => 1,
 		'pending_revision_update_post_date' => 0,
 		'edd_key' => '',
+		'preview_link_type' => 'published_slug',
 	);
 
 	return $def;

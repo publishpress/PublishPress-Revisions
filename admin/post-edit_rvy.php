@@ -66,8 +66,7 @@ class RvyPostEdit {
         global $post;
 
         if ($post && rvy_is_revision_status($post->post_status)) {
-        $_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
-            $url = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $post ) ) );
+            $url = rvy_preview_url($post);
         }
 
         return $url;

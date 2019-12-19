@@ -157,8 +157,7 @@ class RvyPostEditSubmitMetabox
         ?>
         <?php
         if (rvy_is_revision_status($post->post_status)) {
-            $_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
-            $preview_link = add_query_arg('preview', true, str_replace('p=', $_arg, get_post_permalink($post)));
+            $preview_link = rvy_preview_url($post);
 
             $type_obj = get_post_type_object($post->post_type);
             $can_publish = $type_obj && agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));

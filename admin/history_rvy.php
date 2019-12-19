@@ -822,8 +822,8 @@ class RevisionaryHistory
             if ($can_restore) {
                 // Until Reject button is implemented, just route to Preview screen so revision can be edited / deleted if necessary
                 if ( in_array( $revision->post_status, ['pending-revision', 'future-revision'] ) ) {
-                    $_arg = ('page' == $revision->post_type) ? 'page_id=' : 'p=';
-                    $restore_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $revision ) ) );
+                    $restore_link = rvy_preview_url($revision);
+
                     //$link_open = "<a href='$preview_url' target='_blank'>";
                     //$link_close = '</a>';
                 } else {
@@ -1016,8 +1016,7 @@ class RevisionaryHistory
         ?  __('Preview / Restore', 'revisionary')
         : __('Preview', 'revisionary');
 
-        $_arg = ('page' == $post_type) ? 'page_id=' : 'p=';
-        $preview_url = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $post_id ) ) );
+        $preview_url = rvy_preview_url($post);
 
         $manage_label = (empty($type_obj) || agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true])) 
         ?  __('Manage', 'revisionary')

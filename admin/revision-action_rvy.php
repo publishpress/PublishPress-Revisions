@@ -139,8 +139,8 @@ function rvy_revision_approve($revision_id = 0) {
 				$datef = __awp( 'M j, Y @ g:i a' );
 				$message .= sprintf( __('It will be published on %s', 'revisionary' ), agp_date_i18n( $datef, strtotime($revision->post_date) ) ) . "\r\n\r\n";
 				
-				$_arg = ('page' == $revision->post_type) ? 'page_id=' : 'p=';
-				$preview_link = add_query_arg('preview', true, str_replace('p=', $_arg, get_post_permalink($revision->ID)));
+				$preview_link = rvy_preview_url($revision);
+
 				$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
 
 				$message .= __( 'Editor: ', 'revisionary' ) . admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
@@ -199,8 +199,8 @@ function rvy_revision_approve($revision_id = 0) {
 					$datef = __awp( 'M j, Y @ g:i a' );
 					$message .= sprintf( __('It will be published on %s', 'revisionary' ), agp_date_i18n( $datef, strtotime($revision->post_date) ) ) . "\r\n\r\n";
 					
-					$_arg = ('page' == $revision->post_type) ? 'page_id=' : 'p=';
-					$preview_link = add_query_arg('preview', true, str_replace('p=', $_arg, get_post_permalink($revision->ID)));
+					$preview_link = rvy_preview_url($revision);
+
 					$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
 
 					$message .= __( 'Editor: ', 'revisionary' ) . admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
@@ -229,8 +229,7 @@ function rvy_revision_approve($revision_id = 0) {
 		} elseif ( !empty($_REQUEST['rvy_redirect']) && 'edit' == $_REQUEST['rvy_redirect'] ) {
 			$redirect = add_query_arg( $last_arg, "post.php?post=$revision_id&action=edit" );
 		} else {
-			$_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
-			$redirect = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $revision ) ) );
+			$redirect = rvy_preview_url($revision, ['post_type' => $post->post_type]);
 		}
 
 	} while (0);

@@ -41,8 +41,10 @@ class Rvy_Revision_Workflow_UI {
             }
 
             if ( $revision_id ) {
-                $_arg = ('page' == $published_post->post_type) ? 'page_id=' : 'p=';
-				$preview_link = add_query_arg('preview', true, str_replace('p=', $_arg, get_post_permalink($revision_id)));
+                $revision = get_post($revision_id);
+
+                $preview_link = rvy_preview_url($revision);
+
                 $message .= __( 'Preview and Approval: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
 
                 $message .= __( 'Revision Queue: ', 'revisionary' ) . admin_url("admin.php?page=revisionary-q&published_post={$published_post->ID}") . "\r\n\r\n";
@@ -192,8 +194,7 @@ class Rvy_Revision_Workflow_UI {
 
                 $msg = __('Your modification was saved as a Scheduled Revision.', 'revisionary') . ' ';
             
-                $_arg = ('page' == $revision->post_type) ? 'page_id=' : 'p=';
-                $preview_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $revision ) ) );
+                $preview_link = rvy_preview_url($revision);
 			   
                 $msg .= '<ul><li>';
                 $msg .= sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link );
@@ -225,8 +226,7 @@ class Rvy_Revision_Workflow_UI {
 
                 clean_post_cache($revision->ID);
                 
-                $_arg = ('page' == $revision->post_type) ? 'page_id=' : 'p=';
-                $preview_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $revision ) ) );
+                $preview_link = rvy_preview_url($revision);
                 $preview_link = remove_query_arg('preview_id', $preview_link);
 
                 $msg .= '<ul><li>';

@@ -83,6 +83,7 @@ $ui->section_captions = array(
 		'role_definition' 	  	=> __('Role Definition', 'revisionary'),
 		'scheduled_revisions' 	=> __('Scheduled Revisions', 'revisionary'),
 		'pending_revisions'		=> __('Pending Revisions', 'revisionary'),
+		'preview'				=> __('Revision Preview', 'revisionary'),
 		'revisions'				=> __('Revision Options', 'revisionary'),
 		'notification'			=> __('Email Notification', 'revisionary')
 	)
@@ -109,6 +110,7 @@ $ui->option_captions = array(
 	'revisor_role_add_custom_rolecaps' => __('All custom post types available to Revisors', 'revisionary' ),
 	'require_edit_others_drafts' => __('Prevent Revisors from editing other user&apos;s drafts', 'revisionary' ),
 	'display_hints' => __('Display Hints'),
+	'preview_link_type' => __('Preview Link Type', 'revisionary'),
 );
 
 if ( defined('RVY_CONTENT_ROLES') ) {
@@ -126,6 +128,7 @@ $ui->form_options = array(
 	'role_definition' => 	 array( 'revisor_role_add_custom_rolecaps', 'require_edit_others_drafts' ),
 	'scheduled_revisions' => array( 'scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date', ),
 	'pending_revisions'	=> 	 array( 'pending_revisions', 'pending_revision_update_post_date', ),
+	'preview' =>			 array( 'preview_link_type'),
 	'revisions'		=>		 array( 'revisor_lock_others_revisions', 'diff_display_strip_tags', 'display_hints' ),
 	'notification'	=>		 array( 'pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor' )
 )
@@ -345,6 +348,44 @@ $pending_revisions_available ) :
 		</td></tr>
 	<?php endif; // any options accessable in this section
 endif;
+
+
+$section = 'preview';			// --- PREVIEW SECTION ---
+		
+if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
+	<tr valign="top"><th scope="row">
+	<?php echo $ui->section_captions[$tab][$section]; ?>
+	</th><td>
+		
+	<?php 
+	$id = 'preview_link_type';
+	if ( in_array( $id, $ui->form_options[$tab][$section] ) ) {
+		$ui->all_options []= $id;
+		$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
+		
+		echo "<label for='$id'>" . $ui->option_captions[$id] . ': </label>';
+
+		echo " <select name='$id' id='$id'>";
+		$captions = array( '' => __('Published Post Slug', 'revisionary'), 'revision_slug' => __('Revision Slug', 'revisionary'), 'id_only' => __('Revision ID only', 'revisionary') );
+		foreach ( $captions as $key => $value) {
+			$selected = ( $current_setting == $key ) ? 'selected="selected"' : '';
+			echo "\n\t<option value='$key' " . $selected . ">$captions[$key]</option>";
+		}
+		echo '</select>&nbsp;';
+
+		if ( $ui->display_hints ) : ?>
+			<br />
+			<div class="rs-subtext">
+			<?php
+			_e('Some themes or plugins may require Revision Slug or Revision ID link type for proper template loading and field display.', 'revisionary');
+			?>
+			</div>
+		<?php endif;
+	}
+	?>
+	</td></tr>
+<?php endif; // any options accessable in this section
+
 
 if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
 $pending_revisions_available || $scheduled_revisions_available ) :

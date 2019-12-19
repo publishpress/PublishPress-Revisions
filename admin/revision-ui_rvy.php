@@ -379,10 +379,10 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 			
 			if ( $post->ID != $revision->ID ) {
 				if ('inherit' == $revision->post_status) {
+					// @todo: need this case?
 					$preview_url = add_query_arg( 'preview', '1', get_post_permalink( $revision->ID ) . '&post_type=revision' );
 				} else {
-					$_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
-					$preview_url = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink($revision) ) );
+					$preview_url = rvy_preview_url($revision, ['post_type' => $post->post_type]);
 				}
 
 				$preview_link = '<a href="' . esc_url($preview_url) . '" title="' . esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $revision->post_title ) ) . '" rel="permalink">' . __( 'Preview' ) . '</a>';

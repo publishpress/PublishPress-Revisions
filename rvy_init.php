@@ -899,3 +899,48 @@ function rvy_is_post_author($post, $user = false) {
 
 	return false;
 }
+
+function rvy_preview_url($revision, $args = []) {
+	$defaults = ['post_type' => $revision->post_type];  // support preview url for past revisions, which are stored with post_type = 'revision'
+	foreach(array_keys($defaults) as $var) {
+		$$var = (!empty($args[$var])) ? $args[$var] : $defaults[$var]; 
+	}
+
+	$link_type = rvy_get_option('preview_link_type');
+
+	if ('id_only' == $link_type) {
+		// support using ids only if theme or plugins do not tolerate published post url and do not require standard format with revision slug
+		$preview_url = add_query_arg('preview', true, get_post_permalink($revision));
+
+		if ('page' == $post_type) {
+			$preview_url = str_replace('p=', "page_id=", $preview_url);
+			$id_arg = 'page_id';
+		} else {
+			$id_arg = 'p';
+		}
+	} elseif ('revision_slug' == $link_type) {
+		// support using actual revision slug in case theme or plugins do not tolerate published post url
+		$preview_url = add_query_arg('preview', true, get_permalink($revision));
+
+		if ('page' == $post_type) {
+			$preview_url = str_replace('p=', "page_id=", $preview_url);
+			$id_arg = 'page_id';
+		} else {
+			$id_arg = 'p';
+		}
+	} else { // 'published_slug'
+		// default to published post url, appended with 'preview' and page_id args
+		$preview_url = add_query_arg('preview', true, get_permalink(rvy_post_id($revision->ID)));
+		$id_arg = 'page_id';
+	}
+
+	if (!strpos($preview_url, "{$id_arg}=")) {
+		$preview_url = add_query_arg($id_arg, $revision->ID, $preview_url);
+	}
+
+	if (!strpos($preview_url, "post_type=")) {
+		$preview_url = add_query_arg('post_type', $post_type, $preview_url);
+	}
+
+	return apply_filters('revisionary_preview_url', $preview_url, $revision, $args);
+}
