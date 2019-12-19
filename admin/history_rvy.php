@@ -1091,10 +1091,38 @@ class RevisionaryHistory
         <script type="text/javascript">
         /* <![CDATA[ */
         jQuery(document).ready( function($) {
+            var rvyLastID = 0;
+
             var RvyDiffUI = function() {
+                rvySearchParams = new URLSearchParams(window.location.search);
+                        
+                var rvyRevisionID = rvySearchParams.get('to');
+
+                if (!rvyRevisionID) {
+                    rvyRevisionID = rvySearchParams.get('revision');
+                }
+
+                if (!Number(rvyRevisionID)) {
+                    rvyRevisionID = <?php echo $this->revision_id;?>;
+                }
+
+                if (rvyRevisionID != rvyLastID) {
+                    var rvyPreviewURL = '<?php echo $preview_url;?>';
+                    rvyPreviewURL = rvyPreviewURL.replace("page_id=" + <?php echo $post_id;?>, "page_id=" + rvyRevisionID);
+                    rvyPreviewURL = rvyPreviewURL.replace("p=" + <?php echo $post_id;?>, "p=" + rvyRevisionID);
+
+                    var rvyManageURL = '<?php echo $manage_url;?>';
+                    rvyManageURL = rvyManageURL.replace("revision=" + <?php echo $post_id;?>, "revision=" + rvyRevisionID);
+
                 if(!$('span.rvy-compare-preview').length) {
-                    $('h1').append('<span class="rvy-compare-preview" style="margin-left:20px"><a class="rvy_preview_linkspan" href="<?php echo $preview_url;?>" target="_revision_preview"><input type="button" value="<?php echo $preview_label;?>"></a></span>');
-                    $('h1').append('<span class="rvy-compare-list" style="margin-left:10px"><a class="rvy_preview_linkspan" href="<?php echo $manage_url;?>" target="_revision_list"><input type="button" value="<?php echo $manage_label;?>"></a></span>');
+                    $('h1').append('<span class="rvy-compare-preview" style="margin-left:20px"><a class="rvy_preview_linkspan" href="<?php echo $preview_url;?>" target="_revision_preview"><input class="button" type="button" value="<?php echo $preview_label;?>"></a></span>');
+                    $('h1').append('<span class="rvy-compare-list" style="margin-left:10px"><a class="rvy_preview_linkspan" href="<?php echo $manage_url;?>" target="_revision_list"><input class="button" type="button" value="<?php echo $manage_label;?>"></a></span>');
+                    } else {
+                        $('span.rvy-compare-preview a').attr('href', rvyPreviewURL);
+                        $('span.rvy-compare-list a').attr('href', rvyManageURL);
+                    }
+
+                    rvyLastID = rvyRevisionID;
                 }
             }
             var RvyDiffUIinterval = setInterval(RvyDiffUI, 50);
