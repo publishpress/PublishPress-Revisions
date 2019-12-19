@@ -2,8 +2,6 @@
 if ( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 	die();
 
-require_once( dirname(__FILE__).'/defaults_rvy.php');  // @todo: refactor to handle early call of rvy_default_options() from notification cron
-
 define( 'RVY_NETWORK', awp_is_mu() && rvy_plugin_active_for_network( RVY_BASENAME ) );
 
 add_action('init', 'rvy_status_registrations', 40);
@@ -23,6 +21,26 @@ add_action('init', 'rvy_set_notification_queue_cron');
 add_action('rvy_mail_queue_hook', 'rvy_send_queued_mail' );
 add_filter('cron_schedules', 'rvy_mail_queue_cron_interval');
 
+if (defined('JREVIEW_ROOT') && !empty($_REQUEST['preview']) && empty($_REQUEST['preview_id']) && empty($_REQUEST['thumbnail_id'])) {
+	require_once('compat_rvy.php');
+	_rvy_jreviews_preview_compat();
+}
+
+function rvy_mail_check_queue($new_msg = []) {
+	if (!$use_queue = rvy_get_option('use_notification_queue')) {
+		return (defined('REVISIONARY_DISABLE_MAIL_LOG'))
+		? array_fill_keys(['queue', 'sent_mail', 'send_limits', 'sent_counts', 'new_msg_queued'], [])
+		: [];
+	}
+
+	require_once( dirname(__FILE__).'/mail-queue_rvy.php');
+	return _rvy_mail_check_queue($new_msg);
+}
+
+function rvy_send_queued_mail() {
+	require_once( dirname(__FILE__).'/mail-queue_rvy.php');
+	_rvy_send_queued_mail();
+}
 function rvy_set_notification_queue_cron() {
 	$cron_timestamp = wp_next_scheduled( 'rvy_mail_queue_hook' );
 
@@ -424,72 +442,6 @@ function rvy_get_option($option_basename, $sitewide = -1, $get_default = false) 
 	return maybe_unserialize($optval);
 }
  
-function rvy_get_post_revisions($post_id, $status = 'inherit', $args = '' ) {
-	global $wpdb;
-	
-	$defaults = array( 'order' => 'DESC', 'orderby' => 'post_modified_gmt', 'use_memcache' => true, 'fields' => COLS_ALL_RVY, 'return_flipped' => false );
-	$args = wp_parse_args( $args, $defaults );
-	
-	foreach( array_keys( $defaults ) as $var ) {
-		$$var = ( isset( $args[$var] ) ) ? $args[$var] : $defaults[$var];
-	}
-	
-	if (!in_array( 
-		$status, 
-		array_merge(rvy_revision_statuses(), array('inherit')) 
-	) ) {
-		return array();
-	}
-
-	if ( COL_ID_RVY == $fields ) {
-		// performance opt for repeated calls by user_has_cap filter
-		if ( $use_memcache ) {
-			static $last_results;
-			
-			if ( ! isset($last_results) )
-				$last_results = array();
-		
-			elseif ( isset($last_results[$post_id][$status]) )
-				return $last_results[$post_id][$status];
-		}
-		
-		if ('inherit' == $status) {
-			$revisions = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_type = 'revision' AND post_parent = '$post_id' AND post_status = '$status'");
-		} else {
-			$revisions = $wpdb->get_col(
-				"SELECT ID FROM $wpdb->posts "
-				. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
-				. " WHERE pm_published.meta_value = '$post_id' AND post_status = '$status'"
-			);
-		}
-
-		if ( $return_flipped )
-			$revisions = array_fill_keys( $revisions, true );
-
-		if ( $use_memcache ) {
-			if ( ! isset($last_results[$post_id]) )
-				$last_results[$post_id] = array();
-				
-			$last_results[$post_id][$status] = $revisions;
-		}	
-			
-	} else {
-		$order_clause = ( $order && $orderby ) ? "ORDER BY $orderby $order" : '';
-
-		if ('inherit' == $status) {
-			$revisions = $wpdb->get_results("SELECT * FROM $wpdb->posts WHERE post_type = 'revision' AND post_parent = '$post_id' AND post_status = '$status' $order_clause");
-		} else {
-			$revisions = $wpdb->get_results(
-				"SELECT * FROM $wpdb->posts "
-				. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
-				. " WHERE pm_published.meta_value = '$post_id' AND post_status = '$status' $order_clause"
-			);
-		}
-	}
-
-	return $revisions;
-}
-
 function rvy_log_async_request($action) {						
 	// the function which performs requested action will clear this entry to confirm that the asynchronous call was effective 
 	$requested_actions = get_option( 'requested_remote_actions_rvy' );
@@ -523,172 +475,6 @@ function rvy_error( $err_slug, $arg2 = '' ) {
 	include_once( dirname(__FILE__).'/lib/error_rvy.php');
 	$rvy_err = new RvyError();
 	$rvy_err->error_notice( $err_slug );
-}
-
-function rvy_mail_check_queue($new_msg = []) {
-	if (!$use_queue = rvy_get_option('use_notification_queue')) {
-		if (defined('REVISIONARY_DISABLE_MAIL_LOG')) {
-			return array_fill_keys(['queue', 'sent_mail', 'send_limits', 'sent_counts', 'new_msg_queued'], []);
-		}
-
-		$queue = [];
-
-	} elseif (!$queue = get_option('revisionary_mail_queue')) {
-		$queue = [];
-		$first_queue = true;
-	}
-
-	$new_msg_queued = false;
-
-	if (!$sent_mail = get_option('revisionary_sent_mail')) {
-		$sent_mail = [];
-		$first_mail_log = true;
-	}
-
-	$current_time = time();
-
-	// check sending limits
-	$durations = ['minute' => 60, 'hour' => 3600, 'day' => 86400];
-	$sent_counts = ['minute' => 0, 'hour' => 0, 'day' => 0];
-	
-	// by default, purge mail log entries older than 30 days
-	$purge_time = apply_filters('revisionary_mail_log_duration', 86400 * 30);
-	
-	if ($purge_time < $durations['day'] * 2) {
-		$purge_time = $durations['day'] * 2;
-	}
-
-	if ($use_queue) {
-		$default_minute_limit = (defined('REVISIONARY_EMAIL_LIMIT_MINUTE')) ? REVISIONARY_EMAIL_LIMIT_MINUTE : 20;
-		$default_hour_limit = (defined('REVISIONARY_EMAIL_LIMIT_HOUR')) ? REVISIONARY_EMAIL_LIMIT_HOUR : 100;
-		$default_day_limit = (defined('REVISIONARY_EMAIL_LIMIT_DAY')) ? REVISIONARY_EMAIL_LIMIT_DAY : 1000;
-
-	$send_limits = apply_filters(
-		'revisionary_email_limits', 
-		[
-				'minute' => $default_minute_limit,
-				'hour' => $default_hour_limit,
-				'day' => $default_day_limit,
-		]
-	);
-	}
-
-	foreach($sent_mail as $k => $mail) {
-		if (!isset($mail['time_gmt'])) {
-			continue;
-		}
-
-		$elapsed = $current_time - $mail['time_gmt'];
-
-		if ($use_queue) {
-		foreach($durations as $limit_key => $duration) {
-			if ($elapsed < $duration) {
-				$sent_counts[$limit_key]++;
-			}
-
-				if ($new_msg && ($sent_counts[$limit_key] >= $send_limits[$limit_key])) {
-				$new_msg_queued = true;
-			}
-		}
-		}
-
-		if ($elapsed > $purge_time) {
-			unset($sent_mail[$k]);
-			$purged = true;
-		}
-	}
-
-	if ($new_msg_queued) {
-		$queue = array_merge([$new_msg], $queue);
-		update_option('revisionary_mail_queue', $queue);
-	}
-
-	if (!empty($purged)) {
-		update_option('revisionary_sent_mail', $sent_mail);
-	}
-
-	if (!empty($first_mail_log) && $sent_mail) {
-		global $wpdb;
-		$wpdb->query("UPDATE $wpdb->options SET autoload = 'no' WHERE option_name = 'revisionary_sent_mail'");
-	}
-
-	if (!empty($first_queue) && $queue) {
-		global $wpdb;
-		$wpdb->query("UPDATE $wpdb->options SET autoload = 'no' WHERE option_name = 'revisionary_mail_queue'");
-	}
-
-	return (object) compact('queue', 'sent_mail', 'send_limits', 'sent_counts', 'new_msg_queued');
-}
-
-// called by WP-cron hook
-function rvy_send_queued_mail() {
-	$queue_status = rvy_mail_check_queue();
-
-	if (empty($queue_status->queue)) {
-		return false;
-	}
-
-	$q = $queue_status->queue;
-
-	while ($q) {
-		foreach($queue_status->sent_counts as $limit_key => $count) {
-			$queue_status->sent_counts[$limit_key]++;
-
-			if ($count > $queue_status->send_limits[$limit_key]) {
-				// A send limit has been reached
-				break 2;
-			}
-		}
-
-		$next_mail = array_pop($q);
-
-		// update truncated queue immediately to prevent duplicate sending by another process
-		update_option('revisionary_mail_queue', $q);
-
-		// If queued notification is missing vital data, discard it
-		if (empty($next_mail['address']) || empty($next_mail['title']) || empty($next_mail['message']) || empty($next_mail['time_gmt'])) {
-			continue;
-		}
-
-		// If notification was queued more than a week ago, discard it
-		if (time() - $next_mail['time_gmt'] > 3600 * 24 * 7 ) {
-			continue;
-		}
-
-		if (defined('PRESSPERMIT_DEBUG')) {
-			pp_errlog('*** Sending QUEUED mail: ');
-			pp_errlog($next_mail['address'] . ', ' . $next_mail['title']);
-			pp_errlog($next_mail['message']);
-		}
-		
-		if (defined('RS_DEBUG')) {
-			$success = wp_mail($next_mail['address'], $next_mail['title'], $next_mail['message']);
-		} else {
-			$success = @wp_mail($next_mail['address'], $next_mail['title'], $next_mail['message']);
-		}
-
-		if (!$success && defined('REVISIONARY_MAIL_RETRY')) {
-			// message was not sent successfully, so put it back in the queue
-			if ($q) {
-				$q = array_merge([$next_mail], $q);
-			} else {
-				$q = [$next_mail];
-			}
-			update_option('revisionary_mail_queue', $q);
-		} else {
-		// log the sent mail
-			$next_mail['time'] = strtotime(current_time( 'mysql' ));
-		$next_mail['time_gmt'] = time();
-			$next_mail['success'] = intval(boolval($success));
-
-		if (!defined('RS_DEBUG') && !defined('REVISIONARY_LOG_EMAIL_MESSAGE')) {
-			unset($next_mail['message']);
-		}
-
-			$queue_status->sent_mail[]= $next_mail;
-			update_option('revisionary_sent_mail', $queue_status->sent_mail);
-	}
-}
 }
 
 function rvy_mail( $address, $title, $message, $args ) {
@@ -888,47 +674,6 @@ function revisionary_copy_meta_field( $meta_key, $from_post_id, $to_post_id, $mi
 	}
 }
 
-function revisionary_copy_terms( $from_post_id, $to_post_id, $mirror_empty = false ) {
-	global $wpdb;
-
-	if ( ! $to_post_id )
-		return;
-	
-	//if (false===$skip_taxonomies) { @todo: $args
-		$skip_taxonomies = array();	
-	//}
-
-	if ($skip_taxonomies = apply_filters('revisionary_skip_taxonomies', $skip_taxonomies, $from_post_id, $to_post_id)) {
-		$tx_join = "INNER JOIN $wpdb->term_taxonomy AS tt ON tt.term_taxonomy_id = tr.term_taxonomy_id ";
-		$tx_where = "tt.taxonomy NOT IN ('" . implode("','", array_filter($skip_taxonomies, 'sanitize_key')) . "')";
-	} else {
-		$tx_join = '';
-		$tx_where = '';
-	}
-
-	if ( $_post = $wpdb->get_row( "SELECT * FROM $wpdb->posts WHERE ID = '$from_post_id'" ) ) {
-		$source_terms = $wpdb->get_col( "SELECT term_taxonomy_id FROM $wpdb->term_relationships AS tr {$tx_join}WHERE {$tx_where}tr.object_id = '$from_post_id'" );
-
-		$target_terms = $wpdb->get_col( "SELECT term_taxonomy_id FROM $wpdb->term_relationships AS tr {$tx_join}WHERE {$tx_where}tr.object_id = '$to_post_id'" );
-
-		if ( $add_terms = array_diff($source_terms, $target_terms) ) {
-			// todo: single query
-			foreach($add_terms as $tt_id) {
-				$wpdb->query("INSERT INTO $wpdb->term_relationships (object_id, term_taxonomy_id) VALUES ('$to_post_id', '$tt_id')");
-			}
-		}
-		
-		if ($source_terms || $mirror_empty) {
-		if ( $delete_terms = array_diff($target_terms, $source_terms) ) {
-			// todo: single query
-			foreach($delete_terms as $tt_id) {
-				$wpdb->query("DELETE FROM $wpdb->term_relationships WHERE object_id = '$to_post_id' AND term_taxonomy_id = '$tt_id'");
-				}
-			}
-		}
-	}	
-}
-
 function rvy_is_network_activated($plugin_file = '')
 {
 	if (!$plugin_file && defined('REVISIONARY_FILE')) {
@@ -1093,70 +838,11 @@ function rvy_preview_url($revision, $args = []) {
 	return apply_filters('revisionary_preview_url', $preview_url, $revision, $args);
 }
 
-function _rvy_set_ma_post_authors($post_id, $authors)
+function rvy_set_ma_post_authors($post_id, $authors)
 {
+	require_once( dirname(__FILE__).'/multiple-authors_rvy.php');
 	_rvy_set_ma_post_authors_custom_field($post_id, $authors);
 
 	$authors = wp_list_pluck($authors, 'term_id');
 	wp_set_object_terms($post_id, $authors, 'author');
-}
-
-/**
- * Save a custom field with the post authors' name. Add compatibility to
- * Yoast for using in the custom title, and other 3rd party plugins.
- *
- * @param $post_id
- * @param $authors
- */
-function _rvy_set_ma_post_authors_custom_field($post_id, $authors)
-{
-	global $wpdb, $multiple_authors_addon;
-
-	if ( ! is_array($authors)) {
-		$authors = [];
-	}
-
-	$metadata = 'ppma_authors_name';
-
-	if (empty($authors)) {
-		delete_post_meta($post_id, $metadata);
-	} else {
-		$names = [];
-
-		foreach ($authors as $author) {
-			// since this function may be passed a term object with no name property, do a fresh query
-			if (!is_numeric($author)) {
-				if (empty($author->term_id)) {
-					return;
-				}
-
-				$author = $author->term_id;
-			}
-
-			$taxonomy = (!empty($multiple_authors_addon) && !empty($multiple_authors_addon->coauthor_taxonomy)) 
-			? $multiple_authors_addon->coauthor_taxonomy 
-			: 'author';
-
-			//$author = Author::get_by_term_id($author);  // this returns an object with term_id property and no name
-			//$author = get_term($author, 'author');	  // 'author' is actually an invalid taxonomy name per WP API
-			$author = $wpdb->get_row(
-				$wpdb->prepare(
-					"SELECT * FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON t.term_id = tt.term_id"
-					. " WHERE tt.taxonomy = %s AND t.term_id = %d"
-					, $taxonomy, $author
-				)
-			);
-
-			if (!empty($author->name)) {
-				$names[] = $author->name;
-			}
-		}
-
-		if (!empty($names)) {
-			$names = implode(', ', $names);
-			update_post_meta($post_id, $metadata, $names);
-		} else {
-			delete_post_meta($post_id, $metadata);
-		}
-	}
 }

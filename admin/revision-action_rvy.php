@@ -1017,3 +1017,44 @@ function rvy_format_content( $content, $content_filtered, $post_id, $args = arra
 	
 	return $formatted_content;
 }
+
+function revisionary_copy_terms( $from_post_id, $to_post_id, $mirror_empty = false ) {
+	global $wpdb;
+
+	if ( ! $to_post_id )
+		return;
+	
+	//if (false===$skip_taxonomies) { @todo: $args
+		$skip_taxonomies = array();	
+	//}
+
+	if ($skip_taxonomies = apply_filters('revisionary_skip_taxonomies', $skip_taxonomies, $from_post_id, $to_post_id)) {
+		$tx_join = "INNER JOIN $wpdb->term_taxonomy AS tt ON tt.term_taxonomy_id = tr.term_taxonomy_id ";
+		$tx_where = "tt.taxonomy NOT IN ('" . implode("','", array_filter($skip_taxonomies, 'sanitize_key')) . "')";
+	} else {
+		$tx_join = '';
+		$tx_where = '';
+	}
+
+	if ( $_post = $wpdb->get_row( "SELECT * FROM $wpdb->posts WHERE ID = '$from_post_id'" ) ) {
+		$source_terms = $wpdb->get_col( "SELECT term_taxonomy_id FROM $wpdb->term_relationships AS tr {$tx_join}WHERE {$tx_where}tr.object_id = '$from_post_id'" );
+
+		$target_terms = $wpdb->get_col( "SELECT term_taxonomy_id FROM $wpdb->term_relationships AS tr {$tx_join}WHERE {$tx_where}tr.object_id = '$to_post_id'" );
+
+		if ( $add_terms = array_diff($source_terms, $target_terms) ) {
+			// todo: single query
+			foreach($add_terms as $tt_id) {
+				$wpdb->query("INSERT INTO $wpdb->term_relationships (object_id, term_taxonomy_id) VALUES ('$to_post_id', '$tt_id')");
+			}
+		}
+		
+		if ($source_terms || $mirror_empty) {
+			if ( $delete_terms = array_diff($target_terms, $source_terms) ) {
+				// todo: single query
+				foreach($delete_terms as $tt_id) {
+					$wpdb->query("DELETE FROM $wpdb->term_relationships WHERE object_id = '$to_post_id' AND term_taxonomy_id = '$tt_id'");
+				}
+			}
+		}
+	}	
+}
