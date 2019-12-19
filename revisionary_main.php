@@ -87,9 +87,34 @@ class Revisionary
 			add_action('revisionary_saved_revision', [$this, 'act_save_revision_followup'], 5);
 		}
 
+		add_filter('presspermit_exception_clause', [$this, 'fltPressPermitExceptionClause'], 10, 4);
+
 		do_action( 'rvy_init', $this );
 	}
 	
+	function fltPressPermitExceptionClause($clause, $required_operation, $post_type, $args) {
+		//"$src_table.ID $logic ('" . implode("','", $ids) . "')",
+
+		if (('edit' == $required_operation) && in_array($post_type, rvy_get_manageable_types()) 
+		) {
+			foreach(['mod', 'src_table', 'logic', 'ids'] as $var) {
+				if (!empty($args[$var])) {
+					$$var =  $args[$var];
+				} else {
+					return $clause;
+				}
+			}
+
+			if ('include' == $mod) {
+				$clause = "(($clause) OR ($src_table.post_status IN ('pending-revision', 'future-revision') AND $src_table.comment_count IN ('" . implode("','", $ids) . "')))";
+			} elseif ('exclude' == $mod) {
+				$clause = "(($clause) AND ($src_table.post_status NOT IN ('pending-revision', 'future-revision') OR $src_table.comment_count NOT IN ('" . implode("','", $ids) . "')))";
+			}
+		}
+
+		return $clause;
+	}
+
 	function act_save_revision_followup($revision) {
 		global $wpdb;
 
