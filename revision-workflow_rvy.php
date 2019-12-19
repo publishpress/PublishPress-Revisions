@@ -41,10 +41,11 @@ class Rvy_Revision_Workflow_UI {
             }
 
             if ( $revision_id ) {
-                $preview_link = add_query_arg( array( 'preview' => '1', 'rvy_revision' => true ), get_post_permalink( $revision_id ) );
+                $_arg = ('page' == $published_post->post_type) ? 'page_id=' : 'p=';
+				$preview_link = add_query_arg('preview', true, str_replace('p=', $_arg, get_post_permalink($revision_id)));
                 $message .= __( 'Preview and Approval: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
 
-                $message .= __( 'Revision Queue: ', 'revisionary' ) . admin_url("admin.php?page=revisionary-q&published_post={$published_post->ID}") . "\r\n";
+                $message .= __( 'Revision Queue: ', 'revisionary' ) . admin_url("admin.php?page=revisionary-q&published_post={$published_post->ID}") . "\r\n\r\n";
                 
                 $message .= __( 'Edit Revision: ', 'revisionary' ) . admin_url("post.php?action=edit&post={$revision_id}") . "\r\n";
             }

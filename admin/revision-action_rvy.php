@@ -123,8 +123,8 @@ function rvy_revision_approve() {
 				$datef = __awp( 'M j, Y @ g:i a' );
 				$message .= sprintf( __('It will be published on %s', 'revisionary' ), agp_date_i18n( $datef, strtotime($revision->post_date) ) ) . "\r\n\r\n";
 				
-				// @todo: is rvy_revision arg needed?
-				$preview_link = add_query_arg( array( 'preview' => '1', 'rvy_revision' => true ), get_post_permalink( $revision->ID ) );
+				$_arg = ('page' == $revision->post_type) ? 'page_id=' : 'p=';
+				$preview_link = add_query_arg('preview', true, str_replace('p=', $_arg, get_post_permalink($revision->ID)));
 				$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
 
 				$message .= __( 'Editor: ', 'revisionary' ) . admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
@@ -163,7 +163,8 @@ function rvy_revision_approve() {
 					$datef = __awp( 'M j, Y @ g:i a' );
 					$message .= sprintf( __('It will be published on %s', 'revisionary' ), agp_date_i18n( $datef, strtotime($revision->post_date) ) ) . "\r\n\r\n";
 					
-					$preview_link = add_query_arg( array( 'preview' => '1', 'rvy_revision' => true ), get_post_permalink( $revision->ID ) );
+					$_arg = ('page' == $revision->post_type) ? 'page_id=' : 'p=';
+					$preview_link = add_query_arg('preview', true, str_replace('p=', $_arg, get_post_permalink($revision->ID)));
 					$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
 
 					$message .= __( 'Editor: ', 'revisionary' ) . admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
