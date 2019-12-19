@@ -529,10 +529,22 @@ class Revisionary
 				if ($type_obj && !empty($type_obj->cap->edit_others_posts)) {
 					$caps = array_diff($caps, [$type_obj->cap->edit_others_posts, 'do_not_allow']);
 
-					if (rvy_is_post_author($post) || !rvy_get_option('revisor_hide_others_revisions') || rvy_is_full_editor($post)) {
+					$check_post = $post;
+
+					if ($post->ID <= 0) {
+						if ($check_id = rvy_detect_post_id()) {
+							$check_post = get_post($check_id);
+						}
+					}
+
+					if (rvy_is_post_author($check_post) || rvy_is_post_author(rvy_post_id($check_post->ID)) || rvy_is_full_editor($post)) {
 						$caps []= 'read';
-					} else {
+
+					} elseif (rvy_get_option('revisor_hide_others_revisions')) {
 						$caps []= 'list_others_revisions';
+					
+					} else {
+						$caps []= $type_obj->cap->edit_posts;
 					}
 				}
 			}
