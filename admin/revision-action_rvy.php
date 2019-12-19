@@ -466,7 +466,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && $published_authors) {
 		// Make sure Multiple Authors values were not wiped due to incomplete revision data
 		if (!get_multiple_authors($post_id)) {
-			_rvy_set_ma_post_authors($post_id, $published_authors);
+			rvy_set_ma_post_authors($post_id, $published_authors);
 		}
 	}
 
