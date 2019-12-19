@@ -4,7 +4,7 @@ Tags: revision, access, permissions, cms, user, groups, members, admin, pages, p
 Requires at least: 4.9.7
 Tested up to: 5.3
 Requires PHP: 5.6.20
-Stable Tag: 2.1.2
+Stable Tag: 2.1.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -62,6 +62,15 @@ For more details about both the free and pro version, see our <a href="https://p
 
 == Changelog ==
 
+= 2.1.3 - 6 Dec 2019 =
+* Compat : Classic Editor plugin - View / Approve buttons missing on Edit Revision screen if Classic Editor active but settings default to Block Editor
+* Compat : Classic Editor plugin - Javascript errors on Edit Post / Edit Revision screen if Classic Editor active but currently using Block Editor
+* Compat : Thin Out Revisions plugin broke Preview / Approval buttons on Compare Pending Revisions screen
+* Compat : Multiple Authors - Revision Queue "Post Author" links did not work for secondary authors
+* Compat : Multiple Authors - Revision Queue "Post Author" links did not filter Revision Queue
+* Compat : JReviews - Live preview from Edit Revision screen failed if JReviews plugin active
+* Fixed : Preview Top Bar blocks admin bar dropdown menu if another fixed-position element on the page (other than #wpadminbar) has a z-index of 99999 or higher
+
 = 2.1.2 - 4 Dec 2019 =
 * Fixed : Scheduled Revisions were not published (since 2.1)
 * Fixed : Edit Revision - Preview of unsaved revision did not work from Gutenberg
@@ -71,6 +80,7 @@ For more details about both the free and pro version, see our <a href="https://p
 * Fixed : Other users' revisions were not listed in Revision Queue even if "Prevent Revisors from editing others' revisions" disabled
 * Fixed : With "Prevent Revisors from editing others' revisions" setting enabled, Revisors and Authors could edit others' revisions by direct URL access
 * Feature : Support list_others_revisions capability to grant read access to other users' revisions (applies if "Prevent Revisors from editing others' revisions" is enabled)
+* Compat : PressPermit Pro - Revisors could not submit Beaver Builder revisions
 * Compat : PressPermit Pro - Revision Exceptions ("Also these" category / taxonomy assignments) assigned to Authors were not applied correctly
 * Compat : JReviews plugin
 
