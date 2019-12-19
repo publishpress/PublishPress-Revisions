@@ -620,12 +620,6 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			}
 		} 
 
-		if (defined('WP_DEBUG') 
-			|| class_exists('EmailLog') 				// "Email Log" plugin
-			|| defined('POST_SMTP_VER') 				// "Post SMTP" plugin
-			|| rvy_is_plugin_active('wp-mail-logging') 	// WP Mail Logging by MailPoet
-			|| defined('LOG_EMAILS_PLUGIN_VERSION')		// "Log Emails" plugin
-		) {
 			if (empty($_REQUEST['mailinfo'])):?>
 				<br />
 				<div style="padding-left:22px">
@@ -634,7 +628,6 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 				<a href="<?php echo(add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI'])));?>"><?php _e('Show with message content', 'revisionary');?></a>
 				</div>
 			<?php endif;
-		}
 		
 		?>
 		</td></tr>
