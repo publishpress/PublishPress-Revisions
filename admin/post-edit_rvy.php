@@ -17,7 +17,39 @@ class RvyPostEdit {
 
         add_action('post_submitbox_misc_actions', array($this, 'act_post_submit_revisions_links'), 5);
 
+        add_filter('user_has_cap', [$this, 'fltAllowBrowseRevisionsLink'], 50, 3);
+
+        add_filter('revisionary_apply_revision_allowance', [$this, 'fltRevisionAllowance'], 5, 2);
+
         add_action('admin_head', [$this, 'actAdminBarPreventPostClobber'], 5);
+    }
+
+    function fltAllowBrowseRevisionsLink($wp_blogcaps, $reqd_caps, $args) {
+        if (!empty($args[0]) && ('edit_post' == $args[0]) && !empty($args[2])) {
+            if ($_post = get_post($args[2])) {
+                if ('revision' == $_post->post_type && current_user_can('edit_post', $_post->post_parent)) {
+                    if (did_action('post_submitbox_minor_actions')) {
+                        if (!did_action('post_submitbox_misc_actions')) {
+                            $wp_blogcaps = array_merge($wp_blogcaps, array_fill_keys($reqd_caps, true));
+                        } else {
+                            remove_filter('user_has_cap', [$this, 'fltAllowBrowseRevisionsLink'], 50, 3);
+                        }
+                    }
+                }
+            }
+            
+        }
+
+        return $wp_blogcaps;
+    }
+
+    function fltRevisionAllowance($allowance, $post_id) {
+        // Ensure that revision "edit" link is not suppressed for the Revisions > Browse link
+        if (did_action('post_submitbox_minor_actions') && !did_action('post_submitbox_misc_actions')) {
+            $allowance = true;
+        }
+
+        return $allowance;
     }
 
     function actAdminBarPreventPostClobber() {
@@ -139,7 +171,7 @@ public function actSubmitboxStart() {
             $compare_title = __('Compare this revision to published copy, or to other revisions', 'revisionary');
             ?>
 
-            <a class="preview button" href="<?php echo $compare_link; ?>" target="_blank" id="revision-compare"
+            <a id="rvy_compare_button" class="preview button" href="<?php echo $compare_link; ?>" target="_blank" id="revision-compare"
             tabindex="4" title="<?php echo esc_attr($compare_title);?>"><?php echo $compare_button; ?></a>
         <?php endif;
     }

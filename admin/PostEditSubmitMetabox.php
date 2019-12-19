@@ -71,7 +71,7 @@ class RvyPostEditSubmitMetabox
                             }
                             ?>
                             <a class="hide-if-no-js"
-                               href="<?php echo esc_url(get_edit_post_link($args['args']['revision_id'])); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions'); ?></a>
+                               href="<?php echo esc_url(admin_url("revision.php?revision={$args['args']['revision_id']}")); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions'); ?></a>
                         </div>
                     <?php
                     endif;

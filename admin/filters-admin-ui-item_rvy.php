@@ -79,9 +79,21 @@ jQuery(document).ready( function($) {
 	<?php endif;?>
 <?php endif;?>
 
+	<?php
+	$type_obj = get_post_type_object($post->post_type);
+	//$can_publish = $type_obj && agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
+	
+	// Use simpler criteria due to early execution of revisions.php access check in revisionary_main.php
+	$can_publish = $type_obj && (
+		!empty($current_user->allcaps[$type_obj->cap->edit_published_posts]) 
+		&& (($current_user->ID == $parent_post->ID) || !empty($current_user->allcaps[$type_obj->cap->edit_published_posts]))
+	);
+
+	if (!$can_publish):?>
 <style>
-div.num-revisions, #post-preview{ display:none; }
+	div.num-revisions, div.misc-pub-revisions {display:none;}
 </style>
+	<?php endif;?>
 <?php
 	}
 	
