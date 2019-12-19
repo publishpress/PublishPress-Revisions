@@ -1008,8 +1008,10 @@ class RevisionaryHistory
             $post_id = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : 0;
         }
 
-        if ($post_type = get_post_field('post_type', $post_id)) {
-            $type_obj = get_post_type_object($post_type);
+        if ($post = get_post($post_id)) {
+            $type_obj = get_post_type_object($post->post_type);
+        } else {
+            return;
         }
 
         $preview_label = (empty($type_obj) || agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true])) 
