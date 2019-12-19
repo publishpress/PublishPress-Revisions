@@ -592,14 +592,32 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			}
 
 			if (get_option('revisionary_mail_buffer')):?>
-				<br /><br />
+				<br />
 				<a href="<?php echo(add_query_arg('clear_mail_buffer', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Purge Notification Buffer', 'revisionary');?></a>
+				<br />
 			<?php endif;?>
 
 			<?php if (get_option('revisionary_sent_mail')):?>
-				<br /><br />
+				<br />
 				<a href="<?php echo(add_query_arg('truncate_mail_log', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Truncate Notification Log', 'revisionary');?></a>
 			<?php endif;
+
+			$mail_info = rvy_mail_check_buffer([], ['log_only' => true]);
+			?>
+			<br /><br />
+			<p><?php printf(__('Sent in last minute: %d / %d', 'revisionary'), $mail_info->sent_counts['minute'], $mail_info->send_limits['minute']);?></p>
+			<p><?php printf(__('Sent in last hour: %d / %d', 'revisionary'), $mail_info->sent_counts['hour'], $mail_info->send_limits['hour']);?></p>
+			<p><?php printf(__('Sent in last day: %d / %d', 'revisionary'), $mail_info->sent_counts['day'], $mail_info->send_limits['day']);?></p>
+			<?php
+			if (!empty($q)) {
+				if ($cron_timestamp = wp_next_scheduled('rvy_mail_buffer_hook')) {
+					$wait_sec = $cron_timestamp - time();
+					if ($wait_sec > 0) {
+						echo '<br />';
+						printf(__('Seconds until next buffer processing time: %d', 'revisionary'), $wait_sec);
+					}
+				}
+			}
 		} 
 
 		if (defined('WP_DEBUG') 
