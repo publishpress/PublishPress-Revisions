@@ -6,6 +6,8 @@ class RvyPostEditSubmitMetabox
      */
     public static function post_submit_meta_box($post, $args = [])
     {
+        do_action('revisionary_post_submit_meta_box');
+
         $type_obj = get_post_type_object($post->post_type);
         $post_status = $post->post_status;
 
@@ -82,6 +84,17 @@ class RvyPostEditSubmitMetabox
                             <?php self::post_time_display($post, $_args); ?>
                         </div>
                     <?php endif; ?>
+
+                    <?php
+                    if (rvy_is_revision_status($post->post_status)) :
+                        $compare_link = admin_url("revision.php?revision=$post->ID");
+                        $compare_button = __('Compare', 'revisionary');
+                        $compare_title = __('Compare this revision to published copy, or to other revisions', 'revisionary');
+                        ?>
+
+                        <a class="preview button" href="<?php echo $compare_link; ?>" target="_blank" id="revision-compare"
+                        tabindex="4" title="<?php echo esc_attr($compare_title);?>"><?php echo $compare_button; ?></a>
+                    <?php endif;?>
 
                     <?php do_action('post_submitbox_misc_actions'); ?>
                 </div> <?php // misc-publishing-actions ?>

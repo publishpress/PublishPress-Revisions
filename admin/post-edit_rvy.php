@@ -10,6 +10,7 @@ class RvyPostEdit {
         add_filter('preview_post_link', [$this, 'fltPreviewLink']);
         add_filter('presspermit_preview_post_label', [$this, 'fltPreviewLabel']);
         add_filter('presspermit_preview_post_title', [$this, 'fltPreviewTitle']);
+        add_action('post_submitbox_misc_actions', [$this, 'actSubmitMetaboxActions']);
 		add_action('post_submitbox_start', [$this, 'actSubmitBoxStart']);
 
         add_action('admin_head', array($this, 'act_admin_head') );
@@ -87,6 +88,25 @@ public function actSubmitboxStart() {
             <div class="rvy-revision-approve" style="float:right"><a href="<?php echo $approval_url;?>" title="<?php echo esc_attr(__('Approve saved changes', 'revisionary'));?>"><?php _e('Approve', 'revisionary');?></a></div>
         <?php endif;
     }
+
+    public function actSubmitMetaboxActions() {
+        global $post;
+
+        if (did_action('revisionary_post_submit_meta_box')) {
+            return;
+        }
+
+        if (rvy_is_revision_status($post->post_status)) :
+            $compare_link = admin_url("revision.php?revision=$post->ID");
+            $compare_button = __('Compare', 'revisionary');
+            $compare_title = __('Compare this revision to published copy, or to other revisions', 'revisionary');
+            ?>
+
+            <a class="preview button" href="<?php echo $compare_link; ?>" target="_blank" id="revision-compare"
+            tabindex="4" title="<?php echo esc_attr($compare_title);?>"><?php echo $compare_button; ?></a>
+        <?php endif;
+    }
+
     public function fltPreviewLink($url) {
         global $post;
 

@@ -26,6 +26,13 @@ justify-content: center;
 color: #070;
 font-weight: bold;
 }
+
+
+/* Classic */
+#submitpost #revision-compare {
+margin: 5px 10px 10px 5px;
+}
+
 #submitpost div.rvy-revision-approve {
 line-height: 2.1;
 }
