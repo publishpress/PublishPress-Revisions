@@ -37,7 +37,7 @@ function rvy_set_notification_queue_cron() {
 
 function rvy_mail_queue_cron_interval( $schedules ) {
     $schedules['two_minutes'] = array(
-        'interval' => 30,
+        'interval' => 120,
         'display'  => esc_html__( 'Every 2 Minutes' ),
     );
  
