@@ -20,6 +20,14 @@ class RevisionaryHistory
 
         add_action('parse_query', [$this, 'actDisableProblemQueries'], 5);
 
+        // Thin Out Revisions plugin breaks View / Approve button on Compare Pending Revisions screen
+        if (class_exists('HM_TOR_Plugin_Loader')) {
+            global $hm_tor_plugin_loader;
+            if (!empty($hm_tor_plugin_loader)) {
+                remove_action( 'admin_enqueue_scripts',  array( $hm_tor_plugin_loader, 'admin_enqueue_scripts' ), 20 );
+            }
+        }
+
 	   if (did_action('load-revision.php')) {
 		$this->actLoadRevision();
 	   }
@@ -737,6 +745,7 @@ class RevisionaryHistory
             }
         }
         
+        sort($author_ids);
         $author_key = implode(",", $author_ids);
 
         if ( ! isset( $this->authors[ $author_key ] ) ) {

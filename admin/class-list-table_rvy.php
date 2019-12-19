@@ -82,6 +82,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		// === now query the revisions ===
 		$qr = $q; 
 
+		unset($qr['post_author']);
+
 		$qr['post_type'] = $qp['post_type'];
 
 		if (isset($qr['m']) && strlen($qr['m']) == 6) {
@@ -131,6 +133,13 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		add_filter('presspermit_posts_clauses_intercept', [$this, 'flt_presspermit_posts_clauses_intercept'], 10, 4);
 		add_filter('posts_clauses', [$this, 'parent_filter'], 5, 2);
 
+		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
+			remove_action('pre_get_posts', ['MultipleAuthors\\Classes\\Query', 'action_pre_get_posts']);
+			remove_filter('posts_where', ['MultipleAuthors\\Classes\\Query', 'filter_posts_where'], 10, 2);
+			remove_filter('posts_join', ['MultipleAuthors\\Classes\\Query', 'filter_posts_join'], 10, 2);
+			remove_filter('posts_groupby', ['MultipleAuthors\\Classes\\Query', 'filter_posts_groupby'], 10, 2);
+		}
+
 		$qr = apply_filters('revisionary_queue_vars', $qr);
 		$wp_query->query($qr);
 		do_action('revisionary_queue_done');
@@ -158,10 +167,6 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$post_id_csv = "'" . implode("','", $this->published_post_ids) . "'";
 		}
 		$where .= " AND $p.comment_count IN ($post_id_csv)";
-
-		if (!empty($_REQUEST['post_author']) && empty($args['suppress_author_clause']) && empty($args['status_count'])) {
-			$where .= $wpdb->prepare(" AND $p.comment_count IN (SELECT ID FROM $wpdb->posts AS p2 WHERE p2.post_author = %d)", intval($_REQUEST['post_author']));
-		}
 
 		if (rvy_get_option('revisor_lock_others_revisions') && !current_user_can('administrator') 
 			&& !current_user_can('edit_others_revisions') && !current_user_can('list_others_revisions') 
@@ -320,7 +325,21 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				$parent_post = get_post(rvy_post_id($post->ID));
 
 				if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
-					do_action("manage_{$parent_post->post_type}_posts_custom_column", 'authors', $parent_post->ID);
+					$authors     = get_multiple_authors($parent_post->ID);
+					$authors_str = [];
+					foreach ($authors as $author) {
+						if (is_object($author)) {
+							$url           = add_query_arg('post_author', $author->ID, $_SERVER['REQUEST_URI']);
+							$authors_str[] = '<a href="' . esc_url($url) . '">' . esc_html($author->display_name) . '</a>';
+						}
+					}
+
+					if (empty($authors_str)) {
+						$authors_str[] = '<span aria-hidden="true">—</span><span class="screen-reader-text">' . __('No author',
+							'publishpress-multiple-authors') . '</span>';
+					}
+
+					echo implode(', ', $authors_str);
 				} else {
 					$author_caption = get_the_author_meta('display_name', $parent_post->post_author);
 					echo $this->apply_edit_link(add_query_arg('post_author', $parent_post->post_author, $_SERVER['REQUEST_URI']), $author_caption);
