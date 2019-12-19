@@ -24,7 +24,7 @@ add_filter('cron_schedules', 'rvy_mail_queue_cron_interval');
 function rvy_set_notification_queue_cron() {
 	$cron_timestamp = wp_next_scheduled( 'rvy_mail_queue_hook' );
 
-	//$wait_sec = time() - $cron_timestamp;
+	$wait_sec = time() - $cron_timestamp;
 
 	if (rvy_get_option('use_notification_queue')) {
 		if (!$cron_timestamp) {
@@ -665,7 +665,7 @@ function rvy_send_queued_mail() {
 			$success = @wp_mail($next_mail['address'], $next_mail['title'], $next_mail['message']);
 		}
 
-		if (!$success && !defined('REVISIONARY_NO_MAIL_RETRY')) {
+		if (!$success && defined('REVISIONARY_MAIL_RETRY')) {
 			// message was not sent successfully, so put it back in the queue
 			if ($q) {
 				$q = array_merge([$next_mail], $q);
@@ -677,6 +677,7 @@ function rvy_send_queued_mail() {
 		// log the sent mail
 			$next_mail['time'] = strtotime(current_time( 'mysql' ));
 		$next_mail['time_gmt'] = time();
+			$next_mail['success'] = intval(boolval($success));
 
 		if (!defined('RS_DEBUG') && !defined('REVISIONARY_LOG_EMAIL_MESSAGE')) {
 			unset($next_mail['message']);
@@ -721,19 +722,11 @@ function rvy_mail( $address, $title, $message, $args ) {
 	else
 		$success = @wp_mail( $address, $title, $message );
 
-	if ($success || defined('REVISIONARY_NO_MAIL_RETRY')) {
+	if ($success || !defined('REVISIONARY_MAIL_RETRY')) {
 		if (!defined('REVISIONARY_DISABLE_MAIL_LOG')) {
 			$queue_status->sent_mail[]= $new_msg;
 			update_option('revisionary_sent_mail', $queue_status->sent_mail);
 		}
-	} elseif (rvy_get_option('use_notification_queue')) {
-		if ($queue_status->queue) {
-			$queue_status->queue = array_merge([$new_msg], $queue_status->queue);
-		} else {
-			$queue_status->queue = [$new_msg];
-		}
-		
-		update_option('revisionary_mail_queue', $queue_status->queue);
 	}
 }
 
