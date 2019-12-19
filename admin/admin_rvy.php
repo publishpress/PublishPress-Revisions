@@ -358,7 +358,7 @@ class RevisionaryAdmin
 			}
 		}
 	}
-
+		
 	function add_editor_ui() {
 		global $revisionary;
 
@@ -381,6 +381,9 @@ class RevisionaryAdmin
 					if ( $status_obj->public || $status_obj->private || ( 'future' == $post->post_status ) ) {
 						require_once( dirname(__FILE__).'/filters-admin-ui-item_rvy.php' );
 						$GLOBALS['revisionary']->filters_admin_item_ui = new RevisionaryAdminFiltersItemUI();
+					} elseif (rvy_is_revision_status($post->post_status) && !$revisionary->isBlockEditorActive()) {
+						require_once( dirname(__FILE__).'/edit-revision-ui_rvy.php' );
+						$GLOBALS['revisionary']->filters_admin_item_ui = new RevisionaryEditRevisionUI();
 					}
 				}
 			}
@@ -655,7 +658,7 @@ class RevisionaryAdmin
 				 	//else
 						//$unrevisable_css_ids = array_merge( $unrevisable_css_ids, array( 'categorydiv', 'authordiv', 'postcustom', 'customdiv', 'slugdiv', 'commentstatusdiv', 'password-span', 'trackbacksdiv',  'tagsdiv-post_tag', 'visibility', 'edit-slug-box', 'postimagediv', 'ef_editorial_meta' ) );
 
-					$unrevisable_css_ids = array( 'authordiv', 'visibility', 'slugdiv', 'edit-slug-box', 'postcustom', 'pagecustom' );  // todo: filter custom fields queries for revision_id
+					$unrevisable_css_ids = array( 'authordiv', 'visibility', 'postcustom', 'pagecustom' );  // todo: filter custom fields queries for revision_id
 
 					//foreach( get_taxonomies( array(), 'object' ) as $taxonomy => $tx_obj )
 					//	$unrevisable_css_ids []= ( $tx_obj->hierarchical ) ? "{$taxonomy}div" : "tagsdiv-$taxonomy";
@@ -663,7 +666,7 @@ class RevisionaryAdmin
 					$unrevisable_css_ids = apply_filters( 'rvy_hidden_meta_boxes', $unrevisable_css_ids );
 						
 					if (rvy_is_revision_status($post->post_status)) {
-						$unrevisable_css_ids []= 'publish';
+						$unrevisable_css_ids = array_merge($unrevisable_css_ids, ['publish', 'slugdiv', 'edit-slug-box']);
 					}
 
 					echo( "\n<style type='text/css'>\n<!--\n" );
@@ -699,7 +702,7 @@ class RevisionaryAdmin
 
 		return $link;
     }
-	
+
 	function flt_post_title ( $title, $id = '' ) {
 		if ( $id )
 			if ( $post = get_post( $id ) ) {

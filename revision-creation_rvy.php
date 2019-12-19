@@ -2,9 +2,21 @@
 namespace PublishPress\Revisions;
 
 class RevisionCreation {
+	var $revisionary;
+
+	function __construct($args = []) {
+		// Support instantiation downstream from Revisionary constructor (before its return value sets global variable)
+		if (!empty($args) && is_array($args) && !empty($args['revisionary'])) {
+			$this->revisionary = $args['revisionary'];
+		}
+	}
 
     function flt_maybe_insert_revision($data, $postarr) {
+		if (!empty($this->revisionary)) {
+			$revisionary = $this->revisionary;
+		} else {
         global $revisionary;
+		}
 
         if ( isset($_POST['wp-preview']) && ( 'dopreview' == $_POST['wp-preview'] ) ) {
             return $data;
@@ -37,7 +49,11 @@ class RevisionCreation {
     }
 
     function flt_pendingrev_post_status($status) {
+        if (!empty($this->revisionary)) {
+			$revisionary = $this->revisionary;
+		} else {
         global $revisionary;
+		}
         
         if (rvy_is_revision_status($status) || ('inherit' == $status)) {
 			return $status;
@@ -103,7 +119,13 @@ class RevisionCreation {
 
     // impose pending revision
     function flt_pending_revision_data( $data, $postarr ) {
-        global $revisionary, $wpdb, $current_user;
+        global $wpdb, $current_user;
+		
+		if (!empty($this->revisionary)) {
+			$revisionary = $this->revisionary;
+		} else {
+			global $revisionary;
+		}
         
         if ( $revisionary->doing_rest && $revisionary->rest->is_posts_request && ! empty( $revisionary->rest->request ) ) {
             $postarr = array_merge( $revisionary->rest->request->get_params(), $postarr );
@@ -172,6 +194,10 @@ class RevisionCreation {
                 $$col = (isset($data[$col])) ? $data[$col] : '';
             }
 
+			if ($data['post_name'] != $published_post->post_name) {
+				$requested_slug = $data['post_name'];
+			}
+
             $data['post_status'] = 'pending-revision';
             //$data['parent_id'] = $data['post_parent'];
             $data['comment_count'] = $published_post->ID; 	// buffer this value in posts table for query efficiency (actual comment count stored for published post will not be overwritten)
@@ -214,6 +240,10 @@ class RevisionCreation {
 
             update_post_meta($revision_id, '_rvy_base_post_id', $published_post->ID);
             update_post_meta($published_post->ID, '_rvy_has_revisions', true);
+
+			if (!empty($requested_slug)) {
+				add_post_meta($revision_id, '_requested_slug', $requested_slug);
+			}
 
             $post_id = $published_post->ID;						  // passing args ensures back compat by using variables directly rather than retrieving revision, post data
             $object_type = isset($postarr['post_type']) ? $postarr['post_type'] : '';
@@ -311,7 +341,13 @@ class RevisionCreation {
     }
 
     function flt_create_scheduled_rev( $data, $post_arr ) {
-		global $revisionary, $current_user, $wpdb;
+		global $current_user, $wpdb;
+
+		if (!empty($this->revisionary)) {
+			$revisionary = $this->revisionary;
+		} else {
+			global $revisionary;
+		}
 
 		if ( empty( $post_arr['ID'] ) ) {
 			return $data;

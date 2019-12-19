@@ -4,7 +4,7 @@ Tags: revision, access, permissions, cms, user, groups, members, admin, pages, p
 Requires at least: 4.9.7
 Tested up to: 5.3
 Requires PHP: 5.6.20
-Stable Tag: 2.1.1
+Stable Tag: 2.1.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -61,6 +61,19 @@ For more details about both the free and pro version, see our <a href="https://p
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.1.2 - 4 Dec 2019 =
+* Fixed : Scheduled Revisions were not published (since 2.1)
+* Fixed : Edit Revision - Preview of unsaved revision did not work from Gutenberg
+* Change : Edit Revision - Display "View / Approve" button if editor is unchanged from saved revision, otherwise "Preview" button for unsaved changes
+* Fixed : Classic Editor - Preview caused "Update Revision" button to be recaptioned to "Save Draft"
+* Feature : Support Post Slug revision
+* Fixed : Other users' revisions were not listed in Revision Queue even if "Prevent Revisors from editing others' revisions" disabled
+* Fixed : With "Prevent Revisors from editing others' revisions" setting enabled, Revisors and Authors could edit others' revisions by direct URL access
+* Feature : Support list_others_revisions capability to grant read access to other users' revisions (applies if "Prevent Revisors from editing others' revisions" is enabled)
+* Compat : PressPermit Pro - Revisors could not submit Beaver Builder revisions
+* Compat : PressPermit Pro - Revision Exceptions ("Also these" category / taxonomy assignments) assigned to Authors were not applied correctly
+* Compat : JReviews plugin
 
 = 2.1.1 - 26 Nov 2019 =
 * Compat : Multiple Authors - Fatal error on revision creation (since 2.1)

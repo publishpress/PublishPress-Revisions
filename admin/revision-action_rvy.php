@@ -413,8 +413,13 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		return $post_id;
 	}
 
-	// Work around unexplained reversion of editor-modified post slug back to default format on some sites  @todo: identify plugin interaction
-	$wpdb->update($wpdb->posts, array('post_name' => $published->post_name, 'guid' => $published->guid), array('ID' => $post_id));
+	if (!$set_slug = get_post_meta($revision_id, '_requested_slug', true)) {
+		$set_slug = $published->post_name;
+	}
+
+	// Apply requested slug, if applicable. 
+	// Otherwise, work around unexplained reversion of editor-modified post slug back to default format on some sites  @todo: identify plugin interaction
+	$wpdb->update($wpdb->posts, array('post_name' => $set_slug, 'guid' => $published->guid), array('ID' => $post_id));
 
 	$_post = get_post($post_id);
 
