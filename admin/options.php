@@ -526,19 +526,31 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		
 		if (!empty($_REQUEST['mailinfo'])) {
 			$verbose = !empty($_REQUEST['verbose']);
-			$abbrev = !empty($_REQUEST['abbrev']);
 
 			if ($q = get_option('revisionary_mail_queue')) {
-				echo '<h3>' . __('Notification Queue', 'revisionary') . '</h3>';
+				echo '<h3>' . __('Notification Buffer', 'revisionary') . '</h3>';
 				foreach($q as $row) {
-					if ($abbrev) {
+					if (!$verbose) {
 						unset($row['message']);
+					} elseif(!empty($row['message'])) {
+						$row['message'] = '<br />' . str_replace("\r\n", '<br />', $row['message']);
 					}
-					$row['time_gmt'] = gmdate('Y-m-d H:i:s', $row['time_gmt']);
+					
+					$row['time_gmt'] = gmdate('Y-m-d, H:i:s', $row['time_gmt']);
 					if (isset($row['time'])) {
-						$row['time'] = gmdate('Y-m-d H:i:s', $row['time']);
+						$row['time'] = gmdate('Y-m-d, g:i:s a', $row['time']);
 					}
-					var_dump($row);
+
+					foreach($row as $k => $val) {
+						if ($k != 'message') {
+							echo "<b>$k</b> : $val<br />";
+						}
+					}
+
+					if ($verbose && !empty($row['message'])) {
+						echo "<b>message</b> : {$row['message']}<br />";
+					}
+
 					echo '<hr />';
 				}
 			}
@@ -548,15 +560,39 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 				foreach($log as $row) {
 					if (!$verbose) {
 						unset($row['message']);
+					} elseif(!empty($row['message'])) {
+						$row['message'] = '<br />' . str_replace("\r\n", '<br />', $row['message']);
 					}
-					$row['time_gmt'] = gmdate('Y-m-d H:i:s', $row['time_gmt']);
+
+					$row['time_gmt'] = gmdate('Y-m-d, H:i:s', $row['time_gmt']);
 					if (isset($row['time'])) {
-						$row['time'] = gmdate('Y-m-d H:i:s', $row['time']);
+						$row['time'] = gmdate('Y-m-d, g:i:s a', $row['time']);
 					}
-					var_dump($row);
+
+					foreach($row as $k => $val) {
+						if ($k != 'message') {
+							echo "<b>$k</b> : $val<br />";
+						}
+					}
+
+					if ($verbose && !empty($row['message'])) {
+						echo "<b>message</b> : {$row['message']}<br />";
+					}
+
 					echo '<hr />';
 				}
 			}
+
+			if (get_option('revisionary_mail_queue')):?>
+				<br /><br />
+				<a href="<?php echo(add_query_arg('clear_mail_buffer', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Purge Notification Buffer', 'revisionary');?></a>
+			<?php endif;?>
+
+			<?php if (get_option('revisionary_sent_mail')):?>
+				<br /><br />
+				<a href="<?php echo(add_query_arg('truncate_mail_log', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Truncate Notification Log', 'revisionary');?></a>
+			<?php endif;
+		} 
 		}
 		
 		?>
