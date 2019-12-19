@@ -70,7 +70,7 @@ class RevisionaryFront {
 			if($revision && ('revision' == $revision->post_type)) {
 				if ($pub_post = get_post($revision->post_parent)) {
 					if ( $type_obj = get_post_type_object( $pub_post->post_type ) ) {
-						if ( current_user_can('edit_post', $revision_id ) ) {
+						if (current_user_can('read_post', $revision_id ) || current_user_can('edit_post', $revision_id)) {
 							$request = str_replace( "post_type = 'post'", "post_type = 'revision'", $request );
 							$request = str_replace( "post_type = '{$pub_post->post_type}'", "post_type = 'revision'", $request );
 						}
@@ -159,12 +159,18 @@ class RevisionaryFront {
 
 			$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
 
-			if (agp_user_can('read_post', $revision_id)) {
+			//if (agp_user_can('read_post', $revision_id)) {	// @todo
+			if (agp_user_can('read_post', $revision_id) || current_user_can('edit_post', $revision_id)) {
 				load_plugin_textdomain('revisionary', false, RVY_FOLDER . '/languages');
 				
 				$published_url = ($published_post_id) ? get_permalink($published_post_id) : '';
 				$diff_url = admin_url("revision.php?revision=$revision_id");
+				
+				if (current_user_can( 'read_post', $revision_id)) { 
 				$view_published = ($published_url) ? sprintf(__("<span><a href='%s' class='rvy_preview_linkspan'  target='_revision_diff'>Compare</a></span><span><a href='%s' class='rvy_preview_linkspan' >View&nbsp;Published&nbsp;Post</a></span>", 'revisionary'), $diff_url, $published_url) : '';
+				} else { // @todo
+					$view_published = ($published_url) ? sprintf(__("<span><a href='%s' class='rvy_preview_linkspan' >View&nbsp;Published&nbsp;Post</a></span>", 'revisionary'), $diff_url, $published_url) : '';
+				}
 
 				if (agp_user_can('edit_post', $revision_id)) {
 					$edit_url = admin_url("post.php?action=edit&amp;post=$revision_id");

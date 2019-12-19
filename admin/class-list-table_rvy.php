@@ -163,7 +163,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$where .= $wpdb->prepare(" AND $p.comment_count IN (SELECT ID FROM $wpdb->posts AS p2 WHERE p2.post_author = %d)", intval($_REQUEST['post_author']));
 		}
 
-		if (!current_user_can('administrator') && !current_user_can('edit_others_revisions')) {
+		if (rvy_get_option('revisor_lock_others_revisions') && !current_user_can('administrator') 
+			&& !current_user_can('edit_others_revisions') && !current_user_can('list_others_revisions') 
+		) {
 			$can_publish_types = [];
 			foreach(get_post_types(['public' => true], 'object') as $post_type => $type_obj) {
 				if (current_user_can($type_obj->cap->edit_published_posts) && current_user_can($type_obj->cap->publish_posts)) {
@@ -915,6 +917,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$post_type_object = get_post_type_object( $post->post_type );
 		$can_read_post    = current_user_can( 'read_post', $post->ID );
 		$can_edit_post    = current_user_can( 'edit_post', $post->ID );
+
+		$can_read_post = $can_read_post || $can_edit_post; // @todo
+
 		$actions          = array();
 		$title            = _draft_or_post_title();
 
@@ -953,7 +958,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				);
 			}
 
-			if ( current_user_can( 'read_post', $post->ID ) ) {
+			//if ( current_user_can( 'read_post', $post->ID ) ) { // @todo make this work for Author with Revision exceptions
+			if ( current_user_can( 'read_post', $post->ID ) || current_user_can( 'edit_post', $post->ID ) ) {  
 				$actions['diff'] = sprintf(
 					'<a href="%1$s" class="" title="%2$s" aria-label="%2$s" target="_revision_diff">%3$s</a>',
 					admin_url("revision.php?revision=$post->ID"),

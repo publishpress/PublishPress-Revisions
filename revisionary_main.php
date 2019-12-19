@@ -406,7 +406,7 @@ class Revisionary
 			return $caps;
 
 		if ( $post = get_post( $object_id ) ) {
-			//if ( ('revision' != $post->post_type) && ! rvy_is_revision_status($post->post_status) ) {
+			if ( ('revision' != $post->post_type) && ! rvy_is_revision_status($post->post_status) ) {
 				$status_obj = get_post_status_object( $post->post_status );
 
 				if (!rvy_is_post_author($post) && $status_obj && ! $status_obj->public && ! $status_obj->private) {
@@ -415,9 +415,6 @@ class Revisionary
 						return $caps;
 					}
 				
-					if(rvy_is_revision_status($post->post_status)) {
-						$caps[]= "edit_others_drafts";
-					} else {
 						static $stati;
 
 						if ( ! isset($stati) ) {
@@ -430,7 +427,6 @@ class Revisionary
 						}
 					}
 				}
-			//}
 		}
 		
 		return $caps;
@@ -490,7 +486,9 @@ class Revisionary
 	}
 	
 	function flt_post_map_meta_cap($caps, $cap, $user_id, $args) {
-		if (!in_array($cap, array('edit_post', 'edit_page', 'delete_post', 'delete_page'))) {
+		global $current_user;
+		
+		if (!in_array($cap, array('read_post', 'read_page', 'edit_post', 'edit_page', 'delete_post', 'delete_page'))) {
 			return $caps;
 		}
 
@@ -505,24 +503,71 @@ class Revisionary
 				return $caps;
 			}
 		}
-		
+
+		if ($post && ('future-revision' == $post->post_status)) {
+			if (in_array($cap, ['read_post', 'read_page'])) {
+				return $caps;
+			}
+ 
+			// allow Revisor to view a preview of their scheduled revision
+			if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST) || empty($_REQUEST['preview']) || !empty($_POST) || did_action('template_redirect')) {
+				if ($type_obj = get_post_type_object( $post->post_type )) {
+					$check_cap = in_array($cap, ['delete_post', 'delete_page']) ? $type_obj->cap->delete_published_posts : $type_obj->cap->edit_published_posts;
+					return array_merge($caps, [$check_cap => true]);  // @todo: review this
+				}
+			}
+		}
+
+		if (in_array($cap, ['read_post', 'read_page'])	// WP Query imposes edit_post capability requirement for front end viewing of protected statuses 
+			|| (!empty($_REQUEST['preview']) && in_array($cap, array('edit_post', 'edit_page')) && did_action('posts_selection') && !did_action('template_redirect'))
+		) {
+			if ($post && rvy_is_revision_status($post->post_status)) {
+				$type_obj = get_post_type_object($post->post_type);
+
+				if ($type_obj && !empty($type_obj->cap->edit_others_posts)) {
+					$caps = array_diff($caps, [$type_obj->cap->edit_others_posts, 'do_not_allow']);
+
+					if (($post->post_author == $current_user->ID) || !rvy_get_option('revisor_lock_others_revisions')) {
+						$caps []= 'read';
+					} else {
+						$caps []= 'list_others_revisions';
+					}
+				}
+			}
+
+			return $caps;
+
+		} elseif (($post_id > 0) && $post && rvy_is_revision_status($post->post_status) && rvy_get_option('revisor_lock_others_revisions') && ($post->post_author != $current_user->ID)) {
+			if ($type_obj = get_post_type_object( $post->post_type )) {
+				if (in_array($type_obj->cap->edit_others_posts, $caps)) {					
+					if ((!empty($type_obj->cap->edit_others_posts) && empty($current_user->allcaps[$type_obj->cap->edit_others_posts])) 
+					|| (!empty($type_obj->cap->edit_published_posts) && empty($current_user->allcaps[$type_obj->cap->edit_published_posts]))
+					) {
+						if (!empty($current_user->allcaps['edit_others_revisions'])) {
+							$caps[] = 'edit_others_revisions';
+						} else {
+							$caps []= 'do_not_allow';	// @todo: implement this within user_has_cap filters?
+						}
+					}
+				}
+			}
+		}
+
 		if (in_array($cap, array('edit_post', 'edit_page'))) {
+			if ($post && !empty($post->post_status)) {
+				if ($status_obj = get_post_status_object($post->post_status)) {
+					if (empty($status_obj->public) && empty($status_obj->private)) {
+						return $caps;
+					}
+				}
+			}
+			
 			// Run reqd_caps array through the filter which is normally used to implicitly grant edit_published cap to Revisors
 			// Applying this adjustment to reqd_caps instead of user caps on 'edit_post' checks allows for better compat with PressPermit and other plugins
 			if ($grant_caps = $this->filter_caps(array(), $caps, array(0 => $cap, 1 => $user_id, 2 => $post_id), array('filter_context' => 'map_meta_cap'))) {
 				$caps = array_diff($caps, array_keys(array_filter($grant_caps)));
 			}
 		}
-
-		if ($post && ('future-revision' == $post->post_status)) {
-					// allow Revisor to view a preview of their scheduled revision
-					if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST) || empty($_REQUEST['preview']) || !empty($_POST) || did_action('template_redirect')) {
-						if ($type_obj = get_post_type_object( $post->post_type )) {
-							$check_cap = in_array($cap, ['delete_post', 'delete_page']) ? $type_obj->cap->delete_published_posts : $type_obj->cap->edit_published_posts;
-							return array_merge($caps, [$check_cap => true]);
-						}
-					}
-				}
 
 		return $caps;
 	}
@@ -532,6 +577,8 @@ class Revisionary
 	}
 
 	private function filter_caps($wp_blogcaps, $reqd_caps, $args, $internal_args = array()) {
+		global $current_user;
+		
 		if (!rvy_get_option('pending_revisions')) {
 			return $wp_blogcaps;
 		}
@@ -551,9 +598,25 @@ class Revisionary
 			}
 		}
 
+		if ( ! empty($args[2]) )
+			$post_id = $args[2];
+		else
+			$post_id = rvy_detect_post_id();
+
+		if ( $post = get_post( $post_id ) ) {
+			$object_type = $post->post_type;								// todo: better API?
+		} elseif (($post_id == -1) && defined('PRESSPERMIT_PRO_VERSION') && !empty(presspermit()->meta_cap_post)) {  // wp_cache_add(-1) does not work for map_meta_cap call on get-revision-diffs ajax call 
+			$post = presspermit()->meta_cap_post;
+			$object_type = $post->post_type;
+		} else {
+			$object_type = rvy_detect_post_type();
+		}
+
 		// For 'edit_post' check, filter required capabilities via 'map_meta_cap' filter, then pass 'user_has_cap' unfiltered
 		if (in_array($args[0], array('edit_post', 'edit_page')) && ! $is_meta_cap_call) {
+			if (empty($post) || !rvy_is_revision_status($post->post_status)) {
 			return $wp_blogcaps;
+		}
 		}
 
 		if ( ! in_array( $args[0], array( 'edit_post', 'edit_page', 'delete_post', 'delete_page' ) ) && empty($support_publish_cap) ) {			
@@ -572,20 +635,6 @@ class Revisionary
 		// integer value indicates internally triggered on previous execution of this filter
 		if ( 1 === $this->skip_revision_allowance ) {
 			$this->skip_revision_allowance = false;
-		}
-
-		if ( ! empty($args[2]) )
-			$post_id = $args[2];
-		else
-			$post_id = rvy_detect_post_id();
-
-		if ( $post = get_post( $post_id ) ) {
-			$object_type = $post->post_type;								// todo: better API?
-		} elseif (($post_id == -1) && defined('PRESSPERMIT_PRO_VERSION') && !empty(presspermit()->meta_cap_post)) {  // wp_cache_add(-1) does not work for map_meta_cap call on get-revision-diffs ajax call 
-			$post = presspermit()->meta_cap_post;
-			$object_type = $post->post_type;
-		} else {
-			$object_type = rvy_detect_post_type();
 		}
 
 		if (!empty($_REQUEST['action']) && ('inline-save' == $_REQUEST['action']) && !rvy_is_revision_status($post->post_status)) {
@@ -612,6 +661,15 @@ class Revisionary
 		
 		$cap = $object_type_obj->cap;
 		
+		//if (!empty($args[2]) && $post && rvy_is_revision_status($post->post_status)) {
+		if ($post && rvy_is_revision_status($post->post_status)) {
+			if (in_array($cap->edit_others_posts, $reqd_caps) ) {
+				if (!empty($current_user->allcaps['edit_others_revisions']) || !rvy_get_option('revisor_lock_others_revisions')) {
+					$wp_blogcaps[$cap->edit_others_posts] = true;
+				}
+			}
+		}
+
 		$edit_published_cap = ( isset($cap->edit_published_posts) ) ? $cap->edit_published_posts : "edit_published_{$object_type}s";
 		$edit_private_cap = ( isset($cap->edit_private_posts) ) ? $cap->edit_private_posts : "edit_private_{$object_type}s";
 
