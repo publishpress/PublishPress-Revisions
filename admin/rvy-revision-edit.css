@@ -24,9 +24,13 @@ width: 100%;
 margin: 15px 0 15px 0;
 justify-content: center;
 color: #070;
+border-color: #070;
 font-weight: bold;
 }
 
+div.components-panel a.revision-approve{
+text-decoration: none;
+}
 
 /* Classic */
 #submitpost #revision-compare {

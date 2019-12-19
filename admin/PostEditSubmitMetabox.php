@@ -156,12 +156,14 @@ class RvyPostEditSubmitMetabox
      */
     public static function post_preview_button($post, $args)
     {
+        global $revisionary;
+
         if (empty($args['post_status_obj'])) return;
 
         $post_status_obj = $args['post_status_obj'];
         ?>
         <?php
-        if (rvy_is_revision_status($post->post_status)) {
+        if ($is_revision = rvy_is_revision_status($post->post_status)) {
             $preview_link = rvy_preview_url($post);
 
             $type_obj = get_post_type_object($post->post_type);
@@ -177,15 +179,20 @@ class RvyPostEditSubmitMetabox
             <a class="preview button" href="<?php echo $preview_link; ?>" target="_blank" id="revision-preview"
             tabindex="4" title="<?php echo esc_attr($preview_title);?>"><?php echo $preview_button; ?></a>
             <?php
-        } else { 
-            $preview_link = esc_url( get_preview_post_link( $post ) );
+        } 
+
+        remove_filter('preview_post_link', [$revisionary->post_edit_ui, 'fltPreviewLink']);
+        $preview_link = add_query_arg('rvy', 1, esc_url( get_preview_post_link( $post )));
                 $preview_button =__('Preview Changes');
+        $style = ($is_revision) ? 'style="display:none;"' : '';
+
+        global $wp_version;
             ?>
-            <a class="preview button" href="<?php echo $preview_link; ?>" target="wp-preview" id="post-preview"
-            tabindex="4"><?php echo $preview_button; ?></a>
+        <a class="preview button" href="<?php echo $preview_link; ?>" target="<?php echo version_compare($wp_version, '5.3', '>=') ? 'wp-preview-' . (int) $post->ID : 'wp-preview';?>" id="post-preview"
+        tabindex="4" <?php echo $style;?>><?php echo $preview_button; ?></a>
             <input type="hidden" name="wp-preview" id="wp-preview" value=""/>
             <?php
-        }
+        add_filter('preview_post_link', [$revisionary->post_edit_ui, 'fltPreviewLink']);
     }
 
     /**
