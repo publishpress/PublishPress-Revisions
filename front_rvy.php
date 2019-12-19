@@ -257,7 +257,10 @@ class RevisionaryFront {
 					add_action('wp_head', [$this, 'rvyFrontCSS']);
 
 					add_action('wp_enqueue_scripts', [$this, 'rvyEnqueuePreviewJS']);
+
+					if (!defined('REVISIONARY_PREVIEW_BAR_RELATIVE')) {
 					add_action('wp_print_footer_scripts', [$this, 'rvyPreviewJS'], 50);
+					}
 
 					$html = '<div class="rvy_view_revision rvy_view_' . $class . '">' .
 							'<span class="rvy_preview_msgspan">' . $message . '</span>';
@@ -294,7 +297,11 @@ class RevisionaryFront {
 				var rvyAdminBarHeight = 0; 
 			}
 
+			$('div.rvy_view_revision').css('position', 'fixed').css('top', '32px');
+
 			var rvyTotalHeight = $('div.rvy_view_revision').height() + rvyAdminBarHeight;
+			var rvyTopBarZindex = $('div.rvy_view_revision').css('z-index')
+			var rvyOtherElemZindex = 0;
 
 			$('div.rvy_view_revision').css('top', rvyAdminBarHeight);
 
@@ -303,8 +310,15 @@ class RevisionaryFront {
 			$('header,div').each(function(i,e) { 
 				if ($(this).css('position') == 'fixed' && ($(this).attr('id') != 'wpadminbar') && (!$(this).hasClass('rvy_view_revision'))) {
 					if ($(this).position().top < rvyTotalHeight ) {
+						rvyOtherElemZindex = $(this).css('z-index');
+
+						if (rvyOtherElemZindex >= rvyTopBarZindex) {
+							rvyTopBarZindex = rvyOtherElemZindex + 1;
+							$('div.rvy_view_revision').css('z-index', rvyTopBarZindex);
+						}
+
 						$(this).css('padding-top', rvyTotalHeight.toString() + 'px');
-						$('div.rvy_view_revision').css('z-index', '999999');
+
 						return false;
 					}
 				}
