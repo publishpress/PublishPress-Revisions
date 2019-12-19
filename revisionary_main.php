@@ -680,7 +680,7 @@ class Revisionary
 
 		global $current_user;
 
-		if (get_post_meta( $post_id, "_save_as_revision_{$current_user->ID}" )) {
+		if (get_post_meta( $post_id, "_save_as_revision_{$current_user->ID}", true )) {
 			$this->impose_pending_rev[$post_id] = true;
 			return $status;
 		}
