@@ -56,10 +56,12 @@ if ( $doaction ) {
 		case 'approve': // If pending revisions has a requested publish date, schedule it, otherwise schedule for near future. Leave currently scheduled revisions alone. 
 		case 'publish': // Schedule all selected revisions for near future publishing.
 			$approved = 0;
-			$published = 0;
+			//$published = 0;
+
+			$is_administrator = current_user_can('administrator');
 
 			foreach ((array) $post_ids as $post_id) {
-				$publish_ids = [];
+				//$publish_ids = [];
 				$approve_ids = [];
 
 				if (!$revision = get_post($post_id)) {
@@ -70,7 +72,7 @@ if ( $doaction ) {
 					continue;
 				}
 				
-				if ( !current_user_can('administrator')
+				if ( !$is_administrator 
 				&& !agp_user_can($type_obj->cap->edit_post, rvy_post_id($revision->ID), '', ['skip_revision_allowance' => true])
 				) {
 					if (count($post_ids) == 1) {
@@ -80,11 +82,10 @@ if ( $doaction ) {
 					}
 				}
 
-				// To avoid issues with excessive simultaneous email transmission, schedule revisions for the near future instead of publishing immediately.
-				
-				if ('publish' == $doaction) {
-					$publish_ids []= $post_id;
-				} else {
+				if (('publish' == $doaction) || ('future-revision' != $revision->post_status)) {
+					//$publish_ids []= $post_id;
+					$approve_ids []= $post_id;
+				} /* else {
 					// If the revision is already scheduled, leave it alone
 					if ('future-revision' == $revision->post_status) {
 						continue;
@@ -97,6 +98,7 @@ if ( $doaction ) {
 						$publish_ids []= $post_id;
 					}
 				}
+				*/
 
 				/*
 				if ( !wp_delete_post($post_id) ) {
@@ -105,28 +107,31 @@ if ( $doaction ) {
 				*/
 			}
 
+			require_once( dirname(__FILE__).'/revision-action_rvy.php');
+
 			foreach ($approve_ids as $revision_id) {
-				$wpdb->update( $wpdb->posts, array('post_status' => 'future-revision'), array('ID' => $revision_id));
-				clean_post_cache($revision_id);
-				$approved++;
+				rvy_revision_approve($revision_id);
+
+				//$wpdb->update( $wpdb->posts, array('post_status' => 'future-revision'), array('ID' => $revision_id));
+				//clean_post_cache($revision_id);
+				//$approved++;
 			}
 
-			
-			foreach ($publish_ids as $revision_id) {
-
+			if ($approve_ids) {
+				$sendback = add_query_arg('approved', count($approve_ids), $sendback);
 			}
 
-			if ($approved) {
-				$sendback = add_query_arg('approved', $approved, $sendback);
-			}
-
+			/*
 			if ($published) {
 				$sendback = add_query_arg('published', $published, $sendback);
 			}
+			*/
 
+			/*
 			if ($approved || $published) {
 				rvy_update_next_publish_date();
 			}
+			*/
 
 			break;
 

@@ -619,6 +619,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		if ($approval_potential = apply_filters('revisionary_bulk_action_approval', $approval_potential)) {
 			$actions['approve'] = __('Approve', 'revisionary');
+			$actions['publish'] = __('Publish', 'revisionary');
 		}
 
 		$actions['delete'] = __( 'Delete Permanently' );

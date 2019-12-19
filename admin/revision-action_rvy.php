@@ -15,9 +15,21 @@ function rvy_revision_diff() {
 }
 
 // schedules publication of a revision ( or publishes if requested publish date has already passed )
-function rvy_revision_approve() {
+function rvy_revision_approve($revision_id = 0) {
 	require_once( ABSPATH . 'wp-admin/admin.php');
+	
+	if (!$revision_id) {
+		$batch_process = false;
+
+		if (empty($_GET['revision'])) {
+			return;
+		}
+
 	$revision_id = $_GET['revision'];
+	} else {
+		$batch_process = true;
+	}
+
 	$redirect = '';
 	
 	$blogname = wp_specialchars_decode( get_option('blogname'), ENT_QUOTES );
@@ -44,7 +56,9 @@ function rvy_revision_approve() {
 				break;
 		}
 
+		if (!$batch_process) {
 		check_admin_referer( "approve-post_$post->ID|$revision->ID" );
+		}
 		
 		clean_post_cache($post->ID);
 		$published_url = get_permalink($post->ID);
@@ -97,7 +111,9 @@ function rvy_revision_approve() {
 			if ( 'future-revision' != $revision->post_status ) {
 				global $wpdb;
 				$wpdb->update( $wpdb->posts, array( 'post_status' => 'future-revision' ), array( 'ID' => $revision->ID ) );
-				rvy_update_next_publish_date();
+				
+				$update_next_publish_date = true;
+				
 				$db_action = true;
 				
 				clean_post_cache( $revision->ID );
@@ -185,27 +201,31 @@ function rvy_revision_approve() {
 		} else {
 			$_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
 			$redirect = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $revision ) ) );
-
-			//$redirect = add_query_arg( array_merge( $last_arg, array( 'revision_status' => $revision_status ) ), $_REQUEST['rvy_redirect'] );
 		}
 
 	} while (0);
 	
+	if (!empty($update_next_publish_date)) {
+		rvy_update_next_publish_date();
+	}
 	
-
+	if (!$batch_process) {	
 	if ( ! $redirect ) {
 		if ( ! empty($post) && is_object($post) && ( 'post' != $post->post_type ) ) {
 			$redirect = "edit.php?post_type={$post->post_type}";
 		} else
 			$redirect = 'edit.php';
 	}
+	}
 
 	if (empty($approval_error)) {
 		do_action( 'revision_approved', $revision->post_parent, $revision->ID );
 	}
 
+	if (!$batch_process) {
 	wp_redirect( $redirect );
 	exit;
+}
 }
 
 function rvy_revision_restore() {
