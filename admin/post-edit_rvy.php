@@ -144,7 +144,7 @@ public function actSubmitboxStart() {
             return;
         }
 
-        $can_publish = current_user_can($type_obj->cap->publish_posts);
+        $can_publish = agp_user_can( $type_obj->cap->edit_post, rvy_post_id($post->ID), '', array( 'skip_revision_allowance' => true ) );
 
         if ($can_publish && rvy_is_revision_status($post->post_status)):?>
             <?php
