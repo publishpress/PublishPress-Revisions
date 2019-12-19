@@ -523,6 +523,42 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 
 		$hint = __('To avoid notification failures, buffer emails for delayed sending once minute, hour or day limits are exceeded', 'revisionary');
 		$ui->option_checkbox( 'use_notification_queue', $tab, $section, $hint, '' );
+		
+		if (!empty($_REQUEST['mailinfo'])) {
+			$verbose = !empty($_REQUEST['verbose']);
+			$abbrev = !empty($_REQUEST['abbrev']);
+
+			if ($q = get_option('revisionary_mail_queue')) {
+				echo '<h3>' . __('Notification Queue', 'revisionary') . '</h3>';
+				foreach($q as $row) {
+					if ($abbrev) {
+						unset($row['message']);
+					}
+					$row['time_gmt'] = gmdate('Y-m-d H:i:s', $row['time_gmt']);
+					if (isset($row['time'])) {
+						$row['time'] = gmdate('Y-m-d H:i:s', $row['time']);
+					}
+					var_dump($row);
+					echo '<hr />';
+				}
+			}
+
+			if ($log = get_option('revisionary_sent_mail')) {
+				echo '<h3>' . __('Notification Log', 'revisionary') . '</h3>';
+				foreach($log as $row) {
+					if (!$verbose) {
+						unset($row['message']);
+					}
+					$row['time_gmt'] = gmdate('Y-m-d H:i:s', $row['time_gmt']);
+					if (isset($row['time'])) {
+						$row['time'] = gmdate('Y-m-d H:i:s', $row['time']);
+					}
+					var_dump($row);
+					echo '<hr />';
+				}
+			}
+		}
+		
 		?>
 		</td></tr>
 		<!--
