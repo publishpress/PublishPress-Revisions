@@ -78,11 +78,11 @@ class Revisionary
 		}
 		
 		if ( ! is_content_administrator_rvy() ) {
-			add_filter( 'map_meta_cap', array(&$this, 'flt_post_map_meta_cap'), 5, 4);
-			add_filter( 'user_has_cap', array( &$this, 'flt_user_has_cap' ), 98, 3 );
-			add_filter( 'pp_has_cap_bypass', array( &$this, 'flt_has_cap_bypass' ), 10, 4 );
+			add_filter( 'map_meta_cap', array($this, 'flt_post_map_meta_cap'), 5, 4);
+			add_filter( 'user_has_cap', array( $this, 'flt_user_has_cap' ), 98, 3 );
+			add_filter( 'pp_has_cap_bypass', array( $this, 'flt_has_cap_bypass' ), 10, 4 );
 
-			add_filter( 'map_meta_cap', array( &$this, 'flt_limit_others_drafts' ), 10, 4 );
+			add_filter( 'map_meta_cap', array( $this, 'flt_limit_others_drafts' ), 10, 4 );
 		}
 
 		if ( is_admin() ) {
@@ -90,31 +90,28 @@ class Revisionary
 			$this->admin = new RevisionaryAdmin();
 		}	
 		
-		add_action( 'wpmu_new_blog', array( &$this, 'act_new_blog'), 10, 2 );
+		add_action( 'wpmu_new_blog', array( $this, 'act_new_blog'), 10, 2 );
 		
-		add_filter( 'posts_results', array( &$this, 'inherit_status_workaround' ) );
-		add_filter( 'the_posts', array( &$this, 'undo_inherit_status_workaround' ) );
+		add_filter( 'posts_results', array( $this, 'inherit_status_workaround' ) );
+		add_filter( 'the_posts', array( $this, 'undo_inherit_status_workaround' ) );
 	
 		//add_action( 'wp_loaded', array( &$this, 'set_revision_capdefs' ) );
 		
 		if ( rvy_get_option( 'pending_revisions' ) ) {
 			// special filtering to support Contrib editing of published posts/pages to revision
-			add_filter('pre_post_status', array(&$this, 'flt_pendingrev_post_status') );
-
-			//$priority = (defined('ICL_SITEPRESS_VERSION') && !$this->isBlockEditorActive()) ? 12 : 2;
-
+			add_filter('pre_post_status', array($this, 'flt_pendingrev_post_status') );
 			add_filter('wp_insert_post_data', array($this, 'flt_maybe_insert_revision'), 2, 2);
 		}
 		
 		if ( rvy_get_option('scheduled_revisions') ) {
-			add_filter('wp_insert_post_data', array(&$this, 'flt_create_scheduled_rev'), 3, 2 );  // other filters will have a chance to apply at actual publish time
+			add_filter('wp_insert_post_data', array($this, 'flt_create_scheduled_rev'), 3, 2 );  // other filters will have a chance to apply at actual publish time
 
 			// users who have edit_published capability for post/page can create a scheduled revision by modifying post date to a future date (without setting "future" status explicitly)
-			add_filter( 'wp_insert_post_data', array(&$this, 'flt_insert_post_data'), 99, 2 );
+			add_filter( 'wp_insert_post_data', array($this, 'flt_insert_post_data'), 99, 2 );
 		}
 
 		// REST logging
-		add_filter( 'rest_pre_dispatch', array( &$this, 'rest_pre_dispatch' ), 10, 3 );
+		add_filter( 'rest_pre_dispatch', array( $this, 'rest_pre_dispatch' ), 10, 3 );
 
 		// This is needed, implemented for pending revisions only
 		if (!empty($_REQUEST['get_new_revision'])) {
