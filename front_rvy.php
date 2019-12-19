@@ -222,7 +222,10 @@ class RevisionaryFront {
 						}
 					}
 
-					add_action( 'wp_head', 'rvy_front_css' );
+					add_action('wp_head', [$this, 'rvyFrontCSS']);
+
+					add_action('wp_enqueue_scripts', [$this, 'rvyEnqueuePreviewJS']);
+					add_action('wp_print_footer_scripts', [$this, 'rvyPreviewJS'], 50);
 
 					$html = '<div class="rvy_view_revision rvy_view_' . $class . '">' .
 							'<span class="rvy_preview_msgspan">' . $message . '</span>';
@@ -237,6 +240,36 @@ class RevisionaryFront {
 		}
 	}
 
+	function rvyFrontCSS() {
+		$wp_content = ( is_ssl() || ( is_admin() && defined('FORCE_SSL_ADMIN') && FORCE_SSL_ADMIN ) ) ? str_replace( 'http:', 'https:', WP_CONTENT_URL ) : WP_CONTENT_URL;
+		$path = $wp_content . '/plugins/' . RVY_FOLDER;
+		
+		echo '<link rel="stylesheet" href="' . $path . '/revisionary-front.css" type="text/css" />'."\n";
+	}
+	
+	function rvyEnqueuePreviewJS() {
+		wp_enqueue_script('jquery');
+	}
+
+	function rvyPreviewJS() {
+		?>
+		<script type="text/javascript">
+		/* <![CDATA[ */
+		jQuery(document).ready( function($) {
+			$('header,div').each(function(i,e) { 
+				if ($(this).css('position') == 'fixed') {
+					if ($(this).position().top < 60) {
+						$(this).css('padding-top', '60px');
+						$('div.rvy_view_revision').css('position', 'fixed').css('z-index', '999999');
+						return false;
+					}
+				}
+			});
+		});
+		/* ]]> */
+		</script>
+		<?php
+	}
 }
 
 class RvyScheduledHtml {
@@ -256,11 +289,4 @@ class RvyScheduledHtml {
 		echo $this->html;
 		remove_action( $this->action, array( $this, 'echo_html' ), $this->priority );
 	}
-}
-
-function rvy_front_css() {
-	$wp_content = ( is_ssl() || ( is_admin() && defined('FORCE_SSL_ADMIN') && FORCE_SSL_ADMIN ) ) ? str_replace( 'http:', 'https:', WP_CONTENT_URL ) : WP_CONTENT_URL;
-	$path = $wp_content . '/plugins/' . RVY_FOLDER;
-	
-	echo '<link rel="stylesheet" href="' . $path . '/revisionary-front.css" type="text/css" />'."\n";
 }
