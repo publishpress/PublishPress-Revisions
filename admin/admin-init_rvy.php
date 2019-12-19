@@ -3,6 +3,10 @@ global $pagenow, $revisionary;
 
 add_action( 'init', '_rvy_post_edit_ui' );
 
+if (defined('REVISIONARY_PRO_VERSION')) {
+	require_once(RVY_ABSPATH . '/includes-pro/admin-load.php');
+}
+
 if ( in_array( $pagenow, array( 'edit.php', 'post.php', 'post-new.php', 'plugins.php' ) ) ) { 
 	add_action( 'all_admin_notices', '_rvy_intro_notice' );
 

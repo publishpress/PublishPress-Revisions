@@ -2,7 +2,11 @@
 if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 	die( 'This page cannot be called directly.' );
 
+do_action('revisionary_load_options_ui');
+
 class RvyOptionUI {
+	private static $instance = null;
+
 	var $sitewide;
 	var $customize_defaults;
 	var $form_options;
@@ -14,9 +18,22 @@ class RvyOptionUI {
 	var $def_otype_options;
 	var $display_hints = true;
 		
-	function __construct( $sitewide, $customize_defaults ) {
-		$this->sitewide = $sitewide;
-		$this->customize_defaults = $customize_defaults;
+	public static function instance($args = [])
+    {
+        if (is_null(self::$instance)) {
+            self::$instance = new RvyOptionUI($args);
+        }
+
+        return self::$instance;
+    }
+
+    private function __construct($args = [])
+    {
+		$defaults = ['sitewide' => false, 'customize_defaults' => false];
+		$args = array_merge($defaults, (array)$args);
+		
+		$this->sitewide = $args['sitewide'];
+		$this->customize_defaults = $args['customize_defaults'];
 		$this->display_hints = rvy_get_option( 'display_hints' );
 	}
 	
@@ -70,7 +87,7 @@ if ( ! current_user_can( 'manage_options' ) || ( $sitewide && ! is_super_admin()
 if ( $sitewide )
 	$customize_defaults = false;	// this is intended only for storing custom default values for site-specific options
 
-$ui = new RvyOptionUI( $sitewide, $customize_defaults );
+$ui = RvyOptionUI::instance(compact($sitewide, $customize_defaults));
 	
 rvy_refresh_default_options();
 
@@ -88,10 +105,6 @@ $ui->section_captions = array(
 		'notification'			=> __('Email Notification', 'revisionary')
 	)
 );
-
-if (defined('REVISIONARY_PRO_VERSION')) {
-	$ui->section_captions = ['license' => __('License Key', 'revisionary')] + $ui->section_captions;
-}
 
 // TODO: replace individual _e calls with these (and section, tab captions)
 $ui->option_captions = array(
@@ -155,6 +168,8 @@ if ( RVY_NETWORK ) {
 			if ( empty( $ui->form_options[$tab_name][$section_name] ) )
 				unset( $ui->form_options[$tab_name][$section_name] );
 }
+
+do_action('revisionary_settings_ui', $ui, $sitewide, $customize_defaults);
 ?>
 <header>
 <!-- <div class='wrap'> -->
