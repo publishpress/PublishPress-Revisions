@@ -83,7 +83,7 @@ $ui->section_captions = array(
 		'role_definition' 	  	=> __('Role Definition', 'revisionary'),
 		'scheduled_revisions' 	=> __('Scheduled Revisions', 'revisionary'),
 		'pending_revisions'		=> __('Pending Revisions', 'revisionary'),
-		'preview'				=> __('Revision Preview', 'revisionary'),
+		'preview'				=> __('Preview / Approval', 'revisionary'),
 		'revisions'				=> __('Revision Options', 'revisionary'),
 		'notification'			=> __('Email Notification', 'revisionary')
 	)
@@ -112,6 +112,7 @@ $ui->option_captions = array(
 	'require_edit_others_drafts' => __('Prevent Revisors from editing other user&apos;s drafts', 'revisionary' ),
 	'display_hints' => __('Display Hints'),
 	'preview_link_type' => __('Preview Link Type', 'revisionary'),
+	'compare_revisions_direct_approval' => __('Approve Button on Compare Revisions screen', 'revisionary'),
 );
 
 if ( defined('RVY_CONTENT_ROLES') ) {
@@ -129,7 +130,7 @@ $ui->form_options = array(
 	'role_definition' => 	 array( 'revisor_role_add_custom_rolecaps', 'require_edit_others_drafts' ),
 	'scheduled_revisions' => array( 'scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date', ),
 	'pending_revisions'	=> 	 array( 'pending_revisions', 'pending_revision_update_post_date', ),
-	'preview' =>			 array( 'preview_link_type'),
+	'preview' =>			 array( 'preview_link_type', 'compare_revisions_direct_approval'),
 	'revisions'		=>		 array( 'revisor_lock_others_revisions', 'diff_display_strip_tags', 'display_hints' ),
 	'notification'	=>		 array( 'pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_queue' )
 )
@@ -382,7 +383,13 @@ if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
 			?>
 			</div>
 		<?php endif;
+		?>
+		<br />
+		<?php
 	}
+
+	$hint = __('If disabled, Compare screen links to Revision Preview for approval', 'revisionary');
+	$ui->option_checkbox( 'compare_revisions_direct_approval', $tab, $section, $hint, '' );
 	?>
 	</td></tr>
 <?php endif; // any options accessable in this section

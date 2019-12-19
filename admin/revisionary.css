@@ -519,3 +519,11 @@ width:auto;
 #submitdiv_pps #save-action span.spinner {
 margin: 2px 2px 0;
 }
+
+
+.diff-meta input.edit-revision {
+float: right;
+margin-left: 6px;
+margin-right: 6px;
+margin-top: 2px;
+}
