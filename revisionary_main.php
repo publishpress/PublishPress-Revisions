@@ -484,8 +484,9 @@ class Revisionary
 	function set_content_roles( $content_roles_obj ) {
 		$this->content_roles = $content_roles_obj;
 
-		if ( ! defined( 'RVY_CONTENT_ROLES' ) )
+		if ( ! defined( 'RVY_CONTENT_ROLES' ) ) {
 			define( 'RVY_CONTENT_ROLES', true );
+		}
 	}
 	
 	// we generally want Revisors to edit other users' posts, but not other users' revisions
