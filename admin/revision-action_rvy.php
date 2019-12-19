@@ -117,6 +117,9 @@ function rvy_revision_approve($revision_id = 0) {
 				$db_action = true;
 				
 				clean_post_cache( $revision->ID );
+			} else {
+				// this scheduled revision is already approved, so don't included in reported bulk approval count
+				$approval_error = true;
 			}
 
 			$revision_status = 'future-revision';
@@ -255,6 +258,10 @@ function rvy_revision_approve($revision_id = 0) {
 	wp_redirect( $redirect );
 	exit;
 }
+
+	if (empty($approval_error)) {
+		return true;
+	}
 }
 
 function rvy_revision_restore() {
@@ -687,13 +694,16 @@ function rvy_revision_publish($revision_id = false) {
 		check_admin_referer( "publish-post_$post->ID|$revision->ID" );
 		}
 
+		$do_publish = true;
 		do_action( 'revision_published', rvy_post_id($revision->ID), $revision->ID );
 	} while (0);
 	
+	if (!empty($do_publish)) {
 	rvy_publish_scheduled_revisions(array('force_revision_id' => $revision->ID));
 
 	if ($post) {
 		clean_post_cache($post->ID);
+	}
 	}
 
 	if (!$batch_process) {
@@ -703,6 +713,10 @@ function rvy_revision_publish($revision_id = false) {
 
 	wp_redirect( $redirect );
 	exit;
+	}
+
+	if (!empty($do_publish)) {
+		return true;
 	}
 }
 

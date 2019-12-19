@@ -118,15 +118,15 @@ function rvy_admin_init() {
 						}
 					}
 	
-					if ('future-revision' == $revision->post_status) {
-						if ('publish_revision' == $doaction) {
-							rvy_revision_publish($revision->ID);
+					if (('future-revision' == $revision->post_status) && ('publish_revision' == $doaction)) {
+						if (rvy_revision_publish($revision->ID)) {
+							$approved++;
 						}
 					} else {
-						rvy_revision_approve($revision->ID);
+						if (rvy_revision_approve($revision->ID)) {
+							$approved++;
+						}
 					}
-	
-					$approved++;
 				}
 	
 				if ($approved) {
