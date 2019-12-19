@@ -105,7 +105,7 @@ class RevisionaryHistory
                     }
                 }
 
-                if ( ! current_user_can( 'read_post', $revision->ID ) || ! current_user_can( 'edit_post', $published_post->ID ) ) {
+                if ((!current_user_can( 'read_post', $revision->ID ) && !current_user_can('edit_post', $revision->ID))) {
                     return;
                 }
 
@@ -835,8 +835,9 @@ class RevisionaryHistory
                 $restore_link = rvy_preview_url($revision);  // default to revision preview link
                 
                 if ($can_restore) {
-	                if (rvy_get_option('compare_revisions_direct_approval')) {
                         $published_post_id = rvy_post_id($revision->ID);
+
+	                if (rvy_get_option('compare_revisions_direct_approval') && agp_user_can( 'edit_post', $published_post_id, '', ['skip_revision_allowance' => true] ) ) {
                         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
 
                         if (in_array($revision->post_status, ['pending-revision'])) {
@@ -1003,9 +1004,15 @@ class RevisionaryHistory
             $type_obj = get_post_type_object($post_type);
         }
 
-        $direct_approval = rvy_get_option('compare_revisions_direct_approval');
+        $direct_approval = rvy_get_option('compare_revisions_direct_approval') && agp_user_can( 'edit_post', rvy_post_id($post_id), '', ['skip_revision_allowance' => true] );
 
-        if (empty($type_obj) || agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true])) {
+        if ($post_id) {
+            $can_approve = agp_user_can('edit_post', rvy_post_id($post_id), 0, ['skip_revision_allowance' => true]);
+        } else {
+            $can_approve = agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true]);
+        }
+
+        if (empty($type_obj) || $can_approve) {
             $button_label = $direct_approval ? __('Approve', 'revisionary') : __('View / Approve', 'revisionary');
         } else {
             $button_label = __('View', 'revisionary');
@@ -1018,6 +1025,7 @@ class RevisionaryHistory
             var rvySearchParams = '';
             var rvyRevisionID = '';
             var rvyLastID = 0;
+            var rvyCanEdit = false;
 
             var RvyDiffUI = function() {
                 if( $('input.restore-revision:not(.rvy-recaption)').length) {
@@ -1044,9 +1052,15 @@ class RevisionaryHistory
                         }
 
                         if (rvyRevisionID != rvyLastID) {
-                            rvyEditURL = '<?php echo admin_url("post.php?post=9999999&action=edit")?>';
-                            rvyEditURL = rvyEditURL.replace("post=9999999", "post=" + rvyRevisionID);
-                            $('input.restore-revision').after('<a href="' + rvyEditURL + '"><input type="button" class="edit-revision button button-primary" style="float:right" value="<?php _e('Edit');?>"></a>');
+                            var rselected = parseInt(_wpRevisionsSettings.to);
+                            var rkey;
+                            for (rkey = 0; rkey < _wpRevisionsSettings.revisionData.length; rkey++) {
+                                if (_wpRevisionsSettings.revisionData[rkey].id == rselected) {
+                                    if (_wpRevisionsSettings.revisionData[rkey].editUrl) {
+                                        $('input.restore-revision').after('<a href="' + _wpRevisionsSettings.revisionData[rkey].editUrl + '"><input type="button" class="edit-revision button button-primary" style="float:right" value="<?php _e('Edit');?>"></a>');
+                                    }
+                                }
+                            }
                             
                             rvyLastID = rvyRevisionID;
                         }
