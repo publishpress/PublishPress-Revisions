@@ -14,6 +14,10 @@ if (did_action('set_current_user')) {
 	add_action( 'set_current_user', 'rvy_ajax_handler', 20);
 }
 
+if (!empty($_REQUEST['preview'] && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id']))) {
+	add_filter('redirect_canonical', function($redirect, $orig) {return $orig;}, 10, 2);
+}
+
 add_action('init', 'rvy_maybe_redirect', 1);
 
 /*======== WP-Cron implentation for Email Notification Buffer ========*/
