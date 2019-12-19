@@ -362,10 +362,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	$update = wp_slash( $update ); //since data is from db
 
-	//$published = get_post($published_id);
-	$published = $wpdb->get_row(
-		$wpdb->prepare("SELECT * FROM $wpdb->posts WHERE ID = %d", $published_id)
-	);
+	$published = get_post($published_id);
 
 	// published post columns which should not be overwritten by revision values
 	//$update = array_diff_key($update, array_fill_keys(array('post_status', 'comment_count', 'post_name', 'guid', 'post_date', 'post_date_gmt' ), true));
@@ -398,9 +395,6 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	if ( ! $post_id || is_wp_error( $post_id ) ) {
 		return $post_id;
 	}
-
-	// Work around unexplained reversion of editor-modified post slug back to default format on some sites  @todo: identify plugin interaction
-	$wpdb->update($wpdb->posts, array('post_name' => $published->post_name, 'guid' => $published->guid), array('ID' => $post_id));
 
 	$_post = get_post($post_id);
 
