@@ -358,7 +358,7 @@ class RevisionaryAdmin
 			}
 		}
 	}
-
+		
 	function add_editor_ui() {
 		global $revisionary;
 
@@ -381,6 +381,9 @@ class RevisionaryAdmin
 					if ( $status_obj->public || $status_obj->private || ( 'future' == $post->post_status ) ) {
 						require_once( dirname(__FILE__).'/filters-admin-ui-item_rvy.php' );
 						$GLOBALS['revisionary']->filters_admin_item_ui = new RevisionaryAdminFiltersItemUI();
+					} elseif (rvy_is_revision_status($post->post_status) && !$revisionary->isBlockEditorActive()) {
+						require_once( dirname(__FILE__).'/edit-revision-ui_rvy.php' );
+						$GLOBALS['revisionary']->filters_admin_item_ui = new RevisionaryEditRevisionUI();
 					}
 				}
 			}
@@ -699,7 +702,7 @@ class RevisionaryAdmin
 
 		return $link;
     }
-	
+
 	function flt_post_title ( $title, $id = '' ) {
 		if ( $id )
 			if ( $post = get_post( $id ) ) {
