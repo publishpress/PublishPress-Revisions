@@ -799,7 +799,10 @@ class RevisionaryHistory
 
         cache_users( wp_list_pluck( $revisions, 'post_author' ) );
 
-        $can_restore = current_user_can( 'edit_post', $post->ID );
+        $type_obj = get_post_type_object($post->post_type);
+        
+        $can_restore = agp_user_can( $type_obj->cap->edit_post, $post->ID, '', ['skip_revision_allowance' => true] );
+
         $current_id  = false;
 
         $revisions =  [$post->ID => $post] + $revisions;
@@ -826,11 +829,11 @@ class RevisionaryHistory
 
             $edit_url = false;
 
-            if ($can_restore) {
                 // Until Reject button is implemented, just route to Preview screen so revision can be edited / deleted if necessary
                 if ( $current || in_array($revision->post_status, ['pending-revision', 'future-revision'])) {
                     $restore_link = rvy_preview_url($revision);  // default to revision preview link
                     
+                if ($can_restore) {
                     //if (rvy_get_option('compare_revisions_direct_approval')) {
                         //if ($can_edit = agp_user_can('edit_post', $revision->ID)) {
                             $published_post_id = rvy_post_id($revision->ID);
@@ -888,7 +891,7 @@ class RevisionaryHistory
                 'timeAgo'    => sprintf( $time_diff_label, $date_prefix, human_time_diff( $modified_gmt, $now_gmt ) ),
                 'autosave'   => false,
                 'current'    => $current,
-                'restoreUrl' => $can_restore ? $restore_link : false,
+                'restoreUrl' => $restore_link,
                 'editUrl'    => $edit_url,
             ];
 
