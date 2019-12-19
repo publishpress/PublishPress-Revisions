@@ -19,7 +19,7 @@ class RevisionaryHistory
         add_action('wp_ajax_get-revision-diffs', [$this, 'actAjaxRevisionDiffs'], 1);
 
         add_action('parse_query', [$this, 'actDisableProblemQueries'], 5);
-		
+
 	   if (did_action('load-revision.php')) {
 		$this->actLoadRevision();
 	   }
@@ -215,6 +215,7 @@ class RevisionaryHistory
         //do_action('revisionary_history_query', $post);
         add_filter('posts_clauses', [$this, 'fltRevisionClauses'], 5, 2);
         $rvy_query = new WP_Query($q);
+
         remove_filter('posts_clauses', [$this, 'fltRevisionClauses'], 5, 2);
         //do_action('revisionary_history_query_done', $post);
         
@@ -829,34 +830,29 @@ class RevisionaryHistory
 
             $edit_url = false;
 
-                // Until Reject button is implemented, just route to Preview screen so revision can be edited / deleted if necessary
-                if ( $current || in_array($revision->post_status, ['pending-revision', 'future-revision'])) {
-                    $restore_link = rvy_preview_url($revision);  // default to revision preview link
-                    
+            // Until Reject button is implemented, just route to Preview screen so revision can be edited / deleted if necessary
+            if ( $current || in_array($revision->post_status, ['pending-revision', 'future-revision'])) {
+                $restore_link = rvy_preview_url($revision);  // default to revision preview link
+                
                 if ($can_restore) {
-                    //if (rvy_get_option('compare_revisions_direct_approval')) {
-                        //if ($can_edit = agp_user_can('edit_post', $revision->ID)) {
-                            $published_post_id = rvy_post_id($revision->ID);
-                            $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
+	                if (rvy_get_option('compare_revisions_direct_approval')) {
+                        $published_post_id = rvy_post_id($revision->ID);
+                        $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
 
-                            if (in_array($revision->post_status, ['pending-revision'])) {
-                                $restore_link = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|{$revision->ID}" );
-                            
-                            } elseif (in_array($revision->post_status, ['future-revision'])) {
-                                $restore_link = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|{$revision->ID}" );
-                            }
+                        if (in_array($revision->post_status, ['pending-revision'])) {
+                            $restore_link = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|{$revision->ID}" );
+                        
+                        } elseif (in_array($revision->post_status, ['future-revision'])) {
+                            $restore_link = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|{$revision->ID}" );
+                        }
 
-                            if (agp_user_can('edit_post', $revision->ID)) {
-                                $edit_url = admin_url("post.php?action=edit&amp;post=$revision->ID");
-                            }
-                        //}
-                    //} 
-
-                    //$link_open = "<a href='$preview_url' target='_blank'>";
-                    //$link_close = '</a>';
-                } else {
-                    $restore_link = '';
+                        if (agp_user_can('edit_post', $revision->ID)) {
+                            $edit_url = admin_url("post.php?action=edit&amp;post=$revision->ID");
+                        }
+	                } 
                 }
+            } else {
+                $restore_link = '';
             }
 
             if ('future-revision' == $revision->post_status) {
