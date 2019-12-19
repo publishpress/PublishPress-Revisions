@@ -529,7 +529,7 @@ class Revisionary
 				if ($type_obj && !empty($type_obj->cap->edit_others_posts)) {
 					$caps = array_diff($caps, [$type_obj->cap->edit_others_posts, 'do_not_allow']);
 
-					if (rvy_is_post_author($post) || !rvy_get_option('revisor_lock_others_revisions')) {
+					if (rvy_is_post_author($post) || !rvy_get_option('revisor_hide_others_revisions') || rvy_is_full_editor($post)) {
 						$caps []= 'read';
 					} else {
 						$caps []= 'list_others_revisions';
@@ -539,7 +539,9 @@ class Revisionary
 
 			return $caps;
 
-		} elseif (($post_id > 0) && $post && rvy_is_revision_status($post->post_status) && rvy_get_option('revisor_lock_others_revisions') && !rvy_is_post_author($post)) {
+		} elseif (($post_id > 0) && $post && rvy_is_revision_status($post->post_status) 
+			&& rvy_get_option('revisor_lock_others_revisions') && !rvy_is_post_author($post) && !rvy_is_full_editor($post)
+		) {
 			if ($type_obj = get_post_type_object( $post->post_type )) {
 				if (in_array($type_obj->cap->edit_others_posts, $caps)) {					
 					if ((!empty($type_obj->cap->edit_others_posts) && empty($current_user->allcaps[$type_obj->cap->edit_others_posts])) 
@@ -644,7 +646,7 @@ class Revisionary
 		}
 
 		if ( rvy_get_option( 'revisor_lock_others_revisions' ) ) {
-			if ( $post ) {
+			if ($post && !rvy_is_full_editor($post)) {
 				// Revisors are enabled to edit other users' posts for revision, but cannot edit other users' revisions unless cap is explicitly set sitewide
 				if ( rvy_is_revision_status($post->post_type) && ! $this->skip_revision_allowance ) {
 					if (!rvy_is_post_author($post)) {

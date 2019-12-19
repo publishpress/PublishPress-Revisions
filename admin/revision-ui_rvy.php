@@ -313,7 +313,7 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 	
 	$can_edit_post = agp_user_can( $type_obj->cap->edit_post, $post->ID, '', array( 'skip_revision_allowance' => true ) );
 	
-	$hide_others_revisions = ! $can_edit_post && empty( $current_user->allcaps['edit_others_drafts'] ) && rvy_get_option( 'revisor_lock_others_revisions' );
+	$hide_others_revisions = ! $can_edit_post && empty($current_user->allcaps['list_others_revisions']) && rvy_get_option('revisor_hide_others_revisions');
 	
 	$count = 0;
 	$left_checked_done = false;

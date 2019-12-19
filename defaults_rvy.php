@@ -27,6 +27,7 @@ function rvy_default_options_sitewide() {
 		'display_hints' => true,
 		'revisor_role_add_custom_rolecaps' => true,
 		'revisor_lock_others_revisions' => true,
+		'revisor_hide_others_revisions' => true,
 		'require_edit_others_drafts' => true,
 		'diff_display_strip_tags' => false,
 		'scheduled_revision_update_post_date' => true,

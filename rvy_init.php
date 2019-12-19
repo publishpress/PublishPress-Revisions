@@ -767,6 +767,26 @@ function rvy_init() {
 	$revisionary = new Revisionary();
 }
 
+function rvy_is_full_editor($post) {
+	global $current_user;
+	
+	if (!$type_obj = get_post_type_object($post->post_type)) {
+		return false;
+	}
+
+	$cap = (!empty($type_obj->cap->edit_others_posts)) ? $type_obj->cap->edit_others_posts : $type_obj->cap->edit_posts;
+
+	if (empty($current_user->allcaps[$cap])) {
+		return false;
+	}
+
+	if (!empty($type_obj->cap->edit_published_posts) && empty($current_user->allcaps[$type_obj->cap->edit_published_posts])) {
+		return false;
+	}
+
+	return true;
+}
+
 function rvy_is_post_author($post, $user = false) {
 	if (!is_object($post)) {
 		if (!$post = get_post($post)) {
