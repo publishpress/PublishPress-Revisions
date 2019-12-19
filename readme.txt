@@ -4,7 +4,7 @@ Tags: revision, access, permissions, cms, user, groups, members, admin, pages, p
 Requires at least: 4.9.7
 Tested up to: 5.3
 Requires PHP: 5.6.20
-Stable Tag: 2.1
+Stable Tag: 2.1.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -62,12 +62,15 @@ For more details about both the free and pro version, see our <a href="https://p
 
 == Changelog ==
 
+= 2.1.1 - 26 Nov 2019 =
+* Compat : Multiple Authors - Fatal error on revision creation (since 2.1)
+
 = 2.1 - 26 Nov 2019 =
 * Feature : Bulk Approval / Publishing in Revision Queue
 * Feature : Revision Edit: Approve Button on Editor screen
 * Feature : Option for Approve, Edit buttons on Compare Revisions screen (instead of Preview button)
 * Feature : Email Notification Buffer to avoid failures due to exceeding server send limits
-* Fixed : Email Notification - For pending revision submission, submitted was misidentified on some sites
+* Fixed : Email Notification - For pending revision submission, submitter was misidentified on some sites
 * Fixed : Revisors could restore previous revisions through manual URL access
 * Fixed : Fatal error when WP_Privacy_Policy_Content::text_change_check() is triggered
 * Fixed : "Pending Revision" checkbox was displayed in Gutenberg editor, even for unpublished posts
@@ -90,7 +93,7 @@ For more details about both the free and pro version, see our <a href="https://p
 * Fixed : PHP Warning in Gutenberg editor when editing is not being limited to revision submission
 * Compat : Multiple Authors - Compare Pending Revisions screen showed revisor as original post author under some conditions 
 * Compat : Multiple Authors - Revision submission / approval caused published post author to be changed to revisor, under some conditions
-* Compat : Plugin interaction caused published post permalink custom slug was replaced with default permalink structure at revision publication, on some sites
+* Compat : Plugin interaction caused published post permalink custom slug to be replaced with default permalink structure at revision publication, on some sites
 * Change : Revision Queue - recaption "My Posts" to "My Published Posts"
 
 = 2.0.12 - 29 Oct 2019 =
