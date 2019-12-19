@@ -3,7 +3,7 @@
  * @global string       $post_type
  * @global WP_Post_Type $post_type_object
  */
-global $post_type, $post_type_object;
+global $post_type, $post_type_object, $wpdb;
 
 if ( ! $post_types = rvy_get_manageable_types() ) {
 	wp_die( __( 'You are not allowed to manage revisions.' ) );
@@ -27,7 +27,7 @@ $doaction = $wp_list_table->current_action();
 if ( $doaction ) {
 	check_admin_referer('bulk-posts');
 
-	$sendback = remove_query_arg( array('trashed', 'untrashed', 'deleted', 'locked', 'ids'), wp_get_referer() );
+	$sendback = remove_query_arg( array('trashed', 'untrashed', 'approved', 'published', 'deleted', 'locked', 'ids'), wp_get_referer() );
 	if ( ! $sendback )
 		$sendback = admin_url( $parent_file );
 	$sendback = add_query_arg( 'paged', $pagenum, $sendback );
@@ -53,6 +53,83 @@ if ( $doaction ) {
 	}
 
 	switch ( $doaction ) {
+		case 'approve': // If pending revisions has a requested publish date, schedule it, otherwise schedule for near future. Leave currently scheduled revisions alone. 
+		case 'publish': // Schedule all selected revisions for near future publishing.
+			$approved = 0;
+			$published = 0;
+
+			foreach ((array) $post_ids as $post_id) {
+				$publish_ids = [];
+				$approve_ids = [];
+
+				if (!$revision = get_post($post_id)) {
+					continue;
+				}
+				
+				if (!rvy_is_revision_status($revision->post_status)) {
+					continue;
+				}
+				
+				if ( !current_user_can('administrator')
+				&& !agp_user_can($type_obj->cap->edit_post, rvy_post_id($revision->ID), '', ['skip_revision_allowance' => true])
+				) {
+					if (count($post_ids) == 1) {
+						wp_die( __('Sorry, you are not allowed to approve this revision.') );
+					} else {
+						continue;
+					}
+				}
+
+				// To avoid issues with excessive simultaneous email transmission, schedule revisions for the near future instead of publishing immediately.
+				
+				if ('publish' == $doaction) {
+					$publish_ids []= $post_id;
+				} else {
+					// If the revision is already scheduled, leave it alone
+					if ('future-revision' == $revision->post_status) {
+						continue;
+					}
+					
+					// If the pending revision has a requested publish date, schedule that
+					if (strtotime($revision->post_date_gmt) > agp_time_gmt()) {
+						$approve_ids []= $post_id;
+					} else {
+						$publish_ids []= $post_id;
+					}
+				}
+
+				/*
+				if ( !wp_delete_post($post_id) ) {
+					wp_die( __('Error in deleting.') );
+				}
+				*/
+			}
+
+			foreach ($approve_ids as $revision_id) {
+				$wpdb->update( $wpdb->posts, array('post_status' => 'future-revision'), array('ID' => $revision_id));
+				clean_post_cache($revision_id);
+				$approved++;
+			}
+
+			
+			foreach ($publish_ids as $revision_id) {
+
+			}
+
+			if ($approved) {
+				$sendback = add_query_arg('approved', $approved, $sendback);
+			}
+
+			if ($published) {
+				$sendback = add_query_arg('published', $published, $sendback);
+			}
+
+			if ($approved || $published) {
+				rvy_update_next_publish_date();
+			}
+
+			break;
+
 		case 'delete':
 			$deleted = 0;
 			foreach ( (array) $post_ids as $post_id ) {
@@ -89,18 +166,21 @@ $bulk_counts = array(
 	'deleted'   => isset( $_REQUEST['deleted'] )   ? absint( $_REQUEST['deleted'] )   : 0,
 	'updated' => 0,
 	'locked' => 0,
+	'approved' => 0,
+	'published' => 0,
 	'deleted' => 0,
 	'trashed' => 0,
 	'untrashed' => 0,
 );
 
-$bulk_messages = array();
+$bulk_messages = [];
 $bulk_messages['post'] = array(
-	'deleted'   => _n( '%s post permanently deleted.', '%s posts permanently deleted.', $bulk_counts['deleted'] ),
+	'approved'   => _n( '%s revision approved.', '%s revisions approved.', $bulk_counts['approved'], 'revisionary' ),
+	'published'   => _n( '%s revision published.', 'Publishing triggered for %s revisions.', $bulk_counts['published'], 'revisionary' ),
+	'deleted'   => _n( '%s revision permanently deleted.', '%s revisions permanently deleted.', $bulk_counts['deleted'] ),
 );
-$bulk_messages['page'] = array(
-	'deleted'   => _n( '%s page permanently deleted.', '%s pages permanently deleted.', $bulk_counts['deleted'] ),
-);
+
+$bulk_messages['page'] = $bulk_messages['post'];
 
 /**
  * Filters the bulk action updated messages.
@@ -196,7 +276,7 @@ if ( $messages )
 	echo '<div id="message" class="updated notice is-dismissible"><p>' . join( ' ', $messages ) . '</p></div>';
 unset( $messages );
 
-$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated', 'deleted', 'trashed', 'untrashed' ), $_SERVER['REQUEST_URI'] );
+$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated', 'approved', 'published', 'deleted', 'trashed', 'untrashed' ), $_SERVER['REQUEST_URI'] );
 ?>
 
 <?php $wp_list_table->views(); ?>

@@ -601,7 +601,23 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	 * @return array
 	 */
 	protected function get_bulk_actions() {
+		global $current_user;
+
 		$actions = array();
+
+		$approval_potential = false;
+
+		foreach(rvy_get_manageable_types() as $type_obj) {
+			if (!empty($current_user->allcaps[$type_obj->cap->edit_published_posts])) {
+				$approval_potential = true;
+				break;
+			}
+		}
+
+		if ($approval_potential = apply_filters('revisionary_bulk_action_approval', $approval_potential)) {
+			$actions['approve'] = __('Approve', 'revisionary');
+		}
+
 		$actions['delete'] = __( 'Delete Permanently' );
 		return $actions;
 	}
