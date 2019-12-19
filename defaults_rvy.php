@@ -33,6 +33,7 @@ function rvy_default_options_sitewide() {
 		'pending_revision_update_post_date' => true,
 		'edd_key' => true,
 		'preview_link_type' => true,
+		'compare_revisions_direct_approval' => true,
 	);
 
 	if ( $other_options = array_diff_key( rvy_default_options(), $def ) ) {
@@ -65,6 +66,7 @@ function rvy_default_options() {
 		'pending_revision_update_post_date' => 0,
 		'edd_key' => '',
 		'preview_link_type' => 'published_slug',
+		'compare_revisions_direct_approval' => 0,
 	);
 
 	return $def;
