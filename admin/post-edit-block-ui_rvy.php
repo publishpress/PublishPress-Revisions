@@ -32,8 +32,7 @@ class RVY_PostBlockEditUI {
         if ( ('revision' == $post_type) || rvy_is_revision_status($post->post_status) ) {
             wp_enqueue_script( 'rvy_object_edit', RVY_URLPATH . "/admin/rvy_revision-block-edit{$suffix}.js", array('jquery', 'jquery-form'), RVY_VERSION, true );
 
-            $_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
-			$view_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $post ) ) );
+            $view_link = rvy_preview_url($post);
 
             if ($can_publish = agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true))) {
                 $view_caption = ('future-revision' == $post->post_status) ? __('View / Publish') : __('View / Approve');
@@ -52,6 +51,18 @@ class RVY_PostBlockEditUI {
                 $revisions_caption = '';
             }
 
+            $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
+            $published_post_id = rvy_post_id($post->ID);
+
+            if ($can_publish) {
+            if (in_array($post->post_status, ['pending-revision'])) {
+                $approval_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|{$post->ID}" );
+            
+            } elseif (in_array($post->post_status, ['future-revision'])) {
+                $approval_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|{$post->ID}" );
+            }
+            }
+
             $args = array(
                 'saveRevision' => __('Update Revision'),
                 'viewURL' => $view_link,
@@ -59,28 +70,21 @@ class RVY_PostBlockEditUI {
                 'viewTitle' => $view_title,
                 'previewTitle' => $preview_title,
                 'revisionEdits' => $revisions_caption,
+                'approvalCaption' => $can_publish ? __('Approve Revision', 'revisionary') : '',
+                'approvalURL' => $can_publish ? $approval_url : '',
+                'approvalTitle' => esc_attr(__('Approve saved changes', 'revisionary')),
             );  
 
         } elseif ( agp_user_can( $type_obj->cap->edit_post, $post_id, '', array( 'skip_revision_allowance' => true ) ) ) {
             wp_enqueue_script( 'rvy_object_edit', RVY_URLPATH . "/admin/rvy_post-block-edit{$suffix}.js", array('jquery', 'jquery-form'), RVY_VERSION, true );
 
-            // for logged user who can fully edit a published post, clarify the meaning of setting future publish date
-            // @todo  ?>
-            <!--
-            <script type="text/javascript">
-            /* <![CDATA[ */
-            jQuery(document).ready( function($) {
-                postL10n.schedule = "<?php _e('Schedule Revision', 'revisionary' )?>";
-            });
-            /* ]]> */
-            </script>
-            -->
-            <?php
             $args = array();
 
             if (!isset($preview_url)) {
                 $preview_url = '';
             }
+
+            $published_statuses = array_merge(get_post_stati(['public' => true]), get_post_stati(['private' => true]));
 
             $future_status = 'future-revision';
             $pending_status = 'pending-revision';
@@ -90,6 +94,7 @@ class RVY_PostBlockEditUI {
                 'userID' => $current_user->ID,
                 'ScheduleCaption' => ($do_scheduled_revisions) ? __('Schedule Revision', 'revisionary') : '',
                 'UpdateCaption' => __('Update'),
+                'publishedStatuses' => $published_statuses,
                 'revision' => ($do_pending_revisions) ? __('Pending Revision', 'revisionary') : '',
                 'revisionTitle' => attribute_escape(__('Do not publish current changes yet, but save to Revision Queue', 'revisionary')), 
                 'defaultPending' => apply_filters('revisionary_default_pending_revision', false, $post ),

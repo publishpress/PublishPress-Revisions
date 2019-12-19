@@ -23,6 +23,7 @@ function rvy_default_options_sitewide() {
 		'publish_scheduled_notify_admin' => true,
 		'publish_scheduled_notify_author' => true,
 		'publish_scheduled_notify_revisor' => true,
+		'use_notification_buffer' => true,
 		'display_hints' => true,
 		'revisor_role_add_custom_rolecaps' => true,
 		'revisor_lock_others_revisions' => true,
@@ -31,6 +32,8 @@ function rvy_default_options_sitewide() {
 		'scheduled_revision_update_post_date' => true,
 		'pending_revision_update_post_date' => true,
 		'edd_key' => true,
+		'preview_link_type' => true,
+		'compare_revisions_direct_approval' => true,
 	);
 
 	if ( $other_options = array_diff_key( rvy_default_options(), $def ) ) {
@@ -53,6 +56,7 @@ function rvy_default_options() {
 		'publish_scheduled_notify_admin' => 1,
 		'publish_scheduled_notify_author' => 1,
 		'publish_scheduled_notify_revisor' => 1,
+		'use_notification_buffer' => 1,
 		'display_hints' => 1,
 		'revisor_role_add_custom_rolecaps' => 1,
 		'revisor_lock_others_revisions' => 1,
@@ -61,6 +65,8 @@ function rvy_default_options() {
 		'scheduled_revision_update_post_date' => 1,
 		'pending_revision_update_post_date' => 0,
 		'edd_key' => '',
+		'preview_link_type' => 'published_slug',
+		'compare_revisions_direct_approval' => 0,
 	);
 
 	return $def;

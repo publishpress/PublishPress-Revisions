@@ -166,6 +166,11 @@ jQuery(document).ready( function($) {
 		if ( $('button.editor-post-publish-button').length ) {
 			$('button.editor-post-publish-button').hide();
 		}
+
+		if (rvyObjEdit.approvalURL && !RvyApprovalHidden && !$('button.revision-approve').length && $('button.editor-post-trash').filter(':visible').length) {
+			$('button.editor-post-trash').before(
+				'<a href="' + rvyObjEdit.approvalURL + '" class="revision-approve" title="' + rvyObjEdit.approvalTitle + '"><button type="button" class="components-button revision-approve is-button is-default is-large">' + rvyObjEdit.approvalCaption + '</button></a>');
+		}
 	}
 	var RvyHideInterval = setInterval(RvyHideElements, 50);
 
@@ -180,6 +185,7 @@ jQuery(document).ready( function($) {
 				// remove preview event handlers
 				original = $('div.edit-post-header__settings a.editor-post-preview');
 				$(original).after(original.clone().attr('href', rvyObjEdit.viewURL).attr('target', '_blank').removeClass('editor-post-preview').addClass('rvy-post-preview'));
+				$(original).hide();
 			}
 
 			if (rvyObjEdit.viewCaption) {
@@ -205,4 +211,22 @@ jQuery(document).ready( function($) {
 		}
 	}
 	var RvyRecaptionSaveDraftInterval = setInterval(RvyRecaptionSaveDraft, 100);
+
+	var RvyApprovalHidden = false;
+
+	$(document).on('click', 'div.edit-post-visual-editor *, div.editor-inserter *', function() {
+		RvyApprovalHidden = true;
+		$('a.revision-approve').hide();
+		$('a.rvy-post-preview').hide();
+		$('a.editor-post-preview').show();
+		//$('a.revision-save-to-approve').show();
+	});
+
+	$(document).on('click', 'button.editor-post-publish-button,button.editor-post-save-draft', function() {
+		RvyApprovalHidden = false;
+		//$('a.revision-save-to-approve').hide();
+		$('a.revision-approve').show();
+		$('a.editor-post-preview').hide();
+		$('a.rvy-post-preview').show();
+	});
 });

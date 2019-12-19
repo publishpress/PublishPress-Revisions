@@ -2,7 +2,7 @@
 
 class Rvy_Revision_Workflow_UI {
     function do_notifications( $notification_type, $status, $post_arr, $args ) {
-        global $revisionary;
+        global $revisionary, $current_user;
         
         if ( 'pending-revision' != $notification_type ) {
             return;
@@ -35,16 +35,16 @@ class Rvy_Revision_Workflow_UI {
             
             $message = sprintf( __('A pending revision to the %1$s "%2$s" has been submitted.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
             
-
-            if ( $author = new WP_User( $post_arr['post_author'] ) ) {
-                $message .= sprintf( __('It was submitted by %1$s.', 'revisionary' ), $author->display_name ) . "\r\n\r\n";
-            }
+            $message .= sprintf( __('It was submitted by %1$s.', 'revisionary' ), $current_user->display_name ) . "\r\n\r\n";
 
             if ( $revision_id ) {
-                $preview_link = add_query_arg( array( 'preview' => '1', 'rvy_revision' => true ), get_post_permalink( $revision_id ) );
+                $revision = get_post($revision_id);
+
+                $preview_link = rvy_preview_url($revision);
+
                 $message .= __( 'Preview and Approval: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
 
-                $message .= __( 'Revision Queue: ', 'revisionary' ) . admin_url("admin.php?page=revisionary-q&published_post={$published_post->ID}") . "\r\n";
+                $message .= __( 'Revision Queue: ', 'revisionary' ) . admin_url("admin.php?page=revisionary-q&published_post={$published_post->ID}") . "\r\n\r\n";
                 
                 $message .= __( 'Edit Revision: ', 'revisionary' ) . admin_url("post.php?action=edit&post={$revision_id}") . "\r\n";
             }
@@ -64,6 +64,8 @@ class Rvy_Revision_Workflow_UI {
                         $revisionary->skip_revision_allowance = false;
                         $recipient_ids = array_intersect( $recipient_ids, $post_publisher_ids );
                     }
+
+                    $monitor_ids = $recipient_ids;
                 }
 
                 if ( ! $recipient_ids && ( empty($monitor_groups_enabled) || ! defined('RVY_FORCE_MONITOR_GROUPS') ) ) {
@@ -129,13 +131,37 @@ class Rvy_Revision_Workflow_UI {
 
             if ( $recipient_ids ) {
                 global $wpdb;
-                $to_addresses = array_unique( $wpdb->get_col( "SELECT user_email FROM $wpdb->users WHERE ID IN ('" . implode( "','", $recipient_ids ) . "')" ) );
+                $results = $wpdb->get_results( "SELECT ID, user_email FROM $wpdb->users WHERE ID IN ('" . implode( "','", $recipient_ids ) . "')" );
+                
+                foreach($results as $row) {
+                    $to_addresses[$row->ID] = $row->user_email;
+                }
+
+                $to_addresses = array_unique($to_addresses);
             } else {
                 $to_addresses = array();
             }
 
-            foreach ( $to_addresses as $address ) {
-                rvy_mail($address, $title, $message);
+            foreach ( $to_addresses as $user_id => $address ) {
+                if (!empty($author_ids && in_array($user_id, $author_ids))) {
+                    $notification_class = 'rev_submission_notify_author';
+                } elseif (!empty($monitor_ids && in_array($user_id, $monitor_ids))) {
+                    $notification_class = 'rev_submission_notify_monitor';
+                } else {
+                    $notification_class = 'rev_submission_notify_admin';
+                }
+
+                rvy_mail(
+                    $address, 
+                    $title, 
+                    $message, 
+                    [
+                        'revision_id' => $revision_id, 
+                        'post_id' => $published_post->ID, 
+                        'notification_type' => $notification_type,
+                        'notification_class' => $notification_class,
+                    ]
+                );
             }
         }
     }
@@ -181,11 +207,12 @@ class Rvy_Revision_Workflow_UI {
 
                 $msg = __('Your modification was saved as a Scheduled Revision.', 'revisionary') . ' ';
             
-                $_arg = ('page' == $revision->post_type) ? 'page_id=' : 'p=';
-                $preview_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $revision ) ) );
+                $preview_link = rvy_preview_url($revision);
 			   
                 $msg .= '<ul><li>';
                 $msg .= sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link );
+                $preview_link = remove_query_arg('preview_id', $preview_link);
+
                 $msg .= '<br /><br /></li><li>';
                 //$msg .= sprintf( '<a href="%s">' . __('Go to Revisions Manager', 'revisionary') . '</a>', "admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=view" );
                 //$msg .= '<br /><br /></li><li>';
@@ -210,8 +237,10 @@ class Rvy_Revision_Workflow_UI {
                     $msg .= __('It will be published when an editor approves it.', 'revisionary') . ' ';
                 }
 
-                $_arg = ('page' == $revision->post_type) ? 'page_id=' : 'p=';
-                $preview_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $revision ) ) );
+                clean_post_cache($revision->ID);
+                
+                $preview_link = rvy_preview_url($revision);
+                $preview_link = remove_query_arg('preview_id', $preview_link);
 
                 $msg .= '<ul><li>';
                 $msg .= sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link );

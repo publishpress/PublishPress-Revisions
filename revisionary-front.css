@@ -4,7 +4,7 @@
 
 .rvy_view_revision,
 .preview_approval_rvy {
-    height: 60px;
+    height: 50px;
     width: 100%;
     text-align: center;
     padding-right: 20px;
@@ -13,12 +13,11 @@
     font-weight: normal;
     font-size: 0.9em;
     z-index: 99990;
-    position: relative;
 }
 
 .rvy_preview_msgspan {
     font-size: 0.9em;
-    line-height: 60px;
+    line-height: 50px;
 }
 
 .rvy_preview_msgspan > a, .rvy_preview_msgspan > a:visited{ 
@@ -28,7 +27,7 @@
 
 .rvy_preview_linkspan {
     margin-left: 15px;
-    line-height: 60px;
+    line-height: 50px;
     padding: 6px 10px;
     font-family: sans-serif;
     font-size: 0.9em;
@@ -41,7 +40,7 @@
     border: 1px solid;
     cursor: pointer;
     color: #333;
-    z-index: 999999;
+    z-index: 99999;
 }
 
 .rvy_view_published {

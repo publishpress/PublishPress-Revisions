@@ -192,9 +192,13 @@ function rvy_post_revision_title( $revision, $link = true, $date_field = 'post_d
 	// note: RS filter (un-requiring edit_published/private cap) will be applied to this cap check
 	
 	if ( $link ) { //&& current_user_can( 'edit_post', $revision->ID ) ) {    // revisions are listed in the Editor even if not editable / restorable / approvable
+		if ('inherit' == $revision->post_status) {
+			$link = "revision.php?revision=$revision->ID";
+		} else {
+			$link = rvy_preview_url($revision);
+		}
 		
-		$link = "admin.php?page=rvy-revisions&amp;action=view&amp;revision=$revision->ID";
-		$date = "<a href='$link'>$date</a>";
+		$date = "<a href='$link' target='_blank'>$date</a>";
 	}
 
 	$status_obj = get_post_status_object( $revision->post_status );
@@ -379,10 +383,10 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 			
 			if ( $post->ID != $revision->ID ) {
 				if ('inherit' == $revision->post_status) {
+					// @todo: need this case?
 					$preview_url = add_query_arg( 'preview', '1', get_post_permalink( $revision->ID ) . '&post_type=revision' );
 				} else {
-					$_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
-					$preview_url = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink($revision) ) );
+					$preview_url = rvy_preview_url($revision, ['post_type' => $post->post_type]);
 				}
 
 				$preview_link = '<a href="' . esc_url($preview_url) . '" title="' . esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $revision->post_title ) ) . '" rel="permalink">' . __( 'Preview' ) . '</a>';
@@ -417,7 +421,6 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 					$date = str_replace( 'post=', 'revision=', $date );
 					$date = str_replace( '?&amp;', '?', $date );
 					$date = str_replace( '?&', '?', $date );
-					$date = $revisionary->admin->convert_link( $date, 'revision', 'manage', array( 'object_type' => $post->post_type ) );
 
 					$date = str_replace( '&revision=', "&amp;revision_status=$status&amp;revision=", $date );
 					$date = str_replace( '&amp;revision=', "&amp;revision_status=$status&amp;revision=", $date );

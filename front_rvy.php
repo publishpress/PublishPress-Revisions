@@ -88,6 +88,11 @@ class RevisionaryFront {
 			return;
 		}
 		
+		global $wp_query;
+		if ($wp_query->is_404) {
+			return;
+		}
+
 		if (!empty($_REQUEST['page_id'])) {
 			$revision_id = $_REQUEST['page_id'];
 		} elseif (!empty($_REQUEST['p'])) {
@@ -98,9 +103,6 @@ class RevisionaryFront {
 				$revision_id = $post->ID;
 			}
 		}
-
-		// rvy_list_post_revisions passes these args
-		//if( ! empty( $_GET['rvy_revision'] ) && ! empty( $_GET['p'] ) ) {
 
 		if( !$post = get_post($revision_id)) {
 			if (!$post = wp_get_post_revision($revision_id)) {
@@ -113,10 +115,37 @@ class RevisionaryFront {
 			
 			$published_post_id = rvy_post_id($revision_id);	
 
+			if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && !defined('REVISIONARY_DISABLE_MA_PREVIEW_CORRECTION') && rvy_is_revision_status($post->post_status)) {
+				$_authors = get_multiple_authors($revision_id);
+			
+				if (count($_authors) == 1) {
+					$_author = reset($_authors);
+
+					if ($_author && empty($_author->ID)) { // @todo: is this still necessary?
+						$_author = MultipleAuthors\Classes\Objects\Author::get_by_term_id($_author->term_id);
+					}
+				}
+
+				// If revision does not have valid multiple authors stored, correct to published post values
+				if (empty($_authors) || (!empty($_author) && $_author->ID == $post->post_author)) {
+					if (!$published_authors = wp_get_object_terms($published_post_id, 'author')) {
+						if ($published_post = get_post($published_post_id)) {
+							if ($author = MultipleAuthors\Classes\Objects\Author::get_by_user_id((int) $published_post->post_author)) {
+								$published_authors = [$author];
+							}
+						}
+					}
+
+					_rvy_set_ma_post_authors($revision_id, $published_authors);
+				}
+			}
+
 			$datef = __awp( 'M j, Y @ g:i a' );
 			$date = agp_date_i18n( $datef, strtotime( $post->post_date ) );
 
 			$color = '#ccc';
+			$class = '';
+			$message = '';
 			
 			// This topbar is presently only for those with restore / approve / publish rights
 			if ( $type_obj = get_post_type_object( $post->post_type ) ) {
@@ -225,7 +254,13 @@ class RevisionaryFront {
 						}
 					}
 
-					add_action( 'wp_head', 'rvy_front_css' );
+					add_action('wp_head', [$this, 'rvyFrontCSS']);
+
+					add_action('wp_enqueue_scripts', [$this, 'rvyEnqueuePreviewJS']);
+
+					if (!defined('REVISIONARY_PREVIEW_BAR_RELATIVE')) {
+					add_action('wp_print_footer_scripts', [$this, 'rvyPreviewJS'], 50);
+					}
 
 					$html = '<div class="rvy_view_revision rvy_view_' . $class . '">' .
 							'<span class="rvy_preview_msgspan">' . $message . '</span>';
@@ -240,6 +275,59 @@ class RevisionaryFront {
 		}
 	}
 
+	function rvyFrontCSS() {
+		$wp_content = ( is_ssl() || ( is_admin() && defined('FORCE_SSL_ADMIN') && FORCE_SSL_ADMIN ) ) ? str_replace( 'http:', 'https:', WP_CONTENT_URL ) : WP_CONTENT_URL;
+		$path = $wp_content . '/plugins/' . RVY_FOLDER;
+		
+		echo '<link rel="stylesheet" href="' . $path . '/revisionary-front.css" type="text/css" />'."\n";
+	}
+	
+	function rvyEnqueuePreviewJS() {
+		wp_enqueue_script('jquery');
+	}
+
+	function rvyPreviewJS() {
+		?>
+		<script type="text/javascript">
+		/* <![CDATA[ */
+		jQuery(document).ready( function($) {
+			if ($('#wpadminbar').length) {
+				var rvyAdminBarHeight = $('#wpadminbar').height(); 
+			} else {
+				var rvyAdminBarHeight = 0; 
+			}
+
+			$('div.rvy_view_revision').css('position', 'fixed').css('top', '32px');
+
+			var rvyTotalHeight = $('div.rvy_view_revision').height() + rvyAdminBarHeight;
+			var rvyTopBarZindex = $('div.rvy_view_revision').css('z-index')
+			var rvyOtherElemZindex = 0;
+
+			$('div.rvy_view_revision').css('top', rvyAdminBarHeight);
+
+			$('body').css('padding-top', $('div.rvy_view_revision').height());
+
+			$('header,div').each(function(i,e) { 
+				if ($(this).css('position') == 'fixed' && ($(this).attr('id') != 'wpadminbar') && (!$(this).hasClass('rvy_view_revision'))) {
+					if ($(this).position().top < rvyTotalHeight ) {
+						rvyOtherElemZindex = $(this).css('z-index');
+
+						if (rvyOtherElemZindex >= rvyTopBarZindex) {
+							rvyTopBarZindex = rvyOtherElemZindex + 1;
+							$('div.rvy_view_revision').css('z-index', rvyTopBarZindex);
+						}
+
+						$(this).css('padding-top', rvyTotalHeight.toString() + 'px');
+
+						return false;
+					}
+				}
+			});
+		});
+		/* ]]> */
+		</script>
+		<?php
+	}
 }
 
 class RvyScheduledHtml {
@@ -259,11 +347,4 @@ class RvyScheduledHtml {
 		echo $this->html;
 		remove_action( $this->action, array( $this, 'echo_html' ), $this->priority );
 	}
-}
-
-function rvy_front_css() {
-	$wp_content = ( is_ssl() || ( is_admin() && defined('FORCE_SSL_ADMIN') && FORCE_SSL_ADMIN ) ) ? str_replace( 'http:', 'https:', WP_CONTENT_URL ) : WP_CONTENT_URL;
-	$path = $wp_content . '/plugins/' . RVY_FOLDER;
-	
-	echo '<link rel="stylesheet" href="' . $path . '/revisionary-front.css" type="text/css" />'."\n";
 }

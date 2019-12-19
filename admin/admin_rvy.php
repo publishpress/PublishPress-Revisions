@@ -20,6 +20,7 @@ class RevisionaryAdmin
 	var $revision_save_in_progress;
 	var $post_revision_count = array();
 	var $hide_quickedit = array();
+	var $trashed_revisions;
 
 	function __construct() {
 		global $pagenow, $post;
@@ -73,9 +74,6 @@ class RevisionaryAdmin
 				}
 
 				add_filter( 'get_delete_post_link', array(&$this, 'flt_delete_post_link'), 10, 2 );
-				
-				add_filter( 'page_row_actions', array(&$this, 'add_preview_action'), 10, 2 );
-				add_filter( 'post_row_actions', array(&$this, 'add_preview_action'), 10, 2 );
 			}
 		}
 
@@ -138,6 +136,11 @@ class RevisionaryAdmin
 
 		add_filter( 'page_row_actions', array($this, 'revisions_row_action_link' ) );
 		add_filter( 'post_row_actions', array($this, 'revisions_row_action_link' ) );
+
+		if (!empty($_REQUEST['post_status']) && ('trash' == $_REQUEST['post_status'])) {
+			add_filter('display_post_states', [$this, 'fltTrashedPostState'], 20, 2 );
+			add_filter('get_comments_number', [$this, 'fltCommentsNumber'], 20, 2);
+		}
 
 		if ( in_array( $pagenow, array( 'plugins.php', 'plugin-install.php' ) ) ) {
 			require_once( dirname(__FILE__).'/admin-plugins_rvy.php' );
@@ -211,6 +214,62 @@ class RevisionaryAdmin
 				}
 			}
 		}
+	}
+
+	private function logTrashedRevisions() {
+		global $wpdb, $wp_query;
+			
+		if (!empty($wp_query) && !empty($wp_query->posts)) {
+			$listed_ids = [];
+			
+			foreach($wp_query->posts AS $row) {
+				$listed_ids []= $row->ID;
+			}
+
+			$listed_post_csv = implode("','", $listed_ids);
+			$this->trashed_revisions = $wpdb->get_col("SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_base_post_id' AND post_id IN ('$listed_post_csv')");
+		} else {
+			$this->trashed_revisions = [];
+		}
+	}
+
+	/**
+	 * Adds "Pending Revision" or "Scheduled Revision" to the list of display states for trashed revisions in the Posts list table.
+	 *
+	 * @param array   $post_states An array of post display states.
+	 * @param WP_Post $post        The current post object.
+	 * @return array Filtered array of post display states.
+	 */
+	public function fltTrashedPostState($post_states, $post) {
+		if (!$post->comment_count) { // revisions buffer base post id to comment_count column for perf
+			return $post_states;
+		}
+
+		if (!isset($this->trashed_revisions)) {
+			$this->logTrashedRevisions();
+		}
+
+		if (in_array($post->ID, $this->trashed_revisions)) {		
+			if ($orig_revision_status = get_post_meta($post->ID, '_wp_trash_meta_status', true)) {
+				if ($status_obj = get_post_status_object($orig_revision_status)) {
+					$post_states['rvy_revision'] = $status_obj->label;
+				}
+			}
+
+			if (!isset($post_states['rvy_revision'])) {
+				$post_states['rvy_revision'] = __('Pending Revision', 'revisionary');
+			}
+		}
+
+		return $post_states;
+	}
+
+	function fltCommentsNumber($comment_count, $post_id) {
+		if (isset($this->trashed_revisions) && in_array($post_id, $this->trashed_revisions)) {
+			$comment_count = 0;
+		}
+
+		return $comment_count;
 	}
 
 	function revisions_row_action_link($actions = array()) {
@@ -300,45 +359,6 @@ class RevisionaryAdmin
 		}
 	}
 
-	function add_preview_action( $actions, $post ) {
-		if ( rvy_is_revision_status($post->post_status) ) {
-			if ( current_user_can( 'edit_post', $post->ID ) ) {
-				global $revisionary;
-				static $block_editor;
-
-				if ( ! isset( $block_editor ) ) {
-					$block_editor = $revisionary->isBlockEditorActive();
-				}
-
-				$url = parse_url($_SERVER['REQUEST_URI']);
-				$url_query = ( ! empty( $url['query'] ) ) ? $url['query'] : '';
-				$redirect_url = admin_url('edit.php?' . $url_query);
-
-				/*
-				if ( $block_editor ) {
-					$type_obj = get_post_type_object( $post->post_type );
-					$edit_metacap = ( $type_obj ) ? $type_obj->cap->edit_post : 'edit_post';
-
-					if ( agp_user_can( $edit_metacap, $post->ID, '', array( 'skip_revision_allowance' => true ) ) ) {
-						$preview_link = '<a href="' . esc_url( add_query_arg( array( 'preview' => '1', 'rvy_revision' => true, 'rvy_redirect' => esc_url($redirect_url) ), get_post_permalink( $post->ID ) ) )  . '" title="' . esc_attr( sprintf( __( 'Preview & Approve &#8220;%s&#8221;' ), $post->post_title ) ) . '" rel="permalink">' . __( 'Approval' ) . '</a>';
-					} else {
-						$preview_link = '<a href="' . esc_url( add_query_arg( array( 'preview' => '1', 'rvy_revision' => true, 'rvy_redirect' => esc_url($redirect_url) ), get_post_permalink( $post->ID ) ) ) . '" title="' . esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $post->post_title ) ) . '" rel="permalink">' . __( 'Preview' ) . '</a>';
-					}
-
-					$actions = array_merge( array( 'view' => $preview_link ), $actions );
-				} else {
-					$actions['view'] = '<a href="' . esc_url( add_query_arg( array( 'preview' => '1', 'rvy_revision' => true, 'rvy_redirect' => esc_url($redirect_url) ), get_post_permalink( $post->ID ) ) ) . '" title="' . esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $post->post_title ) ) . '" rel="permalink">' . __( 'Preview' ) . '</a>';
-				}
-				*/
-
-				// @todo
-				unset($actions['inline hide-if-no-js']);
-			}
-		}
-		
-		return $actions;
-	}
-		
 	function add_editor_ui() {
 		global $revisionary;
 
@@ -668,37 +688,6 @@ class RevisionaryAdmin
 		}	
 	}
 
-	function convert_link( $link, $topic, $operation, $args = '' ) {
-		$defaults = array ( 'object_type' => '', 'id' => '' );
-		$args = (array) $args;
-		foreach( array_keys( $defaults ) as $var ) {
-			$$var = ( isset( $args[$var] ) ) ? $args[$var] : $defaults[$var];
-		}
-
-		global $pagenow;
-		
-		if ( in_array( $pagenow, apply_filters( 'rvy_default_revision_link_pages', array( 'post.php' ), $link, $args ) ) )
-			return $link;
-		
-		if ( 'revision' == $topic ) {
-			if ( 'preview' == $operation ) {
-				$link = add_query_arg( array( 'preview' => 1, 'rvy_revision' => true ), $link );
-
-			} 
-			/*
-			elseif ( 'delete' == $operation ) {
-				if ( $object_type && $id ) {
-					$link = str_replace( "$object_type.php", 'admin.php?page=rvy-revisions', $link );
-					$link = str_replace( '?post=', "&amp;revision=", $link );
-					$link = wp_nonce_url( $link, 'delete-revision_' . $id );
-				}
-			}
-			*/ 
-		}
-		
-		return $link;
-	}
-	
 	function flt_delete_post_link( $link, $post_id ) {
       if ( strpos( $link, 'revision.php' ) ) {
 			if ( $post_id ) {

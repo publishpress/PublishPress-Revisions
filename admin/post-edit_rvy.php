@@ -7,15 +7,49 @@ class RvyPostEdit {
         add_action('add_meta_boxes', [$this, 'act_replace_publish_metabox'], 10, 2);
 
         // deal with case where another plugin replaced publish metabox
-        add_filter('preview_post_link', [$this, 'fltPreviewLink']);
+        add_filter('preview_post_link', [$this, 'fltPreviewLink'], 10, 2);
         add_filter('presspermit_preview_post_label', [$this, 'fltPreviewLabel']);
         add_filter('presspermit_preview_post_title', [$this, 'fltPreviewTitle']);
+        add_action('post_submitbox_misc_actions', [$this, 'actSubmitMetaboxActions']);
+		add_action('post_submitbox_start', [$this, 'actSubmitBoxStart']);
 
         add_action('admin_head', array($this, 'act_admin_head') );
 
         add_action('post_submitbox_misc_actions', array($this, 'act_post_submit_revisions_links'), 5);
 
+        add_filter('user_has_cap', [$this, 'fltAllowBrowseRevisionsLink'], 50, 3);
+
+        add_filter('revisionary_apply_revision_allowance', [$this, 'fltRevisionAllowance'], 5, 2);
+
         add_action('admin_head', [$this, 'actAdminBarPreventPostClobber'], 5);
+    }
+
+    function fltAllowBrowseRevisionsLink($wp_blogcaps, $reqd_caps, $args) {
+        if (!empty($args[0]) && ('edit_post' == $args[0]) && !empty($args[2])) {
+            if ($_post = get_post($args[2])) {
+                if ('revision' == $_post->post_type && current_user_can('edit_post', $_post->post_parent)) {
+                    if (did_action('post_submitbox_minor_actions')) {
+                        if (!did_action('post_submitbox_misc_actions')) {
+                            $wp_blogcaps = array_merge($wp_blogcaps, array_fill_keys($reqd_caps, true));
+                        } else {
+                            remove_filter('user_has_cap', [$this, 'fltAllowBrowseRevisionsLink'], 50, 3);
+                        }
+                    }
+                }
+            }
+            
+        }
+
+        return $wp_blogcaps;
+    }
+
+    function fltRevisionAllowance($allowance, $post_id) {
+        // Ensure that revision "edit" link is not suppressed for the Revisions > Browse link
+        if (did_action('post_submitbox_minor_actions') && !did_action('post_submitbox_misc_actions')) {
+            $allowance = true;
+        }
+
+        return $allowance;
     }
 
     function actAdminBarPreventPostClobber() {
@@ -30,7 +64,7 @@ class RvyPostEdit {
     }
 
     function act_admin_head() {
-        global $post;
+        global $post, $current_user;
 
         if (!empty($post) && rvy_is_revision_status($post->post_status)):
             $type_obj = get_post_type_object($post->post_type);
@@ -39,10 +73,51 @@ class RvyPostEdit {
     /* <![CDATA[ */
     jQuery(document).ready( function($) {
         $('h1.wp-heading-inline').html('<?php printf(__('Edit %s Revision', 'revisionary'), $type_obj->labels->singular_name);?>');
+
+        $(document).on('click', '#post-body-content *, #wp-content-editor-container *, #tinymce *', function() {
+            $('div.rvy-revision-approve').hide();
+        });
     });
     /* ]]> */
     </script>
         <?php endif;
+
+        // Hide the Approve button if editor window is clicked into
+        add_filter('tiny_mce_before_init', function($initArray, $editor_id = '') {
+                //if (empty($initArray['init_instance_callback'])) {
+                    $initArray['init_instance_callback'] = "function (ed) {
+                        ed.on('click', function (e) {
+                            var revApprove = document.getElementById('rvy_revision_approve');
+
+                            if (revApprove != null) {
+                                revApprove.style.display = 'none';
+                            }
+
+                            var revPreview = document.getElementById('revision-preview');
+
+                            if (revPreview != null) {
+                                revPreview.style.display = 'none';
+                            }
+
+                            var postPreview = document.getElementById('post-preview');
+
+                            if (postPreview != null) {
+                                postPreview.style.display = 'block';
+                            }
+
+                            var revCompare = document.getElementById('rvy_compare_button');
+
+                            if (revCompare != null) {
+                                revCompare.style.display = 'none';
+                            }
+                        });
+                    }";
+                    
+                    return $initArray;
+            }, 10, 2
+        );
+
+        delete_post_meta( $post->ID, "_save_as_revision_{$current_user->ID}" );
     }
 
     function limitRevisionEditorUI() {
@@ -62,12 +137,53 @@ class RvyPostEdit {
         RvyPostEditSubmitMetabox::post_submit_meta_box($post, $args);
     }
 
-    public function fltPreviewLink($url) {
+public function actSubmitboxStart() {
         global $post;
 
-        if ($post && rvy_is_revision_status($post->post_status)) {
-        $_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
-            $url = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $post ) ) );
+        if (!$type_obj = get_post_type_object($post->post_type)) {
+            return;
+        }
+
+        $can_publish = agp_user_can( $type_obj->cap->edit_post, rvy_post_id($post->ID), '', array( 'skip_revision_allowance' => true ) );
+
+        if ($can_publish && rvy_is_revision_status($post->post_status)):?>
+            <?php
+            $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
+            $published_post_id = rvy_post_id($post->ID);
+
+            if (in_array($post->post_status, ['pending-revision'])) {
+                $approval_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|{$post->ID}" );
+            
+            } elseif (in_array($post->post_status, ['future-revision'])) {
+                $approval_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|{$post->ID}" );
+            }
+            ?>
+            <div id="rvy_revision_approve" class="rvy-revision-approve" style="float:right"><a href="<?php echo $approval_url;?>" title="<?php echo esc_attr(__('Approve saved changes', 'revisionary'));?>"><?php _e('Approve', 'revisionary');?></a></div>
+        <?php endif;
+    }
+
+    public function actSubmitMetaboxActions() {
+        global $post;
+
+        if (rvy_is_revision_status($post->post_status)) :
+            $compare_link = admin_url("revision.php?revision=$post->ID");
+            $compare_button = __('Compare', 'revisionary');
+            $compare_title = __('Compare this revision to published copy, or to other revisions', 'revisionary');
+            ?>
+
+            <a id="rvy_compare_button" class="preview button" href="<?php echo $compare_link; ?>" target="_blank" id="revision-compare"
+            tabindex="4" title="<?php echo esc_attr($compare_title);?>"><?php echo $compare_button; ?></a>
+        <?php endif;
+    }
+
+    public function fltPreviewLink($url, $_post = false) {
+        global $post, $revisionary;
+
+        if (!empty($_REQUEST['wp-preview']) && !empty($_post) && !empty($revisionary->last_autosave_id[$_post->ID])) {
+            $url = remove_query_arg('_thumbnail_id', $url);
+            $url = add_query_arg('_thumbnail_id', $revisionary->last_autosave_id[$_post->ID], $url);
+        } elseif ($post && rvy_is_revision_status($post->post_status)) {
+            $url = rvy_preview_url($post);
         }
 
         return $url;

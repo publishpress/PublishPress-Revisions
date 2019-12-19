@@ -83,6 +83,7 @@ $ui->section_captions = array(
 		'role_definition' 	  	=> __('Role Definition', 'revisionary'),
 		'scheduled_revisions' 	=> __('Scheduled Revisions', 'revisionary'),
 		'pending_revisions'		=> __('Pending Revisions', 'revisionary'),
+		'preview'				=> __('Preview / Approval', 'revisionary'),
 		'revisions'				=> __('Revision Options', 'revisionary'),
 		'notification'			=> __('Email Notification', 'revisionary')
 	)
@@ -106,9 +107,12 @@ $ui->option_captions = array(
 	'rev_approval_notify_revisor' => __('Email the Revisor when a Pending Revision is approved', 'revisionary'),
 	'publish_scheduled_notify_author' => __('Email the original Author when a Scheduled Revision is published', 'revisionary'),
 	'publish_scheduled_notify_revisor' => __('Email the Revisor when a Scheduled Revision is published', 'revisionary'),
+	'use_notification_buffer' => __('Enable notification buffer', 'revisionary'),
 	'revisor_role_add_custom_rolecaps' => __('All custom post types available to Revisors', 'revisionary' ),
 	'require_edit_others_drafts' => __('Prevent Revisors from editing other user&apos;s drafts', 'revisionary' ),
 	'display_hints' => __('Display Hints'),
+	'preview_link_type' => __('Preview Link Type', 'revisionary'),
+	'compare_revisions_direct_approval' => __('Approve Button on Compare Revisions screen', 'revisionary'),
 );
 
 if ( defined('RVY_CONTENT_ROLES') ) {
@@ -126,8 +130,9 @@ $ui->form_options = array(
 	'role_definition' => 	 array( 'revisor_role_add_custom_rolecaps', 'require_edit_others_drafts' ),
 	'scheduled_revisions' => array( 'scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date', ),
 	'pending_revisions'	=> 	 array( 'pending_revisions', 'pending_revision_update_post_date', ),
+	'preview' =>			 array( 'preview_link_type', 'compare_revisions_direct_approval'),
 	'revisions'		=>		 array( 'revisor_lock_others_revisions', 'diff_display_strip_tags', 'display_hints' ),
-	'notification'	=>		 array( 'pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor' )
+	'notification'	=>		 array( 'pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer' )
 )
 );
 
@@ -346,6 +351,50 @@ $pending_revisions_available ) :
 	<?php endif; // any options accessable in this section
 endif;
 
+
+$section = 'preview';			// --- PREVIEW SECTION ---
+		
+if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
+	<tr valign="top"><th scope="row">
+	<?php echo $ui->section_captions[$tab][$section]; ?>
+	</th><td>
+		
+	<?php 
+	$id = 'preview_link_type';
+	if ( in_array( $id, $ui->form_options[$tab][$section] ) ) {
+		$ui->all_options []= $id;
+		$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
+		
+		echo "<label for='$id'>" . $ui->option_captions[$id] . ': </label>';
+
+		echo " <select name='$id' id='$id'>";
+		$captions = array( '' => __('Published Post Slug', 'revisionary'), 'revision_slug' => __('Revision Slug', 'revisionary'), 'id_only' => __('Revision ID only', 'revisionary') );
+		foreach ( $captions as $key => $value) {
+			$selected = ( $current_setting == $key ) ? 'selected="selected"' : '';
+			echo "\n\t<option value='$key' " . $selected . ">$captions[$key]</option>";
+		}
+		echo '</select>&nbsp;';
+
+		if ( $ui->display_hints ) : ?>
+			<br />
+			<div class="rs-subtext">
+			<?php
+			_e('Some themes or plugins may require Revision Slug or Revision ID link type for proper template loading and field display.', 'revisionary');
+			?>
+			</div>
+		<?php endif;
+		?>
+		<br />
+		<?php
+	}
+
+	$hint = __('If disabled, Compare screen links to Revision Preview for approval', 'revisionary');
+	$ui->option_checkbox( 'compare_revisions_direct_approval', $tab, $section, $hint, '' );
+	?>
+	</td></tr>
+<?php endif; // any options accessable in this section
+
+
 if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
 $pending_revisions_available || $scheduled_revisions_available ) :
 
@@ -470,6 +519,123 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			}
 		}
 
+		echo '<br />';
+
+		$hint = __('To avoid notification failures, buffer emails for delayed sending once minute, hour or day limits are exceeded', 'revisionary');
+		$ui->option_checkbox( 'use_notification_buffer', $tab, $section, $hint, '' );
+		
+		if (!empty($_REQUEST['truncate_mail_log'])) {
+			delete_option('revisionary_sent_mail');
+		}
+
+		if (!empty($_REQUEST['clear_mail_buffer'])) {
+			delete_option('revisionary_mail_buffer');
+		}
+
+		if (!empty($_REQUEST['mailinfo'])) {
+			$verbose = !empty($_REQUEST['verbose']);
+
+			if ($q = get_option('revisionary_mail_buffer')) {
+				echo '<h3>' . __('Notification Buffer', 'revisionary') . '</h3>';
+				foreach($q as $row) {
+					if (!$verbose) {
+						unset($row['message']);
+					} elseif(!empty($row['message'])) {
+						$row['message'] = '<br />' . str_replace("\r\n", '<br />', $row['message']);
+					}
+					
+					$row['time_gmt'] = gmdate('Y-m-d, H:i:s', $row['time_gmt']);
+					if (isset($row['time'])) {
+						$row['time'] = gmdate('Y-m-d, g:i:s a', $row['time']);
+					}
+
+					foreach($row as $k => $val) {
+						if ($k != 'message') {
+							echo "<b>$k</b> : $val<br />";
+						}
+					}
+
+					if ($verbose && !empty($row['message'])) {
+						echo "<b>message</b> : {$row['message']}<br />";
+					}
+
+					echo '<hr />';
+				}
+			}
+
+			if ($log = get_option('revisionary_sent_mail')) {
+				echo '<h3>' . __('Notification Log', 'revisionary') . '</h3>';
+				foreach($log as $row) {
+					if (!$verbose) {
+						unset($row['message']);
+					} elseif(!empty($row['message'])) {
+						$row['message'] = '<br />' . str_replace("\r\n", '<br />', $row['message']);
+					}
+
+					$row['time_gmt'] = gmdate('Y-m-d, H:i:s', $row['time_gmt']);
+					if (isset($row['time'])) {
+						$row['time'] = gmdate('Y-m-d, g:i:s a', $row['time']);
+					}
+
+					foreach($row as $k => $val) {
+						if ($k != 'message') {
+							echo "<b>$k</b> : $val<br />";
+						}
+					}
+
+					if ($verbose && !empty($row['message'])) {
+						echo "<b>message</b> : {$row['message']}<br />";
+					}
+
+					echo '<hr />';
+				}
+			}
+
+			if (get_option('revisionary_mail_buffer')):?>
+				<br />
+				<a href="<?php echo(add_query_arg('clear_mail_buffer', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Purge Notification Buffer', 'revisionary');?></a>
+				<br />
+			<?php endif;?>
+
+			<?php if (get_option('revisionary_sent_mail')):?>
+				<br />
+				<a href="<?php echo(add_query_arg('truncate_mail_log', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Truncate Notification Log', 'revisionary');?></a>
+			<?php endif;
+
+			$mail_info = rvy_mail_check_buffer([], ['log_only' => true]);
+			?>
+			<br /><br />
+			<p><?php printf(__('Sent in last minute: %d / %d', 'revisionary'), $mail_info->sent_counts['minute'], $mail_info->send_limits['minute']);?></p>
+			<p><?php printf(__('Sent in last hour: %d / %d', 'revisionary'), $mail_info->sent_counts['hour'], $mail_info->send_limits['hour']);?></p>
+			<p><?php printf(__('Sent in last day: %d / %d', 'revisionary'), $mail_info->sent_counts['day'], $mail_info->send_limits['day']);?></p>
+			<?php
+			if (!empty($q)) {
+				if ($cron_timestamp = wp_next_scheduled('rvy_mail_buffer_hook')) {
+					$wait_sec = $cron_timestamp - time();
+					if ($wait_sec > 0) {
+						echo '<br />';
+						printf(__('Seconds until next buffer processing time: %d', 'revisionary'), $wait_sec);
+					}
+				}
+			}
+		} 
+
+		if (defined('WP_DEBUG') 
+			|| class_exists('EmailLog') 				// "Email Log" plugin
+			|| defined('POST_SMTP_VER') 				// "Post SMTP" plugin
+			|| rvy_is_plugin_active('wp-mail-logging') 	// WP Mail Logging by MailPoet
+			|| defined('LOG_EMAILS_PLUGIN_VERSION')		// "Log Emails" plugin
+		) {
+			if (empty($_REQUEST['mailinfo'])):?>
+				<br />
+				<div style="padding-left:22px">
+				<a href="<?php echo(add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Show Notification Log / Buffer', 'revisionary');?></a>
+				<br /><br />
+				<a href="<?php echo(add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI'])));?>"><?php _e('Show with message content', 'revisionary');?></a>
+				</div>
+			<?php endif;
+		}
+		
 		?>
 		</td></tr>
 		<!--
@@ -617,3 +783,24 @@ $revisionary->admin->publishpressFooter();
 
 <?php
 } // end function
+
+function rvy_is_plugin_active($check_plugin_file)
+    {
+        $plugins = (array)get_option('active_plugins');
+        foreach ($plugins as $plugin_file) {
+            if (false !== strpos($plugin_file, $check_plugin_file)) {
+                return $plugin_file;
+            }
+        }
+
+        if (is_multisite()) {
+            $plugins = (array)get_site_option('active_sitewide_plugins');
+
+            // network activated plugin names are array keys
+            foreach (array_keys($plugins) as $plugin_file) {
+                if (false !== strpos($plugin_file, $check_plugin_file)) {
+                    return $plugin_file;
+                }
+            }
+        }
+    }

@@ -556,7 +556,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				$link_class = '';
 			}
 
-			$links['my_posts'] = sprintf(__('%sMy Posts%s(%s)'), "<a href='admin.php?page=revisionary-q&post_author=$current_user->ID'{$link_class}>", '</a>', "<span class='count'>$my_post_count</span>");
+			$links['my_posts'] = sprintf(__('%sMy Published Posts%s(%s)'), "<a href='admin.php?page=revisionary-q&post_author=$current_user->ID'{$link_class}>", '</a>', "<span class='count'>$my_post_count</span>");
 		}
 
 		$all_count = 0;
@@ -601,7 +601,25 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	 * @return array
 	 */
 	protected function get_bulk_actions() {
+		global $current_user;
+
 		$actions = array();
+
+		$approval_potential = false;
+
+		foreach(rvy_get_manageable_types() as $post_type) {
+			$type_obj = get_post_type_object($post_type);
+			if (!empty($current_user->allcaps[$type_obj->cap->edit_published_posts])) {
+				$approval_potential = true;
+				break;
+			}
+		}
+
+		if ($approval_potential = apply_filters('revisionary_bulk_action_approval', $approval_potential)) {
+			$actions['approve_revision'] = __('Approve', 'revisionary');
+			$actions['publish_revision'] = __('Publish', 'revisionary');
+		}
+
 		$actions['delete'] = __( 'Delete Permanently' );
 		return $actions;
 	}
@@ -922,10 +940,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		if ( is_post_type_viewable( $post_type_object ) ) {
 			if ( $can_read_post ) {
-				$_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
+				$preview_link = rvy_preview_url($post);
 
-				$preview_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $post ) ) );
-				$preview_link = remove_query_arg( 'post_type', $preview_link );
+				//$preview_link = remove_query_arg( 'post_type', $preview_link );
+				$preview_link = remove_query_arg( 'preview_id', $preview_link );
 				$actions['view'] = sprintf(
 					'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
 					esc_url( $preview_link ),
@@ -947,6 +965,29 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		return $this->row_actions( $actions );
+	}
+
+	// override default nonce field
+	protected function display_tablenav( $which ) {
+		if ( 'top' === $which ) {
+			wp_nonce_field( 'bulk-revision-queue' );
+		}
+		?>
+	<div class="tablenav <?php echo esc_attr( $which ); ?>">
+
+		<?php if ( $this->has_items() ) : ?>
+		<div class="alignleft actions bulkactions">
+			<?php $this->bulk_actions( $which ); ?>
+		</div>
+			<?php
+		endif;
+		$this->extra_tablenav( $which );
+		$this->pagination( $which );
+		?>
+
+		<br class="clear" />
+	</div>
+		<?php
 	}
 
 	/**
