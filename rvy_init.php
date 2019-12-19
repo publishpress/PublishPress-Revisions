@@ -2,6 +2,8 @@
 if ( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 	die();
 
+require_once( dirname(__FILE__).'/defaults_rvy.php');  // @todo: refactor to handle early call of rvy_default_options() from notification cron
+
 define( 'RVY_NETWORK', awp_is_mu() && rvy_plugin_active_for_network( RVY_BASENAME ) );
 
 add_action('init', 'rvy_status_registrations', 40);
