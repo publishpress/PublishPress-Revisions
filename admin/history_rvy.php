@@ -726,7 +726,9 @@ class RevisionaryHistory
             foreach($authors as $_author) {
                 $author_ids []= $_author->ID;
             }
-        } else {
+        } 
+        
+        if (!$use_multiple_authors || !$author_ids) {
             $author_ids = [$revision->post_author];
             
             if ($_author = new WP_User($revision->post_author)) {
@@ -872,8 +874,10 @@ class RevisionaryHistory
 
             $time_diff_label = ($now_gmt > $modified_gmt) ? __( '%s%s ago' ) : __( '%s%s from now', 'revisionary');
 
+            $use_multiple_authors = function_exists('get_multiple_authors') && !rvy_is_revision_status($revision->post_status);
+
             // Just track single post_author for revision.  Changes to Authors taxonomy will be applied to published post.
-            $author_key = $this->loadAuthorInfo($revision, false, compact('show_avatars'));
+            $author_key = $this->loadAuthorInfo($revision, $use_multiple_authors, compact('show_avatars'));
 
             $revisions_data = [
                 'id'         => $revision->ID,
