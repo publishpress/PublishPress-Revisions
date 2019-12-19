@@ -172,6 +172,10 @@ class RevisionCreation {
                 $$col = (isset($data[$col])) ? $data[$col] : '';
             }
 
+			if ($data['post_name'] != $published_post->post_name) {
+				$requested_slug = $data['post_name'];
+			}
+
             $data['post_status'] = 'pending-revision';
             //$data['parent_id'] = $data['post_parent'];
             $data['comment_count'] = $published_post->ID; 	// buffer this value in posts table for query efficiency (actual comment count stored for published post will not be overwritten)
@@ -214,6 +218,10 @@ class RevisionCreation {
 
             update_post_meta($revision_id, '_rvy_base_post_id', $published_post->ID);
             update_post_meta($published_post->ID, '_rvy_has_revisions', true);
+
+			if (!empty($requested_slug)) {
+				add_post_meta($revision_id, '_requested_slug', $requested_slug);
+			}
 
             $post_id = $published_post->ID;						  // passing args ensures back compat by using variables directly rather than retrieving revision, post data
             $object_type = isset($postarr['post_type']) ? $postarr['post_type'] : '';
