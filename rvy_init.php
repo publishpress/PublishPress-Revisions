@@ -14,6 +14,10 @@ if (did_action('set_current_user')) {
 	add_action( 'set_current_user', 'rvy_ajax_handler', 20);
 }
 
+if (!empty($_REQUEST['preview'] && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id']))) {
+	add_filter('redirect_canonical', function($redirect, $orig) {return $orig;}, 10, 2);
+}
+
 add_action('init', 'rvy_maybe_redirect', 1);
 
 /*======== WP-Cron implentation for Email Notification Buffer ========*/
@@ -765,6 +769,26 @@ function rvy_init() {
 
 	global $revisionary;
 	$revisionary = new Revisionary();
+}
+
+function rvy_is_full_editor($post) {
+	global $current_user;
+	
+	if (!$type_obj = get_post_type_object($post->post_type)) {
+		return false;
+	}
+
+	$cap = (!empty($type_obj->cap->edit_others_posts)) ? $type_obj->cap->edit_others_posts : $type_obj->cap->edit_posts;
+
+	if (empty($current_user->allcaps[$cap])) {
+		return false;
+	}
+
+	if (!empty($type_obj->cap->edit_published_posts) && empty($current_user->allcaps[$type_obj->cap->edit_published_posts])) {
+		return false;
+	}
+
+	return true;
 }
 
 function rvy_is_post_author($post, $user = false) {

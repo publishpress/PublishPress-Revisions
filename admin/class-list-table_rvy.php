@@ -168,12 +168,15 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 		$where .= " AND $p.comment_count IN ($post_id_csv)";
 
-		if (rvy_get_option('revisor_lock_others_revisions') && !current_user_can('administrator') 
-			&& !current_user_can('edit_others_revisions') && !current_user_can('list_others_revisions') 
+		if (rvy_get_option('revisor_hide_others_revisions') && !current_user_can('administrator') 
+			&& !current_user_can('list_others_revisions') 
 		) {
 			$can_publish_types = [];
 			foreach(get_post_types(['public' => true], 'object') as $post_type => $type_obj) {
-				if (current_user_can($type_obj->cap->edit_published_posts) && current_user_can($type_obj->cap->publish_posts)) {
+				if (
+					agp_user_can($type_obj->cap->edit_published_posts, 0, '', ['skip_revision_allowance' => true])
+					&& agp_user_can($type_obj->cap->publish_posts, 0, '', ['skip_revision_allowance' => true])
+				) {
 					$can_publish_types[]= $post_type;
 				}
 			}

@@ -111,6 +111,7 @@ $ui->option_captions = array(
 	'pending_revisions' => __('Enable Pending Revisions', 'revisionary'),
 	'scheduled_revisions' => __('Enable Scheduled Revisions', 'revisionary'),
 	'revisor_lock_others_revisions' => __("Prevent Revisors from editing others&apos; revisions", 'revisionary'),
+	'revisor_hide_others_revisions' => __("Prevent Revisors from viewing others&apos; revisions", 'revisionary'),
 	'diff_display_strip_tags' => __('Strip html tags out of difference display', 'revisionary'),
 	'async_scheduled_publish' => __('Asynchronous Publishing', 'revisionary'),
 	'scheduled_revision_update_post_date' => __('Update Publish Date', 'revisionary'),
@@ -144,7 +145,7 @@ $ui->form_options = array(
 	'scheduled_revisions' => array( 'scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date', ),
 	'pending_revisions'	=> 	 array( 'pending_revisions', 'pending_revision_update_post_date', ),
 	'preview' =>			 array( 'preview_link_type', 'compare_revisions_direct_approval'),
-	'revisions'		=>		 array( 'revisor_lock_others_revisions', 'diff_display_strip_tags', 'display_hints' ),
+	'revisions'		=>		 array( 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'diff_display_strip_tags', 'display_hints' ),
 	'notification'	=>		 array( 'pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer' )
 )
 );
@@ -432,8 +433,11 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		<?php endif;?>
 
 		<?php 
-		$hint = __('This restriction applies to users who are not full editors for the post type. To exempt a limited role, give it the edit_others_revisions or list_others_revisions capability.', 'revisionary');
+		$hint = __('This restriction applies to users who are not full editors for the post type. To enable a role, give it the edit_others_revisions capability.', 'revisionary');
 		$ui->option_checkbox( 'revisor_lock_others_revisions', $tab, $section, $hint, '' );
+		
+		$hint = __('This restriction applies to users who are not full editors for the post type. To enable a role, give it the list_others_revisions capability.', 'revisionary');
+		$ui->option_checkbox( 'revisor_hide_others_revisions', $tab, $section, $hint, '' );
 		
 		$hint = '';
 		$ui->option_checkbox( 'diff_display_strip_tags', $tab, $section, $hint, '' );
