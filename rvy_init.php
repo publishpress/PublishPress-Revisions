@@ -25,7 +25,6 @@ function rvy_set_notification_queue_cron() {
 	$cron_timestamp = wp_next_scheduled( 'rvy_mail_queue_hook' );
 
 	//$wait_sec = time() - $cron_timestamp;
-	//pp_errlog($wait_sec);
 
 	if (rvy_get_option('use_notification_queue')) {
 		if (!$cron_timestamp) {
@@ -550,20 +549,24 @@ function rvy_mail_check_queue($new_msg = []) {
 	$durations = ['minute' => 60, 'hour' => 3600, 'day' => 86400];
 	$sent_counts = ['minute' => 0, 'hour' => 0, 'day' => 0];
 	
-	// by default, purge mail log entries older than 60 days
-	$purge_time = apply_filters('revisionary_mail_log_duration', 86400 * 60);
+	// by default, purge mail log entries older than 30 days
+	$purge_time = apply_filters('revisionary_mail_log_duration', 86400 * 30);
 	
 	if ($purge_time < $durations['day'] * 2) {
 		$purge_time = $durations['day'] * 2;
 	}
 
 	if ($use_queue) {
+		$default_minute_limit = (defined('REVISIONARY_EMAIL_LIMIT_MINUTE')) ? REVISIONARY_EMAIL_LIMIT_MINUTE : 20;
+		$default_hour_limit = (defined('REVISIONARY_EMAIL_LIMIT_HOUR')) ? REVISIONARY_EMAIL_LIMIT_HOUR : 100;
+		$default_day_limit = (defined('REVISIONARY_EMAIL_LIMIT_DAY')) ? REVISIONARY_EMAIL_LIMIT_DAY : 1000;
+
 	$send_limits = apply_filters(
 		'revisionary_email_limits', 
 		[
-			'minute' => 19,
-			'hour' => 99,
-			'day' => 999,
+				'minute' => $default_minute_limit,
+				'hour' => $default_hour_limit,
+				'day' => $default_day_limit,
 		]
 	);
 	}
@@ -581,7 +584,7 @@ function rvy_mail_check_queue($new_msg = []) {
 				$sent_counts[$limit_key]++;
 			}
 
-			if ($new_msg && ($sent_counts[$limit_key] > $send_limits[$limit_key])) {
+				if ($new_msg && ($sent_counts[$limit_key] >= $send_limits[$limit_key])) {
 				$new_msg_queued = true;
 			}
 		}
@@ -672,6 +675,7 @@ function rvy_send_queued_mail() {
 			update_option('revisionary_mail_queue', $q);
 		} else {
 		// log the sent mail
+			$next_mail['time'] = strtotime(current_time( 'mysql' ));
 		$next_mail['time_gmt'] = time();
 
 		if (!defined('RS_DEBUG') && !defined('REVISIONARY_LOG_EMAIL_MESSAGE')) {
