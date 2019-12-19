@@ -94,10 +94,6 @@ public function actSubmitboxStart() {
     public function actSubmitMetaboxActions() {
         global $post;
 
-        if (did_action('revisionary_post_submit_meta_box')) {
-            return;
-        }
-
         if (rvy_is_revision_status($post->post_status)) :
             $compare_link = admin_url("revision.php?revision=$post->ID");
             $compare_button = __('Compare', 'revisionary');
