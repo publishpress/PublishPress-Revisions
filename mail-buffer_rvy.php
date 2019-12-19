@@ -1,9 +1,30 @@
 <?php
 
-function _rvy_mail_check_buffer($new_msg = []) {
+function _rvy_mail_send_limits() {
+	$default_minute_limit = (defined('REVISIONARY_EMAIL_LIMIT_MINUTE')) ? REVISIONARY_EMAIL_LIMIT_MINUTE : 20;
+	$default_hour_limit = (defined('REVISIONARY_EMAIL_LIMIT_HOUR')) ? REVISIONARY_EMAIL_LIMIT_HOUR : 100;
+	$default_day_limit = (defined('REVISIONARY_EMAIL_LIMIT_DAY')) ? REVISIONARY_EMAIL_LIMIT_DAY : 1000;
+
+	$send_limits = apply_filters(
+		'revisionary_email_limits', 
+		[
+			'minute' => $default_minute_limit,
+			'hour' => $default_hour_limit,
+			'day' => $default_day_limit,
+		]
+	);
+
+	return $send_limits;
+}
+
+function _rvy_mail_check_buffer($new_msg = [], $args = []) {
+	$log_only = !empty($args['log_only']);
+	
+	if (!$log_only) {
 	if (!$buffer = get_option('revisionary_mail_buffer')) {
 		$buffer = [];
 		$first_buffer = true;
+	}
 	}
 
 	$new_msg_buffered = false;
@@ -20,26 +41,14 @@ function _rvy_mail_check_buffer($new_msg = []) {
 	$sent_counts = ['minute' => 0, 'hour' => 0, 'day' => 0];
 	
 	// by default, purge mail log entries older than 30 days
+	// @todo: purge mail log even when buffer is disabled
 	$purge_time = apply_filters('revisionary_mail_log_duration', 86400 * 30);
 	
 	if ($purge_time < $durations['day'] * 2) {
 		$purge_time = $durations['day'] * 2;
 	}
 
-	if ($use_buffer) {
-		$default_minute_limit = (defined('REVISIONARY_EMAIL_LIMIT_MINUTE')) ? REVISIONARY_EMAIL_LIMIT_MINUTE : 20;
-		$default_hour_limit = (defined('REVISIONARY_EMAIL_LIMIT_HOUR')) ? REVISIONARY_EMAIL_LIMIT_HOUR : 100;
-		$default_day_limit = (defined('REVISIONARY_EMAIL_LIMIT_DAY')) ? REVISIONARY_EMAIL_LIMIT_DAY : 1000;
-
-		$send_limits = apply_filters(
-			'revisionary_email_limits', 
-			[
-				'minute' => $default_minute_limit,
-				'hour' => $default_hour_limit,
-				'day' => $default_day_limit,
-			]
-		);
-	}
+	$send_limits = _rvy_mail_send_limits();
 
 	foreach($sent_mail as $k => $mail) {
 		if (!isset($mail['time_gmt'])) {
@@ -48,7 +57,6 @@ function _rvy_mail_check_buffer($new_msg = []) {
 
 		$elapsed = $current_time - $mail['time_gmt'];
 
-		if ($use_buffer) {
 			foreach($durations as $limit_key => $duration) {
 				if ($elapsed < $duration) {
 					$sent_counts[$limit_key]++;
@@ -58,7 +66,6 @@ function _rvy_mail_check_buffer($new_msg = []) {
 					$new_msg_buffered = true;
 				}
 			}
-		}
 		
 		if ($elapsed > $purge_time) {
 			unset($sent_mail[$k]);
@@ -66,7 +73,7 @@ function _rvy_mail_check_buffer($new_msg = []) {
 		}
 	}
 
-	if ($new_msg_buffered) {
+	if (!$log_only && $new_msg_buffered) {
 		$buffer = array_merge([$new_msg], $buffer);
 		update_option('revisionary_mail_buffer', $buffer);
 	}
@@ -121,12 +128,6 @@ function _rvy_send_buffered_mail() {
 		// If notification was buffered more than a week ago, discard it
 		if (time() - $next_mail['time_gmt'] > 3600 * 24 * 7 ) {
 			continue;
-		}
-
-		if (defined('PRESSPERMIT_DEBUG')) {
-			pp_errlog('*** Sending BUFFERED mail: ');
-			pp_errlog($next_mail['address'] . ', ' . $next_mail['title']);
-			pp_errlog($next_mail['message']);
 		}
 
 		if (defined('RS_DEBUG')) {

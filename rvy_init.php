@@ -26,15 +26,17 @@ if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview']) && empty($_REQUEST[
 	_rvy_jreviews_preview_compat();
 }
 
-function rvy_mail_check_buffer($new_msg = []) {
+function rvy_mail_check_buffer($new_msg = [], $args = []) {
+	if (empty($args['log_only'])) {
 	if (!$use_buffer = rvy_get_option('use_notification_buffer')) {
 		return (defined('REVISIONARY_DISABLE_MAIL_LOG'))
 		? array_fill_keys(['buffer', 'sent_mail', 'send_limits', 'sent_counts', 'new_msg_buffered'], [])
 		: [];
 	}
+	}
 
 	require_once( dirname(__FILE__).'/mail-buffer_rvy.php');
-	return _rvy_mail_check_buffer($new_msg);
+	return _rvy_mail_check_buffer($new_msg, $args);
 }
 
 function rvy_send_buffered_mail() {
@@ -45,7 +47,7 @@ function rvy_send_buffered_mail() {
 function rvy_set_notification_buffer_cron() {
 	$cron_timestamp = wp_next_scheduled( 'rvy_mail_buffer_hook' );
 
-	$wait_sec = time() - $cron_timestamp;
+	//$wait_sec = time() - $cron_timestamp;
 
 	if (rvy_get_option('use_notification_buffer')) {
 		if (!$cron_timestamp) {
@@ -495,11 +497,6 @@ function rvy_mail( $address, $title, $message, $args ) {
 
 	if (!empty($buffer_status->new_msg_buffered)) {
 		return;
-	}
-
-	if (defined('PRESSPERMIT_DEBUG')) {
-		pp_errlog("$address, $title");
-		pp_errlog($message);
 	}
 
 	if ( defined( 'RS_DEBUG' ) )
