@@ -534,12 +534,23 @@ class Revisionary
 	}
 	
 	function flt_post_map_meta_cap($caps, $cap, $user_id, $args) {
-		if (in_array($cap, array('edit_post', 'edit_page'))) {
-			if (!empty($args[0]))
-				$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
-			else
-				$post_id = 0;
+		if (!in_array($cap, array('edit_post', 'edit_page', 'delete_post', 'delete_page'))) {
+			return $caps;
+		}
 
+		if (!empty($args[0])) {
+				$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
+		} else {
+				$post_id = 0;
+		}
+
+		if ($post = get_post($post_id)) {
+			if ('inherit' == $post->post_status) {
+				return $caps;
+			}
+		}
+		
+		if (in_array($cap, array('edit_post', 'edit_page'))) {
 			// Run reqd_caps array through the filter which is normally used to implicitly grant edit_published cap to Revisors
 			// Applying this adjustment to reqd_caps instead of user caps on 'edit_post' checks allows for better compat with PressPermit and other plugins
 			if ($grant_caps = $this->filter_caps(array(), $caps, array(0 => $cap, 1 => $user_id, 2 => $post_id), array('filter_context' => 'map_meta_cap'))) {
@@ -547,14 +558,7 @@ class Revisionary
 			}
 		}
 
-		if (in_array($cap, array('edit_post', 'edit_page', 'delete_post', 'delete_page'))) {
-			if (!empty($args[0]))
-				$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
-			else
-				$post_id = 0;
-
-			if ( $post = get_post( $post_id ) ) {
-				if ('future-revision' == $post->post_status) {
+		if ($post && ('future-revision' == $post->post_status)) {
 					// allow Revisor to view a preview of their scheduled revision
 					if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST) || empty($_REQUEST['preview']) || !empty($_POST) || did_action('template_redirect')) {
 						if ($type_obj = get_post_type_object( $post->post_type )) {
@@ -563,8 +567,6 @@ class Revisionary
 						}
 					}
 				}
-			}
-		}
 
 		return $caps;
 	}
