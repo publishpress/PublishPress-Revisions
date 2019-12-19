@@ -71,7 +71,6 @@ For more details about both the free and pro version, see our <a href="https://p
 * Fixed : Other users' revisions were not listed in Revision Queue even if "Prevent Revisors from editing others' revisions" disabled
 * Fixed : With "Prevent Revisors from editing others' revisions" setting enabled, Revisors and Authors could edit others' revisions by direct URL access
 * Feature : Support list_others_revisions capability to grant read access to other users' revisions (applies if "Prevent Revisors from editing others' revisions" is enabled)
-* Compat : PressPermit Pro - Revisors could not submit Beaver Builder revisions
 * Compat : PressPermit Pro - Revision Exceptions ("Also these" category / taxonomy assignments) assigned to Authors were not applied correctly
 * Compat : JReviews plugin
 
