@@ -64,6 +64,8 @@ class Rvy_Revision_Workflow_UI {
                         $revisionary->skip_revision_allowance = false;
                         $recipient_ids = array_intersect( $recipient_ids, $post_publisher_ids );
                     }
+
+                    $monitor_ids = $recipient_ids;
                 }
 
                 if ( ! $recipient_ids && ( empty($monitor_groups_enabled) || ! defined('RVY_FORCE_MONITOR_GROUPS') ) ) {
@@ -129,12 +131,26 @@ class Rvy_Revision_Workflow_UI {
 
             if ( $recipient_ids ) {
                 global $wpdb;
-                $to_addresses = array_unique( $wpdb->get_col( "SELECT user_email FROM $wpdb->users WHERE ID IN ('" . implode( "','", $recipient_ids ) . "')" ) );
+                $results = $wpdb->get_results( "SELECT ID, user_email FROM $wpdb->users WHERE ID IN ('" . implode( "','", $recipient_ids ) . "')" );
+                
+                foreach($results as $row) {
+                    $to_addresses[$row->ID] = $row->user_email;
+                }
+
+                $to_addresses = array_unique($to_addresses);
             } else {
                 $to_addresses = array();
             }
 
-            foreach ( $to_addresses as $address ) {
+            foreach ( $to_addresses as $user_id => $address ) {
+                if (!empty($author_ids && in_array($user_id, $author_ids))) {
+                    $notification_class = 'rev_submission_notify_author';
+                } elseif (!empty($monitor_ids && in_array($user_id, $monitor_ids))) {
+                    $notification_class = 'rev_submission_notify_monitor';
+                } else {
+                    $notification_class = 'rev_submission_notify_admin';
+                }
+
                 rvy_mail(
                     $address, 
                     $title, 
@@ -143,7 +159,7 @@ class Rvy_Revision_Workflow_UI {
                         'revision_id' => $revision_id, 
                         'post_id' => $published_post->ID, 
                         'notification_type' => $notification_type,
-                        'notification_class' => '',
+                        'notification_class' => $notification_class,
                     ]
                 );
             }
