@@ -1361,6 +1361,22 @@ class Revisionary
 			return false;
 		}
 
+		if (class_exists('Classic_Editor')) {
+			if (isset($_REQUEST['classic-editor__forget']) && isset($_REQUEST['classic'])) {
+				return false;
+			} elseif (isset($_REQUEST['classic-editor__forget']) && !isset($_REQUEST['classic'])) {
+				return true;
+			} elseif ($post_id = rvy_detect_post_id()) {
+				$which = get_post_meta( $post_id, 'classic-editor-remember', true );
+				
+				if ('block-editor' == $which) {
+					return true;
+				} elseif ('classic-editor' == $which) {
+					return false;
+				}
+			}
+		}
+
 		$pluginsState = array(
 			'classic-editor' => class_exists( 'Classic_Editor' ), // is_plugin_active('classic-editor/classic-editor.php'),
 			'gutenberg'      => function_exists( 'the_gutenberg_project' ), //is_plugin_active('gutenberg/gutenberg.php'),
