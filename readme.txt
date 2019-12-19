@@ -2,9 +2,9 @@
 Contributors: publishpress, kevinB, stevejburge, andergmartins
 Tags: revision, access, permissions, cms, user, groups, members, admin, pages, posts, page, Post
 Requires at least: 4.9.7
-Tested up to: 5.2.4
+Tested up to: 5.3
 Requires PHP: 5.6.20
-Stable Tag: 2.0.10
+Stable Tag: 2.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -61,6 +61,40 @@ For more details about both the free and pro version, see our <a href="https://p
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.1 - 26 Nov 2019 =
+* Feature : Bulk Approval / Publishing in Revision Queue
+* Feature : Revision Edit: Approve Button on Editor screen
+* Feature : Option for Approve, Edit buttons on Compare Revisions screen (instead of Preview button)
+* Feature : Email Notification Buffer to avoid failures due to exceeding server send limits
+* Fixed : Email Notification - For pending revision submission, submitted was misidentified on some sites
+* Fixed : Revisors could restore previous revisions through manual URL access
+* Fixed : Fatal error when WP_Privacy_Policy_Content::text_change_check() is triggered
+* Fixed : "Pending Revision" checkbox was displayed in Gutenberg editor, even for unpublished posts
+* Fixed : After clicking "Pending Revision" checkbox, unchecking did not prevent revision save
+* Fixed : Revision Preview - unsaved changes to saved revision could not be previewed with WP 5.3
+* Fixed : Revision Preview - top bar for edit / approval was not displayed on some sites
+* Change : Revision Preview URL - Default to using published post slug with revision page_id argument, for better theme compatibility. Option to use Revision slug or ID only.
+* Fixed : Edit Revision screen links to published post discarded customized slug
+* Fixed : Classic Editor - "View / Approve" link from Edit Revision screen loaded wrong preview URL and no top bar display for approval
+* Fixed : Classic Editor - No preview button was available to Revisors
+* Fixed : Classic Editor - Invalid Revisions > Browse link displayed to Revisors
+* Compat : Classic Editor plugin - with "Allow users to switch editors" enabled, non-default editor did not have correct javascript loaded for Revisions
+* Compat : On themes that use a fixed position header, display preview top bar above header
+* Compat : PressPermit Pro - revision preview could not be viewed by Contributors under some configurations 
+* Fixed : On standard Compare Revisions screen (for past revisions), Preview and Manage button links did not update with slider selection change
+* Fixed : Pending, Schedule Revision notification - invalid preview link in some emails
+* Fixed : Trashed revisions were not identified as revisions in Edit Posts listing
+* Fixed : Trashed revisions were not deleted on parent post deletion
+* Fixed : Trashed revisions showed an invalid comment count value in Edit Posts listing
+* Fixed : PHP Warning in Gutenberg editor when editing is not being limited to revision submission
+* Compat : Multiple Authors - Compare Pending Revisions screen showed revisor as original post author under some conditions 
+* Compat : Multiple Authors - Revision submission / approval caused published post author to be changed to revisor, under some conditions
+* Compat : Plugin interaction caused published post permalink custom slug was replaced with default permalink structure at revision publication, on some sites
+* Change : Revision Queue - recaption "My Posts" to "My Published Posts"
+
+= 2.0.12 - 29 Oct 2019 =
+* Fixed : Fatal error on Post Preview
 
 = 2.0.11 - 28 Oct 2019 =
 * Fixed : Classic Editor - Post Preview showed last stored copy, not unsaved changes
