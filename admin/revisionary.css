@@ -515,3 +515,7 @@ width:auto;
     background-color: #ffffe0;
     border-color: #e6db55;
 }
+
+#submitdiv_pps #save-action span.spinner {
+margin: 2px 2px 0;
+}

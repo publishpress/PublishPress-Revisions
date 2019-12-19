@@ -76,7 +76,7 @@ function rvy_ajax_handler() {
 function rvy_status_registrations() {
 	register_post_status('pending-revision', array(
 		'label' => _x('Pending Revision', 'post'),
-		'labels' => (object)['publish' => __('Publish Revision', 'revisionary'), 'save' => __('Save Revision'), 'plural' => __('Pending Revisions', 'revisionary'), 'short' => __('Pending', 'revisionary') ],
+		'labels' => (object)['publish' => __('Publish Revision', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Pending Revisions', 'revisionary'), 'short' => __('Pending', 'revisionary') ],
 		'protected' => true,
 		'internal' => true,
 		'label_count' => _n_noop('Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>'),
@@ -87,7 +87,7 @@ function rvy_status_registrations() {
 
 	register_post_status('future-revision', array(
 		'label' => _x('Scheduled Revision', 'post'),
-		'labels' => (object)['publish' => __('Publish Revision', 'revisionary'), 'save' => __('Save Revision'), 'plural' => __('Scheduled Revisions', 'revisionary'), 'short' => __('Scheduled', 'revisionary')],
+		'labels' => (object)['publish' => __('Publish Revision', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Scheduled Revisions', 'revisionary'), 'short' => __('Scheduled', 'revisionary')],
 		'protected' => true,
 		'internal' => true,
 		'label_count' => _n_noop('Scheduled <span class="count">(%s)</span>', 'Scheduled <span class="count">(%s)</span>'),
