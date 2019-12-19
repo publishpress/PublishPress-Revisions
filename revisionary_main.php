@@ -22,6 +22,35 @@ class Revisionary
 
 	// minimal config retrieval to support pre-init usage by WP_Scoped_User before text domain is loaded
 	function __construct() {
+		global $script_name;
+
+		// Ensure editing access to past revisions is not accidentally filtered. 
+		// @todo: Correct selective application of filtering downstream so Revisors can use a read-only Compare [Past] Revisions screen
+		//
+		// Note: some filtering is needed to allow users with full editing permissions on the published post to access a Compare Revisions screen with Preview and Manage buttons
+		if (is_admin() && (false !== strpos($_SERVER['REQUEST_URI'], 'revision.php')) && (!empty($_REQUEST['revision'])) && !is_content_administrator_rvy()) {
+			$revision_id = (!empty($_REQUEST['revision'])) ? $_REQUEST['revision'] : $_REQUEST['to'];
+			
+			if ($revision_id) {
+				if ($_post = get_post($_REQUEST['revision'])) {
+					if (!rvy_is_revision_status($_post->post_status)) {
+						if ($parent_post = get_post($_post->post_parent)) {
+							global $current_user;
+
+							$type_obj = get_post_type_object($parent_post->post_type);
+
+							if ($type_obj && (
+								empty($current_user->allcaps[$type_obj->cap->edit_published_posts]) 
+								|| (($current_user->ID != $parent_post->ID) && empty($current_user->allcaps[$type_obj->cap->edit_published_posts]))
+							)) {
+								return;
+							}
+						}
+					}
+				}
+			}
+		}
+
 		rvy_refresh_options_sitewide();
 
 		// NOTE: $_GET['preview'] and $_GET['post_type'] arguments are set by rvy_init() at response to ?p= request when the requested post is a revision.
