@@ -783,10 +783,6 @@ class Revisionary
 			}
 		}
 
-		if (!empty($_POST)) {
-			$_POST['skip_sitepress_actions'] = true;
-		}
-
 		if (!empty($revision_id) && $post = get_post($revision_id)) {
 			$post_ID = $revision_id;
 			$post_arr['post_ID'] = $revision_id;
