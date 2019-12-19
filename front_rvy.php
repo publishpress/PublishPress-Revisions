@@ -115,6 +115,31 @@ class RevisionaryFront {
 			
 			$published_post_id = rvy_post_id($revision_id);	
 
+			if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && !defined('REVISIONARY_DISABLE_MA_PREVIEW_CORRECTION') && rvy_is_revision_status($post->post_status)) {
+				$_authors = get_multiple_authors($revision_id);
+			
+				if (count($_authors) == 1) {
+					$_author = reset($_authors);
+
+					if ($_author && empty($_author->ID)) { // @todo: is this still necessary?
+						$_author = MultipleAuthors\Classes\Objects\Author::get_by_term_id($_author->term_id);
+					}
+				}
+
+				// If revision does not have valid multiple authors stored, correct to published post values
+				if (empty($_authors) || (!empty($_author) && $_author->ID == $post->post_author)) {
+					if (!$published_authors = wp_get_object_terms($published_post_id, 'author')) {
+						if ($published_post = get_post($published_post_id)) {
+							if ($author = MultipleAuthors\Classes\Objects\Author::get_by_user_id((int) $published_post->post_author)) {
+								$published_authors = [$author];
+							}
+						}
+					}
+
+					MultipleAuthors\Classes\Utils::set_post_authors($revision_id, $published_authors);
+				}
+			}
+
 			$datef = __awp( 'M j, Y @ g:i a' );
 			$date = agp_date_i18n( $datef, strtotime( $post->post_date ) );
 
