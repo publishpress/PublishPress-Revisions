@@ -145,9 +145,17 @@ class Revisionary
 			return;
 		}
 
+		$any_trashed_posts = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_status = 'trash' AND comment_count > 0 LIMIT 1");
+
+		$trashed_clause = ($any_trashed_posts) 
+		? $wpdb->prepare( 
+			" OR (ID IN (SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_base_post_id' AND meta_value = %d) AND post_status = 'trash')",
+			$post_id
+		) : '';
+
 		$post_ids = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT ID FROM $wpdb->posts WHERE post_status IN ('pending-revision', 'future-revision') AND comment_count = %d", 
+				"SELECT ID FROM $wpdb->posts WHERE (post_status IN ('pending-revision', 'future-revision') AND comment_count = %d) $trashed_clause", 
 				$post_id
 			)
 		);
