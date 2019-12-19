@@ -12,7 +12,7 @@ class Revisionary_REST {
 	var $is_posts_request = false;
 	
 	function __construct() {
-		add_filter( 'pp_rest_post_cap_requirement', array( &$this, 'rest_post_cap_requirement' ), 10, 2 );
+		add_filter( 'pp_rest_post_cap_requirement', array( $this, 'rest_post_cap_requirement' ), 10, 2 );
 	}
 	
 	function rest_post_cap_requirement( $orig_cap, $item_id ) {
