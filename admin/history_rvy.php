@@ -3,6 +3,7 @@ class RevisionaryHistory
 {	
     var $published_post_ids = [];
     var $post_status = 'pending-revision';
+    var $revision_id = 0;
 
     private $authors = [];
 
@@ -54,6 +55,8 @@ class RevisionaryHistory
         if ( ! $revision_id ) {
             $revision_id = absint( $to );
         }
+
+        $this->revision_id = $revision_id;
 
         $redirect = 'edit.php';
 
@@ -823,10 +826,10 @@ class RevisionaryHistory
 
             if ($can_restore) {
                 // Until Reject button is implemented, just route to Preview screen so revision can be edited / deleted if necessary
-                if ( in_array( $revision->post_status, ['pending-revision', 'future-revision'] ) ) {
+                if ( $current || in_array($revision->post_status, ['pending-revision', 'future-revision'])) {
                     $restore_link = rvy_preview_url($revision);  // default to revision preview link
                     
-                    if (rvy_get_option('compare_revisions_direct_approval')) {
+                    //if (rvy_get_option('compare_revisions_direct_approval')) {
                         //if ($can_edit = agp_user_can('edit_post', $revision->ID)) {
                             $published_post_id = rvy_post_id($revision->ID);
                             $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
@@ -842,7 +845,7 @@ class RevisionaryHistory
                                 $edit_url = admin_url("post.php?action=edit&amp;post=$revision->ID");
                             }
                         //}
-                    } 
+                    //} 
 
                     //$link_open = "<a href='$preview_url' target='_blank'>";
                     //$link_close = '</a>';
@@ -1031,6 +1034,10 @@ class RevisionaryHistory
 
                         if (!rvyRevisionID) {
                             rvyRevisionID = rvySearchParams.get('revision');
+                        }
+
+                        if (!Number(rvyRevisionID)) {
+                            rvyRevisionID = <?php echo $this->revision_id;?>;
                         }
 
                         if (rvyRevisionID != rvyLastID) {

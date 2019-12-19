@@ -448,7 +448,6 @@ table.diff tr {
 }
 
 table.diff td, table.diff th {
-	padding: .5em;
 	font-family: Consolas, Monaco, monospace;
 	border: none;
 }
