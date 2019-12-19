@@ -638,9 +638,14 @@ function rvy_revision_unschedule() {
 	exit;
 }
 
-function rvy_revision_publish() {
+function rvy_revision_publish($revision_id = false) {
+	if ($revision_id) {
+		$batch_process = true;
+	} else {
 	$revision_id = $_GET['revision'];
 	$redirect = site_url();
+		$batch_process = false;
+	}
 	
 	do {
 		if ( !$revision = get_post($revision_id ) ) {
@@ -664,7 +669,9 @@ function rvy_revision_publish() {
 				break;
 		}
 
+		if (!$batch_process) {
 		check_admin_referer( "publish-post_$post->ID|$revision->ID" );
+		}
 
 		do_action( 'revision_published', rvy_post_id($revision->ID), $revision->ID );
 	} while (0);
@@ -673,11 +680,16 @@ function rvy_revision_publish() {
 
 	if ($post) {
 		clean_post_cache($post->ID);
+	}
+
+	if (!$batch_process) {
+		if ($post) {
 		$redirect = get_permalink($post->ID); // published URL
 	}
 
 	wp_redirect( $redirect );
 	exit;
+	}
 }
 
 // rvy_init action passes Revisionary object
