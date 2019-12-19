@@ -61,6 +61,114 @@ function rvy_admin_init() {
 			$handler->handle_submission( 'default', $sitewide, $customize_defaults );
 		}
 		
+	} elseif (isset($_REQUEST['action2']) && !empty($_REQUEST['page']) && ('revisionary-q' == $_REQUEST['page']) && !empty($_REQUEST['post'])) {
+		$doaction = (!empty($_REQUEST['action']) && !is_numeric($_REQUEST['action'])) ? $_REQUEST['action'] : $_REQUEST['action2'];
+
+		check_admin_referer('bulk-revision-queue');
+
+		$sendback = remove_query_arg( array('trashed', 'untrashed', 'approved_count', 'published_count', 'deleted', 'locked', 'ids', 'posts', '_wp_nonce', '_wp_http_referer'), wp_get_referer() );
+		//if ( ! $sendback )
+		//	$sendback = admin_url( $parent_file );
+		//$sendback = add_query_arg( 'paged', $pagenum, $sendback );
+	
+		if ( 'delete_all' == $doaction ) {
+			// Prepare for deletion of all posts with a specified post status (i.e. Empty trash).
+			$post_status = preg_replace('/[^a-z0-9_-]+/i', '', $_REQUEST['post_status']);
+			// Verify the post status exists.
+			if ( get_post_status_object( $post_status ) ) {
+				$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_type=%s AND post_status = %s", $post_type, $post_status ) );
+			}
+			$doaction = 'delete';
+		} elseif ( isset( $_REQUEST['media'] ) ) {
+			$post_ids = $_REQUEST['media'];
+		} elseif ( isset( $_REQUEST['ids'] ) ) {
+			$post_ids = explode( ',', $_REQUEST['ids'] );
+		} elseif ( !empty( $_REQUEST['post'] ) ) {
+			$post_ids = array_map('intval', $_REQUEST['post']);
+		}
+	
+		if ( !isset( $post_ids ) ) {
+			exit;
+		}
+	
+		switch ( $doaction ) {
+			case 'approve_revision': // If pending revisions has a requested publish date, schedule it, otherwise schedule for near future. Leave currently scheduled revisions alone. 
+			case 'publish_revision': // Schedule all selected revisions for near future publishing.
+				$approved = 0;
+				$is_administrator = current_user_can('administrator');
+	
+				require_once( dirname(__FILE__).'/revision-action_rvy.php');
+	
+				foreach ((array) $post_ids as $post_id) {
+					if (!$revision = get_post($post_id)) {
+						continue;
+					}
+					
+					if (!rvy_is_revision_status($revision->post_status)) {
+						continue;
+					}
+					
+					if ( !$is_administrator 
+					&& !agp_user_can($type_obj->cap->edit_post, rvy_post_id($revision->ID), '', ['skip_revision_allowance' => true])
+					) {
+						if (count($post_ids) == 1) {
+							wp_die( __('Sorry, you are not allowed to approve this revision.') );
+						} else {
+							continue;
+						}
+					}
+	
+					if ('future-revision' == $revision->post_status) {
+						if ('publish_revision' == $doaction) {
+							rvy_revision_publish($revision->ID);
+						}
+					} else {
+						rvy_revision_approve($revision->ID);
+					}
+	
+					$approved++;
+				}
+	
+				if ($approved) {
+					$arg = ('publish_revision' == $doaction) ? 'published_count' : 'approved_count';
+					$sendback = add_query_arg($arg, $approved, $sendback);
+				}
+	
+				break;
+	
+			case 'delete':
+				$deleted = 0;
+				foreach ( (array) $post_ids as $post_id ) {
+					if ( ! $revision = get_post($post_id) )
+						continue;
+					
+					if ( ! rvy_is_revision_status($revision->post_status) )
+						continue;
+					
+					if ( ! current_user_can('administrator') && ! current_user_can( 'delete_post', rvy_post_id($revision->ID) ) ) {  // @todo: review Administrator cap check
+						if (('pending-revision' != $revision->post_status) || !rvy_is_post_author($revision)) {	// allow submitters to delete their own still-pending revisions
+							wp_die( __('Sorry, you are not allowed to delete this revision.') );
+						}
+					} 
+	
+					if ( !wp_delete_post($post_id) )
+						wp_die( __('Error in deleting.') );
+	
+					$deleted++;
+				}
+				$sendback = add_query_arg('deleted', $deleted, $sendback);
+				break;
+	
+			default:
+				$sendback = apply_filters( 'handle_bulk_actions-' . get_current_screen()->id, $sendback, $doaction, $post_ids );
+				break;
+		}
+	
+		if ($sendback) {
+			$sendback = remove_query_arg( array('action', 'action2', '_wp_http_referer', '_wpnonce', 'tags_input', 'post_author', 'comment_status', 'ping_status', '_status', 'post', 'bulk_edit', 'post_view'), $sendback );
+			wp_redirect($sendback);
+		}
+
 	// don't bother with the checks in this block unless action arg was passed or rvy_compare_revs field was posted
 	} elseif ( ! empty($_GET['action']) || ! empty( $_POST['rvy_compare_revs'] ) || ! empty($_POST['action']) ) {
 		if ( false !== strpos( urldecode($_SERVER['REQUEST_URI']), 'admin.php?page=rvy-revisions') ) {

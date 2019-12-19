@@ -22,129 +22,23 @@ $pagenum = $wp_list_table->get_pagenum();
 $parent_file = 'admin.php?page=revisionary-q';
 $submenu_file = 'admin.php?page=revisionary-q';
 
-$doaction = $wp_list_table->current_action();
-
-if ( $doaction ) {
-	check_admin_referer('bulk-posts');
-
-	$sendback = remove_query_arg( array('trashed', 'untrashed', 'approved', 'published', 'deleted', 'locked', 'ids'), wp_get_referer() );
-	if ( ! $sendback )
-		$sendback = admin_url( $parent_file );
-	$sendback = add_query_arg( 'paged', $pagenum, $sendback );
-
-	if ( 'delete_all' == $doaction ) {
-		// Prepare for deletion of all posts with a specified post status (i.e. Empty trash).
-		$post_status = preg_replace('/[^a-z0-9_-]+/i', '', $_REQUEST['post_status']);
-		// Verify the post status exists.
-		if ( get_post_status_object( $post_status ) ) {
-			$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_type=%s AND post_status = %s", $post_type, $post_status ) );
-		}
-		$doaction = 'delete';
-	} elseif ( isset( $_REQUEST['media'] ) ) {
-		$post_ids = $_REQUEST['media'];
-	} elseif ( isset( $_REQUEST['ids'] ) ) {
-		$post_ids = explode( ',', $_REQUEST['ids'] );
-	} elseif ( !empty( $_REQUEST['post'] ) ) {
-		$post_ids = array_map('intval', $_REQUEST['post']);
-	}
-
-	if ( !isset( $post_ids ) ) {
-		exit;
-	}
-
-	switch ( $doaction ) {
-		case 'approve': // If pending revisions has a requested publish date, schedule it, otherwise schedule for near future. Leave currently scheduled revisions alone. 
-		case 'publish': // Schedule all selected revisions for near future publishing.
-			$approved = 0;
-			$is_administrator = current_user_can('administrator');
-
-			require_once( dirname(__FILE__).'/revision-action_rvy.php');
-
-			foreach ((array) $post_ids as $post_id) {
-				if (!$revision = get_post($post_id)) {
-					continue;
-				}
-				
-				if (!rvy_is_revision_status($revision->post_status)) {
-					continue;
-				}
-				
-				if ( !$is_administrator 
-				&& !agp_user_can($type_obj->cap->edit_post, rvy_post_id($revision->ID), '', ['skip_revision_allowance' => true])
-				) {
-					if (count($post_ids) == 1) {
-						wp_die( __('Sorry, you are not allowed to approve this revision.') );
-					} else {
-						continue;
-					}
-				}
-
-				if ('future-revision' == $revision->post_status) {
-					if ('publish' == $doaction) {
-						rvy_revision_publish($revision->ID);
-					}
-				} else {
-					rvy_revision_approve($revision->ID);
-				}
-
-				$approved++;
-			}
-
-			if ($approved) {
-				$sendback = add_query_arg('approved', $approved, $sendback);
-			}
-
-			break;
-
-		case 'delete':
-			$deleted = 0;
-			foreach ( (array) $post_ids as $post_id ) {
-				if ( ! $revision = get_post($post_id) )
-					continue;
-				
-				if ( ! rvy_is_revision_status($revision->post_status) )
-					continue;
-				
-				if ( ! current_user_can('administrator') && ! current_user_can( 'delete_post', rvy_post_id($revision->ID) ) ) {  // @todo: review Administrator cap check
-					if (('pending-revision' != $revision->post_status) || !rvy_is_post_author($revision)) {	// allow submitters to delete their own still-pending revisions
-						wp_die( __('Sorry, you are not allowed to delete this revision.') );
-					}
-				} 
-
-				if ( !wp_delete_post($post_id) )
-					wp_die( __('Error in deleting.') );
-
-				$deleted++;
-			}
-			$sendback = add_query_arg('deleted', $deleted, $sendback);
-			break;
-
-		default:
-			$sendback = apply_filters( 'handle_bulk_actions-' . get_current_screen()->id, $sendback, $doaction, $post_ids );
-			break;
-	}
-
-	$sendback = remove_query_arg( array('action', 'action2', 'tags_input', 'post_author', 'comment_status', 'ping_status', '_status', 'post', 'bulk_edit', 'post_view'), $sendback );
-}
-
 $wp_list_table->prepare_items();
 
 $bulk_counts = array(
 	'deleted'   => isset( $_REQUEST['deleted'] )   ? absint( $_REQUEST['deleted'] )   : 0,
 	'updated' => 0,
 	'locked' => 0,
-	'approved' => 0,
-	'published' => 0,
-	'deleted' => 0,
+	'approved_count' => isset( $_REQUEST['approved_count'] )   ? absint( $_REQUEST['approved_count'] )   : 0,
+	'published_count' => isset( $_REQUEST['published_count'] )   ? absint( $_REQUEST['published_count'] )   : 0,
 	'trashed' => 0,
 	'untrashed' => 0,
 );
 
 $bulk_messages = [];
 $bulk_messages['post'] = array(
-	'approved'   => _n( '%s revision approved.', '%s revisions approved.', $bulk_counts['approved'], 'revisionary' ),
-	'published'   => _n( '%s revision published.', 'Publishing triggered for %s revisions.', $bulk_counts['published'], 'revisionary' ),
-	'deleted'   => _n( '%s revision permanently deleted.', '%s revisions permanently deleted.', $bulk_counts['deleted'] ),
+	'approved_count'   => sprintf(_n( '%s revision approved.', '%s revisions approved.', $bulk_counts['approved_count'], 'revisionary' ), $bulk_counts['approved_count']),
+	'published_count'   => sprintf(_n( '%s revision published.', '%s revisions published.', $bulk_counts['published_count'], 'revisionary' ), $bulk_counts['published_count']),
+	'deleted'   => sprintf(_n( '%s revision permanently deleted.', '%s revisions permanently deleted.', $bulk_counts['deleted'] ), $bulk_counts['deleted']),
 );
 
 $bulk_messages['page'] = $bulk_messages['post'];
@@ -235,20 +129,27 @@ $messages = array();
 foreach ( $bulk_counts as $message => $count ) {
 	if ( $message == 'trashed' && isset( $_REQUEST['ids'] ) ) {
 		$ids = preg_replace( '/[^0-9,]/', '', $_REQUEST['ids'] );
-		$messages[] = '<a href="' . esc_url( wp_nonce_url( "edit.php?post_type=$post_type&doaction=undo&action=untrash&ids=$ids", "bulk-posts" ) ) . '">' . __('Undo') . '</a>';
+		$messages[] = '<a href="' . esc_url( wp_nonce_url( "edit.php?post_type=$post_type&doaction=undo&action=untrash&ids=$ids", "bulk-revision-queue" ) ) . '">' . __('Undo') . '</a>';
+	} elseif (!empty($bulk_messages['post'][$message])) {
+		$messages []= $bulk_messages['post'][$message];
 	}
 }
 
-if ( $messages )
+if ( $messages ) {
 	echo '<div id="message" class="updated notice is-dismissible"><p>' . join( ' ', $messages ) . '</p></div>';
+}
 unset( $messages );
 
-$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated', 'approved', 'published', 'deleted', 'trashed', 'untrashed' ), $_SERVER['REQUEST_URI'] );
+$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated', 'approved_count', 'published_count', 'deleted', 'trashed', 'untrashed' ), $_SERVER['REQUEST_URI'] );
 ?>
 
 <?php $wp_list_table->views(); ?>
 
-<form id="posts-filter" method="get">
+<form name="bulk-revisions" id="bulk-revisions" method="post" action="">
+<?php 
+// This is applied in Revisionary_List_Table::display_tablenav
+//wp_nonce_field('bulk-revision-queue');
+?>
 
 <?php $wp_list_table->search_box( 'Search', 'post' ); ?>
 
