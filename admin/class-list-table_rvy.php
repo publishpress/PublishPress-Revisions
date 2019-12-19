@@ -131,13 +131,6 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		add_filter('presspermit_posts_clauses_intercept', [$this, 'flt_presspermit_posts_clauses_intercept'], 10, 4);
 		add_filter('posts_clauses', [$this, 'parent_filter'], 5, 2);
 
-		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
-			remove_action('pre_get_posts', ['MultipleAuthors\\Classes\\Query', 'action_pre_get_posts']);
-			remove_filter('posts_where', ['MultipleAuthors\\Classes\\Query', 'filter_posts_where'], 10, 2);
-			remove_filter('posts_join', ['MultipleAuthors\\Classes\\Query', 'filter_posts_join'], 10, 2);
-			remove_filter('posts_groupby', ['MultipleAuthors\\Classes\\Query', 'filter_posts_groupby'], 10, 2);
-		}
-
 		$qr = apply_filters('revisionary_queue_vars', $qr);
 		$wp_query->query($qr);
 		do_action('revisionary_queue_done');
