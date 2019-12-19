@@ -21,7 +21,11 @@ add_action('init', 'rvy_set_notification_buffer_cron');
 add_action('rvy_mail_buffer_hook', 'rvy_send_buffered_mail' );
 add_filter('cron_schedules', 'rvy_mail_buffer_cron_interval');
 
-if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview']) && empty($_REQUEST['preview_id']) && empty($_REQUEST['thumbnail_id'])) {
+if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview']) 
+&& ((empty($_REQUEST['preview_id']) && empty($_REQUEST['thumbnail_id']))
+|| (!empty($_REQUEST['preview_id']) && rvy_is_revision_status(get_post_field('post_status', $_REQUEST['preview_id'])))
+)
+) {
 	require_once('compat_rvy.php');
 	_rvy_jreviews_preview_compat();
 }
