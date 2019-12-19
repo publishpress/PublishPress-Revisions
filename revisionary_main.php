@@ -31,6 +31,15 @@ class Revisionary
 		}
 		
 		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && (!empty($_GET['preview']) && !empty($_REQUEST['preview_id']))) {
+			if ($_post = get_post($_REQUEST['preview_id'])) {
+				if (in_array($_post->post_status, ['pending-revision', 'future-revision']) && !$this->isBlockEditorActive()) {
+					$_arg = ('page' == $_post->post_type) ? 'page_id=' : 'p=';
+					$preview_url = add_query_arg('preview', true, str_replace('p=', $_arg, get_post_permalink($_post->ID)));
+					wp_redirect($preview_url);
+					exit;
+				}
+			}
+
 			if (!defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
 				require_once(dirname(__FILE__).'/classes/PublishPress/Revisions/PostPreview.php');
 				new PublishPress\Revisions\PostPreview();
