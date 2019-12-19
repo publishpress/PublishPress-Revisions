@@ -32,7 +32,7 @@ class RvyPostEdit {
     }
 
     function act_admin_head() {
-        global $post;
+        global $post, $current_user;
 
         if (!empty($post) && rvy_is_revision_status($post->post_status)):
             $type_obj = get_post_type_object($post->post_type);
@@ -45,6 +45,8 @@ class RvyPostEdit {
     /* ]]> */
     </script>
         <?php endif;
+
+        delete_post_meta( $post->ID, "_save_as_revision_{$current_user->ID}" );
     }
 
     function limitRevisionEditorUI() {
