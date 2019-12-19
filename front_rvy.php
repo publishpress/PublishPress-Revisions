@@ -288,11 +288,23 @@ class RevisionaryFront {
 		<script type="text/javascript">
 		/* <![CDATA[ */
 		jQuery(document).ready( function($) {
+			if ($('#wpadminbar').length) {
+				var rvyAdminBarHeight = $('#wpadminbar').height(); 
+			} else {
+				var rvyAdminBarHeight = 0; 
+			}
+
+			var rvyTotalHeight = $('div.rvy_view_revision').height() + rvyAdminBarHeight;
+
+			$('div.rvy_view_revision').css('top', rvyAdminBarHeight);
+
+			$('body').css('padding-top', $('div.rvy_view_revision').height());
+
 			$('header,div').each(function(i,e) { 
-				if ($(this).css('position') == 'fixed') {
-					if ($(this).position().top < 60) {
-						$(this).css('padding-top', '60px');
-						$('div.rvy_view_revision').css('position', 'fixed').css('z-index', '999999');
+				if ($(this).css('position') == 'fixed' && ($(this).attr('id') != 'wpadminbar') && (!$(this).hasClass('rvy_view_revision'))) {
+					if ($(this).position().top < rvyTotalHeight ) {
+						$(this).css('padding-top', rvyTotalHeight.toString() + 'px');
+						$('div.rvy_view_revision').css('z-index', '999999');
 						return false;
 					}
 				}
