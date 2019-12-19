@@ -14,8 +14,8 @@ if (did_action('set_current_user')) {
 	add_action( 'set_current_user', 'rvy_ajax_handler', 20);
 }
 
-if (!empty($_REQUEST['preview'] && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id']))) {
-	add_filter('redirect_canonical', function($redirect, $orig) {return $orig;}, 10, 2);
+if (!empty($_REQUEST['preview']) && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id'])) {
+		add_filter('redirect_canonical', '_rvy_no_redirect_filter', 10, 2);
 }
 
 add_action('init', 'rvy_maybe_redirect', 1);
@@ -76,6 +76,16 @@ function rvy_mail_buffer_cron_interval( $schedules ) {
 }
 /*=================== End WP-Cron implementation ====================*/
 
+
+function _rvy_no_redirect_filter($redirect, $orig) {
+	global $current_user, $wpdb;
+
+	if (!empty($current_user->ID) && (empty($wpdb) || empty($wpdb->is_404))) {
+		$redirect = $orig;
+	}
+
+	return $redirect;
+}
 
 function rvy_maybe_redirect() {
 	// temporary provision for 2.0 beta testers
@@ -250,6 +260,8 @@ function rvy_detect_post_id() {
 		$post_id = $_GET['id'];
 	elseif ( ! empty( $_REQUEST['fl_builder_data'] ) && is_array( $_REQUEST['fl_builder_data'] ) && ! empty( $_REQUEST['fl_builder_data']['post_id'] ) )
 		$post_id = $_REQUEST['fl_builder_data']['post_id'];
+	elseif ( ! empty( $_GET['page_id'] ) )
+		$post_id = $_GET['page_id'];
 	else
 		$post_id = 0;
 	

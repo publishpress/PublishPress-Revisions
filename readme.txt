@@ -4,7 +4,7 @@ Tags: revision, access, permissions, cms, user, groups, members, admin, pages, p
 Requires at least: 4.9.7
 Tested up to: 5.3
 Requires PHP: 5.6.20
-Stable Tag: 2.1.4
+Stable Tag: 2.1.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -61,6 +61,13 @@ For more details about both the free and pro version, see our <a href="https://p
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.1.5 - 11 Dec 2019 =
+* Compat : PressPermit Pro - Pending revision previews could be viewed by any user (including anonymous) if "Prevent Revisors from viewing others' revisions" disabled (since 2.1.4)
+* Fixed : Contributors had other users' uneditable, unreadable revisions listed in Revision Queue
+* Fixed : Revision Preview - Under some configurations, users with read-only access to revisions had no top bar in revision preview display
+* Fixed : Revision Preview - Under some role configurations, users saw an ineffective "Publish" button in preview top bar
+* Fixed : PHP warning for undefined index 'preview'
 
 = 2.1.4 - 10 Dec 2019 =
 * Fixed : Revision previews were not displayed to Editors under some configurations
