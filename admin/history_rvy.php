@@ -745,6 +745,7 @@ class RevisionaryHistory
             }
         }
         
+        sort($author_ids);
         $author_key = implode(",", $author_ids);
 
         if ( ! isset( $this->authors[ $author_key ] ) ) {
