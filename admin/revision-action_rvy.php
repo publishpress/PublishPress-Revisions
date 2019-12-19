@@ -716,7 +716,7 @@ function rvy_publish_scheduled_revisions($args = array()) {
 					}
 	
 					foreach($authors as $author) {
-						if ($author) {
+						if ($author && !empty($author->user_email)) {
 							rvy_mail( $author->user_email, $title, $message );
 						}
 					}
