@@ -107,6 +107,7 @@ $ui->option_captions = array(
 	'rev_approval_notify_revisor' => __('Email the Revisor when a Pending Revision is approved', 'revisionary'),
 	'publish_scheduled_notify_author' => __('Email the original Author when a Scheduled Revision is published', 'revisionary'),
 	'publish_scheduled_notify_revisor' => __('Email the Revisor when a Scheduled Revision is published', 'revisionary'),
+	'use_notification_queue' => __('Enable notification queue', 'revisionary'),
 	'revisor_role_add_custom_rolecaps' => __('All custom post types available to Revisors', 'revisionary' ),
 	'require_edit_others_drafts' => __('Prevent Revisors from editing other user&apos;s drafts', 'revisionary' ),
 	'display_hints' => __('Display Hints'),
@@ -130,7 +131,7 @@ $ui->form_options = array(
 	'pending_revisions'	=> 	 array( 'pending_revisions', 'pending_revision_update_post_date', ),
 	'preview' =>			 array( 'preview_link_type'),
 	'revisions'		=>		 array( 'revisor_lock_others_revisions', 'diff_display_strip_tags', 'display_hints' ),
-	'notification'	=>		 array( 'pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor' )
+	'notification'	=>		 array( 'pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_queue' )
 )
 );
 
@@ -511,6 +512,10 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			}
 		}
 
+		echo '<br />';
+
+		$hint = __('Queue email notifications for delayed sending once minute, hour or day limits are exceeded', 'revisionary');
+		$ui->option_checkbox( 'use_notification_queue', $tab, $section, $hint, '' );
 		?>
 		</td></tr>
 		<!--

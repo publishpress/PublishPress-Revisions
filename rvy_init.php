@@ -16,6 +16,41 @@ if (did_action('set_current_user')) {
 
 add_action('init', 'rvy_maybe_redirect', 1);
 
+/*======== WP-Cron implentation for Email Notification Queue ========*/
+add_action('init', 'rvy_set_notification_queue_cron');
+add_action('rvy_mail_queue_hook', 'rvy_send_queued_mail' );
+add_filter('cron_schedules', 'rvy_mail_queue_cron_interval');
+
+function rvy_set_notification_queue_cron() {
+	$cron_timestamp = wp_next_scheduled( 'rvy_mail_queue_hook' );
+
+	//$wait_sec = time() - $cron_timestamp;
+	//pp_errlog($wait_sec);
+
+	if (rvy_get_option('use_notification_queue')) {
+		if (!$cron_timestamp) {
+			wp_schedule_event(time(), 'two_minutes', 'rvy_mail_queue_hook');
+		}
+	} else {
+		wp_unschedule_event($cron_timestamp, 'rvy_mail_queue_hook');
+	}
+}
+
+function rvy_mail_queue_cron_interval( $schedules ) {
+    $schedules['two_minutes'] = array(
+        'interval' => 30,
+        'display'  => esc_html__( 'Every 2 Minutes' ),
+    );
+ 
+    return $schedules;
+}
+
+function rvy_mail_queue_exec() {
+	return rvy_mail_process_queue();
+}
+/*=================== End WP-Cron implementation ====================*/
+
+
 function rvy_maybe_redirect() {
 	// temporary provision for 2.0 beta testers
 	if (strpos($_SERVER['REQUEST_URI'], 'page=rvy-moderation')) {
@@ -458,13 +493,23 @@ function rvy_error( $err_slug, $arg2 = '' ) {
 	$rvy_err->error_notice( $err_slug );
 }
 
+function rvy_mail_check_queue($new_msg = []) {
+	if (!rvy_get_option('use_notification_queue')) {
+		if (defined('REVISIONARY_DISABLE_MAIL_LOG')) {
+			return array_fill_keys(['queue', 'sent_mail', 'send_limits', 'sent_counts', 'new_msg_queued'], []);
+		}
 
-function rvy_mail_process_queue() {
-	if (! $q = get_option('revisionary_mail_queue')) {
-		return false;
+		$queue = [];
+
+	} elseif (!$queue = get_option('revisionary_mail_queue')) {
+		$queue = [];
 	}
 
-	$sent_mail = (array) get_option('revisionary_sent_mail');
+	$new_msg_queued = false;
+
+	if (!$sent_mail = get_option('revisionary_sent_mail')) {
+		$sent_mail = [];
+	}
 
 	$current_time = time();
 
@@ -472,12 +517,19 @@ function rvy_mail_process_queue() {
 	$durations = ['minute' => 60, 'hour' => 3600, 'day' => 86400];
 	$sent_counts = ['minute' => 0, 'hour' => 0, 'day' => 0];
 	
+	// by default, purge mail log entries older than 60 days
+	$purge_time = apply_filters('revisionary_mail_log_duration', 86400 * 60);
+	
+	if ($purge_time < $durations['day'] * 2) {
+		$purge_time = $durations['day'] * 2;
+	}
+
 	$send_limits = apply_filters(
 		'revisionary_email_limits', 
 		[
-			'minute' => 20,
-			'hour' => 140,
-			'day' => 10000,
+			'minute' => 19,
+			'hour' => 99,
+			'day' => 999,
 		]
 	);
 
@@ -492,25 +544,49 @@ function rvy_mail_process_queue() {
 			if ($elapsed < $duration) {
 				$sent_counts[$limit_key]++;
 			}
+
+			if ($new_msg && ($sent_counts[$limit_key] > $send_limits[$limit_key])) {
+				$new_msg_queued = true;
+			}
 		}
 
-		if ($elapsed > $durations['day']) {
+		if ($elapsed > $purge_time) {
 			unset($sent_mail[$k]);
 			$purged = true;
 		}
 	}
 
-	/*
+	if ($new_msg_queued) {
+		$queue = array_merge([$new_msg], $queue);
+		update_option('revisionary_mail_queue', $queue);
+	}
+
 	if (!empty($purged)) {
 		update_option('revisionary_sent_mail', $sent_mail);
 	}
-	*/
+
+	return (object) compact('queue', 'sent_mail', 'send_limits', 'sent_counts', 'new_msg_queued');
+}
+
+// called by WP-cron hook
+function rvy_send_queued_mail() {
+	//pp_errlog('rvy_send_queued_mail');
+
+	$queue_status = rvy_mail_check_queue();
+
+	//pp_errlog($queue_status);
+
+	if (empty($queue_status->queue)) {
+		return false;
+	}
+
+	$q = $queue_status->queue;
 
 	while ($q) {
-		foreach($sent_counts as $limit_key => $count) {
-			$sent_counts[$limit_key]++;
+		foreach($queue_status->sent_counts as $limit_key => $count) {
+			$queue_status->sent_counts[$limit_key]++;
 
-			if ($count > $send_limit[$limit_key]) {
+			if ($count > $queue_status->send_limits[$limit_key]) {
 				// A send limit has been reached
 				break 2;
 			}
@@ -518,19 +594,40 @@ function rvy_mail_process_queue() {
 
 		$next_mail = array_pop($q);
 
-		if (empty($q['address']) || empty($q['title']) || empty($q['message'])) {
+		// update truncated queue immediately to prevent duplicate sending by another process
+		update_option('revisionary_mail_queue', $q);
+
+		// If queued notification is missing vital data, discard it
+		if (empty($next_mail['address']) || empty($next_mail['title']) || empty($next_mail['message']) || empty($next_mail['time_gmt'])) {
 			continue;
 		}
 
-		// update truncated queue immediately to prevent duplicate sending by another process
-		update_option('revisionary_mail_queue', $q);
-		
-		if (defined('RS_DEBUG')) {
-			wp_mail($q['address'], $q['title'], $q['message']);
-		} else {
-			@wp_mail($q['address'], $q['title'], $q['message']);
+		// If notification was queued more than a week ago, discard it
+		if (time() - $next_mail['time_gmt'] > 3600 * 24 * 7 ) {
+			continue;
 		}
 
+		if (defined('PRESSPERMIT_DEBUG')) {
+			pp_errlog('*** Sending QUEUED mail: ');
+			pp_errlog($next_mail['address'] . ', ' . $next_mail['title']);
+			pp_errlog($next_mail['message']);
+		}
+		
+		if (defined('RS_DEBUG')) {
+			$success = wp_mail($next_mail['address'], $next_mail['title'], $next_mail['message']);
+		} else {
+			$success = @wp_mail($next_mail['address'], $next_mail['title'], $next_mail['message']);
+		}
+
+		if (!$success && !defined('REVISIONARY_NO_MAIL_RETRY')) {
+			// message was not sent successfully, so put it back in the queue
+			if ($q) {
+				$q = array_merge([$next_mail], $q);
+			} else {
+				$q = [$next_mail];
+			}
+			update_option('revisionary_mail_queue', $q);
+		} else {
 		// log the sent mail
 		$next_mail['time_gmt'] = time();
 
@@ -538,24 +635,14 @@ function rvy_mail_process_queue() {
 			unset($next_mail['message']);
 		}
 
-		$sent_mail = $next_mail + $sent_mail; // append new log to beginning of array
-	}
-
-	if (!empty($next_mail)) {
-		update_option('revisionary_sent_mail', $sent_mail);
+			$queue_status->sent_mail[]= $next_mail;
+			update_option('revisionary_sent_mail', $queue_status->sent_mail);
 	}
 }
-
-function rvy_mail_maybe_queue($address, $title, $message) {
-	//['revision_id' => $revision_id, 'post_id' => $published_post->ID, 'notification_type' => $notification_type, 'notification_class' => $notification_class]
-
-	// todo: move queue, log, limit retriaval to function
-
-	return false;
 }
 
 function rvy_mail( $address, $title, $message, $args ) {
-	//['revision_id' => $revision_id, 'post_id' => $published_post->ID, 'notification_type' => $notification_type, 'notification_class' => $notification_class]
+	// args: ['revision_id' => $revision_id, 'post_id' => $published_post->ID, 'notification_type' => $notification_type, 'notification_class' => $notification_class]
 
 	/*
 	 * [wp-cron action checks wp_option revisionary_mail_queue. If wait time has elapsed, send queued emails (up to limit per minute)]
@@ -565,14 +652,15 @@ function rvy_mail( $address, $title, $message, $args ) {
 	 * 	- or -
 	 * 
 	 * Check wp_option array revisionary_sent_mail
-	 *   - Flush entries older than 24 hours
 	 *   - If exceeding daily, hourly or minute limit, add this email to queue
-	 * 
-	 * If sending, add current timestamp to wp_option array revisionary_sent_mail
-	 *   - Flush entries older than 24 hours
+	 * 	 - If sending, add current timestamp to wp_option array revisionary_sent_mail
 	 */
 
-	if (rvy_mail_maybe_queue($address, $title, $message, $args)) {
+	$new_msg = array_merge(compact('address', 'title', 'message'), ['time_gmt' => time()], $args);
+
+	$queue_status = rvy_mail_check_queue($new_msg);
+
+	if (!empty($queue_status->new_msg_queued)) {
 		return;
 	}
 
@@ -582,9 +670,24 @@ function rvy_mail( $address, $title, $message, $args ) {
 	}
 
 	if ( defined( 'RS_DEBUG' ) )
-		wp_mail( $address, $title, $message );
+		$success = wp_mail( $address, $title, $message );
 	else
-		@wp_mail( $address, $title, $message );
+		$success = @wp_mail( $address, $title, $message );
+
+	if ($success || defined('REVISIONARY_NO_MAIL_RETRY')) {
+		if (!defined('REVISIONARY_DISABLE_MAIL_LOG')) {
+			$queue_status->sent_mail[]= $new_msg;
+			update_option('revisionary_sent_mail', $queue_status->sent_mail);
+		}
+	} elseif (rvy_get_option('use_notification_queue')) {
+		if ($queue_status->queue) {
+			$queue_status->queue = array_merge([$new_msg], $queue_status->queue);
+		} else {
+			$queue_status->queue = [$new_msg];
+		}
+		
+		update_option('revisionary_mail_queue', $queue_status->queue);
+	}
 }
 
 function rvy_settings_scripts() {

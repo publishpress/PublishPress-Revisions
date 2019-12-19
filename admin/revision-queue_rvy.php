@@ -56,14 +56,11 @@ if ( $doaction ) {
 		case 'approve': // If pending revisions has a requested publish date, schedule it, otherwise schedule for near future. Leave currently scheduled revisions alone. 
 		case 'publish': // Schedule all selected revisions for near future publishing.
 			$approved = 0;
-			//$published = 0;
-
 			$is_administrator = current_user_can('administrator');
 
-			foreach ((array) $post_ids as $post_id) {
-				//$publish_ids = [];
-				$approve_ids = [];
+			require_once( dirname(__FILE__).'/revision-action_rvy.php');
 
+			foreach ((array) $post_ids as $post_id) {
 				if (!$revision = get_post($post_id)) {
 					continue;
 				}
@@ -82,56 +79,20 @@ if ( $doaction ) {
 					}
 				}
 
-				if (('publish' == $doaction) || ('future-revision' != $revision->post_status)) {
-					//$publish_ids []= $post_id;
-					$approve_ids []= $post_id;
-				} /* else {
-					// If the revision is already scheduled, leave it alone
-					if ('future-revision' == $revision->post_status) {
-						continue;
+				if ('future-revision' == $revision->post_status) {
+					if ('publish' == $doaction) {
+						rvy_revision_publish($revision->ID);
 					}
-					
-					// If the pending revision has a requested publish date, schedule that
-					if (strtotime($revision->post_date_gmt) > agp_time_gmt()) {
-						$approve_ids []= $post_id;
-					} else {
-						$publish_ids []= $post_id;
-					}
+				} else {
+					rvy_revision_approve($revision->ID);
 				}
-				*/
 
-				/*
-				if ( !wp_delete_post($post_id) ) {
-					wp_die( __('Error in deleting.') );
-				}
-				*/
+				$approved++;
 			}
 
-			require_once( dirname(__FILE__).'/revision-action_rvy.php');
-
-			foreach ($approve_ids as $revision_id) {
-				rvy_revision_approve($revision_id);
-
-				//$wpdb->update( $wpdb->posts, array('post_status' => 'future-revision'), array('ID' => $revision_id));
-				//clean_post_cache($revision_id);
-				//$approved++;
+			if ($approved) {
+				$sendback = add_query_arg('approved', $approved, $sendback);
 			}
-
-			if ($approve_ids) {
-				$sendback = add_query_arg('approved', count($approve_ids), $sendback);
-			}
-
-			/*
-			if ($published) {
-				$sendback = add_query_arg('published', $published, $sendback);
-			}
-			*/
-
-			/*
-			if ($approved || $published) {
-				rvy_update_next_publish_date();
-			}
-			*/
 
 			break;
 
@@ -157,6 +118,7 @@ if ( $doaction ) {
 			}
 			$sendback = add_query_arg('deleted', $deleted, $sendback);
 			break;
+
 		default:
 			$sendback = apply_filters( 'handle_bulk_actions-' . get_current_screen()->id, $sendback, $doaction, $post_ids );
 			break;
