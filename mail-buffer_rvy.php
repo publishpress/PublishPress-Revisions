@@ -1,12 +1,12 @@
 <?php
 
-function _rvy_mail_check_queue($new_msg = []) {
-	if (!$queue = get_option('revisionary_mail_queue')) {
-		$queue = [];
-		$first_queue = true;
+function _rvy_mail_check_buffer($new_msg = []) {
+	if (!$buffer = get_option('revisionary_mail_buffer')) {
+		$buffer = [];
+		$first_buffer = true;
 	}
 
-	$new_msg_queued = false;
+	$new_msg_buffered = false;
 
 	if (!$sent_mail = get_option('revisionary_sent_mail')) {
 		$sent_mail = [];
@@ -26,7 +26,7 @@ function _rvy_mail_check_queue($new_msg = []) {
 		$purge_time = $durations['day'] * 2;
 	}
 
-	if ($use_queue) {
+	if ($use_buffer) {
 		$default_minute_limit = (defined('REVISIONARY_EMAIL_LIMIT_MINUTE')) ? REVISIONARY_EMAIL_LIMIT_MINUTE : 20;
 		$default_hour_limit = (defined('REVISIONARY_EMAIL_LIMIT_HOUR')) ? REVISIONARY_EMAIL_LIMIT_HOUR : 100;
 		$default_day_limit = (defined('REVISIONARY_EMAIL_LIMIT_DAY')) ? REVISIONARY_EMAIL_LIMIT_DAY : 1000;
@@ -48,14 +48,14 @@ function _rvy_mail_check_queue($new_msg = []) {
 
 		$elapsed = $current_time - $mail['time_gmt'];
 
-		if ($use_queue) {
+		if ($use_buffer) {
 			foreach($durations as $limit_key => $duration) {
 				if ($elapsed < $duration) {
 					$sent_counts[$limit_key]++;
 				}
 
 				if ($new_msg && ($sent_counts[$limit_key] >= $send_limits[$limit_key])) {
-					$new_msg_queued = true;
+					$new_msg_buffered = true;
 				}
 			}
 		}
@@ -66,9 +66,9 @@ function _rvy_mail_check_queue($new_msg = []) {
 		}
 	}
 
-	if ($new_msg_queued) {
-		$queue = array_merge([$new_msg], $queue);
-		update_option('revisionary_mail_queue', $queue);
+	if ($new_msg_buffered) {
+		$buffer = array_merge([$new_msg], $buffer);
+		update_option('revisionary_mail_buffer', $buffer);
 	}
 
 	if (!empty($purged)) {
@@ -80,29 +80,29 @@ function _rvy_mail_check_queue($new_msg = []) {
 		$wpdb->query("UPDATE $wpdb->options SET autoload = 'no' WHERE option_name = 'revisionary_sent_mail'");
 	}
 
-	if (!empty($first_queue) && $queue) {
+	if (!empty($first_buffer) && $buffer) {
 		global $wpdb;
-		$wpdb->query("UPDATE $wpdb->options SET autoload = 'no' WHERE option_name = 'revisionary_mail_queue'");
+		$wpdb->query("UPDATE $wpdb->options SET autoload = 'no' WHERE option_name = 'revisionary_mail_buffer'");
 	}
 
-	return (object) compact('queue', 'sent_mail', 'send_limits', 'sent_counts', 'new_msg_queued');
+	return (object) compact('buffer', 'sent_mail', 'send_limits', 'sent_counts', 'new_msg_buffered');
 }
 
 // called by WP-cron hook
-function _rvy_send_queued_mail() {
-	$queue_status = rvy_mail_check_queue();
+function _rvy_send_buffered_mail() {
+	$buffer_status = rvy_mail_check_buffer();
 
-	if (empty($queue_status->queue)) {
+	if (empty($buffer_status->buffer)) {
 		return false;
 	}
 
-	$q = $queue_status->queue;
+	$q = $buffer_status->buffer;
 
 	while ($q) {
-		foreach($queue_status->sent_counts as $limit_key => $count) {
-			$queue_status->sent_counts[$limit_key]++;
+		foreach($buffer_status->sent_counts as $limit_key => $count) {
+			$buffer_status->sent_counts[$limit_key]++;
 
-			if ($count > $queue_status->send_limits[$limit_key]) {
+			if ($count > $buffer_status->send_limits[$limit_key]) {
 				// A send limit has been reached
 				break 2;
 			}
@@ -110,21 +110,21 @@ function _rvy_send_queued_mail() {
 
 		$next_mail = array_pop($q);
 
-		// update truncated queue immediately to prevent duplicate sending by another process
-		update_option('revisionary_mail_queue', $q);
+		// update truncated buffer immediately to prevent duplicate sending by another process
+		update_option('revisionary_mail_buffer', $q);
 
-		// If queued notification is missing vital data, discard it
+		// If buffered notification is missing vital data, discard it
 		if (empty($next_mail['address']) || empty($next_mail['title']) || empty($next_mail['message']) || empty($next_mail['time_gmt'])) {
 			continue;
 		}
 
-		// If notification was queued more than a week ago, discard it
+		// If notification was buffered more than a week ago, discard it
 		if (time() - $next_mail['time_gmt'] > 3600 * 24 * 7 ) {
 			continue;
 		}
 
 		if (defined('PRESSPERMIT_DEBUG')) {
-			pp_errlog('*** Sending QUEUED mail: ');
+			pp_errlog('*** Sending BUFFERED mail: ');
 			pp_errlog($next_mail['address'] . ', ' . $next_mail['title']);
 			pp_errlog($next_mail['message']);
 		}
@@ -136,13 +136,13 @@ function _rvy_send_queued_mail() {
 		}
 
 		if (!$success && defined('REVISIONARY_MAIL_RETRY')) {
-			// message was not sent successfully, so put it back in the queue
+			// message was not sent successfully, so put it back in the buffer
 			if ($q) {
 				$q = array_merge([$next_mail], $q);
 			} else {
 				$q = [$next_mail];
 			}
-			update_option('revisionary_mail_queue', $q);
+			update_option('revisionary_mail_buffer', $q);
 		} else {
 			// log the sent mail
 			$next_mail['time'] = strtotime(current_time( 'mysql' ));
@@ -153,8 +153,8 @@ function _rvy_send_queued_mail() {
 				unset($next_mail['message']);
 			}
 
-			$queue_status->sent_mail[]= $next_mail;
-			update_option('revisionary_sent_mail', $queue_status->sent_mail);
+			$buffer_status->sent_mail[]= $next_mail;
+			update_option('revisionary_sent_mail', $buffer_status->sent_mail);
 		}
 	}
 }

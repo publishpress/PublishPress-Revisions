@@ -111,8 +111,9 @@ register_activation_hook(__FILE__, function()
 
 register_deactivation_hook(__FILE__, function()
 	{
-		$timestamp = wp_next_scheduled('rvy_mail_queue_hook');
-   		wp_unschedule_event( $timestamp,'rvy_mail_queue_hook');
+		if ($timestamp = wp_next_scheduled('rvy_mail_buffer_hook')) {
+		   wp_unschedule_event( $timestamp,'rvy_mail_buffer_hook');
+		}
 	}
 );
 

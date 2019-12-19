@@ -16,56 +16,53 @@ if (did_action('set_current_user')) {
 
 add_action('init', 'rvy_maybe_redirect', 1);
 
-/*======== WP-Cron implentation for Email Notification Queue ========*/
-add_action('init', 'rvy_set_notification_queue_cron');
-add_action('rvy_mail_queue_hook', 'rvy_send_queued_mail' );
-add_filter('cron_schedules', 'rvy_mail_queue_cron_interval');
+/*======== WP-Cron implentation for Email Notification Buffer ========*/
+add_action('init', 'rvy_set_notification_buffer_cron');
+add_action('rvy_mail_buffer_hook', 'rvy_send_buffered_mail' );
+add_filter('cron_schedules', 'rvy_mail_buffer_cron_interval');
 
 if (defined('JREVIEW_ROOT') && !empty($_REQUEST['preview']) && empty($_REQUEST['preview_id']) && empty($_REQUEST['thumbnail_id'])) {
 	require_once('compat_rvy.php');
 	_rvy_jreviews_preview_compat();
 }
 
-function rvy_mail_check_queue($new_msg = []) {
-	if (!$use_queue = rvy_get_option('use_notification_queue')) {
+function rvy_mail_check_buffer($new_msg = []) {
+	if (!$use_buffer = rvy_get_option('use_notification_buffer')) {
 		return (defined('REVISIONARY_DISABLE_MAIL_LOG'))
-		? array_fill_keys(['queue', 'sent_mail', 'send_limits', 'sent_counts', 'new_msg_queued'], [])
+		? array_fill_keys(['buffer', 'sent_mail', 'send_limits', 'sent_counts', 'new_msg_buffered'], [])
 		: [];
 	}
 
-	require_once( dirname(__FILE__).'/mail-queue_rvy.php');
-	return _rvy_mail_check_queue($new_msg);
+	require_once( dirname(__FILE__).'/mail-buffer_rvy.php');
+	return _rvy_mail_check_buffer($new_msg);
 }
 
-function rvy_send_queued_mail() {
-	require_once( dirname(__FILE__).'/mail-queue_rvy.php');
-	_rvy_send_queued_mail();
+function rvy_send_buffered_mail() {
+	require_once( dirname(__FILE__).'/mail-buffer_rvy.php');
+	_rvy_send_buffered_mail();
 }
-function rvy_set_notification_queue_cron() {
-	$cron_timestamp = wp_next_scheduled( 'rvy_mail_queue_hook' );
+
+function rvy_set_notification_buffer_cron() {
+	$cron_timestamp = wp_next_scheduled( 'rvy_mail_buffer_hook' );
 
 	$wait_sec = time() - $cron_timestamp;
 
-	if (rvy_get_option('use_notification_queue')) {
+	if (rvy_get_option('use_notification_buffer')) {
 		if (!$cron_timestamp) {
-			wp_schedule_event(time(), 'two_minutes', 'rvy_mail_queue_hook');
+			wp_schedule_event(time(), 'two_minutes', 'rvy_mail_buffer_hook');
 		}
 	} else {
-		wp_unschedule_event($cron_timestamp, 'rvy_mail_queue_hook');
+		wp_unschedule_event($cron_timestamp, 'rvy_mail_buffer_hook');
 	}
 }
 
-function rvy_mail_queue_cron_interval( $schedules ) {
+function rvy_mail_buffer_cron_interval( $schedules ) {
     $schedules['two_minutes'] = array(
         'interval' => 120,
         'display'  => esc_html__( 'Every 2 Minutes' ),
     );
  
     return $schedules;
-}
-
-function rvy_mail_queue_exec() {
-	return rvy_mail_process_queue();
 }
 /*=================== End WP-Cron implementation ====================*/
 
@@ -481,22 +478,22 @@ function rvy_mail( $address, $title, $message, $args ) {
 	// args: ['revision_id' => $revision_id, 'post_id' => $published_post->ID, 'notification_type' => $notification_type, 'notification_class' => $notification_class]
 
 	/*
-	 * [wp-cron action checks wp_option revisionary_mail_queue. If wait time has elapsed, send queued emails (up to limit per minute)]
+	 * [wp-cron action checks wp_option revisionary_mail_buffer. If wait time has elapsed, send buffered emails (up to limit per minute)]
 	 * 
-	 * If mail is already queued to wp_option revisionary_mail_queue, add this email to queue
+	 * If mail is already buffered to wp_option revisionary_mail_buffer, add this email to buffer
 	 * 
 	 * 	- or -
 	 * 
 	 * Check wp_option array revisionary_sent_mail
-	 *   - If exceeding daily, hourly or minute limit, add this email to queue
+	 *   - If exceeding daily, hourly or minute limit, add this email to buffer
 	 * 	 - If sending, add current timestamp to wp_option array revisionary_sent_mail
 	 */
 
 	$new_msg = array_merge(compact('address', 'title', 'message'), ['time' => strtotime(current_time( 'mysql' )), 'time_gmt' => time()], $args);
 
-	$queue_status = rvy_mail_check_queue($new_msg);
+	$buffer_status = rvy_mail_check_buffer($new_msg);
 
-	if (!empty($queue_status->new_msg_queued)) {
+	if (!empty($buffer_status->new_msg_buffered)) {
 		return;
 	}
 
@@ -512,8 +509,8 @@ function rvy_mail( $address, $title, $message, $args ) {
 
 	if ($success || !defined('REVISIONARY_MAIL_RETRY')) {
 		if (!defined('REVISIONARY_DISABLE_MAIL_LOG')) {
-			$queue_status->sent_mail[]= $new_msg;
-			update_option('revisionary_sent_mail', $queue_status->sent_mail);
+			$buffer_status->sent_mail[]= $new_msg;
+			update_option('revisionary_sent_mail', $buffer_status->sent_mail);
 		}
 	}
 }
