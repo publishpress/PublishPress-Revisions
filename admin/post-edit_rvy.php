@@ -7,7 +7,7 @@ class RvyPostEdit {
         add_action('add_meta_boxes', [$this, 'act_replace_publish_metabox'], 10, 2);
 
         // deal with case where another plugin replaced publish metabox
-        add_filter('preview_post_link', [$this, 'fltPreviewLink']);
+        add_filter('preview_post_link', [$this, 'fltPreviewLink'], 10, 2);
         add_filter('presspermit_preview_post_label', [$this, 'fltPreviewLabel']);
         add_filter('presspermit_preview_post_title', [$this, 'fltPreviewTitle']);
         add_action('post_submitbox_misc_actions', [$this, 'actSubmitMetaboxActions']);
@@ -41,10 +41,49 @@ class RvyPostEdit {
     /* <![CDATA[ */
     jQuery(document).ready( function($) {
         $('h1.wp-heading-inline').html('<?php printf(__('Edit %s Revision', 'revisionary'), $type_obj->labels->singular_name);?>');
+
+        $(document).on('click', '#post-body-content *, #wp-content-editor-container *, #tinymce *', function() {
+            $('div.rvy-revision-approve').hide();
+        });
     });
     /* ]]> */
     </script>
         <?php endif;
+
+        // Hide the Approve button if editor window is clicked into
+        add_filter('tiny_mce_before_init', function($initArray, $editor_id = '') {
+                //if (empty($initArray['init_instance_callback'])) {
+                    $initArray['init_instance_callback'] = "function (ed) {
+                        ed.on('click', function (e) {
+                            var revApprove = document.getElementById('rvy_revision_approve');
+
+                            if (revApprove != null) {
+                                revApprove.style.display = 'none';
+                            }
+
+                            var revPreview = document.getElementById('revision-preview');
+
+                            if (revPreview != null) {
+                                revPreview.style.display = 'none';
+                            }
+
+                            var postPreview = document.getElementById('post-preview');
+
+                            if (postPreview != null) {
+                                postPreview.style.display = 'block';
+                            }
+
+                            var revCompare = document.getElementById('rvy_compare_button');
+
+                            if (revCompare != null) {
+                                revCompare.style.display = 'none';
+                            }
+                        });
+                    }";
+                    
+                    return $initArray;
+            }, 10, 2
+        );
 
         delete_post_meta( $post->ID, "_save_as_revision_{$current_user->ID}" );
     }
@@ -87,7 +126,7 @@ public function actSubmitboxStart() {
                 $approval_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|{$post->ID}" );
             }
             ?>
-            <div class="rvy-revision-approve" style="float:right"><a href="<?php echo $approval_url;?>" title="<?php echo esc_attr(__('Approve saved changes', 'revisionary'));?>"><?php _e('Approve', 'revisionary');?></a></div>
+            <div id="rvy_revision_approve" class="rvy-revision-approve" style="float:right"><a href="<?php echo $approval_url;?>" title="<?php echo esc_attr(__('Approve saved changes', 'revisionary'));?>"><?php _e('Approve', 'revisionary');?></a></div>
         <?php endif;
     }
 
@@ -105,10 +144,13 @@ public function actSubmitboxStart() {
         <?php endif;
     }
 
-    public function fltPreviewLink($url) {
-        global $post;
+    public function fltPreviewLink($url, $_post = false) {
+        global $post, $revisionary;
 
-        if ($post && rvy_is_revision_status($post->post_status)) {
+        if (!empty($_REQUEST['wp-preview']) && !empty($_post) && !empty($revisionary->last_autosave_id[$_post->ID])) {
+            $url = remove_query_arg('_thumbnail_id', $url);
+            $url = add_query_arg('_thumbnail_id', $revisionary->last_autosave_id[$_post->ID], $url);
+        } elseif ($post && rvy_is_revision_status($post->post_status)) {
             $url = rvy_preview_url($post);
         }
 
