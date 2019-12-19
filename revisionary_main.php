@@ -771,6 +771,10 @@ class Revisionary
 		
 		$published_post = get_post( $postarr['ID'] );
 
+		if ((('revision' == $published_post->post_type) || ('auto-save' == $published_post->post_status)) && $published_post->post_parent) {
+			$published_post = get_post($published_post->post_parent);
+		}
+
 		if ($return_data = apply_filters('revisionary_pending_revision_intercept', [], $data, $postarr, $published_post)) {
 			return $return_data;
 		}
