@@ -529,7 +529,7 @@ class Revisionary
 				if ($type_obj && !empty($type_obj->cap->edit_others_posts)) {
 					$caps = array_diff($caps, [$type_obj->cap->edit_others_posts, 'do_not_allow']);
 
-					if (($post->post_author == $current_user->ID) || !rvy_get_option('revisor_lock_others_revisions')) {
+					if (rvy_is_post_author($post) || !rvy_get_option('revisor_lock_others_revisions')) {
 						$caps []= 'read';
 					} else {
 						$caps []= 'list_others_revisions';
@@ -539,7 +539,7 @@ class Revisionary
 
 			return $caps;
 
-		} elseif (($post_id > 0) && $post && rvy_is_revision_status($post->post_status) && rvy_get_option('revisor_lock_others_revisions') && ($post->post_author != $current_user->ID)) {
+		} elseif (($post_id > 0) && $post && rvy_is_revision_status($post->post_status) && rvy_get_option('revisor_lock_others_revisions') && !rvy_is_post_author($post)) {
 			if ($type_obj = get_post_type_object( $post->post_type )) {
 				if (in_array($type_obj->cap->edit_others_posts, $caps)) {					
 					if ((!empty($type_obj->cap->edit_others_posts) && empty($current_user->allcaps[$type_obj->cap->edit_others_posts])) 
