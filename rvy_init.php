@@ -703,7 +703,7 @@ function rvy_mail( $address, $title, $message, $args ) {
 	 * 	 - If sending, add current timestamp to wp_option array revisionary_sent_mail
 	 */
 
-	$new_msg = array_merge(compact('address', 'title', 'message'), ['time_gmt' => time()], $args);
+	$new_msg = array_merge(compact('address', 'title', 'message'), ['time' => strtotime(current_time( 'mysql' )), 'time_gmt' => time()], $args);
 
 	$queue_status = rvy_mail_check_queue($new_msg);
 
