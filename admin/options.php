@@ -521,7 +521,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 
 		echo '<br />';
 
-		$hint = __('Queue email notifications for delayed sending once minute, hour or day limits are exceeded', 'revisionary');
+		$hint = __('To avoid notification failures, buffer emails for delayed sending once minute, hour or day limits are exceeded', 'revisionary');
 		$ui->option_checkbox( 'use_notification_queue', $tab, $section, $hint, '' );
 		?>
 		</td></tr>
