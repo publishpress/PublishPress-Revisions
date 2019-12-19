@@ -607,6 +607,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$approval_potential = false;
 
+		/*
 		foreach(rvy_get_manageable_types() as $post_type) {
 			$type_obj = get_post_type_object($post_type);
 			if (!empty($current_user->allcaps[$type_obj->cap->edit_published_posts])) {
@@ -614,6 +615,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				break;
 			}
 		}
+		*/
 
 		if ($approval_potential = apply_filters('revisionary_bulk_action_approval', $approval_potential)) {
 			$actions['approve'] = __('Approve', 'revisionary');
