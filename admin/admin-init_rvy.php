@@ -17,7 +17,7 @@ function _rvy_post_edit_ui() {
 	if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ) ) ) {
 		if ( $pagenow == 'post.php' ) {
 			require_once( dirname(__FILE__).'/post-edit_rvy.php' );
-			new RvyPostEdit();
+			$revisionary->post_edit_ui = new RvyPostEdit();
 		}
 
 		if ( $revisionary->isBlockEditorActive() ) {
