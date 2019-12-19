@@ -993,7 +993,7 @@ function rvy_is_post_author($post, $user = false) {
 		$user_id = (is_object($user)) ? $user->ID : $user;
 	}
 
-	if ($post->post_author == $user_id) {
+	if (!empty($post->post_author) && ($post->post_author == $user_id)) {
 		return true;
 
 	} elseif (function_exists('is_multiple_author_for_post') && is_multiple_author_for_post($user_id, $post->ID)) {
