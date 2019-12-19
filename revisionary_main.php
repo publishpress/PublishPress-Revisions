@@ -752,14 +752,3 @@ class Revisionary
 		return $rvy_workflow_ui->get_revision_msg( $revision_id, $args );
 	}
 } // end Revisionary class
-
-
-// Disable Gutenberg on deprecated Revisions Edit screen
-if ( false !== strpos( urldecode($_SERVER['REQUEST_URI']), 'admin.php?page=rvy-revisions') ) {
-	$post_types = get_post_types( array( 'public' => true ), 'object' );
-	foreach( $post_types as $post_type => $type_obj ) {
-		if ( ! defined( 'RVY_FORCE_BLOCKEDIT_' . strtoupper($post_type) ) ) {
-			add_filter( "use_block_editor_for_{$post_type}", '__return_false', 10 );
-		}
-	}
-}
