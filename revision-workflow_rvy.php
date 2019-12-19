@@ -197,6 +197,8 @@ class Rvy_Revision_Workflow_UI {
 			   
                 $msg .= '<ul><li>';
                 $msg .= sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link );
+                $preview_link = remove_query_arg('preview_id', $preview_link);
+
                 $msg .= '<br /><br /></li><li>';
                 //$msg .= sprintf( '<a href="%s">' . __('Go to Revisions Manager', 'revisionary') . '</a>', "admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=view" );
                 //$msg .= '<br /><br /></li><li>';
@@ -221,8 +223,11 @@ class Rvy_Revision_Workflow_UI {
                     $msg .= __('It will be published when an editor approves it.', 'revisionary') . ' ';
                 }
 
+                clean_post_cache($revision->ID);
+                
                 $_arg = ('page' == $revision->post_type) ? 'page_id=' : 'p=';
                 $preview_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $revision ) ) );
+                $preview_link = remove_query_arg('preview_id', $preview_link);
 
                 $msg .= '<ul><li>';
                 $msg .= sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link );
