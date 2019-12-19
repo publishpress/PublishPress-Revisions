@@ -2,7 +2,7 @@
 
 class Rvy_Revision_Workflow_UI {
     function do_notifications( $notification_type, $status, $post_arr, $args ) {
-        global $revisionary;
+        global $revisionary, $current_user;
         
         if ( 'pending-revision' != $notification_type ) {
             return;
@@ -35,10 +35,7 @@ class Rvy_Revision_Workflow_UI {
             
             $message = sprintf( __('A pending revision to the %1$s "%2$s" has been submitted.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
             
-
-            if ( $author = new WP_User( $post_arr['post_author'] ) ) {
-                $message .= sprintf( __('It was submitted by %1$s.', 'revisionary' ), $author->display_name ) . "\r\n\r\n";
-            }
+            $message .= sprintf( __('It was submitted by %1$s.', 'revisionary' ), $current_user->display_name ) . "\r\n\r\n";
 
             if ( $revision_id ) {
                 $revision = get_post($revision_id);
