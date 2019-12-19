@@ -61,12 +61,14 @@ class Revisionary
 		}
 		
 		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && (!empty($_GET['preview']) && !empty($_REQUEST['preview_id']))) {
-			if ($_post = get_post($_REQUEST['preview_id'])) {
-				if (in_array($_post->post_status, ['pending-revision', 'future-revision']) && !$this->isBlockEditorActive()) {
-					if (empty($_REQUEST['_thumbnail_id']) || !get_post($_REQUEST['_thumbnail_id'])) {
-						$preview_url = rvy_preview_url($_post);
-						wp_redirect($preview_url);
-						exit;
+			if (defined('REVISIONARY_PREVIEW_WORKAROUND')) { // @todo: confirm this is no longer needed
+				if ($_post = get_post($_REQUEST['preview_id'])) {
+					if (in_array($_post->post_status, ['pending-revision', 'future-revision']) && !$this->isBlockEditorActive()) {
+						if (empty($_REQUEST['_thumbnail_id']) || !get_post($_REQUEST['_thumbnail_id'])) {
+							$preview_url = rvy_preview_url($_post);
+							wp_redirect($preview_url);
+							exit;
+						}
 					}
 				}
 			}
