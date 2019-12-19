@@ -272,12 +272,12 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 	// link to publish date in Edit Form metaboxes, but modification date in Revisions Manager table
 	if ( ! $date_field  ) {
 		if ( 'list' == $format ) {
-			$date_field = ( in_array( $status, array( 'inherit', 'pending-revision' ) ) ) ? 'post_modified' : 'post_date';
+			//$date_field = ( in_array( $status, array( 'inherit', 'pending-revision' ) ) ) ? 'post_modified' : 'post_date';
 			$date_field = 'post_modified';
 			$sort_field = $date_field;
 		} else {
 			$date_field = 'post_modified';
-			$sort_field = ( 'inherit' == $status ) ? 'post_modified' : 'post_date';
+			$sort_field = 'post_date';
 		}
 	} else {
 		if ( ! $sort_field )
