@@ -67,9 +67,6 @@ function rvy_admin_init() {
 		check_admin_referer('bulk-revision-queue');
 
 		$sendback = remove_query_arg( array('trashed', 'untrashed', 'approved_count', 'published_count', 'deleted', 'locked', 'ids', 'posts', '_wp_nonce', '_wp_http_referer'), wp_get_referer() );
-		//if ( ! $sendback )
-		//	$sendback = admin_url( $parent_file );
-		//$sendback = add_query_arg( 'paged', $pagenum, $sendback );
 	
 		if ( 'delete_all' == $doaction ) {
 			// Prepare for deletion of all posts with a specified post status (i.e. Empty trash).

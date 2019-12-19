@@ -146,10 +146,6 @@ $_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated
 <?php $wp_list_table->views(); ?>
 
 <form name="bulk-revisions" id="bulk-revisions" method="post" action="">
-<?php 
-// This is applied in Revisionary_List_Table::display_tablenav
-//wp_nonce_field('bulk-revision-queue');
-?>
 
 <?php $wp_list_table->search_box( 'Search', 'post' ); ?>
 

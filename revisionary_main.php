@@ -574,9 +574,6 @@ class Revisionary
 	}
 
 	private function filter_caps($wp_blogcaps, $reqd_caps, $args, $internal_args = array()) {
-		//if ( ! rvy_get_option('pending_revisions') )
-		//	return $wp_blogcaps;
-
 		if (!rvy_get_option('pending_revisions')) {
 			return $wp_blogcaps;
 		}
@@ -1399,18 +1396,6 @@ class Revisionary
 		$conditions[] = $this->isWp5()
 						&& ! $pluginsState['classic-editor']
 						&& apply_filters('use_block_editor_for_post_type', true, $postType );
-
-		/*
-		$conditions[] = $this->isWp5()
-						&& $pluginsState['classic-editor']
-						&& (get_option('classic-editor-replace') === 'block'
-							&& ! isset($_GET['classic-editor__forget']));
-
-		$conditions[] = $this->isWp5()
-						&& $pluginsState['classic-editor']
-						&& (get_option('classic-editor-replace') === 'classic'
-							&& isset($_GET['classic-editor__forget']));
-		*/
 
 		/**
 		 * < 5.0 but Gutenberg plugin is active.
