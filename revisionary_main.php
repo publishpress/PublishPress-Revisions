@@ -776,7 +776,8 @@ class Revisionary
 				return false;
 			} elseif (isset($_REQUEST['classic-editor__forget']) && !isset($_REQUEST['classic'])) {
 				return true;
-			} elseif ($post_id = rvy_detect_post_id()) {
+			} elseif (get_option('classic-editor-allow-users') === 'allow') {
+				if ($post_id = rvy_detect_post_id()) {
 				$which = get_post_meta( $post_id, 'classic-editor-remember', true );
 				
 				if ('block-editor' == $which) {
@@ -786,10 +787,12 @@ class Revisionary
 				}
 			}
 		}
+		}
 
 		$pluginsState = array(
 			'classic-editor' => class_exists( 'Classic_Editor' ), // is_plugin_active('classic-editor/classic-editor.php'),
 			'gutenberg'      => function_exists( 'the_gutenberg_project' ), //is_plugin_active('gutenberg/gutenberg.php'),
+			'gutenberg-ramp' => class_exists('Gutenberg_Ramp'),
 		);
 
 		if ( ! $postType = rvy_detect_post_type() ) {
@@ -813,12 +816,23 @@ class Revisionary
 		// phpcs:ignore WordPress.VIP.SuperGlobalInputUsage.AccessDetected, WordPress.Security.NonceVerification.NoNonceVerification
 		$conditions[] = $this->isWp5()
 						&& ! $pluginsState['classic-editor']
-						&& apply_filters('use_block_editor_for_post_type', true, $postType );
+						&& ! $pluginsState['gutenberg-ramp']
+						&& apply_filters('use_block_editor_for_post_type', true, $postType, PHP_INT_MAX);
+
+		$conditions[] = $this->isWp5()
+                        && $pluginsState['classic-editor']
+                        && (get_option('classic-editor-replace') === 'block'
+                            && ! isset($_GET['classic-editor__forget']));
+
+        $conditions[] = $this->isWp5()
+                        && $pluginsState['classic-editor']
+                        && (get_option('classic-editor-replace') === 'classic'
+                            && isset($_GET['classic-editor__forget']));
 
 		/**
 		 * < 5.0 but Gutenberg plugin is active.
 		 */
-		$conditions[] = ! $this->isWp5() && $pluginsState['gutenberg'];
+		$conditions[] = ! $this->isWp5() && ($pluginsState['gutenberg'] || $pluginsState['gutenberg-ramp']);
 
 		// Returns true if at least one condition is true.
 		return count(
