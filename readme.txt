@@ -62,6 +62,10 @@ For more details about both the free and pro version, see our <a href="https://p
 
 == Changelog ==
 
+= 2.1.6-beta =
+* Compat : By default, prevent third party post query filtering on Revision Queue (to avoid non-display of Revisions)
+* Fixed : Revision approval, scheduling, publication, restore or deletion request could be skipped if url parameters passed in unexpected order  
+
 = 2.1.5 - 11 Dec 2019 =
 * Compat : PressPermit Pro - Pending revision previews could be viewed by any user (including anonymous) if "Prevent Revisors from viewing others' revisions" disabled (since 2.1.4)
 * Fixed : Contributors had other users' uneditable, unreadable revisions listed in Revision Queue
@@ -91,6 +95,7 @@ For more details about both the free and pro version, see our <a href="https://p
 * Fixed : Other users' revisions were not listed in Revision Queue even if "Prevent Revisors from editing others' revisions" disabled
 * Fixed : With "Prevent Revisors from editing others' revisions" setting enabled, Revisors and Authors could edit others' revisions by direct URL access
 * Feature : Support list_others_revisions capability to grant read access to other users' revisions (applies if "Prevent Revisors from editing others' revisions" is enabled)
+* Compat : PressPermit Pro - Revisors could not submit Beaver Builder revisions
 * Compat : PressPermit Pro - Revision Exceptions ("Also these" category / taxonomy assignments) assigned to Authors were not applied correctly
 * Compat : JReviews plugin
 
