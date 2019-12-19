@@ -192,9 +192,13 @@ function rvy_post_revision_title( $revision, $link = true, $date_field = 'post_d
 	// note: RS filter (un-requiring edit_published/private cap) will be applied to this cap check
 	
 	if ( $link ) { //&& current_user_can( 'edit_post', $revision->ID ) ) {    // revisions are listed in the Editor even if not editable / restorable / approvable
+		if ('inherit' == $revision->post_status) {
+			$link = "admin.php?page=rvy-revisions&amp;action=view&amp;revision=$revision->ID";
+		} else {
+			$link = rvy_preview_url($revision);
+		}
 		
-		$link = "admin.php?page=rvy-revisions&amp;action=view&amp;revision=$revision->ID";
-		$date = "<a href='$link'>$date</a>";
+		$date = "<a href='$link' target='_blank'>$date</a>";
 	}
 
 	$status_obj = get_post_status_object( $revision->post_status );
