@@ -170,14 +170,10 @@ function rvy_admin_init() {
 			wp_redirect($sendback);
 		}
 
-	// don't bother with the checks in this block unless action arg was passed or rvy_compare_revs field was posted
-	} elseif ( ! empty($_GET['action']) || ! empty( $_POST['rvy_compare_revs'] ) || ! empty($_POST['action']) ) {
-		if ( false !== strpos( urldecode($_SERVER['REQUEST_URI']), 'admin.php?page=rvy-revisions') ) {
-			if ( ! empty( $_POST['rvy_compare_revs'] ) ) {
-				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
-				add_action( 'wp_loaded', 'rvy_revision_diff' );
-				
-			} elseif ( ! empty($_GET['action']) && ('restore' == $_GET['action']) ) {
+	// don't bother with the checks in this block unless action arg was passed
+	} elseif ( ! empty($_GET['action']) || ! empty($_POST['action']) ) {
+		if (false !== strpos(urldecode($_SERVER['REQUEST_URI']), 'admin.php') && !empty($_REQUEST['page']) && ('rvy-revisions' == $_REQUEST['page'])) {
+			if ( ! empty($_GET['action']) && ('restore' == $_GET['action']) ) {
 				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
 				add_action( 'wp_loaded', 'rvy_revision_restore' );
 		
