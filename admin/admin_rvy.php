@@ -74,9 +74,6 @@ class RevisionaryAdmin
 				}
 
 				add_filter( 'get_delete_post_link', array(&$this, 'flt_delete_post_link'), 10, 2 );
-				
-				add_filter( 'page_row_actions', array(&$this, 'add_preview_action'), 10, 2 );
-				add_filter( 'post_row_actions', array(&$this, 'add_preview_action'), 10, 2 );
 			}
 		}
 
@@ -362,45 +359,6 @@ class RevisionaryAdmin
 		}
 	}
 
-	function add_preview_action( $actions, $post ) {
-		if ( rvy_is_revision_status($post->post_status) ) {
-			if ( current_user_can( 'edit_post', $post->ID ) ) {
-				global $revisionary;
-				static $block_editor;
-
-				if ( ! isset( $block_editor ) ) {
-					$block_editor = $revisionary->isBlockEditorActive();
-				}
-
-				$url = parse_url($_SERVER['REQUEST_URI']);
-				$url_query = ( ! empty( $url['query'] ) ) ? $url['query'] : '';
-				$redirect_url = admin_url('edit.php?' . $url_query);
-
-				/*
-				if ( $block_editor ) {
-					$type_obj = get_post_type_object( $post->post_type );
-					$edit_metacap = ( $type_obj ) ? $type_obj->cap->edit_post : 'edit_post';
-
-					if ( agp_user_can( $edit_metacap, $post->ID, '', array( 'skip_revision_allowance' => true ) ) ) {
-						$preview_link = '<a href="' . esc_url( add_query_arg( array( 'preview' => '1', 'rvy_revision' => true, 'rvy_redirect' => esc_url($redirect_url) ), get_post_permalink( $post->ID ) ) )  . '" title="' . esc_attr( sprintf( __( 'Preview & Approve &#8220;%s&#8221;' ), $post->post_title ) ) . '" rel="permalink">' . __( 'Approval' ) . '</a>';
-					} else {
-						$preview_link = '<a href="' . esc_url( add_query_arg( array( 'preview' => '1', 'rvy_revision' => true, 'rvy_redirect' => esc_url($redirect_url) ), get_post_permalink( $post->ID ) ) ) . '" title="' . esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $post->post_title ) ) . '" rel="permalink">' . __( 'Preview' ) . '</a>';
-					}
-
-					$actions = array_merge( array( 'view' => $preview_link ), $actions );
-				} else {
-					$actions['view'] = '<a href="' . esc_url( add_query_arg( array( 'preview' => '1', 'rvy_revision' => true, 'rvy_redirect' => esc_url($redirect_url) ), get_post_permalink( $post->ID ) ) ) . '" title="' . esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $post->post_title ) ) . '" rel="permalink">' . __( 'Preview' ) . '</a>';
-				}
-				*/
-
-				// @todo
-				unset($actions['inline hide-if-no-js']);
-			}
-		}
-		
-		return $actions;
-	}
-		
 	function add_editor_ui() {
 		global $revisionary;
 
@@ -730,37 +688,6 @@ class RevisionaryAdmin
 		}	
 	}
 
-	function convert_link( $link, $topic, $operation, $args = '' ) {
-		$defaults = array ( 'object_type' => '', 'id' => '' );
-		$args = (array) $args;
-		foreach( array_keys( $defaults ) as $var ) {
-			$$var = ( isset( $args[$var] ) ) ? $args[$var] : $defaults[$var];
-		}
-
-		global $pagenow;
-		
-		if ( in_array( $pagenow, apply_filters( 'rvy_default_revision_link_pages', array( 'post.php' ), $link, $args ) ) )
-			return $link;
-		
-		if ( 'revision' == $topic ) {
-			if ( 'preview' == $operation ) {
-				$link = add_query_arg( array( 'preview' => 1, 'rvy_revision' => true ), $link );
-
-			} 
-			/*
-			elseif ( 'delete' == $operation ) {
-				if ( $object_type && $id ) {
-					$link = str_replace( "$object_type.php", 'admin.php?page=rvy-revisions', $link );
-					$link = str_replace( '?post=', "&amp;revision=", $link );
-					$link = wp_nonce_url( $link, 'delete-revision_' . $id );
-				}
-			}
-			*/ 
-		}
-		
-		return $link;
-	}
-	
 	function flt_delete_post_link( $link, $post_id ) {
       if ( strpos( $link, 'revision.php' ) ) {
 			if ( $post_id ) {
