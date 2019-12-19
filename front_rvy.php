@@ -119,6 +119,8 @@ class RevisionaryFront {
 			$date = agp_date_i18n( $datef, strtotime( $post->post_date ) );
 
 			$color = '#ccc';
+			$class = '';
+			$message = '';
 			
 			// This topbar is presently only for those with restore / approve / publish rights
 			if ( $type_obj = get_post_type_object( $post->post_type ) ) {
