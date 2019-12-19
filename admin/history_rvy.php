@@ -819,30 +819,10 @@ class RevisionaryHistory
                 $current_id = $revision->ID;
             }
 
-            $edit_url = false;
-
             if ($can_restore) {
                 // Until Reject button is implemented, just route to Preview screen so revision can be edited / deleted if necessary
                 if ( in_array( $revision->post_status, ['pending-revision', 'future-revision'] ) ) {
-                    $restore_link = rvy_preview_url($revision);  // default to revision preview link
-                    
-                    if (rvy_get_option('compare_revisions_direct_approval')) {
-                        //if ($can_edit = agp_user_can('edit_post', $revision->ID)) {
-                            $published_post_id = rvy_post_id($revision->ID);
-                            $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
-
-                            if (in_array($revision->post_status, ['pending-revision'])) {
-                                $restore_link = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|{$revision->ID}" );
-                            
-                            } elseif (in_array($revision->post_status, ['future-revision'])) {
-                                $restore_link = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|{$revision->ID}" );
-                            }
-
-                            if (agp_user_can('edit_post', $revision->ID)) {
-                                $edit_url = admin_url("post.php?action=edit&amp;post=$revision->ID");
-                            }
-                        //}
-                    } 
+                    $restore_link = rvy_preview_url($revision);
 
                     //$link_open = "<a href='$preview_url' target='_blank'>";
                     //$link_close = '</a>';
@@ -882,7 +862,6 @@ class RevisionaryHistory
                 'autosave'   => false,
                 'current'    => $current,
                 'restoreUrl' => $can_restore ? $restore_link : false,
-                'editUrl'    => $edit_url,
             ];
 
             /**
@@ -997,22 +976,14 @@ class RevisionaryHistory
             $type_obj = get_post_type_object($post_type);
         }
 
-        $direct_approval = rvy_get_option('compare_revisions_direct_approval');
+        $button_label = (empty($type_obj) || agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true])) 
+        ?  __('Preview / Approve', 'revisionary')
+        : __('Preview', 'revisionary');
 
-        if (empty($type_obj) || agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true])) {
-            $button_label = $direct_approval ? __('Approve', 'revisionary') : __('View / Approve', 'revisionary');
-        } else {
-            $button_label = __('View', 'revisionary');
-        }
         ?>
         <script type="text/javascript">
         /* <![CDATA[ */
         jQuery(document).ready( function($) {
-            var rvyEditURL = '';
-            var rvySearchParams = '';
-            var rvyRevisionID = '';
-            var rvyLastID = 0;
-
             var RvyDiffUI = function() {
                 if( $('input.restore-revision:not(.rvy-recaption)').length) {
                     $('input.restore-revision').attr('value', '<?php echo $button_label;?>').addClass('rvy-recaption');
@@ -1021,29 +992,6 @@ class RevisionaryHistory
                 }
             }
             var RvyDiffUIinterval = setInterval(RvyDiffUI, 50);
-
-            var RvyEditButton = function() {
-                if(!$('input.edit-revision').length) {
-                    setTimeout(function() {
-                        rvySearchParams = new URLSearchParams(window.location.search);
-                        
-                        rvyRevisionID = rvySearchParams.get('to');
-
-                        if (!rvyRevisionID) {
-                            rvyRevisionID = rvySearchParams.get('revision');
-                        }
-
-                        if (rvyRevisionID != rvyLastID) {
-                            rvyEditURL = '<?php echo admin_url("post.php?post=9999999&action=edit")?>';
-                            rvyEditURL = rvyEditURL.replace("post=9999999", "post=" + rvyRevisionID);
-                            $('input.restore-revision').after('<a href="' + rvyEditURL + '"><input type="button" class="edit-revision button button-primary" style="float:right" value="<?php _e('Edit');?>"></a>');
-                            
-                            rvyLastID = rvyRevisionID;
-                        }
-                    }, 100);
-                }
-            }
-            var RvyEditButtonInterval = setInterval(RvyEditButton, 250);
         });
         /* ]]> */
         </script>
