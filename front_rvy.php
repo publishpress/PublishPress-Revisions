@@ -88,6 +88,11 @@ class RevisionaryFront {
 			return;
 		}
 		
+		global $wp_query;
+		if ($wp_query->is_404) {
+			return;
+		}
+
 		if (!empty($_REQUEST['page_id'])) {
 			$revision_id = $_REQUEST['page_id'];
 		} elseif (!empty($_REQUEST['p'])) {
