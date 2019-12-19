@@ -45,3 +45,7 @@ line-height: 2.1;
 color: #070;
 font-weight: bold;
 }
+
+#rvy_compare_button {
+margin: 0 10px 10px 10px;
+}
