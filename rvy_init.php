@@ -795,13 +795,16 @@ function rvy_post_id($revision_id) {
 	$published_id = get_post_meta( $revision_id, '_rvy_base_post_id', true );
 	$busy = false;
 
-	if (empty($pubished_id)) {
+	if (empty($published_id)) {
 		if ($_post = get_post($revision_id)) {
 			// if ID passed in is not a revision, return it as is
 			if (('revision' != $_post->post_type) && !rvy_is_revision_status($_post->post_status)) {
 				return $revision_id;
 			} elseif('revision' == $_post->post_type) {
 				return $_post->post_parent;
+			} else {
+				update_post_meta( $revision_id, '_rvy_base_post_id', $_post->comment_count );
+				return $_post->comment_count;
 			}
 		}
 	}
