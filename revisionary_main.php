@@ -131,9 +131,47 @@ class Revisionary
 
 		add_action('wp_insert_post', [$this, 'actLogPreviewAutosave'], 10, 2);
 
+		add_filter('post_link', [$this, 'fltEditRevisionUpdatedLink'], 99, 3);
+
 		do_action( 'rvy_init', $this );
 	}
 	
+	function fltEditRevisionUpdatedLink($permalink, $post, $leavename) {
+		static $busy = false;
+
+		if ($busy) {
+			return $permalink;
+		}
+
+		$params = (!$this->doing_rest || empty($this->rest->request)) ? $_REQUEST : $this->rest->request->get_params();
+
+		if ((empty($params['action']) || ('edit' != $params['action']))
+			&& (empty($params['context']) || ('edit' != $params['context']))
+		) {
+			return $permalink;
+		}
+
+		if ($post_id = rvy_detect_post_id()) {
+			if (rvy_is_revision_status(get_post_field('post_status', $post_id))) {
+				if ($published_post_id = rvy_post_id($post_id)) {
+					$match_ids = [$post_id];
+					
+					if (!$this->isBlockEditorActive()) {
+						$match_ids []= $published_post_id;
+					}
+
+					if (in_array($post->ID, $match_ids)) {
+						$busy = true;
+						$permalink = get_permalink($published_post_id);
+						$busy = false;
+					}
+				}
+			}
+		}
+
+		return $permalink;
+	}
+
 	function actLogPreviewAutosave($post_id, $post) {
 		if ('inherit' == $post->post_status && strpos($post->post_name, 'autosave')) {
 			$this->last_autosave_id[$post->post_parent] = $post_id;
