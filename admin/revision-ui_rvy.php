@@ -417,7 +417,6 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 					$date = str_replace( 'post=', 'revision=', $date );
 					$date = str_replace( '?&amp;', '?', $date );
 					$date = str_replace( '?&', '?', $date );
-					$date = $revisionary->admin->convert_link( $date, 'revision', 'manage', array( 'object_type' => $post->post_type ) );
 
 					$date = str_replace( '&revision=', "&amp;revision_status=$status&amp;revision=", $date );
 					$date = str_replace( '&amp;revision=', "&amp;revision_status=$status&amp;revision=", $date );

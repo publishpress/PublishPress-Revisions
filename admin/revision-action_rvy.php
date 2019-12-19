@@ -237,7 +237,7 @@ function rvy_revision_restore() {
 		if ( class_exists('WPCom_Markdown') && ! defined( 'RVY_DISABLE_MARKDOWN_WORKAROUND' ) )
 			$data['post_content_filtered'] = $revision->post_content;
 		
-		$wpdb->update( $wpdb->posts, $data, array( 'rvy_revision' => true, 'ID' => $revision->ID ) );
+		$wpdb->update($wpdb->posts, $data, array('ID' => $revision->ID));
 		
 		wp_restore_post_revision( $revision->ID, array( 'post_content', 'post_title', 'post_date', 'post_date_gmt', 'post_modified', 'post_modified_gmt' ) );
 

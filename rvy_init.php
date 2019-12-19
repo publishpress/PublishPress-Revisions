@@ -703,7 +703,6 @@ function rvy_init() {
 					if ( $post = get_post( $_GET['p'] ) ) {
 						if (rvy_is_revision_status($post->post_status)) {
 							$_GET['preview'] = 1;
-							$_GET['rvy_revision'] = true;
 						}
 					}
 				}

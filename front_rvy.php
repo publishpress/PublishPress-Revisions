@@ -99,9 +99,6 @@ class RevisionaryFront {
 			}
 		}
 
-		// rvy_list_post_revisions passes these args
-		//if( ! empty( $_GET['rvy_revision'] ) && ! empty( $_GET['p'] ) ) {
-
 		if( !$post = get_post($revision_id)) {
 			if (!$post = wp_get_post_revision($revision_id)) {
 				return;
