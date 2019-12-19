@@ -159,8 +159,6 @@ class RevisionaryFront {
 
 			$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
 
-			//if (agp_user_can('read_post', $revision_id)) {	// @todo
-			if (agp_user_can('read_post', $revision_id) || current_user_can('edit_post', $revision_id)) {
 				load_plugin_textdomain('revisionary', false, RVY_FOLDER . '/languages');
 				
 				$published_url = ($published_post_id) ? get_permalink($published_post_id) : '';
@@ -179,7 +177,7 @@ class RevisionaryFront {
 					$edit_button = '';
 				}
 
-				if ($can_edit = agp_user_can('edit_post', $revision_id)) {
+				if ($can_edit = agp_user_can('edit_post', rvy_post_id($revision_id), 0, ['skip_revision_allowance' => true])) {
 					if ( in_array( $post->post_status, array( 'pending-revision' ) ) ) {
 						$publish_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|$revision_id" );
 					
@@ -275,7 +273,6 @@ class RevisionaryFront {
 
 					new RvyScheduledHtml( $html, 'wp_head', 99 );  // this should be inserted at the top of <body> instead, but currently no way to do it 
 				}
-			}
 			
 			$GLOBALS['revisionary']->skip_revision_allowance = $orig_skip;
 		}
