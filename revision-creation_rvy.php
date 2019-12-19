@@ -264,10 +264,10 @@ class RevisionCreation {
 
                 if ($published_authors) {
                     // This sets author taxonomy terms and meta field ppma_author_name
-                    _rvy_set_ma_post_authors($revision_id, $published_authors);
+                    rvy_set_ma_post_authors($revision_id, $published_authors);
 
                     // Also ensure meta field is set for published post
-                    _rvy_set_ma_post_authors($published_post->ID, $published_authors);
+                    rvy_set_ma_post_authors($published_post->ID, $published_authors);
                 }
             }
             
