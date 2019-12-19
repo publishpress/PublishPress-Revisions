@@ -91,6 +91,22 @@ class RvyPostEditSubmitMetabox
 
             <div id="major-publishing-actions">
                 <?php do_action('post_submitbox_start'); ?>
+
+                <?php if (!did_action('revisionary_post_submit_meta_box') && $can_publish && rvy_is_revision_status($post->post_status)):?>
+                    <?php
+                    $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
+                    $published_post_id = rvy_post_id($post->ID);
+
+                    if (in_array($post->post_status, ['pending-revision'])) {
+                        $approval_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|{$post->ID}" );
+                    
+                    } elseif (in_array($post->post_status, ['future-revision'])) {
+                        $approval_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|{$post->ID}" );
+                    }
+                    ?>
+                    <div class="rvy-revision-approve" style="float:right"><a href="<?php echo $approval_url;?>" title="<?php echo esc_attr(__('Approve saved changes', 'revisionary'));?>"><?php _e('Approve', 'revisionary');?></a></div>
+                <?php endif;?>
+
                 <div id="delete-action">
                     <?php // PP: no change from WP core
                     if (current_user_can("delete_post", $post->ID)) {

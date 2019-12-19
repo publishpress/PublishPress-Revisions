@@ -166,6 +166,13 @@ jQuery(document).ready( function($) {
 		if ( $('button.editor-post-publish-button').length ) {
 			$('button.editor-post-publish-button').hide();
 		}
+
+		if (rvyObjEdit.approvalURL && !$('button.revision-approve').length && $('button.editor-post-trash').filter(':visible').length) {
+			$('button.editor-post-trash').before('<a href="' + rvyObjEdit.approvalURL + '" title="' + rvyObjEdit.approvalTitle + '"><button type="button" class="components-button revision-approve is-button is-default is-large">' + rvyObjEdit.approvalCaption + '</button></a>');
+		} else {
+			if ($('button.revision-approve').length) {
+			}
+		}
 	}
 	var RvyHideInterval = setInterval(RvyHideElements, 50);
 

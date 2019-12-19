@@ -10,6 +10,7 @@ class RvyPostEdit {
         add_filter('preview_post_link', [$this, 'fltPreviewLink']);
         add_filter('presspermit_preview_post_label', [$this, 'fltPreviewLabel']);
         add_filter('presspermit_preview_post_title', [$this, 'fltPreviewTitle']);
+		add_action('post_submitbox_start', [$this, 'actSubmitBoxStart']);
 
         add_action('admin_head', array($this, 'act_admin_head') );
 
@@ -62,6 +63,30 @@ class RvyPostEdit {
         RvyPostEditSubmitMetabox::post_submit_meta_box($post, $args);
     }
 
+public function actSubmitboxStart() {
+        global $post;
+
+        if (!$type_obj = get_post_type_object($post->post_type)) {
+            return;
+        }
+
+        $can_publish = current_user_can($type_obj->cap->publish_posts);
+
+        if ($can_publish && rvy_is_revision_status($post->post_status)):?>
+            <?php
+            $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
+            $published_post_id = rvy_post_id($post->ID);
+
+            if (in_array($post->post_status, ['pending-revision'])) {
+                $approval_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|{$post->ID}" );
+            
+            } elseif (in_array($post->post_status, ['future-revision'])) {
+                $approval_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|{$post->ID}" );
+            }
+            ?>
+            <div class="rvy-revision-approve" style="float:right"><a href="<?php echo $approval_url;?>" title="<?php echo esc_attr(__('Approve saved changes', 'revisionary'));?>"><?php _e('Approve', 'revisionary');?></a></div>
+        <?php endif;
+    }
     public function fltPreviewLink($url) {
         global $post;
 

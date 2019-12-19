@@ -51,6 +51,16 @@ class RVY_PostBlockEditUI {
                 $revisions_caption = '';
             }
 
+            $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
+            $published_post_id = rvy_post_id($post->ID);
+
+            if (in_array($post->post_status, ['pending-revision'])) {
+                $approval_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|{$post->ID}" );
+            
+            } elseif (in_array($post->post_status, ['future-revision'])) {
+                $approval_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|{$post->ID}" );
+            }
+
             $args = array(
                 'saveRevision' => __('Update Revision'),
                 'viewURL' => $view_link,
@@ -58,6 +68,9 @@ class RVY_PostBlockEditUI {
                 'viewTitle' => $view_title,
                 'previewTitle' => $preview_title,
                 'revisionEdits' => $revisions_caption,
+                'approvalCaption' => __('Approve Revision', 'revisionary'),
+                'approvalURL' => $approval_url,
+                'approvalTitle' => esc_attr(__('Approve saved changes', 'revisionary')),
             );  
 
         } elseif ( agp_user_can( $type_obj->cap->edit_post, $post_id, '', array( 'skip_revision_allowance' => true ) ) ) {
