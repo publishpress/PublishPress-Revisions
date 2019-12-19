@@ -78,18 +78,6 @@ class RVY_PostBlockEditUI {
         } elseif ( agp_user_can( $type_obj->cap->edit_post, $post_id, '', array( 'skip_revision_allowance' => true ) ) ) {
             wp_enqueue_script( 'rvy_object_edit', RVY_URLPATH . "/admin/rvy_post-block-edit{$suffix}.js", array('jquery', 'jquery-form'), RVY_VERSION, true );
 
-            // for logged user who can fully edit a published post, clarify the meaning of setting future publish date
-            // @todo  ?>
-            <!--
-            <script type="text/javascript">
-            /* <![CDATA[ */
-            jQuery(document).ready( function($) {
-                postL10n.schedule = "<?php _e('Schedule Revision', 'revisionary' )?>";
-            });
-            /* ]]> */
-            </script>
-            -->
-            <?php
             $args = array();
 
             if (!isset($preview_url)) {
