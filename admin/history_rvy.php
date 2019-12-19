@@ -207,6 +207,8 @@ class RevisionaryHistory
 		$q['post_status'] = (!empty($this->post_status)) ? $this->post_status : ['pending-revision', 'future-revision'];
         $q['posts_per_page'] = 99;
 
+        $q = apply_filters('revisionary_compare_vars', $q);
+
         //do_action('revisionary_history_query', $post);
         add_filter('posts_clauses', [$this, 'fltRevisionClauses'], 5, 2);
         $rvy_query = new WP_Query($q);
