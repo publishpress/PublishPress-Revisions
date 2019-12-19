@@ -936,14 +936,19 @@ class Revisionary
 			
 			// On some sites, MA autosets Authors to current user. Temporary workaround: if Authors are set to current user, revert to published post terms.
 			$_authors = get_multiple_authors($revision_id);
+			
 			if (count($_authors) == 1) {
 				$_author = reset($_authors);
 				$_author = MultipleAuthors\Classes\Objects\Author::get_by_term_id($_author->term_id);
 			}
 
 			// If multiple authors could not be stored, restore original authors from published post
-			if (empty($_authors) || ($_author->ID == $current_user->ID)) {
-				if ($published_authors = get_multiple_authors($published_post->ID)) {
+			if (empty($_authors) || (!empty($_author) && $_author->ID == $current_user->ID)) {
+				if (!$published_authors = get_multiple_authors($published_post->ID)) {
+					$published_authors = (array) MultipleAuthors\Classes\Objects\Author::get_by_user_id($published_post->post_author);
+				}
+
+				if ($published_authors) {
 					// This sets author taxonomy terms and meta field ppma_author_name
 					MultipleAuthors\Classes\Utils::set_post_authors($revision_id, $published_authors);
 
