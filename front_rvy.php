@@ -136,7 +136,6 @@ class RevisionaryFront {
 						}
 					}
 
-					//MultipleAuthors\Classes\Utils::set_post_authors($revision_id, $published_authors);
 					_rvy_set_ma_post_authors($revision_id, $published_authors);
 				}
 			}
