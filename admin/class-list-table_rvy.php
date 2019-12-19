@@ -945,7 +945,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				$_arg = ('page' == $post->post_type) ? 'page_id=' : 'p=';
 
 				$preview_link = add_query_arg( 'preview', true, str_replace( 'p=', $_arg, get_post_permalink( $post ) ) );
-				$preview_link = remove_query_arg( 'post_type', $preview_link );
+				//$preview_link = remove_query_arg( 'post_type', $preview_link );
+				$preview_link = remove_query_arg( 'preview_id', $preview_link );
 				$actions['view'] = sprintf(
 					'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
 					esc_url( $preview_link ),
