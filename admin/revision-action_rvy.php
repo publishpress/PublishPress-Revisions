@@ -158,7 +158,17 @@ function rvy_revision_approve($revision_id = 0) {
 
 				foreach($authors as $author) {
 					if ($author) {
-						rvy_mail($author->user_email, $title, $message);
+						rvy_mail(
+							$author->user_email, 
+							$title, 
+							$message, 
+							[
+								'revision_id' => $revision->ID, 
+								'post_id' => $post->ID, 
+								'notification_type' => 'revision-approval', 
+								'notification_class' => 'rev_approval_notify_author'
+							]
+						);
 					}
 				}
 			}
@@ -167,7 +177,17 @@ function rvy_revision_approve($revision_id = 0) {
 				$super_admin_logins = get_super_admins();
 				foreach( $super_admin_logins as $user_login ) {
 					if ( $super = new WP_User($user_login) )
-						rvy_mail( $super->user_email, $title, $message );
+						rvy_mail( 
+							$super->user_email, 
+							$title, 
+							$message, 
+							[
+								'revision_id' => $revision->ID, 
+								'post_id' => $post->ID, 
+								'notification_type' => 'revision-approval', 
+								'notification_class' => 'rev_approval_notify_super_admin'
+							]
+						);
 				}
 			}
 			
@@ -189,7 +209,17 @@ function rvy_revision_approve($revision_id = 0) {
 				}
 
 				if ( $author = new WP_User( $revision->post_author, '' ) ) {
-					rvy_mail( $author->user_email, $title, $message );
+					rvy_mail( 
+						$author->user_email, 
+						$title, 
+						$message, 
+						[
+							'revision_id' => $revision->ID, 
+							'post_id' => $post->ID, 
+							'notification_type' => 'revision-approval', 
+							'notification_class' => 'rev_approval_notify_revisor'
+						]
+					);
 				}
 			}
 		}
@@ -714,7 +744,17 @@ function rvy_publish_scheduled_revisions($args = array()) {
 						$message .= __( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";
 
 					if ( $author = new WP_User( $row->post_author ) )
-						rvy_mail( $author->user_email, $title, $message );
+						rvy_mail( 
+							$author->user_email, 
+							$title, 
+							$message, 
+							[
+								'revision_id' => $row->ID, 
+								'post_id' => $published_id, 
+								'notification_type' => 'publish-scheduled', 
+								'notification_class' => 'publish_scheduled_notify_revisor'
+							]
+						);
 				}
 
 				// Prior to 1.3, notification was sent to author even if also revision submitter
@@ -737,7 +777,17 @@ function rvy_publish_scheduled_revisions($args = array()) {
 	
 					foreach($authors as $author) {
 						if ($author && !empty($author->user_email)) {
-							rvy_mail( $author->user_email, $title, $message );
+							rvy_mail( 
+								$author->user_email, 
+								$title, 
+								$message, 
+								[
+									'revision_id' => $row->ID, 
+									'post_id' => $published_id, 
+									'notification_type' => 'publish-scheduled', 
+									'notification_class' => 'publish_scheduled_notify_author'
+								]
+							);
 						}
 					}
 				}
@@ -812,7 +862,17 @@ function rvy_publish_scheduled_revisions($args = array()) {
 					//dump($to_addresses);
 					
 					foreach ( $to_addresses as $address )
-						rvy_mail( $address, $title, $message );
+						rvy_mail( 
+							$address, 
+							$title, 
+							$message, 
+							[
+								'revision_id' => $row->ID, 
+								'post_id' => $published_id, 
+								'notification_type' => 'publish-scheduled', 
+								'notification_class' => 'publish_scheduled_notify_admin'
+							]
+						);
 				}
 				
 				

@@ -136,7 +136,17 @@ class Rvy_Revision_Workflow_UI {
             }
 
             foreach ( $to_addresses as $address ) {
-                rvy_mail($address, $title, $message);
+                rvy_mail(
+                    $address, 
+                    $title, 
+                    $message, 
+                    [
+                        'revision_id' => $revision_id, 
+                        'post_id' => $published_post->ID, 
+                        'notification_type' => $notification_type,
+                        'notification_class' => '',
+                    ]
+                );
             }
         }
     }
