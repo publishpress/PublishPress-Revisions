@@ -305,7 +305,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	}
 
 	if (! $published_id = rvy_post_id($revision_id)) {
-		return $revision;
+		return false;
 	}
 
 	$update = (array) $revision;
