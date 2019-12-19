@@ -417,7 +417,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		<?php endif;?>
 
 		<?php 
-		$hint = '';
+		$hint = __('This restriction applies to users who are not full editors for the post type. To exempt a limited role, give it the edit_others_revisions or list_others_revisions capability.', 'revisionary');
 		$ui->option_checkbox( 'revisor_lock_others_revisions', $tab, $section, $hint, '' );
 		
 		$hint = '';
