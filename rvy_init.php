@@ -62,7 +62,8 @@ function rvy_ajax_handler() {
 
 	if (!empty($_REQUEST['rvy_ajax_field']) && !empty($_REQUEST['post_id'])) {
 		if ('save_as_revision' == $_REQUEST['rvy_ajax_field']) {
-			update_post_meta($_REQUEST['post_id'], "_save_as_revision_{$current_user->ID}", !empty($_REQUEST['rvy_ajax_value']));
+			$save_revision = isset($_REQUEST['rvy_ajax_value']) && in_array($_REQUEST['rvy_ajax_value'], ['true', true, 1, '1'], true);
+			update_post_meta($_REQUEST['post_id'], "_save_as_revision_{$current_user->ID}", $save_revision);
 			exit;
 		}
 	}
