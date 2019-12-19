@@ -69,6 +69,9 @@ class Revisionary
 		if ( rvy_get_option( 'pending_revisions' ) ) {
 			// special filtering to support Contrib editing of published posts/pages to revision
 			add_filter('pre_post_status', array(&$this, 'flt_pendingrev_post_status') );
+
+			//$priority = (defined('ICL_SITEPRESS_VERSION') && !$this->isBlockEditorActive()) ? 12 : 2;
+
 			add_filter('wp_insert_post_data', array($this, 'flt_maybe_insert_revision'), 2, 2);
 		}
 		
@@ -781,6 +784,10 @@ class Revisionary
 			} else {
 				//delete_transient("_rvy_pending_revision_{$current_user->ID}_{$postarr['ID']}");
 			}
+		}
+
+		if (!empty($_POST)) {
+			$_POST['skip_sitepress_actions'] = true;
 		}
 
 		if (!empty($revision_id) && $post = get_post($revision_id)) {
