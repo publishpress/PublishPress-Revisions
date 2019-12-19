@@ -329,7 +329,8 @@ margin-bottom:0;
 }
 
 .rvy-current-revision {
-background-color: #ff8;
+background-color: #FFFDE9;
+box-shadow: 0 0 0 1px #ddd;
 }
 
 .rvy-revision-row {
