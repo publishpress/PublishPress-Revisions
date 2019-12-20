@@ -112,6 +112,8 @@ class Revisionary
 			add_filter( 'wp_insert_post_data', array($this, 'flt_insert_post_data'), 99, 2 );
 		}
 
+		add_filter( 'wp_insert_post_data', array($this, 'flt_regulate_revision_status'), 100, 2 );
+
 		// REST logging
 		add_filter( 'rest_pre_dispatch', array( $this, 'rest_pre_dispatch' ), 10, 3 );
 
@@ -756,6 +758,29 @@ class Revisionary
 		return $data;
 	}
 	
+	function flt_regulate_revision_status($data, $postarr) {
+		// Revisions are not published by wp_update_post() execution; Prevent setting to a non-revision status
+		if (get_post_meta($postarr['ID'], '_rvy_base_post_id', true)) {
+			$revision = get_post($postarr['ID']);
+			
+			if (!rvy_is_revision_status($data['post_status'])) {
+				$revert_status = true;
+			} elseif ($revision) {
+				if (($data['post_status'] != $revision->post_status) 
+				&& (('future-revision' == $revision->post_status) || ('future-revision' == $postarr['post_status']))
+				) {
+					$revert_status = true;
+				}
+			}
+
+			if (!empty($revert_status) && rvy_is_revision_status($revision->post_status)) {
+				$data['post_status'] = $revision->post_status;
+			}
+		}
+
+		return $data;
+	}
+
 	function flt_create_scheduled_rev( $data, $post_arr ) {
 		require_once( dirname(__FILE__).'/revision-creation_rvy.php' );
 		$rvy_creation = new PublishPress\Revisions\RevisionCreation(['revisionary' => $this]);
