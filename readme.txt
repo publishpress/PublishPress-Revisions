@@ -2,9 +2,9 @@
 Contributors: publishpress, kevinB, stevejburge, andergmartins
 Tags: revision, access, permissions, cms, user, groups, members, admin, pages, posts, page, Post
 Requires at least: 4.9.7
-Tested up to: 5.3
+Tested up to: 5.3.2
 Requires PHP: 5.6.20
-Stable Tag: 2.1.5
+Stable Tag: 2.1.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -62,10 +62,10 @@ For more details about both the free and pro version, see our <a href="https://p
 
 == Changelog ==
 
-= 2.1.6-beta =
-* Compat : By default, prevent third party post query filtering on Revision Queue (to avoid non-display of Revisions)
+= 2.1.6 - 23 Dec 2019 =
 * Fixed : Edit Revision - Classic Editor "Approve" button ineffective
 * Fixed : Edit Revision - Classic Editor "View / Approve" button loaded live preview (of unsaved changes) instead
+* Compat : By default, prevent third party post query filtering on Revision Queue (to avoid non-display of Revisions)
 * Compat : PressPermit Pro - Updating a saved revision caused it to be changed to a regular pending post
 
 = 2.1.5 - 11 Dec 2019 =
