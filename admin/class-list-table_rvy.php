@@ -5,6 +5,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	var $published_post_ids = [];
 	var $published_post_count_ids = [];
 	var $post_types = [];
+	private $posts_clauses_filtered; 
 	 
 	public function __construct($args = []) {
 		global $wpdb;
@@ -69,8 +70,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		do_action('revisionary_queue_pre_query');
 		add_filter('posts_clauses', [$this, 'pre_query_filter'], 5, 2);
+		add_filter('posts_clauses', [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
 		$pre_query = new WP_Query( $qp );
 		remove_filter('posts_clauses', [$this, 'pre_query_filter'], 5, 2);
+		remove_filter('posts_clauses', [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
 		do_action('revisionary_queue_pre_query_done');
 
 		//echo($pre_query->request . '<br /><br />');
@@ -134,6 +137,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		add_filter('presspermit_posts_clauses_intercept', [$this, 'flt_presspermit_posts_clauses_intercept'], 10, 4);
 		add_filter('posts_clauses', [$this, 'revisions_filter'], 5, 2);
+		add_filter('posts_clauses', [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
 
 		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
 			remove_action('pre_get_posts', ['MultipleAuthors\\Classes\\Query', 'action_pre_get_posts']);
@@ -150,6 +154,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		remove_filter('presspermit_posts_clauses_intercept', [$this, 'flt_presspermit_posts_clauses_intercept'], 10, 4);
 		remove_filter('posts_clauses', [$this, 'revisions_filter'], 5, 2);
+		remove_filter('posts_clauses', [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
 
 		return $qr['post_status'];
 	}
@@ -181,8 +186,18 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		return $where;
 	}
 
+	function restore_revisions_filter($clauses, $_wp_query = false) {
+		if (!empty($this->posts_clauses_filtered) && !defined('REVISIONARY_ENABLE_REVISION_QUEUE_FILTERING')) {
+			$clauses = $this->posts_clauses_filtered;
+		}
+
+		return $clauses;
+	}
+
 	function pre_query_filter($clauses, $_wp_query = false) {
 		$clauses['where'] = $this->pre_query_where_filter($clauses['where']);
+		$this->posts_clauses_filtered = $clauses;
+
 		return $clauses;
 	}
 
@@ -234,6 +249,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 	function revisions_filter($clauses, $_wp_query = false) {
 		$clauses['where'] = $this->revisions_where_filter($clauses['where']);
+		$this->posts_clauses_filtered = $clauses;
 		return $clauses;
 	}
 	

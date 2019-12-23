@@ -58,7 +58,7 @@ class RevisionaryAdmin
 		// log this action so we know when to ignore the save_post action
 		add_action('inherit_revision', array(&$this, 'act_log_revision_save') );
 
-		add_action('pre_post_status', array(&$this, 'flt_detect_revision_save'), 50 );
+		add_filter('pre_post_status', array(&$this, 'flt_detect_revision_save'), 50 );
 	
 		if ( rvy_get_option( 'pending_revisions' ) ) {
 			if ( strpos( $script_name, 'p-admin/edit.php') 

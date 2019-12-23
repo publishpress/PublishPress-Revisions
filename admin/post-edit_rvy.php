@@ -68,6 +68,19 @@ class RvyPostEdit {
 
         if (!empty($post) && rvy_is_revision_status($post->post_status)):
             $type_obj = get_post_type_object($post->post_type);
+
+            $view_link = rvy_preview_url($post);
+
+            if ($can_publish = agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true))) {
+                $view_caption = ('future-revision' == $post->post_status) ? __('View / Publish') : __('View / Approve');
+                $view_title = __('View / moderate saved revision', 'revisionary');
+            } else {
+                $view_caption = __('View');
+                $view_title = __('View saved revision', 'revisionary');
+            }
+
+            $preview_caption = __('View');
+            $preview_title = __('View unsaved changes', 'revisionary');
         ?>
     <script type="text/javascript">
     /* <![CDATA[ */
@@ -77,6 +90,23 @@ class RvyPostEdit {
         $(document).on('click', '#post-body-content *, #wp-content-editor-container *, #tinymce *', function() {
             $('div.rvy-revision-approve').hide();
         });
+
+        <?php if ($view_link) :?>
+            // remove preview event handlers
+            original = $('#minor-publishing-actions #post-preview');
+            $(original).after(original.clone().attr('href', '<?php echo $view_link;?>').attr('target', '_blank').attr('id', 'revision-preview'));
+            $(original).hide();
+        <?php endif;?>
+
+        <?php if ($view_caption) :?>
+            $('#minor-publishing-actions #revision-preview').html('<?php echo $view_caption;?>');
+        <?php endif;?>
+
+        <?php if ($preview_title) :?>
+            $('#minor-publishing-actions #post-preview').html('<?php echo $preview_caption;?>');
+            $('#minor-publishing-actions #post-preview').attr('title', '<?php echo $preview_title;?>');
+        <?php endif;?>
+
     });
     /* ]]> */
     </script>
