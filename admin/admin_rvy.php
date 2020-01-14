@@ -280,7 +280,7 @@ class RevisionaryAdmin
 		}
 
 		if ( 'trash' != $post->post_status && current_user_can( 'edit_post', $post->ID ) && wp_check_post_lock( $post->ID ) === false ) {
-			$actions['revision_queue'] = "<a href='admin.php?page=revisionary-q&published_post=$post->ID'>" . __('Revision Queue') . '</a>';
+			$actions['revision_queue'] = "<a href='admin.php?page=revisionary-q&published_post=$post->ID'>" . __('Revision Queue', 'revisionary') . '</a>';
 		}
 
 		return $actions;
@@ -404,20 +404,20 @@ class RevisionaryAdmin
 		}
 	
 		if ( ! empty($post) && in_array( $post->post_status, $stati ) && ! current_user_can( $type_obj->cap->publish_posts ) && rvy_is_supported_post_type($post->post_type) ) :
-			$datef = __( 'M j, Y @ g:i a' );
+			$datef = __( 'M j, Y @ g:i a', 'revisionary' );
 			if ( 0 != $post->ID ) {
 				if ( 'future' == $post->post_status ) { // scheduled for publishing at a future date
-					$stamp = __('Scheduled for: <b>%1$s</b>');
+					$stamp = __('Scheduled for: %s');
 				} else if ( 'publish' == $post->post_status || 'private' == $post->post_status ) { // already published
-					$stamp = __('Published on: <b>%1$s</b>');
+					$stamp = __('Published on: %s');
 				} else if ( '0000-00-00 00:00:00' == $post->post_date_gmt ) { // draft, 1 or more saves, no date specified
 					$stamp = __('Publish <b>immediately</b>');
 				} else if ( time() < strtotime( $post->post_date_gmt . ' +0000' ) ) { // draft, 1 or more saves, future date specified
-					$stamp = __('Schedule for: <b>%1$s</b>');
+					$stamp = __('Schedule for: %s');
 				} else { // draft, 1 or more saves, date specified
-					$stamp = __('Publish on: <b>%1$s</b>');
+					$stamp = __('Publish on: %s');
 				}
-				$date = date_i18n( $datef, strtotime( $post->post_date ) );
+				$date = '<b>' . date_i18n( $datef, strtotime( $post->post_date ) ) . '</b>';
 			} else { // draft (no saves, and thus no date specified)
 				$stamp = __('Publish <b>immediately</b>');
 				$date = date_i18n( $datef, strtotime( current_time('mysql') ) );

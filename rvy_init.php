@@ -16,7 +16,7 @@ if (did_action('set_current_user')) {
 
 if (!empty($_REQUEST['preview']) && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id'])) {
 		add_filter('redirect_canonical', '_rvy_no_redirect_filter', 10, 2);
-}
+	}
 
 add_action('init', 'rvy_maybe_redirect', 1);
 
@@ -36,11 +36,11 @@ if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview'])
 
 function rvy_mail_check_buffer($new_msg = [], $args = []) {
 	if (empty($args['log_only'])) {
-	if (!$use_buffer = rvy_get_option('use_notification_buffer')) {
-		return (defined('REVISIONARY_DISABLE_MAIL_LOG'))
-		? array_fill_keys(['buffer', 'sent_mail', 'send_limits', 'sent_counts', 'new_msg_buffered'], [])
-		: [];
-	}
+		if (!$use_buffer = rvy_get_option('use_notification_buffer')) {
+			return (defined('REVISIONARY_DISABLE_MAIL_LOG'))
+			? array_fill_keys(['buffer', 'sent_mail', 'send_limits', 'sent_counts', 'new_msg_buffered'], [])
+			: [];
+		}
 	}
 
 	require_once( dirname(__FILE__).'/mail-buffer_rvy.php');
@@ -69,7 +69,7 @@ function rvy_set_notification_buffer_cron() {
 function rvy_mail_buffer_cron_interval( $schedules ) {
     $schedules['two_minutes'] = array(
         'interval' => 120,
-        'display'  => esc_html__( 'Every 2 Minutes' ),
+        'display'  => esc_html__( 'Every 2 Minutes', 'revisionary' ),
     );
  
     return $schedules;
@@ -460,7 +460,7 @@ function rvy_get_option($option_basename, $sitewide = -1, $get_default = false) 
 
 	return maybe_unserialize($optval);
 }
- 
+
 function rvy_log_async_request($action) {						
 	// the function which performs requested action will clear this entry to confirm that the asynchronous call was effective 
 	$requested_actions = get_option( 'requested_remote_actions_rvy' );

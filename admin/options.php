@@ -17,7 +17,7 @@ class RvyOptionUI {
 	var $all_otype_options;
 	var $def_otype_options;
 	var $display_hints = true;
-		
+
 	public static function instance($args = [])
     {
         if (is_null(self::$instance)) {
@@ -35,14 +35,14 @@ class RvyOptionUI {
 		$this->sitewide = $args['sitewide'];
 		$this->customize_defaults = $args['customize_defaults'];
 		$this->display_hints = rvy_get_option( 'display_hints' );
-	}
+    }
 	
 	function option_checkbox( $option_name, $tab_name, $section_name, $hint_text, $trailing_html, $args = '') {
 		$return = array( 'in_scope' => false, 'val' => '', 'subcaption' => '' );
 		
 		if ( ! is_array($args) )
 			$args = array();
-		
+
 		if ( in_array( $option_name, $this->form_options[$tab_name][$section_name] ) ) {
 			$this->all_options []= $option_name;
 			
@@ -88,7 +88,7 @@ if ( $sitewide )
 	$customize_defaults = false;	// this is intended only for storing custom default values for site-specific options
 
 $ui = RvyOptionUI::instance(compact($sitewide, $customize_defaults));
-	
+
 rvy_refresh_default_options();
 
 $ui->all_options = array();
@@ -304,7 +304,7 @@ $table_class = 'form-table rs-form-table';
 		</th><td>
 		
 		<?php 
-		$hint = __('The user role "Revisor" role is now available. Include capabilities for all custom post types in this role?', 'revisor');
+		$hint = __('The user role "Revisor" role is now available. Include capabilities for all custom post types in this role?', 'revisionary');
 		$ui->option_checkbox( 'revisor_role_add_custom_rolecaps', $tab, $section, $hint, '' );
 		?>
 		
@@ -639,14 +639,14 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			}
 		} 
 
-			if (empty($_REQUEST['mailinfo'])):?>
-				<br />
-				<div style="padding-left:22px">
-				<a href="<?php echo(add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Show Notification Log / Buffer', 'revisionary');?></a>
-				<br /><br />
-				<a href="<?php echo(add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI'])));?>"><?php _e('Show with message content', 'revisionary');?></a>
-				</div>
-			<?php endif;
+		if (empty($_REQUEST['mailinfo'])):?>
+			<br />
+			<div style="padding-left:22px">
+			<a href="<?php echo(add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Show Notification Log / Buffer', 'revisionary');?></a>
+			<br /><br />
+			<a href="<?php echo(add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI'])));?>"><?php _e('Show with message content', 'revisionary');?></a>
+			</div>
+		<?php endif;
 		
 		?>
 		</td></tr>
@@ -722,7 +722,7 @@ foreach ( $available_form_options as $tab_name => $sections ) {
 		if ( isset( $ui->section_captions[$tab_name][$section_name] ) )
 			echo $ui->section_captions[$tab_name][$section_name];
 		else
-			_e( $section_name );
+			echo ucwords(str_replace('_', ' ', $section_name));
 		
 		echo '</strong><ul style="margin-left:2em">';
 			

@@ -133,7 +133,7 @@ class RevisionaryHistory
                 $post_edit_link = get_edit_post_link($published_post);
                 $post_title     = '<a href="' . $post_edit_link . '">' . _draft_or_post_title($published_post) . '</a>';
                 /* translators: %s: post title */
-                $h1             = sprintf( __( 'Compare %s of &#8220;%s&#8221;' ), $status_obj->labels->plural, $post_title );
+                $h1             = sprintf( __( 'Compare %s of &#8220;%s&#8221;', 'revisionary' ), $status_obj->labels->plural, $post_title );
                 $return_to_post = '<a href="' . $post_edit_link . '">' . __( '&larr; Return to editor' ) . '</a>';
                 $title          = $status_obj->labels->plural;
 
@@ -167,31 +167,6 @@ class RevisionaryHistory
         wp_enqueue_script( 'revisions' );
 
         $this->actEnqueueScripts();
-
-        /* Revisions Help Tab */
-
-        /*
-        $revisions_overview  = '<p>' . __( 'This screen is used for managing your content revisions.' ) . '</p>';
-        $revisions_overview .= '<p>' . __( 'Revisions are saved copies of your post or page, which are periodically created as you update your content. The red text on the left shows the content that was removed. The green text on the right shows the content that was added.' ) . '</p>';
-        $revisions_overview .= '<p>' . __( 'From this screen you can review, compare, and restore revisions:' ) . '</p>';
-        $revisions_overview .= '<ul><li>' . __( 'To navigate between revisions, <strong>drag the slider handle left or right</strong> or <strong>use the Previous or Next buttons</strong>.' ) . '</li>';
-        $revisions_overview .= '<li>' . __( 'Compare two different revisions by <strong>selecting the &#8220;Compare any two revisions&#8221; box</strong> to the side.' ) . '</li>';
-        $revisions_overview .= '<li>' . __( 'To restore a revision, <strong>click Restore This Revision</strong>.' ) . '</li></ul>';
-
-        get_current_screen()->add_help_tab(
-            array(
-                'id'      => 'revisions-overview',
-                'title'   => __( 'Overview' ),
-                'content' => $revisions_overview,
-            )
-        );
-
-        $revisions_sidebar  = '<p><strong>' . __( 'For more information:' ) . '</strong></p>';
-        $revisions_sidebar .= '<p>' . __( '<a href="https://codex.wordpress.org/Revision_Management">Revisions Management</a>' ) . '</p>';
-        $revisions_sidebar .= '<p>' . __( '<a href="https://wordpress.org/support/">Support</a>' ) . '</p>';
-
-        get_current_screen()->set_help_sidebar( $revisions_sidebar );
-        */
 
         require_once( ABSPATH . 'wp-admin/admin-header.php' );
 
@@ -844,7 +819,7 @@ class RevisionaryHistory
                 $restore_link = rvy_preview_url($revision);  // default to revision preview link
                 
                 if ($can_restore) {
-                        $published_post_id = rvy_post_id($revision->ID);
+                    $published_post_id = rvy_post_id($revision->ID);
 
 	                if (rvy_get_option('compare_revisions_direct_approval') && agp_user_can( 'edit_post', $published_post_id, '', ['skip_revision_allowance' => true] ) ) {
                         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
@@ -892,7 +867,7 @@ class RevisionaryHistory
                 'id'         => $revision->ID,
                 'title'      => get_the_title( $revision->ID ),
                 'author'     => $this->authors[ $author_key ],
-                'date'       => sprintf('%s%s', $date_prefix, date_i18n( __( 'M j, Y @ g:i a' ), $modified )),
+                'date'       => sprintf('%s%s', $date_prefix, date_i18n( __( 'M j, Y @ g:i a', 'revisionary' ), $modified )),
                 'dateShort'  => date_i18n( _x( 'j M @ g:i a', 'revision date short format' ), $modified ),
                 'timeAgo'    => sprintf( $time_diff_label, $date_prefix, human_time_diff( $modified_gmt, $now_gmt ) ),
                 'autosave'   => false,
@@ -937,8 +912,8 @@ class RevisionaryHistory
                 'id'         => $post->ID,
                 'title'      => get_the_title( $post->ID ),
                 'author'     => $this->authors[ $author_key ],
-                'date'       => date_i18n( __( 'M j, Y @ H:i' ), strtotime( $post->post_modified ) ),
-                'dateShort'  => date_i18n( _x( 'j M @ H:i', 'revision date short format' ), strtotime( $post->post_modified ) ),
+                'date'       => date_i18n( __( 'M j, Y @ H:i', 'revisionary' ), strtotime( $post->post_modified ) ),
+                'dateShort'  => date_i18n( _x( 'j M @ H:i', 'revision date short format', 'revisionary' ), strtotime( $post->post_modified ) ),
                 'timeAgo'    => sprintf( __( '%s ago' ), human_time_diff( strtotime( $post->post_modified_gmt ), $now_gmt ) ),
                 'autosave'   => false,
                 'current'    => true,
@@ -1070,7 +1045,7 @@ class RevisionaryHistory
                                     }
                                 }
                             }
-                            
+
                             rvyLastID = rvyRevisionID;
                         }
                     }, 100);
@@ -1101,7 +1076,7 @@ class RevisionaryHistory
 
         $preview_label = (empty($type_obj) || agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true])) 
         ?  __('Preview / Restore', 'revisionary')
-        : __('Preview', 'revisionary');
+        : __('Preview');
 
         $preview_url = rvy_preview_url($post);
 
@@ -1137,7 +1112,7 @@ class RevisionaryHistory
                     var rvyManageURL = '<?php echo $manage_url;?>';
                     rvyManageURL = rvyManageURL.replace("revision=" + <?php echo $post_id;?>, "revision=" + rvyRevisionID);
 
-                if(!$('span.rvy-compare-preview').length) {
+                    if(!$('span.rvy-compare-preview').length) {
                     $('h1').append('<span class="rvy-compare-preview" style="margin-left:20px"><a class="rvy_preview_linkspan" href="<?php echo $preview_url;?>" target="_revision_preview"><input class="button" type="button" value="<?php echo $preview_label;?>"></a></span>');
                     $('h1').append('<span class="rvy-compare-list" style="margin-left:10px"><a class="rvy_preview_linkspan" href="<?php echo $manage_url;?>" target="_revision_list"><input class="button" type="button" value="<?php echo $manage_label;?>"></a></span>');
                     } else {

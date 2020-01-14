@@ -15,7 +15,7 @@ class RevisionCreation {
 		if (!empty($this->revisionary)) {
 			$revisionary = $this->revisionary;
 		} else {
-        global $revisionary;
+			global $revisionary;
 		}
 
         if ( isset($_POST['wp-preview']) && ( 'dopreview' == $_POST['wp-preview'] ) ) {
@@ -52,7 +52,7 @@ class RevisionCreation {
         if (!empty($this->revisionary)) {
 			$revisionary = $this->revisionary;
 		} else {
-        global $revisionary;
+			global $revisionary;
 		}
         
         if (rvy_is_revision_status($status) || ('inherit' == $status)) {
@@ -126,7 +126,7 @@ class RevisionCreation {
 		} else {
 			global $revisionary;
 		}
-        
+
         if ( $revisionary->doing_rest && $revisionary->rest->is_posts_request && ! empty( $revisionary->rest->request ) ) {
             $postarr = array_merge( $revisionary->rest->request->get_params(), $postarr );
             
@@ -520,7 +520,7 @@ class RevisionCreation {
 
 		if ( false === $wpdb->insert( $wpdb->posts, $data ) ) {
 			if (!empty($wpdb->last_error)) {
-				return new WP_Error( 'db_insert_error', __( 'Could not insert post into the database' ), $wpdb->last_error );
+				return new WP_Error( 'db_insert_error', __( 'Could not insert revision into the database', 'revisionary' ), $wpdb->last_error );
 			} else {
 				return 0;
 			}
@@ -560,7 +560,7 @@ class RevisionCreation {
 				$taxonomy_obj = get_taxonomy( $taxonomy );
 				if ( ! $taxonomy_obj ) {
 					/* translators: %s: taxonomy name */
-					_doing_it_wrong( __FUNCTION__, sprintf( __( 'Invalid taxonomy: %s.' ), $taxonomy ), '4.4.0' );
+					_doing_it_wrong( __FUNCTION__, sprintf( __( 'Invalid taxonomy: %s', 'revisionary' ), $taxonomy ), '4.4.0' );
 					continue;
 				}
 	
@@ -628,7 +628,7 @@ class RevisionCreation {
 			$page_templates      = wp_get_theme()->get_page_templates( $post );
 			if ( 'default' != $postarr['page_template'] && ! isset( $page_templates[ $postarr['page_template'] ] ) ) {
 				if ( $wp_error ) {
-					return new WP_Error( 'invalid_page_template', __( 'Invalid page template.' ) );
+					return new WP_Error( 'invalid_page_template', __( 'Invalid page template.', 'revisionary' ) );
 				}
 				update_post_meta( $post_ID, '_wp_page_template', 'default' );
 			} else {

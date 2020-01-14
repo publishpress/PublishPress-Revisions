@@ -62,8 +62,8 @@ class Revisionary
 			require_once( dirname(__FILE__).'/front_rvy.php' );
 			$this->front = new RevisionaryFront();
 		}
-		
-		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && (!empty($_GET['preview']) && !empty($_REQUEST['preview_id']))) {
+
+		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && (!empty($_GET['preview']) && !empty($_REQUEST['preview_id']))) {			
 			if (defined('REVISIONARY_PREVIEW_WORKAROUND')) { // @todo: confirm this is no longer needed
 				if ($_post = get_post($_REQUEST['preview_id'])) {
 					if (in_array($_post->post_status, ['pending-revision', 'future-revision']) && !$this->isBlockEditorActive()) {
@@ -142,7 +142,7 @@ class Revisionary
 
 		do_action( 'rvy_init', $this );
 	}
-	
+
 	function fltEditRevisionUpdatedLink($permalink, $post, $leavename) {
 		static $busy = false;
 
@@ -368,14 +368,13 @@ class Revisionary
 	}
 
 	private function handle_featured_media( $featured_media, $post_id ) {
-
 		$featured_media = (int) $featured_media;
 		if ( $featured_media ) {
 			$result = set_post_thumbnail( $post_id, $featured_media );
 			if ( $result ) {
 				return true;
 			} else {
-				return new WP_Error( 'rest_invalid_featured_media', __( 'Invalid featured media ID.' ), array( 'status' => 400 ) );
+				return new WP_Error( 'rest_invalid_featured_media', __( 'Invalid featured media ID.', 'revisionary' ), array( 'status' => 400 ) );
 			}
 		} else {
 			return delete_post_thumbnail( $post_id );
@@ -425,19 +424,19 @@ class Revisionary
 					if ( agp_user_can( $post_type_obj->cap->edit_published_posts, 0, '', array('skip_revision_allowance' => true) ) ) {	// don't require any additional caps for sitewide Editors
 						return $caps;
 					}
-				
-						static $stati;
+			
+					static $stati;
 
-						if ( ! isset($stati) ) {
-							$stati = get_post_stati( array( 'internal' => false, 'protected' => true ) );
-							$stati = array_diff( $stati, array( 'future' ) );
-						}
+					if ( ! isset($stati) ) {
+						$stati = get_post_stati( array( 'internal' => false, 'protected' => true ) );
+						$stati = array_diff( $stati, array( 'future' ) );
+					}
 
-						if ( in_array( $post->post_status, $stati ) ) {
-							$caps[]= "edit_others_drafts";
-						}
+					if ( in_array( $post->post_status, $stati ) ) {
+						$caps[]= "edit_others_drafts";
 					}
 				}
+			}
 		}
 		
 		return $caps;
@@ -504,9 +503,9 @@ class Revisionary
 		}
 
 		if (!empty($args[0])) {
-				$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
+			$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
 		} else {
-				$post_id = 0;
+			$post_id = 0;
 		}
 
 		if ($post = get_post($post_id)) {
@@ -518,7 +517,7 @@ class Revisionary
 				return $caps;
 			}
 		}
-
+		
 		if ($post && ('future-revision' == $post->post_status)) {
 			if (in_array($cap, ['read_post', 'read_page'])) {
 				return $caps;
@@ -558,7 +557,7 @@ class Revisionary
 					
 					} else {
 						$caps []= $type_obj->cap->edit_posts;
-					}
+					} 
 				}
 			}
 
@@ -597,7 +596,7 @@ class Revisionary
 				$caps = array_diff($caps, array_keys(array_filter($grant_caps)));
 			}
 		}
-
+		
 		return $caps;
 	}
 
@@ -607,7 +606,7 @@ class Revisionary
 
 	private function filter_caps($wp_blogcaps, $reqd_caps, $args, $internal_args = array()) {
 		global $current_user;
-		
+
 		if (!rvy_get_option('pending_revisions')) {
 			return $wp_blogcaps;
 		}
@@ -648,8 +647,8 @@ class Revisionary
 		// For 'edit_post' check, filter required capabilities via 'map_meta_cap' filter, then pass 'user_has_cap' unfiltered
 		if (in_array($args[0], array('edit_post', 'edit_page')) && ! $is_meta_cap_call) {
 			if (empty($post) || !rvy_is_revision_status($post->post_status)) {
-			return $wp_blogcaps;
-		}
+				return $wp_blogcaps;
+			}
 		}
 
 		if ( ! in_array( $args[0], array( 'edit_post', 'edit_page', 'delete_post', 'delete_page' ) ) && empty($support_publish_cap) ) {			
@@ -674,7 +673,7 @@ class Revisionary
 			$this->skip_revision_allowance = true;
 		}
 
-		if ( rvy_get_option( 'revisor_lock_others_revisions' ) ) {
+		if (rvy_get_option('revisor_lock_others_revisions')) {
 			if ($post && !rvy_is_full_editor($post)) {
 				// Revisors are enabled to edit other users' posts for revision, but cannot edit other users' revisions unless cap is explicitly set sitewide
 				if ( rvy_is_revision_status($post->post_type) && ! $this->skip_revision_allowance ) {
@@ -693,7 +692,7 @@ class Revisionary
 			return $wp_blogcaps;
 		
 		$cap = $object_type_obj->cap;
-		
+
 		//if (!empty($args[2]) && $post && rvy_is_revision_status($post->post_status)) {
 		if ($post && rvy_is_revision_status($post->post_status)) {
 			if (in_array($cap->edit_others_posts, $reqd_caps) ) {
@@ -832,15 +831,15 @@ class Revisionary
 				return true;
 			} elseif (get_option('classic-editor-allow-users') === 'allow') {
 				if ($post_id = rvy_detect_post_id()) {
-				$which = get_post_meta( $post_id, 'classic-editor-remember', true );
-				
-				if ('block-editor' == $which) {
-					return true;
-				} elseif ('classic-editor' == $which) {
-					return false;
+					$which = get_post_meta( $post_id, 'classic-editor-remember', true );
+
+					if ('block-editor' == $which) {
+						return true;
+					} elseif ('classic-editor' == $which) {
+						return false;
+					}
 				}
 			}
-		}
 		}
 
 		$pluginsState = array(
