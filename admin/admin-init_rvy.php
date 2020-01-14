@@ -206,22 +206,7 @@ function rvy_admin_init() {
 	}
 
 	if (defined('REVISIONARY_PRO_VERSION') && !empty($_REQUEST['rvy_refresh_updates'])) {
-		revisionary()->keyStatus(true);
-        set_transient('revisionary-pro-refresh-update-info', true, 86400);
-
-		delete_site_transient('update_plugins');
-		delete_option('_site_transient_update_plugins');
-
-		wp_update_plugins();
-		//wp_version_check(array(), true);
-
-		if (current_user_can('update_plugins')) {
-			$url = remove_query_arg('rvy_refresh_updates', $_SERVER['REQUEST_URI']);
-			$url = add_query_arg('rvy_refresh_done', 1, $url);
-			$url = "//" . $_SERVER['HTTP_HOST'] . $url;
-			wp_redirect($url);
-			exit;
-		}
+		do_action('revisionary_refresh_updates');
 	}
 
 	if (!empty($_REQUEST['rvy_refresh_done']) && empty($_POST)) {

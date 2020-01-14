@@ -10,7 +10,7 @@ add_action( 'enqueue_block_editor_assets', array( 'RVY_PostBlockEditUI', 'act_ob
 
 class RVY_PostBlockEditUI {
 	public static function act_object_guten_scripts() {
-        global $current_user;
+        global $current_user, $revisionary;
         
         if ( ! $post_id = rvy_detect_post_id() ) {
             return;
@@ -19,6 +19,10 @@ class RVY_PostBlockEditUI {
         $post_type = rvy_detect_post_type();
 
 		if ( ! $type_obj = get_post_type_object( $post_type ) ) {
+            return;
+        }
+
+        if (empty($revisionary->enabled_post_types[$post_type])) {
             return;
         }
 

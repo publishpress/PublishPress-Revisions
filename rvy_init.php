@@ -642,6 +642,12 @@ function _revisionary_dashboard_dismiss_msg() {
 }
 
 function rvy_is_supported_post_type($post_type) {
+	global $revisionary;
+
+	if (empty($revisionary->enabled_post_types[$post_type])) {
+		return false;
+	}
+
 	$types = rvy_get_manageable_types();
 	return !empty($types[$post_type]);
 }
@@ -703,7 +709,9 @@ function rvy_init() {
 	if ( ! isset( $wp_roles->roles['revisor'] ) ) {
 		rvy_add_revisor_role();
 	} else {
-		set_site_transient('revisionary_previous_install', true, 86400);
+		if (!get_site_transient('revisionary_previous_install')) {
+			set_site_transient('revisionary_previous_install', true, 86400);
+		}
 	}
 
 	/*  // wp_cron hook @todo

@@ -585,7 +585,7 @@ class RevisionaryAdmin
 
 			foreach ($types as $_post_type) {
 				if ($type_obj = get_post_type_object($_post_type)) {
-					if (!empty($current_user->allcaps[$type_obj->cap->edit_posts])) {
+					if (!empty($current_user->allcaps[$type_obj->cap->edit_posts]) || (is_multisite() && is_super_admin())) {
 						$can_edit_any = true;
 						break;
 					}
