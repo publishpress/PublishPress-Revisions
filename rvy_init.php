@@ -709,7 +709,9 @@ function rvy_init() {
 	if ( ! isset( $wp_roles->roles['revisor'] ) ) {
 		rvy_add_revisor_role();
 	} else {
-		set_site_transient('revisionary_previous_install', true, 86400);
+		if (!get_site_transient('revisionary_previous_install')) {
+			set_site_transient('revisionary_previous_install', true, 86400);
+		}
 	}
 
 	/*  // wp_cron hook @todo
