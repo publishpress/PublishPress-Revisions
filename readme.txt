@@ -4,7 +4,7 @@ Tags: revision, access, permissions, cms, user, groups, members, admin, pages, p
 Requires at least: 4.9.7
 Tested up to: 5.3.2
 Requires PHP: 5.6.20
-Stable Tag: 2.1.6
+Stable Tag: 2.1.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -61,6 +61,12 @@ For more details about both the free and pro version, see our <a href="https://p
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.1.7 - 13 Jan 2020 =
+* Fixed : Excessive resource usage with some caching solutions
+* Fixed : Multisite - Super Administrators without a site role could not access Revision Queue 
+* Fixed : Classic Editor - After updating a revision, "View Post" message linked to published post instead of revision preview
+* Feature : New filter 'revisionary_enabled_post_types', unset post types by key to disable PP Revisions involvement
 
 = 2.1.6 - 23 Dec 2019 =
 * Fixed : Edit Revision - Classic Editor "Approve" button ineffective
