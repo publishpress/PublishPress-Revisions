@@ -17,11 +17,28 @@ class RvyPostEdit {
 
         add_action('post_submitbox_misc_actions', array($this, 'act_post_submit_revisions_links'), 5);
 
+        add_filter('post_updated_messages', [$this, 'fltPostUpdatedMessage']);
+
         add_filter('user_has_cap', [$this, 'fltAllowBrowseRevisionsLink'], 50, 3);
 
         add_filter('revisionary_apply_revision_allowance', [$this, 'fltRevisionAllowance'], 5, 2);
 
         add_action('admin_head', [$this, 'actAdminBarPreventPostClobber'], 5);
+    }
+
+    function fltPostUpdatedMessage($messages) {
+        global $post;
+
+        if (rvy_is_revision_status($post->post_status)) {
+            $preview_url = rvy_preview_url($post);
+            $preview_msg = sprintf(__('Revision updated. %sView Preview%s', 'revisionary-pro'), "<a href='$preview_url'>", '</a>');
+
+            $messages['post'][1] = $preview_msg;
+            $messages['page'][1] = $preview_msg;
+            $messages[$post->post_type][1] = $preview_msg;
+        }
+        
+        return $messages;
     }
 
     function fltAllowBrowseRevisionsLink($wp_blogcaps, $reqd_caps, $args) {
