@@ -5,7 +5,7 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 /**
  * @package     PublishPress\Revisions
  * @author      PublishPress <help@publishpress.com>
- * @copyright   Copyright (c) 2019 PublishPress. All rights reserved.
+ * @copyright   Copyright (c) 2020 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
  */
@@ -20,6 +20,7 @@ class Revisionary
 	var $impose_pending_rev = [];
 	var $save_future_rev = [];
 	var $last_autosave_id = [];
+	var $enabled_post_types = [];
 
 	// minimal config retrieval to support pre-init usage by WP_Scoped_User before text domain is loaded
 	function __construct() {
@@ -53,6 +54,8 @@ class Revisionary
 		}
 
 		rvy_refresh_options_sitewide();
+
+		$this->enabled_post_types = apply_filters('revisionary_enabled_post_types', array_fill_keys(get_post_types(['public' => true]), true));
 
 		// NOTE: $_GET['preview'] and $_GET['post_type'] arguments are set by rvy_init() at response to ?p= request when the requested post is a revision.
 		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && ((!empty($_GET['preview']) && empty($_REQUEST['preview_id'])) || !empty($_GET['mark_current_revision']))) { // preview_id indicates a regular preview via WP core, based on autosave revision
@@ -184,6 +187,10 @@ class Revisionary
 	
 	function fltPressPermitExceptionClause($clause, $required_operation, $post_type, $args) {
 		//"$src_table.ID $logic ('" . implode("','", $ids) . "')",
+
+		if (empty($this->enabled_post_types[$post_type])) {
+			return $clause;
+		}
 
 		if (('edit' == $required_operation) && in_array($post_type, rvy_get_manageable_types()) 
 		) {
@@ -506,6 +513,10 @@ class Revisionary
 			if ('inherit' == $post->post_status) {
 				return $caps;
 			}
+
+			if (empty($this->enabled_post_types[$post->post_type])) {
+				return $caps;
+			}
 		}
 
 		if ($post && ('future-revision' == $post->post_status)) {
@@ -628,6 +639,10 @@ class Revisionary
 			$object_type = $post->post_type;
 		} else {
 			$object_type = rvy_detect_post_type();
+		}
+
+		if (empty($this->enabled_post_types[$object_type])) {
+			return $wp_blogcaps;
 		}
 
 		// For 'edit_post' check, filter required capabilities via 'map_meta_cap' filter, then pass 'user_has_cap' unfiltered

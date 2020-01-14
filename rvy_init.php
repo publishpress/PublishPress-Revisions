@@ -642,6 +642,12 @@ function _revisionary_dashboard_dismiss_msg() {
 }
 
 function rvy_is_supported_post_type($post_type) {
+	global $revisionary;
+
+	if (empty($revisionary->enabled_post_types[$post_type])) {
+		return false;
+	}
+
 	$types = rvy_get_manageable_types();
 	return !empty($types[$post_type]);
 }
