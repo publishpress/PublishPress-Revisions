@@ -62,6 +62,9 @@ For more details about both the free and pro version, see our <a href="https://p
 
 == Changelog ==
 
+= 2.1.8-dev =
+* Lang: Updated language files
+
 = 2.1.7 - 13 Jan 2020 =
 * Fixed : Excessive resource usage with some caching solutions
 * Fixed : Multisite - Super Administrators without a site role could not access Revision Queue 
