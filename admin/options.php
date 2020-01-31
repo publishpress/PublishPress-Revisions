@@ -722,7 +722,7 @@ foreach ( $available_form_options as $tab_name => $sections ) {
 		if ( isset( $ui->section_captions[$tab_name][$section_name] ) )
 			echo $ui->section_captions[$tab_name][$section_name];
 		else
-			_e( $section_name );
+			echo ucwords(str_replace('_', ' ', $section_name));
 		
 		echo '</strong><ul style="margin-left:2em">';
 			
