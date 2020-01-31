@@ -133,7 +133,7 @@ class RevisionaryHistory
                 $post_edit_link = get_edit_post_link($published_post);
                 $post_title     = '<a href="' . $post_edit_link . '">' . _draft_or_post_title($published_post) . '</a>';
                 /* translators: %s: post title */
-                $h1             = sprintf( __( 'Compare %s of &#8220;%s&#8221;', 'revisionary' ), $status_obj->labels->plural, $post_title );
+                $h1             = sprintf( __( 'Compare %s of &#8220;%s&#8221;' ), $status_obj->labels->plural, $post_title );
                 $return_to_post = '<a href="' . $post_edit_link . '">' . __( '&larr; Return to editor' ) . '</a>';
                 $title          = $status_obj->labels->plural;
 
@@ -892,7 +892,7 @@ class RevisionaryHistory
                 'id'         => $revision->ID,
                 'title'      => get_the_title( $revision->ID ),
                 'author'     => $this->authors[ $author_key ],
-                'date'       => sprintf('%s%s', $date_prefix, date_i18n( __( 'M j, Y @ g:i a', 'revisionary' ), $modified )),
+                'date'       => sprintf('%s%s', $date_prefix, date_i18n( __( 'M j, Y @ g:i a' ), $modified )),
                 'dateShort'  => date_i18n( _x( 'j M @ g:i a', 'revision date short format' ), $modified ),
                 'timeAgo'    => sprintf( $time_diff_label, $date_prefix, human_time_diff( $modified_gmt, $now_gmt ) ),
                 'autosave'   => false,
@@ -937,8 +937,8 @@ class RevisionaryHistory
                 'id'         => $post->ID,
                 'title'      => get_the_title( $post->ID ),
                 'author'     => $this->authors[ $author_key ],
-                'date'       => date_i18n( __( 'M j, Y @ H:i', 'revisionary' ), strtotime( $post->post_modified ) ),
-                'dateShort'  => date_i18n( _x( 'j M @ H:i', 'revision date short format', 'revisionary' ), strtotime( $post->post_modified ) ),
+                'date'       => date_i18n( __( 'M j, Y @ H:i' ), strtotime( $post->post_modified ) ),
+                'dateShort'  => date_i18n( _x( 'j M @ H:i', 'revision date short format' ), strtotime( $post->post_modified ) ),
                 'timeAgo'    => sprintf( __( '%s ago' ), human_time_diff( strtotime( $post->post_modified_gmt ), $now_gmt ) ),
                 'autosave'   => false,
                 'current'    => true,
@@ -1101,7 +1101,7 @@ class RevisionaryHistory
 
         $preview_label = (empty($type_obj) || agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true])) 
         ?  __('Preview / Restore', 'revisionary')
-        : __('Preview');
+        : __('Preview', 'revisionary');
 
         $preview_url = rvy_preview_url($post);
 

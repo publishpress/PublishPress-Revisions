@@ -62,7 +62,7 @@ class RvyPostEditSubmitMetabox
                             $revisions_caption = (rvy_is_revision_status($post->post_status)) ? __('Revision Edits: %s', 'revisionary') : __('Revisions: %s');
 
                             if ($revisions_to_keep > 0 && $revisions_to_keep <= $args['args']['revisions_count']) {
-                                echo '<span title="' . esc_attr(sprintf(__('Your site is configured to keep only the last %s revisions.', 'revisionary'),
+                                echo '<span title="' . esc_attr(sprintf(__('Your site is configured to keep only the last %s revisions.'),
                                         number_format_i18n($revisions_to_keep))) . '">';
                                 printf($revisions_caption, '<b>' . number_format_i18n($args['args']['revisions_count']) . '+</b>');
                                 echo '</span>';
@@ -71,7 +71,7 @@ class RvyPostEditSubmitMetabox
                             }
                             ?>
                             <a class="hide-if-no-js"
-                               href="<?php echo esc_url(admin_url("revision.php?revision={$args['args']['revision_id']}")); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions', 'revisionary'); ?></a>
+                               href="<?php echo esc_url(admin_url("revision.php?revision={$args['args']['revision_id']}")); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions'); ?></a>
                         </div>
                     <?php
                     endif;
@@ -169,7 +169,7 @@ class RvyPostEditSubmitMetabox
             $type_obj = get_post_type_object($post->post_type);
             $can_publish = $type_obj && agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
             if ($can_publish) {
-                $preview_button = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
+                $preview_button = ('future-revision' == $post->post_status) ? __('View / Publish') : __('View / Approve');
                 $preview_title = __('View / moderate saved revision', 'revisionary');
             } else {
                 $preview_button = __('View');
@@ -337,7 +337,7 @@ class RvyPostEditSubmitMetabox
         <span id="timestamp">
         <?php
         // translators: Publish box date formt, see http://php.net/date
-        $datef =__('M j, Y @ G:i', 'revisionary');
+        $datef =__('M j, Y @ G:i');
 
         if (0 != $post->ID) {
             $published_stati = get_post_stati(['public' => true, 'private' => true], 'names', 'or');

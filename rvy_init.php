@@ -69,7 +69,7 @@ function rvy_set_notification_buffer_cron() {
 function rvy_mail_buffer_cron_interval( $schedules ) {
     $schedules['two_minutes'] = array(
         'interval' => 120,
-        'display'  => esc_html__( 'Every 2 Minutes', 'revisionary' ),
+        'display'  => esc_html__( 'Every 2 Minutes' ),
     );
  
     return $schedules;
@@ -147,7 +147,7 @@ function rvy_ajax_handler() {
 
 function rvy_status_registrations() {
 	register_post_status('pending-revision', array(
-		'label' => __('Pending Revision', 'revisionary'),
+		'label' => _x('Pending Revision', 'post'),
 		'labels' => (object)['publish' => __('Publish Revision', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Pending Revisions', 'revisionary'), 'short' => __('Pending', 'revisionary') ],
 		'protected' => true,
 		'internal' => true,
@@ -158,7 +158,7 @@ function rvy_status_registrations() {
 	));
 
 	register_post_status('future-revision', array(
-		'label' => __('Scheduled Revision', 'revisionary'),
+		'label' => _x('Scheduled Revision', 'post'),
 		'labels' => (object)['publish' => __('Publish Revision', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Scheduled Revisions', 'revisionary'), 'short' => __('Scheduled', 'revisionary')],
 		'protected' => true,
 		'internal' => true,
