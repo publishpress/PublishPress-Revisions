@@ -214,6 +214,14 @@ function rvy_plugin_active_for_network( $plugin ) {
 	return false;
 }
 
+function rvy_configuration_late_init() {
+	global $revisionary;
+
+	if (!empty($revisionary)) {
+		$revisionary->configurationLateInit();
+	}
+}
+
 // auto-define the Revisor role to include custom post type capabilities equivalent to those added for post, page in rvy_add_revisor_role()
 function rvy_add_revisor_custom_caps() {
 	if ( ! rvy_get_option( 'revisor_role_add_custom_rolecaps' ) )
@@ -657,7 +665,7 @@ function _revisionary_dashboard_dismiss_msg() {
 function rvy_is_supported_post_type($post_type) {
 	global $revisionary;
 
-	if (empty($revisionary->enabled_post_types[$post_type])) {
+	if (empty($revisionary->enabled_post_types[$post_type]) && $revisionary->config_loaded) {
 		return false;
 	}
 

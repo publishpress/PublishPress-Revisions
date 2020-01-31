@@ -20,7 +20,9 @@ class Revisionary
 	var $impose_pending_rev = [];
 	var $save_future_rev = [];
 	var $last_autosave_id = [];
-	var $enabled_post_types = [];
+
+	var $config_loaded = false;		// configuration related to post types and statuses must be loaded late on the init action
+	var $enabled_post_types = [];	// enabled_post_types property is set (keyed by post type slug) late on the init action. 
 
 	// minimal config retrieval to support pre-init usage by WP_Scoped_User before text domain is loaded
 	function __construct() {
@@ -54,8 +56,6 @@ class Revisionary
 		}
 
 		rvy_refresh_options_sitewide();
-
-		$this->enabled_post_types = apply_filters('revisionary_enabled_post_types', array_fill_keys(get_post_types(['public' => true]), true));
 
 		// NOTE: $_GET['preview'] and $_GET['post_type'] arguments are set by rvy_init() at response to ?p= request when the requested post is a revision.
 		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && ((!empty($_GET['preview']) && empty($_REQUEST['preview_id'])) || !empty($_GET['mark_current_revision']))) { // preview_id indicates a regular preview via WP core, based on autosave revision
@@ -143,6 +143,11 @@ class Revisionary
 		do_action( 'rvy_init', $this );
 	}
 	
+	function configurationLateInit() {
+		$this->enabled_post_types = apply_filters('revisionary_enabled_post_types', array_fill_keys(get_post_types(['public' => true]), true));
+		$this->config_loaded = true;
+	}
+
 	function fltEditRevisionUpdatedLink($permalink, $post, $leavename) {
 		static $busy = false;
 
@@ -188,7 +193,7 @@ class Revisionary
 	function fltPressPermitExceptionClause($clause, $required_operation, $post_type, $args) {
 		//"$src_table.ID $logic ('" . implode("','", $ids) . "')",
 
-		if (empty($this->enabled_post_types[$post_type])) {
+		if (empty($this->enabled_post_types[$post_type]) && $this->config_loaded) {
 			return $clause;
 		}
 
@@ -514,7 +519,7 @@ class Revisionary
 				return $caps;
 			}
 
-			if (empty($this->enabled_post_types[$post->post_type])) {
+			if (empty($this->enabled_post_types[$post->post_type]) && $this->config_loaded) {
 				return $caps;
 			}
 		}
@@ -641,7 +646,7 @@ class Revisionary
 			$object_type = rvy_detect_post_type();
 		}
 
-		if (empty($this->enabled_post_types[$object_type])) {
+		if (empty($this->enabled_post_types[$object_type]) && $this->config_loaded) {
 			return $wp_blogcaps;
 		}
 

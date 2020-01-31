@@ -226,7 +226,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				if (
 					agp_user_can($type_obj->cap->edit_published_posts, 0, '', ['skip_revision_allowance' => true])
 					&& agp_user_can($type_obj->cap->publish_posts, 0, '', ['skip_revision_allowance' => true])
-					&& !empty($revisionary->enabled_post_types[$post_type])
+					&& (!empty($revisionary->enabled_post_types[$post_type]) || !$revisionary->config_loaded)
 				) {
 					$can_publish_types[]= $post_type;
 				}
@@ -243,7 +243,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			if (empty($args['suppress_author_clause'])) {
 				$where .= $wpdb->prepare(" AND ($p.post_author = %d $type_clause)", $current_user->ID );
 			}
-		} else {
+		} elseif ($revisionary->config_loaded) {
 			$where .= (array_filter($revisionary->enabled_post_types)) 
 			? " AND ($p.post_type IN ('" . implode("','", array_keys(array_filter($revisionary->enabled_post_types))) . "'))" 
 			: "AND 1=2";

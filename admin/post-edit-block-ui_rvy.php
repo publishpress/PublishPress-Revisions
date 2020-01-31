@@ -22,7 +22,7 @@ class RVY_PostBlockEditUI {
             return;
         }
 
-        if (empty($revisionary->enabled_post_types[$post_type])) {
+        if (empty($revisionary->enabled_post_types[$post_type]) || !$revisionary->config_loaded) {
             return;
         }
 
