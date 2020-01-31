@@ -6,11 +6,11 @@
 global $post_type, $post_type_object, $wpdb;
 
 if ( ! $post_types = rvy_get_manageable_types() ) {
-	wp_die( __( 'You are not allowed to manage revisions.' ) );
+	wp_die( __( 'You are not allowed to manage revisions.', 'revisionary' ) );
 }
 
 if (!rvy_get_option('pending_revisions') && !rvy_get_option('scheduled_revisions')) {
-	wp_die( __( 'Pending Revisions and Scheduled Revisions are both disabled. See Revisions > Settings.' ) );
+	wp_die( __( 'Pending Revisions and Scheduled Revisions are both disabled. See Revisions > Settings.', 'revisionary' ) );
 }
 
 set_current_screen( 'revisionary-q' );
@@ -80,7 +80,7 @@ $filters = [];
 if (!empty($_REQUEST['author'])) {
 	if ($_user = new WP_User($_REQUEST['author'])) {
 		$filters['author'] = (!empty($_REQUEST['post_status']) || !empty($_REQUEST['post_status'])) 
-		? sprintf(__('%s: ', 'revisionary'), $_user->display_name)
+		? sprintf(_x('%s: ', 'Author Name', 'revisionary'), $_user->display_name)
 		: $_user->display_name;
 	}
 }
@@ -93,7 +93,7 @@ if (!empty($_REQUEST['post_status'])) {
 
 if (!empty($_REQUEST['post_type']) && empty($published_title)) {
 	$filters['post_type'] = (!empty($_REQUEST['post_status'])) 
-	? sprintf(__('of %s', 'revisionary'), $type_obj->labels->name) 
+	? sprintf(_x('of %s', 'Posts / Pages / etc.', 'revisionary'), $type_obj->labels->name) 
 	: $type_obj->labels->name;
 }
 

@@ -31,7 +31,7 @@ class RvyPostEdit {
 
         if (rvy_is_revision_status($post->post_status)) {
             $preview_url = rvy_preview_url($post);
-            $preview_msg = sprintf(__('Revision updated. %sView Preview%s', 'revisionary-pro'), "<a href='$preview_url'>", '</a>');
+            $preview_msg = sprintf(__('Revision updated. %sView Preview%s', 'revisionary'), "<a href='$preview_url'>", '</a>');
 
             $messages['post'][1] = $preview_msg;
             $messages['page'][1] = $preview_msg;
@@ -89,7 +89,7 @@ class RvyPostEdit {
             $view_link = rvy_preview_url($post);
 
             if ($can_publish = agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true))) {
-                $view_caption = ('future-revision' == $post->post_status) ? __('View / Publish') : __('View / Approve');
+                $view_caption = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
                 $view_title = __('View / moderate saved revision', 'revisionary');
             } else {
                 $view_caption = __('View');
@@ -242,7 +242,7 @@ public function actSubmitboxStart() {
         $type_obj = get_post_type_object($post->post_type);
         $can_publish = $type_obj && agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
         if ($can_publish) {
-            $preview_caption = ('future-revision' == $post->post_status) ? __('View / Publish') : __('View / Approve');
+            $preview_caption = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
         } else {
             $preview_caption = __('View');
         }
@@ -309,7 +309,7 @@ public function actSubmitboxStart() {
 	            echo $caption;
 	            ?>
 	            <a class="hide-if-no-js"
-	                href="<?php echo esc_url($url); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions'); ?></a>
+                    href="<?php echo esc_url($url); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions', 'revisionary'); ?></a>
 	            </div>
 	            <?php
 	        }
@@ -330,7 +330,7 @@ public function actSubmitboxStart() {
 	            echo $caption;
 	            ?>
 	            <a class="hide-if-no-js"
-	                href="<?php echo esc_url($url); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions'); ?></a>
+                    href="<?php echo esc_url($url); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions', 'revisionary'); ?></a>
 	            </div>
 	            <?php
 	           }

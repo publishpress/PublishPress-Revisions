@@ -280,7 +280,7 @@ class RevisionaryAdmin
 		}
 
 		if ( 'trash' != $post->post_status && current_user_can( 'edit_post', $post->ID ) && wp_check_post_lock( $post->ID ) === false ) {
-			$actions['revision_queue'] = "<a href='admin.php?page=revisionary-q&published_post=$post->ID'>" . __('Revision Queue') . '</a>';
+			$actions['revision_queue'] = "<a href='admin.php?page=revisionary-q&published_post=$post->ID'>" . __('Revision Queue', 'revisionary') . '</a>';
 		}
 
 		return $actions;
@@ -404,7 +404,7 @@ class RevisionaryAdmin
 		}
 	
 		if ( ! empty($post) && in_array( $post->post_status, $stati ) && ! current_user_can( $type_obj->cap->publish_posts ) && rvy_is_supported_post_type($post->post_type) ) :
-			$datef = __( 'M j, Y @ g:i a' );
+			$datef = __( 'M j, Y @ g:i a', 'revisionary' );
 			if ( 0 != $post->ID ) {
 				if ( 'future' == $post->post_status ) { // scheduled for publishing at a future date
 					$stamp = __('Scheduled for: <b>%1$s</b>');

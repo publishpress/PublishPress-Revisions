@@ -140,8 +140,8 @@ class RVY_PostBlockEditUI {
             
             $status = 'pending-revision';
             $args = array(
-                'publish' =>    __('Submit Revision'), 
-                'saveAs' =>     __('Submit Revision'), 
+                'publish' =>    __('Submit Revision', 'revisionary'), 
+                'saveAs' =>     __('Submit Revision', 'revisionary'), 
                 'prePublish' => __( 'Workflow&hellip;', 'revisionary' ),
                 'redirectURL' => admin_url("edit.php?post_type={$post_type}&revision_submitted={$status}&post_id={$post_id}"),
             );  
