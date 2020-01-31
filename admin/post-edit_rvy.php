@@ -214,7 +214,7 @@ public function actSubmitboxStart() {
 
         if (rvy_is_revision_status($post->post_status)) :
             $compare_link = admin_url("revision.php?revision=$post->ID");
-            $compare_button = __('Compare', 'revisionary');
+            $compare_button = _x('Compare', 'revisions', 'revisionary');
             $compare_title = __('Compare this revision to published copy, or to other revisions', 'revisionary');
             ?>
 

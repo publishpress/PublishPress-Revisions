@@ -108,7 +108,7 @@ if (!empty($_REQUEST['post_author']) && empty($published_title)) {
 $filter_csv = ($filters) ? ' (' . implode(" ", $filters) . ')' : '';
 
 if (!empty($published_title)) {
-	printf( __('Revision Queue for "%s"%s', 'revisionary'), $published_title, $filter_csv );
+	printf( _x('Revision Queue for "%s"%s', 'PublishedPostName (other filter captions)', 'revisionary'), $published_title, $filter_csv );
 } else
 	printf( __('Revision Queue %s', 'revisionary' ), $filter_csv);
 ?></h1>

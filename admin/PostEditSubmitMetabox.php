@@ -343,17 +343,17 @@ class RvyPostEditSubmitMetabox
             $published_stati = get_post_stati(['public' => true, 'private' => true], 'names', 'or');
 
             if ('future' == $post_status_obj->name) { // scheduled for publishing at a future date
-                $stamp =__('Scheduled for: <b>%1$s</b>');
+                $stamp =__('Scheduled for: %s');
             } elseif (in_array($post_status_obj->name, $published_stati)) { // already published
-                $stamp =__('Published on: <b>%1$s</b>');
+                $stamp =__('Published on: %s');
             } elseif ('0000-00-00 00:00:00' == $post->post_date_gmt) { // draft, 1 or more saves, no date specified
                 $stamp =__('Publish <b>immediately</b>');
             } elseif (time() < strtotime($post->post_date_gmt . ' +0000')) { // draft, 1 or more saves, future date specified
-                $stamp =__('Schedule for: <b>%1$s</b>');
+                $stamp =__('Schedule for: %s');
             } else { // draft, 1 or more saves, date specified
-                $stamp =__('Publish on: <b>%1$s</b>');
+                $stamp =__('Publish on: %s');
             }
-            $date = date_i18n($datef, strtotime($post->post_date));
+            $date = '<b>' . date_i18n($datef, strtotime($post->post_date)) . '</b>';
         } else { // draft (no saves, and thus no date specified)
             $stamp =__('Publish <b>immediately</b>');
             $date = date_i18n($datef, strtotime(current_time('mysql')));
