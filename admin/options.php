@@ -304,7 +304,7 @@ $table_class = 'form-table rs-form-table';
 		</th><td>
 		
 		<?php 
-		$hint = __('The user role "Revisor" role is now available. Include capabilities for all custom post types in this role?', 'revisor');
+		$hint = __('The user role "Revisor" role is now available. Include capabilities for all custom post types in this role?', 'revisionary');
 		$ui->option_checkbox( 'revisor_role_add_custom_rolecaps', $tab, $section, $hint, '' );
 		?>
 		

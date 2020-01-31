@@ -375,7 +375,7 @@ class Revisionary
 			if ( $result ) {
 				return true;
 			} else {
-				return new WP_Error( 'rest_invalid_featured_media', __( 'Invalid featured media ID.' ), array( 'status' => 400 ) );
+				return new WP_Error( 'rest_invalid_featured_media', __( 'Invalid featured media ID.', 'revisionary' ), array( 'status' => 400 ) );
 			}
 		} else {
 			return delete_post_thumbnail( $post_id );
