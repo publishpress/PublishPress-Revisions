@@ -799,7 +799,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				selected( $m, $year . $month, false ),
 				esc_attr( $arc_row->year . $month ),
 				/* translators: 1: month name, 2: 4-digit year */
-				sprintf( __( '%1$s %2$d' ), $wp_locale->get_month( $month ), $year )
+				sprintf( _x( '%1$s %2$d', 'MonthName 4-DigitYear', 'revisionary' ), $wp_locale->get_month( $month ), $year )
 			);
 		}
 ?>
