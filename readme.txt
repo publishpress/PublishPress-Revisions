@@ -4,7 +4,7 @@ Tags: revision, access, permissions, cms, user, groups, members, admin, pages, p
 Requires at least: 4.9.7
 Tested up to: 5.3.2
 Requires PHP: 5.6.20
-Stable Tag: 2.1.7
+Stable Tag: 2.1.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -61,6 +61,11 @@ For more details about both the free and pro version, see our <a href="https://p
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.1.8 - 15 Jan 2020 =
+* Fixed : Custom Post Types did not have Pending Revisions or Scheduled Revisions available (since 2.1.7)
+* Lang : Some strings were not translatable 
+* Lang: Updated language files
 
 = 2.1.7 - 13 Jan 2020 =
 * Fixed : Excessive resource usage with some caching solutions
