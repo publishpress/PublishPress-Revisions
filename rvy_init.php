@@ -290,6 +290,19 @@ function rvy_add_revisor_role( $requested_blog_id = '' ) {
 	$wp_roles->add_role( 'revisor', __( 'Revisor', 'revisionary' ), $wp_role_caps );
 }
 
+function rvy_apply_role_translation($translations, $text, $context, $domain) {
+	if (('User role' === $context) && ('Revisor' == $text) && ($domain !== 'revisionary')) {
+		return translate_with_gettext_context($text, $context, 'revisionary');
+	}
+
+	return $translations;
+}
+
+function rvy_role_translation_support() {
+	_x('Revisor', 'User role', 'revisionary');
+	add_filter('gettext_with_context', 'rvy_apply_role_translation', 10, 4);
+}
+
 // wrapper function for use with wp_cron hook
 function revisionary_publish_scheduled() {
 	require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
@@ -713,6 +726,8 @@ function rvy_init() {
 			set_site_transient('revisionary_previous_install', true, 86400);
 		}
 	}
+
+	rvy_role_translation_support();
 
 	/*  // wp_cron hook @todo
 	if ( rvy_get_option( 'scheduled_revisions' ) ) {
