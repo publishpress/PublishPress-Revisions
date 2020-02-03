@@ -425,6 +425,10 @@ class Revisionary
 			if ( ('revision' != $post->post_type) && ! rvy_is_revision_status($post->post_status) ) {
 				$status_obj = get_post_status_object( $post->post_status );
 
+				if (!apply_filters('revisionary_require_edit_others_drafts', true, $post->post_type, $post->post_status, $args)) {
+					return $caps;
+				}
+
 				if (!rvy_is_post_author($post) && $status_obj && ! $status_obj->public && ! $status_obj->private) {
 					$post_type_obj = get_post_type_object( $post->post_type );
 					if ( agp_user_can( $post_type_obj->cap->edit_published_posts, 0, '', array('skip_revision_allowance' => true) ) ) {	// don't require any additional caps for sitewide Editors
