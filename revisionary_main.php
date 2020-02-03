@@ -537,7 +537,7 @@ class Revisionary
 			if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST) || empty($_REQUEST['preview']) || !empty($_POST) || did_action('template_redirect')) {
 				if ($type_obj = get_post_type_object( $post->post_type )) {
 					$check_cap = in_array($cap, ['delete_post', 'delete_page']) ? $type_obj->cap->delete_published_posts : $type_obj->cap->edit_published_posts;
-					return array_merge($caps, [$check_cap => true]);  // @todo: review this
+					return array_merge($caps, [$check_cap]);
 				}
 			}
 		}
