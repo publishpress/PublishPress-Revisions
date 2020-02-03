@@ -1073,7 +1073,7 @@ function revisionary_copy_terms( $from_post_id, $to_post_id, $mirror_empty = fal
 
 	if ($skip_taxonomies = apply_filters('revisionary_skip_taxonomies', $skip_taxonomies, $from_post_id, $to_post_id)) {
 		$tx_join = "INNER JOIN $wpdb->term_taxonomy AS tt ON tt.term_taxonomy_id = tr.term_taxonomy_id ";
-		$tx_where = "tt.taxonomy NOT IN ('" . implode("','", array_filter($skip_taxonomies, 'sanitize_key')) . "')";
+		$tx_where = "tt.taxonomy NOT IN ('" . implode("','", array_map('sanitize_key', array_filter($skip_taxonomies))) . "') AND ";
 	} else {
 		$tx_join = '';
 		$tx_where = '';
