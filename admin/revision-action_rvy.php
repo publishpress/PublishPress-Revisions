@@ -176,6 +176,27 @@ function rvy_revision_approve($revision_id = 0) {
 				}
 			}
 			
+			if ( $db_action && rvy_get_option( 'rev_approval_notify_admin' ) ) {
+				require_once(dirname(REVISIONARY_FILE).'/revision-workflow_rvy.php');
+				$admin_ids = Rvy_Revision_Workflow_UI::getRecipients('rev_approval_notify_admin', ['type_obj' => $type_obj, 'published_post' => $post]);
+
+				foreach($admin_ids as $user_id) {
+					if ($user = new WP_User($user_id)) {
+						rvy_mail(
+							$user->user_email, 
+							$title, 
+							$message, 
+							[
+								'revision_id' => $revision->ID, 
+								'post_id' => $post->ID, 
+								'notification_type' => 'revision-approval', 
+								'notification_class' => 'rev_approval_notify_admin'
+							]
+						);
+					}
+				}
+			}
+
 			if ( $db_action && defined( 'RVY_NOTIFY_SUPER_ADMIN' ) && is_multisite() ) {
 				$super_admin_logins = get_super_admins();
 				foreach( $super_admin_logins as $user_login ) {
