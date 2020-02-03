@@ -77,7 +77,6 @@ class RVY_PostBlockEditUI {
                 'approvalCaption' => $can_publish ? __('Approve Revision', 'revisionary') : '',
                 'approvalURL' => $can_publish ? $approval_url : '',
                 'approvalTitle' => esc_attr(__('Approve saved changes', 'revisionary')),
-                'scheduledRevisionsEnabled' => $do_scheduled_revisions,
             );  
 
         } elseif ( agp_user_can( $type_obj->cap->edit_post, $post_id, '', array( 'skip_revision_allowance' => true ) ) ) {

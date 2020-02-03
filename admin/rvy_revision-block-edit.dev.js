@@ -160,10 +160,6 @@ jQuery(document).ready( function($) {
 			$(ediv + 'div.editor-post-link').parent().hide();
 			$(ediv + 'div.components-notice-list').hide();	// autosave notice
 				
-			if(!rvyObjEdit.scheduledRevisionsEnabled) {
-				$(ediv + 'div.edit-post-post-schedule').hide();
-			}
-
 			$(ediv + '#publishpress-notifications').closest('div.edit-post-meta-boxes-area').hide();
 		}
 
