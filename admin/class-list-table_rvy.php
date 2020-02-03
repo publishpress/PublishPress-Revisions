@@ -1037,7 +1037,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			}
 
 			//if ( current_user_can( 'read_post', $post->ID ) ) { // @todo make this work for Author with Revision exceptions
-			if ( current_user_can( 'read_post', $post->ID ) || current_user_can( 'edit_post', $post->ID ) ) {  
+			if ( $can_read_post || $can_edit_post ) {  
 				$actions['diff'] = sprintf(
 					'<a href="%1$s" class="" title="%2$s" aria-label="%2$s" target="_revision_diff">%3$s</a>',
 					admin_url("revision.php?revision=$post->ID"),
