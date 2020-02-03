@@ -442,7 +442,7 @@ class RevisionCreation {
 		if (!empty($revision_id) && $post = get_post($revision_id)) {
 			$post_ID = $revision_id;
 			$post_arr['post_ID'] = $revision_id;
-			$data = wp_unslash((array) $post);
+			$data = (!defined('REVISIONARY_NO_UNSLASH')) ? (array) $post : wp_unslash((array) $post);
 		} else {
 			unset($data['post_ID']);
 
@@ -513,7 +513,9 @@ class RevisionCreation {
 		$data['post_modified'] = current_time( 'mysql' );
 		$data['post_modified_gmt'] = current_time( 'mysql', 1 );
 
-		$data = wp_unslash($data);
+		if (!defined('REVISIONARY_NO_UNSLASH')) {
+			$data = wp_unslash($data);
+		}
 
 		$post_type = $data['post_type'];
 		unset($data['ID']);
