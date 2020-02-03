@@ -429,6 +429,15 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		);
 	}
 
+	if (defined('FL_BUILDER_VERSION')) {
+		// If Beaver Builder is active for this post, don't allow pending revision publication to strip terms
+		if (get_post_meta($published->ID, '_fl_builder_data', true)) {
+			$orig_terms = [];
+			$orig_terms['post_tag'] = wp_get_object_terms($published->ID, 'post_tag', ['fields' => 'ids']);
+			$orig_terms['category'] = wp_get_object_terms($published->ID, 'category', ['fields' => 'ids']);
+		}
+	}
+	
 	$post_id = wp_update_post( $update );
 	if ( ! $post_id || is_wp_error( $post_id ) ) {
 		return $post_id;
@@ -504,6 +513,14 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
 
 	update_post_meta($revision_id, '_rvy_published_gmt', $post_modified_gmt);
+
+	if (!empty($orig_terms) && is_array($orig_terms)) {
+		foreach($orig_terms as $taxonomy => $terms) {
+			if ($terms && !wp_get_object_terms($published->ID, $taxonomy, ['fields' => 'ids'])) {
+				wp_set_object_terms($published->ID, $terms, $taxonomy);
+			}
+		}
+	}
 
 	rvy_delete_past_revisions($revision_id);
 

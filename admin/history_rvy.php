@@ -589,6 +589,9 @@ class RevisionaryHistory
             }
         }
         
+        $published_id = rvy_post_id($compare_from->ID);
+		$is_beaver = defined('FL_BUILDER_VERSION') && get_post_meta($published_id, '_fl_builder_data', true);
+
         foreach( apply_filters('revisionary_compare_taxonomies', $taxonomies) as $taxonomy => $name) {
             $field = $taxonomy;
             
@@ -607,6 +610,8 @@ class RevisionaryHistory
                 $terms = [];
             }
 
+            $other_term_names = $term_names;
+
             $term_names = [];
             foreach($terms as $term) {
                 $term_names []= $term->name;
@@ -618,6 +623,10 @@ class RevisionaryHistory
             $args = array(
                 'show_split_view' => true,
             );
+
+            if ($is_beaver && (!$term_names || !$other_term_names)) {
+                continue;
+            }
 
             $args = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
     
@@ -678,6 +687,10 @@ class RevisionaryHistory
                 if ($parent_post = get_post($published_id)) {
                     $content_from = $parent_post->post_name;
                 }
+            }
+
+            if ($is_beaver && !$content_to) {
+                continue;
             }
 
             $args = array(
