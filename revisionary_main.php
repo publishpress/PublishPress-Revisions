@@ -802,6 +802,13 @@ class Revisionary
 	}
 
 	function flt_create_scheduled_rev( $data, $post_arr ) {
+		global $current_user;
+
+		// If Administrator opted to save as a pending revision, don't apply revision scheduling scripts
+		if (get_post_meta($post_arr['ID'], "_save_as_revision_{$current_user->ID}")) {
+			return $data;
+		}
+
 		require_once( dirname(__FILE__).'/revision-creation_rvy.php' );
 		$rvy_creation = new PublishPress\Revisions\RevisionCreation(['revisionary' => $this]);
 		return $rvy_creation->flt_create_scheduled_rev( $data, $post_arr );
