@@ -752,6 +752,24 @@ class Revisionary
 				$wp_blogcaps['edit_others_posts'] = true;
 		}
 
+		if (!empty($args[0]) && ('edit_post' == $args[0]) && !defined('REVISIONARY_DISABLE_REVISION_CAP_WORKAROUND') && array_diff($reqd_caps, array_keys(array_filter($wp_blogcaps)))) {
+			// If checking capability for a revision, also grant permission if user has capability for published post
+			$published_id = rvy_post_id($args[2]);
+			if ($published_id && ($published_id != $args[2])) {
+				remove_filter('map_meta_cap', array($this, 'flt_post_map_meta_cap'), 5, 4);
+				remove_filter('user_has_cap', array($this, 'flt_user_has_cap' ), 98, 3);
+				remove_filter('map_meta_cap', array($this, 'flt_limit_others_drafts' ), 10, 4);
+
+				if (current_user_can('edit_post', $args[2])) {
+					$wp_blogcaps = array_merge($wp_blogcaps, array_fill_keys($reqd_caps, true));
+				}
+
+				add_filter('map_meta_cap', array($this, 'flt_post_map_meta_cap'), 5, 4);
+				add_filter('user_has_cap', array($this, 'flt_user_has_cap' ), 98, 3);
+				add_filter('map_meta_cap', array($this, 'flt_limit_others_drafts' ), 10, 4);
+			}
+		}
+
 		// TODO: possible need to redirect revision cap check to published parent post/page ( RS cap-interceptor "maybe_revision" )
 		return $wp_blogcaps;			
 	}
