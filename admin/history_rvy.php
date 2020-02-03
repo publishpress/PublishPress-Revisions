@@ -673,6 +673,11 @@ class RevisionaryHistory
             if ('_thumbnail_id' == $field) {
                 $content_from = ($content_from) ? "$content_from (" . wp_get_attachment_image_url($content_from, 'full') . ')' : '';
                 $content_to = ($content_to) ? "$content_to (" . wp_get_attachment_image_url($content_to, 'full') . ')' : '';
+            
+			} elseif(('_requested_slug' == $field) && !$content_from) {
+                if ($parent_post = get_post($published_id)) {
+                    $content_from = $parent_post->post_name;
+                }
             }
 
             $args = array(
