@@ -483,9 +483,17 @@ class RevisionaryAdmin
 	function admin_scripts() {
 		wp_enqueue_style('revisionary', RVY_URLPATH . '/admin/revisionary.css', [], REVISIONARY_VERSION);
 
-		global $pagenow, $post;
+		global $pagenow, $post, $revisionary;
 		if ( ('post.php' == $pagenow) && (('revision' == $post->post_type) || rvy_is_revision_status($post->post_status)) ) {
 			wp_enqueue_style('rvy-revision-edit', RVY_URLPATH . '/admin/rvy-revision-edit.css', [], REVISIONARY_VERSION);
+
+			if (!rvy_get_option('scheduled_revisions') && !$revisionary->isBlockEditorActive()) {
+				?>
+				<style>
+				#misc-publishing-actions div.curtime {display:none;}
+				</style>
+				<?php
+			}
 		}
 
 		wp_enqueue_style('revisionary-admin-common', RVY_URLPATH . '/common/css/pressshack-admin.css', [], REVISIONARY_VERSION);
