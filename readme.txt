@@ -62,9 +62,23 @@ For more details about both the free and pro version, see our <a href="https://p
 
 == Changelog ==
 
+= 2.2-rc =
+* Feature : Email Notification - option to notify Editors and Administrators when a Pending Revision is approved
+* Fixed : Revisions submitted by Administrators or Editors using "Pending Revision" checkbox caused published post title and content to be cleared if a future publish date was also selected
+* Compat : PublishPress Permissions Status Control - "Prevent Revisors from editing other users' drafts" setting also prevented other non-Editors from editing posts of a custom workflow status that uses custom capabilities (also requires PP Permissions Pro 2.9.1)
+* Compat : Block data from some plugins had html formatting tags displayed as unicode character codes
+* Fixed : Edit Revision screen - Date selector was displayed even if scheduled revisions feature disabled
+* Fixed : Compare Pending Revisions - Non-administrators could not edit Scheduled Revisions
+* Fixed : Compare Pending Revisions - for page slug change, original published slug was not displayed 
+* Fixed : 'revisionary_skip_taxonomies' filter triggered a database error
+* Change : By default, enable "Prevent Revisors from viewing others'" setting
+* Change : Apply possible workaround for Revision Queue capability issues on some sites
+
 = 2.1.8 - 15 Jan 2020 =
 * Fixed : Custom Post Types did not have Pending Revisions or Scheduled Revisions available (since 2.1.7)
-* Lang : Some strings were not translatable 
+* Lang : Correct textdomain on numerous translation calls
+* Lang : Improve translation string construction
+* Lang : Support translation of Revisor role name
 * Lang: Updated language files
 
 = 2.1.7 - 13 Jan 2020 =
