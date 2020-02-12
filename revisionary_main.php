@@ -373,8 +373,7 @@ class Revisionary
 		update_post_meta( $post_id, '_wp_page_template', $template );
 	}
 
-	private function handle_featured_media( $featured_media, $post_id ) {
-
+	public function handle_featured_media( $featured_media, $post_id ) {
 		$featured_media = (int) $featured_media;
 		if ( $featured_media ) {
 			$result = set_post_thumbnail( $post_id, $featured_media );
