@@ -4,7 +4,7 @@ Tags: revision, access, permissions, cms, user, groups, members, admin, pages, p
 Requires at least: 4.9.7
 Tested up to: 5.3.2
 Requires PHP: 5.6.20
-Stable Tag: 2.1.8
+Stable Tag: 2.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -62,7 +62,7 @@ For more details about both the free and pro version, see our <a href="https://p
 
 == Changelog ==
 
-= 2.2-rc =
+= 2.2 - 12 Feb 2020 =
 * Feature : Email Notification - option to notify Editors and Administrators when a Pending Revision is approved
 * Fixed : Revisions submitted by Administrators or Editors using "Pending Revision" checkbox caused published post title and content to be cleared if a future publish date was also selected
 * Compat : PublishPress Permissions Status Control - "Prevent Revisors from editing other users' drafts" setting also prevented other non-Editors from editing posts of a custom workflow status that uses custom capabilities (also requires PP Permissions Pro 2.9.1)
