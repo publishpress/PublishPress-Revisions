@@ -16,7 +16,7 @@ This plugin gives you control over updating published content. Users can submit 
 == Description ==
 
 WordPress Revisions are a powerful way to track where your site has been. But what about where it's going?
-To moderate or schedule changes to published posts, just install PublishPress Revisions and let the teamwork begin. There is no need to learn or configure complex new screens because PublishPress Revisions works with the default WordPress revisions, plus Gutenberg and the Classic Editor.
+To moderate or schedule changes to published posts, just install PublishPress Revisions and let the teamwork begin. There is no need to learn or configure complex new screens because PublishPress Revisions works with familiar WordPress UI, including the Gutenberg and the Classic Editor.
 
 = Submit Revisions =
 PublishPress Revisions allows your users to submit change requests for published posts. Your users can update posts using the normal WordPress editor, but their changes will not be published automatically. Instead, the changes are stored as a "pending revision" that can be approved or rejected.
@@ -43,7 +43,7 @@ PublishPress Revisions will notify Administrators and Editors when a new revisio
 [Click here for more on revision notifications](https://publishpress.com/knowledge-base/emails-revisionary/).
 
 = Revision Permissions =
-PublishPress Revisions has permissions for the default WordPress user roles:
+PublishPress Revisions works with the default WordPress user roles, and also introduces a Revisor role:
 Contributorsùcan submit revisions to their own published posts.
 Revisorsùcan submit revisions to posts and pages published by others.
 Authors, Editorsù and Administratorsùcan approve revisions or schedule their own revisions.
