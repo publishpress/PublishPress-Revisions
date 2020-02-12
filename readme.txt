@@ -64,6 +64,8 @@ For more details about both the free and pro version, see our <a href="https://p
 
 = 2.2 - 12 Feb 2020 =
 * Feature : Email Notification - option to notify Editors and Administrators when a Pending Revision is approved
+* Fixed : Block Editor - Custom Taxonomies, if unchanged, were not saved to revision. Publication of revision cleared custom taxonomies for published post.
+* Fixed : Block Editor - Error setting Featured Image
 * Fixed : Revisions submitted by Administrators or Editors using "Pending Revision" checkbox caused published post title and content to be cleared if a future publish date was also selected
 * Compat : PublishPress Permissions Status Control - "Prevent Revisors from editing other users' drafts" setting also prevented other non-Editors from editing posts of a custom workflow status that uses custom capabilities (also requires PP Permissions Pro 2.9.1)
 * Compat : Block data from some plugins had html formatting tags displayed as unicode character codes
@@ -72,6 +74,7 @@ For more details about both the free and pro version, see our <a href="https://p
 * Fixed : Compare Pending Revisions - for page slug change, original published slug was not displayed 
 * Fixed : 'revisionary_skip_taxonomies' filter triggered a database error
 * Fixed : PHP Notice if third party code registers a post type without defining the edit_published capability
+* Fixed : PHP Notices on revision submission notification
 * Change : By default, enable "Prevent Revisors from viewing others'" setting
 * Change : Apply possible workaround for Revision Queue capability issues on some sites
 
