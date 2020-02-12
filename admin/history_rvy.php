@@ -686,6 +686,11 @@ class RevisionaryHistory
                 $content_from = ($content_from) ? "$content_from (" . wp_get_attachment_image_url($content_from, 'full') . ')' : '';
                 $content_to = ($content_to) ? "$content_to (" . wp_get_attachment_image_url($content_to, 'full') . ')' : '';
             
+            	// suppress false alarm for featured image clearance
+                if ($content_from && !$content_to) {
+                    continue;
+                }
+            
 			} elseif(('_requested_slug' == $field) && !$content_from) {
                 if ($parent_post = get_post($published_id)) {
                     $content_from = $parent_post->post_name;
