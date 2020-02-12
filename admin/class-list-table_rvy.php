@@ -224,7 +224,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$can_publish_types = [];
 			foreach(get_post_types(['public' => true], 'object') as $post_type => $type_obj) {
 				if (
-					agp_user_can($type_obj->cap->edit_published_posts, 0, '', ['skip_revision_allowance' => true])
+					isset($type_obj->cap->edit_published_posts)
+					&& agp_user_can($type_obj->cap->edit_published_posts, 0, '', ['skip_revision_allowance' => true])
 					&& agp_user_can($type_obj->cap->publish_posts, 0, '', ['skip_revision_allowance' => true])
 					&& (!empty($revisionary->enabled_post_types[$post_type]) || !$revisionary->config_loaded)
 				) {
@@ -689,7 +690,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		foreach(rvy_get_manageable_types() as $post_type) {
 			$type_obj = get_post_type_object($post_type);
-			if (!empty($current_user->allcaps[$type_obj->cap->edit_published_posts])) {
+			if (isset($type_obj->cap->edit_published_posts) && !empty($current_user->allcaps[$type_obj->cap->edit_published_posts])) {
 				$approval_potential = true;
 				break;
 			}

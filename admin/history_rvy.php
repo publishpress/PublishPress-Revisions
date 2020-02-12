@@ -1011,7 +1011,7 @@ class RevisionaryHistory
         if ($post_id) {
             $can_approve = agp_user_can('edit_post', rvy_post_id($post_id), 0, ['skip_revision_allowance' => true]);
         } else {
-            $can_approve = agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true]);
+            $can_approve = isset($type_obj->cap->edit_published_posts) && agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true]);
         }
 
         if (empty($type_obj) || $can_approve) {
@@ -1092,13 +1092,15 @@ class RevisionaryHistory
             return;
         }
 
-        $preview_label = (empty($type_obj) || agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true])) 
+        $edit_published_cap = isset($type_obj->cap->edit_published_posts) ? $type_obj->cap->edit_published_posts : 'do_not_allow';
+
+        $preview_label = (empty($type_obj) || agp_user_can($edit_published_cap, 0, 0, ['skip_revision_allowance' => true])) 
         ?  __('Preview / Restore', 'revisionary')
         : __('Preview');
 
         $preview_url = rvy_preview_url($post);
 
-        $manage_label = (empty($type_obj) || agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true])) 
+        $manage_label = (empty($type_obj) || agp_user_can($edit_published_cap, 0, 0, ['skip_revision_allowance' => true])) 
         ?  __('Manage', 'revisionary')
         : __('List', 'revisionary');
 

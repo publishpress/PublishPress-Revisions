@@ -44,7 +44,8 @@ class Revisionary
 							$type_obj = get_post_type_object($parent_post->post_type);
 
 							if ($type_obj && (
-								empty($current_user->allcaps[$type_obj->cap->edit_published_posts]) 
+								!isset($type_obj->cap->edit_published_posts)
+								|| empty($current_user->allcaps[$type_obj->cap->edit_published_posts]) 
 								|| (($current_user->ID != $parent_post->ID) && empty($current_user->allcaps[$type_obj->cap->edit_published_posts]))
 							)) {
 								return;
@@ -431,7 +432,7 @@ class Revisionary
 
 				if (!rvy_is_post_author($post) && $status_obj && ! $status_obj->public && ! $status_obj->private) {
 					$post_type_obj = get_post_type_object( $post->post_type );
-					if ( agp_user_can( $post_type_obj->cap->edit_published_posts, 0, '', array('skip_revision_allowance' => true) ) ) {	// don't require any additional caps for sitewide Editors
+					if (isset($post_type_obj->cap->edit_published_posts) && agp_user_can( $post_type_obj->cap->edit_published_posts, 0, '', array('skip_revision_allowance' => true) ) ) {	// don't require any additional caps for sitewide Editors
 						return $caps;
 					}
 				
@@ -536,8 +537,12 @@ class Revisionary
 			// allow Revisor to view a preview of their scheduled revision
 			if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST) || empty($_REQUEST['preview']) || !empty($_POST) || did_action('template_redirect')) {
 				if ($type_obj = get_post_type_object( $post->post_type )) {
+					if (isset($type_obj->cap->edit_published_posts)) {
 					$check_cap = in_array($cap, ['delete_post', 'delete_page']) ? $type_obj->cap->delete_published_posts : $type_obj->cap->edit_published_posts;
 					return array_merge($caps, [$check_cap]);
+					} else {
+						return $caps;
+					}
 				}
 			}
 		}

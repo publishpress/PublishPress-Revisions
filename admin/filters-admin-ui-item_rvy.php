@@ -73,7 +73,8 @@ jQuery(document).ready( function($) {
 	
 	// Use simpler criteria due to early execution of revisions.php access check in revisionary_main.php
 	$can_publish = $type_obj && (
-		!empty($current_user->allcaps[$type_obj->cap->edit_published_posts]) 
+		isset($type_obj->cap->edit_published_posts)
+		&& !empty($current_user->allcaps[$type_obj->cap->edit_published_posts]) 
 		&& (($current_user->ID == $parent_post->ID) || !empty($current_user->allcaps[$type_obj->cap->edit_published_posts]))
 	);
 
