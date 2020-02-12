@@ -624,7 +624,10 @@ class RevisionaryHistory
                 'show_split_view' => true,
             );
 
-            if ($is_beaver && (!$term_names || !$other_term_names)) {
+            if ($is_beaver 
+            && (!$other_term_names && !rvy_is_revision_status($compare_from->post_status)) 
+            || (!$term_names && !rvy_is_revision_status($compare_to->post_status))
+            ) {
                 continue;
             }
 

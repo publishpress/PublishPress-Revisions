@@ -71,6 +71,7 @@ For more details about both the free and pro version, see our <a href="https://p
 * Fixed : Compare Pending Revisions - Non-administrators could not edit Scheduled Revisions
 * Fixed : Compare Pending Revisions - for page slug change, original published slug was not displayed 
 * Fixed : 'revisionary_skip_taxonomies' filter triggered a database error
+* Fixed : PHP Notice if third party code registers a post type without defining the edit_published capability
 * Change : By default, enable "Prevent Revisors from viewing others'" setting
 * Change : Apply possible workaround for Revision Queue capability issues on some sites
 
