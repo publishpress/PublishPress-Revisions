@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Revisionary Pro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-03 16:43-0500\n"
+"POT-Creation-Date: 2020-02-12 12:28-0500\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Kevin Behrens <kevin@publishpress.com>\n"
 "Language-Team: PublishPress <help@publishpress.com>\n"
@@ -111,12 +111,12 @@ msgstr ""
 msgid "Could not insert revision into the database"
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-creation_rvy.php:565
+#: F:\snapshot\revisionary/revision-creation_rvy.php:566
 #, php-format
 msgid "Invalid taxonomy: %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-creation_rvy.php:633
+#: F:\snapshot\revisionary/revision-creation_rvy.php:645
 msgid "Invalid page template."
 msgstr ""
 
@@ -229,7 +229,7 @@ msgstr ""
 msgid "PublishPress Revisions requires WordPress version %s or higher."
 msgstr ""
 
-#: F:\snapshot\revisionary/revisionary_main.php:382
+#: F:\snapshot\revisionary/revisionary_main.php:383
 msgid "Invalid featured media ID."
 msgstr ""
 
@@ -277,7 +277,7 @@ msgstr ""
 msgid "Revisor"
 msgstr ""
 
-#: F:\snapshot\revisionary/rvy_init.php:650
+#: F:\snapshot\revisionary/rvy_init.php:656
 msgid "Revision Workflow"
 msgstr ""
 
@@ -363,7 +363,7 @@ msgid "The revision was published."
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/admin_rvy.php:407
-#: F:\snapshot\revisionary/admin/history_rvy.php:888
+#: F:\snapshot\revisionary/admin/history_rvy.php:906
 msgid "M j, Y @ g:i a"
 msgstr ""
 
@@ -428,7 +428,7 @@ msgid "Settings"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/admin_rvy.php:707
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1025
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1026
 msgid "Delete"
 msgstr ""
 
@@ -493,90 +493,90 @@ msgstr ""
 msgid "unselect"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:272
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:273
 msgid "Revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:273
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:274
 msgid "Status"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:274
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:275
 msgid "Post Type"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:275
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:276
 msgid "Revised By"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:276
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:277
 msgid "Submission"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:284
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:285
 msgid "Schedule"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:287
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:288
 msgid "Published Post"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:288
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:289
 msgid "Post Author"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:329
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:945
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:330
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:946
 msgid "Y/m/d g:i:s a"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:337
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:950
-#: F:\snapshot\revisionary/admin/history_rvy.php:935
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:338
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:951
+#: F:\snapshot\revisionary/admin/history_rvy.php:953
 #, php-format
 msgid "%s ago"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:340
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:953
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:341
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:954
 msgid "Y/m/d g:i a"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:347
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:348
 #, php-format
 msgid "Scheduled publication: %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:350
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:351
 #, php-format
 msgid "Requested publication: %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:354
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:355
 msgid "Missed schedule"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:397
-#: F:\snapshot\revisionary/admin/history_rvy.php:753
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:398
+#: F:\snapshot\revisionary/admin/history_rvy.php:771
 msgid "No author"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:436
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:437
 #, php-format
 msgid "View only revisions of %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:437
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:748
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:438
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:749
 msgid "Filter"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:445
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:446
 msgid "View published post"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:446
-#: F:\snapshot\revisionary/admin/history_rvy.php:1020
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:447
+#: F:\snapshot\revisionary/admin/history_rvy.php:1038
 #: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:45
 #: F:\snapshot\revisionary/admin/post-edit_rvy.php:95
 #: F:\snapshot\revisionary/admin/post-edit_rvy.php:99
@@ -585,82 +585,82 @@ msgstr ""
 msgid "View"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:463
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:464
 msgid "Compare Past Revisions"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:464
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:465
 msgid "History"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:612
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:613
 #, php-format
 msgid "%sMy Revisions%s(%s)"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:641
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:642
 #, php-format
 msgid "%sMy Published Posts%s(%s)"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:676
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:677
 #, php-format
 msgid "All %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:702
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:703
 msgid "Publish"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:705
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:706
 #: F:\snapshot\revisionary/admin/PostEditSubmitMetabox.php:103
 msgid "Delete Permanently"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:727
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:728
 msgid "Filter by category"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:790
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:791
 msgid "Filter by date"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:792
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:793
 msgid "All dates"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:805
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:806
 #, php-format
 msgid "%1$s %2$d"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:851
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:852
 msgid "Select All"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:933
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:934
 #, php-format
 msgid "&#8220;%s&#8221; (Edit)"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1024
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1025
 msgid "Delete Revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1039
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1040
 msgid "Preview Revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1040
-#: F:\snapshot\revisionary/admin/history_rvy.php:1097
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1041
+#: F:\snapshot\revisionary/admin/history_rvy.php:1117
 msgid "Preview"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1050
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1051
 msgid "Compare Changes"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1051
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1052
 #: F:\snapshot\revisionary/admin/post-edit_rvy.php:217
 #: F:\snapshot\revisionary/admin/post-edit_rvy.php:312
 #: F:\snapshot\revisionary/admin/post-edit_rvy.php:333
@@ -684,7 +684,7 @@ msgstr ""
 msgid "Submit Scheduled Revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/filters-admin-ui-item_rvy.php:100
+#: F:\snapshot\revisionary/admin/filters-admin-ui-item_rvy.php:101
 msgid "Publishers to Notify of Your Revision"
 msgstr ""
 
@@ -722,57 +722,57 @@ msgstr ""
 msgid "Ping Status"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:651
+#: F:\snapshot\revisionary/admin/history_rvy.php:654
 msgid "Page Template"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:654
+#: F:\snapshot\revisionary/admin/history_rvy.php:657
 msgid "Featured Image"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:663
+#: F:\snapshot\revisionary/admin/history_rvy.php:666
 msgid "Beaver Builder Data"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:664
+#: F:\snapshot\revisionary/admin/history_rvy.php:667
 msgid "Beaver Builder Settings"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:862
+#: F:\snapshot\revisionary/admin/history_rvy.php:880
 msgid "Scheduled for "
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:867
+#: F:\snapshot\revisionary/admin/history_rvy.php:885
 msgid "Requested for "
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:872
+#: F:\snapshot\revisionary/admin/history_rvy.php:890
 msgid "Submitted "
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:877
+#: F:\snapshot\revisionary/admin/history_rvy.php:895
 #, php-format
 msgid "%s%s ago"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:877
+#: F:\snapshot\revisionary/admin/history_rvy.php:895
 #, php-format
 msgid "%s%s from now"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:889
+#: F:\snapshot\revisionary/admin/history_rvy.php:907
 msgid "j M @ g:i a"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:933
+#: F:\snapshot\revisionary/admin/history_rvy.php:951
 msgid "M j, Y @ H:i"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:934
+#: F:\snapshot\revisionary/admin/history_rvy.php:952
 msgid "j M @ H:i"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:1018
+#: F:\snapshot\revisionary/admin/history_rvy.php:1036
 #: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:42
 #: F:\snapshot\revisionary/admin/post-edit_rvy.php:92
 #: F:\snapshot\revisionary/admin/post-edit_rvy.php:245
@@ -780,15 +780,15 @@ msgstr ""
 msgid "View / Approve"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:1096
+#: F:\snapshot\revisionary/admin/history_rvy.php:1116
 msgid "Preview / Restore"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:1102
+#: F:\snapshot\revisionary/admin/history_rvy.php:1122
 msgid "Manage"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:1103
+#: F:\snapshot\revisionary/admin/history_rvy.php:1123
 msgid "List"
 msgstr ""
 
@@ -1494,80 +1494,5 @@ msgstr ""
 #: F:\snapshot\revisionary/lib/debug.php:182
 #, php-format
 msgid "%1$s queries in %2$s seconds. %3$s MB used."
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/edd-license-handler/EDD_License_Handler.php:123
-#, php-format
-msgid "%1$s License Key"
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/edd-license-handler/EDD_License_Handler.php:249
-msgid "Deactivate License"
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/edd-license-handler/EDD_SL_Plugin_Updater.php:196
-#, php-format
-msgid "There is a new version of %1$s available. %2$sView version %3$s details%4$s."
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/edd-license-handler/EDD_SL_Plugin_Updater.php:204
-#, php-format
-msgid "There is a new version of %1$s available. %2$sView version %3$s details%4$s or %5$supdate now%6$s."
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/edd-license-handler/EDD_SL_Plugin_Updater.php:391
-msgid "You do not have permission to install plugin updates"
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/edd-license-handler/EDD_SL_Plugin_Updater.php:391
-msgid "Error"
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/wordpress-edd-license-integration/src/core/License.php:122
-msgid "An error occurred. Please, try again."
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:108
-msgid "Missing license"
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:111
-msgid "Your license key is expired"
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:114
-msgid "Your license key has been disabled"
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:118
-msgid "Invalid license"
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:121
-msgid "Your license is not active for this URL"
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:124
-msgid "This appears to be an invalid license key for this product"
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:127
-msgid "Your license key has reached its activation limit"
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:132
-msgid "Activated"
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:135
-msgid "Not validated yet"
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:150
-msgid "Click here to read more about licenses."
-msgstr ""
-
-#: F:\snapshot\revisionary/vendor/publishpress/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:151
-msgid "More information"
 msgstr ""
 
