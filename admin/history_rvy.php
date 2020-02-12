@@ -133,7 +133,7 @@ class RevisionaryHistory
                 $post_edit_link = get_edit_post_link($published_post);
                 $post_title     = '<a href="' . $post_edit_link . '">' . _draft_or_post_title($published_post) . '</a>';
                 /* translators: %s: post title */
-                $h1             = sprintf( __( 'Compare %s of &#8220;%s&#8221;' ), $status_obj->labels->plural, $post_title );
+                $h1             = sprintf( __( 'Compare %s of &#8220;%s&#8221;', 'revisionary' ), $status_obj->labels->plural, $post_title );
                 $return_to_post = '<a href="' . $post_edit_link . '">' . __( '&larr; Return to editor' ) . '</a>';
                 $title          = $status_obj->labels->plural;
 
@@ -167,31 +167,6 @@ class RevisionaryHistory
         wp_enqueue_script( 'revisions' );
 
         $this->actEnqueueScripts();
-
-        /* Revisions Help Tab */
-
-        /*
-        $revisions_overview  = '<p>' . __( 'This screen is used for managing your content revisions.' ) . '</p>';
-        $revisions_overview .= '<p>' . __( 'Revisions are saved copies of your post or page, which are periodically created as you update your content. The red text on the left shows the content that was removed. The green text on the right shows the content that was added.' ) . '</p>';
-        $revisions_overview .= '<p>' . __( 'From this screen you can review, compare, and restore revisions:' ) . '</p>';
-        $revisions_overview .= '<ul><li>' . __( 'To navigate between revisions, <strong>drag the slider handle left or right</strong> or <strong>use the Previous or Next buttons</strong>.' ) . '</li>';
-        $revisions_overview .= '<li>' . __( 'Compare two different revisions by <strong>selecting the &#8220;Compare any two revisions&#8221; box</strong> to the side.' ) . '</li>';
-        $revisions_overview .= '<li>' . __( 'To restore a revision, <strong>click Restore This Revision</strong>.' ) . '</li></ul>';
-
-        get_current_screen()->add_help_tab(
-            array(
-                'id'      => 'revisions-overview',
-                'title'   => __( 'Overview' ),
-                'content' => $revisions_overview,
-            )
-        );
-
-        $revisions_sidebar  = '<p><strong>' . __( 'For more information:' ) . '</strong></p>';
-        $revisions_sidebar .= '<p>' . __( '<a href="https://codex.wordpress.org/Revision_Management">Revisions Management</a>' ) . '</p>';
-        $revisions_sidebar .= '<p>' . __( '<a href="https://wordpress.org/support/">Support</a>' ) . '</p>';
-
-        get_current_screen()->set_help_sidebar( $revisions_sidebar );
-        */
 
         require_once( ABSPATH . 'wp-admin/admin-header.php' );
 
@@ -614,6 +589,9 @@ class RevisionaryHistory
             }
         }
         
+        $published_id = rvy_post_id($compare_from->ID);
+		$is_beaver = defined('FL_BUILDER_VERSION') && get_post_meta($published_id, '_fl_builder_data', true);
+
         foreach( apply_filters('revisionary_compare_taxonomies', $taxonomies) as $taxonomy => $name) {
             $field = $taxonomy;
             
@@ -632,6 +610,8 @@ class RevisionaryHistory
                 $terms = [];
             }
 
+            $other_term_names = $term_names;
+
             $term_names = [];
             foreach($terms as $term) {
                 $term_names []= $term->name;
@@ -643,6 +623,13 @@ class RevisionaryHistory
             $args = array(
                 'show_split_view' => true,
             );
+
+            if ($is_beaver 
+            && (!$other_term_names && !rvy_is_revision_status($compare_from->post_status)) 
+            || (!$term_names && !rvy_is_revision_status($compare_to->post_status))
+            ) {
+                continue;
+            }
 
             $args = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
     
@@ -698,6 +685,30 @@ class RevisionaryHistory
             if ('_thumbnail_id' == $field) {
                 $content_from = ($content_from) ? "$content_from (" . wp_get_attachment_image_url($content_from, 'full') . ')' : '';
                 $content_to = ($content_to) ? "$content_to (" . wp_get_attachment_image_url($content_to, 'full') . ')' : '';
+            
+            	// suppress false alarm for featured image clearance
+                if ($content_from && !$content_to) {
+                    continue;
+                }
+            
+            } elseif(('_requested_slug' == $field)) {
+                if ($content_to && !rvy_is_revision_status($compare_to->post_status)) {
+                    $content_to = '';
+                }
+
+                if ($content_from && !rvy_is_revision_status($compare_from->post_status)) {
+                    $content_from = '';
+                }
+                
+                if ($content_to && !$content_from) {
+                    if ($parent_post = get_post($published_id)) {
+                        $content_from = $parent_post->post_name;
+                    }
+                }
+            }
+
+            if ($is_beaver && !$content_to) {
+                continue;
             }
 
             $args = array(
@@ -892,7 +903,7 @@ class RevisionaryHistory
                 'id'         => $revision->ID,
                 'title'      => get_the_title( $revision->ID ),
                 'author'     => $this->authors[ $author_key ],
-                'date'       => sprintf('%s%s', $date_prefix, date_i18n( __( 'M j, Y @ g:i a' ), $modified )),
+                'date'       => sprintf('%s%s', $date_prefix, date_i18n( __( 'M j, Y @ g:i a', 'revisionary' ), $modified )),
                 'dateShort'  => date_i18n( _x( 'j M @ g:i a', 'revision date short format' ), $modified ),
                 'timeAgo'    => sprintf( $time_diff_label, $date_prefix, human_time_diff( $modified_gmt, $now_gmt ) ),
                 'autosave'   => false,
@@ -937,8 +948,8 @@ class RevisionaryHistory
                 'id'         => $post->ID,
                 'title'      => get_the_title( $post->ID ),
                 'author'     => $this->authors[ $author_key ],
-                'date'       => date_i18n( __( 'M j, Y @ H:i' ), strtotime( $post->post_modified ) ),
-                'dateShort'  => date_i18n( _x( 'j M @ H:i', 'revision date short format' ), strtotime( $post->post_modified ) ),
+                'date'       => date_i18n( __( 'M j, Y @ H:i', 'revisionary' ), strtotime( $post->post_modified ) ),
+                'dateShort'  => date_i18n( _x( 'j M @ H:i', 'revision date short format', 'revisionary' ), strtotime( $post->post_modified ) ),
                 'timeAgo'    => sprintf( __( '%s ago' ), human_time_diff( strtotime( $post->post_modified_gmt ), $now_gmt ) ),
                 'autosave'   => false,
                 'current'    => true,
@@ -1018,7 +1029,7 @@ class RevisionaryHistory
         if ($post_id) {
             $can_approve = agp_user_can('edit_post', rvy_post_id($post_id), 0, ['skip_revision_allowance' => true]);
         } else {
-            $can_approve = agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true]);
+            $can_approve = isset($type_obj->cap->edit_published_posts) && agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true]);
         }
 
         if (empty($type_obj) || $can_approve) {
@@ -1099,13 +1110,15 @@ class RevisionaryHistory
             return;
         }
 
-        $preview_label = (empty($type_obj) || agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true])) 
+        $edit_published_cap = isset($type_obj->cap->edit_published_posts) ? $type_obj->cap->edit_published_posts : 'do_not_allow';
+
+        $preview_label = (empty($type_obj) || agp_user_can($edit_published_cap, 0, 0, ['skip_revision_allowance' => true])) 
         ?  __('Preview / Restore', 'revisionary')
-        : __('Preview', 'revisionary');
+        : __('Preview');
 
         $preview_url = rvy_preview_url($post);
 
-        $manage_label = (empty($type_obj) || agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true])) 
+        $manage_label = (empty($type_obj) || agp_user_can($edit_published_cap, 0, 0, ['skip_revision_allowance' => true])) 
         ?  __('Manage', 'revisionary')
         : __('List', 'revisionary');
 

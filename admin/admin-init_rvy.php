@@ -113,7 +113,7 @@ function rvy_admin_init() {
 					&& !agp_user_can($type_obj->cap->edit_post, rvy_post_id($revision->ID), '', ['skip_revision_allowance' => true])
 					) {
 						if (count($post_ids) == 1) {
-							wp_die( __('Sorry, you are not allowed to approve this revision.') );
+							wp_die( __('Sorry, you are not allowed to approve this revision.', 'revisionary') );
 						} else {
 							continue;
 						}
@@ -148,7 +148,7 @@ function rvy_admin_init() {
 					
 					if ( ! current_user_can('administrator') && ! current_user_can( 'delete_post', rvy_post_id($revision->ID) ) ) {  // @todo: review Administrator cap check
 						if (('pending-revision' != $revision->post_status) || !rvy_is_post_author($revision)) {	// allow submitters to delete their own still-pending revisions
-							wp_die( __('Sorry, you are not allowed to delete this revision.') );
+							wp_die( __('Sorry, you are not allowed to delete this revision.', 'revisionary') );
 						}
 					} 
 	
@@ -262,7 +262,7 @@ function rvy_dismissable_notice( $msg_id, $message ) {
 		$class = 'rvy-admin-notice rvy-admin-notice-plugin';
 		?>
 		<div class='updated rvy-notice' class='<?php echo $class;?>' id='rvy_dashboard_message'>
-		<span style="float:right"><a href="javascript:void(0);" onclick="RvyDismissNotice();"><?php _e("Dismiss", "pp") ?></a></span>
+		<span style="float:right"><a href="javascript:void(0);" onclick="RvyDismissNotice();"><?php _e("Dismiss", "revisionary") ?></a></span>
 		<?php echo $message ?></div>
 		<script type="text/javascript">
 			function RvyDismissNotice(){

@@ -165,9 +165,23 @@ class RevisionaryFront {
 				$diff_url = admin_url("revision.php?revision=$revision_id");
 				
 				if (current_user_can( 'read_post', $revision_id)) { 
-				$view_published = ($published_url) ? sprintf(__("<span><a href='%s' class='rvy_preview_linkspan'  target='_revision_diff'>Compare</a></span><span><a href='%s' class='rvy_preview_linkspan' >View&nbsp;Published&nbsp;Post</a></span>", 'revisionary'), $diff_url, $published_url) : '';
+				$view_published = ($published_url) 
+				? sprintf(
+					__("%sCompare%s%sView&nbsp;Published&nbsp;Post%s", 'revisionary'),
+					"<span><a href='$diff_url' class='rvy_preview_linkspan' target='_revision_diff'>",
+					'</a></span>',
+					"<span><a href='$published_url' class='rvy_preview_linkspan'>",
+					'</a></span>'
+					)
+				: '';
 				} else { // @todo
-					$view_published = ($published_url) ? sprintf(__("<span><a href='%s' class='rvy_preview_linkspan' >View&nbsp;Published&nbsp;Post</a></span>", 'revisionary'), $diff_url, $published_url) : '';
+				$view_published = ($published_url) 
+				? sprintf(
+					__("%sView&nbsp;Published&nbsp;Post%s", 'revisionary'), 
+					"<span><a href='$published_url' class='rvy_preview_linkspan'>",
+					"</a></span>"
+					) 
+				: '';
 				}
 
 				if (agp_user_can('edit_post', $revision_id)) {

@@ -176,6 +176,27 @@ function rvy_revision_approve($revision_id = 0) {
 				}
 			}
 			
+			if ( $db_action && rvy_get_option( 'rev_approval_notify_admin' ) ) {
+				require_once(dirname(REVISIONARY_FILE).'/revision-workflow_rvy.php');
+				$admin_ids = Rvy_Revision_Workflow_UI::getRecipients('rev_approval_notify_admin', ['type_obj' => $type_obj, 'published_post' => $post]);
+
+				foreach($admin_ids as $user_id) {
+					if ($user = new WP_User($user_id)) {
+						rvy_mail(
+							$user->user_email, 
+							$title, 
+							$message, 
+							[
+								'revision_id' => $revision->ID, 
+								'post_id' => $post->ID, 
+								'notification_type' => 'revision-approval', 
+								'notification_class' => 'rev_approval_notify_admin'
+							]
+						);
+					}
+				}
+			}
+
 			if ( $db_action && defined( 'RVY_NOTIFY_SUPER_ADMIN' ) && is_multisite() ) {
 				$super_admin_logins = get_super_admins();
 				foreach( $super_admin_logins as $user_login ) {
@@ -408,6 +429,15 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		);
 	}
 
+	if (defined('FL_BUILDER_VERSION')) {
+		// If Beaver Builder is active for this post, don't allow pending revision publication to strip terms
+		if (get_post_meta($published->ID, '_fl_builder_data', true)) {
+			$orig_terms = [];
+			$orig_terms['post_tag'] = wp_get_object_terms($published->ID, 'post_tag', ['fields' => 'ids']);
+			$orig_terms['category'] = wp_get_object_terms($published->ID, 'category', ['fields' => 'ids']);
+		}
+	}
+	
 	$post_id = wp_update_post( $update );
 	if ( ! $post_id || is_wp_error( $post_id ) ) {
 		return $post_id;
@@ -483,6 +513,14 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
 
 	update_post_meta($revision_id, '_rvy_published_gmt', $post_modified_gmt);
+
+	if (!empty($orig_terms) && is_array($orig_terms)) {
+		foreach($orig_terms as $taxonomy => $terms) {
+			if ($terms && !wp_get_object_terms($published->ID, $taxonomy, ['fields' => 'ids'])) {
+				wp_set_object_terms($published->ID, $terms, $taxonomy);
+			}
+		}
+	}
 
 	rvy_delete_past_revisions($revision_id);
 
@@ -1035,7 +1073,7 @@ function revisionary_copy_terms( $from_post_id, $to_post_id, $mirror_empty = fal
 
 	if ($skip_taxonomies = apply_filters('revisionary_skip_taxonomies', $skip_taxonomies, $from_post_id, $to_post_id)) {
 		$tx_join = "INNER JOIN $wpdb->term_taxonomy AS tt ON tt.term_taxonomy_id = tr.term_taxonomy_id ";
-		$tx_where = "tt.taxonomy NOT IN ('" . implode("','", array_filter($skip_taxonomies, 'sanitize_key')) . "')";
+		$tx_where = "tt.taxonomy NOT IN ('" . implode("','", array_map('sanitize_key', array_filter($skip_taxonomies))) . "') AND ";
 	} else {
 		$tx_join = '';
 		$tx_where = '';

@@ -5,7 +5,7 @@
  * Description: Maintain published content with teamwork and precision using the Revisions model to submit, approve and schedule changes.
  * Author: PublishPress
  * Author URI: https://publishpress.com
- * Version: 2.1.7
+ * Version: 2.2
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 4.9.7
@@ -64,7 +64,7 @@ if ($pro_active) {
         function($links, $file)
         {
             if ($file == plugin_basename(__FILE__)) {
-                $links[]= __('<strong>This plugin can be deleted.</strong>', 'press-permit-core');
+                $links[]= __('<strong>This plugin can be deleted.</strong>', 'revisionary');
             }
 
             return $links;
@@ -80,9 +80,9 @@ if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1
 		add_action('all_admin_notices', function()
 		{
 			if ( defined( 'RVY_FOLDER' ) )
-				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: "%2$s")', 'rvy' ), RVY_VERSION, RVY_FOLDER );
+				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: "%2$s")', 'revisionary' ), RVY_VERSION, RVY_FOLDER );
 			else
-				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)', 'rvy' ), RVY_VERSION );
+				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)', 'revisionary' ), RVY_VERSION );
 		
 			echo "<div id='message' class='notice error' style='color:black'>" . $message . '</div>';
 		}, 5);
@@ -96,7 +96,7 @@ define('REVISIONARY_FILE', __FILE__);
 register_activation_hook(__FILE__, function() 
 	{
 		// mirror to REVISIONARY_VERSION
-		update_option('revisionary_last_version', '2.1.7');
+		update_option('revisionary_last_version', '2.2');
 
 		// force this timestamp to be regenerated, in case something went wrong before
 		delete_option( 'rvy_next_rev_publish_gmt' );
@@ -128,9 +128,9 @@ add_action(
 				add_action('all_admin_notices', function()
 				{
 					if ( defined( 'RVY_FOLDER' ) )
-						$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: "%2$s")', 'rvy' ), RVY_VERSION, RVY_FOLDER );
+						$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: "%2$s")', 'revisionary' ), RVY_VERSION, RVY_FOLDER );
 					else
-						$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)', 'rvy' ), RVY_VERSION );
+						$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)', 'revisionary' ), RVY_VERSION );
 				
 					echo "<div id='message' class='notice error' style='color:black'>" . $message . '</div>';
 				}, 5);
@@ -148,19 +148,19 @@ add_action(
 		// Critical errors that prevent initialization
 		if (version_compare($min_php_version, $php_version, '>')) {
 			if (is_admin() && current_user_can('activate_plugins')) {
-				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(__('PublishPress Revisions requires PHP version %s or higher.'), '5.6.20') . "</div>"; });
+				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(__('PublishPress Revisions requires PHP version %s or higher.', 'revisionary'), '5.6.20') . "</div>"; });
 			}
 			return;
 		}
 
 		if (version_compare($wp_version, $min_wp_version, '<')) {
 			if (is_admin() && current_user_can('activate_plugins')) {
-				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(__('PublishPress Revisions requires WordPress version %s or higher.'), '4.9.7') . "</div>"; });
+				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(__('PublishPress Revisions requires WordPress version %s or higher.', 'revisionary'), '4.9.7') . "</div>"; });
 			}
 			return;
 		}
 
-		define('REVISIONARY_VERSION', '2.1.7');
+		define('REVISIONARY_VERSION', '2.2');
 
 		if ( ! defined( 'RVY_VERSION' ) ) {
 			define( 'RVY_VERSION', REVISIONARY_VERSION );  // back compat
@@ -221,6 +221,7 @@ add_action(
 		// since sequence of set_current_user and init actions seems unreliable, make sure our current_user is loaded first
 		add_action('init', 'rvy_init', 1);
 		add_action('init', 'rvy_add_revisor_custom_caps', 99);
+		add_action('init', 'rvy_configuration_late_init', PHP_INT_MAX - 1);
 
 		revisionary();
 	}

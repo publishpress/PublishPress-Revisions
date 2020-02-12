@@ -69,7 +69,7 @@ function rvy_set_notification_buffer_cron() {
 function rvy_mail_buffer_cron_interval( $schedules ) {
     $schedules['two_minutes'] = array(
         'interval' => 120,
-        'display'  => esc_html__( 'Every 2 Minutes' ),
+        'display'  => esc_html__( 'Every 2 Minutes', 'revisionary' ),
     );
  
     return $schedules;
@@ -147,7 +147,7 @@ function rvy_ajax_handler() {
 
 function rvy_status_registrations() {
 	register_post_status('pending-revision', array(
-		'label' => _x('Pending Revision', 'post'),
+		'label' => __('Pending Revision', 'revisionary'),
 		'labels' => (object)['publish' => __('Publish Revision', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Pending Revisions', 'revisionary'), 'short' => __('Pending', 'revisionary') ],
 		'protected' => true,
 		'internal' => true,
@@ -158,7 +158,7 @@ function rvy_status_registrations() {
 	));
 
 	register_post_status('future-revision', array(
-		'label' => _x('Scheduled Revision', 'post'),
+		'label' => __('Scheduled Revision', 'revisionary'),
 		'labels' => (object)['publish' => __('Publish Revision', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Scheduled Revisions', 'revisionary'), 'short' => __('Scheduled', 'revisionary')],
 		'protected' => true,
 		'internal' => true,
@@ -212,6 +212,14 @@ function rvy_plugin_active_for_network( $plugin ) {
 	}
 
 	return false;
+}
+
+function rvy_configuration_late_init() {
+	global $revisionary;
+
+	if (!empty($revisionary)) {
+		$revisionary->configurationLateInit();
+	}
 }
 
 // auto-define the Revisor role to include custom post type capabilities equivalent to those added for post, page in rvy_add_revisor_role()
@@ -288,6 +296,19 @@ function rvy_add_revisor_role( $requested_blog_id = '' ) {
 	);
 
 	$wp_roles->add_role( 'revisor', __( 'Revisor', 'revisionary' ), $wp_role_caps );
+}
+
+function rvy_apply_role_translation($translations, $text, $context, $domain) {
+	if (('User role' === $context) && ('Revisor' == $text) && ($domain !== 'revisionary')) {
+		return translate_with_gettext_context($text, $context, 'revisionary');
+	}
+
+	return $translations;
+}
+
+function rvy_role_translation_support() {
+	_x('Revisor', 'User role', 'revisionary');
+	add_filter('gettext_with_context', 'rvy_apply_role_translation', 10, 4);
 }
 
 // wrapper function for use with wp_cron hook
@@ -513,7 +534,9 @@ function rvy_mail( $address, $title, $message, $args ) {
 
 	$new_msg = array_merge(compact('address', 'title', 'message'), ['time' => strtotime(current_time( 'mysql' )), 'time_gmt' => time()], $args);
 
-	$buffer_status = rvy_mail_check_buffer($new_msg);
+	if (!$buffer_status = rvy_mail_check_buffer($new_msg)) {
+		$buffer_status = (object)[];
+	}
 
 	if (!empty($buffer_status->new_msg_buffered)) {
 		return;
@@ -526,6 +549,10 @@ function rvy_mail( $address, $title, $message, $args ) {
 
 	if ($success || !defined('REVISIONARY_MAIL_RETRY')) {
 		if (!defined('REVISIONARY_DISABLE_MAIL_LOG')) {
+			if (!isset($buffer_status->sent_mail)) {
+				$buffer_status->sent_mail = [];
+			}
+
 			$buffer_status->sent_mail[]= $new_msg;
 			update_option('revisionary_sent_mail', $buffer_status->sent_mail);
 		}
@@ -644,7 +671,7 @@ function _revisionary_dashboard_dismiss_msg() {
 function rvy_is_supported_post_type($post_type) {
 	global $revisionary;
 
-	if (empty($revisionary->enabled_post_types[$post_type])) {
+	if (empty($revisionary->enabled_post_types[$post_type]) && $revisionary->config_loaded) {
 		return false;
 	}
 
@@ -713,6 +740,8 @@ function rvy_init() {
 			set_site_transient('revisionary_previous_install', true, 86400);
 		}
 	}
+
+	rvy_role_translation_support();
 
 	/*  // wp_cron hook @todo
 	if ( rvy_get_option( 'scheduled_revisions' ) ) {

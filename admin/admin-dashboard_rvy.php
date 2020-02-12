@@ -32,7 +32,7 @@ function rvy_glance_pending() {
 						
 					$url = "admin.php?page=revisionary-q&post_status=$status{$type_clause}";
 
-					if (current_user_can('administrator') || (current_user_can($post_type_obj->cap->edit_published_posts) && current_user_can($post_type_obj->cap->edit_others_posts))) {  // hide count from non-Admins until it is properly filtered
+					if (current_user_can('administrator') || (isset($post_type_obj->cap->edit_published_posts) && current_user_can($post_type_obj->cap->edit_published_posts) && current_user_can($post_type_obj->cap->edit_others_posts))) {  // hide count from non-Admins until it is properly filtered
 						echo "<a class='waiting' href='$url'><span class='pending-count'>$num</span> $text</a>";
 					} else {
 						echo "<a class='waiting' href='$url'>" . sprintf( __("View %s", 'revisionary'), $text) . "</a>";

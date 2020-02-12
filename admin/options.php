@@ -132,9 +132,11 @@ $ui->option_captions = array(
 if ( defined('RVY_CONTENT_ROLES') ) {
 	$ui->option_captions['pending_rev_notify_admin'] = __('Email designated Publishers when a Pending Revision is submitted', 'revisionary');
 	$ui->option_captions['publish_scheduled_notify_admin'] = __('Email designated Publishers when a Scheduled Revision is published', 'revisionary');
+	$ui->option_captions['rev_approval_notify_admin'] = __('Email designated Publishers when a Pending Revision is approved', 'revisionary');
 } else {
 	$ui->option_captions['pending_rev_notify_admin'] = __('Email Editors and Administrators when a Pending Revision is submitted', 'revisionary');
 	$ui->option_captions['publish_scheduled_notify_admin'] = __('Email Editors and Administrators when a Scheduled Revision is published', 'revisionary');
+	$ui->option_captions['rev_approval_notify_admin'] = __('Email Editors and Administrators when a Pending Revision is approved', 'revisionary');
 }
 	
 
@@ -146,7 +148,7 @@ $ui->form_options = array(
 	'pending_revisions'	=> 	 array( 'pending_revisions', 'pending_revision_update_post_date', ),
 	'preview' =>			 array( 'preview_link_type', 'compare_revisions_direct_approval'),
 	'revisions'		=>		 array( 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'diff_display_strip_tags', 'display_hints' ),
-	'notification'	=>		 array( 'pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer' )
+	'notification'	=>		 array( 'pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer' )
 )
 );
 
@@ -304,7 +306,7 @@ $table_class = 'form-table rs-form-table';
 		</th><td>
 		
 		<?php 
-		$hint = __('The user role "Revisor" role is now available. Include capabilities for all custom post types in this role?', 'revisor');
+		$hint = __('The user role "Revisor" role is now available. Include capabilities for all custom post types in this role?', 'revisionary');
 		$ui->option_checkbox( 'revisor_role_add_custom_rolecaps', $tab, $section, $hint, '' );
 		?>
 		
@@ -502,6 +504,9 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			
 			echo '<br />';
 			
+			$hint = '';
+			$ui->option_checkbox( 'rev_approval_notify_admin', $tab, $section, $hint, '' );
+
 			$hint = '';
 			$ui->option_checkbox( 'rev_approval_notify_author', $tab, $section, $hint, '' );
 			
@@ -722,7 +727,7 @@ foreach ( $available_form_options as $tab_name => $sections ) {
 		if ( isset( $ui->section_captions[$tab_name][$section_name] ) )
 			echo $ui->section_captions[$tab_name][$section_name];
 		else
-			_e( $section_name );
+			echo ucwords(str_replace('_', ' ', $section_name));
 		
 		echo '</strong><ul style="margin-left:2em">';
 			

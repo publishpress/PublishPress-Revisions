@@ -442,7 +442,7 @@ class RevisionCreation {
 		if (!empty($revision_id) && $post = get_post($revision_id)) {
 			$post_ID = $revision_id;
 			$post_arr['post_ID'] = $revision_id;
-			$data = wp_unslash((array) $post);
+			$data = (!defined('REVISIONARY_NO_UNSLASH')) ? (array) $post : wp_unslash((array) $post);
 		} else {
 			unset($data['post_ID']);
 
@@ -513,14 +513,16 @@ class RevisionCreation {
 		$data['post_modified'] = current_time( 'mysql' );
 		$data['post_modified_gmt'] = current_time( 'mysql', 1 );
 
-		$data = wp_unslash($data);
+		if (!defined('REVISIONARY_NO_UNSLASH')) {
+			$data = wp_unslash($data);
+		}
 
 		$post_type = $data['post_type'];
 		unset($data['ID']);
 
 		if ( false === $wpdb->insert( $wpdb->posts, $data ) ) {
 			if (!empty($wpdb->last_error)) {
-				return new WP_Error( 'db_insert_error', __( 'Could not insert post into the database' ), $wpdb->last_error );
+				return new WP_Error( 'db_insert_error', __( 'Could not insert revision into the database', 'revisionary' ), $wpdb->last_error );
 			} else {
 				return 0;
 			}
@@ -555,12 +557,13 @@ class RevisionCreation {
 		}
 	
 		// New-style support for all custom taxonomies.
+		$set_taxonomies = [];
 		if ( ! empty( $postarr['tax_input'] ) ) {
 			foreach ( $postarr['tax_input'] as $taxonomy => $tags ) {
 				$taxonomy_obj = get_taxonomy( $taxonomy );
 				if ( ! $taxonomy_obj ) {
 					/* translators: %s: taxonomy name */
-					_doing_it_wrong( __FUNCTION__, sprintf( __( 'Invalid taxonomy: %s.' ), $taxonomy ), '4.4.0' );
+					_doing_it_wrong( __FUNCTION__, sprintf( __( 'Invalid taxonomy: %s', 'revisionary' ), $taxonomy ), '4.4.0' );
 					continue;
 				}
 	
@@ -568,8 +571,19 @@ class RevisionCreation {
 				if ( is_array( $tags ) ) {
 					$tags = array_filter( $tags );
 				}
+			
 				if ( current_user_can( $taxonomy_obj->cap->assign_terms ) ) {
 					wp_set_post_terms( $post_ID, $tags, $taxonomy );
+					$set_taxonomies[$taxonomy] = true;
+				}
+			}
+		}
+
+		// If term selections are not posted for revision, store current published terms
+		foreach(get_taxonomies(['public' => true]) as $taxonomy) {
+			if (empty($set_taxonomies[$taxonomy])) {
+				if ($published_terms = wp_get_object_terms($published_post_id, $taxonomy, ['fields' => 'ids'])) {
+					wp_set_object_terms( $post_ID, $published_terms, $taxonomy );
 				}
 			}
 		}
@@ -628,7 +642,7 @@ class RevisionCreation {
 			$page_templates      = wp_get_theme()->get_page_templates( $post );
 			if ( 'default' != $postarr['page_template'] && ! isset( $page_templates[ $postarr['page_template'] ] ) ) {
 				if ( $wp_error ) {
-					return new WP_Error( 'invalid_page_template', __( 'Invalid page template.' ) );
+					return new WP_Error( 'invalid_page_template', __( 'Invalid page template.', 'revisionary' ) );
 				}
 				update_post_meta( $post_ID, '_wp_page_template', 'default' );
 			} else {

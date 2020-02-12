@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Revisionary Pro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-10 13:13-0500\n"
+"POT-Creation-Date: 2020-02-12 12:28-0500\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Kevin Behrens <kevin@publishpress.com>\n"
 "Language-Team: PublishPress <help@publishpress.com>\n"
@@ -12,73 +12,69 @@ msgstr ""
 "X-Poedit-Language: English\n"
 "X-Poedit-Country: UNITED STATES\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Poedit-KeywordsList: __;_e;_c;__ngettext;_n;rvy_po_trigger;__awp\n"
+"X-Poedit-KeywordsList: __;_e;_c;__ngettext;_n;_x;_ex\n"
 "X-Poedit-Basepath: F:\\snapshot\\revisionary\n"
 "X-Poedit-SearchPath-0: F:\\snapshot\\revisionary\n"
 "X-Poedit-SearchPath-1: F:\\snapshot\\revisionary\\admin\n"
 "X-Poedit-SearchPath-2: F:\\snapshot\\revisionary\\hardway\n"
 "X-Poedit-SearchPath-3: F:\\snapshot\\revisionary\\lib\n"
 
-#: F:\snapshot\revisionary/front_rvy.php:143
-msgid "M j, Y @ g:i a"
-msgstr ""
-
 #: F:\snapshot\revisionary/front_rvy.php:170
 #, php-format
-msgid "<span><a href='%s' class='rvy_preview_linkspan'  target='_revision_diff'>Compare</a></span><span><a href='%s' class='rvy_preview_linkspan' >View&nbsp;Published&nbsp;Post</a></span>"
+msgid "%sCompare%s%sView&nbsp;Published&nbsp;Post%s"
 msgstr ""
 
-#: F:\snapshot\revisionary/front_rvy.php:172
+#: F:\snapshot\revisionary/front_rvy.php:180
 #, php-format
-msgid "<span><a href='%s' class='rvy_preview_linkspan' >View&nbsp;Published&nbsp;Post</a></span>"
+msgid "%sView&nbsp;Published&nbsp;Post%s"
 msgstr ""
 
-#: F:\snapshot\revisionary/front_rvy.php:177
+#: F:\snapshot\revisionary/front_rvy.php:189
 msgid "Edit"
 msgstr ""
 
-#: F:\snapshot\revisionary/front_rvy.php:213
+#: F:\snapshot\revisionary/front_rvy.php:225
 msgid "Approve"
 msgstr ""
 
-#: F:\snapshot\revisionary/front_rvy.php:214
+#: F:\snapshot\revisionary/front_rvy.php:226
 #, php-format
 msgid "This is a Pending Revision (requested publish date: %s). %s %s %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/front_rvy.php:217
-#: F:\snapshot\revisionary/front_rvy.php:235
+#: F:\snapshot\revisionary/front_rvy.php:229
+#: F:\snapshot\revisionary/front_rvy.php:247
 msgid "Publish now"
 msgstr ""
 
-#: F:\snapshot\revisionary/front_rvy.php:218
+#: F:\snapshot\revisionary/front_rvy.php:230
 #, php-format
 msgid "This is a Pending Revision. %s %s %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/front_rvy.php:228
+#: F:\snapshot\revisionary/front_rvy.php:240
 msgid "This revision is very new, preview may not be synchronized with theme."
 msgstr ""
 
-#: F:\snapshot\revisionary/front_rvy.php:229
+#: F:\snapshot\revisionary/front_rvy.php:241
 msgid "Reload"
 msgstr ""
 
-#: F:\snapshot\revisionary/front_rvy.php:237
+#: F:\snapshot\revisionary/front_rvy.php:249
 #, php-format
 msgid "This is a Scheduled Revision (for publication on %s). %s %s %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/front_rvy.php:244
+#: F:\snapshot\revisionary/front_rvy.php:256
 msgid "Restore"
 msgstr ""
 
-#: F:\snapshot\revisionary/front_rvy.php:245
+#: F:\snapshot\revisionary/front_rvy.php:257
 #, php-format
 msgid "This is a Past Revision (from %s). %s %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/front_rvy.php:257
+#: F:\snapshot\revisionary/front_rvy.php:269
 #, php-format
 msgid "This is the Current Revision. %s"
 msgstr ""
@@ -111,16 +107,16 @@ msgstr ""
 msgid "Scheduled Revision Created"
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-creation_rvy.php:523
-msgid "Could not insert post into the database"
+#: F:\snapshot\revisionary/revision-creation_rvy.php:525
+msgid "Could not insert revision into the database"
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-creation_rvy.php:563
+#: F:\snapshot\revisionary/revision-creation_rvy.php:566
 #, php-format
-msgid "Invalid taxonomy: %s."
+msgid "Invalid taxonomy: %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-creation_rvy.php:631
+#: F:\snapshot\revisionary/revision-creation_rvy.php:645
 msgid "Invalid page template."
 msgstr ""
 
@@ -151,58 +147,58 @@ msgstr ""
 msgid "Edit Revision: "
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:177
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:133
 msgid "Sorry, an error occurred while attempting to save your revision."
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:208
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:164
 msgid "Your modification was saved as a Scheduled Revision."
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:213
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:246
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:169
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:202
 msgid "Preview it"
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:219
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:250
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:175
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:206
 msgid "Keep editing the revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:221
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:177
 msgid "Go back to schedule another revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:223
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:258
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:179
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:214
 msgid "View Revision Queue"
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:232
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:188
 msgid "Your modification has been saved for editorial review."
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:235
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:191
 msgid "If approved by an editor, it will be published on the date you specified."
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:237
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:193
 msgid "It will be published when an editor approves it."
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:254
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:210
 msgid "Go back to submit another revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:275
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:231
 msgid "Return to Edit Posts"
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:278
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:234
 msgid "Return to Edit Pages"
 msgstr ""
 
-#: F:\snapshot\revisionary/revision-workflow_rvy.php:282
+#: F:\snapshot\revisionary/revision-workflow_rvy.php:238
 #, php-format
 msgid "Return to Edit %s"
 msgstr ""
@@ -233,52 +229,56 @@ msgstr ""
 msgid "PublishPress Revisions requires WordPress version %s or higher."
 msgstr ""
 
-#: F:\snapshot\revisionary/revisionary_main.php:368
+#: F:\snapshot\revisionary/revisionary_main.php:383
 msgid "Invalid featured media ID."
 msgstr ""
 
-#: F:\snapshot\revisionary/rvy_init.php:141
-#: F:\snapshot\revisionary/rvy_init.php:152
+#: F:\snapshot\revisionary/rvy_init.php:150
+msgid "Pending Revision"
+msgstr ""
+
+#: F:\snapshot\revisionary/rvy_init.php:151
+#: F:\snapshot\revisionary/rvy_init.php:162
 msgid "Publish Revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/rvy_init.php:141
-#: F:\snapshot\revisionary/rvy_init.php:152
+#: F:\snapshot\revisionary/rvy_init.php:151
+#: F:\snapshot\revisionary/rvy_init.php:162
 msgid "Save Revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/rvy_init.php:141
-#: F:\snapshot\revisionary/rvy_init.php:152
+#: F:\snapshot\revisionary/rvy_init.php:151
+#: F:\snapshot\revisionary/rvy_init.php:162
 msgid "Update Revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/rvy_init.php:141
+#: F:\snapshot\revisionary/rvy_init.php:151
 msgid "Pending Revisions"
 msgstr ""
 
-#: F:\snapshot\revisionary/rvy_init.php:141
+#: F:\snapshot\revisionary/rvy_init.php:151
 msgid "Pending"
 msgstr ""
 
-#: F:\snapshot\revisionary/rvy_init.php:152
+#: F:\snapshot\revisionary/rvy_init.php:161
+msgid "Scheduled Revision"
+msgstr ""
+
+#: F:\snapshot\revisionary/rvy_init.php:162
 msgid "Scheduled Revisions"
 msgstr ""
 
-#: F:\snapshot\revisionary/rvy_init.php:152
+#: F:\snapshot\revisionary/rvy_init.php:162
 msgid "Scheduled"
 msgstr ""
 
-#: F:\snapshot\revisionary/rvy_init.php:278
+#: F:\snapshot\revisionary/rvy_init.php:298
+#: F:\snapshot\revisionary/rvy_init.php:310
 msgid "Revisor"
 msgstr ""
 
-#: F:\snapshot\revisionary/rvy_init.php:617
+#: F:\snapshot\revisionary/rvy_init.php:656
 msgid "Revision Workflow"
-msgstr ""
-
-#: F:\snapshot\revisionary/submittee_rvy.php:11
-#: F:\snapshot\revisionary/submittee_rvy.php:14
-msgid "Cheatin&#8217; uh?"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/admin-dashboard_rvy.php:27
@@ -308,27 +308,27 @@ msgstr ""
 msgid "Error in deleting."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin-init_rvy.php:242
+#: F:\snapshot\revisionary/admin/admin-init_rvy.php:223
 #, php-format
 msgid "For more details on setting up PublishPress Revisions, %sread this guide%s."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin-init_rvy.php:248
+#: F:\snapshot\revisionary/admin/admin-init_rvy.php:229
 #, php-format
 msgid "<strong>Welcome to PublishPress Revisions!</strong> Here&apos;s how it works:%s<li>\"Contributors\" can submit revisions to their published posts.</li><li>\"Revisors\" can submit revisions to posts and pages published by others.</li><li>\"Authors\", \"Editors\" and \"Administrators\" can approve revisions or schedule their own revisions.</li>%s%s%s"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin-init_rvy.php:258
+#: F:\snapshot\revisionary/admin/admin-init_rvy.php:239
 #, php-format
 msgid "<strong>Revisionary is now PublishPress Revisions!</strong> Note the new Revisions menu and %sRevision Queue%s screen, where Pending and Scheduled Revisions are listed. %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin-init_rvy.php:284
+#: F:\snapshot\revisionary/admin/admin-init_rvy.php:265
 msgid "Dismiss"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/admin_lib-mu_rvy.php:12
-#: F:\snapshot\revisionary/admin/options.php:195
+#: F:\snapshot\revisionary/admin/options.php:197
 msgid "PublishPress Revisions Network Settings"
 msgstr ""
 
@@ -337,7 +337,7 @@ msgid "Network Settings"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/admin_lib-mu_rvy.php:23
-#: F:\snapshot\revisionary/admin/options.php:197
+#: F:\snapshot\revisionary/admin/options.php:199
 msgid "PublishPress Revisions Network Defaults"
 msgstr ""
 
@@ -345,13 +345,8 @@ msgstr ""
 msgid "Network Defaults"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin_rvy.php:260
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:98
-msgid "Pending Revision"
-msgstr ""
-
 #: F:\snapshot\revisionary/admin/admin_rvy.php:283
-#: F:\snapshot\revisionary/admin/admin_rvy.php:599
+#: F:\snapshot\revisionary/admin/admin_rvy.php:607
 msgid "Revision Queue"
 msgstr ""
 
@@ -367,16 +362,21 @@ msgstr ""
 msgid "The revision was published."
 msgstr ""
 
+#: F:\snapshot\revisionary/admin/admin_rvy.php:407
+#: F:\snapshot\revisionary/admin/history_rvy.php:906
+msgid "M j, Y @ g:i a"
+msgstr ""
+
 #: F:\snapshot\revisionary/admin/admin_rvy.php:410
 #: F:\snapshot\revisionary/admin/PostEditSubmitMetabox.php:347
 #, php-format
-msgid "Scheduled for: <b>%1$s</b>"
+msgid "Scheduled for: %s"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/admin_rvy.php:412
 #: F:\snapshot\revisionary/admin/PostEditSubmitMetabox.php:349
 #, php-format
-msgid "Published on: <b>%1$s</b>"
+msgid "Published on: %s"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/admin_rvy.php:414
@@ -389,13 +389,13 @@ msgstr ""
 #: F:\snapshot\revisionary/admin/admin_rvy.php:416
 #: F:\snapshot\revisionary/admin/PostEditSubmitMetabox.php:353
 #, php-format
-msgid "Schedule for: <b>%1$s</b>"
+msgid "Schedule for: %s"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/admin_rvy.php:418
 #: F:\snapshot\revisionary/admin/PostEditSubmitMetabox.php:355
 #, php-format
-msgid "Publish on: <b>%1$s</b>"
+msgid "Publish on: %s"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/admin_rvy.php:454
@@ -403,68 +403,67 @@ msgid "Save as Pending Revision"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/admin_rvy.php:457
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:99
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:104
 msgid "Do not publish current changes yet, but save to Revision Queue"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin_rvy.php:477
-#: F:\snapshot\revisionary/admin/admin_rvy.php:613
-#: F:\snapshot\revisionary/admin/options.php:96
-msgid "Settings"
-msgstr ""
-
-#: F:\snapshot\revisionary/admin/admin_rvy.php:509
+#: F:\snapshot\revisionary/admin/admin_rvy.php:517
 #: F:\snapshot\revisionary/admin/filters-admin-ui-item_rvy.php:62
 msgid "Current Time"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin_rvy.php:580
-#: F:\snapshot\revisionary/admin/admin_rvy.php:596
+#: F:\snapshot\revisionary/admin/admin_rvy.php:588
+#: F:\snapshot\revisionary/admin/admin_rvy.php:604
 msgid "Revisions"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin_rvy.php:613
-#: F:\snapshot\revisionary/admin/options.php:201
+#: F:\snapshot\revisionary/admin/admin_rvy.php:621
+#: F:\snapshot\revisionary/admin/options.php:203
 msgid "PublishPress Revisions Settings"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin_rvy.php:699
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:969
+#: F:\snapshot\revisionary/admin/admin_rvy.php:621
+#: F:\snapshot\revisionary/admin/options.php:96
+msgid "Settings"
+msgstr ""
+
+#: F:\snapshot\revisionary/admin/admin_rvy.php:707
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1026
 msgid "Delete"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin_rvy.php:710
+#: F:\snapshot\revisionary/admin/admin_rvy.php:718
 #, php-format
 msgid "%s (revision)"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin_rvy.php:744
+#: F:\snapshot\revisionary/admin/admin_rvy.php:752
 #, php-format
 msgid "If you like %s, please leave us a %s rating. Thank you!"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin_rvy.php:755
+#: F:\snapshot\revisionary/admin/admin_rvy.php:763
 msgid "About PublishPress Revisions"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin_rvy.php:755
+#: F:\snapshot\revisionary/admin/admin_rvy.php:763
 msgid "About"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin_rvy.php:757
+#: F:\snapshot\revisionary/admin/admin_rvy.php:765
 msgid "PublishPress Revisions Documentation"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin_rvy.php:757
-#: F:\snapshot\revisionary/admin/options.php:655
+#: F:\snapshot\revisionary/admin/admin_rvy.php:765
+#: F:\snapshot\revisionary/admin/options.php:660
 msgid "Documentation"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin_rvy.php:759
+#: F:\snapshot\revisionary/admin/admin_rvy.php:767
 msgid "Contact the PublishPress team"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/admin_rvy.php:759
+#: F:\snapshot\revisionary/admin/admin_rvy.php:767
 msgid "Contact"
 msgstr ""
 
@@ -494,181 +493,190 @@ msgstr ""
 msgid "unselect"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:216
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:273
 msgid "Revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:217
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:274
 msgid "Status"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:218
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:275
 msgid "Post Type"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:219
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:276
 msgid "Revised By"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:220
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:277
 msgid "Submission"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:228
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:285
 msgid "Schedule"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:231
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:288
 msgid "Published Post"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:232
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:289
 msgid "Post Author"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:273
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:889
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:330
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:946
 msgid "Y/m/d g:i:s a"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:281
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:894
-#: F:\snapshot\revisionary/admin/history_rvy.php:942
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:338
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:951
+#: F:\snapshot\revisionary/admin/history_rvy.php:953
 #, php-format
 msgid "%s ago"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:284
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:897
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:341
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:954
 msgid "Y/m/d g:i a"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:291
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:348
 #, php-format
 msgid "Scheduled publication: %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:294
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:351
 #, php-format
 msgid "Requested publication: %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:298
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:355
 msgid "Missed schedule"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:341
-#: F:\snapshot\revisionary/admin/history_rvy.php:760
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:398
+#: F:\snapshot\revisionary/admin/history_rvy.php:771
 msgid "No author"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:380
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:437
 #, php-format
-msgid "View only revisions of &#8220;%s&#8221;"
+msgid "View only revisions of %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:381
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:692
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:438
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:749
 msgid "Filter"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:389
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:446
 msgid "View published post"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:390
-#: F:\snapshot\revisionary/admin/history_rvy.php:1027
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:41
-#: F:\snapshot\revisionary/admin/post-edit_rvy.php:200
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:447
+#: F:\snapshot\revisionary/admin/history_rvy.php:1038
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:45
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:95
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:99
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:247
 #: F:\snapshot\revisionary/admin/PostEditSubmitMetabox.php:175
 msgid "View"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:408
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:464
+msgid "Compare Past Revisions"
+msgstr ""
+
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:465
 msgid "History"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:556
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:613
 #, php-format
 msgid "%sMy Revisions%s(%s)"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:585
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:642
 #, php-format
 msgid "%sMy Published Posts%s(%s)"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:620
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:677
 #, php-format
 msgid "All %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:646
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:703
 msgid "Publish"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:649
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:706
 #: F:\snapshot\revisionary/admin/PostEditSubmitMetabox.php:103
 msgid "Delete Permanently"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:671
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:728
 msgid "Filter by category"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:734
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:791
 msgid "Filter by date"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:736
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:793
 msgid "All dates"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:749
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:806
 #, php-format
 msgid "%1$s %2$d"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:795
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:852
 msgid "Select All"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:877
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:934
 #, php-format
 msgid "&#8220;%s&#8221; (Edit)"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:968
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1025
 msgid "Delete Revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:983
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1040
 msgid "Preview Revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:984
-#: F:\snapshot\revisionary/admin/history_rvy.php:1104
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1041
+#: F:\snapshot\revisionary/admin/history_rvy.php:1117
 msgid "Preview"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:994
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1051
 msgid "Compare Changes"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:995
-#: F:\snapshot\revisionary/admin/post-edit_rvy.php:170
+#: F:\snapshot\revisionary/admin/class-list-table_rvy.php:1052
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:217
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:312
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:333
+#: F:\snapshot\revisionary/admin/PostEditSubmitMetabox.php:74
 msgid "Compare"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/filters-admin-ui-item_rvy.php:36
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:95
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:100
 msgid "Schedule Revision"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/filters-admin-ui-item_rvy.php:59
 #: F:\snapshot\revisionary/admin/filters-admin-ui-item_rvy.php:60
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:139
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:140
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:144
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:145
 msgid "Submit Revision"
 msgstr ""
 
@@ -676,7 +684,7 @@ msgstr ""
 msgid "Submit Scheduled Revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/filters-admin-ui-item_rvy.php:100
+#: F:\snapshot\revisionary/admin/filters-admin-ui-item_rvy.php:101
 msgid "Publishers to Notify of Your Revision"
 msgstr ""
 
@@ -689,89 +697,98 @@ msgstr ""
 msgid "&larr; Return to editor"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:464
-#: F:\snapshot\revisionary/admin/history_rvy.php:467
+#: F:\snapshot\revisionary/admin/history_rvy.php:439
+#: F:\snapshot\revisionary/admin/history_rvy.php:442
 msgid "(no title)"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:555
+#: F:\snapshot\revisionary/admin/history_rvy.php:530
 msgid "Post Date"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:556
+#: F:\snapshot\revisionary/admin/history_rvy.php:531
 msgid "Post Parent"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:557
+#: F:\snapshot\revisionary/admin/history_rvy.php:532
 msgid "Menu Order"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:558
+#: F:\snapshot\revisionary/admin/history_rvy.php:533
 msgid "Comment Status"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:559
+#: F:\snapshot\revisionary/admin/history_rvy.php:534
 msgid "Ping Status"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:667
+#: F:\snapshot\revisionary/admin/history_rvy.php:654
 msgid "Page Template"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:670
+#: F:\snapshot\revisionary/admin/history_rvy.php:657
 msgid "Featured Image"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:679
+#: F:\snapshot\revisionary/admin/history_rvy.php:666
 msgid "Beaver Builder Data"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:680
+#: F:\snapshot\revisionary/admin/history_rvy.php:667
 msgid "Beaver Builder Settings"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:869
+#: F:\snapshot\revisionary/admin/history_rvy.php:880
 msgid "Scheduled for "
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:874
+#: F:\snapshot\revisionary/admin/history_rvy.php:885
 msgid "Requested for "
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:879
+#: F:\snapshot\revisionary/admin/history_rvy.php:890
 msgid "Submitted "
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:884
+#: F:\snapshot\revisionary/admin/history_rvy.php:895
 #, php-format
 msgid "%s%s ago"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:884
+#: F:\snapshot\revisionary/admin/history_rvy.php:895
 #, php-format
 msgid "%s%s from now"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:940
+#: F:\snapshot\revisionary/admin/history_rvy.php:907
+msgid "j M @ g:i a"
+msgstr ""
+
+#: F:\snapshot\revisionary/admin/history_rvy.php:951
 msgid "M j, Y @ H:i"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:1025
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:38
-#: F:\snapshot\revisionary/admin/post-edit_rvy.php:198
+#: F:\snapshot\revisionary/admin/history_rvy.php:952
+msgid "j M @ H:i"
+msgstr ""
+
+#: F:\snapshot\revisionary/admin/history_rvy.php:1036
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:42
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:92
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:245
 #: F:\snapshot\revisionary/admin/PostEditSubmitMetabox.php:172
 msgid "View / Approve"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:1103
+#: F:\snapshot\revisionary/admin/history_rvy.php:1116
 msgid "Preview / Restore"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:1109
+#: F:\snapshot\revisionary/admin/history_rvy.php:1122
 msgid "Manage"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/history_rvy.php:1110
+#: F:\snapshot\revisionary/admin/history_rvy.php:1123
 msgid "List"
 msgstr ""
 
@@ -876,279 +893,301 @@ msgstr ""
 msgid "Email designated Publishers when a Scheduled Revision is published"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:136
-msgid "Email Editors and Administrators when a Pending Revision is submitted"
+#: F:\snapshot\revisionary/admin/options.php:135
+msgid "Email designated Publishers when a Pending Revision is approved"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/options.php:137
+msgid "Email Editors and Administrators when a Pending Revision is submitted"
+msgstr ""
+
+#: F:\snapshot\revisionary/admin/options.php:138
 msgid "Email Editors and Administrators when a Scheduled Revision is published"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:199
+#: F:\snapshot\revisionary/admin/options.php:139
+msgid "Email Editors and Administrators when a Pending Revision is approved"
+msgstr ""
+
+#: F:\snapshot\revisionary/admin/options.php:201
 msgid "PublishPress Revisions Site Settings"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:207
-#: F:\snapshot\revisionary/admin/options.php:773
+#: F:\snapshot\revisionary/admin/options.php:209
+#: F:\snapshot\revisionary/admin/options.php:778
 msgid "Update &raquo;"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:221
+#: F:\snapshot\revisionary/admin/options.php:223
 msgid "These are the <strong>default</strong> settings for options which can be adjusted per-site."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:258
+#: F:\snapshot\revisionary/admin/options.php:260
 #, php-format
 msgid "You can also specify %1$sdefaults for site-specific settings%2$s."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:259
+#: F:\snapshot\revisionary/admin/options.php:261
 #, php-format
 msgid "Use this tab to make <strong>NETWORK-WIDE</strong> changes to PublishPress Revisions settings. %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:261
+#: F:\snapshot\revisionary/admin/options.php:263
 msgid "Here you can change the default value for settings which are controlled separately on each site."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:275
+#: F:\snapshot\revisionary/admin/options.php:277
 #, php-format
 msgid "Note that %1$s network-wide settings%2$s may also be available."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:307
+#: F:\snapshot\revisionary/admin/options.php:309
 msgid "The user role \"Revisor\" role is now available. Include capabilities for all custom post types in this role?"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:312
+#: F:\snapshot\revisionary/admin/options.php:314
 msgid "If checked, users lacking site-wide publishing capabilities will also be checked for the edit_others_drafts capability"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:333
+#: F:\snapshot\revisionary/admin/options.php:335
 msgid "If a currently published post or page is edited and a future date set, the change will not be applied until the selected date."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:336
+#: F:\snapshot\revisionary/admin/options.php:338
 msgid "When a scheduled revision is published, also update the publish date."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:339
+#: F:\snapshot\revisionary/admin/options.php:341
 msgid "Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:357
+#: F:\snapshot\revisionary/admin/options.php:359
 #, php-format
 msgid "Enable Contributors to submit revisions to their own published content. Revisors and users who have the edit_others (but not edit_published) capability for the post type can submit revisions to other user's content. These Pending Revisions are listed in %sRevision Queue%s."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:363
+#: F:\snapshot\revisionary/admin/options.php:365
 msgid "When a pending revision is published, also update the publish date."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:387
+#: F:\snapshot\revisionary/admin/options.php:389
 msgid "Published Post Slug"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:387
+#: F:\snapshot\revisionary/admin/options.php:389
 msgid "Revision Slug"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:387
+#: F:\snapshot\revisionary/admin/options.php:389
 msgid "Revision ID only"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:398
+#: F:\snapshot\revisionary/admin/options.php:400
 msgid "Some themes or plugins may require Revision Slug or Revision ID link type for proper template loading and field display."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:407
+#: F:\snapshot\revisionary/admin/options.php:409
 msgid "If disabled, Compare screen links to Revision Preview for approval"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:427
+#: F:\snapshot\revisionary/admin/options.php:429
 #, php-format
 msgid "For compatibility with Advanced Custom Fields, Beaver Builder and WPML, upgrade to <a href=\"%s\" target=\"_blank\">PublishPress Revisions Pro</a>."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:436
+#: F:\snapshot\revisionary/admin/options.php:438
 msgid "This restriction applies to users who are not full editors for the post type. To enable a role, give it the edit_others_revisions capability."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:439
+#: F:\snapshot\revisionary/admin/options.php:441
 msgid "This restriction applies to users who are not full editors for the post type. To enable a role, give it the list_others_revisions capability."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:445
+#: F:\snapshot\revisionary/admin/options.php:447
 msgid "Show descriptive captions for PublishPress Revisions settings"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:462
-#: F:\snapshot\revisionary/admin/options.php:516
+#: F:\snapshot\revisionary/admin/options.php:464
+#: F:\snapshot\revisionary/admin/options.php:521
 msgid "select recipients"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:471
-#: F:\snapshot\revisionary/admin/options.php:489
+#: F:\snapshot\revisionary/admin/options.php:473
+#: F:\snapshot\revisionary/admin/options.php:491
 msgid "Never"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:471
-#: F:\snapshot\revisionary/admin/options.php:489
+#: F:\snapshot\revisionary/admin/options.php:473
+#: F:\snapshot\revisionary/admin/options.php:491
 msgid "By default"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:471
-#: F:\snapshot\revisionary/admin/options.php:489
+#: F:\snapshot\revisionary/admin/options.php:473
+#: F:\snapshot\revisionary/admin/options.php:491
 msgid "Always"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:533
+#: F:\snapshot\revisionary/admin/options.php:538
 msgid "Note: \"by default\" means Pending Revision creators can customize email notification recipients before submitting.  Eligibile \"Publisher\" email recipients are members of the Pending Revision Monitors group who <strong>also</strong> have the ability to publish the revision.  If not explicitly defined, the Monitors group is all users with a primary WP role of Administrator or Editor."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:535
+#: F:\snapshot\revisionary/admin/options.php:540
 #, php-format
 msgid "Note: \"by default\" means Pending Revision creators can customize email notification recipients before submitting.  For more flexibility in moderation and notification, install the %1$s PressPermit Pro%2$s plugin."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:543
+#: F:\snapshot\revisionary/admin/options.php:548
 msgid "To avoid notification failures, buffer emails for delayed sending once minute, hour or day limits are exceeded"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:558
+#: F:\snapshot\revisionary/admin/options.php:563
 msgid "Notification Buffer"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:586
+#: F:\snapshot\revisionary/admin/options.php:591
 msgid "Notification Log"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:615
+#: F:\snapshot\revisionary/admin/options.php:620
 msgid "Purge Notification Buffer"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:621
+#: F:\snapshot\revisionary/admin/options.php:626
 msgid "Truncate Notification Log"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:627
+#: F:\snapshot\revisionary/admin/options.php:632
 #, php-format
 msgid "Sent in last minute: %d / %d"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:628
+#: F:\snapshot\revisionary/admin/options.php:633
 #, php-format
 msgid "Sent in last hour: %d / %d"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:629
+#: F:\snapshot\revisionary/admin/options.php:634
 #, php-format
 msgid "Sent in last day: %d / %d"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:636
+#: F:\snapshot\revisionary/admin/options.php:641
 #, php-format
 msgid "Seconds until next buffer processing time: %d"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:645
+#: F:\snapshot\revisionary/admin/options.php:650
 msgid "Show Notification Log / Buffer"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:647
+#: F:\snapshot\revisionary/admin/options.php:652
 msgid "Show with message content"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:688
+#: F:\snapshot\revisionary/admin/options.php:693
 #, php-format
 msgid "network-wide control of \"%s\""
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:695
+#: F:\snapshot\revisionary/admin/options.php:700
 msgid "Specify which PublishPress Revisions Settings to control network-wide. Unselected settings are controlled separately on each site."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/options.php:777
-msgid "All settings in this form (including those on unselected tabs) will be reset to DEFAULTS.  Are you sure?"
+#: F:\snapshot\revisionary/admin/options.php:710
+#, php-format
+msgid "<span class=\"rs-h3text\">%1$s</span> (%2$s)"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/options.php:782
+msgid "All settings in this form (including those on unselected tabs) will be reset to DEFAULTS.  Are you sure?"
+msgstr ""
+
+#: F:\snapshot\revisionary/admin/options.php:787
 msgid "Revert to Defaults"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:38
-#: F:\snapshot\revisionary/admin/post-edit_rvy.php:198
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:42
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:92
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:245
 #: F:\snapshot\revisionary/admin/PostEditSubmitMetabox.php:172
 msgid "View / Publish"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:39
-#: F:\snapshot\revisionary/admin/post-edit_rvy.php:212
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:43
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:93
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:259
 #: F:\snapshot\revisionary/admin/PostEditSubmitMetabox.php:173
 msgid "View / moderate saved revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:42
-#: F:\snapshot\revisionary/admin/post-edit_rvy.php:214
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:46
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:96
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:261
 #: F:\snapshot\revisionary/admin/PostEditSubmitMetabox.php:176
 msgid "View saved revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:45
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:49
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:100
 msgid "View unsaved changes"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:49
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:53
 #, php-format
 msgid "<span class=\"dashicons dashicons-backup\"></span>&nbsp;%s Revision Edit"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:73
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:77
 msgid "Approve Revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:75
-#: F:\snapshot\revisionary/admin/post-edit_rvy.php:161
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:79
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:208
 msgid "Approve saved changes"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:96
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:101
 msgid "Update"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:101
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:106
 msgid "Do not schedule current changes yet, but save to Revision Queue"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:109
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:114
 #, php-format
 msgid "<span class=\"dashicons dashicons-edit\"></span>&nbsp;%s Pending Revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:120
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:125
 #, php-format
 msgid "<span class=\"dashicons dashicons-clock\"></span>&nbsp;%s Scheduled Revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:141
+#: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:146
 msgid "Workflow&hellip;"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit_rvy.php:75
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:34
+#, php-format
+msgid "Revision updated. %sView Preview%s"
+msgstr ""
+
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:105
 #, php-format
 msgid "Edit %s Revision"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit_rvy.php:171
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:218
 msgid "Compare this revision to published copy, or to other revisions"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit_rvy.php:253
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:300
 #, php-format
 msgid "%sScheduled Revisions: %s"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/post-edit_rvy.php:274
+#: F:\snapshot\revisionary/admin/post-edit_rvy.php:321
 #, php-format
 msgid "%sPending Revisions: %s"
 msgstr ""
@@ -1219,7 +1258,7 @@ msgid "M j, Y @ G:i"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/revision-action_rvy.php:135
-#: F:\snapshot\revisionary/admin/revision-action_rvy.php:198
+#: F:\snapshot\revisionary/admin/revision-action_rvy.php:219
 #, php-format
 msgid "[%s] Revision Approval Notice"
 msgstr ""
@@ -1235,56 +1274,56 @@ msgid "The submitter was %1$s."
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/revision-action_rvy.php:143
-#: F:\snapshot\revisionary/admin/revision-action_rvy.php:203
+#: F:\snapshot\revisionary/admin/revision-action_rvy.php:224
 #, php-format
 msgid "It will be published on %s"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/revision-action_rvy.php:147
-#: F:\snapshot\revisionary/admin/revision-action_rvy.php:207
+#: F:\snapshot\revisionary/admin/revision-action_rvy.php:228
 msgid "Preview it here: "
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/revision-action_rvy.php:149
-#: F:\snapshot\revisionary/admin/revision-action_rvy.php:209
+#: F:\snapshot\revisionary/admin/revision-action_rvy.php:230
 msgid "Editor: "
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/revision-action_rvy.php:151
-#: F:\snapshot\revisionary/admin/revision-action_rvy.php:211
-#: F:\snapshot\revisionary/admin/revision-action_rvy.php:794
-#: F:\snapshot\revisionary/admin/revision-action_rvy.php:819
-#: F:\snapshot\revisionary/admin/revision-action_rvy.php:854
+#: F:\snapshot\revisionary/admin/revision-action_rvy.php:232
+#: F:\snapshot\revisionary/admin/revision-action_rvy.php:833
+#: F:\snapshot\revisionary/admin/revision-action_rvy.php:858
+#: F:\snapshot\revisionary/admin/revision-action_rvy.php:893
 msgid "View it online: "
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/revision-action_rvy.php:199
+#: F:\snapshot\revisionary/admin/revision-action_rvy.php:220
 #, php-format
 msgid "The revision you submitted for the %1$s \"%2$s\" has been approved."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/revision-action_rvy.php:790
-#: F:\snapshot\revisionary/admin/revision-action_rvy.php:812
+#: F:\snapshot\revisionary/admin/revision-action_rvy.php:829
+#: F:\snapshot\revisionary/admin/revision-action_rvy.php:851
 #, php-format
 msgid "[%s] Scheduled Revision Publication Notice"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/revision-action_rvy.php:791
+#: F:\snapshot\revisionary/admin/revision-action_rvy.php:830
 #, php-format
 msgid "The scheduled revision you submitted for the %1$s \"%2$s\" has been published."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/revision-action_rvy.php:813
+#: F:\snapshot\revisionary/admin/revision-action_rvy.php:852
 #, php-format
 msgid "A scheduled revision to your %1$s \"%2$s\" has been published."
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/revision-action_rvy.php:846
+#: F:\snapshot\revisionary/admin/revision-action_rvy.php:885
 #, php-format
 msgid "[%s] Scheduled Revision Publication"
 msgstr ""
 
-#: F:\snapshot\revisionary/admin/revision-action_rvy.php:848
+#: F:\snapshot\revisionary/admin/revision-action_rvy.php:887
 #, php-format
 msgid "A scheduled revision to the %1$s \"%2$s\" has been published."
 msgstr ""
@@ -1355,6 +1394,10 @@ msgstr ""
 msgid "No email notifications will be sent."
 msgstr ""
 
+#: F:\snapshot\revisionary/admin/revision-ui_rvy.php:188
+msgid "j F, Y @ g:i a"
+msgstr ""
+
 #: F:\snapshot\revisionary/admin/revision-ui_rvy.php:207
 #, php-format
 msgid "%1$s (Current)"
@@ -1365,6 +1408,10 @@ msgstr ""
 msgid "%1$s (Autosave)"
 msgstr ""
 
+#: F:\snapshot\revisionary/admin/revision-ui_rvy.php:217
+msgid "j F, Y, g:i a"
+msgstr ""
+
 #: F:\snapshot\revisionary/admin/revision-ui_rvy.php:221
 #, php-format
 msgid "%1$s <span class=\"rvy-revision-pubish-date\">(Requested publication: %2$s)</span>"
@@ -1373,6 +1420,11 @@ msgstr ""
 #: F:\snapshot\revisionary/admin/revision-ui_rvy.php:223
 #, php-format
 msgid "%1$s <span class=\"rvy-revision-pubish-date\">(Publish date: %2$s)</span>"
+msgstr ""
+
+#: F:\snapshot\revisionary/admin/revision-ui_rvy.php:304
+#, php-format
+msgid "%1$s by %2$s"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/revision-ui_rvy.php:323
@@ -1390,10 +1442,6 @@ msgstr ""
 
 #: F:\snapshot\revisionary/admin/revision-ui_rvy.php:495
 msgid "Modified Date"
-msgstr ""
-
-#: F:\snapshot\revisionary/admin/revision-ui_rvy.php:498
-msgid "Author"
 msgstr ""
 
 #: F:\snapshot\revisionary/admin/revision-ui_rvy.php:499

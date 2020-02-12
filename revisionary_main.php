@@ -20,7 +20,9 @@ class Revisionary
 	var $impose_pending_rev = [];
 	var $save_future_rev = [];
 	var $last_autosave_id = [];
-	var $enabled_post_types = [];
+
+	var $config_loaded = false;		// configuration related to post types and statuses must be loaded late on the init action
+	var $enabled_post_types = [];	// enabled_post_types property is set (keyed by post type slug) late on the init action. 
 
 	// minimal config retrieval to support pre-init usage by WP_Scoped_User before text domain is loaded
 	function __construct() {
@@ -42,7 +44,8 @@ class Revisionary
 							$type_obj = get_post_type_object($parent_post->post_type);
 
 							if ($type_obj && (
-								empty($current_user->allcaps[$type_obj->cap->edit_published_posts]) 
+								!isset($type_obj->cap->edit_published_posts)
+								|| empty($current_user->allcaps[$type_obj->cap->edit_published_posts]) 
 								|| (($current_user->ID != $parent_post->ID) && empty($current_user->allcaps[$type_obj->cap->edit_published_posts]))
 							)) {
 								return;
@@ -54,8 +57,6 @@ class Revisionary
 		}
 
 		rvy_refresh_options_sitewide();
-
-		$this->enabled_post_types = apply_filters('revisionary_enabled_post_types', array_fill_keys(get_post_types(['public' => true]), true));
 
 		// NOTE: $_GET['preview'] and $_GET['post_type'] arguments are set by rvy_init() at response to ?p= request when the requested post is a revision.
 		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && ((!empty($_GET['preview']) && empty($_REQUEST['preview_id'])) || !empty($_GET['mark_current_revision']))) { // preview_id indicates a regular preview via WP core, based on autosave revision
@@ -143,6 +144,11 @@ class Revisionary
 		do_action( 'rvy_init', $this );
 	}
 	
+	function configurationLateInit() {
+		$this->enabled_post_types = apply_filters('revisionary_enabled_post_types', array_fill_keys(get_post_types(['public' => true]), true));
+		$this->config_loaded = true;
+	}
+
 	function fltEditRevisionUpdatedLink($permalink, $post, $leavename) {
 		static $busy = false;
 
@@ -188,7 +194,7 @@ class Revisionary
 	function fltPressPermitExceptionClause($clause, $required_operation, $post_type, $args) {
 		//"$src_table.ID $logic ('" . implode("','", $ids) . "')",
 
-		if (empty($this->enabled_post_types[$post_type])) {
+		if (empty($this->enabled_post_types[$post_type]) && $this->config_loaded) {
 			return $clause;
 		}
 
@@ -367,15 +373,14 @@ class Revisionary
 		update_post_meta( $post_id, '_wp_page_template', $template );
 	}
 
-	private function handle_featured_media( $featured_media, $post_id ) {
-
+	public function handle_featured_media( $featured_media, $post_id ) {
 		$featured_media = (int) $featured_media;
 		if ( $featured_media ) {
 			$result = set_post_thumbnail( $post_id, $featured_media );
 			if ( $result ) {
 				return true;
 			} else {
-				return new WP_Error( 'rest_invalid_featured_media', __( 'Invalid featured media ID.' ), array( 'status' => 400 ) );
+				return new WP_Error( 'rest_invalid_featured_media', __( 'Invalid featured media ID.', 'revisionary' ), array( 'status' => 400 ) );
 			}
 		} else {
 			return delete_post_thumbnail( $post_id );
@@ -420,9 +425,13 @@ class Revisionary
 			if ( ('revision' != $post->post_type) && ! rvy_is_revision_status($post->post_status) ) {
 				$status_obj = get_post_status_object( $post->post_status );
 
+				if (!apply_filters('revisionary_require_edit_others_drafts', true, $post->post_type, $post->post_status, $args)) {
+					return $caps;
+				}
+
 				if (!rvy_is_post_author($post) && $status_obj && ! $status_obj->public && ! $status_obj->private) {
 					$post_type_obj = get_post_type_object( $post->post_type );
-					if ( agp_user_can( $post_type_obj->cap->edit_published_posts, 0, '', array('skip_revision_allowance' => true) ) ) {	// don't require any additional caps for sitewide Editors
+					if (isset($post_type_obj->cap->edit_published_posts) && agp_user_can( $post_type_obj->cap->edit_published_posts, 0, '', array('skip_revision_allowance' => true) ) ) {	// don't require any additional caps for sitewide Editors
 						return $caps;
 					}
 				
@@ -514,7 +523,7 @@ class Revisionary
 				return $caps;
 			}
 
-			if (empty($this->enabled_post_types[$post->post_type])) {
+			if (empty($this->enabled_post_types[$post->post_type]) && $this->config_loaded) {
 				return $caps;
 			}
 		}
@@ -527,8 +536,12 @@ class Revisionary
 			// allow Revisor to view a preview of their scheduled revision
 			if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST) || empty($_REQUEST['preview']) || !empty($_POST) || did_action('template_redirect')) {
 				if ($type_obj = get_post_type_object( $post->post_type )) {
+					if (isset($type_obj->cap->edit_published_posts)) {
 					$check_cap = in_array($cap, ['delete_post', 'delete_page']) ? $type_obj->cap->delete_published_posts : $type_obj->cap->edit_published_posts;
-					return array_merge($caps, [$check_cap => true]);  // @todo: review this
+					return array_merge($caps, [$check_cap]);
+					} else {
+						return $caps;
+					}
 				}
 			}
 		}
@@ -641,7 +654,7 @@ class Revisionary
 			$object_type = rvy_detect_post_type();
 		}
 
-		if (empty($this->enabled_post_types[$object_type])) {
+		if (empty($this->enabled_post_types[$object_type]) && $this->config_loaded) {
 			return $wp_blogcaps;
 		}
 
@@ -743,6 +756,24 @@ class Revisionary
 				$wp_blogcaps['edit_others_posts'] = true;
 		}
 
+		if (!empty($args[0]) && ('edit_post' == $args[0]) && !defined('REVISIONARY_DISABLE_REVISION_CAP_WORKAROUND') && array_diff($reqd_caps, array_keys(array_filter($wp_blogcaps)))) {
+			// If checking capability for a revision, also grant permission if user has capability for published post
+			$published_id = rvy_post_id($args[2]);
+			if ($published_id && ($published_id != $args[2])) {
+				remove_filter('map_meta_cap', array($this, 'flt_post_map_meta_cap'), 5, 4);
+				remove_filter('user_has_cap', array($this, 'flt_user_has_cap' ), 98, 3);
+				remove_filter('map_meta_cap', array($this, 'flt_limit_others_drafts' ), 10, 4);
+
+				if (current_user_can('edit_post', $args[2])) {
+					$wp_blogcaps = array_merge($wp_blogcaps, array_fill_keys($reqd_caps, true));
+				}
+
+				add_filter('map_meta_cap', array($this, 'flt_post_map_meta_cap'), 5, 4);
+				add_filter('user_has_cap', array($this, 'flt_user_has_cap' ), 98, 3);
+				add_filter('map_meta_cap', array($this, 'flt_limit_others_drafts' ), 10, 4);
+			}
+		}
+
 		// TODO: possible need to redirect revision cap check to published parent post/page ( RS cap-interceptor "maybe_revision" )
 		return $wp_blogcaps;			
 	}
@@ -797,6 +828,13 @@ class Revisionary
 	}
 
 	function flt_create_scheduled_rev( $data, $post_arr ) {
+		global $current_user;
+
+		// If Administrator opted to save as a pending revision, don't apply revision scheduling scripts
+		if (get_post_meta($post_arr['ID'], "_save_as_revision_{$current_user->ID}")) {
+			return $data;
+		}
+
 		require_once( dirname(__FILE__).'/revision-creation_rvy.php' );
 		$rvy_creation = new PublishPress\Revisions\RevisionCreation(['revisionary' => $this]);
 		return $rvy_creation->flt_create_scheduled_rev( $data, $post_arr );

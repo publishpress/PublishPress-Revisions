@@ -51,51 +51,7 @@ class Rvy_Revision_Workflow_UI {
 
             if ( $admin_notify ) {
                 // establish the publisher recipients
-                
-                if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') ) {
-                    $monitor_groups_enabled = true;
-                    $revisionary->content_roles->ensure_init();
-                    
-                    $recipient_ids = $revisionary->content_roles->get_metagroup_members( 'Pending Revision Monitors' );
-                    
-                    if ( $type_obj ) {
-                        $revisionary->skip_revision_allowance = true;
-                        $post_publisher_ids = $revisionary->content_roles->users_who_can( $type_obj->cap->edit_post, $published_post->ID, array( 'cols' => 'id', 'user_ids' => $recipient_ids ) );
-                        $revisionary->skip_revision_allowance = false;
-                        $recipient_ids = array_intersect( $recipient_ids, $post_publisher_ids );
-                    }
-
-                    $monitor_ids = $recipient_ids;
-                }
-
-                if ( ! $recipient_ids && ( empty($monitor_groups_enabled) || ! defined('RVY_FORCE_MONITOR_GROUPS') ) ) {
-                    require_once(ABSPATH . 'wp-admin/includes/user.php');
-                    
-                    if ( defined( 'SCOPER_MONITOR_ROLES' ) ) {
-                        $use_wp_roles = SCOPER_MONITOR_ROLES;
-                    } else {
-                        $use_wp_roles = ( defined( 'RVY_MONITOR_ROLES' ) ) ? RVY_MONITOR_ROLES : 'administrator,editor';
-                    }
-
-                    $use_wp_roles = str_replace( ' ', '', $use_wp_roles );
-                    $use_wp_roles = explode( ',', $use_wp_roles );
-                    
-                    foreach ( $use_wp_roles as $role_name ) {
-                        $search = new WP_User_Query( "search=&fields=id&role=$role_name" );
-                        $recipient_ids = array_merge( $recipient_ids, $search->results );
-                    }
-                    
-                    if ( $recipient_ids && $type_obj ) {
-                        foreach( $recipient_ids as $key => $user_id ) {
-                            $_user = new WP_User($user_id);
-                            $reqd_caps = map_meta_cap( $type_obj->cap->edit_post, $user_id, $published_post->ID );
-                            
-                            if ( array_diff( $reqd_caps, array_keys( array_intersect( $_user->allcaps, array( true, 1, '1' ) ) ) ) ) {
-                                unset( $recipient_ids[$key] );
-                            }
-                        }
-                    }
-                }
+                $recipient_ids = self::getRecipients('rev_submission_notify_admin', compact('type_obj', 'published_post'));
                 
                 if ( ( 'always' != $admin_notify ) && $selected_recipients ) {
                     // intersect default recipients with selected recipients
@@ -143,9 +99,9 @@ class Rvy_Revision_Workflow_UI {
             }
 
             foreach ( $to_addresses as $user_id => $address ) {
-                if (!empty($author_ids && in_array($user_id, $author_ids))) {
+                if (!empty($author_ids) && in_array($user_id, $author_ids)) {
                     $notification_class = 'rev_submission_notify_author';
-                } elseif (!empty($monitor_ids && in_array($user_id, $monitor_ids))) {
+                } elseif (!empty($monitor_ids) && in_array($user_id, $monitor_ids)) {
                     $notification_class = 'rev_submission_notify_monitor';
                 } else {
                     $notification_class = 'rev_submission_notify_admin';
@@ -284,4 +240,74 @@ class Rvy_Revision_Workflow_UI {
 		
 		return $arr;
 	}
+    
+    static function getRecipients($notification_class, $args) {
+        $defaults = ['type_obj' => false, 'published_post' => false];
+        foreach(array_keys($defaults) as $key) {
+            if (!empty($args[$key])) {
+                $$key = $args[$key];
+            } else {
+                return [];
+            }
+        }
+
+        $recipient_ids = [];
+
+        switch ($notification_class) {
+            case 'rev_submission_notify_admin' :
+            case 'rev_approval_notify_admin' :
+
+                if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') ) {
+                    global $revisionary;
+                    
+                    $monitor_groups_enabled = true;
+                    $revisionary->content_roles->ensure_init();
+                    
+                    $recipient_ids = $revisionary->content_roles->get_metagroup_members( 'Pending Revision Monitors' );
+                    
+                    if ( $type_obj ) {
+                        $revisionary->skip_revision_allowance = true;
+                        $post_publisher_ids = $revisionary->content_roles->users_who_can( $type_obj->cap->edit_post, $published_post->ID, array( 'cols' => 'id', 'user_ids' => $recipient_ids ) );
+                        $revisionary->skip_revision_allowance = false;
+                        $recipient_ids = array_intersect( $recipient_ids, $post_publisher_ids );
+                    }
+
+                    $monitor_ids = $recipient_ids;
+                }
+
+                if (!$recipient_ids && (empty($monitor_groups_enabled) || ! defined('RVY_FORCE_MONITOR_GROUPS'))) {
+                    require_once(ABSPATH . 'wp-admin/includes/user.php');
+                    
+                    if ( defined( 'SCOPER_MONITOR_ROLES' ) ) {
+                        $use_wp_roles = SCOPER_MONITOR_ROLES;
+                    } else {
+                        $use_wp_roles = ( defined( 'RVY_MONITOR_ROLES' ) ) ? RVY_MONITOR_ROLES : 'administrator,editor';
+                    }
+
+                    $use_wp_roles = str_replace( ' ', '', $use_wp_roles );
+                    $use_wp_roles = explode( ',', $use_wp_roles );
+                    
+                    foreach ( $use_wp_roles as $role_name ) {
+                        $search = new WP_User_Query( "search=&fields=id&role=$role_name" );
+                        $recipient_ids = array_merge( $recipient_ids, $search->results );
+                    }
+
+                    if ( $recipient_ids && $type_obj ) {
+                        foreach( $recipient_ids as $key => $user_id ) {
+                            $_user = new WP_User($user_id);
+                            $reqd_caps = map_meta_cap( $type_obj->cap->edit_post, $user_id, $published_post->ID );
+                            
+                            if ( array_diff( $reqd_caps, array_keys( array_intersect( $_user->allcaps, array( true, 1, '1' ) ) ) ) ) {
+                                unset( $recipient_ids[$key] );
+                            }
+                        }
+                    }
+                }
+
+                break;
+            default:
+        } // end switch notification_class
+
+        return $recipient_ids;
+    }
 }

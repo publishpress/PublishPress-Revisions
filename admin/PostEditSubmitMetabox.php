@@ -62,7 +62,7 @@ class RvyPostEditSubmitMetabox
                             $revisions_caption = (rvy_is_revision_status($post->post_status)) ? __('Revision Edits: %s', 'revisionary') : __('Revisions: %s');
 
                             if ($revisions_to_keep > 0 && $revisions_to_keep <= $args['args']['revisions_count']) {
-                                echo '<span title="' . esc_attr(sprintf(__('Your site is configured to keep only the last %s revisions.'),
+                                echo '<span title="' . esc_attr(sprintf(__('Your site is configured to keep only the last %s revisions.', 'revisionary'),
                                         number_format_i18n($revisions_to_keep))) . '">';
                                 printf($revisions_caption, '<b>' . number_format_i18n($args['args']['revisions_count']) . '+</b>');
                                 echo '</span>';
@@ -71,7 +71,7 @@ class RvyPostEditSubmitMetabox
                             }
                             ?>
                             <a class="hide-if-no-js"
-                               href="<?php echo esc_url(admin_url("revision.php?revision={$args['args']['revision_id']}")); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions'); ?></a>
+                               href="<?php echo esc_url(admin_url("revision.php?revision={$args['args']['revision_id']}")); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions', 'revisionary'); ?></a>
                         </div>
                     <?php
                     endif;
@@ -169,7 +169,7 @@ class RvyPostEditSubmitMetabox
             $type_obj = get_post_type_object($post->post_type);
             $can_publish = $type_obj && agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
             if ($can_publish) {
-                $preview_button = ('future-revision' == $post->post_status) ? __('View / Publish') : __('View / Approve');
+                $preview_button = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
                 $preview_title = __('View / moderate saved revision', 'revisionary');
             } else {
                 $preview_button = __('View');
@@ -337,23 +337,23 @@ class RvyPostEditSubmitMetabox
         <span id="timestamp">
         <?php
         // translators: Publish box date formt, see http://php.net/date
-        $datef =__('M j, Y @ G:i');
+        $datef =__('M j, Y @ G:i', 'revisionary');
 
         if (0 != $post->ID) {
             $published_stati = get_post_stati(['public' => true, 'private' => true], 'names', 'or');
 
             if ('future' == $post_status_obj->name) { // scheduled for publishing at a future date
-                $stamp =__('Scheduled for: <b>%1$s</b>');
+                $stamp =__('Scheduled for: %s');
             } elseif (in_array($post_status_obj->name, $published_stati)) { // already published
-                $stamp =__('Published on: <b>%1$s</b>');
+                $stamp =__('Published on: %s');
             } elseif ('0000-00-00 00:00:00' == $post->post_date_gmt) { // draft, 1 or more saves, no date specified
                 $stamp =__('Publish <b>immediately</b>');
             } elseif (time() < strtotime($post->post_date_gmt . ' +0000')) { // draft, 1 or more saves, future date specified
-                $stamp =__('Schedule for: <b>%1$s</b>');
+                $stamp =__('Schedule for: %s');
             } else { // draft, 1 or more saves, date specified
-                $stamp =__('Publish on: <b>%1$s</b>');
+                $stamp =__('Publish on: %s');
             }
-            $date = date_i18n($datef, strtotime($post->post_date));
+            $date = '<b>' . date_i18n($datef, strtotime($post->post_date)) . '</b>';
         } else { // draft (no saves, and thus no date specified)
             $stamp =__('Publish <b>immediately</b>');
             $date = date_i18n($datef, strtotime(current_time('mysql')));
