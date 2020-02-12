@@ -534,7 +534,9 @@ function rvy_mail( $address, $title, $message, $args ) {
 
 	$new_msg = array_merge(compact('address', 'title', 'message'), ['time' => strtotime(current_time( 'mysql' )), 'time_gmt' => time()], $args);
 
-	$buffer_status = rvy_mail_check_buffer($new_msg);
+	if (!$buffer_status = rvy_mail_check_buffer($new_msg)) {
+		$buffer_status = (object)[];
+	}
 
 	if (!empty($buffer_status->new_msg_buffered)) {
 		return;
@@ -547,6 +549,10 @@ function rvy_mail( $address, $title, $message, $args ) {
 
 	if ($success || !defined('REVISIONARY_MAIL_RETRY')) {
 		if (!defined('REVISIONARY_DISABLE_MAIL_LOG')) {
+			if (!isset($buffer_status->sent_mail)) {
+				$buffer_status->sent_mail = [];
+			}
+
 			$buffer_status->sent_mail[]= $new_msg;
 			update_option('revisionary_sent_mail', $buffer_status->sent_mail);
 		}
