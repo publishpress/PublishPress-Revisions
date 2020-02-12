@@ -691,9 +691,19 @@ class RevisionaryHistory
                     continue;
                 }
             
-			} elseif(('_requested_slug' == $field) && !$content_from) {
-                if ($parent_post = get_post($published_id)) {
-                    $content_from = $parent_post->post_name;
+            } elseif(('_requested_slug' == $field)) {
+                if ($content_to && !rvy_is_revision_status($compare_to->post_status)) {
+                    $content_to = '';
+                }
+
+                if ($content_from && !rvy_is_revision_status($compare_from->post_status)) {
+                    $content_from = '';
+                }
+                
+                if ($content_to && !$content_from) {
+                    if ($parent_post = get_post($published_id)) {
+                        $content_from = $parent_post->post_name;
+                    }
                 }
             }
 
