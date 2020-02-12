@@ -99,9 +99,9 @@ class Rvy_Revision_Workflow_UI {
             }
 
             foreach ( $to_addresses as $user_id => $address ) {
-                if (!empty($author_ids && in_array($user_id, $author_ids))) {
+                if (!empty($author_ids) && in_array($user_id, $author_ids)) {
                     $notification_class = 'rev_submission_notify_author';
-                } elseif (!empty($monitor_ids && in_array($user_id, $monitor_ids))) {
+                } elseif (!empty($monitor_ids) && in_array($user_id, $monitor_ids)) {
                     $notification_class = 'rev_submission_notify_monitor';
                 } else {
                     $notification_class = 'rev_submission_notify_admin';
