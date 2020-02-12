@@ -557,6 +557,7 @@ class RevisionCreation {
 		}
 	
 		// New-style support for all custom taxonomies.
+		$set_taxonomies = [];
 		if ( ! empty( $postarr['tax_input'] ) ) {
 			foreach ( $postarr['tax_input'] as $taxonomy => $tags ) {
 				$taxonomy_obj = get_taxonomy( $taxonomy );
@@ -570,8 +571,19 @@ class RevisionCreation {
 				if ( is_array( $tags ) ) {
 					$tags = array_filter( $tags );
 				}
+			
 				if ( current_user_can( $taxonomy_obj->cap->assign_terms ) ) {
 					wp_set_post_terms( $post_ID, $tags, $taxonomy );
+					$set_taxonomies[$taxonomy] = true;
+				}
+			}
+		}
+
+		// If term selections are not posted for revision, store current published terms
+		foreach(get_taxonomies(['public' => true]) as $taxonomy) {
+			if (empty($set_taxonomies[$taxonomy])) {
+				if ($published_terms = wp_get_object_terms($published_post_id, $taxonomy, ['fields' => 'ids'])) {
+					wp_set_object_terms( $post_ID, $published_terms, $taxonomy );
 				}
 			}
 		}
