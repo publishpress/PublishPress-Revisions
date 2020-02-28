@@ -220,7 +220,20 @@ class RevisionCreation {
                 $data['post_date'] = date( 'Y-m-d H:i:00', strtotime( $data['post_date'] ) );
             }
 
-            $data = wp_unslash( $data );
+			$emoji_fields = array( 'post_title', 'post_content', 'post_excerpt' );
+
+			foreach ( $emoji_fields as $emoji_field ) {
+				if ( isset( $data[ $emoji_field ] ) ) {
+					$charset = $wpdb->get_col_charset( $wpdb->posts, $emoji_field );
+					if ( 'utf8' === $charset ) {
+						$data[ $emoji_field ] = wp_encode_emoji( $data[ $emoji_field ] );
+					}
+				}
+			}
+
+			if (defined('RVY_REVISION_CREATION_DO_UNSLASH')) {
+            	$data = wp_unslash( $data );
+			}
 
             $revision_id = $this->create_revision($data, $postarr);
             if (!is_scalar($revision_id)) { // update_post_data() returns array or object on update abandon / failure
