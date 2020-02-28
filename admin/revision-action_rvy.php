@@ -522,6 +522,30 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 	}
 
+	if (rvy_get_option('trigger_post_update_actions')) {
+		global $revisionary;
+
+		if (!defined('RVY_NO_TRANSITION_STATUS_ACTION')) {
+			$old_status = (defined('RVY_TRANSITION_ACTION_USE_REVISION_STATUS')) ? $revision->post_status : 'pending';
+			do_action('transition_post_status', $published->post_status, $old_status, $published);
+		}
+
+		if (!defined('RVY_NO_SAVE_POST_ACTION')) {
+			remove_action('save_post', array($revisionary, 'actSavePost'), 20, 2);
+
+			if (function_exists('presspermit')) {
+				presspermit()->flags['ignore_save_post'] = true;
+			}
+
+			$_published = get_post($published->ID);
+			do_action('save_post', $published->ID, $_published, true);
+
+			if (function_exists('presspermit')) {
+				unset(presspermit()->flags['ignore_save_post']);
+			}
+		}
+	}
+
 	rvy_delete_past_revisions($revision_id);
 
 	return $revision;
