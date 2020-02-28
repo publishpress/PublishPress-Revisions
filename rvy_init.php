@@ -551,13 +551,7 @@ function rvy_mail( $address, $title, $message, $args ) {
 	 * 	 - If sending, add current timestamp to wp_option array revisionary_sent_mail
 	 */
 
-	$send = apply_filters('revisionary_mail', compact('address', 'title', 'message'), $args);
-
-	if (empty($send['address'])) {
-		return;
-	}
-
-	$new_msg = array_merge($send, ['time' => strtotime(current_time( 'mysql' )), 'time_gmt' => time()], $args);
+	$new_msg = array_merge(compact('address', 'title', 'message'), ['time' => strtotime(current_time( 'mysql' )), 'time_gmt' => time()], $args);
 
 	if (!$buffer_status = rvy_mail_check_buffer($new_msg)) {
 		$buffer_status = (object)[];
