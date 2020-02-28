@@ -812,21 +812,24 @@ function rvy_init() {
 		
 			// If a previously requested asynchronous request was ineffective, perform the actions now
 			// (this is not executed if the current URI is from a manual publication request with action=publish_scheduled_revisions)
-			$requested_actions = get_option( 'requested_remote_actions_rvy' );
-			if ( is_array( $requested_actions) && ! empty($requested_actions) ) {
-				if ( ! empty($requested_actions['publish_scheduled_revisions']) ) {
-					require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
-					rvy_publish_scheduled_revisions();
-					unset( $requested_actions['publish_scheduled_revisions'] );
+			if (defined('RVY_SCHEDULED_PUBLISH_FALLBACK')) {
+				$requested_actions = get_option( 'requested_remote_actions_rvy' );
+				if ( is_array( $requested_actions) && ! empty($requested_actions) ) {
+					if ( ! empty($requested_actions['publish_scheduled_revisions']) ) {
+						require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
+						rvy_publish_scheduled_revisions();
+						unset( $requested_actions['publish_scheduled_revisions'] );
+					}
+		
+					update_option( 'requested_remote_actions_rvy', $requested_actions );
 				}
-	
-				update_option( 'requested_remote_actions_rvy', $requested_actions );
 			}
 			
 			$next_publish = get_option( 'rvy_next_rev_publish_gmt' );
 			
 			// automatically publish any scheduled revisions whose time has come
 			if ( ! $next_publish || ( agp_time_gmt() >= strtotime( $next_publish ) ) ) {
+				update_option('rvy_next_rev_publish_gmt', '2035-01-01 00:00:00');
 
 				if ( ini_get( 'allow_url_fopen' ) && rvy_get_option('async_scheduled_publish') ) {
 					// asynchronous secondary site call to avoid delays // TODO: pass site key here
