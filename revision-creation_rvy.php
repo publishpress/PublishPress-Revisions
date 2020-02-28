@@ -266,6 +266,15 @@ class RevisionCreation {
             rvy_halt( $msg, __('Revision Submission Error', 'revisionary') );
         }
 
+		// Prevent unintended clearance of Page Template on revision submission
+		if ($revisionary->isBlockEditorActive()) {
+			if ($published_template = get_post_meta($published_post->ID, '_wp_page_template', true)) {
+				if (!get_post_meta($revision_id, '_wp_page_template', true)) {
+					update_post_meta($revision_id, '_wp_page_template', $published_template);
+				}
+			}
+		}
+
         if (!$revisionary->doing_rest) {
             $_POST['ID'] = $revision_id;
             $_REQUEST['ID'] = $revision_id;
