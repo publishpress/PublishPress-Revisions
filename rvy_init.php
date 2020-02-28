@@ -517,6 +517,25 @@ function rvy_error( $err_slug, $arg2 = '' ) {
 	$rvy_err->error_notice( $err_slug );
 }
 
+function rvy_check_duplicate_mail($new_msg, $sent_mail, $buffer) {
+	// $new_msg = array_merge(compact('address', 'title', 'message'), ['time' => strtotime(current_time( 'mysql' )), 'time_gmt' => time()], $args);
+
+	foreach([$sent_mail, $buffer] as $compare_set) {
+		foreach($compare_set as $sent) {
+			foreach(['address', 'title', 'message'] as $field) {
+				if ($new_msg[$field] != $sent[$field]) {
+					continue 2;
+				}
+			}
+
+			// If an identical message was sent or queued to the same recipient less than 2 seconds ago, don't send another
+			if (abs($new_msg['time_gmt'] - $sent['time_gmt']) <= 1) {
+				return true;
+			}
+		}
+	}
+}
+
 function rvy_mail( $address, $title, $message, $args ) {
 	// args: ['revision_id' => $revision_id, 'post_id' => $published_post->ID, 'notification_type' => $notification_type, 'notification_class' => $notification_class]
 
@@ -539,6 +558,12 @@ function rvy_mail( $address, $title, $message, $args ) {
 	}
 
 	if (!empty($buffer_status->new_msg_buffered)) {
+		return;
+	}
+
+	$sent_mail = (!empty($buffer_status->sent_mail)) ? $buffer_status->sent_mail : [];
+	$buffer = (!empty($buffer_status->buffer)) ? $buffer_status->buffer : [];
+	if (rvy_check_duplicate_mail($new_msg, $sent_mail, $buffer)) {
 		return;
 	}
 
