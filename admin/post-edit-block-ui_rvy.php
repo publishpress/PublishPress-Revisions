@@ -65,6 +65,8 @@ class RVY_PostBlockEditUI {
                 } elseif (in_array($post->post_status, ['future-revision'])) {
                     $approval_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|{$post->ID}" );
                 }
+
+                $deletion_url = get_delete_post_link($post->ID, '', false);
             }
 
             $args = array(
@@ -76,6 +78,7 @@ class RVY_PostBlockEditUI {
                 'revisionEdits' => $revisions_caption,
                 'approvalCaption' => $can_publish ? __('Approve Revision', 'revisionary') : '',
                 'approvalURL' => $can_publish ? $approval_url : '',
+                'deletionURL' => $can_publish ? $deletion_url : '',
                 'approvalTitle' => esc_attr(__('Approve saved changes', 'revisionary')),
                 'scheduledRevisionsEnabled' => $do_scheduled_revisions,
             );
