@@ -212,7 +212,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$post_id_csv = "'" . implode("','", $this->published_post_ids) . "'";
 		}
 
-		$own_revision_clause = (empty($_REQUEST['post_author']) || !empty($args['status_count']))
+		$own_revision_clause = (empty($_REQUEST['post_author']) || !empty($args['status_count'])) && empty($_REQUEST['published_post'])
 		? "OR ($p.post_status = 'pending-revision' AND $p.post_author = '$current_user->ID')" 
 		: '';
 
