@@ -694,6 +694,9 @@ class RevisionCreation {
 			return $data;
 		}
 
+		$data['ID'] = $revision_id;
+		do_action('revisionary_create_revision', $data);
+
 		return (int) $revision_id; // only return array in calling function should return
 	}
 }
