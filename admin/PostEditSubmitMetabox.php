@@ -51,7 +51,7 @@ class RvyPostEditSubmitMetabox
                         <?php self::post_visibility_display($post, $_args); ?>
                     </div>
 
-                    <?php do_action('post_submitbox_misc_sections'); ?>
+                    <?php do_action('post_submitbox_misc_sections', $post); ?>
 
                     <?php
                     if (!empty($args['args']['revisions_count'])) :
@@ -87,14 +87,14 @@ class RvyPostEditSubmitMetabox
 
                     <?php /* see RvyPostEdit::actSubmitMetaboxActions() */  ?>
 
-                    <?php do_action('post_submitbox_misc_actions'); ?>
+                    <?php do_action('post_submitbox_misc_actions', $post); ?>
                 </div> <?php // misc-publishing-actions ?>
 
                 <div class="clear"></div>
             </div> <?php // minor-publishing ?>
 
             <div id="major-publishing-actions">
-                <?php do_action('post_submitbox_start'); ?>
+                <?php do_action('post_submitbox_start', $post); ?>
 
                 <div id="delete-action">
                     <?php // PP: no change from WP core
