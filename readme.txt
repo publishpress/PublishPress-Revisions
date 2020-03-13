@@ -102,6 +102,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 = 2.2.1-rc =
 * Fixed : Page Template was cleared on revision submission in some installations
+* Fixed : Revision Queue - "Filter" link was ineffective in showing only revisions of the selected published post. This also applies to "View Revision Queue" link after revision creation.
 * Fixed : Edit Revision - Move to Trash button did not work (and created new pending revision)
 * Fixed : Duplicate email notifications for scheduled revision publication on some installations
 * Fixed : Safeguard to prevent duplicate email notifications
