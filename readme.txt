@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.3
-Stable tag: 2.2
+Stable tag: 2.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -100,7 +100,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
-= 2.2.1-rc =
+= 2.2.1 - 16 Mar 2020 =
 * Fixed : Page Template was cleared on revision submission in some installations
 * Fixed : Revision Queue - "Filter" link was ineffective in showing only revisions of the selected published post. This also applies to "View Revision Queue" link after revision creation.
 * Fixed : Edit Revision - Move to Trash button did not work (and created new pending revision)
