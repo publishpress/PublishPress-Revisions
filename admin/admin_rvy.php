@@ -627,7 +627,7 @@ class RevisionaryAdmin
             __('Upgrade to Pro', 'revisionary'), 
             __('Upgrade to Pro', 'revisionary'), 
             'read', 
-            'revisionary-q', 
+            'revisionary-pro', 
             'rvy_omit_site_options'
         );
 	}

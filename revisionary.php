@@ -184,11 +184,6 @@ add_action(
 		define( 'IS_MU_RVY', awp_is_mu() );
 		// -------------------------------------------
 
-		if (is_admin() && !defined('REVISIONARY_PRO_VERSION')) {
-			require_once(__DIR__ . '/includes/CoreAdmin.php');
-			new \PublishPress\Revisions\CoreAdmin();
-		}
-
 		require_once( dirname(__FILE__).'/content-roles_rvy.php');
 
 		if ( is_admin() || defined('XMLRPC_REQUEST') ) {
@@ -218,6 +213,11 @@ add_action(
 			define( 'WP_CONTENT_DIR', str_replace('\\', '/', ABSPATH) . 'wp-content' );
 
 		define ('RVY_ABSPATH', WP_CONTENT_DIR . '/plugins/' . RVY_FOLDER);
+
+		if (is_admin() && !defined('REVISIONARY_PRO_VERSION')) {
+			require_once(__DIR__ . '/includes/CoreAdmin.php');
+			new \PublishPress\Revisions\CoreAdmin();
+		}
 
 		require_once( dirname(__FILE__).'/defaults_rvy.php');
 
