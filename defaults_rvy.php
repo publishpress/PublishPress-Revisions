@@ -37,6 +37,7 @@ function rvy_default_options_sitewide() {
 		'preview_link_type' => true,
 		'compare_revisions_direct_approval' => true,
 		'display_pp_branding' => true,
+		'trigger_post_update_actions' => true,
 	);
 
 	if ( $other_options = array_diff_key( rvy_default_options(), $def ) ) {
@@ -73,6 +74,7 @@ function rvy_default_options() {
 		'preview_link_type' => 'published_slug',
 		'compare_revisions_direct_approval' => 0,
 		'display_pp_branding' => 1,
+		'trigger_post_update_actions' => 0,
 	);
 
 	return $def;

@@ -517,6 +517,25 @@ function rvy_error( $err_slug, $arg2 = '' ) {
 	$rvy_err->error_notice( $err_slug );
 }
 
+function rvy_check_duplicate_mail($new_msg, $sent_mail, $buffer) {
+	// $new_msg = array_merge(compact('address', 'title', 'message'), ['time' => strtotime(current_time( 'mysql' )), 'time_gmt' => time()], $args);
+
+	foreach([$sent_mail, $buffer] as $compare_set) {
+		foreach($compare_set as $sent) {
+			foreach(['address', 'title', 'message'] as $field) {
+				if ($new_msg[$field] != $sent[$field]) {
+					continue 2;
+				}
+			}
+
+			// If an identical message was sent or queued to the same recipient less than 2 seconds ago, don't send another
+			if (abs($new_msg['time_gmt'] - $sent['time_gmt']) <= 1) {
+				return true;
+			}
+		}
+	}
+}
+
 function rvy_mail( $address, $title, $message, $args ) {
 	// args: ['revision_id' => $revision_id, 'post_id' => $published_post->ID, 'notification_type' => $notification_type, 'notification_class' => $notification_class]
 
@@ -532,7 +551,13 @@ function rvy_mail( $address, $title, $message, $args ) {
 	 * 	 - If sending, add current timestamp to wp_option array revisionary_sent_mail
 	 */
 
-	$new_msg = array_merge(compact('address', 'title', 'message'), ['time' => strtotime(current_time( 'mysql' )), 'time_gmt' => time()], $args);
+	$send = apply_filters('revisionary_mail', compact('address', 'title', 'message'), $args);
+
+	if (empty($send['address'])) {
+		return;
+	}
+
+	$new_msg = array_merge($send, ['time' => strtotime(current_time( 'mysql' )), 'time_gmt' => time()], $args);
 
 	if (!$buffer_status = rvy_mail_check_buffer($new_msg)) {
 		$buffer_status = (object)[];
@@ -542,10 +567,16 @@ function rvy_mail( $address, $title, $message, $args ) {
 		return;
 	}
 
+	$sent_mail = (!empty($buffer_status->sent_mail)) ? $buffer_status->sent_mail : [];
+	$buffer = (!empty($buffer_status->buffer)) ? $buffer_status->buffer : [];
+	if (rvy_check_duplicate_mail($new_msg, $sent_mail, $buffer)) {
+		return;
+	}
+
 	if ( defined( 'RS_DEBUG' ) )
-		$success = wp_mail( $address, $title, $message );
+		$success = wp_mail( $new_msg['address'], $new_msg['title'], $new_msg['message'] );
 	else
-		$success = @wp_mail( $address, $title, $message );
+		$success = @wp_mail( $new_msg['address'], $new_msg['title'], $new_msg['message'] );
 
 	if ($success || !defined('REVISIONARY_MAIL_RETRY')) {
 		if (!defined('REVISIONARY_DISABLE_MAIL_LOG')) {
@@ -781,21 +812,24 @@ function rvy_init() {
 		
 			// If a previously requested asynchronous request was ineffective, perform the actions now
 			// (this is not executed if the current URI is from a manual publication request with action=publish_scheduled_revisions)
-			$requested_actions = get_option( 'requested_remote_actions_rvy' );
-			if ( is_array( $requested_actions) && ! empty($requested_actions) ) {
-				if ( ! empty($requested_actions['publish_scheduled_revisions']) ) {
-					require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
-					rvy_publish_scheduled_revisions();
-					unset( $requested_actions['publish_scheduled_revisions'] );
+			if (defined('RVY_SCHEDULED_PUBLISH_FALLBACK')) {
+				$requested_actions = get_option( 'requested_remote_actions_rvy' );
+				if ( is_array( $requested_actions) && ! empty($requested_actions) ) {
+					if ( ! empty($requested_actions['publish_scheduled_revisions']) ) {
+						require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
+						rvy_publish_scheduled_revisions();
+						unset( $requested_actions['publish_scheduled_revisions'] );
+					}
+		
+					update_option( 'requested_remote_actions_rvy', $requested_actions );
 				}
-	
-				update_option( 'requested_remote_actions_rvy', $requested_actions );
 			}
 			
 			$next_publish = get_option( 'rvy_next_rev_publish_gmt' );
 			
 			// automatically publish any scheduled revisions whose time has come
 			if ( ! $next_publish || ( agp_time_gmt() >= strtotime( $next_publish ) ) ) {
+				update_option('rvy_next_rev_publish_gmt', '2035-01-01 00:00:00');
 
 				if ( ini_get( 'allow_url_fopen' ) && rvy_get_option('async_scheduled_publish') ) {
 					// asynchronous secondary site call to avoid delays // TODO: pass site key here

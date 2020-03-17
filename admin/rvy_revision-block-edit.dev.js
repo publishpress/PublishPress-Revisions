@@ -174,6 +174,10 @@ jQuery(document).ready( function($) {
 		if (rvyObjEdit.approvalURL && !RvyApprovalHidden && !$('button.revision-approve').length && $('button.editor-post-trash').filter(':visible').length) {
 			$('button.editor-post-trash').before(
 				'<a href="' + rvyObjEdit.approvalURL + '" class="revision-approve" title="' + rvyObjEdit.approvalTitle + '"><button type="button" class="components-button revision-approve is-button is-default is-large">' + rvyObjEdit.approvalCaption + '</button></a>');
+			
+			if (rvyObjEdit.deletionURL) {
+				$('button.editor-post-trash').wrap('<a href="' + rvyObjEdit.deletionURL + '"></a>');
+			}
 		}
 	}
 	var RvyHideInterval = setInterval(RvyHideElements, 50);

@@ -806,7 +806,7 @@ class Revisionary
 	
 	function flt_regulate_revision_status($data, $postarr) {
 		// Revisions are not published by wp_update_post() execution; Prevent setting to a non-revision status
-		if (get_post_meta($postarr['ID'], '_rvy_base_post_id', true)) {
+		if (get_post_meta($postarr['ID'], '_rvy_base_post_id', true) && ('trash' != $data['post_status'])) {
 			$revision = get_post($postarr['ID']);
 			
 			if (!rvy_is_revision_status($data['post_status'])) {

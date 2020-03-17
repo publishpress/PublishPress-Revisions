@@ -621,6 +621,15 @@ class RevisionaryAdmin
 			add_submenu_page( 'revisionary-q', __('PublishPress Revisions Settings', 'revisionary'), __('Settings', 'revisionary'), 'read', 'revisionary-settings', 'rvy_omit_site_options');
 			add_action('revisionary_page_revisionary-settings', 'rvy_omit_site_options' );	
 		}
+
+		add_submenu_page(
+            'revisionary-q', 
+            __('Upgrade to Pro', 'revisionary'), 
+            __('Upgrade to Pro', 'revisionary'), 
+            'read', 
+            'revisionary-pro', 
+            'rvy_omit_site_options'
+        );
 	}
 
 	function act_hide_quickedit() {

@@ -3,11 +3,11 @@
 Contributors: publishpress, kevinB, stevejburge, andergmartins
 Author: PublishPress
 Author URI: https://publishpress.com
-Tags: revision, moderate, permissions, submit revisions, schedule revisions,
+Tags: revision, submit changes, workflow, collaboration, permissions, moderate, posts, schedule revisions
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.3
-Stable tag: 2.2
+Stable tag: 2.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -99,6 +99,17 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.2.1 - 16 Mar 2020 =
+* Fixed : Page Template was cleared on revision submission in some installations
+* Fixed : Revision Queue - "Filter" link was ineffective in showing only revisions of the selected published post. This also applies to "View Revision Queue" link after revision creation.
+* Fixed : Edit Revision - Move to Trash button did not work (and created new pending revision)
+* Fixed : Duplicate email notifications for scheduled revision publication on some installations
+* Fixed : Safeguard to prevent duplicate email notifications
+* Feature : Plugin API - new filter 'revisionary_mail' allows adjustment to notification email address, title or message (or blockage of a particular email)
+* Compat : New setting "Revision publication triggers API actions to mimic post update" causes save_post and transition_post_status actions to fire on revision publication
+* Compat : Yoast SEO - Revision submission stripped accented characters and emojis out of FAQ block
+* Compat : On revision publication, trigger 'transition_post_status' action, for plugins that use it
 
 = 2.2 - 12 Feb 2020 =
 * Feature : Email Notification - option to notify Editors and Administrators when a Pending Revision is approved

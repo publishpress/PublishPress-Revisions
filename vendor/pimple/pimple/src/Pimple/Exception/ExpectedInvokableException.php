@@ -24,21 +24,15 @@
  * THE SOFTWARE.
  */
 
- // kevinB temp
-/*
 namespace Pimple\Exception;
 
 use Psr\Container\ContainerExceptionInterface;
-*/
 
 /**
  * A closure or invokable object was expected.
  *
  * @author Pascal Luna <skalpa@zetareticuli.org>
  */
-
- /*
 class ExpectedInvokableException extends \InvalidArgumentException implements ContainerExceptionInterface
 {
 }
-*/
