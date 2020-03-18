@@ -87,7 +87,11 @@ class Rvy_Revision_Workflow_UI {
 
             if ( $recipient_ids ) {
                 global $wpdb;
-                $results = $wpdb->get_results( "SELECT ID, user_email FROM $wpdb->users WHERE ID IN ('" . implode( "','", $recipient_ids ) . "')" );
+                $results = $wpdb->get_results( 
+                    "SELECT ID, user_email FROM $wpdb->users WHERE ID IN ('" 
+                    . implode("','", array_map('intval', $recipient_ids)) 
+                    . "')" 
+                );
                 
                 foreach($results as $row) {
                     $to_addresses[$row->ID] = $row->user_email;

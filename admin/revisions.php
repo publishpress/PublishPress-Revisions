@@ -176,9 +176,18 @@ if ( 'diff' != $action ) {
 if ( $is_administrator = is_content_administrator_rvy() ) {
 	global $wpdb;
 
-	$status_csv = "'" . implode("','", array_merge(rvy_revision_statuses(), ['inherit'])) . "'";
+	$status_csv = implode("','", array_merge(rvy_revision_statuses(), ['inherit']));
 
-	$results = $wpdb->get_results( "SELECT post_status, COUNT( * ) AS num_posts FROM {$wpdb->posts} WHERE post_status IN ($status_csv) AND ((post_type = 'revision' AND post_status = 'inherit' AND post_parent = '$rvy_post->ID') OR (post_type != 'revision' AND post_status != 'inherit' AND comment_count = '$rvy_post->ID')) GROUP BY post_status" );
+	$results = $wpdb->get_results( 
+		$wpdb->prepare(
+			"SELECT post_status, COUNT( * ) AS num_posts FROM {$wpdb->posts}"
+			. " WHERE post_status IN ('$status_csv')"
+			. " AND ((post_type = 'revision' AND post_status = 'inherit' AND post_parent = %d) OR (post_type != 'revision' AND post_status != 'inherit' AND comment_count = %d))"
+			. " GROUP BY post_status",
+			$rvy_post->ID,
+			$rvy_post->ID
+		)
+	);
 	
 	$num_revisions = array( 'inherit' => 0, 'pending-revision' => 0, 'future-revision' => 0 );
 	foreach( $results as $row )

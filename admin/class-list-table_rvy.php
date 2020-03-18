@@ -449,7 +449,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		// todo: single query for all listed published posts
 		if (!isset($last_past_revision[$post->ID])) {
 			global $wpdb;
-			if ($revision_id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_type='revision' AND post_status='inherit' AND post_parent='$post->ID' ORDER BY ID DESC LIMIT 1")) {
+			if ($revision_id = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT ID FROM $wpdb->posts WHERE post_type='revision' AND post_status='inherit' AND post_parent = %d ORDER BY ID DESC LIMIT 1",
+					$post->ID
+				)
+			)) {
 				$last_past_revision[$post->ID] = $revision_id;
 			}
 		}
@@ -529,10 +534,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	private function count_revisions($post_type = '', $statuses = '' ) {
 		global $wpdb;
 
-		$status_csv = implode("','", (array) $statuses);
+		$status_csv = implode("','", array_map('sanitize_key', (array) $statuses));
 
 		if ($post_type) {
-			$type_clause = "AND post_type IN ('" . implode("','", (array) $post_type) . "')";
+			$type_clause = "AND post_type IN ('" 
+			. implode("','", array_map('sanitize_key', (array) $post_type)) 
+			. "')";
 		}
 
 		$where = $this->revisions_where_filter("post_status IN ('$status_csv') $type_clause", ['status_count' => true]);
@@ -766,14 +773,14 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$date_col = ( ! empty($_REQUEST['post_status']) && 'future-revision' == $_REQUEST['post_status'] ) ? 'post_date' : 'post_modified';
 
-		$ids = implode( "','", $this->published_post_ids );
+		$ids = implode("','", array_map('intval', $this->published_post_ids));
 		
-		$type_csv = "'" . implode("','", rvy_get_manageable_types()) . "'";
+		$type_csv = implode("','", array_map('sanitize_key', rvy_get_manageable_types()));
 
 		$months = $wpdb->get_results( "
 			SELECT DISTINCT YEAR( $date_col ) AS year, MONTH( $date_col ) AS month
 			FROM $wpdb->posts
-			WHERE post_type IN ($type_csv) AND comment_count IN ('$ids')
+			WHERE post_type IN ('$type_csv') AND comment_count IN ('$ids')
 			$extra_checks
 			ORDER BY $date_col DESC
 		" );

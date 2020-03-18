@@ -820,7 +820,12 @@ function rvy_publish_scheduled_revisions($args = array()) {
 			)
 		);
 	} else {
-		$results = $wpdb->get_results( "SELECT * FROM $wpdb->posts WHERE post_status = 'future-revision' AND post_date_gmt <= '$time_gmt' ORDER BY post_date_gmt DESC" );
+		$results = $wpdb->get_results( 
+			$wpdb->prepare(
+				"SELECT * FROM $wpdb->posts WHERE post_status = 'future-revision' AND post_date_gmt <= %s ORDER BY post_date_gmt DESC",
+				$time_gmt
+			)
+		);
 	}
 
 	if ( $results ) {
@@ -1104,15 +1109,36 @@ function revisionary_copy_terms( $from_post_id, $to_post_id, $mirror_empty = fal
 		$tx_where = '';
 	}
 
-	if ( $_post = $wpdb->get_row( "SELECT * FROM $wpdb->posts WHERE ID = '$from_post_id'" ) ) {
-		$source_terms = $wpdb->get_col( "SELECT term_taxonomy_id FROM $wpdb->term_relationships AS tr {$tx_join}WHERE {$tx_where}tr.object_id = '$from_post_id'" );
+	if ($_post = $wpdb->get_row( 
+		$wpdb->prepare(
+			"SELECT * FROM $wpdb->posts WHERE ID = %d",
+			$from_post_id 
+		) 
+	)) {
+		$source_terms = $wpdb->get_col( 
+			$wpdb->prepare(
+				"SELECT term_taxonomy_id FROM $wpdb->term_relationships AS tr {$tx_join}WHERE {$tx_where}tr.object_id = %d",
+				$from_post_id
+			)
+		);
 
-		$target_terms = $wpdb->get_col( "SELECT term_taxonomy_id FROM $wpdb->term_relationships AS tr {$tx_join}WHERE {$tx_where}tr.object_id = '$to_post_id'" );
+		$target_terms = $wpdb->get_col( 
+			$wpdb->prepare(
+				"SELECT term_taxonomy_id FROM $wpdb->term_relationships AS tr {$tx_join}WHERE {$tx_where}tr.object_id = %d",
+				$to_post_id
+			)
+		);
 
 		if ( $add_terms = array_diff($source_terms, $target_terms) ) {
 			// todo: single query
 			foreach($add_terms as $tt_id) {
-				$wpdb->query("INSERT INTO $wpdb->term_relationships (object_id, term_taxonomy_id) VALUES ('$to_post_id', '$tt_id')");
+				$wpdb->query(
+					$wpdb->prepare(
+						"INSERT INTO $wpdb->term_relationships (object_id, term_taxonomy_id) VALUES (%d, %d)",
+						$to_post_id,
+						$tt_id
+					)
+				);
 			}
 		}
 		
@@ -1120,7 +1146,13 @@ function revisionary_copy_terms( $from_post_id, $to_post_id, $mirror_empty = fal
 			if ( $delete_terms = array_diff($target_terms, $source_terms) ) {
 				// todo: single query
 				foreach($delete_terms as $tt_id) {
-					$wpdb->query("DELETE FROM $wpdb->term_relationships WHERE object_id = '$to_post_id' AND term_taxonomy_id = '$tt_id'");
+					$wpdb->query(
+						$wpdb->prepare(
+							"DELETE FROM $wpdb->term_relationships WHERE object_id = %d AND term_taxonomy_id = %d",
+							$to_post_id,
+							$tt_id
+						)
+					);
 				}
 			}
 		}

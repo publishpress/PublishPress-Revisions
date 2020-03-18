@@ -355,7 +355,12 @@ function rvy_refresh_default_options() {
 function rvy_apply_custom_default_options() {
 	global $wpdb, $rvy_default_options, $rvy_options_sitewide;
 	
-	if ( $results = $wpdb->get_results( "SELECT meta_key, meta_value FROM $wpdb->sitemeta WHERE site_id = '$wpdb->siteid' AND meta_key LIKE 'rvy_default_%'" ) ) {
+	if ( $results = $wpdb->get_results( 
+		$wpdb->prepare(
+			"SELECT meta_key, meta_value FROM $wpdb->sitemeta WHERE site_id = %d AND meta_key LIKE 'rvy_default_%'", 
+			$wpdb->siteid
+		)	
+	) ) {
 		foreach ( $results as $row ) {
 			$option_basename = str_replace( 'rvy_default_', '', $row->meta_key );
 
@@ -409,9 +414,16 @@ function rvy_retrieve_options( $sitewide = false ) {
 		
 		$rvy_site_options = array();
 
-		if ( $results = $wpdb->get_results( "SELECT meta_key, meta_value FROM $wpdb->sitemeta WHERE site_id = '$wpdb->siteid' AND meta_key LIKE 'rvy_%'" ) )
-			foreach ( $results as $row )
+		if ( $results = $wpdb->get_results( 
+			$wpdb->prepare(
+				"SELECT meta_key, meta_value FROM $wpdb->sitemeta WHERE site_id = %d AND meta_key LIKE 'rvy_%'",
+				$wpdb->siteid
+			) 	
+		) ) {
+			foreach ( $results as $row ) {
 				$rvy_site_options[$row->meta_key] = $row->meta_value;
+			}
+		}
 
 		$rvy_site_options = apply_filters( 'site_options_rvy', $rvy_site_options );
 		return $rvy_site_options;
@@ -421,9 +433,11 @@ function rvy_retrieve_options( $sitewide = false ) {
 		
 		$rvy_blog_options = array();
 		
-		if ( $results = $wpdb->get_results("SELECT option_name, option_value FROM $wpdb->options WHERE option_name LIKE 'rvy_%'") )
-			foreach ( $results as $row )
+		if ( $results = $wpdb->get_results("SELECT option_name, option_value FROM $wpdb->options WHERE option_name LIKE 'rvy_%'") ) {
+			foreach ( $results as $row ) {
 				$rvy_blog_options[$row->option_name] = $row->option_value;
+			}
+		}
 				
 		$rvy_blog_options = apply_filters( 'options_rvy', $rvy_blog_options );
 		return $rvy_blog_options;
@@ -634,7 +648,7 @@ function rvy_is_status_published( $status ) {
 }
 
 function rvy_revision_statuses() {
-	return apply_filters('rvy_revision_statuses', array('pending-revision', 'future-revision'));
+	return array_map('sanitize_key', (array) apply_filters('rvy_revision_statuses', array('pending-revision', 'future-revision')));
 }
 
 function rvy_is_revision_status($status) {

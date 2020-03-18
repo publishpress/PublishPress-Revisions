@@ -162,8 +162,10 @@ class RevisionaryAdmin
 		}
 
 		if ($listed_ids) {
-			$id_csv = implode("','", $listed_ids);
-			$results = $wpdb->get_results("SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN('$id_csv') GROUP BY comment_count");
+			$id_csv = implode("','", array_map('intval', $listed_ids));
+			$results = $wpdb->get_results(
+				"SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN('$id_csv') GROUP BY comment_count"
+			);
 			
 			foreach($results as $row) {
 				$this->post_revision_count[$row->published_post] = $row->num_revisions;
@@ -191,7 +193,7 @@ class RevisionaryAdmin
 					$ids []= $row->ID;
 				}
 
-				$id_csv = implode("','", $ids);
+				$id_csv = implode("','", array_map('intval', $ids));
 				$results = $wpdb->get_results("SELECT ID, post_status FROM $wpdb->posts WHERE ID IN ('$id_csv')");
 				foreach($results as $row ) {
 					$listed_post_statuses[$row->ID] = $row->post_status;
@@ -226,7 +228,7 @@ class RevisionaryAdmin
 				$listed_ids []= $row->ID;
 			}
 
-			$listed_post_csv = implode("','", $listed_ids);
+			$listed_post_csv = implode("','", array_map('intval', $listed_ids));
 			$this->trashed_revisions = $wpdb->get_col("SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_base_post_id' AND post_id IN ('$listed_post_csv')");
 		} else {
 			$this->trashed_revisions = [];
@@ -622,14 +624,16 @@ class RevisionaryAdmin
 			add_action('revisionary_page_revisionary-settings', 'rvy_omit_site_options' );	
 		}
 
-		add_submenu_page(
-            'revisionary-q', 
-            __('Upgrade to Pro', 'revisionary'), 
-            __('Upgrade to Pro', 'revisionary'), 
-            'read', 
-            'revisionary-pro', 
-            'rvy_omit_site_options'
-        );
+		if (!defined('REVISIONARY_PRO_VERSION')) {
+			add_submenu_page(
+	            'revisionary-q', 
+	            __('Upgrade to Pro', 'revisionary'), 
+	            __('Upgrade to Pro', 'revisionary'), 
+	            'read', 
+	            'revisionary-pro', 
+	            'rvy_omit_site_options'
+	        );
+    	}
 	}
 
 	function act_hide_quickedit() {

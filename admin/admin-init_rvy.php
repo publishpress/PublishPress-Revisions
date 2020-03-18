@@ -304,12 +304,22 @@ function rvy_get_post_revisions($post_id, $status = 'inherit', $args = '' ) {
 		}
 		
 		if ('inherit' == $status) {
-			$revisions = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_type = 'revision' AND post_parent = '$post_id' AND post_status = '$status'");
+			$revisions = $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT ID FROM $wpdb->posts WHERE post_type = 'revision' AND post_parent = %d AND post_status = %s",
+					$post_id,
+					$status
+				)
+			);
 		} else {
 			$revisions = $wpdb->get_col(
+				$wpdb->prepare(
 				"SELECT ID FROM $wpdb->posts "
 				. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
-				. " WHERE pm_published.meta_value = '$post_id' AND post_status = '$status'"
+					. " WHERE pm_published.meta_value = %s AND post_status = %s",
+					$post_id,
+					$status
+				)
 			);
 		}
 
@@ -324,15 +334,27 @@ function rvy_get_post_revisions($post_id, $status = 'inherit', $args = '' ) {
 		}	
 			
 	} else {
-		$order_clause = ( $order && $orderby ) ? "ORDER BY $orderby $order" : '';
+		$order_clause = ( $order && $orderby ) 
+		? $wpdb->prepare("ORDER BY %s %s", $orderby, $order)
+		: '';
 
 		if ('inherit' == $status) {
-			$revisions = $wpdb->get_results("SELECT * FROM $wpdb->posts WHERE post_type = 'revision' AND post_parent = '$post_id' AND post_status = '$status' $order_clause");
+			$revisions = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM $wpdb->posts WHERE post_type = 'revision' AND post_parent = %d AND post_status = %s $order_clause",
+					$post_id,
+					$status
+				)
+			);
 		} else {
 			$revisions = $wpdb->get_results(
+				$wpdb->prepare(
 				"SELECT * FROM $wpdb->posts "
 				. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
-				. " WHERE pm_published.meta_value = '$post_id' AND post_status = '$status' $order_clause"
+					. " WHERE pm_published.meta_value = %d AND post_status = %s $order_clause",
+					$post_id,
+					$status
+				)
 			);
 		}
 	}
