@@ -683,19 +683,6 @@ function rvy_post_id($revision_id) {
 	return ($published_id) ? $published_id : 0;
 }
 
-/*
-function rvy_get_post_meta($post_id, $key, $single = false) {
-	global $wpdb;
-	if ( $results = $wpdb->get_results( "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = '$key' AND post_id = '$post_id' GROUP BY meta_id LIMIT 1" ) ) {
-		if ( $single )
-			return current( $results[0] );
-		else
-			return @array_map( 'maybe_unserialize', current($results) );
-	} else
-		return false;
-}
-*/
-
 function rvy_halt( $msg, $title = '' ) {
 	if ( ! $title ) {
 		$title = __( 'Revision Workflow', 'revisionary' );

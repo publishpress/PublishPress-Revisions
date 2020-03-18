@@ -327,23 +327,6 @@ function rvy_revision_restore() {
 
 		revisionary_copy_terms($revision->ID, $post->ID, false);
 
-		/*
-		if ( $postmeta = $wpdb->get_results( "SELECT meta_key, meta_value FROM $wpdb->postmeta WHERE post_id = '$revision_id'", ARRAY_A ) ) {
-			foreach( $postmeta as $row ) {		
-				$row['post_id'] = $revision->post_parent;					
-				
-				if ( is_array($row['meta_value']) && ( count($row['meta_value'] <= 1 ) ) )
-					$row['meta_value'] = maybe_unserialize($row['meta_value']);	
-				
-				if ( $meta_id = $wpdb->get_var( $wpdb->prepare( "SELECT meta_id FROM $wpdb->postmeta WHERE meta_key = %s AND post_id = %d", $row['meta_key'], $revision->post_parent ) ) ) {						
-					$wpdb->update( $wpdb->postmeta, $row, array( 'meta_id' => $meta_id ) );					
-				} else {					
-					$wpdb->insert( $wpdb->postmeta, $row );					
-				}
-			}
-		}
-		*/
-
 		rvy_format_content( $revision->post_content, $revision->post_content_filtered, $post->ID );
 
 		if ( 'inherit' == $revision->post_status ) {
