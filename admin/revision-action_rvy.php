@@ -3,7 +3,7 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 	die( 'This page cannot be called directly.' );
 
 add_action( '_wp_put_post_revision', 'rvy_review_revision' );
-	
+
 /**
  * @package     PublishPress\Revisions\RevisionaryAction
  * @author      PublishPress <help@publishpress.com>
@@ -25,7 +25,7 @@ function rvy_revision_approve($revision_id = 0) {
 			return;
 		}
 
-	$revision_id = $_GET['revision'];
+		$revision_id = $_GET['revision'];
 	} else {
 		$batch_process = true;
 	}
@@ -57,7 +57,7 @@ function rvy_revision_approve($revision_id = 0) {
 		}
 
 		if (!$batch_process) {
-		check_admin_referer( "approve-post_$post->ID|$revision->ID" );
+			check_admin_referer( "approve-post_$post->ID|$revision->ID" );
 		}
 		
 		clean_post_cache($post->ID);
@@ -265,12 +265,12 @@ function rvy_revision_approve($revision_id = 0) {
 	}
 	
 	if (!$batch_process) {	
-	if ( ! $redirect ) {
-		if ( ! empty($post) && is_object($post) && ( 'post' != $post->post_type ) ) {
-			$redirect = "edit.php?post_type={$post->post_type}";
-		} else
-			$redirect = 'edit.php';
-	}
+		if ( ! $redirect ) {
+			if ( ! empty($post) && is_object($post) && ( 'post' != $post->post_type ) ) {
+				$redirect = "edit.php?post_type={$post->post_type}";
+			} else
+				$redirect = 'edit.php';
+		}
 	}
 
 	if (empty($approval_error)) {
@@ -278,9 +278,9 @@ function rvy_revision_approve($revision_id = 0) {
 	}
 
 	if (!$batch_process) {
-	wp_redirect( $redirect );
-	exit;
-}
+		wp_redirect( $redirect );
+		exit;
+	}
 
 	if (empty($approval_error)) {
 		return true;
@@ -716,8 +716,8 @@ function rvy_revision_publish($revision_id = false) {
 	if ($revision_id) {
 		$batch_process = true;
 	} else {
-	$revision_id = $_GET['revision'];
-	$redirect = site_url();
+		$revision_id = $_GET['revision'];
+		$redirect = site_url();
 		$batch_process = false;
 	}
 	
@@ -744,7 +744,7 @@ function rvy_revision_publish($revision_id = false) {
 		}
 
 		if (!$batch_process) {
-		check_admin_referer( "publish-post_$post->ID|$revision->ID" );
+			check_admin_referer( "publish-post_$post->ID|$revision->ID" );
 		}
 
 		$do_publish = true;
@@ -752,20 +752,20 @@ function rvy_revision_publish($revision_id = false) {
 	} while (0);
 	
 	if (!empty($do_publish)) {
-	rvy_publish_scheduled_revisions(array('force_revision_id' => $revision->ID));
+		rvy_publish_scheduled_revisions(array('force_revision_id' => $revision->ID));
 
-	if ($post) {
-		clean_post_cache($post->ID);
-	}
+		if ($post) {
+			clean_post_cache($post->ID);
+		}
 	}
 
 	if (!$batch_process) {
 		if ($post) {
-		$redirect = get_permalink($post->ID); // published URL
-	}
+			$redirect = get_permalink($post->ID); // published URL
+		}
 
-	wp_redirect( $redirect );
-	exit;
+		wp_redirect($redirect);
+		exit;
 	}
 
 	if (!empty($do_publish)) {

@@ -159,12 +159,12 @@ class RevisionaryFront {
 
 			$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
 
-				load_plugin_textdomain('revisionary', false, RVY_FOLDER . '/languages');
-				
-				$published_url = ($published_post_id) ? get_permalink($published_post_id) : '';
-				$diff_url = admin_url("revision.php?revision=$revision_id");
-				
-				if (current_user_can( 'read_post', $revision_id)) { 
+			load_plugin_textdomain('revisionary', false, RVY_FOLDER . '/languages');
+			
+			$published_url = ($published_post_id) ? get_permalink($published_post_id) : '';
+			$diff_url = admin_url("revision.php?revision=$revision_id");
+			
+			if (current_user_can( 'read_post', $revision_id)) { 
 				$view_published = ($published_url) 
 				? sprintf(
 					__("%sCompare%s%sView&nbsp;Published&nbsp;Post%s", 'revisionary'),
@@ -174,7 +174,7 @@ class RevisionaryFront {
 					'</a></span>'
 					)
 				: '';
-				} else { // @todo
+			} else { // @todo
 				$view_published = ($published_url) 
 				? sprintf(
 					__("%sView&nbsp;Published&nbsp;Post%s", 'revisionary'), 
@@ -182,7 +182,7 @@ class RevisionaryFront {
 					"</a></span>"
 					) 
 				: '';
-				}
+			}
 
 				if (agp_user_can('edit_post', $revision_id)) {
 					$edit_url = admin_url("post.php?action=edit&amp;post=$revision_id");
@@ -311,7 +311,7 @@ class RevisionaryFront {
 			var rvyAdminBarMenuZindex = 99999;
 
 			if ($('#wpadminbar').length) {
-				var rvyAdminBarHeight = $('#wpadminbar').height(); 
+				var rvyAdminBarHeight = $('#wpadminbar').height();
 				var barZ = parseInt($('#wpadminbar').css('z-index'));
 				if (barZ > rvyAdminBarMenuZindex) {
 					rvyAdminBarMenuZindex = barZ;

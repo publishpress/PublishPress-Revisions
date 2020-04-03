@@ -186,15 +186,15 @@ class RvyPostEditSubmitMetabox
         
         remove_filter('preview_post_link', [$revisionary->post_edit_ui, 'fltPreviewLink']);
         $preview_link = add_query_arg('rvy', 1, esc_url( get_preview_post_link( $post )));
-                $preview_button =__('Preview Changes');
+        $preview_button =__('Preview Changes');
         $style = ($is_revision) ? 'style="display:none;"' : '';
 
         global $wp_version;
-            ?>
+        ?>
         <a class="preview button" href="<?php echo $preview_link; ?>" target="<?php echo version_compare($wp_version, '5.3', '>=') ? 'wp-preview-' . (int) $post->ID : 'wp-preview';?>" id="post-preview"
         tabindex="4" <?php echo $style;?>><?php echo $preview_button; ?></a>
-            <input type="hidden" name="wp-preview" id="wp-preview" value=""/>
-            <?php
+        <input type="hidden" name="wp-preview" id="wp-preview" value=""/>
+        <?php
         add_filter('preview_post_link', [$revisionary->post_edit_ui, 'fltPreviewLink']);
     }
 

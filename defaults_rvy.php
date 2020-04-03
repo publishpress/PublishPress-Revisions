@@ -9,7 +9,7 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
  * @license     GPLv2 or later
  * @since       1.0.0
  */
- 
+
 // Setting scope: For Network installations, which Revisionary options should default to site-wide control?
 function rvy_default_options_sitewide() {
 	$def = array(

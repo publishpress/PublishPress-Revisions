@@ -855,7 +855,7 @@ class RevisionaryHistory
                 $restore_link = rvy_preview_url($revision);  // default to revision preview link
                 
                 if ($can_restore) {
-                        $published_post_id = rvy_post_id($revision->ID);
+                    $published_post_id = rvy_post_id($revision->ID);
 
 	                if (rvy_get_option('compare_revisions_direct_approval') && agp_user_can( 'edit_post', $published_post_id, '', ['skip_revision_allowance' => true] ) ) {
                         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';

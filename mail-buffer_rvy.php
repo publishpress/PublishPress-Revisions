@@ -61,15 +61,15 @@ function _rvy_mail_check_buffer($new_msg = [], $args = []) {
 
 		$elapsed = $current_time - $mail['time_gmt'];
 
-			foreach($durations as $limit_key => $duration) {
-				if ($elapsed < $duration) {
-					$sent_counts[$limit_key]++;
-				}
-
-				if ($new_msg && ($sent_counts[$limit_key] >= $send_limits[$limit_key])) {
-					$new_msg_buffered = true;
-				}
+		foreach($durations as $limit_key => $duration) {
+			if ($elapsed < $duration) {
+				$sent_counts[$limit_key]++;
 			}
+
+			if ($new_msg && ($sent_counts[$limit_key] >= $send_limits[$limit_key])) {
+				$new_msg_buffered = true;
+			}
+		}
 		
 		if ($elapsed > $purge_time) {
 			unset($sent_mail[$k]);

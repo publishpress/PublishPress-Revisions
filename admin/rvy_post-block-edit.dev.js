@@ -118,7 +118,7 @@ jQuery(document).ready( function($) {
 	}
 
 	if (rvyObjEdit.ScheduleCaption) {
-    var RvyDetectPublishOptionsDivInterval = setInterval(RvyDetectPublishOptionsDiv, 500);
+    	var RvyDetectPublishOptionsDivInterval = setInterval(RvyDetectPublishOptionsDiv, 500);
 	}
     
 	// @todo: Don't show Pending Revision checkbox when post is not publish, private or a custom privacy status
@@ -129,12 +129,12 @@ jQuery(document).ready( function($) {
 		var publishedStatuses = Object.keys(rvyObjEdit.publishedStatuses).map(function (key) { return rvyObjEdit.publishedStatuses[key]; });
 
 		if (publishedStatuses.indexOf(postStatus) >= 0) {
-		if (rvyObjEdit.revision && !$('#rvy_save_as_revision').length) {
-			var attribs = rvyObjEdit.defaultPending ? ' checked="checked"' : '';
-			if (rvyObjEdit.defaultPending) {
-				RvyRecaptionElement('button.editor-post-publish-button', rvyObjEdit.SaveCaption);
-			}
-			$('button.editor-post-publish-button').after('<label style="-webkit-touch-callout: none;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;" title="' + rvyObjEdit.revisionTitle + '"><input type="checkbox" class="rvy_save_as_revision" id="rvy_save_as_revision"' + attribs + '>' + rvyObjEdit.revision + '&nbsp;</label>');
+			if (rvyObjEdit.revision && !$('#rvy_save_as_revision').length) {
+				var attribs = rvyObjEdit.defaultPending ? ' checked="checked"' : '';
+				if (rvyObjEdit.defaultPending) {
+					RvyRecaptionElement('button.editor-post-publish-button', rvyObjEdit.SaveCaption);
+				}
+				$('button.editor-post-publish-button').after('<label style="-webkit-touch-callout: none;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;" title="' + rvyObjEdit.revisionTitle + '"><input type="checkbox" class="rvy_save_as_revision" id="rvy_save_as_revision"' + attribs + '>' + rvyObjEdit.revision + '&nbsp;</label>');
 			}
 		} else {
 			$('#rvy_save_as_revision').parent('label').remove();

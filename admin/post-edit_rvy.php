@@ -188,7 +188,7 @@ class RvyPostEdit {
         RvyPostEditSubmitMetabox::post_submit_meta_box($post, $args);
     }
 
-public function actSubmitboxStart() {
+    public function actSubmitboxStart() {
         global $post;
 
         if (!$type_obj = get_post_type_object($post->post_type)) {

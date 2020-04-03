@@ -17,7 +17,7 @@ class RvyOptionUI {
 	var $all_otype_options;
 	var $def_otype_options;
 	var $display_hints = true;
-		
+
 	public static function instance($args = [])
     {
         if (is_null(self::$instance)) {
@@ -654,14 +654,14 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			}
 		} 
 
-			if (empty($_REQUEST['mailinfo'])):?>
-				<br />
-				<div style="padding-left:22px">
-				<a href="<?php echo(add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Show Notification Log / Buffer', 'revisionary');?></a>
-				<br /><br />
-				<a href="<?php echo(add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI'])));?>"><?php _e('Show with message content', 'revisionary');?></a>
-				</div>
-			<?php endif;
+		if (empty($_REQUEST['mailinfo'])):?>
+			<br />
+			<div style="padding-left:22px">
+			<a href="<?php echo(add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Show Notification Log / Buffer', 'revisionary');?></a>
+			<br /><br />
+			<a href="<?php echo(add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI'])));?>"><?php _e('Show with message content', 'revisionary');?></a>
+			</div>
+		<?php endif;
 		
 		?>
 		</td></tr>

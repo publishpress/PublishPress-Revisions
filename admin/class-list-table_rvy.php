@@ -6,7 +6,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	var $published_post_count_ids = [];
 	var $post_types = [];
 	private $posts_clauses_filtered; 
-	 
+
 	public function __construct($args = []) {
 		global $wpdb;
 
@@ -627,8 +627,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		);
 
 		$count_query = apply_filters('presspermit_posts_request',
-				"SELECT COUNT(r.ID) FROM $wpdb->posts AS r INNER JOIN $wpdb->posts AS p ON r.comment_count = p.ID WHERE $where", 
-				['has_cap_check' => true, 'source_alias' => 'p']
+			"SELECT COUNT(r.ID) FROM $wpdb->posts AS r INNER JOIN $wpdb->posts AS p ON r.comment_count = p.ID WHERE $where", 
+			['has_cap_check' => true, 'source_alias' => 'p']
 		);
 
 		// work around some versions of PressPermit inserting non-aliased post_type reference into where clause under some configurations
@@ -1001,7 +1001,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		$post_type_object = get_post_type_object( $post->post_type );
-		$can_read_post    = current_user_can( 'read_post', $post->ID );
+
+		$can_read_post = current_user_can('read_post', $post->ID);
+
 		$can_edit_post    = current_user_can( 'edit_post', $post->ID );
 
 		$can_read_post = $can_read_post || $can_edit_post; // @todo
