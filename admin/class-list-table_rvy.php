@@ -1031,17 +1031,19 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		if ( is_post_type_viewable( $post_type_object ) ) {
 			if ( $can_read_post ) {
-				$preview_link = rvy_preview_url($post);
+				if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
+					$preview_link = rvy_preview_url($post);
 
-				//$preview_link = remove_query_arg( 'post_type', $preview_link );
-				$preview_link = remove_query_arg( 'preview_id', $preview_link );
-				$actions['view'] = sprintf(
-					'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
-					esc_url( $preview_link ),
-					/* translators: %s: post title */
-					esc_attr( __( 'Preview Revision', 'revisionary' ) ),
-					__( 'Preview' )
-				);
+					//$preview_link = remove_query_arg( 'post_type', $preview_link );
+					$preview_link = remove_query_arg( 'preview_id', $preview_link );
+					$actions['view'] = sprintf(
+						'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
+						esc_url( $preview_link ),
+						/* translators: %s: post title */
+						esc_attr( __( 'Preview Revision', 'revisionary' ) ),
+						__( 'Preview' )
+					);
+				}
 			}
 
 			//if ( current_user_can( 'read_post', $post->ID ) ) { // @todo make this work for Author with Revision exceptions

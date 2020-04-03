@@ -142,9 +142,10 @@ function rvy_revision_approve($revision_id = 0) {
 				$datef = __awp( 'M j, Y @ g:i a' );
 				$message .= sprintf( __('It will be published on %s', 'revisionary' ), agp_date_i18n( $datef, strtotime($revision->post_date) ) ) . "\r\n\r\n";
 				
-				$preview_link = rvy_preview_url($revision);
-
-				$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
+				if (rvy_get_option('revision_preview_links')) {
+					$preview_link = rvy_preview_url($revision);
+					$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
+				}
 
 				$message .= __( 'Editor: ', 'revisionary' ) . admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
 			} else {
@@ -223,9 +224,10 @@ function rvy_revision_approve($revision_id = 0) {
 					$datef = __awp( 'M j, Y @ g:i a' );
 					$message .= sprintf( __('It will be published on %s', 'revisionary' ), agp_date_i18n( $datef, strtotime($revision->post_date) ) ) . "\r\n\r\n";
 					
-					$preview_link = rvy_preview_url($revision);
-
-					$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
+					if (rvy_get_option('revision_preview_links')) {
+						$preview_link = rvy_preview_url($revision);
+						$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
+					}
 
 					$message .= __( 'Editor: ', 'revisionary' ) . admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
 				} else {

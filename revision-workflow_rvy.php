@@ -40,9 +40,10 @@ class Rvy_Revision_Workflow_UI {
             if ( $revision_id ) {
                 $revision = get_post($revision_id);
 
-                $preview_link = rvy_preview_url($revision);
-
-                $message .= __( 'Preview and Approval: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
+                if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
+                    $preview_link = rvy_preview_url($revision);
+                    $message .= __( 'Preview and Approval: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
+                }
 
                 $message .= __( 'Revision Queue: ', 'revisionary' ) . admin_url("admin.php?page=revisionary-q&published_post={$published_post->ID}") . "\r\n\r\n";
                 
@@ -167,13 +168,15 @@ class Rvy_Revision_Workflow_UI {
 
                 $msg = __('Your modification was saved as a Scheduled Revision.', 'revisionary') . ' ';
             
-                $preview_link = rvy_preview_url($revision);
-			   
-                $msg .= '<ul><li>';
-                $msg .= sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link );
-                $preview_link = remove_query_arg('preview_id', $preview_link);
+                $msg .= '<ul>';
+                
+                if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
+                    $preview_link = rvy_preview_url($revision);
+                    $msg .= '<li>' . sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link );
+                    $preview_link = remove_query_arg('preview_id', $preview_link);
+                    $msg .= '<br /><br /></li><li>';
+                }
 
-                $msg .= '<br /><br /></li><li>';
                 //$msg .= sprintf( '<a href="%s">' . __('Go to Revisions Manager', 'revisionary') . '</a>', "admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=view" );
                 //$msg .= '<br /><br /></li><li>';
                 $msg .= sprintf( '<a href="%s">' . __('Keep editing the revision', 'revisionary') . '</a>', "post.php?post={$revision->ID}&amp;action=edit" );
@@ -199,14 +202,18 @@ class Rvy_Revision_Workflow_UI {
 
                 clean_post_cache($revision->ID);
                 
-                $preview_link = rvy_preview_url($revision);
-                $preview_link = remove_query_arg('preview_id', $preview_link);
+                $msg .= '<ul>';
 
-                $msg .= '<ul><li>';
-                $msg .= sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link );
-                $msg .= '<br /><br /></li><li>';
-                //$msg .= sprintf( '<a href="%s">' . __('Go to Revisions Manager', 'revisionary') . '</a>', "admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=view" );
-                //$msg .= '<br /><br /></li><li>';
+                if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
+                    $preview_link = rvy_preview_url($revision);
+                    $preview_link = remove_query_arg('preview_id', $preview_link);
+
+                    $msg .= '<li>';
+                    $msg .= sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link );
+                    $msg .= '<br /><br /></li>';
+                }
+
+                $msg .= '<li>';
                 $msg .= sprintf( '<a href="%s">' . __('Keep editing the revision', 'revisionary') . '</a>', "post.php?post={$revision->ID}&amp;action=edit" );
                 $msg .= '<br /><br /></li><li>';
                 

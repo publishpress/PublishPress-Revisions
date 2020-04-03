@@ -30,8 +30,12 @@ class RvyPostEdit {
         global $post;
 
         if (rvy_is_revision_status($post->post_status)) {
-            $preview_url = rvy_preview_url($post);
-            $preview_msg = sprintf(__('Revision updated. %sView Preview%s', 'revisionary'), "<a href='$preview_url'>", '</a>');
+            if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
+                $preview_url = rvy_preview_url($post);
+                $preview_msg = sprintf(__('Revision updated. %sView Preview%s', 'revisionary'), "<a href='$preview_url'>", '</a>');
+            } else {
+                $preview_msg = __('Revision updated.', 'revisionary');
+            }
 
             $messages['post'][1] = $preview_msg;
             $messages['page'][1] = $preview_msg;
