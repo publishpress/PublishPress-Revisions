@@ -508,8 +508,6 @@ class RevisionaryAdmin
 	function admin_head() {
 		//echo '<link rel="stylesheet" href="' . RVY_URLPATH . '/admin/revisionary.css" type="text/css" />'."\n";
 
-		add_filter( 'contextual_help_list', array(&$this, 'flt_contextual_help_list'), 10, 2 );
-		
 		global $pagenow, $revisionary;
 
 		if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ) ) && ! defined('RVY_PREVENT_PUBHIST_CAPTION') && ! $revisionary->isBlockEditorActive() ) {
@@ -554,23 +552,6 @@ class RevisionaryAdmin
 		// TODO: replace some of this JS with equivalent JQuery
 		if ( ! defined('SCOPER_VERSION') )
 			wp_enqueue_script( 'rvy', RVY_URLPATH . "/admin/revisionary.js", array('jquery'), RVY_VERSION, true );
-	}
-	
-	function flt_contextual_help_list ($help, $screen) {
-		if ( is_object($screen) )
-			$screen = $screen->id;
-		
-		if ( in_array( $screen, array( 'edit', 'post', 'settings_page_rvy-revisions', 'revisionary_page_revisionary-settings' ) ) ) {
-			if ( ! isset($help[$screen]) )
-				$help[$screen] = '';
-
-			//$doc_url =
-			//$help[$screen] .= sprintf(__('%1$s PublishPress Revisions Documentation%2$s', 'revisionary'), "<a href='$doc_url' target='_blank'>", '</a>')
-			//$forum_url =
-			//$help[$screen] .= ' ' . sprintf(__('%1$s PublishPress Revisions Support Forum%2$s', 'revisionary'), "<a href='$forum_url' target='_blank'>", '</a>');
-		}
-
-		return $help;
 	}
 
 	function moderation_queue() {
