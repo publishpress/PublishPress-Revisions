@@ -51,10 +51,10 @@ function agp_user_can($reqd_caps, $object_id = 0, $user_id = 0, $args = array() 
 		if ( empty($user) )
 			return false;
 	}
-	
+
 	$orig_skip = ! empty($GLOBALS['revisionary']->skip_revision_allowance);
-	
-	if ( ! empty( $args['skip_revision_allowance'] ) ) {
+
+	if (!empty($args['skip_revision_allowance'])) {
 		$GLOBALS['revisionary']->skip_revision_allowance = true;	// this will affect the behavior of Press Permit / Role Scoper's user_has_cap filter
 	}
 
@@ -113,7 +113,7 @@ function agp_user_can($reqd_caps, $object_id = 0, $user_id = 0, $args = array() 
 			$GLOBALS['revisionary']->content_roles->set_hascap_flags( $flags );
 		}
 		
-		if ( ! empty( $args['skip_revision_allowance'] ) ) {
+		if (!empty($args['skip_revision_allowance'])) {
 			$GLOBALS['revisionary']->skip_revision_allowance = false;
 		}
 

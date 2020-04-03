@@ -88,7 +88,7 @@ if ( $sitewide )
 	$customize_defaults = false;	// this is intended only for storing custom default values for site-specific options
 
 $ui = RvyOptionUI::instance(compact($sitewide, $customize_defaults));
-	
+
 rvy_refresh_default_options();
 
 $ui->all_options = array();
