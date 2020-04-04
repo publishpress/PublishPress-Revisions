@@ -372,7 +372,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	$update = (array) $revision;
 
-	$update = wp_slash( $update ); //since data is from db
+	//$update = wp_slash( $update ); //since data is from db
 
 	//$published = get_post($published_id);
 	$published = $wpdb->get_row(
@@ -423,6 +423,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 	}
 	
+	$revision_content = $update['post_content'];
+
 	$post_id = wp_update_post( $update );
 	if ( ! $post_id || is_wp_error( $post_id ) ) {
 		return $post_id;
@@ -434,7 +436,14 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	// Apply requested slug, if applicable. 
 	// Otherwise, work around unexplained reversion of editor-modified post slug back to default format on some sites  @todo: identify plugin interaction
-	$wpdb->update($wpdb->posts, array('post_name' => $set_slug, 'guid' => $published->guid), array('ID' => $post_id));
+	$update_fields = ['post_name' => $set_slug, 'guid' => $published->guid, 'post_content' => $revision_content];
+
+	// Prevent wp_insert_post() from stripping inline html styles
+	if (!defined('RVY_DISABLE_REVISION_CONTENT_PASSTHRU')) {
+		$update_fields['post_content'] = $revision_content;
+	}
+	
+	$wpdb->update($wpdb->posts, $update_fields, array('ID' => $post_id));
 
 	$_post = get_post($post_id);
 
