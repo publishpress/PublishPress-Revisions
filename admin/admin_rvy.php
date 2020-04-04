@@ -318,9 +318,9 @@ class RevisionaryAdmin
 	}
 
 	function flt_dashboard_query_clauses( $clauses ) {
-		global $wpdb;
+		global $wpdb, $revisionary;
 
-		$types = array_merge( get_post_types( array( 'public' => true ), 'names' ) );
+		$types = array_keys($revisionary->enabled_post_types);
 		$post_types_csv = implode( "','", $types );
 		$clauses['where'] = str_replace( "$wpdb->posts.post_type = 'post'", "$wpdb->posts.post_type IN ('$post_types_csv')", $clauses['where'] );
 

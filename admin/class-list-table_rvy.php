@@ -8,7 +8,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	private $posts_clauses_filtered; 
 
 	public function __construct($args = []) {
-		global $wpdb;
+		global $wpdb, $revisionary;
 
 		parent::__construct([
 			'plural' => 'posts',
@@ -18,7 +18,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if ( isset( $args['post_types'] ) )
 			$this->post_types = $args['post_types'];
 		else
-			$this->post_types = get_post_types(['public' => true]);
+			$this->post_types = array_keys($revisionary->enabled_post_types);
 		
 		$omit_types = ['forum', 'topic', 'reply'];
 		$this->post_types = array_diff( $this->post_types, $omit_types );
@@ -164,13 +164,16 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	}
 
 	function pre_query_where_filter($where, $args = []) {
-		global $wpdb, $current_user;
+		global $wpdb, $current_user, $revisionary;
 		
 		if (!current_user_can('administrator') && empty($args['suppress_author_clause'])) {
 			$p = (!empty($args['alias'])) ? $args['alias'] : $wpdb->posts;
 
 			$can_edit_others_types = [];
-			foreach(get_post_types(['public' => true], 'object') as $post_type => $type_obj) {
+			
+			foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
+				$type_obj = get_post_type_object($post_type);
+
 				if (agp_user_can($type_obj->cap->edit_others_posts, 0, '', ['skip_revision_allowance' => true])) {
 					$can_edit_others_types[]= $post_type;
 				}
@@ -222,7 +225,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			&& !current_user_can('list_others_revisions') 
 		) {
 			$can_publish_types = [];
-			foreach(get_post_types(['public' => true], 'object') as $post_type => $type_obj) {
+			foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
+				$type_obj = get_post_type_object($post_type);
+
 				if (
 					isset($type_obj->cap->edit_published_posts)
 					&& agp_user_can($type_obj->cap->edit_published_posts, 0, '', ['skip_revision_allowance' => true])

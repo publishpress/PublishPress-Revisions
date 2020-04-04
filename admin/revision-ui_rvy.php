@@ -170,6 +170,8 @@ function rvy_metabox_revisions_future() {
  * @return string i18n formatted datetimestamp or localized 'Current Revision'.
  */
 function rvy_post_revision_title( $revision, $link = true, $date_field = 'post_date', $args = array() ) {
+	global $revisionary;
+	
 	$defaults = array( 'post' => false, 'format' => 'list' );
 	$args = array_merge( $defaults, (array) $args );
 	foreach ( array_keys( $defaults ) as $var ) { $$var = $args[$var]; }
@@ -178,7 +180,7 @@ function rvy_post_revision_title( $revision, $link = true, $date_field = 'post_d
 		if ( !$revision = get_post( $revision ) )
 			return $revision;
 
-	$public_types = array_diff( get_post_types( array( 'public' => true ) ), array( 'attachment' ) );
+	$public_types = array_keys($revisionary->enabled_post_types);
 	$public_types []= 'revision';
 	
 	if ( ! in_array( $revision->post_type, $public_types ) )

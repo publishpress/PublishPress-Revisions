@@ -13,6 +13,8 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 
 include_once( dirname(__FILE__).'/revision-ui_rvy.php' ); 
 
+global $revisionary;
+
 if ( defined( 'FV_FCK_NAME' ) && current_user_can('activate_plugins') ) {
 	echo( '<div class="error">' );
 	_e( "<strong>Note:</strong> For visual display of revisions, add the following code to foliopress-wysiwyg.php:<br />&nbsp;&nbsp;if ( strpos( $" . "_SERVER['REQUEST_URI'], 'admin.php?page=rvy-revisions' ) ) return;", 'revisionary');
@@ -87,9 +89,7 @@ default :
 		if ( ! $rvy_post = get_post( $revision_id) )
 			break;
 
-		$public_types = array_diff( get_post_types( array( 'public' => true ) ), array( 'attachment' ) );
-	
-		if ( ! in_array( $rvy_post->post_type, $public_types ) ) {
+		if ( ! in_array( $rvy_post->post_type, array_keys($revisionary->enabled_post_types) ) ) {
 			$rvy_post = '';  // todo: is this necessary?
 			break;
 		}

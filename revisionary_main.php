@@ -56,6 +56,8 @@ class Revisionary
 			}
 		}
 
+		$this->setPostTypes();
+
 		rvy_refresh_options_sitewide();
 
 		// NOTE: $_GET['preview'] and $_GET['post_type'] arguments are set by rvy_init() at response to ?p= request when the requested post is a revision.
@@ -145,8 +147,15 @@ class Revisionary
 	}
 	
 	function configurationLateInit() {
-		$this->enabled_post_types = apply_filters('revisionary_enabled_post_types', array_fill_keys(get_post_types(['public' => true]), true));
+		$this->setPostTypes();
 		$this->config_loaded = true;
+	}
+
+	// This is intentionally called twice: once for code that fires on 'init' and then very late on 'init' for types which were registered late on 'init'
+	private function setPostTypes() {
+		$this->enabled_post_types = apply_filters('revisionary_enabled_post_types', array_fill_keys(get_post_types(['public' => true]), true));
+		unset($this->enabled_post_types['attachment']);
+		$this->enabled_post_types = array_filter($this->enabled_post_types);
 	}
 
 	function fltEditRevisionUpdatedLink($permalink, $post, $leavename) {

@@ -98,23 +98,23 @@ function rvy_maybe_redirect() {
 class RVY_RestAPI {
     // register a postmeta field to flag the need for a redirect following scheduled revision creation
     public static function register_scheduled_rev_meta_field() {
-			$post_types = get_post_types( array( 'public' => true ) );
+		global $revisionary;
 
-			foreach( $post_types as $post_type ) {
-				// Thanks to Josh Pollock for demonstrating this:
-				// https://torquemag.io/2015/07/working-with-post-meta-data-using-the-wordpress-rest-api/
-				register_rest_field( $post_type, 'new_scheduled_revision', array(
-					'get_callback' => array( 'RVY_RestAPI', 'get_new_scheduled_revision_flag' ),
-					'schema' => null,
-					)
-				);
+		foreach(array_keys($revisionary->enabled_post_types) as $post_type ) {
+			// Thanks to Josh Pollock for demonstrating this:
+			// https://torquemag.io/2015/07/working-with-post-meta-data-using-the-wordpress-rest-api/
+			register_rest_field( $post_type, 'new_scheduled_revision', array(
+				'get_callback' => array( 'RVY_RestAPI', 'get_new_scheduled_revision_flag' ),
+				'schema' => null,
+				)
+			);
 
-				register_rest_field( $post_type, 'save_as_revision', array(
-					'get_callback' => array( 'RVY_RestAPI', 'get_save_as_revision_flag' ),
-					'schema' => null,
-					)
-				);
-			}
+			register_rest_field( $post_type, 'save_as_revision', array(
+				'get_callback' => array( 'RVY_RestAPI', 'get_save_as_revision_flag' ),
+				'schema' => null,
+				)
+			);
+		}
     }
     
     public static function get_new_scheduled_revision_flag( $object ) {
@@ -714,9 +714,9 @@ function rvy_is_supported_post_type($post_type) {
 function rvy_get_manageable_types() {
 	$types = array();
 	
-	global $current_user;
+	global $current_user, $revisionary;
 	
-	foreach( get_post_types( array( 'public' => true ), 'object' ) as $post_type => $type_obj ) {
+	foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
 		//if ( ! empty( $current_user->allcaps[$type_obj->cap->publish_posts] ) 
 		//&& ! empty( $current_user->allcaps[$type_obj->cap->edit_published_posts] ) 
 		//&& ! empty( $current_user->allcaps[$type_obj->cap->edit_others_posts] ) ) {
