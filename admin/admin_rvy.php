@@ -147,7 +147,18 @@ class RevisionaryAdmin
 			$rvy_plugin_admin = new Rvy_Plugin_Admin();
 		}
 
+		if (!empty($_REQUEST['page']) && ('cms-tpv-page-page' == $_REQUEST['page'])) {
+			add_action('pre_get_posts', [$this, 'pre_get_posts']);
+		}
+
 		add_action('admin_menu', [$this, 'actSettingsPageMaybeRedirect'], 999);
+	}
+
+	// Prevent PublishPress Revisions statuses from confusing the page listing
+	public function pre_get_posts($wp_query) {
+		$stati = array_diff(get_post_stati(), apply_filters('revisionary_cmstpv_omit_statuses', ['pending-revision', 'future-revision'], rvy_detect_post_type()));
+		$wp_query->query['post_status'] = $stati;
+		$wp_query->query_vars['post_status'] = $stati;
 	}
 
 	public function fltAdminPostsListing() {
