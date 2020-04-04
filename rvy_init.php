@@ -36,11 +36,11 @@ if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview'])
 
 function rvy_mail_check_buffer($new_msg = [], $args = []) {
 	if (empty($args['log_only'])) {
-	if (!$use_buffer = rvy_get_option('use_notification_buffer')) {
-		return (defined('REVISIONARY_DISABLE_MAIL_LOG'))
-		? array_fill_keys(['buffer', 'sent_mail', 'send_limits', 'sent_counts', 'new_msg_buffered'], [])
-		: [];
-	}
+		if (!$use_buffer = rvy_get_option('use_notification_buffer')) {
+			return (defined('REVISIONARY_DISABLE_MAIL_LOG'))
+			? array_fill_keys(['buffer', 'sent_mail', 'send_limits', 'sent_counts', 'new_msg_buffered'], [])
+			: [];
+		}
 	}
 
 	require_once( dirname(__FILE__).'/mail-buffer_rvy.php');
@@ -98,23 +98,23 @@ function rvy_maybe_redirect() {
 class RVY_RestAPI {
     // register a postmeta field to flag the need for a redirect following scheduled revision creation
     public static function register_scheduled_rev_meta_field() {
-			$post_types = get_post_types( array( 'public' => true ) );
+		global $revisionary;
 
-			foreach( $post_types as $post_type ) {
-				// Thanks to Josh Pollock for demonstrating this:
-				// https://torquemag.io/2015/07/working-with-post-meta-data-using-the-wordpress-rest-api/
-				register_rest_field( $post_type, 'new_scheduled_revision', array(
-					'get_callback' => array( 'RVY_RestAPI', 'get_new_scheduled_revision_flag' ),
-					'schema' => null,
-					)
-				);
+		foreach(array_keys($revisionary->enabled_post_types) as $post_type ) {
+			// Thanks to Josh Pollock for demonstrating this:
+			// https://torquemag.io/2015/07/working-with-post-meta-data-using-the-wordpress-rest-api/
+			register_rest_field( $post_type, 'new_scheduled_revision', array(
+				'get_callback' => array( 'RVY_RestAPI', 'get_new_scheduled_revision_flag' ),
+				'schema' => null,
+				)
+			);
 
-				register_rest_field( $post_type, 'save_as_revision', array(
-					'get_callback' => array( 'RVY_RestAPI', 'get_save_as_revision_flag' ),
-					'schema' => null,
-					)
-				);
-			}
+			register_rest_field( $post_type, 'save_as_revision', array(
+				'get_callback' => array( 'RVY_RestAPI', 'get_save_as_revision_flag' ),
+				'schema' => null,
+				)
+			);
+		}
     }
     
     public static function get_new_scheduled_revision_flag( $object ) {
@@ -260,8 +260,8 @@ function rvy_detect_post_id() {
 		$post_id = $_GET['post'];
 	elseif ( ! empty( $_POST['post_ID'] ) )
 		$post_id = $_POST['post_ID'];
-	elseif ( ! empty( $_GET['post_id'] ) )
-		$post_id = $_GET['post_id'];
+	elseif ( ! empty( $_REQUEST['post_id'] ) )
+		$post_id = $_REQUEST['post_id'];
 	elseif ( ! empty( $_GET['p'] ) )
 		$post_id = $_GET['p'];
 	elseif ( ! empty( $_GET['id'] ) )
@@ -355,7 +355,12 @@ function rvy_refresh_default_options() {
 function rvy_apply_custom_default_options() {
 	global $wpdb, $rvy_default_options, $rvy_options_sitewide;
 	
-	if ( $results = $wpdb->get_results( "SELECT meta_key, meta_value FROM $wpdb->sitemeta WHERE site_id = '$wpdb->siteid' AND meta_key LIKE 'rvy_default_%'" ) ) {
+	if ( $results = $wpdb->get_results( 
+		$wpdb->prepare(
+			"SELECT meta_key, meta_value FROM $wpdb->sitemeta WHERE site_id = %d AND meta_key LIKE 'rvy_default_%'", 
+			$wpdb->siteid
+		)	
+	) ) {
 		foreach ( $results as $row ) {
 			$option_basename = str_replace( 'rvy_default_', '', $row->meta_key );
 
@@ -409,9 +414,16 @@ function rvy_retrieve_options( $sitewide = false ) {
 		
 		$rvy_site_options = array();
 
-		if ( $results = $wpdb->get_results( "SELECT meta_key, meta_value FROM $wpdb->sitemeta WHERE site_id = '$wpdb->siteid' AND meta_key LIKE 'rvy_%'" ) )
-			foreach ( $results as $row )
+		if ( $results = $wpdb->get_results( 
+			$wpdb->prepare(
+				"SELECT meta_key, meta_value FROM $wpdb->sitemeta WHERE site_id = %d AND meta_key LIKE 'rvy_%'",
+				$wpdb->siteid
+			) 	
+		) ) {
+			foreach ( $results as $row ) {
 				$rvy_site_options[$row->meta_key] = $row->meta_value;
+			}
+		}
 
 		$rvy_site_options = apply_filters( 'site_options_rvy', $rvy_site_options );
 		return $rvy_site_options;
@@ -421,9 +433,11 @@ function rvy_retrieve_options( $sitewide = false ) {
 		
 		$rvy_blog_options = array();
 		
-		if ( $results = $wpdb->get_results("SELECT option_name, option_value FROM $wpdb->options WHERE option_name LIKE 'rvy_%'") )
-			foreach ( $results as $row )
+		if ( $results = $wpdb->get_results("SELECT option_name, option_value FROM $wpdb->options WHERE option_name LIKE 'rvy_%'") ) {
+			foreach ( $results as $row ) {
 				$rvy_blog_options[$row->option_name] = $row->option_value;
+			}
+		}
 				
 		$rvy_blog_options = apply_filters( 'options_rvy', $rvy_blog_options );
 		return $rvy_blog_options;
@@ -481,7 +495,7 @@ function rvy_get_option($option_basename, $sitewide = -1, $get_default = false) 
 
 	return maybe_unserialize($optval);
 }
- 
+
 function rvy_log_async_request($action) {						
 	// the function which performs requested action will clear this entry to confirm that the asynchronous call was effective 
 	$requested_actions = get_option( 'requested_remote_actions_rvy' );
@@ -634,7 +648,7 @@ function rvy_is_status_published( $status ) {
 }
 
 function rvy_revision_statuses() {
-	return apply_filters('rvy_revision_statuses', array('pending-revision', 'future-revision'));
+	return array_map('sanitize_key', (array) apply_filters('rvy_revision_statuses', array('pending-revision', 'future-revision')));
 }
 
 function rvy_is_revision_status($status) {
@@ -669,19 +683,6 @@ function rvy_post_id($revision_id) {
 	return ($published_id) ? $published_id : 0;
 }
 
-/*
-function rvy_get_post_meta($post_id, $key, $single = false) {
-	global $wpdb;
-	if ( $results = $wpdb->get_results( "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = '$key' AND post_id = '$post_id' GROUP BY meta_id LIMIT 1" ) ) {
-		if ( $single )
-			return current( $results[0] );
-		else
-			return @array_map( 'maybe_unserialize', current($results) );
-	} else
-		return false;
-}
-*/
-
 function rvy_halt( $msg, $title = '' ) {
 	if ( ! $title ) {
 		$title = __( 'Revision Workflow', 'revisionary' );
@@ -713,9 +714,9 @@ function rvy_is_supported_post_type($post_type) {
 function rvy_get_manageable_types() {
 	$types = array();
 	
-	global $current_user;
+	global $current_user, $revisionary;
 	
-	foreach( get_post_types( array( 'public' => true ), 'object' ) as $post_type => $type_obj ) {
+	foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
 		//if ( ! empty( $current_user->allcaps[$type_obj->cap->publish_posts] ) 
 		//&& ! empty( $current_user->allcaps[$type_obj->cap->edit_published_posts] ) 
 		//&& ! empty( $current_user->allcaps[$type_obj->cap->edit_others_posts] ) ) {

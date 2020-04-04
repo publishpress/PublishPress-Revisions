@@ -18,7 +18,7 @@ class RevisionaryActivation {
         if (defined('REVISIONARY_FORCE_REIMPORT') && REVISIONARY_FORCE_REIMPORT) {
             $id_csv = '';
         } elseif ($imported_ids = (array) get_option('revisionary_imported_ids')) {
-            $id_csv = implode("','", $imported_ids);
+            $id_csv = implode("','", array_map('intval', $imported_ids));
         } else {
             $imported_ids = [];
             $id_csv = '';

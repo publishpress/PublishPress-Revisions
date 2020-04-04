@@ -159,12 +159,12 @@ class RevisionaryFront {
 
 			$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
 
-				load_plugin_textdomain('revisionary', false, RVY_FOLDER . '/languages');
-				
-				$published_url = ($published_post_id) ? get_permalink($published_post_id) : '';
-				$diff_url = admin_url("revision.php?revision=$revision_id");
-				
-				if (current_user_can( 'read_post', $revision_id)) { 
+			load_plugin_textdomain('revisionary', false, RVY_FOLDER . '/languages');
+			
+			$published_url = ($published_post_id) ? get_permalink($published_post_id) : '';
+			$diff_url = admin_url("revision.php?revision=$revision_id");
+			
+			if (current_user_can( 'read_post', $revision_id)) { 
 				$view_published = ($published_url) 
 				? sprintf(
 					__("%sCompare%s%sView&nbsp;Published&nbsp;Post%s", 'revisionary'),
@@ -174,7 +174,7 @@ class RevisionaryFront {
 					'</a></span>'
 					)
 				: '';
-				} else { // @todo
+			} else { // @todo
 				$view_published = ($published_url) 
 				? sprintf(
 					__("%sView&nbsp;Published&nbsp;Post%s", 'revisionary'), 
@@ -182,111 +182,111 @@ class RevisionaryFront {
 					"</a></span>"
 					) 
 				: '';
-				}
+			}
 
-				if (agp_user_can('edit_post', $revision_id)) {
-					$edit_url = admin_url("post.php?action=edit&amp;post=$revision_id");
-					$edit_button = "<span><a href='$edit_url' class='rvy_preview_linkspan'>" . __('Edit', 'revisionary') . '</a></span>';
-				} else {
-					$edit_button = '';
-				}
+			if (agp_user_can('edit_post', $revision_id)) {
+				$edit_url = admin_url("post.php?action=edit&amp;post=$revision_id");
+				$edit_button = "<span><a href='$edit_url' class='rvy_preview_linkspan'>" . __('Edit', 'revisionary') . '</a></span>';
+			} else {
+				$edit_button = '';
+			}
 
-				if ($can_edit = agp_user_can('edit_post', rvy_post_id($revision_id), 0, ['skip_revision_allowance' => true])) {
-					if ( in_array( $post->post_status, array( 'pending-revision' ) ) ) {
-						$publish_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|$revision_id" );
-					
-					} elseif ( in_array( $post->post_status, array( 'future-revision' ) ) ) {
-						$publish_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|$revision_id" );
-					
-					} elseif ( in_array( $post->post_status, array( 'inherit' ) ) ) {
-						$publish_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=restore$redirect_arg"), "restore-post_$published_post_id|$revision_id" );
-					
-					} else {
-						$publish_url = '';
-					}
+			if ($can_edit = agp_user_can('edit_post', rvy_post_id($revision_id), 0, ['skip_revision_allowance' => true])) {
+				if ( in_array( $post->post_status, array( 'pending-revision' ) ) ) {
+					$publish_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|$revision_id" );
+				
+				} elseif ( in_array( $post->post_status, array( 'future-revision' ) ) ) {
+					$publish_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|$revision_id" );
+				
+				} elseif ( in_array( $post->post_status, array( 'inherit' ) ) ) {
+					$publish_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=restore$redirect_arg"), "restore-post_$published_post_id|$revision_id" );
+				
 				} else {
 					$publish_url = '';
 				}
+			} else {
+				$publish_url = '';
+			}
 
-				if (('revision' == $post->post_type) && (get_post_field('post_modified_gmt', $post->post_parent) == get_post_meta($revision_id, '_rvy_published_gmt', true) && empty($_REQUEST['mark_current_revision']))
-				) {
-					if ($post = get_post($post->post_parent)) {
-						if ('revision' != $post->post_type && !rvy_is_revision_status($post->post_status)) {
-							$url = add_query_arg('mark_current_revision', 1, get_permalink($post->ID));
-							wp_redirect($url);
-							exit;
-						}
+			if (('revision' == $post->post_type) && (get_post_field('post_modified_gmt', $post->post_parent) == get_post_meta($revision_id, '_rvy_published_gmt', true) && empty($_REQUEST['mark_current_revision']))
+			) {
+				if ($post = get_post($post->post_parent)) {
+					if ('revision' != $post->post_type && !rvy_is_revision_status($post->post_status)) {
+						$url = add_query_arg('mark_current_revision', 1, get_permalink($post->ID));
+						wp_redirect($url);
+						exit;
 					}
-				} else {
-					switch ( $post->post_status ) {
-					case 'pending-revision' :
-						if ( strtotime( $post->post_date_gmt ) > agp_time_gmt() ) {
-							$class = 'pending_future';
-							$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . __( 'Approve', 'revisionary' ) . '</a></span>' : '';
-							$message = sprintf( __('This is a Pending Revision (requested publish date: %s). %s %s %s', 'revisionary'), $date, $view_published, $edit_button, $publish_button );
-						} else {
-							$class = 'pending';
-							$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . __( 'Publish now', 'revisionary' ) . '</a></span>' : '';
-							$message = sprintf( __('This is a Pending Revision. %s %s %s', 'revisionary'), $view_published, $edit_button, $publish_button );
-						}
-						break;
-					
-					case 'future-revision' :
-						$class = 'future';
-
-						// work around quirk of new scheduled revision preview not displaying page template and post thumbnail when accessed immediately after creation
-						if (time() < strtotime($post->post_modified_gmt) + 15) {
-							$current_url = set_url_scheme( 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
-							$title = esc_attr(__('This revision is very new, preview may not be synchronized with theme.', 'revisionary'));
-							$reload_link = " <a href='$current_url' title='$title'>" . __('Reload', 'revisionary') . '</a>';
-						} else {
-							$reload_link = '';
-						}
-
-						$edit_url = admin_url("post.php?action=edit&amp;post=$revision_id");
-						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . __( 'Publish now', 'revisionary' ) . '</a></span>' : '';
-						$publish_button .= $reload_link;
-						$message = sprintf( __('This is a Scheduled Revision (for publication on %s). %s %s %s', 'revisionary'), $date, $view_published, $edit_button, $publish_button );
-						break;
-
-					case 'inherit' :
-						if ( current_user_can('edit_post', $revision_id ) ) {
-							$class = 'past';
-							$date = agp_date_i18n( $datef, strtotime( $post->post_modified ) );
-							$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . __( 'Restore', 'revisionary' ) . '</a></span>' : '';
-							$message = sprintf( __('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, $view_published, $publish_button );
-						}
-						break;
-
-					default:
-						if (!empty($_REQUEST['mark_current_revision'])) {
-							$class = 'published';
-							
-							if (!$can_edit) {
-								$edit_button = '';
-							}
-							
-							$message = sprintf( __('This is the Current Revision. %s', 'revisionary'), $edit_button );
-						} else {
-							return;
-						}
-					}
-
-					add_action('wp_head', [$this, 'rvyFrontCSS']);
-
-					add_action('wp_enqueue_scripts', [$this, 'rvyEnqueuePreviewJS']);
-
-					if (!defined('REVISIONARY_PREVIEW_BAR_RELATIVE')) {
-					add_action('wp_print_footer_scripts', [$this, 'rvyPreviewJS'], 50);
-					}
-
-					$html = '<div class="rvy_view_revision rvy_view_' . $class . '">' .
-							'<span class="rvy_preview_msgspan">' . $message . '</span>';
-
-					$html .= '</div>';
-
-					new RvyScheduledHtml( $html, 'wp_head', 99 );  // this should be inserted at the top of <body> instead, but currently no way to do it 
 				}
+			} else {
+				switch ( $post->post_status ) {
+				case 'pending-revision' :
+					if ( strtotime( $post->post_date_gmt ) > agp_time_gmt() ) {
+						$class = 'pending_future';
+						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . __( 'Approve', 'revisionary' ) . '</a></span>' : '';
+						$message = sprintf( __('This is a Pending Revision (requested publish date: %s). %s %s %s', 'revisionary'), $date, $view_published, $edit_button, $publish_button );
+					} else {
+						$class = 'pending';
+						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . __( 'Publish now', 'revisionary' ) . '</a></span>' : '';
+						$message = sprintf( __('This is a Pending Revision. %s %s %s', 'revisionary'), $view_published, $edit_button, $publish_button );
+					}
+					break;
+				
+				case 'future-revision' :
+					$class = 'future';
+
+					// work around quirk of new scheduled revision preview not displaying page template and post thumbnail when accessed immediately after creation
+					if (time() < strtotime($post->post_modified_gmt) + 15) {
+						$current_url = set_url_scheme( 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+						$title = esc_attr(__('This revision is very new, preview may not be synchronized with theme.', 'revisionary'));
+						$reload_link = " <a href='$current_url' title='$title'>" . __('Reload', 'revisionary') . '</a>';
+					} else {
+						$reload_link = '';
+					}
+
+					$edit_url = admin_url("post.php?action=edit&amp;post=$revision_id");
+					$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . __( 'Publish now', 'revisionary' ) . '</a></span>' : '';
+					$publish_button .= $reload_link;
+					$message = sprintf( __('This is a Scheduled Revision (for publication on %s). %s %s %s', 'revisionary'), $date, $view_published, $edit_button, $publish_button );
+					break;
+
+				case 'inherit' :
+					if ( current_user_can('edit_post', $revision_id ) ) {
+						$class = 'past';
+						$date = agp_date_i18n( $datef, strtotime( $post->post_modified ) );
+						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . __( 'Restore', 'revisionary' ) . '</a></span>' : '';
+						$message = sprintf( __('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, $view_published, $publish_button );
+					}
+					break;
+
+				default:
+					if (!empty($_REQUEST['mark_current_revision'])) {
+						$class = 'published';
+						
+						if (!$can_edit) {
+							$edit_button = '';
+						}
+						
+						$message = sprintf( __('This is the Current Revision. %s', 'revisionary'), $edit_button );
+					} else {
+						return;
+					}
+				}
+
+				add_action('wp_head', [$this, 'rvyFrontCSS']);
+
+				add_action('wp_enqueue_scripts', [$this, 'rvyEnqueuePreviewJS']);
+
+				if (!defined('REVISIONARY_PREVIEW_BAR_RELATIVE')) {
+					add_action('wp_print_footer_scripts', [$this, 'rvyPreviewJS'], 50);
+				}
+
+				$html = '<div class="rvy_view_revision rvy_view_' . $class . '">' .
+						'<span class="rvy_preview_msgspan">' . $message . '</span>';
+
+				$html .= '</div>';
+
+				new RvyScheduledHtml( $html, 'wp_head', 99 );  // this should be inserted at the top of <body> instead, but currently no way to do it 
+			}
 			
 			$GLOBALS['revisionary']->skip_revision_allowance = $orig_skip;
 		}
@@ -311,7 +311,7 @@ class RevisionaryFront {
 			var rvyAdminBarMenuZindex = 99999;
 
 			if ($('#wpadminbar').length) {
-				var rvyAdminBarHeight = $('#wpadminbar').height(); 
+				var rvyAdminBarHeight = $('#wpadminbar').height();
 				var barZ = parseInt($('#wpadminbar').css('z-index'));
 				if (barZ > rvyAdminBarMenuZindex) {
 					rvyAdminBarMenuZindex = barZ;

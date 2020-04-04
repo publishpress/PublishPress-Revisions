@@ -6,9 +6,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	var $published_post_count_ids = [];
 	var $post_types = [];
 	private $posts_clauses_filtered; 
-	 
+
 	public function __construct($args = []) {
-		global $wpdb;
+		global $wpdb, $revisionary;
 
 		parent::__construct([
 			'plural' => 'posts',
@@ -18,7 +18,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if ( isset( $args['post_types'] ) )
 			$this->post_types = $args['post_types'];
 		else
-			$this->post_types = get_post_types(['public' => true]);
+			$this->post_types = array_keys($revisionary->enabled_post_types);
 		
 		$omit_types = ['forum', 'topic', 'reply'];
 		$this->post_types = array_diff( $this->post_types, $omit_types );
@@ -164,13 +164,16 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	}
 
 	function pre_query_where_filter($where, $args = []) {
-		global $wpdb, $current_user;
+		global $wpdb, $current_user, $revisionary;
 		
 		if (!current_user_can('administrator') && empty($args['suppress_author_clause'])) {
 			$p = (!empty($args['alias'])) ? $args['alias'] : $wpdb->posts;
 
 			$can_edit_others_types = [];
-			foreach(get_post_types(['public' => true], 'object') as $post_type => $type_obj) {
+			
+			foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
+				$type_obj = get_post_type_object($post_type);
+
 				if (agp_user_can($type_obj->cap->edit_others_posts, 0, '', ['skip_revision_allowance' => true])) {
 					$can_edit_others_types[]= $post_type;
 				}
@@ -222,7 +225,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			&& !current_user_can('list_others_revisions') 
 		) {
 			$can_publish_types = [];
-			foreach(get_post_types(['public' => true], 'object') as $post_type => $type_obj) {
+			foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
+				$type_obj = get_post_type_object($post_type);
+
 				if (
 					isset($type_obj->cap->edit_published_posts)
 					&& agp_user_can($type_obj->cap->edit_published_posts, 0, '', ['skip_revision_allowance' => true])
@@ -449,7 +454,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		// todo: single query for all listed published posts
 		if (!isset($last_past_revision[$post->ID])) {
 			global $wpdb;
-			if ($revision_id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_type='revision' AND post_status='inherit' AND post_parent='$post->ID' ORDER BY ID DESC LIMIT 1")) {
+			if ($revision_id = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT ID FROM $wpdb->posts WHERE post_type='revision' AND post_status='inherit' AND post_parent = %d ORDER BY ID DESC LIMIT 1",
+					$post->ID
+				)
+			)) {
 				$last_past_revision[$post->ID] = $revision_id;
 			}
 		}
@@ -529,10 +539,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	private function count_revisions($post_type = '', $statuses = '' ) {
 		global $wpdb;
 
-		$status_csv = implode("','", (array) $statuses);
+		$status_csv = implode("','", array_map('sanitize_key', (array) $statuses));
 
 		if ($post_type) {
-			$type_clause = "AND post_type IN ('" . implode("','", (array) $post_type) . "')";
+			$type_clause = "AND post_type IN ('" 
+			. implode("','", array_map('sanitize_key', (array) $post_type)) 
+			. "')";
 		}
 
 		$where = $this->revisions_where_filter("post_status IN ('$status_csv') $type_clause", ['status_count' => true]);
@@ -620,8 +632,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		);
 
 		$count_query = apply_filters('presspermit_posts_request',
-				"SELECT COUNT(r.ID) FROM $wpdb->posts AS r INNER JOIN $wpdb->posts AS p ON r.comment_count = p.ID WHERE $where", 
-				['has_cap_check' => true, 'source_alias' => 'p']
+			"SELECT COUNT(r.ID) FROM $wpdb->posts AS r INNER JOIN $wpdb->posts AS p ON r.comment_count = p.ID WHERE $where", 
+			['has_cap_check' => true, 'source_alias' => 'p']
 		);
 
 		// work around some versions of PressPermit inserting non-aliased post_type reference into where clause under some configurations
@@ -766,14 +778,14 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$date_col = ( ! empty($_REQUEST['post_status']) && 'future-revision' == $_REQUEST['post_status'] ) ? 'post_date' : 'post_modified';
 
-		$ids = implode( "','", $this->published_post_ids );
+		$ids = implode("','", array_map('intval', $this->published_post_ids));
 		
-		$type_csv = "'" . implode("','", rvy_get_manageable_types()) . "'";
+		$type_csv = implode("','", array_map('sanitize_key', rvy_get_manageable_types()));
 
 		$months = $wpdb->get_results( "
 			SELECT DISTINCT YEAR( $date_col ) AS year, MONTH( $date_col ) AS month
 			FROM $wpdb->posts
-			WHERE post_type IN ($type_csv) AND comment_count IN ('$ids')
+			WHERE post_type IN ('$type_csv') AND comment_count IN ('$ids')
 			$extra_checks
 			ORDER BY $date_col DESC
 		" );
@@ -994,7 +1006,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		$post_type_object = get_post_type_object( $post->post_type );
-		$can_read_post    = current_user_can( 'read_post', $post->ID );
+
+		$can_read_post = current_user_can('read_post', $post->ID);
+
 		$can_edit_post    = current_user_can( 'edit_post', $post->ID );
 
 		$can_read_post = $can_read_post || $can_edit_post; // @todo
@@ -1024,17 +1038,19 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		if ( is_post_type_viewable( $post_type_object ) ) {
 			if ( $can_read_post ) {
-				$preview_link = rvy_preview_url($post);
+				if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
+					$preview_link = rvy_preview_url($post);
 
-				//$preview_link = remove_query_arg( 'post_type', $preview_link );
-				$preview_link = remove_query_arg( 'preview_id', $preview_link );
-				$actions['view'] = sprintf(
-					'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
-					esc_url( $preview_link ),
-					/* translators: %s: post title */
-					esc_attr( __( 'Preview Revision', 'revisionary' ) ),
-					__( 'Preview' )
-				);
+					//$preview_link = remove_query_arg( 'post_type', $preview_link );
+					$preview_link = remove_query_arg( 'preview_id', $preview_link );
+					$actions['view'] = sprintf(
+						'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
+						esc_url( $preview_link ),
+						/* translators: %s: post title */
+						esc_attr( __( 'Preview Revision', 'revisionary' ) ),
+						__( 'Preview' )
+					);
+				}
 			}
 
 			//if ( current_user_can( 'read_post', $post->ID ) ) { // @todo make this work for Author with Revision exceptions

@@ -17,7 +17,7 @@ class RvyOptionUI {
 	var $all_otype_options;
 	var $def_otype_options;
 	var $display_hints = true;
-		
+
 	public static function instance($args = [])
     {
         if (is_null(self::$instance)) {
@@ -88,7 +88,7 @@ if ( $sitewide )
 	$customize_defaults = false;	// this is intended only for storing custom default values for site-specific options
 
 $ui = RvyOptionUI::instance(compact($sitewide, $customize_defaults));
-	
+
 rvy_refresh_default_options();
 
 $ui->all_options = array();
@@ -126,6 +126,7 @@ $ui->option_captions = array(
 	'revisor_role_add_custom_rolecaps' => __('All custom post types available to Revisors', 'revisionary' ),
 	'require_edit_others_drafts' => __('Prevent Revisors from editing other user&apos;s drafts', 'revisionary' ),
 	'display_hints' => __('Display Hints'),
+	'revision_preview_links' => __('Show Preview Links', 'revisionary'),
 	'preview_link_type' => __('Preview Link Type', 'revisionary'),
 	'compare_revisions_direct_approval' => __('Approve Button on Compare Revisions screen', 'revisionary'),
 );
@@ -147,7 +148,7 @@ $ui->form_options = array(
 	'role_definition' => 	 array( 'revisor_role_add_custom_rolecaps', 'require_edit_others_drafts' ),
 	'scheduled_revisions' => array( 'scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date', ),
 	'pending_revisions'	=> 	 array( 'pending_revisions', 'pending_revision_update_post_date', ),
-	'preview' =>			 array( 'preview_link_type', 'compare_revisions_direct_approval'),
+	'preview' =>			 array( 'revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'),
 	'revisions'		=>		 array( 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'trigger_post_update_actions', 'diff_display_strip_tags', 'display_hints' ),
 	'notification'	=>		 array( 'pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer' )
 )
@@ -379,11 +380,15 @@ if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
 	</th><td>
 		
 	<?php 
+	$hint = __('For themes that block revision preview, hide preview links from non-Administrators', 'revisionary');
+	$ui->option_checkbox( 'revision_preview_links', $tab, $section, $hint, '' );
+
 	$id = 'preview_link_type';
 	if ( in_array( $id, $ui->form_options[$tab][$section] ) ) {
 		$ui->all_options []= $id;
 		$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
 		
+		echo '<div style="padding-left: 25px">';
 		echo "<label for='$id'>" . $ui->option_captions[$id] . ': </label>';
 
 		echo " <select name='$id' id='$id'>";
@@ -403,6 +408,7 @@ if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
 			</div>
 		<?php endif;
 		?>
+		</div>
 		<br />
 		<?php
 	}
@@ -648,14 +654,14 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			}
 		} 
 
-			if (empty($_REQUEST['mailinfo'])):?>
-				<br />
-				<div style="padding-left:22px">
-				<a href="<?php echo(add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Show Notification Log / Buffer', 'revisionary');?></a>
-				<br /><br />
-				<a href="<?php echo(add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI'])));?>"><?php _e('Show with message content', 'revisionary');?></a>
-				</div>
-			<?php endif;
+		if (empty($_REQUEST['mailinfo'])):?>
+			<br />
+			<div style="padding-left:22px">
+			<a href="<?php echo(add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Show Notification Log / Buffer', 'revisionary');?></a>
+			<br /><br />
+			<a href="<?php echo(add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI'])));?>"><?php _e('Show with message content', 'revisionary');?></a>
+			</div>
+		<?php endif;
 		
 		?>
 		</td></tr>

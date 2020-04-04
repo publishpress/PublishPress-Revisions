@@ -13,6 +13,8 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 
 include_once( dirname(__FILE__).'/revision-ui_rvy.php' ); 
 
+global $revisionary;
+
 if ( defined( 'FV_FCK_NAME' ) && current_user_can('activate_plugins') ) {
 	echo( '<div class="error">' );
 	_e( "<strong>Note:</strong> For visual display of revisions, add the following code to foliopress-wysiwyg.php:<br />&nbsp;&nbsp;if ( strpos( $" . "_SERVER['REQUEST_URI'], 'admin.php?page=rvy-revisions' ) ) return;", 'revisionary');
@@ -87,9 +89,7 @@ default :
 		if ( ! $rvy_post = get_post( $revision_id) )
 			break;
 
-		$public_types = array_diff( get_post_types( array( 'public' => true ) ), array( 'attachment' ) );
-	
-		if ( ! in_array( $rvy_post->post_type, $public_types ) ) {
+		if ( ! in_array( $rvy_post->post_type, array_keys($revisionary->enabled_post_types) ) ) {
 			$rvy_post = '';  // todo: is this necessary?
 			break;
 		}
@@ -176,9 +176,18 @@ if ( 'diff' != $action ) {
 if ( $is_administrator = is_content_administrator_rvy() ) {
 	global $wpdb;
 
-	$status_csv = "'" . implode("','", array_merge(rvy_revision_statuses(), ['inherit'])) . "'";
+	$status_csv = implode("','", array_merge(rvy_revision_statuses(), ['inherit']));
 
-	$results = $wpdb->get_results( "SELECT post_status, COUNT( * ) AS num_posts FROM {$wpdb->posts} WHERE post_status IN ($status_csv) AND ((post_type = 'revision' AND post_status = 'inherit' AND post_parent = '$rvy_post->ID') OR (post_type != 'revision' AND post_status != 'inherit' AND comment_count = '$rvy_post->ID')) GROUP BY post_status" );
+	$results = $wpdb->get_results( 
+		$wpdb->prepare(
+			"SELECT post_status, COUNT( * ) AS num_posts FROM {$wpdb->posts}"
+			. " WHERE post_status IN ('$status_csv')"
+			. " AND ((post_type = 'revision' AND post_status = 'inherit' AND post_parent = %d) OR (post_type != 'revision' AND post_status != 'inherit' AND comment_count = %d))"
+			. " GROUP BY post_status",
+			$rvy_post->ID,
+			$rvy_post->ID
+		)
+	);
 	
 	$num_revisions = array( 'inherit' => 0, 'pending-revision' => 0, 'future-revision' => 0 );
 	foreach( $results as $row )

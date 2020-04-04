@@ -56,6 +56,8 @@ class Revisionary
 			}
 		}
 
+		$this->setPostTypes();
+
 		rvy_refresh_options_sitewide();
 
 		// NOTE: $_GET['preview'] and $_GET['post_type'] arguments are set by rvy_init() at response to ?p= request when the requested post is a revision.
@@ -145,8 +147,15 @@ class Revisionary
 	}
 	
 	function configurationLateInit() {
-		$this->enabled_post_types = apply_filters('revisionary_enabled_post_types', array_fill_keys(get_post_types(['public' => true]), true));
+		$this->setPostTypes();
 		$this->config_loaded = true;
+	}
+
+	// This is intentionally called twice: once for code that fires on 'init' and then very late on 'init' for types which were registered late on 'init'
+	private function setPostTypes() {
+		$this->enabled_post_types = apply_filters('revisionary_enabled_post_types', array_fill_keys(get_post_types(['public' => true]), true));
+		unset($this->enabled_post_types['attachment']);
+		$this->enabled_post_types = array_filter($this->enabled_post_types);
 	}
 
 	function fltEditRevisionUpdatedLink($permalink, $post, $leavename) {
@@ -434,19 +443,19 @@ class Revisionary
 					if (isset($post_type_obj->cap->edit_published_posts) && agp_user_can( $post_type_obj->cap->edit_published_posts, 0, '', array('skip_revision_allowance' => true) ) ) {	// don't require any additional caps for sitewide Editors
 						return $caps;
 					}
-				
-						static $stati;
+			
+					static $stati;
 
-						if ( ! isset($stati) ) {
-							$stati = get_post_stati( array( 'internal' => false, 'protected' => true ) );
-							$stati = array_diff( $stati, array( 'future' ) );
-						}
+					if ( ! isset($stati) ) {
+						$stati = get_post_stati( array( 'internal' => false, 'protected' => true ) );
+						$stati = array_diff( $stati, array( 'future' ) );
+					}
 
-						if ( in_array( $post->post_status, $stati ) ) {
-							$caps[]= "edit_others_drafts";
-						}
+					if ( in_array( $post->post_status, $stati ) ) {
+						$caps[]= "edit_others_drafts";
 					}
 				}
+			}
 		}
 		
 		return $caps;
@@ -513,9 +522,9 @@ class Revisionary
 		}
 
 		if (!empty($args[0])) {
-				$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
+			$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
 		} else {
-				$post_id = 0;
+			$post_id = 0;
 		}
 
 		if ($post = get_post($post_id)) {
@@ -661,19 +670,21 @@ class Revisionary
 		// For 'edit_post' check, filter required capabilities via 'map_meta_cap' filter, then pass 'user_has_cap' unfiltered
 		if (in_array($args[0], array('edit_post', 'edit_page')) && ! $is_meta_cap_call) {
 			if (empty($post) || !rvy_is_revision_status($post->post_status)) {
-			return $wp_blogcaps;
-		}
+				return $wp_blogcaps;
+			}
 		}
 
 		if ( ! in_array( $args[0], array( 'edit_post', 'edit_page', 'delete_post', 'delete_page' ) ) && empty($support_publish_cap) ) {			
 			if ( ( 
 				( ! strpos( $script_name, 'p-admin/post.php' ) || empty( $_POST ) ) 
 				&& ! $this->doing_rest && ! rvy_wp_api_request() 
-				&& ( ! defined('DOING_AJAX') || ! DOING_AJAX ) 
+				&& ( ! defined('DOING_AJAX') || ! DOING_AJAX )
 				) || empty( $_REQUEST['action'] ) || ( 'editpost' != $_REQUEST['action'] ) 
 			) {
-				if ( ! in_array( $args[0], array( 'edit_published_pages', 'edit_others_pages', 'edit_private_pages', 'edit_pages', 'publish_pages', 'publish_posts' ) ) ) {
-					return $wp_blogcaps;
+				if (!apply_filters('revisionary_flag_as_post_update', false, $post_id, $reqd_caps, $args, $internal_args)) {
+					if ( ! in_array( $args[0], array( 'edit_published_pages', 'edit_others_pages', 'edit_private_pages', 'edit_pages', 'publish_pages', 'publish_posts' ) ) ) {
+						return $wp_blogcaps;
+					}
 				}
 			}
 		}
@@ -687,7 +698,7 @@ class Revisionary
 			$this->skip_revision_allowance = true;
 		}
 
-		if ( rvy_get_option( 'revisor_lock_others_revisions' ) ) {
+		if (rvy_get_option('revisor_lock_others_revisions')) {
 			if ($post && !rvy_is_full_editor($post)) {
 				// Revisors are enabled to edit other users' posts for revision, but cannot edit other users' revisions unless cap is explicitly set sitewide
 				if ( rvy_is_revision_status($post->post_type) && ! $this->skip_revision_allowance ) {
@@ -870,15 +881,15 @@ class Revisionary
 				return true;
 			} elseif (get_option('classic-editor-allow-users') === 'allow') {
 				if ($post_id = rvy_detect_post_id()) {
-				$which = get_post_meta( $post_id, 'classic-editor-remember', true );
-				
-				if ('block-editor' == $which) {
-					return true;
-				} elseif ('classic-editor' == $which) {
-					return false;
+					$which = get_post_meta( $post_id, 'classic-editor-remember', true );
+
+					if ('block-editor' == $which) {
+						return true;
+					} elseif ('classic-editor' == $which) {
+						return false;
+					}
 				}
 			}
-		}
 		}
 
 		$pluginsState = array(

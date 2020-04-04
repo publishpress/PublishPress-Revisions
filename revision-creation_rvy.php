@@ -15,7 +15,7 @@ class RevisionCreation {
 		if (!empty($this->revisionary)) {
 			$revisionary = $this->revisionary;
 		} else {
-        global $revisionary;
+			global $revisionary;
 		}
 
         if ( isset($_POST['wp-preview']) && ( 'dopreview' == $_POST['wp-preview'] ) ) {
@@ -52,7 +52,7 @@ class RevisionCreation {
         if (!empty($this->revisionary)) {
 			$revisionary = $this->revisionary;
 		} else {
-        global $revisionary;
+			global $revisionary;
 		}
         
         if (rvy_is_revision_status($status) || ('inherit' == $status)) {
@@ -593,7 +593,7 @@ class RevisionCreation {
 				if ( is_array( $tags ) ) {
 					$tags = array_filter( $tags );
 				}
-			
+				
 				if ( current_user_can( $taxonomy_obj->cap->assign_terms ) ) {
 					wp_set_post_terms( $post_ID, $tags, $taxonomy );
 					$set_taxonomies[$taxonomy] = true;

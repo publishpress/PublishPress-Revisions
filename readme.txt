@@ -6,8 +6,8 @@ Author URI: https://publishpress.com
 Tags: revision, submit changes, workflow, collaboration, permissions, moderate, posts, schedule revisions
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
-Tested up to: 5.3
-Stable tag: 2.2.1
+Tested up to: 5.4
+Stable tag: 2.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -100,6 +100,15 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.2.2 - 2 Apr 2020 =
+* Feature : Option to disable revision preview links for non-Administrators (to work around themes that force a 404 Not Found response) 
+* Fixed : Inline styles were stripped or modifield on scheduled revision publication
+* Fixed : Possible fatal error on Revisions screen on a small percentage of installations
+* Fixed : PHP Notice for deprecated function contextual_help_list()
+* Change : Standardize sanitization of database queries 
+* API: revisionary_enabled_post_types filter was not applied consistently
+* Compat : CMS Tree Page View - Suppress Pending Revisions and Scheduled Revisions from Page Tree View
+
 = 2.2.1 - 16 Mar 2020 =
 * Fixed : Page Template was cleared on revision submission in some installations
 * Fixed : Revision Queue - "Filter" link was ineffective in showing only revisions of the selected published post. This also applies to "View Revision Queue" link after revision creation.
@@ -107,6 +116,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 * Fixed : Duplicate email notifications for scheduled revision publication on some installations
 * Fixed : Safeguard to prevent duplicate email notifications
 * Feature : Plugin API - new filter 'revisionary_mail' allows adjustment to notification email address, title or message (or blockage of a particular email)
+* Change : Pro top banner on Revisions screens
 * Compat : New setting "Revision publication triggers API actions to mimic post update" causes save_post and transition_post_status actions to fire on revision publication
 * Compat : Yoast SEO - Revision submission stripped accented characters and emojis out of FAQ block
 * Compat : On revision publication, trigger 'transition_post_status' action, for plugins that use it

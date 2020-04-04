@@ -9,7 +9,7 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
  * @license     GPLv2 or later
  * @since       1.0.0
  */
- 
+
 // Setting scope: For Network installations, which Revisionary options should default to site-wide control?
 function rvy_default_options_sitewide() {
 	$def = array(
@@ -34,6 +34,7 @@ function rvy_default_options_sitewide() {
 		'scheduled_revision_update_post_date' => true,
 		'pending_revision_update_post_date' => true,
 		'edd_key' => true,
+		'revision_preview_links' => true,
 		'preview_link_type' => true,
 		'compare_revisions_direct_approval' => true,
 		'display_pp_branding' => true,
@@ -71,6 +72,7 @@ function rvy_default_options() {
 		'scheduled_revision_update_post_date' => 1,
 		'pending_revision_update_post_date' => 0,
 		'edd_key' => '',
+		'revision_preview_links' => 1,
 		'preview_link_type' => 'published_slug',
 		'compare_revisions_direct_approval' => 0,
 		'display_pp_branding' => 1,

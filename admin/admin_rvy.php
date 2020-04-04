@@ -147,7 +147,18 @@ class RevisionaryAdmin
 			$rvy_plugin_admin = new Rvy_Plugin_Admin();
 		}
 
+		if (!empty($_REQUEST['page']) && ('cms-tpv-page-page' == $_REQUEST['page'])) {
+			add_action('pre_get_posts', [$this, 'pre_get_posts']);
+		}
+
 		add_action('admin_menu', [$this, 'actSettingsPageMaybeRedirect'], 999);
+	}
+
+	// Prevent PublishPress Revisions statuses from confusing the page listing
+	public function pre_get_posts($wp_query) {
+		$stati = array_diff(get_post_stati(), apply_filters('revisionary_cmstpv_omit_statuses', ['pending-revision', 'future-revision'], rvy_detect_post_type()));
+		$wp_query->query['post_status'] = $stati;
+		$wp_query->query_vars['post_status'] = $stati;
 	}
 
 	public function fltAdminPostsListing() {
@@ -162,8 +173,10 @@ class RevisionaryAdmin
 		}
 
 		if ($listed_ids) {
-			$id_csv = implode("','", $listed_ids);
-			$results = $wpdb->get_results("SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN('$id_csv') GROUP BY comment_count");
+			$id_csv = implode("','", array_map('intval', $listed_ids));
+			$results = $wpdb->get_results(
+				"SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN('$id_csv') GROUP BY comment_count"
+			);
 			
 			foreach($results as $row) {
 				$this->post_revision_count[$row->published_post] = $row->num_revisions;
@@ -191,7 +204,7 @@ class RevisionaryAdmin
 					$ids []= $row->ID;
 				}
 
-				$id_csv = implode("','", $ids);
+				$id_csv = implode("','", array_map('intval', $ids));
 				$results = $wpdb->get_results("SELECT ID, post_status FROM $wpdb->posts WHERE ID IN ('$id_csv')");
 				foreach($results as $row ) {
 					$listed_post_statuses[$row->ID] = $row->post_status;
@@ -226,7 +239,7 @@ class RevisionaryAdmin
 				$listed_ids []= $row->ID;
 			}
 
-			$listed_post_csv = implode("','", $listed_ids);
+			$listed_post_csv = implode("','", array_map('intval', $listed_ids));
 			$this->trashed_revisions = $wpdb->get_col("SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_base_post_id' AND post_id IN ('$listed_post_csv')");
 		} else {
 			$this->trashed_revisions = [];
@@ -316,9 +329,9 @@ class RevisionaryAdmin
 	}
 
 	function flt_dashboard_query_clauses( $clauses ) {
-		global $wpdb;
+		global $wpdb, $revisionary;
 
-		$types = array_merge( get_post_types( array( 'public' => true ), 'names' ) );
+		$types = array_keys($revisionary->enabled_post_types);
 		$post_types_csv = implode( "','", $types );
 		$clauses['where'] = str_replace( "$wpdb->posts.post_type = 'post'", "$wpdb->posts.post_type IN ('$post_types_csv')", $clauses['where'] );
 
@@ -506,8 +519,6 @@ class RevisionaryAdmin
 	function admin_head() {
 		//echo '<link rel="stylesheet" href="' . RVY_URLPATH . '/admin/revisionary.css" type="text/css" />'."\n";
 
-		add_filter( 'contextual_help_list', array(&$this, 'flt_contextual_help_list'), 10, 2 );
-		
 		global $pagenow, $revisionary;
 
 		if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ) ) && ! defined('RVY_PREVENT_PUBHIST_CAPTION') && ! $revisionary->isBlockEditorActive() ) {
@@ -552,23 +563,6 @@ class RevisionaryAdmin
 		// TODO: replace some of this JS with equivalent JQuery
 		if ( ! defined('SCOPER_VERSION') )
 			wp_enqueue_script( 'rvy', RVY_URLPATH . "/admin/revisionary.js", array('jquery'), RVY_VERSION, true );
-	}
-	
-	function flt_contextual_help_list ($help, $screen) {
-		if ( is_object($screen) )
-			$screen = $screen->id;
-		
-		if ( in_array( $screen, array( 'edit', 'post', 'settings_page_rvy-revisions', 'revisionary_page_revisionary-settings' ) ) ) {
-			if ( ! isset($help[$screen]) )
-				$help[$screen] = '';
-
-			//$doc_url =
-			//$help[$screen] .= sprintf(__('%1$s PublishPress Revisions Documentation%2$s', 'revisionary'), "<a href='$doc_url' target='_blank'>", '</a>')
-			//$forum_url =
-			//$help[$screen] .= ' ' . sprintf(__('%1$s PublishPress Revisions Support Forum%2$s', 'revisionary'), "<a href='$forum_url' target='_blank'>", '</a>');
-		}
-
-		return $help;
 	}
 
 	function moderation_queue() {
@@ -622,14 +616,16 @@ class RevisionaryAdmin
 			add_action('revisionary_page_revisionary-settings', 'rvy_omit_site_options' );	
 		}
 
-		add_submenu_page(
-            'revisionary-q', 
-            __('Upgrade to Pro', 'revisionary'), 
-            __('Upgrade to Pro', 'revisionary'), 
-            'read', 
-            'revisionary-pro', 
-            'rvy_omit_site_options'
-        );
+		if (!defined('REVISIONARY_PRO_VERSION')) {
+			add_submenu_page(
+	            'revisionary-q', 
+	            __('Upgrade to Pro', 'revisionary'), 
+	            __('Upgrade to Pro', 'revisionary'), 
+	            'read', 
+	            'revisionary-pro', 
+	            'rvy_omit_site_options'
+	        );
+    	}
 	}
 
 	function act_hide_quickedit() {

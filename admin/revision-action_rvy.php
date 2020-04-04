@@ -3,7 +3,7 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 	die( 'This page cannot be called directly.' );
 
 add_action( '_wp_put_post_revision', 'rvy_review_revision' );
-	
+
 /**
  * @package     PublishPress\Revisions\RevisionaryAction
  * @author      PublishPress <help@publishpress.com>
@@ -25,7 +25,7 @@ function rvy_revision_approve($revision_id = 0) {
 			return;
 		}
 
-	$revision_id = $_GET['revision'];
+		$revision_id = $_GET['revision'];
 	} else {
 		$batch_process = true;
 	}
@@ -57,7 +57,7 @@ function rvy_revision_approve($revision_id = 0) {
 		}
 
 		if (!$batch_process) {
-		check_admin_referer( "approve-post_$post->ID|$revision->ID" );
+			check_admin_referer( "approve-post_$post->ID|$revision->ID" );
 		}
 		
 		clean_post_cache($post->ID);
@@ -142,9 +142,10 @@ function rvy_revision_approve($revision_id = 0) {
 				$datef = __awp( 'M j, Y @ g:i a' );
 				$message .= sprintf( __('It will be published on %s', 'revisionary' ), agp_date_i18n( $datef, strtotime($revision->post_date) ) ) . "\r\n\r\n";
 				
-				$preview_link = rvy_preview_url($revision);
-
-				$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
+				if (rvy_get_option('revision_preview_links')) {
+					$preview_link = rvy_preview_url($revision);
+					$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
+				}
 
 				$message .= __( 'Editor: ', 'revisionary' ) . admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
 			} else {
@@ -223,9 +224,10 @@ function rvy_revision_approve($revision_id = 0) {
 					$datef = __awp( 'M j, Y @ g:i a' );
 					$message .= sprintf( __('It will be published on %s', 'revisionary' ), agp_date_i18n( $datef, strtotime($revision->post_date) ) ) . "\r\n\r\n";
 					
-					$preview_link = rvy_preview_url($revision);
-
-					$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
+					if (rvy_get_option('revision_preview_links')) {
+						$preview_link = rvy_preview_url($revision);
+						$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
+					}
 
 					$message .= __( 'Editor: ', 'revisionary' ) . admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
 				} else {
@@ -263,12 +265,12 @@ function rvy_revision_approve($revision_id = 0) {
 	}
 	
 	if (!$batch_process) {	
-	if ( ! $redirect ) {
-		if ( ! empty($post) && is_object($post) && ( 'post' != $post->post_type ) ) {
-			$redirect = "edit.php?post_type={$post->post_type}";
-		} else
-			$redirect = 'edit.php';
-	}
+		if ( ! $redirect ) {
+			if ( ! empty($post) && is_object($post) && ( 'post' != $post->post_type ) ) {
+				$redirect = "edit.php?post_type={$post->post_type}";
+			} else
+				$redirect = 'edit.php';
+		}
 	}
 
 	if (empty($approval_error)) {
@@ -276,9 +278,9 @@ function rvy_revision_approve($revision_id = 0) {
 	}
 
 	if (!$batch_process) {
-	wp_redirect( $redirect );
-	exit;
-}
+		wp_redirect( $redirect );
+		exit;
+	}
 
 	if (empty($approval_error)) {
 		return true;
@@ -327,23 +329,6 @@ function rvy_revision_restore() {
 
 		revisionary_copy_terms($revision->ID, $post->ID, false);
 
-		/*
-		if ( $postmeta = $wpdb->get_results( "SELECT meta_key, meta_value FROM $wpdb->postmeta WHERE post_id = '$revision_id'", ARRAY_A ) ) {
-			foreach( $postmeta as $row ) {		
-				$row['post_id'] = $revision->post_parent;					
-				
-				if ( is_array($row['meta_value']) && ( count($row['meta_value'] <= 1 ) ) )
-					$row['meta_value'] = maybe_unserialize($row['meta_value']);	
-				
-				if ( $meta_id = $wpdb->get_var( $wpdb->prepare( "SELECT meta_id FROM $wpdb->postmeta WHERE meta_key = %s AND post_id = %d", $row['meta_key'], $revision->post_parent ) ) ) {						
-					$wpdb->update( $wpdb->postmeta, $row, array( 'meta_id' => $meta_id ) );					
-				} else {					
-					$wpdb->insert( $wpdb->postmeta, $row );					
-				}
-			}
-		}
-		*/
-
 		rvy_format_content( $revision->post_content, $revision->post_content_filtered, $post->ID );
 
 		if ( 'inherit' == $revision->post_status ) {
@@ -387,7 +372,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	$update = (array) $revision;
 
-	$update = wp_slash( $update ); //since data is from db
+	//$update = wp_slash( $update ); //since data is from db
 
 	//$published = get_post($published_id);
 	$published = $wpdb->get_row(
@@ -438,6 +423,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 	}
 	
+	$revision_content = $update['post_content'];
+
 	$post_id = wp_update_post( $update );
 	if ( ! $post_id || is_wp_error( $post_id ) ) {
 		return $post_id;
@@ -449,7 +436,14 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	// Apply requested slug, if applicable. 
 	// Otherwise, work around unexplained reversion of editor-modified post slug back to default format on some sites  @todo: identify plugin interaction
-	$wpdb->update($wpdb->posts, array('post_name' => $set_slug, 'guid' => $published->guid), array('ID' => $post_id));
+	$update_fields = ['post_name' => $set_slug, 'guid' => $published->guid, 'post_content' => $revision_content];
+
+	// Prevent wp_insert_post() from stripping inline html styles
+	if (!defined('RVY_DISABLE_REVISION_CONTENT_PASSTHRU')) {
+		$update_fields['post_content'] = $revision_content;
+	}
+	
+	$wpdb->update($wpdb->posts, $update_fields, array('ID' => $post_id));
 
 	$_post = get_post($post_id);
 
@@ -731,8 +725,8 @@ function rvy_revision_publish($revision_id = false) {
 	if ($revision_id) {
 		$batch_process = true;
 	} else {
-	$revision_id = $_GET['revision'];
-	$redirect = site_url();
+		$revision_id = $_GET['revision'];
+		$redirect = site_url();
 		$batch_process = false;
 	}
 	
@@ -759,7 +753,7 @@ function rvy_revision_publish($revision_id = false) {
 		}
 
 		if (!$batch_process) {
-		check_admin_referer( "publish-post_$post->ID|$revision->ID" );
+			check_admin_referer( "publish-post_$post->ID|$revision->ID" );
 		}
 
 		$do_publish = true;
@@ -767,20 +761,20 @@ function rvy_revision_publish($revision_id = false) {
 	} while (0);
 	
 	if (!empty($do_publish)) {
-	rvy_publish_scheduled_revisions(array('force_revision_id' => $revision->ID));
+		rvy_publish_scheduled_revisions(array('force_revision_id' => $revision->ID));
 
-	if ($post) {
-		clean_post_cache($post->ID);
-	}
+		if ($post) {
+			clean_post_cache($post->ID);
+		}
 	}
 
 	if (!$batch_process) {
 		if ($post) {
-		$redirect = get_permalink($post->ID); // published URL
-	}
+			$redirect = get_permalink($post->ID); // published URL
+		}
 
-	wp_redirect( $redirect );
-	exit;
+		wp_redirect($redirect);
+		exit;
 	}
 
 	if (!empty($do_publish)) {
@@ -820,7 +814,12 @@ function rvy_publish_scheduled_revisions($args = array()) {
 			)
 		);
 	} else {
-		$results = $wpdb->get_results( "SELECT * FROM $wpdb->posts WHERE post_status = 'future-revision' AND post_date_gmt <= '$time_gmt' ORDER BY post_date_gmt DESC" );
+		$results = $wpdb->get_results( 
+			$wpdb->prepare(
+				"SELECT * FROM $wpdb->posts WHERE post_status = 'future-revision' AND post_date_gmt <= %s ORDER BY post_date_gmt DESC",
+				$time_gmt
+			)
+		);
 	}
 
 	if ( $results ) {
@@ -1104,15 +1103,36 @@ function revisionary_copy_terms( $from_post_id, $to_post_id, $mirror_empty = fal
 		$tx_where = '';
 	}
 
-	if ( $_post = $wpdb->get_row( "SELECT * FROM $wpdb->posts WHERE ID = '$from_post_id'" ) ) {
-		$source_terms = $wpdb->get_col( "SELECT term_taxonomy_id FROM $wpdb->term_relationships AS tr {$tx_join}WHERE {$tx_where}tr.object_id = '$from_post_id'" );
+	if ($_post = $wpdb->get_row( 
+		$wpdb->prepare(
+			"SELECT * FROM $wpdb->posts WHERE ID = %d",
+			$from_post_id 
+		) 
+	)) {
+		$source_terms = $wpdb->get_col( 
+			$wpdb->prepare(
+				"SELECT term_taxonomy_id FROM $wpdb->term_relationships AS tr {$tx_join}WHERE {$tx_where}tr.object_id = %d",
+				$from_post_id
+			)
+		);
 
-		$target_terms = $wpdb->get_col( "SELECT term_taxonomy_id FROM $wpdb->term_relationships AS tr {$tx_join}WHERE {$tx_where}tr.object_id = '$to_post_id'" );
+		$target_terms = $wpdb->get_col( 
+			$wpdb->prepare(
+				"SELECT term_taxonomy_id FROM $wpdb->term_relationships AS tr {$tx_join}WHERE {$tx_where}tr.object_id = %d",
+				$to_post_id
+			)
+		);
 
 		if ( $add_terms = array_diff($source_terms, $target_terms) ) {
 			// todo: single query
 			foreach($add_terms as $tt_id) {
-				$wpdb->query("INSERT INTO $wpdb->term_relationships (object_id, term_taxonomy_id) VALUES ('$to_post_id', '$tt_id')");
+				$wpdb->query(
+					$wpdb->prepare(
+						"INSERT INTO $wpdb->term_relationships (object_id, term_taxonomy_id) VALUES (%d, %d)",
+						$to_post_id,
+						$tt_id
+					)
+				);
 			}
 		}
 		
@@ -1120,7 +1140,13 @@ function revisionary_copy_terms( $from_post_id, $to_post_id, $mirror_empty = fal
 			if ( $delete_terms = array_diff($target_terms, $source_terms) ) {
 				// todo: single query
 				foreach($delete_terms as $tt_id) {
-					$wpdb->query("DELETE FROM $wpdb->term_relationships WHERE object_id = '$to_post_id' AND term_taxonomy_id = '$tt_id'");
+					$wpdb->query(
+						$wpdb->prepare(
+							"DELETE FROM $wpdb->term_relationships WHERE object_id = %d AND term_taxonomy_id = %d",
+							$to_post_id,
+							$tt_id
+						)
+					);
 				}
 			}
 		}

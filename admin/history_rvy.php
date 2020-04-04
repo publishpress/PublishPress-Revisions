@@ -855,7 +855,7 @@ class RevisionaryHistory
                 $restore_link = rvy_preview_url($revision);  // default to revision preview link
                 
                 if ($can_restore) {
-                        $published_post_id = rvy_post_id($revision->ID);
+                    $published_post_id = rvy_post_id($revision->ID);
 
 	                if (rvy_get_option('compare_revisions_direct_approval') && agp_user_can( 'edit_post', $published_post_id, '', ['skip_revision_allowance' => true] ) ) {
                         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
@@ -1112,11 +1112,15 @@ class RevisionaryHistory
 
         $edit_published_cap = isset($type_obj->cap->edit_published_posts) ? $type_obj->cap->edit_published_posts : 'do_not_allow';
 
-        $preview_label = (empty($type_obj) || agp_user_can($edit_published_cap, 0, 0, ['skip_revision_allowance' => true])) 
-        ?  __('Preview / Restore', 'revisionary')
-        : __('Preview');
+        $show_preview_link = rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin();
 
-        $preview_url = rvy_preview_url($post);
+        if ($show_preview_link) {
+            $preview_label = (empty($type_obj) || agp_user_can($edit_published_cap, 0, 0, ['skip_revision_allowance' => true])) 
+            ?  __('Preview / Restore', 'revisionary')
+            : __('Preview');
+
+            $preview_url = rvy_preview_url($post);
+        }
 
         $manage_label = (empty($type_obj) || agp_user_can($edit_published_cap, 0, 0, ['skip_revision_allowance' => true])) 
         ?  __('Manage', 'revisionary')
@@ -1143,18 +1147,26 @@ class RevisionaryHistory
                 }
 
                 if (rvyRevisionID != rvyLastID) {
+                    <?php if($show_preview_link):?>
                     var rvyPreviewURL = '<?php echo $preview_url;?>';
                     rvyPreviewURL = rvyPreviewURL.replace("page_id=" + <?php echo $post_id;?>, "page_id=" + rvyRevisionID);
                     rvyPreviewURL = rvyPreviewURL.replace("p=" + <?php echo $post_id;?>, "p=" + rvyRevisionID);
+                    <?php endif;?>
 
                     var rvyManageURL = '<?php echo $manage_url;?>';
                     rvyManageURL = rvyManageURL.replace("revision=" + <?php echo $post_id;?>, "revision=" + rvyRevisionID);
 
-                if(!$('span.rvy-compare-preview').length) {
-                    $('h1').append('<span class="rvy-compare-preview" style="margin-left:20px"><a class="rvy_preview_linkspan" href="<?php echo $preview_url;?>" target="_revision_preview"><input class="button" type="button" value="<?php echo $preview_label;?>"></a></span>');
-                    $('h1').append('<span class="rvy-compare-list" style="margin-left:10px"><a class="rvy_preview_linkspan" href="<?php echo $manage_url;?>" target="_revision_list"><input class="button" type="button" value="<?php echo $manage_label;?>"></a></span>');
+                    if(!$('span.rvy-compare-preview').length) {
+                        <?php if($show_preview_link):?>
+                        $('h1').append('<span class="rvy-compare-preview" style="margin-left:20px"><a class="rvy_preview_linkspan" href="<?php echo $preview_url;?>" target="_revision_preview"><input class="button" type="button" value="<?php echo $preview_label;?>"></a></span>');
+                        <?php endif;?>
+
+                        $('h1').append('<span class="rvy-compare-list" style="margin-left:10px"><a class="rvy_preview_linkspan" href="<?php echo $manage_url;?>" target="_revision_list"><input class="button" type="button" value="<?php echo $manage_label;?>"></a></span>');
                     } else {
+                        <?php if($show_preview_link):?>
                         $('span.rvy-compare-preview a').attr('href', rvyPreviewURL);
+                        <?php endif;?>
+
                         $('span.rvy-compare-list a').attr('href', rvyManageURL);
                     }
 

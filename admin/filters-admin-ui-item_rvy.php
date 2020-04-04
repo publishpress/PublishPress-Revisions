@@ -79,9 +79,9 @@ jQuery(document).ready( function($) {
 	);
 
 	if (!$can_publish):?>
-<style>
+	<style>
 	div.num-revisions, div.misc-pub-revisions {display:none;}
-</style>
+	</style>
 	<?php endif;?>
 <?php
 	}

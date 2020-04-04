@@ -36,14 +36,20 @@ class RVY_PostBlockEditUI {
         if ( ('revision' == $post_type) || rvy_is_revision_status($post->post_status) ) {
             wp_enqueue_script( 'rvy_object_edit', RVY_URLPATH . "/admin/rvy_revision-block-edit{$suffix}.js", array('jquery', 'jquery-form'), RVY_VERSION, true );
 
-            $view_link = rvy_preview_url($post);
+            if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
+                $view_link = rvy_preview_url($post);
 
-            if ($can_publish = agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true))) {
-                $view_caption = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
-                $view_title = __('View / moderate saved revision', 'revisionary');
+                if ($can_publish = agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true))) {
+                    $view_caption = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
+                    $view_title = __('View / moderate saved revision', 'revisionary');
+                } else {
+                    $view_caption = __('View');
+                    $view_title = __('View saved revision', 'revisionary');
+                }
             } else {
-                $view_caption = __('View');
-                $view_title = __('View saved revision', 'revisionary');
+                $view_link = '';
+                $view_caption = '';
+                $view_title = '';
             }
 
             $preview_title = __('View unsaved changes', 'revisionary');

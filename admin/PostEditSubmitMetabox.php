@@ -163,35 +163,38 @@ class RvyPostEditSubmitMetabox
         $post_status_obj = $args['post_status_obj'];
         ?>
         <?php
-        if ($is_revision = rvy_is_revision_status($post->post_status)) {
-            $preview_link = rvy_preview_url($post);
+        if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
+            if ($is_revision = rvy_is_revision_status($post->post_status)) {
+                $preview_link = rvy_preview_url($post);
 
-            $type_obj = get_post_type_object($post->post_type);
-            $can_publish = $type_obj && agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
-            if ($can_publish) {
-                $preview_button = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
-                $preview_title = __('View / moderate saved revision', 'revisionary');
-            } else {
-                $preview_button = __('View');
-                $preview_title = __('View saved revision', 'revisionary');
-            }
-            ?>
-            <a class="preview button" href="<?php echo $preview_link; ?>" target="_blank" id="revision-preview"
-            tabindex="4" title="<?php echo esc_attr($preview_title);?>"><?php echo $preview_button; ?></a>
-            <?php
-        } 
+                $type_obj = get_post_type_object($post->post_type);
+                $can_publish = $type_obj && agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
+                if ($can_publish) {
+                    $preview_button = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
+                    $preview_title = __('View / moderate saved revision', 'revisionary');
+                } else {
+                    $preview_button = __('View');
+                    $preview_title = __('View saved revision', 'revisionary');
+                }
+                ?>
+                <a class="preview button" href="<?php echo $preview_link; ?>" target="_blank" id="revision-preview"
+                tabindex="4" title="<?php echo esc_attr($preview_title);?>"><?php echo $preview_button; ?></a>
 
+                <?php
+            } 
+        }
+        
         remove_filter('preview_post_link', [$revisionary->post_edit_ui, 'fltPreviewLink']);
         $preview_link = add_query_arg('rvy', 1, esc_url( get_preview_post_link( $post )));
-                $preview_button =__('Preview Changes');
+        $preview_button =__('Preview Changes');
         $style = ($is_revision) ? 'style="display:none;"' : '';
 
         global $wp_version;
-            ?>
+        ?>
         <a class="preview button" href="<?php echo $preview_link; ?>" target="<?php echo version_compare($wp_version, '5.3', '>=') ? 'wp-preview-' . (int) $post->ID : 'wp-preview';?>" id="post-preview"
         tabindex="4" <?php echo $style;?>><?php echo $preview_button; ?></a>
-            <input type="hidden" name="wp-preview" id="wp-preview" value=""/>
-            <?php
+        <input type="hidden" name="wp-preview" id="wp-preview" value=""/>
+        <?php
         add_filter('preview_post_link', [$revisionary->post_edit_ui, 'fltPreviewLink']);
     }
 
