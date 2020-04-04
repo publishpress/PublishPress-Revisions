@@ -100,6 +100,9 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.2.3 - 3 Apr 2020 =
+* Fixed : Classic Editor - Category and Post Tag revisions were not applied
+
 = 2.2.2 - 2 Apr 2020 =
 * Feature : Option to disable revision preview links for non-Administrators (to work around themes that force a 404 Not Found response) 
 * Fixed : Inline styles were stripped or modifield on scheduled revision publication
