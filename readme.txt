@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.4
-Stable tag: 2.2.2
+Stable tag: 2.2.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -100,13 +100,16 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.2.4 - 6 Apr 2020 =
+* Fixed : Possible fatal error loading Revisions screen on a small percentage of installations
+
 = 2.2.3 - 3 Apr 2020 =
 * Fixed : Classic Editor - Category and Post Tag revisions were not applied
 
 = 2.2.2 - 2 Apr 2020 =
 * Feature : Option to disable revision preview links for non-Administrators (to work around themes that force a 404 Not Found response) 
 * Fixed : Inline styles were stripped or modifield on scheduled revision publication
-* Fixed : Possible fatal error on Revisions screen on a small percentage of installations
+* Fixed : Possible fatal error loading Revisions screen on a small percentage of installations
 * Fixed : PHP Notice for deprecated function contextual_help_list()
 * Change : Standardize sanitization of database queries 
 * API: revisionary_enabled_post_types filter was not applied consistently
