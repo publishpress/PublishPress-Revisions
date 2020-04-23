@@ -716,6 +716,10 @@ function rvy_get_manageable_types() {
 	
 	global $current_user, $revisionary;
 	
+	if (empty($revisionary)) {
+		return [];
+	}
+
 	foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
 		//if ( ! empty( $current_user->allcaps[$type_obj->cap->publish_posts] ) 
 		//&& ! empty( $current_user->allcaps[$type_obj->cap->edit_published_posts] ) 

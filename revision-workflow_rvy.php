@@ -301,6 +301,7 @@ class Rvy_Revision_Workflow_UI {
                     foreach ( $use_wp_roles as $role_name ) {
                         $search = new WP_User_Query( "search=&fields=id&role=$role_name" );
                         $recipient_ids = array_merge( $recipient_ids, $search->results );
+                        $recipient_ids = array_unique($recipient_ids);
                     }
 
                     if ( $recipient_ids && $type_obj ) {

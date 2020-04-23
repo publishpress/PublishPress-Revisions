@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.4
-Stable tag: 2.2.4
+Stable tag: 2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -99,6 +99,10 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.3 - 23 Apr 2020 =
+* Fixed : Dashboard At a Glance link for Pending Post Revisions linked to Revision Queue without filtering display to Posts only
+* Compat : PublishPress Permissions - suppress Permissions metaboxes on Edit Revision screen
 
 = 2.2.4 - 6 Apr 2020 =
 * Fixed : Possible fatal error loading Revisions screen on a small percentage of installations
