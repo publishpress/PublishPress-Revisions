@@ -151,7 +151,27 @@ class RevisionaryAdmin
 			add_action('pre_get_posts', [$this, 'pre_get_posts']);
 		}
 
+		add_filter('presspermit_disable_exception_ui', [$this, 'fltDisableExceptionUI'], 10, 4);
+
 		add_action('admin_menu', [$this, 'actSettingsPageMaybeRedirect'], 999);
+	}
+
+	public function fltDisableExceptionUI($disable, $src_name, $post_id, $post_type) {
+		if (!$post_id) {
+			// Permissions version < 3.1.4 always passes zero value $post_id
+			$post_id = rvy_detect_post_id();
+		}
+
+		if ($post_id) {
+			$post_status = get_post_field('post_status', $post_id);
+
+			if (in_array($post_status, ['pending-revision', 'future-revision'])) {
+				return true;
+			}
+		
+		}
+
+		return $disable;
 	}
 
 	// Prevent PublishPress Revisions statuses from confusing the page listing
