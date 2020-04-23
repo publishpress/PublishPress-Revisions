@@ -156,6 +156,15 @@ class RevisionCreation {
             }
         }
 
+		// sanity check: don't create revision if same user created another pending revision for this post less than 2 seconds ago
+		$last_revision = $wpdb->get_row($wpdb->prepare("SELECT ID, post_modified_gmt FROM $wpdb->posts WHERE comment_count = %d AND post_author = %d ORDER BY post_modified_gmt DESC LIMIT 1", $published_post->ID, $current_user->ID));	
+
+		if ($last_revision && (strtotime(current_time('mysql', 1)) - strtotime($last_revision->post_modified_gmt) < 2 )) {
+			// return currently stored published post data
+			$data = array_intersect_key((array) get_post($published_post->ID), $data);
+			return $data;
+		}
+
         if (!empty($_POST)) {
             $_POST['skip_sitepress_actions'] = true;
         }
@@ -237,7 +246,8 @@ class RevisionCreation {
 
             $revision_id = $this->create_revision($data, $postarr);
             if (!is_scalar($revision_id)) { // update_post_data() returns array or object on update abandon / failure
-                return $revision_id;
+				$data['ID'] = $revision_id;
+				return $data;
             }
 
             $post = get_post($revision_id);
@@ -357,6 +367,9 @@ class RevisionCreation {
             }
             $revisionary->do_notifications( 'pending-revision', 'pending-revision', $postarr, $args );
             rvy_halt( $msg, __('Pending Revision Created', 'revisionary') );
+        } else {
+        	// return currently stored published post data
+			$data = array_intersect_key((array) get_post($published_post->ID), $data);
         }
 
         return $data;

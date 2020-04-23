@@ -104,6 +104,8 @@ class RevisionaryFront {
 			}
 		}
 
+		do_action('revisionary_front', $revision_id);
+
 		if( !$post = get_post($revision_id)) {
 			if (!$post = wp_get_post_revision($revision_id)) {
 				return;
