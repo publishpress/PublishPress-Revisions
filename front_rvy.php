@@ -310,7 +310,7 @@ class RevisionaryFront {
 		<script type="text/javascript">
 		/* <![CDATA[ */
 		jQuery(document).ready( function($) {
-			var rvyAdminBarMenuZindex = 99999;
+			var rvyAdminBarMenuZindex = 100001;
 
 			if ($('#wpadminbar').length) {
 				var rvyAdminBarHeight = $('#wpadminbar').height();
@@ -325,7 +325,7 @@ class RevisionaryFront {
 			$('div.rvy_view_revision').css('position', 'fixed').css('top', '32px');
 
 			var rvyTotalHeight = $('div.rvy_view_revision').height() + rvyAdminBarHeight;
-			var rvyTopBarZindex = $('div.rvy_view_revision').css('z-index')
+			var rvyTopBarZindex = $('div.rvy_view_revision').css('z-index');
 			var rvyOtherElemZindex = 0;
 
 			$('div.rvy_view_revision').css('top', rvyAdminBarHeight);
@@ -335,7 +335,7 @@ class RevisionaryFront {
 			$('header,div').each(function(i,e) { 
 				if ($(this).css('position') == 'fixed' && ($(this).attr('id') != 'wpadminbar') && (!$(this).hasClass('rvy_view_revision'))) {
 					if ($(this).position().top < rvyTotalHeight ) {
-						rvyOtherElemZindex = $(this).css('z-index');
+						rvyOtherElemZindex = parseInt($(this).css('z-index'));
 
 						if (rvyOtherElemZindex >= rvyAdminBarMenuZindex) {
 							rvyOtherElemZindex = rvyAdminBarMenuZindex - 1;

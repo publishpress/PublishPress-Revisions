@@ -317,6 +317,53 @@ function revisionary_publish_scheduled() {
 	rvy_publish_scheduled_revisions();
 }
 
+function revisionary_refresh_postmeta($post_id, $set_value = null) {
+	global $wpdb;
+
+	if (is_null($set_value)) {
+		$revision_status_csv = "'pending-revision', 'future-revision'";
+
+		$var = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT comment_count FROM $wpdb->posts WHERE post_status IN ($revision_status_csv) AND ID = %d LIMIT 1",
+				$post_id
+			)
+		);
+
+		$set_value = !empty($var);
+	}
+
+	if ($set_value) {
+		update_post_meta($post_id, '_rvy_has_revisions', $set_value);
+	} else {
+		delete_post_meta($post_id, '_rvy_has_revisions');
+	}
+}
+
+if (!empty($_REQUEST['rvy_flush_flags'])) {
+	revisionary_refresh_revision_flags();
+}
+
+function revisionary_refresh_revision_flags() {
+	global $wpdb;
+
+	$status_csv = "'" . implode("','", get_post_stati(['public' => true, 'private' => true], 'names', 'or')) . "'";
+	$arr_have_revisions = $wpdb->get_col("SELECT r.comment_count FROM $wpdb->posts r INNER JOIN $wpdb->posts p ON r.comment_count = p.ID WHERE p.post_status IN ($status_csv) AND r.post_status IN ('pending-revision', 'future-revision')");
+	$have_revisions = implode("','", array_unique($arr_have_revisions));
+
+	if ($ids = $wpdb->get_col("SELECT meta_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_has_revisions' AND post_id NOT IN ('$have_revisions')")) {
+		$wpdb->query("DELETE FROM $wpdb->postmeta WHERE meta_id IN (" . implode(",", $ids) . ")");
+	}
+
+	$have_flag_ids = $wpdb->get_col("SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_has_revisions'");
+	
+	if ($posts_missing_flag = array_diff($arr_have_revisions, $have_flag_ids)) {
+		foreach($posts_missing_flag as $post_id) {
+			update_post_meta($post_id, '_rvy_has_revisions', true);
+		}
+	}
+}
+
 function rvy_refresh_options() {
 	rvy_retrieve_options(true);
 	rvy_retrieve_options(false);
@@ -542,8 +589,10 @@ function rvy_check_duplicate_mail($new_msg, $sent_mail, $buffer) {
 				}
 			}
 
-			// If an identical message was sent or queued to the same recipient less than 2 seconds ago, don't send another
-			if (abs($new_msg['time_gmt'] - $sent['time_gmt']) <= 1) {
+			$min_seconds = (defined('ET_BUILDER_PLUGIN_VERSION') || (false !== stripos(get_template(), 'divi'))) ? 20 : 5;
+
+			// If an identical message was sent or queued to the same recipient less than 5 seconds ago, don't send another
+			if (abs($new_msg['time_gmt'] - $sent['time_gmt']) <= $min_seconds) {
 				return true;
 			}
 		}

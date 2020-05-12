@@ -3,12 +3,15 @@ namespace PublishPress\Revisions;
 
 class RevisionCreation {
 	var $revisionary;
+	var $options = [];
 
 	function __construct($args = []) {
 		// Support instantiation downstream from Revisionary constructor (before its return value sets global variable)
 		if (!empty($args) && is_array($args) && !empty($args['revisionary'])) {
 			$this->revisionary = $args['revisionary'];
 		}
+
+		$this->options = (array) apply_filters('revisionary_creation_options', []);
 	}
 
     function flt_maybe_insert_revision($data, $postarr) {
@@ -156,10 +159,12 @@ class RevisionCreation {
             }
         }
 
-		// sanity check: don't create revision if same user created another pending revision for this post less than 2 seconds ago
+		// sanity check: don't create revision if same user created another pending revision for this post less than 5 seconds ago
+		$min_seconds = (!empty($this->options['min_seconds'])) ? $this->options['min_seconds'] : 5;
+
 		$last_revision = $wpdb->get_row($wpdb->prepare("SELECT ID, post_modified_gmt FROM $wpdb->posts WHERE comment_count = %d AND post_author = %d ORDER BY post_modified_gmt DESC LIMIT 1", $published_post->ID, $current_user->ID));	
 
-		if ($last_revision && (strtotime(current_time('mysql', 1)) - strtotime($last_revision->post_modified_gmt) < 2 )) {
+		if ($last_revision && (strtotime(current_time('mysql', 1)) - strtotime($last_revision->post_modified_gmt) < $min_seconds )) {
 			// return currently stored published post data
 			$data = array_intersect_key((array) get_post($published_post->ID), $data);
 			return $data;
@@ -242,6 +247,10 @@ class RevisionCreation {
 
 			if (defined('RVY_REVISION_CREATION_DO_UNSLASH')) {
             	$data = wp_unslash( $data );
+			}
+
+			if ($bypass_data = apply_filters('revisionary_bypass_revision_creation', false, $data, $published_post)) {
+				return $bypass_data;
 			}
 
             $revision_id = $this->create_revision($data, $postarr);
@@ -353,7 +362,7 @@ class RevisionCreation {
 
         if ( $revisionary->doing_rest || apply_filters('revisionary_limit_revision_fields', false, $post, $published_post) ) {
             // prevent alteration of published post, while allowing save operation to complete
-            $data = array_intersect_key( (array) $published_post, array_fill_keys( array( 'ID', 'post_type', 'post_name', 'post_status', 'post_parent', 'post_author' ), true ) );
+            $data = array_intersect_key( (array) $published_post, array_fill_keys( array( 'ID', 'post_type', 'post_name', 'post_status', 'post_parent', 'post_author', 'post_content' ), true ) );
         
         }
 
@@ -388,6 +397,18 @@ class RevisionCreation {
 			return $data;
 		}
 		
+		if ( ! $published_post = get_post( $post_arr['ID'] ) ) {
+			return $data;
+		}
+
+		// sanity check: don't create revision if same user created another pending revision for this post less than 5 seconds ago
+		$min_seconds = (!empty($this->options['min_seconds'])) ? $this->options['min_seconds'] : 5;
+
+		$last_revision = $wpdb->get_row($wpdb->prepare("SELECT ID, post_modified_gmt FROM $wpdb->posts WHERE comment_count = %d AND post_author = %d ORDER BY post_modified_gmt DESC LIMIT 1", $published_post->ID, $current_user->ID));	
+
+		if ($last_revision && (strtotime(current_time('mysql', 1)) - strtotime($last_revision->post_modified_gmt) < $min_seconds )) {
+			return $data;
+		}
 		if ( isset($_POST['wp-preview']) && ( 'dopreview' == $_POST['wp-preview'] ) ) {
 			return $data;
 		}
@@ -428,6 +449,10 @@ class RevisionCreation {
 			if ( ! $original_post_status ) {
 				$original_post_status = ( isset( $_POST['hidden_post_status'] ) ) ? $_POST['hidden_post_status'] : '';
 			}
+
+			if (!$original_post_status) {
+				$original_post_status = get_post_field('post_status', $post_arr['ID']);
+			}
 		}
 
 		// don't interfere with scheduling of unpublished drafts
@@ -439,20 +464,17 @@ class RevisionCreation {
 			return $data;
 		}
 
-		if ( ! $published_post = get_post( $post_arr['ID'] ) ) {
-			return $data;
-		}
-		
 		if ( empty($post_arr['post_date_gmt']) || ( strtotime($post_arr['post_date_gmt'] ) <= agp_time_gmt() ) ) {
 			// Allow continued processing for non-REST followup query after REST operation
 			if (empty($_REQUEST['meta-box-loader']) || empty($_REQUEST['action']) || ('editpost' != $_REQUEST['action'])) {
-				return $data;
+				return apply_filters('revisionary_future_rev_submit_data', $data, $published_post);
 			}
 		}
 
 		if ( $type_obj = get_post_type_object( $published_post->post_type ) ) {
-			if ( ! agp_user_can( $type_obj->cap->edit_post, $published_post->ID, $current_user->ID, array( 'skip_revision_allowance' => true ) ) )
+			if ( ! agp_user_can( $type_obj->cap->edit_post, $published_post->ID, $current_user->ID, array( 'skip_revision_allowance' => true ) ) ) {
 				return $data;
+			}
 		}
 		
 		// @todo: need to filter post parent?
@@ -485,9 +507,12 @@ class RevisionCreation {
 			$data['post_date_gmt'] = date( 'Y-m-d H:i:00', strtotime( $data['post_date_gmt'] ) );
 			$data['post_date'] = date( 'Y-m-d H:i:00', strtotime( $data['post_date'] ) );
 
+			$data = apply_filters('revisionary_future_rev_creation_data', $data, $published_post);
+
 			$revision_id = $this->create_revision($data, $post_arr);
 			if (!is_scalar($revision_id)) { // update_post_data() returns array or object on update abandon / failure
-				return $revision_id;
+				$data = array_intersect_key( (array) $published_post, array_fill_keys( array( 'ID', 'post_type', 'post_name', 'post_status', 'post_parent', 'post_author', 'post_content' ), true ) );
+				return $data;
 			}
 
 			if ($revision_id) {
@@ -537,7 +562,7 @@ class RevisionCreation {
 			rvy_halt( $msg, __('Scheduled Revision Created', 'revisionary') );
 		}
 
-		return $data;
+		return apply_filters('revisionary_future_rev_return_data', $data, $published_post, $revision_id);
     }
     
     private function create_revision($data, $postarr) {
