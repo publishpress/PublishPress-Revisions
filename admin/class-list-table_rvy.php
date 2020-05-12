@@ -222,7 +222,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$where .= " AND ($p.comment_count IN ($post_id_csv) $own_revision_clause)";
 
 		if (rvy_get_option('revisor_hide_others_revisions') && !current_user_can('administrator') 
-			&& !current_user_can('list_others_revisions') 
+			&& !current_user_can('list_others_revisions') && empty($args['suppress_author_clause']) 
 		) {
 			$can_publish_types = [];
 			foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
@@ -231,6 +231,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				if (
 					isset($type_obj->cap->edit_published_posts)
 					&& agp_user_can($type_obj->cap->edit_published_posts, 0, '', ['skip_revision_allowance' => true])
+					&& !empty($current_user->allcaps[$type_obj->cap->edit_others_posts])
 					&& agp_user_can($type_obj->cap->publish_posts, 0, '', ['skip_revision_allowance' => true])
 					&& (!empty($revisionary->enabled_post_types[$post_type]) || !$revisionary->config_loaded)
 				) {
@@ -238,7 +239,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				}
 			}
 
-			$can_publish_types = apply_filters('revisionary_manageable_types', $can_publish_types);
+			$can_publish_types = array_intersect($can_publish_types, apply_filters('revisionary_manageable_types', $can_publish_types));
 
 			if ($can_publish_types) {
 				$type_clause = "OR $p.post_type IN ('" . implode("','", $can_publish_types) . "')";
@@ -246,13 +247,16 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				$type_clause = '';
 			}
 
-			if (empty($args['suppress_author_clause'])) {
 				$where .= $wpdb->prepare(" AND ($p.post_author = %d $type_clause)", $current_user->ID );
-			}
 		} elseif ($revisionary->config_loaded) {
 			$where .= (array_filter($revisionary->enabled_post_types)) 
 			? " AND ($p.post_type IN ('" . implode("','", array_keys(array_filter($revisionary->enabled_post_types))) . "'))" 
 			: "AND 1=2";
+		}
+
+		if (empty($args['suppress_author_clause'])) {
+			$status_csv = "'" . implode("','", get_post_stati(['public' => true, 'private' => true], 'names', 'or')) . "'";
+			$where .= " AND $p.comment_count IN (SELECT ID FROM $wpdb->posts WHERE post_status IN ($status_csv))";
 		}
 
 		return $where;
