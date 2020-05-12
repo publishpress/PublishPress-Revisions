@@ -607,12 +607,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			['status_count' => true]
 		);
 
-		if ($my_count = $wpdb->get_var( 
-			apply_filters('presspermit_posts_request',
+		$_request = apply_filters('presspermit_posts_request',
 				"SELECT COUNT($wpdb->posts.ID) FROM $wpdb->posts WHERE $where", 
 				['has_cap_check' => true]
-			)
-		)) {
+		);
+
+		if ($my_count = $wpdb->get_var($_request)) {
 			if (!empty($_REQUEST['author']) && ($current_user->ID == $_REQUEST['author']) && empty($_REQUEST['post_type']) && empty($_REQUEST['post_author']) && empty($_REQUEST['published_post']) && empty($_REQUEST['post_status'])) {
 				$current_link_class = 'mine';
 				$link_class = " class='current'";
