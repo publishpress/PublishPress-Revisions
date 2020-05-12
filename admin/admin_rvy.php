@@ -169,6 +169,9 @@ class RevisionaryAdmin
 				return true;
 			}
 		
+			if (!agp_user_can('edit_post', $post_id, '', ['skip_revision_allowance' => true])) {
+				return true;
+			}
 		}
 
 		return $disable;
