@@ -105,6 +105,8 @@ class Revisionary
 	
 		//add_action( 'wp_loaded', array( &$this, 'set_revision_capdefs' ) );
 		
+		add_action( 'deleted_post', [$this, 'actDeletedPost']);
+
 		if ( rvy_get_option( 'pending_revisions' ) ) {
 			// special filtering to support Contrib editing of published posts/pages to revision
 			add_filter('pre_post_status', array($this, 'flt_pendingrev_post_status') );
@@ -156,6 +158,11 @@ class Revisionary
 		$this->enabled_post_types = apply_filters('revisionary_enabled_post_types', array_fill_keys(get_post_types(['public' => true]), true));
 		unset($this->enabled_post_types['attachment']);
 		$this->enabled_post_types = array_filter($this->enabled_post_types);
+	}
+
+	// If deleted revision was the last remaining pending / scheduled, clear _rvy_has_revisions postmeta flag 
+	function actDeletedPost($post_id) {
+		revisionary_refresh_postmeta($post_id);
 	}
 
 	function fltEditRevisionUpdatedLink($permalink, $post, $leavename) {

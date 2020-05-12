@@ -508,6 +508,9 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	update_post_meta($revision_id, '_rvy_published_gmt', $post_modified_gmt);
 
+	// If published revision was the last remaining pending / scheduled, clear _rvy_has_revisions postmeta flag 
+	revisionary_refresh_postmeta($post_id);
+
 	if (!empty($orig_terms) && is_array($orig_terms)) {
 		foreach($orig_terms as $taxonomy => $terms) {
 			if ($terms && !wp_get_object_terms($published->ID, $taxonomy, ['fields' => 'ids'])) {
