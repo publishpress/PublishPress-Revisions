@@ -589,8 +589,10 @@ function rvy_check_duplicate_mail($new_msg, $sent_mail, $buffer) {
 				}
 			}
 
-			// If an identical message was sent or queued to the same recipient less than 2 seconds ago, don't send another
-			if (abs($new_msg['time_gmt'] - $sent['time_gmt']) <= 1) {
+			$min_seconds = (defined('ET_BUILDER_PLUGIN_VERSION') || (false !== stripos(get_template(), 'divi'))) ? 20 : 5;
+
+			// If an identical message was sent or queued to the same recipient less than 5 seconds ago, don't send another
+			if (abs($new_msg['time_gmt'] - $sent['time_gmt']) <= $min_seconds) {
 				return true;
 			}
 		}
