@@ -632,9 +632,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		);
 
 		$count_query = apply_filters('presspermit_posts_request',
-			"SELECT COUNT(r.ID) FROM $wpdb->posts AS r INNER JOIN $wpdb->posts AS p ON r.comment_count = p.ID WHERE $where", 
+			"SELECT COUNT(DISTINCT p.ID) FROM $wpdb->posts AS p INNER JOIN $wpdb->posts AS r ON r.comment_count = p.ID WHERE $where", 
 			['has_cap_check' => true, 'source_alias' => 'p']
 		);
+
+		$status_csv = "'" . implode("','", get_post_stati(['public' => true, 'private' => true], 'names', 'or')) . "'";
+		$count_query .= " AND p.post_status IN ($status_csv)";
 
 		// work around some versions of PressPermit inserting non-aliased post_type reference into where clause under some configurations
 		$count_query = str_replace("$wpdb->posts.post_type", "p.post_type", $count_query);
