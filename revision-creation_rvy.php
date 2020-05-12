@@ -3,12 +3,15 @@ namespace PublishPress\Revisions;
 
 class RevisionCreation {
 	var $revisionary;
+	var $options = [];
 
 	function __construct($args = []) {
 		// Support instantiation downstream from Revisionary constructor (before its return value sets global variable)
 		if (!empty($args) && is_array($args) && !empty($args['revisionary'])) {
 			$this->revisionary = $args['revisionary'];
 		}
+
+		$this->options = (array) apply_filters('revisionary_creation_options', []);
 	}
 
     function flt_maybe_insert_revision($data, $postarr) {
@@ -156,10 +159,12 @@ class RevisionCreation {
             }
         }
 
-		// sanity check: don't create revision if same user created another pending revision for this post less than 2 seconds ago
+		// sanity check: don't create revision if same user created another pending revision for this post less than 5 seconds ago
+		$min_seconds = (!empty($this->options['min_seconds'])) ? $this->options['min_seconds'] : 5;
+
 		$last_revision = $wpdb->get_row($wpdb->prepare("SELECT ID, post_modified_gmt FROM $wpdb->posts WHERE comment_count = %d AND post_author = %d ORDER BY post_modified_gmt DESC LIMIT 1", $published_post->ID, $current_user->ID));	
 
-		if ($last_revision && (strtotime(current_time('mysql', 1)) - strtotime($last_revision->post_modified_gmt) < 2 )) {
+		if ($last_revision && (strtotime(current_time('mysql', 1)) - strtotime($last_revision->post_modified_gmt) < $min_seconds )) {
 			// return currently stored published post data
 			$data = array_intersect_key((array) get_post($published_post->ID), $data);
 			return $data;
@@ -388,6 +393,14 @@ class RevisionCreation {
 			return $data;
 		}
 		
+		// sanity check: don't create revision if same user created another pending revision for this post less than 5 seconds ago
+		$min_seconds = (!empty($this->options['min_seconds'])) ? $this->options['min_seconds'] : 5;
+
+		$last_revision = $wpdb->get_row($wpdb->prepare("SELECT ID, post_modified_gmt FROM $wpdb->posts WHERE comment_count = %d AND post_author = %d ORDER BY post_modified_gmt DESC LIMIT 1", $published_post->ID, $current_user->ID));	
+
+		if ($last_revision && (strtotime(current_time('mysql', 1)) - strtotime($last_revision->post_modified_gmt) < $min_seconds )) {
+			return $data;
+		}
 		if ( isset($_POST['wp-preview']) && ( 'dopreview' == $_POST['wp-preview'] ) ) {
 			return $data;
 		}
