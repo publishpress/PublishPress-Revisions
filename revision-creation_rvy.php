@@ -249,6 +249,10 @@ class RevisionCreation {
             	$data = wp_unslash( $data );
 			}
 
+			if ($bypass_data = apply_filters('revisionary_bypass_revision_creation', false, $data, $published_post)) {
+				return $bypass_data;
+			}
+
             $revision_id = $this->create_revision($data, $postarr);
             if (!is_scalar($revision_id)) { // update_post_data() returns array or object on update abandon / failure
 				$data['ID'] = $revision_id;
@@ -393,6 +397,10 @@ class RevisionCreation {
 			return $data;
 		}
 		
+		if ( ! $published_post = get_post( $post_arr['ID'] ) ) {
+			return $data;
+		}
+
 		// sanity check: don't create revision if same user created another pending revision for this post less than 5 seconds ago
 		$min_seconds = (!empty($this->options['min_seconds'])) ? $this->options['min_seconds'] : 5;
 
@@ -441,6 +449,10 @@ class RevisionCreation {
 			if ( ! $original_post_status ) {
 				$original_post_status = ( isset( $_POST['hidden_post_status'] ) ) ? $_POST['hidden_post_status'] : '';
 			}
+
+			if (!$original_post_status) {
+				$original_post_status = get_post_field('post_status', $post_arr['ID']);
+			}
 		}
 
 		// don't interfere with scheduling of unpublished drafts
@@ -452,20 +464,17 @@ class RevisionCreation {
 			return $data;
 		}
 
-		if ( ! $published_post = get_post( $post_arr['ID'] ) ) {
-			return $data;
-		}
-		
 		if ( empty($post_arr['post_date_gmt']) || ( strtotime($post_arr['post_date_gmt'] ) <= agp_time_gmt() ) ) {
 			// Allow continued processing for non-REST followup query after REST operation
 			if (empty($_REQUEST['meta-box-loader']) || empty($_REQUEST['action']) || ('editpost' != $_REQUEST['action'])) {
-				return $data;
+				return apply_filters('revisionary_future_rev_submit_data', $data, $published_post);
 			}
 		}
 
 		if ( $type_obj = get_post_type_object( $published_post->post_type ) ) {
-			if ( ! agp_user_can( $type_obj->cap->edit_post, $published_post->ID, $current_user->ID, array( 'skip_revision_allowance' => true ) ) )
+			if ( ! agp_user_can( $type_obj->cap->edit_post, $published_post->ID, $current_user->ID, array( 'skip_revision_allowance' => true ) ) ) {
 				return $data;
+			}
 		}
 		
 		// @todo: need to filter post parent?
@@ -498,9 +507,12 @@ class RevisionCreation {
 			$data['post_date_gmt'] = date( 'Y-m-d H:i:00', strtotime( $data['post_date_gmt'] ) );
 			$data['post_date'] = date( 'Y-m-d H:i:00', strtotime( $data['post_date'] ) );
 
+			$data = apply_filters('revisionary_future_rev_creation_data', $data, $published_post);
+
 			$revision_id = $this->create_revision($data, $post_arr);
 			if (!is_scalar($revision_id)) { // update_post_data() returns array or object on update abandon / failure
-				return $revision_id;
+				$data = array_intersect_key( (array) $published_post, array_fill_keys( array( 'ID', 'post_type', 'post_name', 'post_status', 'post_parent', 'post_author', 'post_content' ), true ) );
+				return $data;
 			}
 
 			if ($revision_id) {
@@ -550,7 +562,7 @@ class RevisionCreation {
 			rvy_halt( $msg, __('Scheduled Revision Created', 'revisionary') );
 		}
 
-		return $data;
+		return apply_filters('revisionary_future_rev_return_data', $data, $published_post, $revision_id);
     }
     
     private function create_revision($data, $postarr) {
