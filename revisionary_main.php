@@ -849,7 +849,7 @@ class Revisionary
 		global $current_user;
 
 		// If Administrator opted to save as a pending revision, don't apply revision scheduling scripts
-		if (get_post_meta($post_arr['ID'], "_save_as_revision_{$current_user->ID}")) {
+		if (get_post_meta($post_arr['ID'], "_save_as_revision_{$current_user->ID}", true)) {
 			return $data;
 		}
 
