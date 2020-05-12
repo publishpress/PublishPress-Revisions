@@ -971,6 +971,8 @@ class Revisionary
 			$rvy_workflow_ui = new Rvy_Revision_Workflow_UI();
 		}
 
+		do_action('revisionary_get_rev_msg', $revision_id, $args);
+
 		return $rvy_workflow_ui->get_revision_msg( $revision_id, $args );
 	}
 } // end Revisionary class
