@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.4
-Stable tag: 2.3
+Stable tag: 2.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -100,9 +100,13 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
-= 2.3 - 23 Apr 2020 =
+= 2.3.2 - 12 May 2020 =
+* Fixed : Post meta flag "_rvy_has_revisions" was not cleared after last remaining pending / scheduled revision was published or deleted, affecting Revision Queue performance
+* Fixed : Revision Queue listed uneditable revisions under some conditions
+* Fixed : My Published Posts count was wrong under some conditions
 * Fixed : Dashboard At a Glance link for Pending Post Revisions linked to Revision Queue without filtering display to Posts only
 * Compat : PublishPress Permissions - suppress Permissions metaboxes on Edit Revision screen
+* Fixed : Published post content cleared on pending revisions submission, on a minority of installations
 
 = 2.2.4 - 6 Apr 2020 =
 * Fixed : Possible fatal error loading Revisions screen on a small percentage of installations
