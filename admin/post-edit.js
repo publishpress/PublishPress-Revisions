@@ -27,25 +27,4 @@ jQuery(document).ready( function($) {
 		}
 		$('#mn').val(minutes);
 	});
-
-	// Apply "Schedule Revision" button caption even if post is private
-	$('#timestampdiv a.save-timestamp').click( function() {
-		if ( ! $('#timestampdiv a.save-timestamp').is(':visible') || ! $('#visibility-radio-private').attr('checked') || $('#publish').val() == postL10n.schedule ) {
-			return;
-		}
-		
-		var aa = $('#aa').val(), mm = $('#mm').val(), jj = $('#jj').val(), hh = $('#hh').val(), mn = $('#mn').val();
-		var attemptedDate = new Date( aa, mm - 1, jj, hh, mn );
-		var currentDate = new Date( $('#cur_aa').val(), $('#cur_mm').val() -1, $('#cur_jj').val(), $('#cur_hh').val(), $('#cur_mn').val() );
-
-		// Confirm valid date
-		if ( attemptedDate.getFullYear() == aa && (1 + attemptedDate.getMonth()) == mm && attemptedDate.getDate() == jj && attemptedDate.getMinutes() == mn ) {
-			
-			// If button caption should be "Schedule Revision," set it. Otherwise, no change
-			if ( attemptedDate > currentDate && $('#original_post_status').val() != 'future' ) {
-				$('#publish').val( postL10n.schedule );
-			}
-		}
-	} );
-
 });
