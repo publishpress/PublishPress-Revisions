@@ -156,7 +156,7 @@ class RevisionaryAdmin
 		add_action('admin_menu', [$this, 'actSettingsPageMaybeRedirect'], 999);
 	}
 
-	public function fltDisableExceptionUI($disable, $src_name, $post_id, $post_type) {
+	public function fltDisableExceptionUI($disable, $src_name, $post_id, $post_type = '') {
 		if (!$post_id) {
 			// Permissions version < 3.1.4 always passes zero value $post_id
 			$post_id = rvy_detect_post_id();
