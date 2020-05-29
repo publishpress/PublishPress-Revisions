@@ -1,10 +1,9 @@
 <?php
 class RevisionaryHistory
 {	
-    var $published_post_ids = [];
-    var $post_status = 'pending-revision';
-    var $revision_id = 0;
-
+    private $published_post_ids = [];
+    private $post_status = 'pending-revision';
+    private $revision_id = 0;
     private $authors = [];
 
 	function __construct() {

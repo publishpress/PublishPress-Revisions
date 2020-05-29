@@ -18,9 +18,9 @@ define ('RVY_URLPATH', $wp_content . '/plugins/' . RVY_FOLDER);
 class RevisionaryAdmin
 {
 	var $revision_save_in_progress;
-	var $post_revision_count = array();
-	var $hide_quickedit = array();
-	var $trashed_revisions;
+	private $post_revision_count = array();
+	private $hide_quickedit = array();
+	private $trashed_revisions;
 
 	function __construct() {
 		global $pagenow, $post;

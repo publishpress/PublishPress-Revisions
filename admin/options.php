@@ -7,16 +7,16 @@ do_action('revisionary_load_options_ui');
 class RvyOptionUI {
 	private static $instance = null;
 
-	var $sitewide;
-	var $customize_defaults;
+	private $sitewide;
+	private $customize_defaults;
 	var $form_options;
-	var $tab_captions;
+	private $tab_captions;
 	var $section_captions;
 	var $option_captions;
-	var $all_options;
-	var $all_otype_options;
-	var $def_otype_options;
-	var $display_hints = true;
+	private $all_options;
+	private $all_otype_options;
+	private $def_otype_options;
+	private $display_hints = true;
 
 	public static function instance($args = [])
     {

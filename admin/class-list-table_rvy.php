@@ -2,9 +2,9 @@
 require_once( ABSPATH . 'wp-admin/includes/class-wp-posts-list-table.php' );
 
 class Revisionary_List_Table extends WP_Posts_List_Table {
-	var $published_post_ids = [];
-	var $published_post_count_ids = [];
-	var $post_types = [];
+	private $published_post_ids = [];
+	private $published_post_count_ids = [];
+	private $post_types = [];
 	private $posts_clauses_filtered; 
 
 	public function __construct($args = []) {

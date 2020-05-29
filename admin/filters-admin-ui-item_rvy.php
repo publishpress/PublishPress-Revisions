@@ -3,10 +3,8 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 	die();
 
 class RevisionaryAdminFiltersItemUI {
-
-	var $meta_box_ids = array();
-	var $pending_revisions = array();
-	var $future_revisions = array();
+	private $pending_revisions = array();
+	private $future_revisions = array();
 	
 	// note: in current implementations, this must be instatiated on admin_head action
 	function __construct () {
