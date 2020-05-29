@@ -53,7 +53,7 @@ class Revisionary_Submittee {
 	
 		$default_prefix = ( $customize_defaults ) ? 'default_' : '';
 
-		$reviewed_options = explode(',', $_POST['all_options']);
+		$reviewed_options = array_map('sanitize_key', explode(',', $_POST['all_options']));
 		foreach ( $reviewed_options as $option_name )
 			rvy_delete_option($default_prefix . $option_name, $sitewide );
 	}
@@ -79,7 +79,7 @@ class Revisionary_Submittee {
 	function update_page_options( $sitewide = false, $customize_defaults = false ) {
 		$default_prefix = ( $customize_defaults ) ? 'default_' : '';
 		
-		$reviewed_options = explode(',', $_POST['all_options']);
+		$reviewed_options = array_map('sanitize_key', explode(',', $_POST['all_options']));
 
 		foreach ( $reviewed_options as $option_basename ) {
 			$value = isset($_POST[$option_basename]) ? $_POST[$option_basename] : '';

@@ -33,7 +33,7 @@ class Revisionary
 		//
 		// Note: some filtering is needed to allow users with full editing permissions on the published post to access a Compare Revisions screen with Preview and Manage buttons
 		if (is_admin() && (false !== strpos($_SERVER['REQUEST_URI'], 'revision.php')) && (!empty($_REQUEST['revision'])) && !is_content_administrator_rvy()) {
-			$revision_id = (!empty($_REQUEST['revision'])) ? $_REQUEST['revision'] : $_REQUEST['to'];
+			$revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : $_REQUEST['to'];
 			
 			if ($revision_id) {
 				if ($_post = get_post($_REQUEST['revision'])) {
@@ -68,9 +68,9 @@ class Revisionary
 		
 		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && (!empty($_GET['preview']) && !empty($_REQUEST['preview_id']))) {
 			if (defined('REVISIONARY_PREVIEW_WORKAROUND')) { // @todo: confirm this is no longer needed
-				if ($_post = get_post($_REQUEST['preview_id'])) {
+				if ($_post = get_post((int) $_REQUEST['preview_id'])) {
 					if (in_array($_post->post_status, ['pending-revision', 'future-revision']) && !$this->isBlockEditorActive()) {
-						if (empty($_REQUEST['_thumbnail_id']) || !get_post($_REQUEST['_thumbnail_id'])) {
+						if (empty($_REQUEST['_thumbnail_id']) || !get_post((int) $_REQUEST['_thumbnail_id'])) {
 							$preview_url = rvy_preview_url($_post);
 							wp_redirect($preview_url);
 							exit;
@@ -354,7 +354,7 @@ class Revisionary
 			return;
 		}
 
-		$last_user_revision_id = $_REQUEST['get_new_revision'];
+		$last_user_revision_id = (int) $_REQUEST['get_new_revision'];
 
 		$published_post_id = rvy_post_id($post->ID);
 		$published_url = get_permalink($published_post_id);

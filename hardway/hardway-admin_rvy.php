@@ -10,13 +10,11 @@ if ( ! is_content_administrator_rvy() ) {
 	$nomess_uris = apply_filters( 'rvy_skip_lastresort_filter_uris', array( 'p-admin/categories.php', 'p-admin/themes.php', 'p-admin/plugins.php', 'p-admin/profile.php' ) );
 	$nomess_uris = array_merge($nomess_uris, array('p-admin/admin-ajax.php'));
 
-	$haystack = $_SERVER['REQUEST_URI'];
-	$haystack_length = strlen($haystack);
 	$matched = false;
 	
 	foreach($nomess_uris as $needle) {
-		$pos = strpos($haystack, $needle);
-		if ( is_numeric($pos) && ( $pos == ( $haystack_length - strlen($needle) ) ) ) {
+		$pos = strpos($_SERVER['REQUEST_URI'], $needle);
+		if ( is_numeric($pos) && ( $pos == ( strlen($_SERVER['REQUEST_URI']) - strlen($needle) ) ) ) {
 			$matched = true;
 			break;
 		}

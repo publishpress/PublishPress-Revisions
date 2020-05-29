@@ -570,6 +570,8 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			delete_option('revisionary_mail_buffer');
 		}
 
+		$uri = esc_url($_SERVER['REQUEST_URI']);
+
 		if (!empty($_REQUEST['mailinfo'])) {
 			$verbose = !empty($_REQUEST['verbose']);
 
@@ -631,13 +633,13 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 
 			if (get_option('revisionary_mail_buffer')):?>
 				<br />
-				<a href="<?php echo(add_query_arg('clear_mail_buffer', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Purge Notification Buffer', 'revisionary');?></a>
+				<a href="<?php echo(add_query_arg('clear_mail_buffer', '1', $uri));?>"><?php _e('Purge Notification Buffer', 'revisionary');?></a>
 				<br />
 			<?php endif;?>
 
 			<?php if (get_option('revisionary_sent_mail')):?>
 				<br />
-				<a href="<?php echo(add_query_arg('truncate_mail_log', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Truncate Notification Log', 'revisionary');?></a>
+				<a href="<?php echo(add_query_arg('truncate_mail_log', '1', $uri));?>"><?php _e('Truncate Notification Log', 'revisionary');?></a>
 			<?php endif;
 
 			$mail_info = rvy_mail_check_buffer([], ['log_only' => true]);
@@ -661,9 +663,9 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		if (empty($_REQUEST['mailinfo'])):?>
 			<br />
 			<div style="padding-left:22px">
-			<a href="<?php echo(add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Show Notification Log / Buffer', 'revisionary');?></a>
+			<a href="<?php echo(add_query_arg('mailinfo', '1', $uri));?>"><?php _e('Show Notification Log / Buffer', 'revisionary');?></a>
 			<br /><br />
-			<a href="<?php echo(add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI'])));?>"><?php _e('Show with message content', 'revisionary');?></a>
+			<a href="<?php echo(add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $uri)));?>"><?php _e('Show with message content', 'revisionary');?></a>
 			</div>
 		<?php endif;
 		

@@ -46,7 +46,7 @@ class RevisionaryFront {
 	function flt_view_revision($request) {
 		//WP post/page preview passes this arg
 		if ( ! empty( $_GET['preview_id'] ) ) {
-			$published_post_id = $_GET['preview_id'];
+			$published_post_id = (int) $_GET['preview_id'];
 			
 			remove_filter( 'posts_request', array( &$this, 'flt_view_revision' ) ); // no infinite recursion!
 
@@ -56,7 +56,7 @@ class RevisionaryFront {
 			add_filter( 'posts_request', array( &$this, 'flt_view_revision' ) );
 
 		} else {
-			$revision_id = (isset($_REQUEST['page_id'])) ? $_REQUEST['page_id'] : 0;
+			$revision_id = (isset($_REQUEST['page_id'])) ? (int) $_REQUEST['page_id'] : 0;
 
 			if (!$revision_id) {
 				$revision_id = rvy_detect_post_id();
@@ -94,9 +94,9 @@ class RevisionaryFront {
 		}
 
 		if (!empty($_REQUEST['page_id'])) {
-			$revision_id = $_REQUEST['page_id'];
+			$revision_id = (int) $_REQUEST['page_id'];
 		} elseif (!empty($_REQUEST['p'])) {
-			$revision_id = $_REQUEST['p'];
+			$revision_id = (int) $_REQUEST['p'];
 		} else {
 			global $post;
 			if ($post) {
@@ -159,7 +159,7 @@ class RevisionaryFront {
 
 			$can_publish = agp_user_can( $cap_name, $published_post_id, '', array( 'skip_revision_allowance' => true ) );
 
-			$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
+			$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
 
 			load_plugin_textdomain('revisionary', false, RVY_FOLDER . '/languages');
 			
@@ -238,7 +238,7 @@ class RevisionaryFront {
 
 					// work around quirk of new scheduled revision preview not displaying page template and post thumbnail when accessed immediately after creation
 					if (time() < strtotime($post->post_modified_gmt) + 15) {
-						$current_url = set_url_scheme( 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+						$current_url = set_url_scheme( esc_url('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']) );
 						$title = esc_attr(__('This revision is very new, preview may not be synchronized with theme.', 'revisionary'));
 						$reload_link = " <a href='$current_url' title='$title'>" . __('Reload', 'revisionary') . '</a>';
 					} else {

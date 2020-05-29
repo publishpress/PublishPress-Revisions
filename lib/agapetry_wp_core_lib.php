@@ -154,10 +154,10 @@ function awp_post_type_from_uri() {
 	$script_name = $_SERVER['SCRIPT_NAME'];
 	
 	if ( strpos( $script_name, 'post-new.php' ) || strpos( $script_name, 'edit.php' ) ) {
-		$object_type = ! empty( $_GET['post_type'] ) ? $_GET['post_type'] : 'post';
+		$object_type = ! empty( $_GET['post_type'] ) ? sanitize_key($_GET['post_type']) : 'post';
 		
 	} elseif ( ! empty( $_GET['post'] ) ) {	 // post.php
-		if ( $_post = get_post( $_GET['post'] ) )
+		if ( $_post = get_post((int) $_GET['post'] ) )
 			$object_type = $_post->post_type;
 	}
 

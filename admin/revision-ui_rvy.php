@@ -150,7 +150,7 @@ function rvy_metabox_revisions( $status ) {
 	
 	elseif ( ! empty( $_GET['post'] ) ) {
 		$args = array( 'format' => 'list', 'parent' => false );
-		rvy_list_post_revisions( $_GET['post'], $status, $args );
+		rvy_list_post_revisions( (int) $_GET['post'], $status, $args );
 	}
 }
 

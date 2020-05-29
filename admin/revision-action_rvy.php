@@ -25,7 +25,7 @@ function rvy_revision_approve($revision_id = 0) {
 			return;
 		}
 
-		$revision_id = $_GET['revision'];
+		$revision_id = (int) $_GET['revision'];
 	} else {
 		$batch_process = true;
 	}
@@ -289,7 +289,7 @@ function rvy_revision_approve($revision_id = 0) {
 
 function rvy_revision_restore() {
 	require_once( ABSPATH . 'wp-admin/admin.php');
-	$revision_id = $_GET['revision'];
+	$revision_id = (int) $_GET['revision'];
 	$redirect = '';
 	
 	do {
@@ -343,7 +343,7 @@ function rvy_revision_restore() {
 		} elseif ( 'edit' == $_REQUEST['rvy_redirect'] ) {
 			$redirect = add_query_arg( $last_arg, "post.php?post={$post->ID}&action=edit" );
 		} else {
-			$redirect = add_query_arg( $last_arg, $_REQUEST['rvy_redirect'] );
+			$redirect = add_query_arg( $last_arg, esc_url($_REQUEST['rvy_redirect']) );
 		}
 
 	} while (0);
@@ -584,7 +584,7 @@ function rvy_do_revision_restore( $revision_id, $actual_revision_status = '' ) {
 
 function rvy_revision_delete() {
 	require_once( ABSPATH . 'wp-admin/admin.php');
-	$revision_id = $_GET['revision'];
+	$revision_id = (int) $_GET['revision'];
 	$redirect = '';
 	
 	do {
@@ -637,13 +637,16 @@ function rvy_revision_bulk_delete() {
 	if ( empty($_POST['delete_revisions']) || empty($_POST['delete_revisions']) ) {
 
 		if ( ! empty( $_POST['left'] ) )
-			$post_id = 	$_POST['left'];
+			$post_id = (int) $_POST['left'];
 
 		elseif ( ! empty( $_POST['right'] ) )
-			$post_id = 	$_POST['right'];	
+			$post_id = (int) $_POST['right'];	
 
 	} else {
-		foreach ( $_POST['delete_revisions'] as $revision_id ) {
+		$delete_revisions = array_map('intval', (array) $_POST['delete_revisions']);
+		$post_ids = [];
+
+		foreach ($delete_revisions as $revision_id) {
 			// this function is only used for past revisions (status=inherit)
 			if ( ! $revision = wp_get_post_revision( $revision_id ) )
 				continue;
@@ -680,7 +683,7 @@ function rvy_revision_bulk_delete() {
 
 function rvy_revision_unschedule() {
 	require_once( ABSPATH . 'wp-admin/admin.php');
-	$revision_id = $_GET['revision'];
+	$revision_id = (int) $_GET['revision'];
 	$redirect = '';
 	
 	do {
@@ -706,7 +709,12 @@ function rvy_revision_unschedule() {
 		check_admin_referer('unschedule-revision_' .  $revision_id);
 
 		global $wpdb;
-		$wpdb->query( "UPDATE $wpdb->posts SET post_status = 'pending-revision' WHERE ID = '$revision_id'" );
+		$wpdb->query( 
+			$wpdb->prepare(
+				"UPDATE $wpdb->posts SET post_status = 'pending-revision' WHERE ID = %d",
+				$revision_id
+			)
+		);
 		
 		rvy_update_next_publish_date();
 
@@ -728,7 +736,7 @@ function rvy_revision_publish($revision_id = false) {
 	if ($revision_id) {
 		$batch_process = true;
 	} else {
-		$revision_id = $_GET['revision'];
+		$revision_id = (int) $_GET['revision'];
 		$redirect = site_url();
 		$batch_process = false;
 	}
@@ -1009,7 +1017,7 @@ function rvy_publish_scheduled_revisions($args = array()) {
 	if ( ! empty( $_GET['action']) && ( 'publish_scheduled_revisions' == $_GET['action'] ) ) {
 		exit( 0 );
 	} elseif ( in_array( $_SERVER['REQUEST_URI'], $revised_uris ) ) {
-		wp_redirect( $_SERVER['REQUEST_URI'] );  // if one of the revised pages is being accessed now, redirect back so revision is published on first access
+		wp_redirect( esc_url($_SERVER['REQUEST_URI']) );  // if one of the revised pages is being accessed now, redirect back so revision is published on first access
 	}
 }
 

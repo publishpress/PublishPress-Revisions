@@ -51,7 +51,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$qp['post_status'] = array_diff( get_post_stati( ['public' => true, 'private' => true], 'names', 'or' ), $omit_stati );
 
 		if (!empty($q['published_post'])) {
-			$qp['p'] = $q['published_post'];
+			$qp['p'] = (int) $q['published_post'];
 		}
 
 		$qp['posts_per_page'] = -1;
@@ -307,7 +307,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		switch ($column_name) {
 			case 'post_type':
 				if ( $type_obj = get_post_type_object( get_post_field( 'post_type', $post->post_parent ) ) ) {
-					$link = add_query_arg( 'post_type', $type_obj->name, $_SERVER['REQUEST_URI'] );
+					$link = add_query_arg( 'post_type', $type_obj->name, esc_url($_SERVER['REQUEST_URI']) );
 					echo "<a href='$link'>{$type_obj->labels->singular_name}</a>";
 				}
 
@@ -329,7 +329,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 							$label = ucwords($post->post_status);
 				}
 
-				$link = add_query_arg( 'post_status', $post->post_status, $_SERVER['REQUEST_URI'] );
+				$link = add_query_arg( 'post_status', $post->post_status, esc_url($_SERVER['REQUEST_URI']) );
 				echo "<a href='$link'>$label</a>";
 
 				break;
@@ -398,8 +398,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					$authors_str = [];
 					foreach ($authors as $author) {
 						if (is_object($author)) {
-							$url           = add_query_arg('post_author', $author->ID, $_SERVER['REQUEST_URI']);
-							$authors_str[] = '<a href="' . esc_url($url) . '">' . esc_html($author->display_name) . '</a>';
+							$url           = add_query_arg('post_author', $author->ID, esc_url($_SERVER['REQUEST_URI']));
+							$authors_str[] = '<a href="' . $url . '">' . esc_html($author->display_name) . '</a>';
 						}
 					}
 
@@ -411,7 +411,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					echo implode(', ', $authors_str);
 				} else {
 					$author_caption = get_the_author_meta('display_name', $parent_post->post_author);
-					echo $this->apply_edit_link(add_query_arg('post_author', $parent_post->post_author, $_SERVER['REQUEST_URI']), $author_caption);
+					echo $this->apply_edit_link(add_query_arg('post_author', $parent_post->post_author, esc_url($_SERVER['REQUEST_URI'])), $author_caption);
 				}
 		} // end switch
 	}
@@ -439,7 +439,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$actions['list_filter'] = sprintf(
 			'<a href="%1$s" title="%2$s" aria-label="%2$s">%3$s</a>',
-			add_query_arg('published_post', $post->ID, $_SERVER['REQUEST_URI']),
+			add_query_arg('published_post', $post->ID, esc_url($_SERVER['REQUEST_URI'])),
 			/* translators: %s: post title */
 			esc_attr( sprintf( __( 'View only revisions of %s', 'revisionary' ), '&#8220;' . $post->post_title . '&#8221;' ) ),
 			__( 'Filter' )
@@ -595,8 +595,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if ( ! empty($_REQUEST['s']) )
 			$q['s'] = $_REQUEST['s'];
 		
-		if ( ! empty($_REQUEST['m']) )
-			$q['m'] = $_REQUEST['m'];
+		if ( ! empty($_REQUEST['m']) ) {
+			$q['m'] = (int) $_REQUEST['m'];
+		}
 		
 		$num_posts = $this->count_revisions($post_types, $statuses);
 
@@ -729,7 +730,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			return;
 		}
 
-		$cat = (!empty($_REQUEST['cat'])) ? $_REQUEST['cat'] : '';
+		$cat = (!empty($_REQUEST['cat'])) ? (int) $_REQUEST['cat'] : '';
 
 		//if ( is_object_in_taxonomy( $post_type, 'category' ) ) {
 			$dropdown_options = array(
@@ -778,7 +779,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$extra_checks = "AND post_status != 'auto-draft'";
 		
 		if (isset($_GET['post_status']) && ('all' != $_GET['post_status'])) {
-			$extra_checks = $wpdb->prepare( ' AND post_status = %s', $_GET['post_status'] );
+			$extra_checks = $wpdb->prepare( ' AND post_status = %s', sanitize_key($_GET['post_status']) );
 		} else {
 			$extra_checks = " AND post_status IN ('pending-revision', 'future-revision')";
 		}
@@ -848,11 +849,11 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	public function print_column_headers( $with_id = true ) {		
 		list( $columns, $hidden, $sortable, $primary ) = $this->get_column_info();
 
-		$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+		$current_url = set_url_scheme( esc_url('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ));
 		$current_url = remove_query_arg( 'paged', $current_url );
 
 		if ( isset( $_GET['orderby'] ) ) {
-			$current_orderby = $_GET['orderby'];
+			$current_orderby = sanitize_key($_GET['orderby']);
 		} else {
 			$current_orderby = '';
 		}
@@ -991,7 +992,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		//	do_action("manage_{$post->post_type}_posts_custom_column", 'authors', $post->ID);
 		//} else {
 			$args = ['author' => get_the_author_meta( 'ID' )];
-			echo $this->apply_edit_link( add_query_arg('author', $args['author'], $_SERVER['REQUEST_URI']), get_the_author() );
+			echo $this->apply_edit_link( add_query_arg('author', $args['author'], esc_url($_SERVER['REQUEST_URI'])), get_the_author() );
 		//}
 	}
 

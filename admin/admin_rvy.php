@@ -26,7 +26,7 @@ class RevisionaryAdmin
 		global $pagenow, $post;
 
 		$script_name = $_SERVER['SCRIPT_NAME'];
-		$request_uri = $_SERVER['REQUEST_URI'];
+		$request_uri = esc_url($_SERVER['REQUEST_URI']);
 		
 		add_action('admin_head', array(&$this, 'admin_head'));
 		add_action('admin_enqueue_scripts', array(&$this, 'admin_scripts'));
@@ -382,7 +382,7 @@ class RevisionaryAdmin
 						if ( time() - strtotime( $revision->post_modified_gmt ) < 90 ) { // sanity check in finding the revision that was just submitted
 							$args = array( 'revision_id' => $revision->ID, 'published_post' => $revised_post, 'object_type' => $revised_post->post_type );
 							if ( ! empty( $_REQUEST['cc'] ) ) {
-								$args['selected_recipients'] = explode( ',', $_REQUEST['cc'] );
+								$args['selected_recipients'] = array_map('intval', explode( ',', $_REQUEST['cc'] ));
 							}
 
 							$revisionary->do_notifications( $status, $status, (array) $revision, $args );
@@ -570,7 +570,7 @@ class RevisionaryAdmin
 			<?php
 
 			if ( ( empty( $_GET['action'] ) || in_array( $_GET['action'], array( 'view', 'edit' ) ) ) && ! empty( $_GET['revision'] ) ) {
-				if ( $revision = get_post( $_GET['revision'] ) ) {
+				if ( $revision = get_post( (int) $_GET['revision'] ) ) {
 					$published_id = rvy_post_id($revision->ID);
 
 					if ( !rvy_is_revision_status($revision->post_status) || $post = get_post($published_id) ) {

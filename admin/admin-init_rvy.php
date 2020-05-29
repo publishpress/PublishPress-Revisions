@@ -66,7 +66,7 @@ function rvy_admin_init() {
 		}
 		
 	} elseif (isset($_REQUEST['action2']) && !empty($_REQUEST['page']) && ('revisionary-q' == $_REQUEST['page']) && !empty($_REQUEST['post'])) {
-		$doaction = (!empty($_REQUEST['action']) && !is_numeric($_REQUEST['action'])) ? $_REQUEST['action'] : $_REQUEST['action2'];
+		$doaction = (!empty($_REQUEST['action']) && !is_numeric($_REQUEST['action'])) ? sanitize_key($_REQUEST['action']) : sanitize_key($_REQUEST['action2']);
 
 		check_admin_referer('bulk-revision-queue');
 
@@ -74,16 +74,16 @@ function rvy_admin_init() {
 	
 		if ( 'delete_all' == $doaction ) {
 			// Prepare for deletion of all posts with a specified post status (i.e. Empty trash).
-			$post_status = preg_replace('/[^a-z0-9_-]+/i', '', $_REQUEST['post_status']);
+			$post_status = preg_replace('/[^a-z0-9_-]+/i', '', sanitize_key($_REQUEST['post_status']));
 			// Verify the post status exists.
 			if ( get_post_status_object( $post_status ) ) {
 				$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_type=%s AND post_status = %s", $post_type, $post_status ) );
 			}
 			$doaction = 'delete';
 		} elseif ( isset( $_REQUEST['media'] ) ) {
-			$post_ids = $_REQUEST['media'];
+			$post_ids =  array_map('intval', (array) $_REQUEST['media']);
 		} elseif ( isset( $_REQUEST['ids'] ) ) {
-			$post_ids = explode( ',', $_REQUEST['ids'] );
+			$post_ids =  array_map('intval', explode( ',', $_REQUEST['ids'] ));
 		} elseif ( !empty( $_REQUEST['post'] ) ) {
 			$post_ids = array_map('intval', $_REQUEST['post']);
 		}
