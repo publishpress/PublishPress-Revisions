@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.4
-Stable tag: 2.3.5
+Stable tag: 2.3.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -99,6 +99,11 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.3.6 - 10 Jun 2020 =
+* Fixed : After revision submission, preview link was not always to latest revision
+* Fixed : Preview button on editor screen loaded preview with invalid thumbnail under some conditions
+* Fixed : When network-activated, Network Settings menu item loaded site-specific settings screen
 
 = 2.3.5 - 29 May 2020 =
 * Fixed : Compare link on Editor screen linked to Edit Posts screen instead of Compare Revisions 
