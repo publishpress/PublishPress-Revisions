@@ -386,7 +386,9 @@ class RevisionaryHistory
             return $return;
         }
 
-        if (!rvy_is_revision_status($compare_from->post_status) && ! rvy_is_revision_status($compare_to->post_status)) {
+        $from_status = ($compare_from) ? $compare_from->post_status : '';
+
+        if (!rvy_is_revision_status($from_status) && ! rvy_is_revision_status($compare_to->post_status)) {
             return $return;
         }
 
