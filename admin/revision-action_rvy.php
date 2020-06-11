@@ -1012,7 +1012,11 @@ function rvy_publish_scheduled_revisions($args = array()) {
 					} 
 					
 					if ( ! $to_addresses && ( empty($monitor_groups_enabled) || ! defined('RVY_FORCE_MONITOR_GROUPS') ) ) {  // if RS/PP are not active, monitor groups have been disabled or no monitor group members can publish this post...
-						$use_wp_roles = ( defined( 'SCOPER_MONITOR_ROLES' ) ) ? SCOPER_MONITOR_ROLES : 'administrator,editor';
+						if ( defined( 'SCOPER_MONITOR_ROLES' ) ) {
+							$use_wp_roles = SCOPER_MONITOR_ROLES;
+						} else {
+							$use_wp_roles = (defined('RVY_MONITOR_ROLES')) ? RVY_MONITOR_ROLES : 'administrator,editor';
+						}
 						
 						$use_wp_roles = str_replace( ' ', '', $use_wp_roles );
 						$use_wp_roles = explode( ',', $use_wp_roles );
