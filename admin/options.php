@@ -268,7 +268,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 	if ( RVY_NETWORK && is_super_admin() ) {
 		if ( ! $sitewide ) {
 			global $blog_id;
-			if ( 1 == $blog_id ) {
+			if ( is_main_site($blog_id) ) {
 				$link_open = "<a href='admin.php?page=rvy-net_options'>";
 				$link_close = '</a>';
 			} else {
