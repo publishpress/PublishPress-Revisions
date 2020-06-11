@@ -146,6 +146,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			remove_filter('posts_groupby', ['MultipleAuthors\\Classes\\Query', 'filter_posts_groupby'], 10, 2);
 		}
 
+		if (!empty($_REQUEST['s'])) {
+			$qr['s'] = $_REQUEST['s'];
+		}
+
 		$qr = apply_filters('revisionary_queue_vars', $qr);
 		$wp_query->query($qr);
 		do_action('revisionary_queue_done');
