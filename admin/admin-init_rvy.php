@@ -334,9 +334,7 @@ function rvy_get_post_revisions($post_id, $status = 'inherit', $args = '' ) {
 		}	
 			
 	} else {
-		$order_clause = ( $order && $orderby ) 
-		? $wpdb->prepare("ORDER BY %s %s", $orderby, $order)
-		: '';
+		$order_clause = "ORDER BY $orderby $order";
 
 		if ('inherit' == $status) {
 			$revisions = $wpdb->get_results(
