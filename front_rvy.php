@@ -5,8 +5,8 @@ class RevisionaryFront {
 		global $revisionary;
 		
 		if ( ! defined('RVY_CONTENT_ROLES') || !$revisionary->content_roles->is_direct_file_access() ) {
-			add_filter( 'posts_request', array( &$this, 'flt_view_revision' ) );
-			add_action('template_redirect', array( &$this, 'act_template_redirect' ), 5 );
+			add_filter('posts_request', [$this, 'flt_view_revision'] );
+			add_action('template_redirect', [$this, 'act_template_redirect'], 5 );
 		}
 
 		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {

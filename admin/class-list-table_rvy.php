@@ -596,8 +596,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$q = ['post_type' => $post_types, 'fields' => 'ids', 'post_parent' => $this->published_post_ids];
 		
-		if ( ! empty($_REQUEST['s']) )
+		if ( ! empty($_REQUEST['s']) ) {
 			$q['s'] = $_REQUEST['s'];
+		}
 		
 		if ( ! empty($_REQUEST['m']) ) {
 			$q['m'] = (int) $_REQUEST['m'];
@@ -794,13 +795,13 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		
 		$type_csv = implode("','", array_map('sanitize_key', rvy_get_manageable_types()));
 
-		$months = $wpdb->get_results( "
-			SELECT DISTINCT YEAR( $date_col ) AS year, MONTH( $date_col ) AS month
+		$months = $wpdb->get_results(
+			"SELECT DISTINCT YEAR( $date_col ) AS year, MONTH( $date_col ) AS month
 			FROM $wpdb->posts
 			WHERE post_type IN ('$type_csv') AND comment_count IN ('$ids')
 			$extra_checks
-			ORDER BY $date_col DESC
-		" );
+			ORDER BY $date_col DESC" 
+		);
 
 		$month_count = count( $months );
 

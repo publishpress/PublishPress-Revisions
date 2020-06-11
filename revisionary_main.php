@@ -281,7 +281,7 @@ class Revisionary
 		}
 	}
 
-	// On post deletion, also delete its pending revisions and future revisions (and their meta data)
+	// Immediately prior to post deletion, also delete its pending revisions and future revisions (and their meta data)
 	function actDeletePost($post_id) {
 		global $wpdb;
 
