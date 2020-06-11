@@ -354,10 +354,10 @@ function revisionary_refresh_revision_flags() {
 
 	$status_csv = "'" . implode("','", get_post_stati(['public' => true, 'private' => true], 'names', 'or')) . "'";
 	$arr_have_revisions = $wpdb->get_col("SELECT r.comment_count FROM $wpdb->posts r INNER JOIN $wpdb->posts p ON r.comment_count = p.ID WHERE p.post_status IN ($status_csv) AND r.post_status IN ('pending-revision', 'future-revision')");
-	$have_revisions = implode("','", array_unique($arr_have_revisions));
+	$have_revisions = implode("','", array_map('intval', array_unique($arr_have_revisions)));
 
 	if ($ids = $wpdb->get_col("SELECT meta_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_has_revisions' AND post_id NOT IN ('$have_revisions')")) {
-		$wpdb->query("DELETE FROM $wpdb->postmeta WHERE meta_id IN (" . implode(",", $ids) . ")");
+		$wpdb->query("DELETE FROM $wpdb->postmeta WHERE meta_id IN (" . implode(",", array_map('intval', $ids)) . ")");
 	}
 
 	$have_flag_ids = $wpdb->get_col("SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_has_revisions'");
