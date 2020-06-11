@@ -362,9 +362,9 @@ class RevisionaryFront {
 }
 
 class RvyScheduledHtml {
-	var $html;
-	var $action;
-	var $priority;
+	private $html;
+	private $action;
+	private $priority;
 
 	function __construct( $html, $action, $priority = 10 ) {
 		$this->html = $html;
