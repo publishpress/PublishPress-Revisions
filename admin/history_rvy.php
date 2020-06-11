@@ -41,13 +41,13 @@ class RevisionaryHistory
 
         //wp_reset_vars( array( 'revision', 'action', 'from', 'to' ) );
 
-        $revision_id = (isset($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : '';
+        if (!empty($_REQUEST['revision']) && is_scalar($_REQUEST['revision']) && !empty($_REQUEST['post_id']) && !is_numeric($_REQUEST['revision']) && rvy_is_revision_status(sanitize_key($_REQUEST['revision']))) {
+            $revision_status = sanitize_key($_REQUEST['revision']);
 
-        if (is_scalar($revision_id) && !empty($_REQUEST['post_id']) && rvy_is_revision_status($revision_id)) {
-            $orderby = ('future-revision' == $revision_id) ? 'post_date' : 'ID';
-            $order =   ('future-revision' == $revision_id) ? 'DESC' : 'ASC';
+            $orderby = ('future-revision' == $revision_status) ? 'post_date' : 'ID';
+            $order =   ('future-revision' == $revision_status) ? 'DESC' : 'ASC';
 
-            $_revisions = rvy_get_post_revisions(intval($_REQUEST['post_id']), $revision_id, ['orderby' => $orderby, 'order' => $order]);
+            $_revisions = rvy_get_post_revisions(intval($_REQUEST['post_id']), $revision_status, ['orderby' => $orderby, 'order' => $order]);
             $revision_id = ($revision = array_pop($_revisions)) ? $revision->ID : 0;
 
             $_REQUEST['revision'] = $revision_id;
