@@ -373,7 +373,7 @@ class RevisionCreation {
             $object_type = isset($postarr['post_type']) ? $postarr['post_type'] : '';
             $args = compact( 'revision_id', 'published_post', 'object_type' );
             if ( ! empty( $_REQUEST['prev_cc_user'] ) ) {
-                $args['selected_recipients'] = $_REQUEST['prev_cc_user'];
+                $args['selected_recipients'] = array_map('intval', $_REQUEST['prev_cc_user']);
             }
             $revisionary->do_notifications( 'pending-revision', 'pending-revision', $postarr, $args );
             rvy_halt( $msg, __('Pending Revision Created', 'revisionary') );
