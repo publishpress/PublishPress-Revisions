@@ -570,6 +570,14 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	rvy_delete_past_revisions($revision_id);
 
+	/**
+	 * Trigger after a revision has been applied.
+	 *
+	 * @param int $post_id The post ID.
+	 * @param int $revision_id The revision object.
+	 */
+	do_action( 'revision_applied', $published->ID, $revision );
+
 	return $revision;
 }
 
