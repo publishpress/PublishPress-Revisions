@@ -116,7 +116,7 @@ if (!empty($published_title)) {
 <?php
 if ( isset( $_REQUEST['s'] ) && strlen( $_REQUEST['s'] ) ) {
 	/* translators: %s: search keywords */
-	printf( ' <span class="subtitle">' . __( 'Search results for &#8220;%s&#8221;' ) . '</span>', $_REQUEST['s'] );
+	printf( ' <span class="subtitle">' . __( 'Search results for &#8220;%s&#8221;' ) . '</span>', strip_tags($_REQUEST['s']) );
 }
 ?>
 
