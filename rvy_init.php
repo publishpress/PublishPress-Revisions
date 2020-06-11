@@ -317,20 +317,25 @@ function revisionary_publish_scheduled() {
 	rvy_publish_scheduled_revisions();
 }
 
-function revisionary_refresh_postmeta($post_id, $set_value = null) {
+function revisionary_refresh_postmeta($post_id, $set_value = null, $args = []) {
 	global $wpdb;
+
+	$ignore_revisions = (!empty($args['ignore_revisions'])) ? $args['ignore_revisions'] : [];
 
 	if (is_null($set_value)) {
 		$revision_status_csv = "'pending-revision', 'future-revision'";
 
-		$var = $wpdb->get_var(
+		$ignore_clause = ($ignore_revisions) ? " AND ID NOT IN (" . implode(",", array_map('intval', $ignore_revisions)) . ")" : '';
+
+		$has_revisions = $wpdb->get_var(
+			// account for post deletion
 			$wpdb->prepare(
-				"SELECT comment_count FROM $wpdb->posts WHERE post_status IN ($revision_status_csv) AND ID = %d LIMIT 1",
+				"SELECT ID FROM $wpdb->posts WHERE post_status IN ($revision_status_csv) $ignore_clause AND comment_count = %d LIMIT 1",
 				$post_id
 			)
 		);
 
-		$set_value = !empty($var);
+		$set_value = !empty($has_revisions);
 	}
 
 	if ($set_value) {

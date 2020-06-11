@@ -632,6 +632,8 @@ function rvy_revision_delete() {
 		$redirect = "admin.php?page=rvy-revisions&revision={$revision->post_parent}&action=view&revision_status={$revision->post_status}&deleted=1";
 
 		rvy_delete_past_revisions($revision_id);
+
+		revisionary_refresh_postmeta($revision->post_parent);
 	} while (0);
 	
 	if ( ! empty( $_GET['return'] ) && ! empty( $_SERVER['HTTP_REFERER'] ) ) {
@@ -683,6 +685,8 @@ function rvy_revision_bulk_delete() {
 			}
 
 			if ( $post = get_post( $revision->post_parent ) ) {
+				$post_ids []= $revision->post_parent;
+
 				if ( $type_obj = get_post_type_object( $post->post_type ) ) {
 					if ( ! current_user_can( $type_obj->cap->delete_post, $revision->post_parent ) ) {
 						continue;
@@ -696,6 +700,10 @@ function rvy_revision_bulk_delete() {
 			$delete_count++;
 
 			rvy_delete_past_revisions($revision_id);
+		}
+
+		foreach($post_ids as $_post_id) {
+			revisionary_refresh_postmeta($_post_id);
 		}
 	}
 

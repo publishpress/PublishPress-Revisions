@@ -160,9 +160,9 @@ class Revisionary
 		$this->enabled_post_types = array_filter($this->enabled_post_types);
 	}
 
-	// If deleted revision was the last remaining pending / scheduled, clear _rvy_has_revisions postmeta flag 
+	// On post deletion, clear corresponding _rvy_has_revisions postmeta flag
 	function actDeletedPost($post_id) {
-		revisionary_refresh_postmeta($post_id);
+		delete_post_meta($post_id, '_rvy_has_revisions');
 	}
 
 	function fltEditRevisionUpdatedLink($permalink, $post, $leavename) {
@@ -317,6 +317,8 @@ class Revisionary
 					$post_id
 				)
 			);
+
+			revisionary_refresh_postmeta(rvy_post_id($post->ID), null, ['ignore_revisions' => [$post->ID]]);
 		}
 	}
 
