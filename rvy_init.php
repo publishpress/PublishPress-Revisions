@@ -2,7 +2,9 @@
 if ( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 	die();
 
-define( 'RVY_NETWORK', awp_is_mu() && rvy_plugin_active_for_network( RVY_BASENAME ) );
+if (defined('RVY_BASENAME')) {
+	define( 'RVY_NETWORK', awp_is_mu() && rvy_plugin_active_for_network( RVY_BASENAME ) );
+}
 
 add_action('init', 'rvy_status_registrations', 40);
 
