@@ -457,7 +457,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		?>
 
 		<p style="padding-left:22px">
-		<a href="<?php echo add_query_arg('rvy_flush_flags', 1, $_SERVER['REQUEST_URI'])?>"><?php _e('Regenerate revision storage flags (for Revision Queue listing)', 'revisionary');?></a>
+		<a href="<?php echo add_query_arg('rvy_flush_flags', 1, esc_url($_SERVER['REQUEST_URI']))?>"><?php _e('Regenerate revision storage flags (for Revision Queue listing)', 'revisionary');?></a>
 		</p>
 		</td></tr>
 	<?php endif; // any options accessable in this section
