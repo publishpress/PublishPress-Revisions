@@ -498,6 +498,10 @@ function rvy_retrieve_options( $sitewide = false ) {
 }
 
 function rvy_get_option($option_basename, $sitewide = -1, $get_default = false) {
+	if (('async_scheduled_publish' == $option_basename) && function_exists('relevanssi_query')) {
+		return false;
+	}
+	
 	if ( ! $get_default ) {
 		// allow explicit selection of sitewide / non-sitewide scope for better performance and update security
 		if ( -1 === $sitewide ) {
