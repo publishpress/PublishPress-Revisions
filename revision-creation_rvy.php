@@ -268,6 +268,7 @@ class RevisionCreation {
         unset($revisionary->impose_pending_rev[ $published_post->ID ]);
         
         if ( $revision_id ) {
+			$revisionary->last_revision[$published_post->ID] = $revision_id;
             set_transient("_rvy_pending_revision_{$current_user->ID}_{$postarr['ID']}", $revision_id, 30);
 
             update_post_meta($revision_id, '_rvy_base_post_id', $published_post->ID);
