@@ -36,7 +36,7 @@ class Revisionary
 			$revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : $_REQUEST['to'];
 			
 			if ($revision_id) {
-				if ($_post = get_post($_REQUEST['revision'])) {
+				if ($_post = get_post($revision_id)) {
 					if (!rvy_is_revision_status($_post->post_status)) {
 						if ($parent_post = get_post($_post->post_parent)) {
 							global $current_user;
