@@ -288,7 +288,7 @@ function rvy_get_post_revisions($post_id, $status = 'inherit', $args = '' ) {
 		$status, 
 		array_merge(rvy_revision_statuses(), array('inherit')) 
 	) ) {
-		return array();
+		return [];
 	}
 
 	if ( COL_ID_RVY == $fields ) {
