@@ -396,7 +396,7 @@ class RevisionaryAdmin
 	}
 		
 	function add_editor_ui() {
-		global $revisionary;
+		global $revisionary, $pagenow;
 
 		if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ) ) ) {
 			global $post;
