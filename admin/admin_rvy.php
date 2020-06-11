@@ -385,7 +385,7 @@ class RevisionaryAdmin
 								$args['selected_recipients'] = array_map('intval', explode( ',', $_REQUEST['cc'] ));
 							}
 
-							$revisionary->do_notifications( $status, $status, (array) $revision, $args );
+							$revisionary->do_notifications( $status, $status, (array) $revised_post, $args );
 						}
 						
 						rvy_halt( $revisionary->get_revision_msg( $revision, array( 'post_arr' => (array) $revision, 'post_id' => $revised_post->ID ) ) );
