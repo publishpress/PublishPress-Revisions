@@ -825,10 +825,6 @@ function _rvy_publish_scheduled_revisions() {
 function rvy_publish_scheduled_revisions($args = array()) {
 	global $wpdb;
 	
-	if (function_exists('relevanssi_query')) {
-		remove_action( 'wp_insert_post', 'relevanssi_insert_edit', 99, 1 );
-	}
-
 	rvy_confirm_async_execution( 'publish_scheduled_revisions' );
 
 	// Prevent this function from being triggered simultaneously by another site request
