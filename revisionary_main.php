@@ -156,7 +156,16 @@ class Revisionary
 
 	// This is intentionally called twice: once for code that fires on 'init' and then very late on 'init' for types which were registered late on 'init'
 	private function setPostTypes() {
-		$this->enabled_post_types = apply_filters('revisionary_enabled_post_types', array_fill_keys(get_post_types(['public' => true]), true));
+		$this->enabled_post_types = apply_filters(
+			'revisionary_enabled_post_types', 
+			array_merge(
+				array_fill_keys(
+					get_post_types(['public' => true]), true
+				),
+				['swfd-courses' => true]
+			)
+		);
+
 		unset($this->enabled_post_types['attachment']);
 		$this->enabled_post_types = array_filter($this->enabled_post_types);
 	}
