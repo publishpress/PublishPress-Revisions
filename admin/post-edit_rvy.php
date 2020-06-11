@@ -231,8 +231,10 @@ class RvyPostEdit {
         global $post, $revisionary;
 
         if (!empty($_REQUEST['wp-preview']) && !empty($_post) && !empty($revisionary->last_autosave_id[$_post->ID])) {
-            $url = remove_query_arg('_thumbnail_id', $url);
-            $url = add_query_arg('_thumbnail_id', $revisionary->last_autosave_id[$_post->ID], $url);
+            if (defined('REVISIONARY_PREVIEW_LEGACY_ARGS')) {
+            	$url = remove_query_arg('_thumbnail_id', $url);
+            	$url = add_query_arg('_thumbnail_id', $revisionary->last_autosave_id[$_post->ID], $url);
+            }
         } elseif ($post && rvy_is_revision_status($post->post_status)) {
             $url = rvy_preview_url($post);
         }
