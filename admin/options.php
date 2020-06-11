@@ -818,8 +818,8 @@ $revisionary->admin->publishpressFooter();
 
 
 function rvy_options( $sitewide = false, $customize_defaults = false ) {
-	$ui = RvyOptionUI::instance(compact($sitewide, $customize_defaults));
-	$ui->options_ui();
+	$ui = RvyOptionUI::instance(compact('sitewide', 'customize_defaults'));
+	$ui->options_ui($sitewide, $customize_defaults);
 }
 
 function rvy_is_plugin_active($check_plugin_file)

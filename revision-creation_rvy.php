@@ -268,6 +268,7 @@ class RevisionCreation {
         unset($revisionary->impose_pending_rev[ $published_post->ID ]);
         
         if ( $revision_id ) {
+			$revisionary->last_revision[$published_post->ID] = $revision_id;
             set_transient("_rvy_pending_revision_{$current_user->ID}_{$postarr['ID']}", $revision_id, 30);
 
             update_post_meta($revision_id, '_rvy_base_post_id', $published_post->ID);
@@ -372,7 +373,7 @@ class RevisionCreation {
             $object_type = isset($postarr['post_type']) ? $postarr['post_type'] : '';
             $args = compact( 'revision_id', 'published_post', 'object_type' );
             if ( ! empty( $_REQUEST['prev_cc_user'] ) ) {
-                $args['selected_recipients'] = $_REQUEST['prev_cc_user'];
+                $args['selected_recipients'] = array_map('intval', $_REQUEST['prev_cc_user']);
             }
             $revisionary->do_notifications( 'pending-revision', 'pending-revision', $postarr, $args );
             rvy_halt( $msg, __('Pending Revision Created', 'revisionary') );
