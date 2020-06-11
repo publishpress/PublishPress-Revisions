@@ -61,7 +61,7 @@ class RVY_PostBlockEditUI {
                 $revisions_caption = '';
             }
 
-            $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
+            $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
             $published_post_id = rvy_post_id($post->ID);
 
             if ($can_publish) {

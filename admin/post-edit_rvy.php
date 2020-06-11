@@ -80,7 +80,7 @@ class RvyPostEdit {
         // Notice: Trying to get property of non-object in F:\www\wp50\wp-content\plugins\publishpress-multiple-authors\core\Classes\Utils.php on line 309
         // @todo: address within MA
         if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && !empty($_REQUEST['post'])) {
-            $post = get_post($_REQUEST['post']);
+            $post = get_post((int) $_REQUEST['post']);
         }
     }
 
@@ -199,7 +199,7 @@ class RvyPostEdit {
 
         if ($can_publish && rvy_is_revision_status($post->post_status)):?>
             <?php
-            $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
+            $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
             $published_post_id = rvy_post_id($post->ID);
 
             if (in_array($post->post_status, ['pending-revision'])) {

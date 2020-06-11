@@ -2,9 +2,11 @@
 
 class RevisionaryFront {
 	function __construct() {
-		if ( ! defined('RVY_CONTENT_ROLES') || ! $GLOBALS['revisionary']->content_roles->is_direct_file_access() ) {
-			add_filter( 'posts_request', array( &$this, 'flt_view_revision' ) );
-			add_action('template_redirect', array( &$this, 'act_template_redirect' ), 5 );
+		global $revisionary;
+		
+		if ( ! defined('RVY_CONTENT_ROLES') || !$revisionary->content_roles->is_direct_file_access() ) {
+			add_filter('posts_request', [$this, 'flt_view_revision'] );
+			add_action('template_redirect', [$this, 'act_template_redirect'], 5 );
 		}
 
 		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
@@ -46,7 +48,7 @@ class RevisionaryFront {
 	function flt_view_revision($request) {
 		//WP post/page preview passes this arg
 		if ( ! empty( $_GET['preview_id'] ) ) {
-			$published_post_id = $_GET['preview_id'];
+			$published_post_id = (int) $_GET['preview_id'];
 			
 			remove_filter( 'posts_request', array( &$this, 'flt_view_revision' ) ); // no infinite recursion!
 
@@ -56,7 +58,7 @@ class RevisionaryFront {
 			add_filter( 'posts_request', array( &$this, 'flt_view_revision' ) );
 
 		} else {
-			$revision_id = (isset($_REQUEST['page_id'])) ? $_REQUEST['page_id'] : 0;
+			$revision_id = (isset($_REQUEST['page_id'])) ? (int) $_REQUEST['page_id'] : 0;
 
 			if (!$revision_id) {
 				$revision_id = rvy_detect_post_id();
@@ -88,15 +90,15 @@ class RevisionaryFront {
 			return;
 		}
 		
-		global $wp_query;
+		global $wp_query, $revisionary;
 		if ($wp_query->is_404) {
 			return;
 		}
 
 		if (!empty($_REQUEST['page_id'])) {
-			$revision_id = $_REQUEST['page_id'];
+			$revision_id = (int) $_REQUEST['page_id'];
 		} elseif (!empty($_REQUEST['p'])) {
-			$revision_id = $_REQUEST['p'];
+			$revision_id = (int) $_REQUEST['p'];
 		} else {
 			global $post;
 			if ($post) {
@@ -154,12 +156,12 @@ class RevisionaryFront {
 				$cap_name = $type_obj->cap->edit_post;	
 			}
 
-			$orig_skip = ! empty( $GLOBALS['revisionary']->skip_revision_allowance );
-			$GLOBALS['revisionary']->skip_revision_allowance = true;
+			$orig_skip = ! empty( $revisionary->skip_revision_allowance );
+			$revisionary->skip_revision_allowance = true;
 
 			$can_publish = agp_user_can( $cap_name, $published_post_id, '', array( 'skip_revision_allowance' => true ) );
 
-			$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect={$_REQUEST['rvy_redirect']}" : '';
+			$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
 
 			load_plugin_textdomain('revisionary', false, RVY_FOLDER . '/languages');
 			
@@ -238,7 +240,7 @@ class RevisionaryFront {
 
 					// work around quirk of new scheduled revision preview not displaying page template and post thumbnail when accessed immediately after creation
 					if (time() < strtotime($post->post_modified_gmt) + 15) {
-						$current_url = set_url_scheme( 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+						$current_url = set_url_scheme( esc_url('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']) );
 						$title = esc_attr(__('This revision is very new, preview may not be synchronized with theme.', 'revisionary'));
 						$reload_link = " <a href='$current_url' title='$title'>" . __('Reload', 'revisionary') . '</a>';
 					} else {
@@ -290,7 +292,7 @@ class RevisionaryFront {
 				new RvyScheduledHtml( $html, 'wp_head', 99 );  // this should be inserted at the top of <body> instead, but currently no way to do it 
 			}
 			
-			$GLOBALS['revisionary']->skip_revision_allowance = $orig_skip;
+			$revisionary->skip_revision_allowance = $orig_skip;
 		}
 	}
 
@@ -360,9 +362,9 @@ class RevisionaryFront {
 }
 
 class RvyScheduledHtml {
-	var $html;
-	var $action;
-	var $priority;
+	private $html;
+	private $action;
+	private $priority;
 
 	function __construct( $html, $action, $priority = 10 ) {
 		$this->html = $html;

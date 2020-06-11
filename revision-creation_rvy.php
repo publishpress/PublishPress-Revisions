@@ -65,7 +65,7 @@ class RevisionCreation {
 		if ( $revisionary->doing_rest && $revisionary->rest->is_posts_request ) {
 			$post_id = $revisionary->rest->post_id;
 		} elseif ( ! empty( $_POST['post_ID'] ) ) {
-			$post_id = $_POST['post_ID'];
+			$post_id = (int) $_POST['post_ID'];
 		} else {
 			$post_id = rvy_detect_post_id();
 		} 
@@ -104,7 +104,7 @@ class RevisionCreation {
 		if ( $revisionary->doing_rest && $revisionary->rest->is_posts_request ) {
 			$post_type = $revisionary->rest->post_type;
 		} elseif ( ! empty( $_POST['post_type'] ) ) {
-			$post_type = $_POST['post_type'];
+			$post_type = sanitize_key($_POST['post_type']);
 		} else {
 			$post_type = rvy_detect_post_type();
 		} 
