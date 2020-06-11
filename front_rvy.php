@@ -2,7 +2,9 @@
 
 class RevisionaryFront {
 	function __construct() {
-		if ( ! defined('RVY_CONTENT_ROLES') || ! $GLOBALS['revisionary']->content_roles->is_direct_file_access() ) {
+		global $revisionary;
+		
+		if ( ! defined('RVY_CONTENT_ROLES') || !$revisionary->content_roles->is_direct_file_access() ) {
 			add_filter( 'posts_request', array( &$this, 'flt_view_revision' ) );
 			add_action('template_redirect', array( &$this, 'act_template_redirect' ), 5 );
 		}
@@ -88,7 +90,7 @@ class RevisionaryFront {
 			return;
 		}
 		
-		global $wp_query;
+		global $wp_query, $revisionary;
 		if ($wp_query->is_404) {
 			return;
 		}
@@ -154,8 +156,8 @@ class RevisionaryFront {
 				$cap_name = $type_obj->cap->edit_post;	
 			}
 
-			$orig_skip = ! empty( $GLOBALS['revisionary']->skip_revision_allowance );
-			$GLOBALS['revisionary']->skip_revision_allowance = true;
+			$orig_skip = ! empty( $revisionary->skip_revision_allowance );
+			$revisionary->skip_revision_allowance = true;
 
 			$can_publish = agp_user_can( $cap_name, $published_post_id, '', array( 'skip_revision_allowance' => true ) );
 
@@ -290,7 +292,7 @@ class RevisionaryFront {
 				new RvyScheduledHtml( $html, 'wp_head', 99 );  // this should be inserted at the top of <body> instead, but currently no way to do it 
 			}
 			
-			$GLOBALS['revisionary']->skip_revision_allowance = $orig_skip;
+			$revisionary->skip_revision_allowance = $orig_skip;
 		}
 	}
 

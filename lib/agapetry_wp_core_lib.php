@@ -38,6 +38,8 @@ function agp_date_i18n( $datef, $timestamp ) {
 
 if ( ! function_exists('agp_user_can') ) {
 function agp_user_can($reqd_caps, $object_id = 0, $user_id = 0, $args = array() ) {
+	global $revisionary, $current_user;
+	
 	if ( function_exists('is_super_admin') && is_super_admin() ) 
 		return true;
 
@@ -52,13 +54,13 @@ function agp_user_can($reqd_caps, $object_id = 0, $user_id = 0, $args = array() 
 			return false;
 	}
 
-	$orig_skip = ! empty($GLOBALS['revisionary']->skip_revision_allowance);
+	$orig_skip = ! empty($revisionary->skip_revision_allowance);
 
 	if (!empty($args['skip_revision_allowance'])) {
-		$GLOBALS['revisionary']->skip_revision_allowance = true;	// this will affect the behavior of Press Permit / Role Scoper's user_has_cap filter
+		$revisionary->skip_revision_allowance = true;	// this will affect the behavior of Press Permit / Role Scoper's user_has_cap filter
 	}
 
-	if ( ( $user->ID != $GLOBALS['current_user']->ID ) || ( ! defined( 'PP_VERSION' ) && ! defined( 'PPC_VERSION' ) && ! defined( 'PRESSPERMIT_VERSION' ) ) ) { // TODO: also with Role Scoper?
+	if ( ( $user->ID != $current_user->ID ) || ( ! defined( 'PP_VERSION' ) && ! defined( 'PPC_VERSION' ) && ! defined( 'PRESSPERMIT_VERSION' ) ) ) { // TODO: also with Role Scoper?
 		$reqd_caps = (array) $reqd_caps;
 		$check_caps = $reqd_caps;
 		foreach ( $check_caps as $cap_name ) {
@@ -72,12 +74,13 @@ function agp_user_can($reqd_caps, $object_id = 0, $user_id = 0, $args = array() 
 	if ( defined('RVY_CONTENT_ROLES') && ( 'blog' == $object_id ) ) {
 		// if this is being called with Press Permit / Role Scoper loaded, any_object_check won't be called anyway
 		$flags = array_fill_keys( array( 'skip_any_object_check', 'skip_any_term_check', 'skip_id_generation' ), true );
-		$GLOBALS['revisionary']->content_roles->set_hascap_flags( $flags );
+		$revisionary->content_roles->set_hascap_flags( $flags );
 	}
 	
-	if ( ( $user->ID == $GLOBALS['current_user']->ID ) && ( defined( 'PP_VERSION' ) || defined( 'PPC_VERSION' ) || defined( 'PRESSPERMIT_VERSION' ) ) ) {  // temp workaround
+	if ( ( $user->ID == $current_user->ID ) && ( defined( 'PP_VERSION' ) || defined( 'PPC_VERSION' ) || defined( 'PRESSPERMIT_VERSION' ) ) ) {  // temp workaround
 		$user_can = current_user_can( $reqd_caps, $object_id );
-		$GLOBALS['revisionary']->skip_revision_allowance = $orig_skip;
+		$revisionary->skip_revision_allowance = $orig_skip;
+
 		return $user_can;
 		
 	} else {
@@ -92,7 +95,7 @@ function agp_user_can($reqd_caps, $object_id = 0, $user_id = 0, $args = array() 
 				$pp_user_workaround = true;
 			}
 			
-			if ( ! empty($GLOBALS['revisionary']->skip_revision_allowance) ) {
+			if ( ! empty($revisionary->skip_revision_allowance) ) {
 				//$cap_interceptor->memcache = array();
 				$cap_interceptor->flags['memcache_disabled'] = true;
 			}
@@ -110,11 +113,11 @@ function agp_user_can($reqd_caps, $object_id = 0, $user_id = 0, $args = array() 
 		
 		if ( defined('RVY_CONTENT_ROLES') && ('blog' == $object_id) ) {
 			$flags = array_fill_keys( array( 'skip_any_object_check', 'skip_any_term_check', 'skip_id_generation' ), false );
-			$GLOBALS['revisionary']->content_roles->set_hascap_flags( $flags );
+			$revisionary->content_roles->set_hascap_flags( $flags );
 		}
 		
 		if (!empty($args['skip_revision_allowance'])) {
-			$GLOBALS['revisionary']->skip_revision_allowance = false;
+			$revisionary->skip_revision_allowance = false;
 		}
 
 		foreach ($reqd_caps as $cap_name) {
@@ -125,7 +128,7 @@ function agp_user_can($reqd_caps, $object_id = 0, $user_id = 0, $args = array() 
 					$alternate_cap_name = str_replace( 'create_child_', 'edit_', $cap_name );
 					$_args = array( array($alternate_cap_name), $user->ID, $object_id );
 					
-					if ( ( defined( 'PPC_VERSION' ) || defined( 'PRESSPERMIT_VERSION' ) ) && ! empty($GLOBALS['revisionary']->skip_revision_allowance) ) {
+					if ( ( defined( 'PPC_VERSION' ) || defined( 'PRESSPERMIT_VERSION' ) ) && ! empty($revisionary->skip_revision_allowance) ) {
 						//$cap_interceptor->memcache = array();
 						$cap_interceptor->flags['memcache_disabled'] = true;
 					}
@@ -133,18 +136,18 @@ function agp_user_can($reqd_caps, $object_id = 0, $user_id = 0, $args = array() 
 					$capabilities = apply_filters('user_has_cap', $user->allcaps, array($alternate_cap_name), $_args, $current_user );
 					
 					if( empty($capabilities[$alternate_cap_name]) || ! $capabilities[$alternate_cap_name] ) {
-						$GLOBALS['revisionary']->skip_revision_allowance = $orig_skip;
+						$revisionary->skip_revision_allowance = $orig_skip;
 						return false;
 					}
 				} else {
-					$GLOBALS['revisionary']->skip_revision_allowance = $orig_skip;
+					$revisionary->skip_revision_allowance = $orig_skip;
 					return false;
 				}
 			}
 		}
 	}
 
-	$GLOBALS['revisionary']->skip_revision_allowance = $orig_skip;
+	$revisionary->skip_revision_allowance = $orig_skip;
 	return true;
 }
 }

@@ -491,18 +491,20 @@ class Revisionary
 	// @todo: still needed?
 	// work around WP query_posts behavior (won't allow preview on posts unless status is public, private or protected)
 	function inherit_status_workaround( $results ) {
+		global $wp_post_statuses;
+		
 		if ( isset( $this->orig_inherit_protected_value ) )
 			return $results;
 		
-		$this->orig_inherit_protected_value = $GLOBALS['wp_post_statuses']['inherit']->protected;
+		$this->orig_inherit_protected_value = $wp_post_statuses['inherit']->protected;
 		
-		$GLOBALS['wp_post_statuses']['inherit']->protected = true;
+		$wp_post_statuses['inherit']->protected = true;
 		return $results;
 	}
 	
 	function undo_inherit_status_workaround( $results ) {
 		if ( ! empty( $this->orig_inherit_protected_value ) )
-			$GLOBALS['wp_post_statuses']['inherit']->protected = $this->orig_inherit_protected_value;
+			$wp_post_statuses['inherit']->protected = $this->orig_inherit_protected_value;
 		
 		return $results;
 	}
@@ -512,7 +514,13 @@ class Revisionary
 	}
 	
 	function flt_has_cap_bypass( $bypass, $wp_sitecaps, $pp_reqd_caps, $args ) {
-		if ( ! $GLOBALS['pp_attributes']->is_metacap( $args[0] ) && ( ! array_intersect( $pp_reqd_caps, array_keys($GLOBALS['pp_attributes']->condition_cap_map) )
+		global $pp_attributes;
+
+		if (empty($pp_attributes)) {
+			return $wp_sitecaps;
+		}
+
+		if ( ! $pp_attributes->is_metacap( $args[0] ) && ( ! array_intersect( $pp_reqd_caps, array_keys($pp_attributes->condition_cap_map) )
 		|| ( is_admin() && strpos( $_SERVER['SCRIPT_NAME'], 'p-admin/post.php' ) && ! is_array($args[0]) && ( false !== strpos( $args[0], 'publish_' ) && empty( $_REQUEST['publish'] ) ) ) )
 		) {						// @todo: simplify (Press Permit filter for publish_posts cap check which determines date selector visibility)
 			return $wp_sitecaps;
@@ -710,7 +718,7 @@ class Revisionary
 				// Revisors are enabled to edit other users' posts for revision, but cannot edit other users' revisions unless cap is explicitly set sitewide
 				if ( rvy_is_revision_status($post->post_type) && ! $this->skip_revision_allowance ) {
 					if (!rvy_is_post_author($post)) {
-						if ( empty( $GLOBALS['current_user']->allcaps['edit_others_revisions'] ) ) {
+						if ( empty( $current_user->allcaps['edit_others_revisions'] ) ) {
 							$this->skip_revision_allowance = 1;
 						}
 					}

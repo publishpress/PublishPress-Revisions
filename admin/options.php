@@ -474,7 +474,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		
 		<?php 
 		if( $pending_revisions_available ) {
-			$subcaption = ( defined('RVY_CONTENT_ROLES') && $group_link = $GLOBALS['revisionary']->content_roles->get_metagroup_edit_link( 'Pending Revision Monitors' ) ) ?
+			$subcaption = ( defined('RVY_CONTENT_ROLES') && $group_link = $revisionary->content_roles->get_metagroup_edit_link( 'Pending Revision Monitors' ) ) ?
 				sprintf( " &bull;&nbsp;<a href='%s'>" . __('select recipients', 'revisionary') . "</a>", $group_link ) : '';
 			
 			// TODO: $ui->option_dropdown() method
@@ -531,7 +531,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		if( $scheduled_revisions_available ) {
 			echo '<br />';
 					
-			$subcaption = ( defined('RVY_CONTENT_ROLES') && $group_link = $GLOBALS['revisionary']->content_roles->get_metagroup_edit_link( 'Scheduled Revision Monitors' ) ) ?
+			$subcaption = ( defined('RVY_CONTENT_ROLES') && $group_link = $revisionary->content_roles->get_metagroup_edit_link( 'Scheduled Revision Monitors' ) ) ?
 				sprintf( " &bull;&nbsp;<a href='%s'>" . __('select recipients', 'revisionary') . "</a>", $group_link ) : '';
 
 			$hint = '';
