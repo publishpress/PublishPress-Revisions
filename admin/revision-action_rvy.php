@@ -157,7 +157,7 @@ function rvy_revision_approve($revision_id = 0) {
 			$type_caption = $type_obj->labels->singular_name;
 
 			$title = sprintf(__('[%s] Revision Approval Notice', 'revisionary' ), $blogname );
-			$message = sprintf( __('A revision to your %1$s "%2$s" has been approved.', 'revisionary' ), $type_caption, $post->post_title ) . "\r\n\r\n";
+			$message = sprintf( __('A revision to the %1$s "%2$s" has been approved.', 'revisionary' ), $type_caption, $post->post_title ) . "\r\n\r\n";
 
 			if ( $revisor = new WP_User( $revision->post_author ) )
 				$message .= sprintf( __('The submitter was %1$s.', 'revisionary'), $revisor->display_name ) . "\r\n\r\n";
