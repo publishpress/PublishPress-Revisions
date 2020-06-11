@@ -30,7 +30,7 @@ function rvy_metabox_notification_list() {
 		$type_obj = get_post_type_object( $object_type );
 		
 		if ( '1' === $notify_editors ) {
-			if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') ) {
+			if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') && ! defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS') ) {
 				global $revisionary;
 				
 				$monitor_groups_enabled = true;

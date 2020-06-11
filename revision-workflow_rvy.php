@@ -16,6 +16,11 @@ class Rvy_Revision_Workflow_UI {
             return;
         }
 
+        // Support workaround to prevent notification when an Administrator or Editor voluntarily creates a pending revision
+        if (defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS') && agp_user_can('edit_post', $published_post->ID, 0, ['skip_revision_allowance' => true])) {
+            return;
+        }
+
         if ( $revisionary->doing_rest && $revisionary->rest->is_posts_request && ! empty( $revisionary->rest->request ) ) {
             $post_arr = array_merge( $revisionary->rest->request->get_params(), $post_arr );
         }
@@ -192,12 +197,43 @@ class Rvy_Revision_Workflow_UI {
 
             case 'pending-revision':
             default:
-                $msg = __('Your modification has been saved for editorial review.', 'revisionary') . ' <br /><br />';
-                
-                if ( $future_date ) {
-                    $msg .= __('If approved by an editor, it will be published on the date you specified.', 'revisionary') . ' ';
+                // support alternate message if revision was submitted by an Editor or Administrator
+                if (defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATION')) {
+                    $editor_roles = [];
+                    
+                    foreach (['REVISIONARY_ALTERNATE_SUBMISSION_CAPTION_ROLES', 'RVY_MONITOR_ROLES', 'SCOPER_MONITOR_ROLES'] as $const) {
+                        if (defined($const)) {
+                            $editor_roles = array_map('trim', explode(',', constant($const)));
+                            break;
+                        }
+                    }
+
+                    if (empty($editor_roles)) {
+                        $editor_roles = ['editor', 'administrator'];
+                    }
+
+					// Administrator role might be excluded from revision notification, but as a self-approving revisor should still get the abbreviated submission caption. 
+                    if (!defined('REVISIONARY_ALTERNATE_SUBMISSION_CAPTION_ROLES')) {
+                        $editor_roles []= 'administrator';
+                    }
+
+                    if ($user = new WP_User($revision->post_author)) {
+                        if (array_intersect($user->roles, $editor_roles)) {
+                            $use_editor_message = true;
+                        }
+                    }
+                }
+
+                if (!empty($use_editor_message)) {
+                    $msg = __('Your modification has been saved.', 'revisionary') . ' <br />';
                 } else {
-                    $msg .= __('It will be published when an editor approves it.', 'revisionary') . ' ';
+	                $msg = __('Your modification has been saved for editorial review.', 'revisionary') . ' <br /><br />';
+	                
+	                if ( $future_date ) {
+	                    $msg .= __('If approved by an editor, it will be published on the date you specified.', 'revisionary') . ' ';
+	                } else {
+	                    $msg .= __('It will be published when an editor approves it.', 'revisionary') . ' ';
+	                }
                 }
 
                 clean_post_cache($revision->ID);
@@ -268,7 +304,7 @@ class Rvy_Revision_Workflow_UI {
             case 'rev_submission_notify_admin' :
             case 'rev_approval_notify_admin' :
 
-                if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') ) {
+                if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') && ! defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS') ) {
                     global $revisionary;
                     
                     $monitor_groups_enabled = true;

@@ -127,8 +127,32 @@ function rvy_revision_approve($revision_id = 0) {
 			$scheduled = $revision->post_date;
 		}
 		
+		// Support workaround to prevent notification when an Administrator or Editor created the revision
+        if (defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS')) {
+			global $current_user;
+
+			$user = ($current_user->ID != $revision->post_author) ? new WP_User($revision->post_author) : $current_user;
+
+			if ($user && !empty($user->ID)) {
+				foreach (['REVISIONARY_LIMIT_NOTIFICATION_SUBMITTER_ROLES', 'RVY_MONITOR_ROLES', 'SCOPER_MONITOR_ROLES'] as $const) {
+					if (defined($const)) {
+						$skip_notification_roles = array_map('trim', explode(',', constant($const)));
+						break;
+					}
+				}
+
+				if (empty($skip_notification_roles)) {
+					$skip_notification_roles = ['editor', 'administrator'];
+				}
+			}
+
+			if (array_intersect($user->roles, $skip_notification_roles)) {
+				$skip_notification = true;
+			}
+		}
+
 		// Don't send approval notification on restoration of a past revision
-		if ('revision' != $revision->post_type) {
+		if (('revision' != $revision->post_type) && empty($skip_notification)) {
 			$type_obj = get_post_type_object( $post->post_type );
 			$type_caption = $type_obj->labels->singular_name;
 
@@ -916,6 +940,40 @@ function rvy_publish_scheduled_revisions($args = array()) {
 				}
 				
 				if ( rvy_get_option( 'publish_scheduled_notify_admin' ) ) {
+
+					// Support workaround to prevent notification when an user of specified role created the revision
+					if (defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS')) {
+						global $current_user;
+			
+						$user = ($current_user->ID != $revision->post_author) ? new WP_User($revision->post_author) : $current_user;
+			
+						if ($user && !empty($user->ID)) {
+							foreach (['REVISIONARY_LIMIT_NOTIFICATION_SUBMITTER_ROLES', 'RVY_MONITOR_ROLES', 'SCOPER_MONITOR_ROLES'] as $const) {
+								if (defined($const)) {
+									// revision submitter roles for which revision publication should not trigger email notification
+									$skip_notification_revisor_roles = array_map('trim', explode(',', constant($const)));
+									break;
+								}
+							}
+			
+							if (empty($skip_notification_revisor_roles)) {
+								$skip_notification_revisor_roles = ['editor', 'administrator'];
+							}
+						}
+			
+						if (array_intersect($user->roles, $skip_notification_revisor_roles)) {
+							$skip_notification = true;
+
+							/*
+							// If notification is being limited due to the role of the revision submitter, for which roles should notification be suppressed?
+							$skip_notification_admin_recipient_roles = (defined('REVISIONARY_LIMIT_NOTIFICATION_RECIPIENT_ROLES')) 
+							? array_map('trim', explode(',', constant('REVISIONARY_LIMIT_NOTIFICATION_RECIPIENT_ROLES')))
+							: [];
+							*/
+						}
+					}
+					
+					if (empty($skip_notification)) {
 					$title = sprintf(__('[%s] Scheduled Revision Publication'), $blogname );
 					
 					$message = sprintf( __('A scheduled revision to the %1$s "%2$s" has been published.'), $type_caption, $row->post_title ) . "\r\n\r\n";
@@ -933,7 +991,7 @@ function rvy_publish_scheduled_revisions($args = array()) {
 					// if it was not stored, or cleared, use default recipients
 					$to_addresses = array();
 					
-					if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') ) { // e-mail to Scheduled Revision Montiors metagroup if Role Scoper is activated
+						if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') && ! defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS') ) { // e-mail to Scheduled Revision Montiors metagroup if Role Scoper is activated
 						global $revisionary;
 						
 						$monitor_groups_enabled = true;
