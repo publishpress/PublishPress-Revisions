@@ -46,7 +46,7 @@ msgstr "Genehmigen"
 #, php-format
 msgid "This is a Pending Revision (requested publish date: %s). %s %s %s"
 msgstr ""
-"Dies ist eine ausstehende Revision (vorgesehenes Veröffentlichkeitsdatum: "
+"Dies ist eine ausstehende Revision (vorgesehenes Veröffentlichungsdatum: "
 "%s). %s %s %s"
 
 #: F:\snapshot\revisionary/front_rvy.php:229
@@ -99,11 +99,11 @@ msgstr ""
 
 #: F:\snapshot\revisionary/revision-creation_rvy.php:265
 msgid "Sorry, an error occurred while attempting to submit your revision!"
-msgstr "Ein Problem ist aufgetreten beim dem Einreichen der Revision!"
+msgstr "Ein Fehler ist aufgetreten beim dem Einreichen der Revision!"
 
 #: F:\snapshot\revisionary/revision-creation_rvy.php:266
 msgid "Revision Submission Error"
-msgstr "Error beim Einreichen der Revision"
+msgstr "Fehler beim Einreichen der Revision"
 
 #: F:\snapshot\revisionary/revision-creation_rvy.php:359
 msgid "Pending Revision Created"
@@ -116,7 +116,7 @@ msgstr ""
 
 #: F:\snapshot\revisionary/revision-creation_rvy.php:487
 msgid "Revision Scheduling Error"
-msgstr "Revision-Planungs Error"
+msgstr "Revision-Planungs Fehler"
 
 #: F:\snapshot\revisionary/revision-creation_rvy.php:524
 msgid "Scheduled Revision Created"
@@ -143,7 +143,7 @@ msgstr "[%s] Ausstehende Revisions-Nachricht"
 #: F:\snapshot\revisionary/revision-workflow_rvy.php:36
 #, php-format
 msgid "A pending revision to the %1$s \"%2$s\" has been submitted."
-msgstr "Eine ausstehende Revision zu %1$s „%2$s“ wurde eingereicht."
+msgstr "Eine ausstehende Revision zu %1$s \"%2$s\" wurde eingereicht."
 
 #: F:\snapshot\revisionary/revision-workflow_rvy.php:38
 #, php-format
@@ -233,7 +233,7 @@ msgid ""
 "(version %1$s: \"%2$s\")"
 msgstr ""
 "Eine weitere Kopie von PublishPress Revisions (oder Revisionary) ist bereits "
-"aktiviert (Version %1$s: „%2$s“)"
+"aktiviert (Version %1$s: \"%2$s\")"
 
 #: F:\snapshot\revisionary/revisionary.php:85
 #: F:\snapshot\revisionary/revisionary.php:133
@@ -336,7 +336,7 @@ msgstr "Sie sind nicht befugt diese Revision zu löschen."
 
 #: F:\snapshot\revisionary/admin/admin-init_rvy.php:156
 msgid "Error in deleting."
-msgstr "Error beim Löschen."
+msgstr "Fehler beim Löschen."
 
 #: F:\snapshot\revisionary/admin/admin-init_rvy.php:223
 #, php-format
@@ -355,11 +355,12 @@ msgid ""
 "others.</li><li>\"Authors\", \"Editors\" and \"Administrators\" can approve "
 "revisions or schedule their own revisions.</li>%s%s%s"
 msgstr ""
-"<strong>Willkommen zu PublishPress Revisions!</strong> So funktioniert es:"
-"%s<li>“Mitwirkende“ können Revisionen ihrer veröffentlichten Posts erstellen."
-"</li><li>“Prüfer“ können Revisionen zu Beiträgen und Seiten, die von anderen "
-"veröffentlicht wurden</li><li>“Autoren“, „Redakteure“ und „Administratoren“ "
-"können Revisionen genehmigen oder ihre eigenen planen.</li>%s%s%s"
+"<strong>Willkommen bei PublishPress Revisions!</strong> So funktioniert es:"
+"%s<li>\"Mitwirkende\" können Revisionen ihrer veröffentlichten Posts "
+"erstellen.</li><li>\"Prüfer\" können Revisionen zu Beiträgen und Seiten, die "
+"von anderen veröffentlicht wurden</li><li>\"Autoren\", \"Redakteure\" und "
+"\"Administratoren\" können Revisionen genehmigen oder ihre eigenen planen.</"
+"li>%s%s%s"
 
 #: F:\snapshot\revisionary/admin/admin-init_rvy.php:239
 #, php-format
@@ -522,7 +523,7 @@ msgstr "Kontakt"
 
 #: F:\snapshot\revisionary/admin/agents_checklist_rvy.php:43
 msgid "Enter additional User Names or IDs (comma-separate)"
-msgstr "Zusätzliche Nutzernamen oder IDs eingeben (Komma-getrennt)"
+msgstr "Zusätzliche Nutzernamen oder IDs eingeben (kommagetrennt)"
 
 #: F:\snapshot\revisionary/admin/agents_checklist_rvy.php:98
 #, php-format
@@ -536,7 +537,7 @@ msgstr "Berechtigte Nutzer anzeigen (%d)"
 
 #: F:\snapshot\revisionary/admin/agents_checklist_rvy.php:116
 msgid "filter:"
-msgstr "filter:"
+msgstr "Filter:"
 
 #: F:\snapshot\revisionary/admin/agents_checklist_rvy.php:125
 msgid "select"
@@ -748,11 +749,11 @@ msgstr "Beitragsdatum"
 
 #: F:\snapshot\revisionary/admin/history_rvy.php:531
 msgid "Post Parent"
-msgstr "Beitrags-Parent"
+msgstr "Ursprungsbeitrag"
 
 #: F:\snapshot\revisionary/admin/history_rvy.php:532
 msgid "Menu Order"
-msgstr "Menü Reihenfolge"
+msgstr "Menü-Reihenfolge"
 
 #: F:\snapshot\revisionary/admin/history_rvy.php:533
 msgid "Comment Status"
@@ -904,7 +905,7 @@ msgstr ""
 #: F:\snapshot\revisionary/admin/options.php:124
 msgid "Email the Revisor when a Scheduled Revision is published"
 msgstr ""
-"Gemehmiger via E-Mail benachrichtigen wenn eine geplante Revision "
+"Genehmiger via E-Mail benachrichtigen wenn eine geplante Revision "
 "veröffentlicht wurde"
 
 #: F:\snapshot\revisionary/admin/options.php:125
@@ -1000,7 +1001,7 @@ msgid ""
 "Use this tab to make <strong>NETWORK-WIDE</strong> changes to PublishPress "
 "Revisions settings. %s"
 msgstr ""
-"Verwenden Sie diesen Tab, sum <strong>netzwerkweite</strong> Änderungen an "
+"Verwenden Sie diesen Tab, um <strong>netzwerkweite</strong> Änderungen an "
 "den PublishPress Revisions Einstellungen vorzunehmen %s"
 
 #: F:\snapshot\revisionary/admin/options.php:265
@@ -1023,7 +1024,7 @@ msgid ""
 "The user role \"Revisor\" role is now available. Include capabilities for "
 "all custom post types in this role?"
 msgstr ""
-"The Nutzerrolle „Prüfer“ ist nun verfügbar. Befähigungen für alle "
+"The Nutzerrolle \"Prüfer\" ist nun verfügbar. Berechtigungen für alle "
 "benutzerdefinierten Beitragstypen einbinden?"
 
 #: F:\snapshot\revisionary/admin/options.php:316
@@ -1056,7 +1057,7 @@ msgid ""
 msgstr ""
 "Geplante Revisionen asynchron veröffentlichen, mit einer zweiten HTTP-"
 "Anfrage vom Server. Das ist üblicherweise die beste Optionen, da hier "
-"Verzögerungen angeschlossen werden. Dieses Feature wird jedoch nicht von "
+"Verzögerungen ausgeschlossen werden. Dieses Feature wird jedoch nicht von "
 "allen Servern unterstützt."
 
 #: F:\snapshot\revisionary/admin/options.php:361
@@ -1105,13 +1106,13 @@ msgid ""
 "for proper template loading and field display."
 msgstr ""
 "Manche Themes und Plugins benötigen möglicherweise einen Revisions-Slug oder "
-"einen Revisions-ID Linktyp, damit das Template richtig lädt und die "
+"einen Revisions-ID Link-Typ, damit das Template richtig lädt und die "
 "Eingabefelder richtig dargestellt werden."
 
 #: F:\snapshot\revisionary/admin/options.php:416
 msgid "If disabled, Compare screen links to Revision Preview for approval"
 msgstr ""
-"Wenn deaktiviert, verlinkt der Vergleichs-Screen die Revisions-Voransicht "
+"Wenn deaktiviert, verlinkt die Vergleichsansicht die Revisions-Voransicht "
 "zur Genehmigung"
 
 #: F:\snapshot\revisionary/admin/options.php:436
@@ -1120,8 +1121,8 @@ msgid ""
 "For compatibility with Advanced Custom Fields, Beaver Builder and WPML, "
 "upgrade to <a href=\"%s\" target=\"_blank\">PublishPress Revisions Pro</a>."
 msgstr ""
-"Für Kompatibilität mit ACF, Beamer Builder und WPML, upgraden zu <a "
-"href=„%s“ target=„_blank“>PublishPress Revisions Pro</a>."
+"Für Kompatibilität mit ACF, Beamer Builder und WPML, upgraden zu <a href=\"%s"
+"\" target=\"_blank\">PublishPress Revisions Pro</a>."
 
 #: F:\snapshot\revisionary/admin/options.php:445
 msgid ""
@@ -1178,12 +1179,12 @@ msgid ""
 "explicitly defined, the Monitors group is all users with a primary WP role "
 "of Administrator or Editor."
 msgstr ""
-"Beachten Sie: „Standardmäßig“ bedeutet, dass Ersteller ausstehender "
+"Beachten Sie: \"Standardmäßig\" bedeutet, dass Ersteller ausstehender "
 "Revisionen Email-Benachrichtigungen vor dem Senden bearbeiten können. "
-"Berechtigte „Verleger“ Email-Empfänger sind Mitglieder der Gruppe zur "
-"Überwachung austehender Revisionen, welche <strong>ebenfalls</strong> die "
+"Berechtigte \"Verleger\" Email-Empfänger sind Mitglieder der Gruppe zur "
+"Überwachung ausstehender Revisionen, welche <strong>ebenfalls</strong> die "
 "Berechtigung besitzt die Revision zu veröffentlichen. Wenn nicht explizit "
-"definiert, besteht die Überwachunggruppe aus primären WP Nutzerrollen wie "
+"definiert, besteht die Überwachungsgruppe aus primären WP Nutzerrollen wie "
 "Administratoren oder Redakteuren."
 
 #: F:\snapshot\revisionary/admin/options.php:550
@@ -1193,7 +1194,7 @@ msgid ""
 "notification recipients before submitting.  For more flexibility in "
 "moderation and notification, install the %1$s PressPermit Pro%2$s plugin."
 msgstr ""
-"Beachten Sie: „Standardmäßig“ bedeutet, dass Ersteller ausstehender "
+"Beachten Sie: \"Standardmäßig\" bedeutet, dass Ersteller ausstehender "
 "Revisionen Email-Benachrichtigungen vor dem Senden bearbeiten können. Für "
 "mehr Flexibilität bei der Moderation und Benachrichtigung, installieren sie "
 "das %1$s PressPermit Pro%2$s Plugin."
@@ -1253,7 +1254,7 @@ msgstr "Nachricht mit Inhalt anzeigen"
 #: F:\snapshot\revisionary/admin/options.php:703
 #, php-format
 msgid "network-wide control of \"%s\""
-msgstr "netzwerkweite Kontrolle von „%s“"
+msgstr "netzwerkweite Kontrolle von \"%s\""
 
 #: F:\snapshot\revisionary/admin/options.php:710
 msgid ""
@@ -1306,7 +1307,8 @@ msgstr "Ungesicherte Änderungen ansehen"
 msgid ""
 "<span class=\"dashicons dashicons-backup\"></span>&nbsp;%s Revision Edit"
 msgstr ""
-"<span class=„dashicons dashicons-backup“></span>&nbsp;%s Revisionsbearbeitung"
+"<span class=\"dashicons dashicons-backup\"></span>&nbsp;%s "
+"Revisionsbearbeitung"
 
 #: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:85
 msgid "Approve Revision"
@@ -1330,14 +1332,14 @@ msgstr "Noch nicht speichern, aber in Revision Queue einreihen"
 msgid ""
 "<span class=\"dashicons dashicons-edit\"></span>&nbsp;%s Pending Revision"
 msgstr ""
-"<span class=„dashicons dashicons-edit“></span>&nbsp;%s Ausstehende Revision"
+"<span class=\"dashicons dashicons-edit\"></span>&nbsp;%s Ausstehende Revision"
 
 #: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:134
 #, php-format
 msgid ""
 "<span class=\"dashicons dashicons-clock\"></span>&nbsp;%s Scheduled Revision"
 msgstr ""
-"<span class=„dashicons dashicons-clock“></span>&nbsp;%s Geplante Revision"
+"<span class=\"dashicons dashicons-clock\"></span>&nbsp;%s Geplante Revision"
 
 #: F:\snapshot\revisionary/admin/post-edit-block-ui_rvy.php:155
 msgid "Workflow&hellip;"
@@ -1448,7 +1450,7 @@ msgstr "[%s] Mitteilung zur Revisions-Genehmigung"
 #: F:\snapshot\revisionary/admin/revision-action_rvy.php:136
 #, php-format
 msgid "A revision to your %1$s \"%2$s\" has been approved."
-msgstr "Eine Revision zu %1$s „%2$s“ wurde genehmigt."
+msgstr "Eine Revision zu %1$s \"%2$s\" wurde genehmigt."
 
 #: F:\snapshot\revisionary/admin/revision-action_rvy.php:139
 #, php-format
@@ -1483,7 +1485,7 @@ msgstr "Online ansehen: "
 #, php-format
 msgid "The revision you submitted for the %1$s \"%2$s\" has been approved."
 msgstr ""
-"Die geplante Revision, die Sie für %1$s „%2$s“ eingereicht haben, wurde "
+"Die geplante Revision, die Sie für %1$s \"%2$s\" eingereicht haben, wurde "
 "genehmigt."
 
 #: F:\snapshot\revisionary/admin/revision-action_rvy.php:853
@@ -1498,13 +1500,13 @@ msgid ""
 "The scheduled revision you submitted for the %1$s \"%2$s\" has been "
 "published."
 msgstr ""
-"Die geplante Revision, die Sie für %1$s „%2$s“ eingereicht haben, wurde "
+"Die geplante Revision, die Sie für %1$s \"%2$s\" eingereicht haben, wurde "
 "veröffentlicht."
 
 #: F:\snapshot\revisionary/admin/revision-action_rvy.php:876
 #, php-format
 msgid "A scheduled revision to your %1$s \"%2$s\" has been published."
-msgstr "Eine geplante Revision für deinen %1$s „%2$s“ wurde veröffentlicht."
+msgstr "Eine geplante Revision für deinen %1$s \"%2$s\" wurde veröffentlicht."
 
 #: F:\snapshot\revisionary/admin/revision-action_rvy.php:909
 #, php-format
@@ -1514,7 +1516,7 @@ msgstr "[%s] Geplante Revisionsveröffentlichung"
 #: F:\snapshot\revisionary/admin/revision-action_rvy.php:911
 #, php-format
 msgid "A scheduled revision to the %1$s \"%2$s\" has been published."
-msgstr "Eine geplante Revision für %1$s „%2$s“ wurde veröffentlicht."
+msgstr "Eine geplante Revision für %1$s \"%2$s\" wurde veröffentlicht."
 
 #: F:\snapshot\revisionary/admin/revision-queue_rvy.php:9
 msgid "You are not allowed to manage revisions."
@@ -1525,7 +1527,7 @@ msgid ""
 "Pending Revisions and Scheduled Revisions are both disabled. See Revisions > "
 "Settings."
 msgstr ""
-"Ausstehende und geplante Revisionen sind beide deaktiviert. Siehe Revisonen "
+"Ausstehende und geplante Revisionen sind beide deaktiviert. Siehe Revisionen "
 "> Einstellungen."
 
 #: F:\snapshot\revisionary/admin/revision-queue_rvy.php:39
@@ -1588,15 +1590,15 @@ msgid ""
 "%1$s <span class=\"rvy-revision-pubish-date\">(Requested publication: %2$s)</"
 "span>"
 msgstr ""
-"%1$s <span class=„rvy-revision-pubish-date“>(Angeforderte Veröffentlichung: "
-"%2$s)</span>"
+"%1$s <span class=\"rvy-revision-pubish-date\">(Angeforderte "
+"Veröffentlichung: %2$s)</span>"
 
 #: F:\snapshot\revisionary/admin/revision-ui_rvy.php:225
 #, php-format
 msgid ""
 "%1$s <span class=\"rvy-revision-pubish-date\">(Publish date: %2$s)</span>"
 msgstr ""
-"%1$s <span class=„rvy-revision-pubish-date“>(Veröffentlichungsdatum %2$s)</"
+"%1$s <span class=\"rvy-revision-pubish-date\">(Veröffentlichungsdatum %2$s)</"
 "span>"
 
 #: F:\snapshot\revisionary/admin/revision-ui_rvy.php:325
@@ -1666,7 +1668,7 @@ msgstr "Bisherige Revisionen"
 #: F:\snapshot\revisionary/admin/revisions.php:227
 #, php-format
 msgid "%1$s <span class=\"count\"> (%2$s)</span>"
-msgstr "%1$s <span class=„count“> (%2$s)</span>"
+msgstr "%1$s <span class=\"count\"> (%2$s)</span>"
 
 #: F:\snapshot\revisionary/admin/revisions.php:242
 #, php-format
