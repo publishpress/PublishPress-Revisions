@@ -100,6 +100,10 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.3.8-beta3 =
+* Compat : Public Post Preview - support preview link generation on Edit Revision screen
+* Fixed : API - revisionary_enabled_post_types filter was not fully effective
+
 = 2.3.6 - 10 Jun 2020 =
 * Fixed : After revision submission, preview link was not always to latest revision
 * Fixed : Preview button on editor screen loaded preview with invalid thumbnail under some conditions
