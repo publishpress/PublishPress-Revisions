@@ -721,9 +721,9 @@ function rvy_revision_bulk_delete() {
 	exit;
 }
 
-function rvy_revision_unschedule() {
-	require_once( ABSPATH . 'wp-admin/admin.php');
-	$revision_id = (int) $_GET['revision'];
+function rvy_revision_unschedule($revision_id) {
+	global $wpdb;
+
 	$redirect = '';
 	
 	do {
@@ -742,34 +742,17 @@ function rvy_revision_unschedule() {
 		}
 
 		if ( $type_obj = get_post_type_object( $revision->post_type ) ) {
-			if ( ! agp_user_can( $type_obj->cap->edit_post, $published_id, '', array( 'skip_revision_allowance' => true ) ) )
+			if ( ! agp_user_can( $type_obj->cap->edit_post, $published_id, '', array( 'skip_revision_allowance' => true ) ) ) {
 				break;
 		}
+		}
 		
-		check_admin_referer('unschedule-revision_' .  $revision_id);
-
-		global $wpdb;
-		$wpdb->query( 
-			$wpdb->prepare(
-				"UPDATE $wpdb->posts SET post_status = 'pending-revision' WHERE ID = %d",
-				$revision_id
-			)
-		);
+		$wpdb->update( $wpdb->posts, array( 'post_status' => 'pending-revision' ), array( 'ID' => $revision->ID ) );
 		
 		rvy_update_next_publish_date();
-
-		$redirect = rvy_preview_url($revision);
 	} while (0);
 	
-	if ( ! $redirect ) {
-		if ( ! empty($post) && is_object($post) && ( 'post' != $post->post_type ) ) {
-			$redirect = "edit.php?post_type={$post->post_type}";
-		} else
-			$redirect = 'edit.php';
-	}
-
-	wp_redirect( $redirect );
-	exit;
+	return true;
 }
 
 function rvy_revision_publish($revision_id = false) {
