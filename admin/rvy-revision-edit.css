@@ -1,9 +1,5 @@
-div.edit-post-post-visibility {
-display:none;
-}
-
-div.edit-post-post-status div {
-display:none;
+div.publishpress-extended-post-privacy, div.publishpress-extended-post-status {
+display: none;
 }
 
 div.edit-post-post-status div.edit-post-post-schedule, div.edit-post-post-status div.edit-post-post-schedule div {
