@@ -425,6 +425,10 @@ class Revisionary
 		$rest_response = $this->rest->pre_dispatch( $rest_response, $rest_server, $request );
 
 		if ($this->rest->is_posts_request) {
+			if (empty($this->enabled_post_types[$this->rest->post_type])) {
+				return $rest_response;
+			}
+
 			add_action( 
 				"rest_insert_{$this->rest->post_type}", 
 				array($this, 'act_rest_insert'), 
@@ -451,6 +455,10 @@ class Revisionary
 
 		if ( $post = get_post( $object_id ) ) {
 			if ( ('revision' != $post->post_type) && ! rvy_is_revision_status($post->post_status) ) {
+				if (empty($this->enabled_post_types[$post->post_type])) {
+					return $caps;
+				}
+
 				$status_obj = get_post_status_object( $post->post_status );
 
 				if (!apply_filters('revisionary_require_edit_others_drafts', true, $post->post_type, $post->post_status, $args)) {
@@ -823,6 +831,10 @@ class Revisionary
 	}
 
 	function flt_maybe_insert_revision($data, $postarr) {
+		if (!empty($post_arr['post_type']) && empty($this->enabled_post_types[ $post_arr['post_type'] ])) {
+			return $data;
+		}
+
 		require_once( dirname(__FILE__).'/revision-creation_rvy.php' );
 		$rvy_creation = new PublishPress\Revisions\RevisionCreation(['revisionary' => $this]);
 		return $rvy_creation->flt_maybe_insert_revision($data, $postarr);
@@ -831,6 +843,11 @@ class Revisionary
 	// If Scheduled Revisions are enabled, don't allow WP to force current post status to future based on publish date
 	function flt_insert_post_data( $data, $postarr ) {
 		if ( ( 'future' == $data['post_status'] ) && ( rvy_is_status_published( $postarr['post_status'] ) ) ) {
+
+			if (!empty($postarr['post_type']) && empty($this->enabled_post_types[$postarr['post_type']])) {
+				return $data;
+			}
+
 			// don't interfere with scheduling of unpublished drafts
 			if ( $stored_status = get_post_field ( 'post_status', rvy_detect_post_id() ) ) {
 				if ( rvy_is_status_published( $stored_status ) ) {
@@ -845,7 +862,13 @@ class Revisionary
 	function flt_regulate_revision_status($data, $postarr) {
 		// Revisions are not published by wp_update_post() execution; Prevent setting to a non-revision status
 		if (get_post_meta($postarr['ID'], '_rvy_base_post_id', true) && ('trash' != $data['post_status'])) {
-			$revision = get_post($postarr['ID']);
+			if (!$revision = get_post($postarr['ID'])) {
+				return $data;
+			}
+
+			if (empty($this->enabled_post_types[$revision->post_type])) {
+				return $data;
+			}
 			
 			if (!rvy_is_revision_status($data['post_status'])) {
 				$revert_status = true;
@@ -867,6 +890,10 @@ class Revisionary
 
 	function flt_create_scheduled_rev( $data, $post_arr ) {
 		global $current_user;
+
+		if (!empty($post_arr['post_type']) && empty($this->enabled_post_types[ $post_arr['post_type'] ])) {
+			return $data;
+		}
 
 		// If Administrator opted to save as a pending revision, don't apply revision scheduling scripts
 		if (get_post_meta($post_arr['ID'], "_save_as_revision_{$current_user->ID}", true)) {
