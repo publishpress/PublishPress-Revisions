@@ -831,7 +831,7 @@ class Revisionary
 	}
 
 	function flt_maybe_insert_revision($data, $postarr) {
-		if (!empty($post_arr['post_type']) && empty($this->enabled_post_types[ $post_arr['post_type'] ])) {
+		if (!empty($postarr['post_type']) && empty($this->enabled_post_types[ $postarr['post_type'] ])) {
 			return $data;
 		}
 
