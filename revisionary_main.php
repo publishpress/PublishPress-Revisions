@@ -617,10 +617,9 @@ class Revisionary
 						$caps []= $type_obj->cap->edit_posts;
 					}
 				}
+
+				return $caps;
 			}
-
-			return $caps;
-
 		} elseif (($post_id > 0) && $post && rvy_is_revision_status($post->post_status) 
 			&& rvy_get_option('revisor_lock_others_revisions') && !rvy_is_post_author($post) && !rvy_is_full_editor($post)
 		) {
