@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.4
-Stable tag: 2.3.6
+Stable tag: 2.3.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -99,6 +99,14 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.3.8 - 30 Jul 2020 =
+* Feature : Revision Queue - new bulk action to Unschedule selected revisions
+* Lang : Add Spanish translation
+* Fixed : Revisors could not preview changes prior to submitting a pending revision
+* Fixed : Classic Editor plugin - when "Edit (Classic)" link is used, Revisors did not have Update button recaptioned to "Submit Revision"
+* Fixed : API - revisionary_enabled_post_types filter was not fully effective
+* Compat : Public Post Preview - support preview link generation on Edit Revision screen
 
 = 2.3.6 - 10 Jun 2020 =
 * Fixed : After revision submission, preview link was not always to latest revision

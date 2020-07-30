@@ -176,10 +176,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$can_edit_others_types = [];
 			
 			foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
-				$type_obj = get_post_type_object($post_type);
-
-				if (agp_user_can($type_obj->cap->edit_others_posts, 0, '', ['skip_revision_allowance' => true])) {
-					$can_edit_others_types[]= $post_type;
+				if ($type_obj = get_post_type_object($post_type)) {
+					if (agp_user_can($type_obj->cap->edit_others_posts, 0, '', ['skip_revision_allowance' => true])) {
+						$can_edit_others_types[]= $post_type;
+					}
 				}
 			}
 
@@ -724,6 +724,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if ($approval_potential = apply_filters('revisionary_bulk_action_approval', $approval_potential)) {
 			$actions['approve_revision'] = __('Approve');
 			$actions['publish_revision'] = __('Publish');
+
+			if (revisionary()->getOption('scheduled_revisions')) {
+				$actions['unschedule_revision'] = __('Unschedule', 'revisionary');
+			}
 		}
 
 		$actions['delete'] = __( 'Delete Permanently' );

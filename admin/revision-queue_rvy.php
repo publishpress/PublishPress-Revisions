@@ -29,6 +29,7 @@ $bulk_counts = array(
 	'updated' => 0,
 	'locked' => 0,
 	'approved_count' => isset( $_REQUEST['approved_count'] )   ? absint( $_REQUEST['approved_count'] )   : 0,
+	'unscheduled_count' => isset( $_REQUEST['unscheduled_count'] ) ? absint( $_REQUEST['unscheduled_count'] )   : 0,
 	'published_count' => isset( $_REQUEST['published_count'] )   ? absint( $_REQUEST['published_count'] )   : 0,
 	'trashed' => 0,
 	'untrashed' => 0,
@@ -37,6 +38,7 @@ $bulk_counts = array(
 $bulk_messages = [];
 $bulk_messages['post'] = array(
 	'approved_count'   => sprintf(_n( '%s revision approved.', '%s revisions approved.', $bulk_counts['approved_count'], 'revisionary' ), $bulk_counts['approved_count']),
+	'unscheduled_count' => sprintf(_n( '%s revision unscheduled.', '%s revisions unscheduled.', $bulk_counts['unscheduled_count'], 'revisionary' ), $bulk_counts['unscheduled_count']),
 	'published_count'   => sprintf(_n( '%s revision published.', '%s revisions published.', $bulk_counts['published_count'], 'revisionary' ), $bulk_counts['published_count']),
 	'deleted'   => sprintf(_n( '%s revision permanently deleted.', '%s revisions permanently deleted.', $bulk_counts['deleted'] ), $bulk_counts['deleted']),
 );

@@ -137,6 +137,43 @@ function rvy_admin_init() {
 	
 				break;
 	
+			case 'unschedule_revision' :
+				$unscheduled = 0;
+				$is_administrator = current_user_can('administrator');
+	
+				require_once( dirname(__FILE__).'/revision-action_rvy.php');
+
+				foreach ((array) $post_ids as $post_id) {
+					if (!$revision = get_post($post_id)) {
+						continue;
+					}
+					
+					if ('future-revision' != $revision->post_status) {
+						continue;
+					}
+					
+					if ( !$is_administrator 
+					&& !agp_user_can($type_obj->cap->edit_post, rvy_post_id($revision->ID), '', ['skip_revision_allowance' => true])
+					) {
+						if (count($post_ids) == 1) {
+							wp_die( __('Sorry, you are not allowed to approve this revision.', 'revisionary') );
+						} else {
+							continue;
+						}
+					}
+						
+					if (rvy_revision_unschedule($revision->ID)) {
+						$unscheduled++;
+					}
+				}
+
+				if ($unscheduled) {
+					$arg = 'unscheduled_count';
+					$sendback = add_query_arg($arg, $unscheduled, $sendback);
+				}
+
+				break;
+
 			case 'delete':
 				$deleted = 0;
 				foreach ( (array) $post_ids as $post_id ) {
@@ -167,6 +204,7 @@ function rvy_admin_init() {
 	
 		if ($sendback) {
 			$sendback = remove_query_arg( array('action', 'action2', '_wp_http_referer', '_wpnonce', 'tags_input', 'post_author', 'comment_status', 'ping_status', '_status', 'post', 'bulk_edit', 'post_view'), $sendback );
+			$sendback = str_replace('#038;', '&', $sendback);	// @todo Proper decode
 			wp_redirect($sendback);
 		}
 
@@ -188,10 +226,6 @@ function rvy_admin_init() {
 			} elseif ( ! empty($_GET['action']) && ('publish' == $_GET['action']) ) {
 				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
 				add_action( 'wp_loaded', 'rvy_revision_publish' );
-
-			} elseif ( ! empty($_GET['action']) && ('unschedule' == $_GET['action']) ) {
-				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
-				add_action( 'wp_loaded', 'rvy_revision_unschedule' );
 
 			} elseif ( ! empty($_POST['action']) && ('bulk-delete' == $_POST['action'] ) ) {
 				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
