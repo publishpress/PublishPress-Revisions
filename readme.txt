@@ -100,6 +100,9 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.3.9-beta =
+* API : New filter 'revisionary_apply_revision_data' to adjust standard revision fields prior to publication
+
 = 2.3.8 - 30 Jul 2020 =
 * Feature : Revision Queue - new bulk action to Unschedule selected revisions
 * Lang : Add Spanish translation
