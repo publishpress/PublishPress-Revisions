@@ -447,6 +447,15 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 	}
 	
+	/**
+	* Filter revision data before applying the revision.
+	*
+	* @param array $update Revision data
+	* @param WP_Post $revision Revision being applied
+	* @param Object $published Currently published post
+	*/
+	$update = apply_filters( 'revisionary_apply_revision_data', $update, $revision, $published );
+
 	$revision_content = $update['post_content'];
 
 	$post_id = wp_update_post( $update );
