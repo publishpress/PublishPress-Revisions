@@ -674,7 +674,6 @@ function rvy_settings_scripts() {
 	if (defined('REVISIONARY_PRO_VERSION')) {
 		$suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '.dev' : '';
 		wp_enqueue_script('revisionary-pro-settings', plugins_url('', REVISIONARY_FILE) . "/includes-pro/settings-pro{$suffix}.js", ['jquery', 'jquery-form'], REVISIONARY_VERSION, true);
-		$wp_scripts->in_footer[] = 'revisionary-pro-settings';  // otherwise it will not be printed in footer  @todo: review
 	}
 }
 
