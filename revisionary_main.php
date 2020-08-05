@@ -21,6 +21,7 @@ class Revisionary
 	var $save_future_rev = [];
 	var $last_autosave_id = [];
 	var $last_revision = [];
+	var $disable_revision_trigger = false;
 
 	var $config_loaded = false;		// configuration related to post types and statuses must be loaded late on the init action
 	var $enabled_post_types = [];	// enabled_post_types property is set (keyed by post type slug) late on the init action. 
