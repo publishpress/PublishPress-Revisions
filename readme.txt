@@ -100,8 +100,9 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
-= 2.3.9-beta2 =
-* Fixed : Schedule revisions caused post to be unpublished under some conditions
+= 2.3.9-beta3 =
+* Fixed : Scheduled revision publication failed under some conditions, caused post to be unpublished
+* Fixed : Scheduled revisions could not be published ahead of schedule using "Publish Now" link on preview (since 2.3.4)
 * API : New filter 'revisionary_apply_revision_data' to adjust standard revision fields prior to publication
 
 = 2.3.8 - 30 Jul 2020 =
