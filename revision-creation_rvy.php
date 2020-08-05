@@ -722,8 +722,6 @@ class RevisionCreation {
 				update_post_meta( $post_ID, '_wp_page_template', $postarr['page_template'] );
 			}
 		}
-
-		pp_errlog(serialize($postarr));
 	
 		// Workaround for Gutenberg stripping post thumbnail, page template on revision creation
 		foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {

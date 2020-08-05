@@ -138,7 +138,7 @@ class Revisionary
 		add_action('delete_post', [$this, 'actDeletePost'], 10, 3);
 
 		if (!defined('REVISIONARY_PRO_VERSION')) {
-			add_action('revisionary_saved_revision', [$this, 'act_save_revision_followup'], 5);
+			add_action('revisionary_created_revision', [$this, 'act_save_revision_followup'], 5);
 		}
 
 		add_filter('presspermit_exception_clause', [$this, 'fltPressPermitExceptionClause'], 10, 4);
