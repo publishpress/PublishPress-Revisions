@@ -25,7 +25,7 @@ function rvy_revision_approve($revision_id = 0) {
 			return;
 		}
 
-		$revision_id = $_GET['revision'];
+		$revision_id = (int) $_GET['revision'];
 	} else {
 		$batch_process = true;
 	}
@@ -127,13 +127,37 @@ function rvy_revision_approve($revision_id = 0) {
 			$scheduled = $revision->post_date;
 		}
 		
+		// Support workaround to prevent notification when an Administrator or Editor created the revision
+        if (defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS')) {
+			global $current_user;
+
+			$user = ($current_user->ID != $revision->post_author) ? new WP_User($revision->post_author) : $current_user;
+
+			if ($user && !empty($user->ID)) {
+				foreach (['REVISIONARY_LIMIT_NOTIFICATION_SUBMITTER_ROLES', 'RVY_MONITOR_ROLES', 'SCOPER_MONITOR_ROLES'] as $const) {
+					if (defined($const)) {
+						$skip_notification_roles = array_map('trim', explode(',', constant($const)));
+						break;
+					}
+				}
+
+				if (empty($skip_notification_roles)) {
+					$skip_notification_roles = ['editor', 'administrator'];
+				}
+			}
+
+			if (array_intersect($user->roles, $skip_notification_roles)) {
+				$skip_notification = true;
+			}
+		}
+
 		// Don't send approval notification on restoration of a past revision
-		if ('revision' != $revision->post_type) {
+		if (('revision' != $revision->post_type) && empty($skip_notification)) {
 			$type_obj = get_post_type_object( $post->post_type );
 			$type_caption = $type_obj->labels->singular_name;
 
 			$title = sprintf(__('[%s] Revision Approval Notice', 'revisionary' ), $blogname );
-			$message = sprintf( __('A revision to your %1$s "%2$s" has been approved.', 'revisionary' ), $type_caption, $post->post_title ) . "\r\n\r\n";
+			$message = sprintf( __('A revision to the %1$s "%2$s" has been approved.', 'revisionary' ), $type_caption, $post->post_title ) . "\r\n\r\n";
 
 			if ( $revisor = new WP_User( $revision->post_author ) )
 				$message .= sprintf( __('The submitter was %1$s.', 'revisionary'), $revisor->display_name ) . "\r\n\r\n";
@@ -289,7 +313,7 @@ function rvy_revision_approve($revision_id = 0) {
 
 function rvy_revision_restore() {
 	require_once( ABSPATH . 'wp-admin/admin.php');
-	$revision_id = $_GET['revision'];
+	$revision_id = (int) $_GET['revision'];
 	$redirect = '';
 	
 	do {
@@ -343,7 +367,7 @@ function rvy_revision_restore() {
 		} elseif ( 'edit' == $_REQUEST['rvy_redirect'] ) {
 			$redirect = add_query_arg( $last_arg, "post.php?post={$post->ID}&action=edit" );
 		} else {
-			$redirect = add_query_arg( $last_arg, $_REQUEST['rvy_redirect'] );
+			$redirect = add_query_arg( $last_arg, esc_url($_REQUEST['rvy_redirect']) );
 		}
 
 	} while (0);
@@ -367,6 +391,10 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	}
 
 	if (! $published_id = rvy_post_id($revision_id)) {
+		return false;
+	}
+
+	if ('revision' == get_post_field('post_type', $published_id)) {
 		return false;
 	}
 
@@ -394,6 +422,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		array(
 			'ID' => $published->ID,
 			'post_author' => $published->post_author,
+			'post_type' => $published->post_type,
 			'post_status' => $published->post_status,
 			'comment_count' => $published->comment_count,
 			'post_name' => $published->post_name,
@@ -423,9 +452,23 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 	}
 	
+	/**
+	* Filter revision data before applying the revision.
+	*
+	* @param array $update Revision data
+	* @param WP_Post $revision Revision being applied
+	* @param Object $published Currently published post
+	*/
+	$update = apply_filters( 'revisionary_apply_revision_data', $update, $revision, $published );
+
 	$revision_content = $update['post_content'];
 
+	global $revisionary;
+	
+	$revisionary->disable_revision_trigger = true;
 	$post_id = wp_update_post( $update );
+	$revisionary->disable_revision_trigger = false;
+
 	if ( ! $post_id || is_wp_error( $post_id ) ) {
 		return $post_id;
 	}
@@ -436,7 +479,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	// Apply requested slug, if applicable. 
 	// Otherwise, work around unexplained reversion of editor-modified post slug back to default format on some sites  @todo: identify plugin interaction
-	$update_fields = ['post_name' => $set_slug, 'guid' => $published->guid, 'post_content' => $revision_content];
+	$update_fields = ['post_name' => $set_slug, 'guid' => $published->guid, 'post_type' => $published->post_type];
 
 	// Prevent wp_insert_post() from stripping inline html styles
 	if (!defined('RVY_DISABLE_REVISION_CONTENT_PASSTHRU')) {
@@ -499,14 +542,19 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 	}
 
+	if ($published_id != $revision_id) {
 	// @todo save change as past revision?
 	//$wpdb->delete($wpdb->posts, array('ID' => $revision_id));
 	$wpdb->update($wpdb->posts, array('post_type' => 'revision', 'post_status' => 'inherit', 'post_parent' => $post_id, 'comment_count' => 0), array('ID' => $revision_id));
 
 	// @todo save change as past revision?
 	$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
+	}
 
 	update_post_meta($revision_id, '_rvy_published_gmt', $post_modified_gmt);
+
+	// If published revision was the last remaining pending / scheduled, clear _rvy_has_revisions postmeta flag 
+	revisionary_refresh_postmeta($post_id);
 
 	if (!empty($orig_terms) && is_array($orig_terms)) {
 		foreach($orig_terms as $taxonomy => $terms) {
@@ -544,10 +592,10 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	rvy_delete_past_revisions($revision_id);
 
 	/**
-	 * Trigger after a revision has been apply.
+	 * Trigger after a revision has been applied.
 	 *
 	 * @param int $post_id The post ID.
-	 * @param \WP_Post $revision The revision object.
+	 * @param int $revision_id The revision object.
 	 */
 	do_action( 'revision_applied', $published->ID, $revision );
 
@@ -589,7 +637,7 @@ function rvy_do_revision_restore( $revision_id, $actual_revision_status = '' ) {
 
 function rvy_revision_delete() {
 	require_once( ABSPATH . 'wp-admin/admin.php');
-	$revision_id = $_GET['revision'];
+	$revision_id = (int) $_GET['revision'];
 	$redirect = '';
 	
 	do {
@@ -613,6 +661,8 @@ function rvy_revision_delete() {
 		$redirect = "admin.php?page=rvy-revisions&revision={$revision->post_parent}&action=view&revision_status={$revision->post_status}&deleted=1";
 
 		rvy_delete_past_revisions($revision_id);
+
+		revisionary_refresh_postmeta($revision->post_parent);
 	} while (0);
 	
 	if ( ! empty( $_GET['return'] ) && ! empty( $_SERVER['HTTP_REFERER'] ) ) {
@@ -642,13 +692,16 @@ function rvy_revision_bulk_delete() {
 	if ( empty($_POST['delete_revisions']) || empty($_POST['delete_revisions']) ) {
 
 		if ( ! empty( $_POST['left'] ) )
-			$post_id = 	$_POST['left'];
+			$post_id = (int) $_POST['left'];
 
 		elseif ( ! empty( $_POST['right'] ) )
-			$post_id = 	$_POST['right'];	
+			$post_id = (int) $_POST['right'];	
 
 	} else {
-		foreach ( $_POST['delete_revisions'] as $revision_id ) {
+		$delete_revisions = array_map('intval', (array) $_POST['delete_revisions']);
+		$post_ids = [];
+
+		foreach ($delete_revisions as $revision_id) {
 			// this function is only used for past revisions (status=inherit)
 			if ( ! $revision = wp_get_post_revision( $revision_id ) )
 				continue;
@@ -661,6 +714,8 @@ function rvy_revision_bulk_delete() {
 			}
 
 			if ( $post = get_post( $revision->post_parent ) ) {
+				$post_ids []= $revision->post_parent;
+
 				if ( $type_obj = get_post_type_object( $post->post_type ) ) {
 					if ( ! current_user_can( $type_obj->cap->delete_post, $revision->post_parent ) ) {
 						continue;
@@ -670,10 +725,14 @@ function rvy_revision_bulk_delete() {
 	
 			// before deleting the revision, note its status for redirect
 			$revision_status = $revision->post_status;
-			wp_delete_post_revision( $revision_id );
+			wp_delete_post( $revision_id );
 			$delete_count++;
 
 			rvy_delete_past_revisions($revision_id);
+		}
+
+		foreach($post_ids as $_post_id) {
+			revisionary_refresh_postmeta($_post_id);
 		}
 	}
 
@@ -683,9 +742,9 @@ function rvy_revision_bulk_delete() {
 	exit;
 }
 
-function rvy_revision_unschedule() {
-	require_once( ABSPATH . 'wp-admin/admin.php');
-	$revision_id = $_GET['revision'];
+function rvy_revision_unschedule($revision_id) {
+	global $wpdb;
+
 	$redirect = '';
 	
 	do {
@@ -704,36 +763,24 @@ function rvy_revision_unschedule() {
 		}
 
 		if ( $type_obj = get_post_type_object( $revision->post_type ) ) {
-			if ( ! agp_user_can( $type_obj->cap->edit_post, $published_id, '', array( 'skip_revision_allowance' => true ) ) )
+			if ( ! agp_user_can( $type_obj->cap->edit_post, $published_id, '', array( 'skip_revision_allowance' => true ) ) ) {
 				break;
 		}
+		}
 		
-		check_admin_referer('unschedule-revision_' .  $revision_id);
-
-		global $wpdb;
-		$wpdb->query( "UPDATE $wpdb->posts SET post_status = 'pending-revision' WHERE ID = '$revision_id'" );
+		$wpdb->update( $wpdb->posts, array( 'post_status' => 'pending-revision' ), array( 'ID' => $revision->ID ) );
 		
 		rvy_update_next_publish_date();
-
-		$redirect = rvy_preview_url($revision);
 	} while (0);
 	
-	if ( ! $redirect ) {
-		if ( ! empty($post) && is_object($post) && ( 'post' != $post->post_type ) ) {
-			$redirect = "edit.php?post_type={$post->post_type}";
-		} else
-			$redirect = 'edit.php';
-	}
-
-	wp_redirect( $redirect );
-	exit;
+	return true;
 }
 
 function rvy_revision_publish($revision_id = false) {
 	if ($revision_id) {
 		$batch_process = true;
 	} else {
-		$revision_id = $_GET['revision'];
+		$revision_id = (int) $_GET['revision'];
 		$redirect = site_url();
 		$batch_process = false;
 	}
@@ -798,6 +845,10 @@ function _rvy_publish_scheduled_revisions() {
 function rvy_publish_scheduled_revisions($args = array()) {
 	global $wpdb;
 	
+	if (function_exists('relevanssi_query')) {
+		remove_action( 'wp_insert_post', 'relevanssi_insert_edit', 99, 1 );
+	}
+
 	rvy_confirm_async_execution( 'publish_scheduled_revisions' );
 
 	// Prevent this function from being triggered simultaneously by another site request
@@ -913,86 +964,126 @@ function rvy_publish_scheduled_revisions($args = array()) {
 				}
 				
 				if ( rvy_get_option( 'publish_scheduled_notify_admin' ) ) {
-					$title = sprintf(__('[%s] Scheduled Revision Publication'), $blogname );
-					
-					$message = sprintf( __('A scheduled revision to the %1$s "%2$s" has been published.'), $type_caption, $row->post_title ) . "\r\n\r\n";
 
-					if ( $author = new WP_User( $row->post_author ) )
-						$message .= sprintf( __('It was submitted by %1$s.'), $author->display_name ) . "\r\n\r\n";
-
-					if ( ! empty($post->ID) )
-						$message .= __( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";
-
-					$object_id = ( isset($post) && isset($post->ID) ) ? $post->ID : $row->ID;
-					$object_type = ( isset($post) && isset($post->post_type) ) ? $post->post_type : 'post';
-					
-
-					// if it was not stored, or cleared, use default recipients
-					$to_addresses = array();
-					
-					if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') ) { // e-mail to Scheduled Revision Montiors metagroup if Role Scoper is activated
-						global $revisionary;
-						
-						$monitor_groups_enabled = true;
-						$revisionary->content_roles->ensure_init();
-
-						if ( $default_ids = $revisionary->content_roles->get_metagroup_members( 'Scheduled Revision Monitors' ) ) {
-							if ( $type_obj = get_post_type_object( $object_type ) ) {
-								$revisionary->skip_revision_allowance = true;
-								$cols = ( defined('COLS_ALL_RS') ) ? COLS_ALL_RS : 'all';
-								$post_publishers = $revisionary->content_roles->users_who_can( $type_obj->cap->edit_post, $object_id, array( 'cols' => $cols ) );
-								$revisionary->skip_revision_allowance = false;
-								
-								foreach ( $post_publishers as $user )
-									if ( in_array( $user->ID, $default_ids ) )
-										$to_addresses []= $user->user_email;
+					// Support workaround to prevent notification when an user of specified role created the revision
+					if (defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS')) {
+						global $current_user;
+			
+						$user = ($current_user->ID != $revision->post_author) ? new WP_User($revision->post_author) : $current_user;
+			
+						if ($user && !empty($user->ID)) {
+							foreach (['REVISIONARY_LIMIT_NOTIFICATION_SUBMITTER_ROLES', 'RVY_MONITOR_ROLES', 'SCOPER_MONITOR_ROLES'] as $const) {
+								if (defined($const)) {
+									// revision submitter roles for which revision publication should not trigger email notification
+									$skip_notification_revisor_roles = array_map('trim', explode(',', constant($const)));
+									break;
+								}
+							}
+			
+							if (empty($skip_notification_revisor_roles)) {
+								$skip_notification_revisor_roles = ['editor', 'administrator'];
 							}
 						}
-					} 
-					
-					if ( ! $to_addresses && ( empty($monitor_groups_enabled) || ! defined('RVY_FORCE_MONITOR_GROUPS') ) ) {  // if RS/PP are not active, monitor groups have been disabled or no monitor group members can publish this post...
-						$use_wp_roles = ( defined( 'SCOPER_MONITOR_ROLES' ) ) ? SCOPER_MONITOR_ROLES : 'administrator,editor';
-						
-						$use_wp_roles = str_replace( ' ', '', $use_wp_roles );
-						$use_wp_roles = explode( ',', $use_wp_roles );
-						
-						$recipient_ids = array();
+			
+						if (array_intersect($user->roles, $skip_notification_revisor_roles)) {
+							$skip_notification = true;
 
-						foreach ( $use_wp_roles as $role_name ) {
-							$search = new WP_User_Query( "search=&fields=id&role=$role_name" );
-							$recipient_ids = array_merge( $recipient_ids, $search->results );
+							/*
+							// If notification is being limited due to the role of the revision submitter, for which roles should notification be suppressed?
+							$skip_notification_admin_recipient_roles = (defined('REVISIONARY_LIMIT_NOTIFICATION_RECIPIENT_ROLES')) 
+							? array_map('trim', explode(',', constant('REVISIONARY_LIMIT_NOTIFICATION_RECIPIENT_ROLES')))
+							: [];
+							*/
+						}
+					}
+					
+					if (empty($skip_notification)) {
+						$title = sprintf(__('[%s] Scheduled Revision Publication'), $blogname );
+						
+						$message = sprintf( __('A scheduled revision to the %1$s "%2$s" has been published.'), $type_caption, $row->post_title ) . "\r\n\r\n";
+	
+						if ( $author = new WP_User( $row->post_author ) )
+							$message .= sprintf( __('It was submitted by %1$s.'), $author->display_name ) . "\r\n\r\n";
+	
+						if ( ! empty($post->ID) )
+							$message .= __( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";
+	
+						$object_id = ( isset($post) && isset($post->ID) ) ? $post->ID : $row->ID;
+						$object_type = ( isset($post) && isset($post->post_type) ) ? $post->post_type : 'post';
+						
+	
+						// if it was not stored, or cleared, use default recipients
+						$to_addresses = array();
+						
+						if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') && ! defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS') ) { // e-mail to Scheduled Revision Montiors metagroup if Role Scoper is activated
+							global $revisionary;
+							
+							$monitor_groups_enabled = true;
+							$revisionary->content_roles->ensure_init();
+	
+							if ( $default_ids = $revisionary->content_roles->get_metagroup_members( 'Scheduled Revision Monitors' ) ) {
+								if ( $type_obj = get_post_type_object( $object_type ) ) {
+									$revisionary->skip_revision_allowance = true;
+									$cols = ( defined('COLS_ALL_RS') ) ? COLS_ALL_RS : 'all';
+									$post_publishers = $revisionary->content_roles->users_who_can( $type_obj->cap->edit_post, $object_id, array( 'cols' => $cols ) );
+									$revisionary->skip_revision_allowance = false;
+									
+									foreach ( $post_publishers as $user )
+										if ( in_array( $user->ID, $default_ids ) )
+											$to_addresses []= $user->user_email;
+								}
+							}
+						} 
+						
+						if ( ! $to_addresses && ( empty($monitor_groups_enabled) || ! defined('RVY_FORCE_MONITOR_GROUPS') ) ) {  // if RS/PP are not active, monitor groups have been disabled or no monitor group members can publish this post...
+							if ( defined( 'SCOPER_MONITOR_ROLES' ) ) {
+								$use_wp_roles = SCOPER_MONITOR_ROLES;
+							} else {
+								$use_wp_roles = (defined('RVY_MONITOR_ROLES')) ? RVY_MONITOR_ROLES : 'administrator,editor';
+							}
+							
+							$use_wp_roles = str_replace( ' ', '', $use_wp_roles );
+							$use_wp_roles = explode( ',', $use_wp_roles );
+							
+							$recipient_ids = array();
+	
+							foreach ( $use_wp_roles as $role_name ) {
+								$search = new WP_User_Query( "search=&fields=id&role=$role_name" );
+								$recipient_ids = array_merge( $recipient_ids, $search->results );
+							}
+							
+							foreach ( $recipient_ids as $userid ) {
+								$user = new WP_User($userid);
+								$to_addresses []= $user->user_email;
+							}
 						}
 						
-						foreach ( $recipient_ids as $userid ) {
-							$user = new WP_User($userid);
-							$to_addresses []= $user->user_email;
+						if ( defined( 'RVY_NOTIFY_SUPER_ADMIN' ) && is_multisite() ) {
+							$super_admin_logins = get_super_admins();
+							foreach( $super_admin_logins as $user_login ) {
+								if ( $super = new WP_User($user_login) )
+									$to_addresses []= $super->user_email;
+							}
 						}
-					}
-					
-					if ( defined( 'RVY_NOTIFY_SUPER_ADMIN' ) && is_multisite() ) {
-						$super_admin_logins = get_super_admins();
-						foreach( $super_admin_logins as $user_login ) {
-							if ( $super = new WP_User($user_login) )
-								$to_addresses []= $super->user_email;
+						
+						$to_addresses = array_unique( $to_addresses );
+						
+						//dump($to_addresses);
+						
+						foreach ( $to_addresses as $address ) {
+							rvy_mail( 
+								$address, 
+								$title, 
+								$message, 
+								[
+									'revision_id' => $row->ID, 
+									'post_id' => $published_id, 
+									'notification_type' => 'publish-scheduled', 
+									'notification_class' => 'publish_scheduled_notify_admin'
+								]
+							);
 						}
-					}
-					
-					$to_addresses = array_unique( $to_addresses );
-					
-					//dump($to_addresses);
-					
-					foreach ( $to_addresses as $address )
-						rvy_mail( 
-							$address, 
-							$title, 
-							$message, 
-							[
-								'revision_id' => $row->ID, 
-								'post_id' => $published_id, 
-								'notification_type' => 'publish-scheduled', 
-								'notification_class' => 'publish_scheduled_notify_admin'
-							]
-						);
+					} // endif skip_notification
 				}
 				
 				
@@ -1014,7 +1105,7 @@ function rvy_publish_scheduled_revisions($args = array()) {
 	if ( ! empty( $_GET['action']) && ( 'publish_scheduled_revisions' == $_GET['action'] ) ) {
 		exit( 0 );
 	} elseif ( in_array( $_SERVER['REQUEST_URI'], $revised_uris ) ) {
-		wp_redirect( $_SERVER['REQUEST_URI'] );  // if one of the revised pages is being accessed now, redirect back so revision is published on first access
+		wp_redirect( esc_url($_SERVER['REQUEST_URI']) );  // if one of the revised pages is being accessed now, redirect back so revision is published on first access
 	}
 }
 

@@ -42,7 +42,12 @@ class Revisionary_REST {
 
 					$this->endpoint_class = get_class( $handler['callback'][0] );
 					
-					if ( ! in_array( $this->endpoint_class, array( 'WP_REST_Posts_Controller' ) ) ) {
+					$compatible_endpoints = apply_filters(
+						'revisionary_rest_post_endpoints', 
+						['WP_REST_Posts_Controller', 'LD_REST_Posts_Gutenberg_Controller']
+					);
+
+					if (!in_array($this->endpoint_class, $compatible_endpoints)) {
 						continue;
 					}
 
@@ -50,21 +55,16 @@ class Revisionary_REST {
 
 					$this->is_view_method = in_array( $this->method, array( WP_REST_Server::READABLE, 'GET' ) );
 
-					switch( $this->endpoint_class ) {
-						case 'WP_REST_Posts_Controller':
 							$post_id = $this->get_id_element( $path );
 								
-							if ( ! is_numeric( $post_id ) ) break;
-							
+					if (is_numeric($post_id)) {
 							// back post type out of path because controller object does not expose it
 							$type_base = $this->get_path_element( $path );
 							
 							$this->post_type = $this->get_type_from_rest_base( $type_base );
 							$this->post_id = $post_id;
 							$this->is_posts_request = true;
-
-							break;
-					} // end switch
+					}
 				}
 			}
 		}

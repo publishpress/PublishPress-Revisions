@@ -37,19 +37,20 @@ else
 
 /*
 if ( ! empty($_GET['revision_status']) )
-	$revision_status = $_GET['revision_status'];
+	$revision_status = sanitize_key($_GET['revision_status']);
 else
 	$revision_status = '';
 */	
 $revision_status = 'inherit';
 
 if ( ! empty($_GET['action']) )
-	$action = $_GET['action'];
+	$action = sanitize_key($_GET['action']);
 else
 	$action = '';
 
-if ( ! empty($_GET['restored_post'] ) )
-	$revision_id = $_GET['restored_post'];
+if ( ! empty($_GET['restored_post'] ) ) {
+	$revision_id = (int) $_GET['restored_post'];
+}
 
 if ( empty($revision_id) && ! $left && ! $right ) {
 	echo( '<div><br />' );

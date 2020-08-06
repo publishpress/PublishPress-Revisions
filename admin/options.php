@@ -7,16 +7,16 @@ do_action('revisionary_load_options_ui');
 class RvyOptionUI {
 	private static $instance = null;
 
-	var $sitewide;
-	var $customize_defaults;
+	private $sitewide;
+	private $customize_defaults;
 	var $form_options;
-	var $tab_captions;
+	private $tab_captions;
 	var $section_captions;
 	var $option_captions;
-	var $all_options;
-	var $all_otype_options;
-	var $def_otype_options;
-	var $display_hints = true;
+	private $all_options;
+	private $all_otype_options;
+	private $def_otype_options;
+	private $display_hints = true;
 
 	public static function instance($args = [])
     {
@@ -72,10 +72,10 @@ class RvyOptionUI {
 		
 		return $return;
 	}
-}
 
+function options_ui( $sitewide = false, $customize_defaults = false ) {
 	
-function rvy_options( $sitewide = false, $customize_defaults = false ) {
+global $revisionary;
 
 if ( ! current_user_can( 'manage_options' ) || ( $sitewide && ! is_super_admin() ) )
 	wp_die(__awp('Cheatin&#8217; uh?'));
@@ -87,15 +87,13 @@ if ( ! current_user_can( 'manage_options' ) || ( $sitewide && ! is_super_admin()
 if ( $sitewide )
 	$customize_defaults = false;	// this is intended only for storing custom default values for site-specific options
 
-$ui = RvyOptionUI::instance(compact($sitewide, $customize_defaults));
-
 rvy_refresh_default_options();
 
-$ui->all_options = array();
+$this->all_options = array();
 
-$ui->tab_captions = array( 'features' => __( 'Settings', 'revisionary' ), 'optscope' => __( 'Setting Scope', 'revisionary' ) );
+$this->tab_captions = array( 'features' => __( 'Settings', 'revisionary' ), 'optscope' => __( 'Setting Scope', 'revisionary' ) );
 
-$ui->section_captions = array(
+$this->section_captions = array(
 	'features' => array(
 		'role_definition' 	  	=> __('Role Definition', 'revisionary'),
 		'scheduled_revisions' 	=> __('Scheduled Revisions', 'revisionary'),
@@ -107,7 +105,7 @@ $ui->section_captions = array(
 );
 
 // TODO: replace individual _e calls with these (and section, tab captions)
-$ui->option_captions = array(
+$this->option_captions = array(
 	'pending_revisions' => __('Enable Pending Revisions', 'revisionary'),
 	'scheduled_revisions' => __('Enable Scheduled Revisions', 'revisionary'),
 	'revisor_lock_others_revisions' => __("Prevent Revisors from editing others&apos; revisions", 'revisionary'),
@@ -132,17 +130,17 @@ $ui->option_captions = array(
 );
 
 if ( defined('RVY_CONTENT_ROLES') ) {
-	$ui->option_captions['pending_rev_notify_admin'] = __('Email designated Publishers when a Pending Revision is submitted', 'revisionary');
-	$ui->option_captions['publish_scheduled_notify_admin'] = __('Email designated Publishers when a Scheduled Revision is published', 'revisionary');
-	$ui->option_captions['rev_approval_notify_admin'] = __('Email designated Publishers when a Pending Revision is approved', 'revisionary');
+	$this->option_captions['pending_rev_notify_admin'] = __('Email designated Publishers when a Pending Revision is submitted', 'revisionary');
+	$this->option_captions['publish_scheduled_notify_admin'] = __('Email designated Publishers when a Scheduled Revision is published', 'revisionary');
+	$this->option_captions['rev_approval_notify_admin'] = __('Email designated Publishers when a Pending Revision is approved', 'revisionary');
 } else {
-	$ui->option_captions['pending_rev_notify_admin'] = __('Email Editors and Administrators when a Pending Revision is submitted', 'revisionary');
-	$ui->option_captions['publish_scheduled_notify_admin'] = __('Email Editors and Administrators when a Scheduled Revision is published', 'revisionary');
-	$ui->option_captions['rev_approval_notify_admin'] = __('Email Editors and Administrators when a Pending Revision is approved', 'revisionary');
+	$this->option_captions['pending_rev_notify_admin'] = __('Email Editors and Administrators when a Pending Revision is submitted', 'revisionary');
+	$this->option_captions['publish_scheduled_notify_admin'] = __('Email Editors and Administrators when a Scheduled Revision is published', 'revisionary');
+	$this->option_captions['rev_approval_notify_admin'] = __('Email Editors and Administrators when a Pending Revision is approved', 'revisionary');
 }
 	
 
-$ui->form_options = array( 
+$this->form_options = array( 
 'features' => array(
 	'license' =>			 array( 'edd_key' ),
 	'role_definition' => 	 array( 'revisor_role_add_custom_rolecaps', 'require_edit_others_drafts' ),
@@ -156,25 +154,25 @@ $ui->form_options = array(
 
 if ( RVY_NETWORK ) {
 	if ( $sitewide )
-		$available_form_options = $ui->form_options;
+		$available_form_options = $this->form_options;
 	
 	global $rvy_options_sitewide;
 	
-	foreach ( $ui->form_options as $tab_name => $sections )
+	foreach ( $this->form_options as $tab_name => $sections )
 		foreach ( $sections as $section_name => $option_names ) {
 			if ( $sitewide )
-				$ui->form_options[$tab_name][$section_name] = array_intersect( $ui->form_options[$tab_name][$section_name], array_keys($rvy_options_sitewide) );
+				$this->form_options[$tab_name][$section_name] = array_intersect( $this->form_options[$tab_name][$section_name], array_keys($rvy_options_sitewide) );
 			else
-				$ui->form_options[$tab_name][$section_name] = array_diff( $ui->form_options[$tab_name][$section_name], array_keys($rvy_options_sitewide) );
+				$this->form_options[$tab_name][$section_name] = array_diff( $this->form_options[$tab_name][$section_name], array_keys($rvy_options_sitewide) );
 		}
 				
-	foreach ( $ui->form_options as $tab_name => $sections )
+	foreach ( $this->form_options as $tab_name => $sections )
 		foreach ( array_keys($sections) as $section_name )
-			if ( empty( $ui->form_options[$tab_name][$section_name] ) )
-				unset( $ui->form_options[$tab_name][$section_name] );
+			if ( empty( $this->form_options[$tab_name][$section_name] ) )
+				unset( $this->form_options[$tab_name][$section_name] );
 }
 
-do_action('revisionary_settings_ui', $ui, $sitewide, $customize_defaults);
+do_action('revisionary_settings_ui', $this, $sitewide, $customize_defaults);
 ?>
 <header>
 <!-- <div class='wrap'> -->
@@ -236,13 +234,13 @@ if ( $sitewide || $customize_defaults ) {
 	$js_call = "agp_swap_display('rvy-features', 'rvy-optscope', 'rvy_show_features', 'rvy_show_optscope', '$class_selected', '$class_unselected');";
 	echo "<ul class='rs-list_horiz' style='margin-bottom:-0.1em'>"
 		. "<li class='$class_selected'>"
-		. "<a id='rvy_show_features' href='javascript:void(0)' onclick=\"$js_call\">" . $ui->tab_captions['features'] . '</a>'
+		. "<a id='rvy_show_features' href='javascript:void(0)' onclick=\"$js_call\">" . $this->tab_captions['features'] . '</a>'
 		. '</li>';
 
 	if ( $sitewide ) {
 		$js_call = "agp_swap_display('rvy-optscope', 'rvy-features', 'rvy_show_optscope', 'rvy_show_features', '$class_selected', '$class_unselected');";
 		echo "<li class='$class_unselected'>"
-			. "<a id='rvy_show_optscope' href='javascript:void(0)' onclick=\"$js_call\">" . $ui->tab_captions['optscope'] . '</a>'
+			. "<a id='rvy_show_optscope' href='javascript:void(0)' onclick=\"$js_call\">" . $this->tab_captions['optscope'] . '</a>'
 			. '</li>';
 	}
 
@@ -268,7 +266,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 	if ( RVY_NETWORK && is_super_admin() ) {
 		if ( ! $sitewide ) {
 			global $blog_id;
-			if ( 1 == $blog_id ) {
+			if ( is_main_site($blog_id) ) {
 				$link_open = "<a href='admin.php?page=rvy-net_options'>";
 				$link_close = '</a>';
 			} else {
@@ -302,19 +300,19 @@ $table_class = 'form-table rs-form-table';
 
 	$section = 'role_definition';			// --- ROLE DEFINITION SECTION ---
 
-	if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
+	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		<tr valign="top"><th scope="row">
-		<?php echo $ui->section_captions[$tab][$section]; ?>
+		<?php echo $this->section_captions[$tab][$section]; ?>
 		</th><td>
 		
 		<?php 
 		$hint = __('The user role "Revisor" role is now available. Include capabilities for all custom post types in this role?', 'revisionary');
-		$ui->option_checkbox( 'revisor_role_add_custom_rolecaps', $tab, $section, $hint, '' );
+		$this->option_checkbox( 'revisor_role_add_custom_rolecaps', $tab, $section, $hint, '' );
 		?>
 		
 		<?php
 		$hint = __( 'If checked, users lacking site-wide publishing capabilities will also be checked for the edit_others_drafts capability', 'revisionary' );
-		$ui->option_checkbox( 'require_edit_others_drafts', $tab, $section, $hint, '' );
+		$this->option_checkbox( 'require_edit_others_drafts', $tab, $section, $hint, '' );
 		?>
 		
 		</td></tr>
@@ -328,20 +326,20 @@ $scheduled_revisions_available ) :
 
 	$section = 'scheduled_revisions';			// --- SCHEDULED REVISIONS SECTION ---
 
-	if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
+	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		<tr valign="top"><th scope="row">
-		<?php echo $ui->section_captions[$tab][$section]; ?>
+		<?php echo $this->section_captions[$tab][$section]; ?>
 		</th><td>
 		
 		<?php 
 		$hint = __( 'If a currently published post or page is edited and a future date set, the change will not be applied until the selected date.', 'revisionary' );
-		$ui->option_checkbox( 'scheduled_revisions', $tab, $section, $hint, '' );
+		$this->option_checkbox( 'scheduled_revisions', $tab, $section, $hint, '' );
 		
 		$hint = __( 'When a scheduled revision is published, also update the publish date.', 'revisionary' );
-		$ui->option_checkbox( 'scheduled_revision_update_post_date', $tab, $section, $hint, '' );
+		$this->option_checkbox( 'scheduled_revision_update_post_date', $tab, $section, $hint, '' );
 
 		$hint = __( 'Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
-		$ui->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
+		$this->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
 		?>
 		</td></tr>
 	<?php endif; // any options accessable in this section
@@ -351,9 +349,9 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 $pending_revisions_available ) :
 	$section = 'pending_revisions';			// --- PENDING REVISIONS SECTION ---
 
-	if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
+	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		<tr valign="top"><th scope="row">
-		<?php echo $ui->section_captions[$tab][$section]; ?>
+		<?php echo $this->section_captions[$tab][$section]; ?>
 		</th><td>
 		
 		<?php 
@@ -362,10 +360,10 @@ $pending_revisions_available ) :
 			"<a href='" . admin_url('admin.php?page=revisionary-q') . "'>",
 			'</a>'	
 		);
-		$ui->option_checkbox( 'pending_revisions', $tab, $section, $hint, '' );
+		$this->option_checkbox( 'pending_revisions', $tab, $section, $hint, '' );
 		
 		$hint = __( 'When a pending revision is published, also update the publish date.', 'revisionary' );
-		$ui->option_checkbox( 'pending_revision_update_post_date', $tab, $section, $hint, '' );
+		$this->option_checkbox( 'pending_revision_update_post_date', $tab, $section, $hint, '' );
 		?>
 		</td></tr>
 	<?php endif; // any options accessable in this section
@@ -374,22 +372,22 @@ endif;
 
 $section = 'preview';			// --- PREVIEW SECTION ---
 		
-if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
+if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	<tr valign="top"><th scope="row">
-	<?php echo $ui->section_captions[$tab][$section]; ?>
+	<?php echo $this->section_captions[$tab][$section]; ?>
 	</th><td>
 		
 	<?php 
 	$hint = __('For themes that block revision preview, hide preview links from non-Administrators', 'revisionary');
-	$ui->option_checkbox( 'revision_preview_links', $tab, $section, $hint, '' );
+	$this->option_checkbox( 'revision_preview_links', $tab, $section, $hint, '' );
 
 	$id = 'preview_link_type';
-	if ( in_array( $id, $ui->form_options[$tab][$section] ) ) {
-		$ui->all_options []= $id;
+	if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
+		$this->all_options []= $id;
 		$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
 		
 		echo '<div style="padding-left: 25px">';
-		echo "<label for='$id'>" . $ui->option_captions[$id] . ': </label>';
+		echo "<label for='$id'>" . $this->option_captions[$id] . ': </label>';
 
 		echo " <select name='$id' id='$id'>";
 		$captions = array( '' => __('Published Post Slug', 'revisionary'), 'revision_slug' => __('Revision Slug', 'revisionary'), 'id_only' => __('Revision ID only', 'revisionary') );
@@ -399,7 +397,7 @@ if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
 		}
 		echo '</select>&nbsp;';
 
-		if ( $ui->display_hints ) : ?>
+		if ( $this->display_hints ) : ?>
 			<br />
 			<div class="rs-subtext">
 			<?php
@@ -414,7 +412,7 @@ if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
 	}
 
 	$hint = __('If disabled, Compare screen links to Revision Preview for approval', 'revisionary');
-	$ui->option_checkbox( 'compare_revisions_direct_approval', $tab, $section, $hint, '' );
+	$this->option_checkbox( 'compare_revisions_direct_approval', $tab, $section, $hint, '' );
 	?>
 	</td></tr>
 <?php endif; // any options accessable in this section
@@ -425,9 +423,9 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 
 	$section = 'revisions';			// --- REVISIONS SECTION ---
 
-	if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
+	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		<tr valign="top"><th scope="row">
-		<?php echo $ui->section_captions[$tab][$section]; ?>
+		<?php echo $this->section_captions[$tab][$section]; ?>
 		</th><td>
 		
 		<?php
@@ -443,40 +441,44 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 
 		<?php 
 		$hint = __('This restriction applies to users who are not full editors for the post type. To enable a role, give it the edit_others_revisions capability.', 'revisionary');
-		$ui->option_checkbox( 'revisor_lock_others_revisions', $tab, $section, $hint, '' );
+		$this->option_checkbox( 'revisor_lock_others_revisions', $tab, $section, $hint, '' );
 		
 		$hint = __('This restriction applies to users who are not full editors for the post type. To enable a role, give it the list_others_revisions capability.', 'revisionary');
-		$ui->option_checkbox( 'revisor_hide_others_revisions', $tab, $section, $hint, '' );
+		$this->option_checkbox( 'revisor_hide_others_revisions', $tab, $section, $hint, '' );
 		
 		$hint = __('This may improve compatibility with some plugins.', 'revisionary');
-		$ui->option_checkbox( 'trigger_post_update_actions', $tab, $section, $hint, '' );
+		$this->option_checkbox( 'trigger_post_update_actions', $tab, $section, $hint, '' );
 
 		$hint = '';
-		$ui->option_checkbox( 'diff_display_strip_tags', $tab, $section, $hint, '' );
+		$this->option_checkbox( 'diff_display_strip_tags', $tab, $section, $hint, '' );
 
 		$hint = __( 'Show descriptive captions for PublishPress Revisions settings', 'revisionary' );
-		$ui->option_checkbox( 'display_hints', $tab, $section, $hint, '' );
+		$this->option_checkbox( 'display_hints', $tab, $section, $hint, '' );
 		?>
+
+		<p style="padding-left:22px">
+		<a href="<?php echo add_query_arg('rvy_flush_flags', 1, esc_url($_SERVER['REQUEST_URI']))?>"><?php _e('Regenerate revision storage flags (for Revision Queue listing)', 'revisionary');?></a>
+		</p>
 		</td></tr>
 	<?php endif; // any options accessable in this section
 		
 	
 	$section = 'notification';			// --- NOTIFICATION SECTION ---
 		
-	if ( ! empty( $ui->form_options[$tab][$section] ) ) :?>
+	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		<tr valign="top"><th scope="row">
-		<?php echo $ui->section_captions[$tab][$section]; ?>
+		<?php echo $this->section_captions[$tab][$section]; ?>
 		</th><td>
 		
 		<?php 
 		if( $pending_revisions_available ) {
-			$subcaption = ( defined('RVY_CONTENT_ROLES') && $group_link = $GLOBALS['revisionary']->content_roles->get_metagroup_edit_link( 'Pending Revision Monitors' ) ) ?
+			$subcaption = ( defined('RVY_CONTENT_ROLES') && $group_link = $revisionary->content_roles->get_metagroup_edit_link( 'Pending Revision Monitors' ) ) ?
 				sprintf( " &bull;&nbsp;<a href='%s'>" . __('select recipients', 'revisionary') . "</a>", $group_link ) : '';
 			
-			// TODO: $ui->option_dropdown() method
+			// TODO: $this->option_dropdown() method
 			$id = 'pending_rev_notify_admin';
-			if ( in_array( $id, $ui->form_options[$tab][$section] ) ) {
-				$ui->all_options []= $id;
+			if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
+				$this->all_options []= $id;
 				$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
 				
 				echo "<select name='$id' id='$id'>";
@@ -487,14 +489,14 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 				}
 				echo '</select>&nbsp;';
 				
-				echo $ui->option_captions[$id];
+				echo $this->option_captions[$id];
 				echo $subcaption;
 				echo "<br />";
 			}
 			
 			$id = 'pending_rev_notify_author';
-			if ( in_array( $id, $ui->form_options[$tab][$section] ) ) {
-				$ui->all_options []= $id;
+			if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
+				$this->all_options []= $id;
 				$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
 				
 				echo "<select name='$id' id='$id'>";
@@ -505,44 +507,44 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 				}
 				echo '</select>&nbsp;';
 				
-				echo $ui->option_captions[$id];
+				echo $this->option_captions[$id];
 				echo "<br />";
 			}
 			
 			$hint = '';
-			$ui->option_checkbox( 'pending_rev_notify_revisor', $tab, $section, $hint, '' );
+			$this->option_checkbox( 'pending_rev_notify_revisor', $tab, $section, $hint, '' );
 			
 			echo '<br />';
 			
 			$hint = '';
-			$ui->option_checkbox( 'rev_approval_notify_admin', $tab, $section, $hint, '' );
+			$this->option_checkbox( 'rev_approval_notify_admin', $tab, $section, $hint, '' );
 
 			$hint = '';
-			$ui->option_checkbox( 'rev_approval_notify_author', $tab, $section, $hint, '' );
+			$this->option_checkbox( 'rev_approval_notify_author', $tab, $section, $hint, '' );
 			
 			$hint = '';
-			$ui->option_checkbox( 'rev_approval_notify_revisor', $tab, $section, $hint, '' );
+			$this->option_checkbox( 'rev_approval_notify_revisor', $tab, $section, $hint, '' );
 		}
 		
 		if( $scheduled_revisions_available ) {
 			echo '<br />';
 					
-			$subcaption = ( defined('RVY_CONTENT_ROLES') && $group_link = $GLOBALS['revisionary']->content_roles->get_metagroup_edit_link( 'Scheduled Revision Monitors' ) ) ?
+			$subcaption = ( defined('RVY_CONTENT_ROLES') && $group_link = $revisionary->content_roles->get_metagroup_edit_link( 'Scheduled Revision Monitors' ) ) ?
 				sprintf( " &bull;&nbsp;<a href='%s'>" . __('select recipients', 'revisionary') . "</a>", $group_link ) : '';
 
 			$hint = '';
-			$ui->option_checkbox( 'publish_scheduled_notify_admin', $tab, $section, $hint, '', array( 'subcaption' => $subcaption ) );
+			$this->option_checkbox( 'publish_scheduled_notify_admin', $tab, $section, $hint, '', array( 'subcaption' => $subcaption ) );
 			
 			$hint = '';
-			$ui->option_checkbox( 'publish_scheduled_notify_author', $tab, $section, $hint, '' );
+			$this->option_checkbox( 'publish_scheduled_notify_author', $tab, $section, $hint, '' );
 			
 			$hint = '';
-			$ui->option_checkbox( 'publish_scheduled_notify_revisor', $tab, $section, $hint, '' );
+			$this->option_checkbox( 'publish_scheduled_notify_revisor', $tab, $section, $hint, '' );
 		}
 		
 		if( $pending_revisions_available ) {
-			if ( in_array( 'pending_rev_notify_admin', $ui->form_options[$tab][$section] ) || in_array( 'pending_rev_notify_author', $ui->form_options[$tab][$section] ) ) {
-				if ( $ui->display_hints ) {
+			if ( in_array( 'pending_rev_notify_admin', $this->form_options[$tab][$section] ) || in_array( 'pending_rev_notify_author', $this->form_options[$tab][$section] ) ) {
+				if ( $this->display_hints ) {
 					echo '<div class="rs-subtext">';
 					if ( defined('RVY_CONTENT_ROLES') )
 						_e('Note: "by default" means Pending Revision creators can customize email notification recipients before submitting.  Eligibile "Publisher" email recipients are members of the Pending Revision Monitors group who <strong>also</strong> have the ability to publish the revision.  If not explicitly defined, the Monitors group is all users with a primary WP role of Administrator or Editor.', 'revisionary');
@@ -556,7 +558,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		echo '<br />';
 
 		$hint = __('To avoid notification failures, buffer emails for delayed sending once minute, hour or day limits are exceeded', 'revisionary');
-		$ui->option_checkbox( 'use_notification_buffer', $tab, $section, $hint, '' );
+		$this->option_checkbox( 'use_notification_buffer', $tab, $section, $hint, '' );
 		
 		if (!empty($_REQUEST['truncate_mail_log'])) {
 			delete_option('revisionary_sent_mail');
@@ -565,6 +567,8 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		if (!empty($_REQUEST['clear_mail_buffer'])) {
 			delete_option('revisionary_mail_buffer');
 		}
+
+		$uri = esc_url($_SERVER['REQUEST_URI']);
 
 		if (!empty($_REQUEST['mailinfo'])) {
 			$verbose = !empty($_REQUEST['verbose']);
@@ -627,13 +631,13 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 
 			if (get_option('revisionary_mail_buffer')):?>
 				<br />
-				<a href="<?php echo(add_query_arg('clear_mail_buffer', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Purge Notification Buffer', 'revisionary');?></a>
+				<a href="<?php echo(add_query_arg('clear_mail_buffer', '1', $uri));?>"><?php _e('Purge Notification Buffer', 'revisionary');?></a>
 				<br />
 			<?php endif;?>
 
 			<?php if (get_option('revisionary_sent_mail')):?>
 				<br />
-				<a href="<?php echo(add_query_arg('truncate_mail_log', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Truncate Notification Log', 'revisionary');?></a>
+				<a href="<?php echo(add_query_arg('truncate_mail_log', '1', $uri));?>"><?php _e('Truncate Notification Log', 'revisionary');?></a>
 			<?php endif;
 
 			$mail_info = rvy_mail_check_buffer([], ['log_only' => true]);
@@ -657,9 +661,9 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		if (empty($_REQUEST['mailinfo'])):?>
 			<br />
 			<div style="padding-left:22px">
-			<a href="<?php echo(add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI']));?>"><?php _e('Show Notification Log / Buffer', 'revisionary');?></a>
+			<a href="<?php echo(add_query_arg('mailinfo', '1', $uri));?>"><?php _e('Show Notification Log / Buffer', 'revisionary');?></a>
 			<br /><br />
-			<a href="<?php echo(add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $_SERVER['REQUEST_URI'])));?>"><?php _e('Show with message content', 'revisionary');?></a>
+			<a href="<?php echo(add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $uri)));?>"><?php _e('Show with message content', 'revisionary');?></a>
 			</div>
 		<?php endif;
 		
@@ -709,18 +713,18 @@ foreach ( $available_form_options as $tab_name => $sections ) {
 	
 	$explanatory_caption = __( 'Specify which PublishPress Revisions Settings to control network-wide. Unselected settings are controlled separately on each site.', 'revisionary' );
 
-	if ( isset( $ui->tab_captions[$tab_name] ) )
-		$tab_caption = $ui->tab_captions[$tab_name];
+	if ( isset( $this->tab_captions[$tab_name] ) )
+		$tab_caption = $this->tab_captions[$tab_name];
 	else
 		$tab_caption = $tab_name;
 
 	echo '<div style="margin:1em 0 1em 0">';
 	if ( count( $available_form_options ) > 1 ) {
-		if ( $ui->display_hints )
+		if ( $this->display_hints )
 			printf( _x( '<span class="rs-h3text">%1$s</span> (%2$s)', 'option_tabname (explanatory note)', 'revisionary' ), $tab_caption, $explanatory_caption );
 		else
 			echo $tab_caption;
-	} elseif ( $ui->display_hints ) {
+	} elseif ( $this->display_hints ) {
 		echo $explanatory_caption;
 	}
 
@@ -734,15 +738,15 @@ foreach ( $available_form_options as $tab_name => $sections ) {
 		
 		echo '<li><strong>';
 
-		if ( isset( $ui->section_captions[$tab_name][$section_name] ) )
-			echo $ui->section_captions[$tab_name][$section_name];
+		if ( isset( $this->section_captions[$tab_name][$section_name] ) )
+			echo $this->section_captions[$tab_name][$section_name];
 		else
 			echo ucwords(str_replace('_', ' ', $section_name));
 		
 		echo '</strong><ul style="margin-left:2em">';
 			
 		foreach ( $option_names as $option_name ) {
-			if ( $option_name && $ui->option_captions[$option_name] ) {
+			if ( $option_name && $this->option_captions[$option_name] ) {
 				$all_movable_options []= $option_name;
 				echo '<li>';
 				
@@ -753,7 +757,7 @@ foreach ( $available_form_options as $tab_name => $sections ) {
 				echo "<label for='$id'>";
 				echo "<input name='rvy_options_sitewide[]' type='checkbox' id='$id' value='$option_name' $disabled " . checked('1', $val, false) . " />";
 
-				printf( $option_scope_stamp, $ui->option_captions[$option_name] );
+				printf( $option_scope_stamp, $this->option_captions[$option_name] );
 					
 				echo '</label></li>';
 			}
@@ -779,8 +783,8 @@ endif; // any options accessable in this tab
 //$all = implode(',', $all_otypes);
 //echo "<input type='hidden' name='all_object_types' value='$all' />";
 
-$ui->all_options = implode(',', $ui->all_options);
-echo "<input type='hidden' name='all_options' value='$ui->all_options' />";
+$this->all_options = implode(',', $this->all_options);
+echo "<input type='hidden' name='all_options' value='$this->all_options' />";
 
 echo "<input type='hidden' name='rvy_submission_topic' value='options' />";
 ?>
@@ -810,6 +814,13 @@ $revisionary->admin->publishpressFooter();
 
 <?php
 } // end function
+} // end class RvyOptionUI
+
+
+function rvy_options( $sitewide = false, $customize_defaults = false ) {
+	$ui = RvyOptionUI::instance(compact('sitewide', 'customize_defaults'));
+	$ui->options_ui($sitewide, $customize_defaults);
+}
 
 function rvy_is_plugin_active($check_plugin_file)
     {

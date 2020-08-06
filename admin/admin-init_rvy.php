@@ -66,7 +66,7 @@ function rvy_admin_init() {
 		}
 		
 	} elseif (isset($_REQUEST['action2']) && !empty($_REQUEST['page']) && ('revisionary-q' == $_REQUEST['page']) && !empty($_REQUEST['post'])) {
-		$doaction = (!empty($_REQUEST['action']) && !is_numeric($_REQUEST['action'])) ? $_REQUEST['action'] : $_REQUEST['action2'];
+		$doaction = (!empty($_REQUEST['action']) && !is_numeric($_REQUEST['action'])) ? sanitize_key($_REQUEST['action']) : sanitize_key($_REQUEST['action2']);
 
 		check_admin_referer('bulk-revision-queue');
 
@@ -74,16 +74,16 @@ function rvy_admin_init() {
 	
 		if ( 'delete_all' == $doaction ) {
 			// Prepare for deletion of all posts with a specified post status (i.e. Empty trash).
-			$post_status = preg_replace('/[^a-z0-9_-]+/i', '', $_REQUEST['post_status']);
+			$post_status = preg_replace('/[^a-z0-9_-]+/i', '', sanitize_key($_REQUEST['post_status']));
 			// Verify the post status exists.
 			if ( get_post_status_object( $post_status ) ) {
 				$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_type=%s AND post_status = %s", $post_type, $post_status ) );
 			}
 			$doaction = 'delete';
 		} elseif ( isset( $_REQUEST['media'] ) ) {
-			$post_ids = $_REQUEST['media'];
+			$post_ids =  array_map('intval', (array) $_REQUEST['media']);
 		} elseif ( isset( $_REQUEST['ids'] ) ) {
-			$post_ids = explode( ',', $_REQUEST['ids'] );
+			$post_ids =  array_map('intval', explode( ',', $_REQUEST['ids'] ));
 		} elseif ( !empty( $_REQUEST['post'] ) ) {
 			$post_ids = array_map('intval', $_REQUEST['post']);
 		}
@@ -137,6 +137,43 @@ function rvy_admin_init() {
 	
 				break;
 	
+			case 'unschedule_revision' :
+				$unscheduled = 0;
+				$is_administrator = current_user_can('administrator');
+	
+				require_once( dirname(__FILE__).'/revision-action_rvy.php');
+
+				foreach ((array) $post_ids as $post_id) {
+					if (!$revision = get_post($post_id)) {
+						continue;
+					}
+					
+					if ('future-revision' != $revision->post_status) {
+						continue;
+					}
+					
+					if ( !$is_administrator 
+					&& !agp_user_can($type_obj->cap->edit_post, rvy_post_id($revision->ID), '', ['skip_revision_allowance' => true])
+					) {
+						if (count($post_ids) == 1) {
+							wp_die( __('Sorry, you are not allowed to approve this revision.', 'revisionary') );
+						} else {
+							continue;
+						}
+					}
+						
+					if (rvy_revision_unschedule($revision->ID)) {
+						$unscheduled++;
+					}
+				}
+
+				if ($unscheduled) {
+					$arg = 'unscheduled_count';
+					$sendback = add_query_arg($arg, $unscheduled, $sendback);
+				}
+
+				break;
+
 			case 'delete':
 				$deleted = 0;
 				foreach ( (array) $post_ids as $post_id ) {
@@ -167,6 +204,7 @@ function rvy_admin_init() {
 	
 		if ($sendback) {
 			$sendback = remove_query_arg( array('action', 'action2', '_wp_http_referer', '_wpnonce', 'tags_input', 'post_author', 'comment_status', 'ping_status', '_status', 'post', 'bulk_edit', 'post_view'), $sendback );
+			$sendback = str_replace('#038;', '&', $sendback);	// @todo Proper decode
 			wp_redirect($sendback);
 		}
 
@@ -188,10 +226,6 @@ function rvy_admin_init() {
 			} elseif ( ! empty($_GET['action']) && ('publish' == $_GET['action']) ) {
 				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
 				add_action( 'wp_loaded', 'rvy_revision_publish' );
-
-			} elseif ( ! empty($_GET['action']) && ('unschedule' == $_GET['action']) ) {
-				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
-				add_action( 'wp_loaded', 'rvy_revision_unschedule' );
 
 			} elseif ( ! empty($_POST['action']) && ('bulk-delete' == $_POST['action'] ) ) {
 				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
@@ -288,7 +322,7 @@ function rvy_get_post_revisions($post_id, $status = 'inherit', $args = '' ) {
 		$status, 
 		array_merge(rvy_revision_statuses(), array('inherit')) 
 	) ) {
-		return array();
+		return [];
 	}
 
 	if ( COL_ID_RVY == $fields ) {
@@ -334,9 +368,7 @@ function rvy_get_post_revisions($post_id, $status = 'inherit', $args = '' ) {
 		}	
 			
 	} else {
-		$order_clause = ( $order && $orderby ) 
-		? $wpdb->prepare("ORDER BY %s %s", $orderby, $order)
-		: '';
+		$order_clause = "ORDER BY $orderby $order";
 
 		if ('inherit' == $status) {
 			$revisions = $wpdb->get_results(

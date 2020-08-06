@@ -29,6 +29,7 @@ $bulk_counts = array(
 	'updated' => 0,
 	'locked' => 0,
 	'approved_count' => isset( $_REQUEST['approved_count'] )   ? absint( $_REQUEST['approved_count'] )   : 0,
+	'unscheduled_count' => isset( $_REQUEST['unscheduled_count'] ) ? absint( $_REQUEST['unscheduled_count'] )   : 0,
 	'published_count' => isset( $_REQUEST['published_count'] )   ? absint( $_REQUEST['published_count'] )   : 0,
 	'trashed' => 0,
 	'untrashed' => 0,
@@ -37,6 +38,7 @@ $bulk_counts = array(
 $bulk_messages = [];
 $bulk_messages['post'] = array(
 	'approved_count'   => sprintf(_n( '%s revision approved.', '%s revisions approved.', $bulk_counts['approved_count'], 'revisionary' ), $bulk_counts['approved_count']),
+	'unscheduled_count' => sprintf(_n( '%s revision unscheduled.', '%s revisions unscheduled.', $bulk_counts['unscheduled_count'], 'revisionary' ), $bulk_counts['unscheduled_count']),
 	'published_count'   => sprintf(_n( '%s revision published.', '%s revisions published.', $bulk_counts['published_count'], 'revisionary' ), $bulk_counts['published_count']),
 	'deleted'   => sprintf(_n( '%s revision permanently deleted.', '%s revisions permanently deleted.', $bulk_counts['deleted'] ), $bulk_counts['deleted']),
 );
@@ -66,7 +68,7 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 echo '<span class="dashicons dashicons-backup"></span>&nbsp;';
 
 if ( ! empty( $_REQUEST['post_type'] ) ) {
-	$type_obj = get_post_type_object( $_REQUEST['post_type'] );
+	$type_obj = get_post_type_object( sanitize_key($_REQUEST['post_type']) );
 }
 
 if (!empty($_REQUEST['published_post'])) {
@@ -78,7 +80,7 @@ if (!empty($_REQUEST['published_post'])) {
 $filters = [];
 
 if (!empty($_REQUEST['author'])) {
-	if ($_user = new WP_User($_REQUEST['author'])) {
+	if ($_user = new WP_User((int) $_REQUEST['author'])) {
 		$filters['author'] = (!empty($_REQUEST['post_status']) || !empty($_REQUEST['post_status'])) 
 		? sprintf(_x('%s: ', 'Author Name', 'revisionary'), $_user->display_name)
 		: $_user->display_name;
@@ -86,7 +88,7 @@ if (!empty($_REQUEST['author'])) {
 }
 
 if (!empty($_REQUEST['post_status'])) {
-	if ($status_obj = get_post_status_object($_REQUEST['post_status'])) {
+	if ($status_obj = get_post_status_object(sanitize_key($_REQUEST['post_status']))) {
 		$filters['post_status'] = $status_obj->labels->plural;
 	}
 }
@@ -98,7 +100,7 @@ if (!empty($_REQUEST['post_type']) && empty($published_title)) {
 }
 
 if (!empty($_REQUEST['post_author']) && empty($published_title)) {
-	if ($_user = new WP_User($_REQUEST['post_author'])) {
+	if ($_user = new WP_User((int) $_REQUEST['post_author'])) {
 		$filters['post_author'] = $filters 
 		? sprintf(__('%sPost Author: %s', 'revisionary'), ' - ', $_user->display_name) 
 		: sprintf(__('%sPost Author: %s', 'revisionary'), '', $_user->display_name);
@@ -116,7 +118,7 @@ if (!empty($published_title)) {
 <?php
 if ( isset( $_REQUEST['s'] ) && strlen( $_REQUEST['s'] ) ) {
 	/* translators: %s: search keywords */
-	printf( ' <span class="subtitle">' . __( 'Search results for &#8220;%s&#8221;' ) . '</span>', get_search_query() );
+	printf( ' <span class="subtitle">' . __( 'Search results for &#8220;%s&#8221;' ) . '</span>', strip_tags($_REQUEST['s']) );
 }
 ?>
 
@@ -140,7 +142,7 @@ if ( $messages ) {
 }
 unset( $messages );
 
-$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated', 'approved_count', 'published_count', 'deleted', 'trashed', 'untrashed' ), $_SERVER['REQUEST_URI'] );
+$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated', 'approved_count', 'published_count', 'deleted', 'trashed', 'untrashed' ), esc_url($_SERVER['REQUEST_URI']) );
 ?>
 
 <?php $wp_list_table->views(); ?>

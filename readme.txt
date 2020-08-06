@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.4
-Stable tag: 2.3
+Stable tag: 2.3.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -100,9 +100,48 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
-= 2.3 - 23 Apr 2020 =
+= 2.3.9 - 6 Aug 2020 =
+* Fixed : Featured Image was removed from pending revision at creation
+* Fixed : Scheduled revision publication failed under some conditions, caused post to be unpublished
+* Fixed : Scheduled revisions could not be published ahead of schedule using "Publish Now" link on preview (since 2.3.4)
+* Lang : Add German translation
+* API : New filter 'revisionary_apply_revision_data' to adjust standard revision fields prior to publication
+
+= 2.3.8 - 30 Jul 2020 =
+* Feature : Revision Queue - new bulk action to Unschedule selected revisions
+* Lang : Add Spanish translation
+* Fixed : Revisors could not preview changes prior to submitting a pending revision
+* Fixed : Classic Editor plugin - when "Edit (Classic)" link is used, Revisors did not have Update button recaptioned to "Submit Revision"
+* Fixed : API - revisionary_enabled_post_types filter was not fully effective
+* Compat : Public Post Preview - support preview link generation on Edit Revision screen
+
+= 2.3.6 - 10 Jun 2020 =
+* Fixed : After revision submission, preview link was not always to latest revision
+* Fixed : Preview button on editor screen loaded preview with invalid thumbnail under some conditions
+* Fixed : When network-activated, Network Settings menu item loaded site-specific settings screen
+
+= 2.3.5 - 29 May 2020 =
+* Fixed : Compare link on Editor screen linked to Edit Posts screen instead of Compare Revisions 
+
+= 2.3.4 - 29 May 2020 =
+* Fixed : Duplicate email notifications to users who have more than one WordPress role
+* Change : Suppress email notification when an Administrator or Editor creates a pending revision, if constant REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS is defined
+* Compat : Relevanssi - Scheduled revisions were not published with Relevanssi active
+* Fixed : Scheduled revision publication caused other scheduled revisions (for the same post) to be hidden from Revision Queue
+* Fixed : has_revisions postmeta flag was not cleared when a post's last revision was deleted
+* Fixed : Revision Queue - Search function did not work
+* Fixed : Revision Queue link in Edit Posts / Edit Pages row was not removed after post's last pending or scheduled revision published or deleted
+
+= 2.3.3 - 14 May 2020 =
+* Compat : PublishPress Permissions - Fatal error on post creation
+
+= 2.3.2 - 12 May 2020 =
+* Fixed : Post meta flag "_rvy_has_revisions" was not cleared after last remaining pending / scheduled revision was published or deleted, affecting Revision Queue performance
+* Fixed : Revision Queue listed uneditable revisions under some conditions
+* Fixed : My Published Posts count was wrong under some conditions
 * Fixed : Dashboard At a Glance link for Pending Post Revisions linked to Revision Queue without filtering display to Posts only
 * Compat : PublishPress Permissions - suppress Permissions metaboxes on Edit Revision screen
+* Fixed : Published post content cleared on pending revisions submission, on a minority of installations
 
 = 2.2.4 - 6 Apr 2020 =
 * Fixed : Possible fatal error loading Revisions screen on a small percentage of installations
