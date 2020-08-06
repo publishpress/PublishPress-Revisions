@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.4
-Stable tag: 2.3.8
+Stable tag: 2.3.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -99,6 +99,12 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.3.9 - 6 Aug 2020 =
+* Fixed : Featured Image was removed from pending revision at creation
+* Fixed : Scheduled revision publication failed under some conditions, caused post to be unpublished
+* Fixed : Scheduled revisions could not be published ahead of schedule using "Publish Now" link on preview (since 2.3.4)
+* API : New filter 'revisionary_apply_revision_data' to adjust standard revision fields prior to publication
 
 = 2.3.8 - 30 Jul 2020 =
 * Feature : Revision Queue - new bulk action to Unschedule selected revisions

@@ -21,6 +21,10 @@ class RevisionCreation {
 			global $revisionary;
 		}
 
+		if ($revisionary->disable_revision_trigger) {
+			return $data;
+		}
+
         if ( isset($_POST['wp-preview']) && ( 'dopreview' == $_POST['wp-preview'] ) ) {
             return $data;
         }
@@ -130,6 +134,10 @@ class RevisionCreation {
 			global $revisionary;
 		}
         
+		if ($revisionary->disable_revision_trigger) {
+			return $data;
+		}
+
         if ( $revisionary->doing_rest && $revisionary->rest->is_posts_request && ! empty( $revisionary->rest->request ) ) {
             $postarr = array_merge( $revisionary->rest->request->get_params(), $postarr );
             
@@ -392,6 +400,10 @@ class RevisionCreation {
 			$revisionary = $this->revisionary;
 		} else {
 			global $revisionary;
+		}
+
+		if ($revisionary->disable_revision_trigger) {
+			return $data;
 		}
 
 		if ( empty( $post_arr['ID'] ) ) {

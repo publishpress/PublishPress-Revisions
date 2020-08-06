@@ -394,6 +394,10 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		return false;
 	}
 
+	if ('revision' == get_post_field('post_type', $published_id)) {
+		return false;
+	}
+
 	$update = (array) $revision;
 
 	//$update = wp_slash( $update ); //since data is from db
@@ -418,6 +422,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		array(
 			'ID' => $published->ID,
 			'post_author' => $published->post_author,
+			'post_type' => $published->post_type,
 			'post_status' => $published->post_status,
 			'comment_count' => $published->comment_count,
 			'post_name' => $published->post_name,
@@ -447,9 +452,23 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 	}
 	
+	/**
+	* Filter revision data before applying the revision.
+	*
+	* @param array $update Revision data
+	* @param WP_Post $revision Revision being applied
+	* @param Object $published Currently published post
+	*/
+	$update = apply_filters( 'revisionary_apply_revision_data', $update, $revision, $published );
+
 	$revision_content = $update['post_content'];
 
+	global $revisionary;
+	
+	$revisionary->disable_revision_trigger = true;
 	$post_id = wp_update_post( $update );
+	$revisionary->disable_revision_trigger = false;
+
 	if ( ! $post_id || is_wp_error( $post_id ) ) {
 		return $post_id;
 	}
@@ -460,7 +479,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	// Apply requested slug, if applicable. 
 	// Otherwise, work around unexplained reversion of editor-modified post slug back to default format on some sites  @todo: identify plugin interaction
-	$update_fields = ['post_name' => $set_slug, 'guid' => $published->guid, 'post_content' => $revision_content];
+	$update_fields = ['post_name' => $set_slug, 'guid' => $published->guid, 'post_type' => $published->post_type];
 
 	// Prevent wp_insert_post() from stripping inline html styles
 	if (!defined('RVY_DISABLE_REVISION_CONTENT_PASSTHRU')) {
@@ -523,12 +542,14 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 	}
 
+	if ($published_id != $revision_id) {
 	// @todo save change as past revision?
 	//$wpdb->delete($wpdb->posts, array('ID' => $revision_id));
 	$wpdb->update($wpdb->posts, array('post_type' => 'revision', 'post_status' => 'inherit', 'post_parent' => $post_id, 'comment_count' => 0), array('ID' => $revision_id));
 
 	// @todo save change as past revision?
 	$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
+	}
 
 	update_post_meta($revision_id, '_rvy_published_gmt', $post_modified_gmt);
 
