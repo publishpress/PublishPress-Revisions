@@ -104,6 +104,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 * Fixed : Featured Image was removed from pending revision at creation
 * Fixed : Scheduled revision publication failed under some conditions, caused post to be unpublished
 * Fixed : Scheduled revisions could not be published ahead of schedule using "Publish Now" link on preview (since 2.3.4)
+* Lang : Add German translation
 * API : New filter 'revisionary_apply_revision_data' to adjust standard revision fields prior to publication
 
 = 2.3.8 - 30 Jul 2020 =
