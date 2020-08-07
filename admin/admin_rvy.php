@@ -135,6 +135,7 @@ class RevisionaryAdmin
 
 		add_action('admin_enqueue_scripts', [$this, 'fltAdminPostsListing'], 50);  // 'the_posts' filter is not applied on edit.php for hierarchical types
 
+		add_filter('display_post_states', [$this, 'flt_display_post_states'], 50, 2);
 		add_filter( 'page_row_actions', array($this, 'revisions_row_action_link' ) );
 		add_filter( 'post_row_actions', array($this, 'revisions_row_action_link' ) );
 
@@ -307,6 +308,14 @@ class RevisionaryAdmin
 		}
 
 		return $comment_count;
+	}
+
+	function flt_display_post_states($post_states, $post) {
+		if (!empty($this->post_revision_count[$post->ID]) && !defined('REVISIONARY_SUPPRESS_POST_STATE_DISPLAY')) {
+			$post_states []= __('Has Revision', 'revisionary');
+		}
+
+		return $post_states;
 	}
 
 	function revisions_row_action_link($actions = array()) {
