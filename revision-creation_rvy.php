@@ -133,7 +133,7 @@ class RevisionCreation {
 		} else {
 			global $revisionary;
 		}
-        
+		
 		if ($revisionary->disable_revision_trigger) {
 			return $data;
 		}
@@ -625,8 +625,16 @@ class RevisionCreation {
 			}
 		}
 	
-		if ( isset( $postarr['tags_input'] ) && is_object_in_taxonomy( $post_type, 'post_tag' ) ) {
+		if (is_object_in_taxonomy( $post_type, 'post_tag' )) {
+			if (isset($postarr['tags_input'])) {
 			wp_set_post_tags( $post_ID, $postarr['tags_input'] );
+
+			} elseif (isset($postarr['tags'])) {
+				wp_set_post_tags( $post_ID, $postarr['tags'] );
+
+			} elseif ($tags = wp_get_object_terms($published_post_id, 'post_tag', ['fields' => 'ids'])) {
+				wp_set_post_tags( $post_ID, $tags );
+			}
 		}
 	
 		// New-style support for all custom taxonomies.

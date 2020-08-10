@@ -100,7 +100,8 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
-= 2.3.10-beta =
+= 2.3.10-beta2 =
+* Fixed : Revisions submitted without modifying tags had tags removed
 * Feature : Edit Posts screen - display "Has Revision" as a post state after post title
 
 = 2.3.9 - 6 Aug 2020 =
