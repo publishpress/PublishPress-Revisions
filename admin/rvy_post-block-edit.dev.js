@@ -174,6 +174,8 @@ jQuery(document).ready( function($) {
 				var pclone = $('div.edit-post-last-revision__panel a:first').clone().addClass('rvy-pending-revisions').attr('href', rvyObjEdit.pendingRevisionsURL).html(rvyObjEdit.pendingRevisionsCaption);
 				$(ediv + 'div.edit-post-last-revision__panel a:last').after(pclone);
 			}
+
+			$('div.edit-post-last-revision__panel').css('height', 'inherit');
 		}
 		var RvyPendingRevPanelInt = setInterval(RvyPendingRevPanel, 200);
 	}
