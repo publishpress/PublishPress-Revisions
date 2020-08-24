@@ -6,8 +6,8 @@ Author URI: https://publishpress.com
 Tags: revision, submit changes, workflow, collaboration, permissions, moderate, posts, schedule revisions
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
-Tested up to: 5.4
-Stable tag: 2.3.9
+Tested up to: 5.5
+Stable tag: 2.3.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -99,6 +99,17 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.3.11 - 13 Aug 2020 =
+* Compat : WP 5.5 - "Pending Revision" checkbox sometimes ineffective
+* Compat : WP 5.5 - Posts with pending or scheduled revisions stored had misplaced links in Gutenberg editor sidebar
+* Compat : WP 5.5 - With Classic Editor, javascript errors in post editor
+* Compat : WP 5.5 - PHP warning on post edit (deprecated function escape_attribute)
+* Compat : WP 5.5 - Edit Revision screen - Duplicate Preview link, misaligned
+* Compat : WP 5.5 - Edit Revision screen - View / Approve link misaligned
+* Fixed : "Has Revision" post state displayed for posts that have comments but no revisions (since 2.3.10)
+* Fixed : Scheduled revisions were not published under some conditions (since 2.3.9)
+* Fixed : In some conditions, fatal error on Plugins screen
 
 = 2.3.10 - 10 Aug 2020 =
 * Fixed : Revisions submitted without modifying tags had tags removed
