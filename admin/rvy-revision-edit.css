@@ -9,7 +9,8 @@ display:inline-flex;
 /* Gutenberg */
 a.rvy-post-preview, a.rvy-post-preview.components-button.is-large {
 margin-right:5px;
-height: 33px;
+text-decoration: none;
+height: inherit;
 }
 
 a.editor-post-preview, a.editor-post-preview.components-button.is-large {
