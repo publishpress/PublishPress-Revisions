@@ -465,9 +465,15 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	global $revisionary;
 	
-	$revisionary->disable_revision_trigger = true;
+	if (!empty($revisionary)) {
+		$revisionary->disable_revision_trigger = true;
+	}
+
 	$post_id = wp_update_post( $update );
-	$revisionary->disable_revision_trigger = false;
+	
+	if (!empty($revisionary)) {
+		$revisionary->disable_revision_trigger = false;
+	}
 
 	if ( ! $post_id || is_wp_error( $post_id ) ) {
 		return $post_id;
