@@ -188,12 +188,16 @@ jQuery(document).ready( function($) {
 			$('button.editor-post-save-draft:not(.rvy-recaption)').addClass('rvy-recaption');
 		}
 
-		if ($('div.edit-post-header__settings a.editor-post-preview:visible').length && !$('div.edit-post-header__settings a.rvy-post-preview').length) {
+		if (($('div.edit-post-header__settings a.editor-post-preview:visible').length || $('div.block-editor-post-preview__dropdown button.block-editor-post-preview__button-toggle:visible').length) && !$('a.rvy-post-preview').length) {
+			
 			if (rvyObjEdit.viewURL) {
-				// remove preview event handlers
 				original = $('div.edit-post-header__settings a.editor-post-preview');
 				$(original).after(original.clone().attr('href', rvyObjEdit.viewURL).attr('target', '_blank').removeClass('editor-post-preview').addClass('rvy-post-preview'));
 				$(original).hide();
+
+				if (rvyObjEdit.multiPreviewActive) {
+					$('.rvy-post-preview').removeClass('components-button').css('height', 'inherit').css('text-decoration', 'none');
+				}
 			}
 
 			if (rvyObjEdit.viewCaption) {
@@ -204,12 +208,14 @@ jQuery(document).ready( function($) {
 				$('div.edit-post-header__settings a.rvy-post-preview').attr('title', rvyObjEdit.viewTitle);
 			}
 		} else {
-			if (!$('a.editor-post-preview').next('a.rvy-post-preview').length) {
-				$('a.rvy-post-preview').insertAfter($('a.editor-post-preview'));
-			}
-
-			if (rvyObjEdit.previewTitle && !$('a.editor-post-preview').attr('title')) {
-				$('div.edit-post-header__settings a.editor-post-preview').attr('title', rvyObjEdit.previewTitle);
+			if (!rvyObjEdit.multiPreviewActive) {
+				if (!$('a.editor-post-preview').next('a.rvy-post-preview').length) {
+					$('a.rvy-post-preview').insertAfter($('a.editor-post-preview'));
+				}
+	
+				if (rvyObjEdit.previewTitle && !$('a.editor-post-preview').attr('title')) {
+					$('div.edit-post-header__settings a.editor-post-preview').attr('title', rvyObjEdit.previewTitle);
+				}
 			}
 		}
 
@@ -226,7 +232,11 @@ jQuery(document).ready( function($) {
 		RvyApprovalHidden = true;
 		$('a.revision-approve').hide();
 		$('a.rvy-post-preview').hide();
+
+		if (!rvyObjEdit.multiPreviewActive) {
 		$('a.editor-post-preview').show();
+		}
+
 		//$('a.revision-save-to-approve').show();
 	});
 
@@ -234,7 +244,10 @@ jQuery(document).ready( function($) {
 		RvyApprovalHidden = false;
 		//$('a.revision-save-to-approve').hide();
 		$('a.revision-approve').show();
-		$('a.editor-post-preview').hide();
 		$('a.rvy-post-preview').show();
+
+		if (!rvyObjEdit.multiPreviewActive) {
+		$('a.editor-post-preview').hide();
+		}
 	});
 });

@@ -200,7 +200,7 @@ class RevisionaryAdmin
 		if ($listed_ids) {
 			$id_csv = implode("','", array_map('intval', $listed_ids));
 			$results = $wpdb->get_results(
-				"SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN('$id_csv') GROUP BY comment_count"
+				"SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN('$id_csv') AND post_status IN ('pending-revision', 'future-revision') GROUP BY comment_count"
 			);
 			
 			foreach($results as $row) {

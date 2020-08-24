@@ -75,6 +75,8 @@ class RVY_PostBlockEditUI {
                 $deletion_url = get_delete_post_link($post->ID, '', false);
             }
 
+            global $wp_version;
+
             $args = array(
                 'saveRevision' => __('Update Revision'),
                 'viewURL' => $view_link,
@@ -87,6 +89,7 @@ class RVY_PostBlockEditUI {
                 'deletionURL' => $can_publish ? $deletion_url : '',
                 'approvalTitle' => esc_attr(__('Approve saved changes', 'revisionary')),
                 'scheduledRevisionsEnabled' => $do_scheduled_revisions,
+                'multiPreviewActive' => version_compare($wp_version, '5.5-beta', '>=')
             );
 
         } elseif ( agp_user_can( $type_obj->cap->edit_post, $post_id, '', array( 'skip_revision_allowance' => true ) ) ) {

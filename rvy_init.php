@@ -136,7 +136,7 @@ function rvy_ajax_handler() {
 	if (!empty($_REQUEST['rvy_ajax_field']) && !empty($_REQUEST['post_id'])) {
 		if ('save_as_revision' == $_REQUEST['rvy_ajax_field']) {
 			$save_revision = isset($_REQUEST['rvy_ajax_value']) && in_array($_REQUEST['rvy_ajax_value'], ['true', true, 1, '1'], true);
-			update_post_meta((int) $_REQUEST['post_id'], "_save_as_revision_{$current_user->ID}", $save_revision);
+			rvy_update_post_meta((int) $_REQUEST['post_id'], "_save_as_revision_{$current_user->ID}", $save_revision);
 			exit;
 		}
 	}
@@ -145,6 +145,38 @@ function rvy_ajax_handler() {
 		require_once( dirname(__FILE__).'/admin/history_rvy.php' );
 		new RevisionaryHistory();
 	}
+}
+
+function rvy_update_post_meta($post_id, $meta_key, $meta_value) {
+	global $wpdb;
+
+	// some extra low-level database operations until the cause of meta sync failure with WP 5.5 can be determined
+	rvy_delete_post_meta($post_id, $meta_key);
+
+	if ($meta_value) {
+		$wpdb->insert(
+			$wpdb->postmeta, 
+			['meta_value' => $meta_value, 'meta_key' => $meta_key, 'post_id' => $post_id]
+		);
+	}
+}
+
+function rvy_delete_post_meta($post_id, $meta_key) {
+	global $wpdb;
+
+	delete_post_meta($post_id, $meta_key);
+
+	// some extra low-level database operations until the cause of meta sync failure with WP 5.5 can be determined
+
+	$wpdb->query(
+		$wpdb->prepare(
+			"DELETE FROM $wpdb->postmeta WHERE meta_key = %s AND post_id = %d",
+			$meta_key,
+			$post_id
+		)
+	);
+
+	//wp_cache_delete($post_id, 'post_meta');
 }
 
 function rvy_status_registrations() {

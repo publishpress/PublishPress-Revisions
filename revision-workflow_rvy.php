@@ -169,7 +169,7 @@ class Rvy_Revision_Workflow_UI {
             
             switch( $revision->post_status ) {
             case 'future-revision':
-                delete_post_meta( $post_id, "_new_scheduled_revision_{$current_user->ID}" );  // clear the flag which triggered a redirect from Gutenberg editor
+                rvy_delete_post_meta( $post_id, "_new_scheduled_revision_{$current_user->ID}" );  // clear the flag which triggered a redirect from Gutenberg editor
 
                 $msg = __('Your modification was saved as a Scheduled Revision.', 'revisionary') . ' ';
             
