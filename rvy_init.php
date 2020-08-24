@@ -288,24 +288,37 @@ function rvy_detect_post_type() {
 function rvy_detect_post_id() {
 	global $revisionary;
 	
-	if ( isset($revisionary) && $revisionary->doing_rest && $revisionary->rest->is_posts_request )
+	if ( isset($revisionary) && $revisionary->doing_rest && $revisionary->rest->is_posts_request ) {
 		$post_id = $revisionary->rest->post_id;
-	elseif ( ! empty( $_GET['post'] ) )
+
+	} elseif ( ! empty( $_GET['post'] ) ) {
 		$post_id = (int) $_GET['post'];
-	elseif ( ! empty( $_POST['post_ID'] ) )
+
+	} elseif ( ! empty( $_POST['post_ID'] ) ) {
 		$post_id = (int) $_POST['post_ID'];
-	elseif ( ! empty( $_REQUEST['post_id'] ) )
+
+	} elseif ( ! empty( $_REQUEST['post_id'] ) ) {
 		$post_id = (int) $_REQUEST['post_id'];
-	elseif ( ! empty( $_GET['p'] ) )
+
+	} elseif ( ! empty( $_GET['p'] ) ) {
 		$post_id = (int) $_GET['p'];
-	elseif ( ! empty( $_GET['id'] ) )
+
+	} elseif ( ! empty( $_GET['id'] ) ) {
 		$post_id = (int) $_GET['id'];
-	elseif ( ! empty( $_REQUEST['fl_builder_data'] ) && is_array( $_REQUEST['fl_builder_data'] ) && ! empty( $_REQUEST['fl_builder_data']['post_id'] ) )
+
+	} elseif ( ! empty( $_REQUEST['fl_builder_data'] ) && is_array( $_REQUEST['fl_builder_data'] ) && ! empty( $_REQUEST['fl_builder_data']['post_id'] ) ) {
 		$post_id = (int) $_REQUEST['fl_builder_data']['post_id'];
-	elseif ( ! empty( $_GET['page_id'] ) )
+
+	} elseif ( ! empty( $_GET['page_id'] ) ) {
 		$post_id = (int) $_GET['page_id'];
-	else
+
+	} elseif (defined('REST_REQUEST') && REST_REQUEST && strpos($_SERVER['REQUEST_URI'], 'autosaves')) {
+		require_once( dirname(__FILE__).'/rest_rvy.php' );
+		$post_id = Revisionary_REST::get_id_element($_SERVER['REQUEST_URI'], 1);
+
+	} else {
 		$post_id = 0;
+	}
 	
 	return $post_id;	
 }
