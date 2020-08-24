@@ -33,7 +33,7 @@ class RevisionaryAdminFiltersItemUI {
 					<script type="text/javascript">
 					/* <![CDATA[ */
 					jQuery(document).ready( function($) {
-						postL10n.schedule = "<?php _e('Schedule Revision', 'revisionary' )?>";
+						var postL10nschedule = "<?php _e('Schedule Revision', 'revisionary' )?>";
 
 						// Apply "Schedule Revision" button caption even if post is private
 						$('#timestampdiv a.save-timestamp').click( function() {
@@ -41,7 +41,7 @@ class RevisionaryAdminFiltersItemUI {
 							var attemptedDate = new Date( aa, mm - 1, jj, hh, mn );
 							var currentDate = new Date( $('#cur_aa').val(), $('#cur_mm').val() -1, $('#cur_jj').val(), $('#cur_hh').val(), $('#cur_mn').val() );
 
-							if ( ! $('#timestampdiv a.save-timestamp').is(':visible') || ! $('#visibility-radio-private').attr('checked') || $('#publish').val() == postL10n.schedule ) {
+							if ( ! $('#timestampdiv a.save-timestamp').is(':visible') || ! $('#visibility-radio-private').attr('checked') || $('#publish').val() == postL10nschedule ) {
 								//return;
 							} else {
 								// Confirm valid date
@@ -49,7 +49,7 @@ class RevisionaryAdminFiltersItemUI {
 									// If button caption should be "Schedule Revision," set it. Otherwise, no change
 									if ( attemptedDate > currentDate ) {
 										if ($('#original_post_status').val() != 'future') {
-											$('#publish').val( postL10n.schedule );
+											$('#publish').val( postL10nschedule );
 										}
 									} 
 								}
@@ -58,7 +58,7 @@ class RevisionaryAdminFiltersItemUI {
 							// If button caption should be "Schedule Revision," set it. Otherwise, no change
 							if ( attemptedDate > currentDate ) {
 								if ($('#original_post_status').val() != 'future') {
-									$('#publish').val( postL10n.schedule );
+									$('#publish').val( postL10nschedule );
 								}
 
 								var data = {'rvy_ajax_field': 'set_future_date', 'rvy_ajax_value': 1, 'post_id': <?php echo $object_id;?>};
@@ -116,8 +116,21 @@ if ( ! $revisionary->isBlockEditorActive() ) :?>
 /* <![CDATA[ */
 jQuery(document).ready( function($) {
 	$('#publish').val("<?php _e('Submit Revision', 'revisionary' )?>");
+	
+	if (typeof(postL10n) != 'undefined') {
 	postL10n.update = "<?php _e('Submit Revision', 'revisionary' )?>";
 	postL10n.schedule = "<?php _e('Submit Scheduled Revision', 'revisionary' )?>";
+	} else {
+		setInterval(
+			function() {
+				if ($('#publish').val() != "<?php _e('Submit Revision', 'revisionary' )?>") {
+					$('#publish').val("<?php _e('Submit Revision', 'revisionary' )?>");
+				}
+			}
+			, 200
+		);
+	}
+
 	var rvyNowCaption = "<?php _e( 'Current Time', 'revisionary' );?>";
 	$('#publishing-action #publish').show();
 });
