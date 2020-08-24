@@ -5,7 +5,7 @@
  * Description: Maintain published content with teamwork and precision using the Revisions model to submit, approve and schedule changes.
  * Author: PublishPress
  * Author URI: https://publishpress.com
- * Version: 2.3.10
+ * Version: 2.3.11
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 4.9.7
@@ -95,7 +95,7 @@ define('REVISIONARY_FILE', __FILE__);
 // register these functions before any early exits so normal activation/deactivation can still run with RS_DEBUG
 register_activation_hook(__FILE__, function() 
 	{
-		$current_version = '2.3.10';
+		$current_version = '2.3.11';
 
 		$last_ver = get_option('revisionary_last_version');
 
@@ -170,7 +170,7 @@ add_action(
 			return;
 		}
 
-		define('REVISIONARY_VERSION', '2.3.10');
+		define('REVISIONARY_VERSION', '2.3.11');
 
 		if ( ! defined( 'RVY_VERSION' ) ) {
 			define( 'RVY_VERSION', REVISIONARY_VERSION );  // back compat
@@ -188,6 +188,8 @@ add_action(
 			add_action( 'admin_footer', 'rvy_echo_usage_message' );
 		} else
 			include_once( dirname(__FILE__).'/lib/debug_shell.php');
+
+		require_once( dirname(__FILE__).'/defaults_rvy.php');
 
 		// === awp_is_mu() function definition and usage: must be executed in this order, and before any checks of IS_MU_RVY constant ===
 		require_once( dirname(__FILE__).'/lib/agapetry_wp_core_lib.php');
@@ -228,8 +230,6 @@ add_action(
 			require_once(__DIR__ . '/includes/CoreAdmin.php');
 			new \PublishPress\Revisions\CoreAdmin();
 		}
-
-		require_once( dirname(__FILE__).'/defaults_rvy.php');
 
 		rvy_refresh_options_sitewide();
 
