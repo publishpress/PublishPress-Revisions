@@ -569,7 +569,7 @@ class RevisionCreation {
 		if ( $revisionary->doing_rest ) {
 			// prevent alteration of published post, while allowing save operation to complete
 			$data = array_intersect_key( (array) $published_post, array_fill_keys( array( 'ID', 'post_name', 'post_status', 'post_parent', 'post_author' ), true ) );
-			update_post_meta( $published_post->ID, "_new_scheduled_revision_{$current_user->ID}", $revision_id );
+			rvy_update_post_meta( $published_post->ID, "_new_scheduled_revision_{$current_user->ID}", $revision_id );
 		} else {
 			$msg = $revisionary->get_revision_msg( $revision_id, array( 'post_id' => $published_post->ID ) );
 			rvy_halt( $msg, __('Scheduled Revision Created', 'revisionary') );
