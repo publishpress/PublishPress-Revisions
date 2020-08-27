@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.5
-Stable tag: 2.3.11
+Stable tag: 2.3.12
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -99,6 +99,12 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.3.12 - 27 Aug 2020 =
+* Fixed : WP 5.5 - Post previews did not display correctly for Revisors
+* Fixed : Pending, Scheduled revisions not listed in Revision Queue following mirroring of posts database table from another installation (or possibly under other conditions) 
+* Fixed : Editorial Comments added on "Edit Revision" screen did not trigger email notification to post author or revision author
+* Feature : Option to copy revision's editorial comments over to published post (at revision publication)
 
 = 2.3.11 - 13 Aug 2020 =
 * Compat : WP 5.5 - "Pending Revision" checkbox sometimes ineffective

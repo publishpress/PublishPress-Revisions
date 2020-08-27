@@ -55,7 +55,7 @@ class Revisionary_REST {
 
 					$this->is_view_method = in_array( $this->method, array( WP_REST_Server::READABLE, 'GET' ) );
 
-							$post_id = $this->get_id_element( $path );
+					$post_id = self::get_id_element( $path );
 								
 					if (is_numeric($post_id)) {
 							// back post type out of path because controller object does not expose it
@@ -72,7 +72,7 @@ class Revisionary_REST {
 		return $rest_response;
 	}  // end function pre_dispatch
 
-	function get_id_element( $path, $position_from_right = 0 ) {
+	public static function get_id_element( $path, $position_from_right = 0 ) {
 		$arr_path = explode( '/', $path );
 		
 		$count = -1;

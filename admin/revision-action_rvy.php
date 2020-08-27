@@ -570,6 +570,32 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 	}
 
+	if (rvy_get_option('copy_revision_comments_to_post')) {
+		if ($rev_comments = get_comments([
+			'post_id' => $revision_id, 
+			'status' => 'editorial-comment',
+		])) {
+			$post_comments = get_comments([
+				'post_id' => $published->ID, 
+				'status' => 'editorial-comment',
+			]);
+
+			foreach($rev_comments as $comment) {
+				$arr_comment = (array) $comment;
+				$arr_comment['comment_post_ID'] = $published->ID;
+
+				// Don't copy a revision comment if published post already has an identical comment
+				foreach($post_comments as $post_comment) {
+					if ($post_comment->comment_content == $comment->comment_content) {
+						continue 2;
+					}
+				}
+
+				wp_insert_comment($arr_comment);
+			}
+		}
+	}
+
 	if (rvy_get_option('trigger_post_update_actions')) {
 		global $revisionary;
 

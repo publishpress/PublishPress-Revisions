@@ -33,6 +33,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			global $multiple_authors_addon;
 			remove_action('the_post', [$multiple_authors_addon, 'fix_post'], 10);
 		}
+
+		if (!empty($_REQUEST['published_post']) && !get_post_meta($post_id, '_rvy_has_revisions', true)) {
+			revisionary_refresh_postmeta($_REQUEST['published_post']);
+		}
 	}
 
 	function do_query( $q = false ) {

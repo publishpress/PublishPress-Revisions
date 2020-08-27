@@ -141,6 +141,8 @@ class Revisionary
 			add_action('revisionary_created_revision', [$this, 'act_save_revision_followup'], 5);
 		}
 
+		add_filter('publishpress_notif_workflow_receiver_post_authors', [$this, 'flt_publishpress_notification_authors'], 10, 3);
+
 		add_filter('presspermit_exception_clause', [$this, 'fltPressPermitExceptionClause'], 10, 4);
 
 		add_action('wp_insert_post', [$this, 'actLogPreviewAutosave'], 10, 2);
@@ -169,6 +171,61 @@ class Revisionary
 
 		unset($this->enabled_post_types['attachment']);
 		$this->enabled_post_types = array_filter($this->enabled_post_types);
+	}
+
+	/**
+	 * Filters the list of PublishPress Notification receivers, but triggers only when "Authors of the Content" is selected in Notification settings.
+	 *
+	 * @param array $receivers
+	 * @param WP_Post $workflow
+	 * @param array $args
+	 */
+	function flt_publishpress_notification_authors($receivers, $workflow, $args) {
+		global $current_user;
+
+		if (empty($args['post']) || !rvy_is_revision_status($args['post']->post_status)) {
+			return $receivers;
+		}
+
+		$revision = $args['post'];
+		$recipient_ids = [];
+
+		if ($revision->post_author != $current_user->ID) {
+			$recipient_ids []= $revision->post_author;
+		}
+
+		$post_author = get_post_field('post_author', rvy_post_id($revision->ID));
+		
+		if (!in_array($post_author, [$current_user->ID, $revision->post_author])) {
+			$recipient_ids []= $post_author;
+		}
+
+		foreach($recipient_ids as $user_id) {
+			$channel = get_user_meta($user_id, 'psppno_workflow_channel_' . $workflow->ID, true);
+
+			// If no channel is set yet, use the default one
+			if (empty($channel)) {
+				if (!isset($notification_options)) {
+					// Avoid reference to PublishPress module class, object schema
+					$notification_options = get_option('publishpress_improved_notifications_options');
+				}
+
+				if (!empty($notification_options) && !empty($notification_options->default_channels)) {
+					if (!empty($notification_options->default_channels[$workflow->ID])) {
+						$channel = $notification_options->default_channels[$workflow->ID];
+					}
+				}
+			}
+
+			// @todo: config retrieval method for Slack, other channels
+			if (!empty($channel) && ('email' == $channel)) {
+				if ($user = new WP_User($user_id)) {
+					$receivers []= "{$channel}:{$user->user_email}";
+				}
+			}
+		}
+
+		return $receivers;
 	}
 
 	// On post deletion, clear corresponding _rvy_has_revisions postmeta flag
