@@ -10,7 +10,11 @@ add_action( 'enqueue_block_editor_assets', array( 'RVY_PostBlockEditUI', 'act_ob
 
 class RVY_PostBlockEditUI {
 	public static function act_object_guten_scripts() {
-        global $current_user, $revisionary;
+        global $current_user, $revisionary, $pagenow;
+        
+        if ('post-new.php' == $pagenow) {
+            return;
+        }
         
         if ( ! $post_id = rvy_detect_post_id() ) {
             return;
