@@ -497,7 +497,7 @@ class RevisionaryAdmin
 			}
 		}
 
-		$caption = __( 'Save as Pending Revision', 'revisionary' );
+		$caption = apply_filters('revisionary_pending_checkbox_caption_classic', __( 'Save as Pending Revision', 'revisionary' ), $post);
 		$checked = (apply_filters('revisionary_default_pending_revision', false, $post )) ? "checked='checked'" : '';
 		
 		$title = esc_attr(__('Do not publish current changes yet, but save to Revision Queue', 'revisionary'));
