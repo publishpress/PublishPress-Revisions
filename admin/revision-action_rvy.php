@@ -621,6 +621,24 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 	}
 
+	// Prevent post date from being set to current time unless Revisionary settings call for that
+	if (
+		(('pending-revision' == $revision->post_status) && !rvy_get_option('pending_revision_update_post_date'))
+		|| (('future-revision' == $revision->post_status) && !rvy_get_option('scheduled_revision_update_post_date'))
+	) {
+		if ($_post) {
+			$set_dates = (('pending-revision' == $revision->post_status) && ($_post->post_date_gmt != $_post->post_modified_gmt))
+			? ['post_date' => $revision->post_date, 'post_date_gmt' => $revision->post_date_gmt]
+			: ['post_date' => $published->post_date, 'post_date_gmt' => $published->post_date_gmt];
+
+			$wpdb->update(
+				$wpdb->posts, 
+				$set_dates, 
+				['ID' => $published->ID]
+			);
+		}
+	}
+
 	rvy_delete_past_revisions($revision_id);
 
 	/**
