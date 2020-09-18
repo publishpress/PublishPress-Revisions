@@ -1028,7 +1028,7 @@ class Revisionary
 		 * It's a hairy conditional :(
 		 */
 		// phpcs:ignore WordPress.VIP.SuperGlobalInputUsage.AccessDetected, WordPress.Security.NonceVerification.NoNonceVerification
-		$conditions[] = $this->isWp5()
+		$conditions[] = ($this->isWp5() || $pluginsState['gutenberg'])
 						&& ! $pluginsState['classic-editor']
 						&& ! $pluginsState['gutenberg-ramp']
 						&& apply_filters('use_block_editor_for_post_type', true, $postType, PHP_INT_MAX);
@@ -1043,10 +1043,8 @@ class Revisionary
                         && (get_option('classic-editor-replace') === 'classic'
                             && isset($_GET['classic-editor__forget']));
 
-		/**
-		 * < 5.0 but Gutenberg plugin is active.
-		 */
-		$conditions[] = ! $this->isWp5() && ($pluginsState['gutenberg'] || $pluginsState['gutenberg-ramp']);
+		$conditions[] = $pluginsState['gutenberg-ramp'] 
+						&& apply_filters('use_block_editor_for_post', true, get_post(rvy_detect_post_id()), PHP_INT_MAX);
 
 		// Returns true if at least one condition is true.
 		return count(
