@@ -729,7 +729,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$actions['approve_revision'] = __('Approve');
 			$actions['publish_revision'] = __('Publish');
 
-			if (revisionary()->getOption('scheduled_revisions')) {
+			if (rvy_get_option('scheduled_revisions')) {
 				$actions['unschedule_revision'] = __('Unschedule', 'revisionary');
 			}
 		}
