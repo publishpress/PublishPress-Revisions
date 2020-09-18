@@ -112,7 +112,7 @@ class RVY_PostBlockEditUI {
                 'ScheduleCaption' => ($do_scheduled_revisions) ? __('Schedule Revision', 'revisionary') : '',
                 'UpdateCaption' => __('Update'),
                 'publishedStatuses' => $published_statuses,
-                'revision' => ($do_pending_revisions) ? __('Pending Revision', 'revisionary') : '',
+                'revision' => ($do_pending_revisions) ? apply_filters('revisionary_pending_checkbox_caption', __('Pending Revision', 'revisionary'), $post) : '',
                 'revisionTitle' => esc_attr(__('Do not publish current changes yet, but save to Revision Queue', 'revisionary')), 
                 'defaultPending' => apply_filters('revisionary_default_pending_revision', false, $post ),
                 'revisionTitleFuture' => esc_attr(__('Do not schedule current changes yet, but save to Revision Queue', 'revisionary')), 
