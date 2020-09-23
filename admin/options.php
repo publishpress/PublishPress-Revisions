@@ -363,7 +363,7 @@ $pending_revisions_available ) :
 		);
 		$this->option_checkbox( 'pending_revisions', $tab, $section, $hint, '' );
 		
-		$hint = __( 'When a pending revision is published, also update the publish date.', 'revisionary' );
+		$hint = __( 'When a pending revision is published, update post publish date to current time.', 'revisionary' );
 		$this->option_checkbox( 'pending_revision_update_post_date', $tab, $section, $hint, '' );
 		?>
 		</td></tr>
