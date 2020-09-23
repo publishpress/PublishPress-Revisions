@@ -5,6 +5,7 @@ add_action( 'init', '_rvy_post_edit_ui' );
 
 if (defined('REVISIONARY_PRO_VERSION')) {
 	require_once(RVY_ABSPATH . '/includes-pro/admin-load.php');
+	new RevisionaryProAdmin();
 }
 
 if ( in_array( $pagenow, array( 'edit.php', 'post.php', 'post-new.php', 'plugins.php' ) ) ) { 
@@ -24,7 +25,7 @@ function _rvy_post_edit_ui() {
 			$revisionary->post_edit_ui = new RvyPostEdit();
 		}
 
-		if ( $revisionary->isBlockEditorActive() ) {
+		if ($revisionary->isBlockEditorActive()) {
 			require_once( dirname(__FILE__).'/post-edit-block-ui_rvy.php' );
 		}
 	}

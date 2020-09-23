@@ -35,14 +35,14 @@ class RvyOptionUI {
 		$this->sitewide = $args['sitewide'];
 		$this->customize_defaults = $args['customize_defaults'];
 		$this->display_hints = rvy_get_option( 'display_hints' );
-	}
+    }
 	
 	function option_checkbox( $option_name, $tab_name, $section_name, $hint_text, $trailing_html, $args = '') {
 		$return = array( 'in_scope' => false, 'val' => '', 'subcaption' => '' );
 		
 		if ( ! is_array($args) )
 			$args = array();
-		
+
 		if ( in_array( $option_name, $this->form_options[$tab_name][$section_name] ) ) {
 			$this->all_options []= $option_name;
 			
@@ -72,9 +72,9 @@ class RvyOptionUI {
 		
 		return $return;
 	}
-
-function options_ui( $sitewide = false, $customize_defaults = false ) {
 	
+function options_ui( $sitewide = false, $customize_defaults = false ) {
+
 global $revisionary;
 
 if ( ! current_user_can( 'manage_options' ) || ( $sitewide && ! is_super_admin() ) )
@@ -105,7 +105,7 @@ $this->section_captions = array(
 );
 
 // TODO: replace individual _e calls with these (and section, tab captions)
-$this->option_captions = array(
+$this->option_captions = apply_filters('revisionary_option_captions', array(
 	'pending_revisions' => __('Enable Pending Revisions', 'revisionary'),
 	'scheduled_revisions' => __('Enable Scheduled Revisions', 'revisionary'),
 	'revisor_lock_others_revisions' => __("Prevent Revisors from editing others&apos; revisions", 'revisionary'),
@@ -128,7 +128,8 @@ $this->option_captions = array(
 	'preview_link_type' => __('Preview Link Type', 'revisionary'),
 	'compare_revisions_direct_approval' => __('Approve Button on Compare Revisions screen', 'revisionary'),
 	'copy_revision_comments_to_post' => __('Copy revision comments to published post', 'revisionary'),
-);
+));
+
 
 if ( defined('RVY_CONTENT_ROLES') ) {
 	$this->option_captions['pending_rev_notify_admin'] = __('Email designated Publishers when a Pending Revision is submitted', 'revisionary');
@@ -141,8 +142,8 @@ if ( defined('RVY_CONTENT_ROLES') ) {
 }
 	
 
-$this->form_options = array( 
-'features' => array(
+$this->form_options = apply_filters('revisionary_option_sections', [ 
+'features' => [
 	'license' =>			 array( 'edd_key' ),
 	'role_definition' => 	 array( 'revisor_role_add_custom_rolecaps', 'require_edit_others_drafts' ),
 	'scheduled_revisions' => array( 'scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date', ),
@@ -150,8 +151,8 @@ $this->form_options = array(
 	'preview' =>			 array( 'revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'),
 	'revisions'		=>		 array( 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'display_hints' ),
 	'notification'	=>		 array( 'pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer' )
-)
-);
+]
+]);
 
 if ( RVY_NETWORK ) {
 	if ( $sitewide )
@@ -365,6 +366,8 @@ $pending_revisions_available ) :
 		
 		$hint = __( 'When a pending revision is published, update post publish date to current time.', 'revisionary' );
 		$this->option_checkbox( 'pending_revision_update_post_date', $tab, $section, $hint, '' );
+
+		do_action('revisionary_option_ui_pending_revisions', $this);
 		?>
 		</td></tr>
 	<?php endif; // any options accessable in this section

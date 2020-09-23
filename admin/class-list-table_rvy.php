@@ -22,7 +22,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		
 		$omit_types = ['forum', 'topic', 'reply'];
 		$this->post_types = array_diff( $this->post_types, $omit_types );
-		
+
 		add_filter('manage_revisionary-q_columns', [$this, 'rvy_pending_list_register_columns']);
 
 		add_action('manage_posts_custom_column', [$this, 'rvy_pending_custom_col'], 10, 2);
@@ -52,7 +52,14 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$qp['post_type'] = $this->post_types;
 		
 		$omit_stati = ['hidden'];
-		$qp['post_status'] = array_diff( get_post_stati( ['public' => true, 'private' => true], 'names', 'or' ), $omit_stati );
+
+		$statuses = apply_filters(
+			'revisionary_main_post_statuses', 
+			get_post_stati( ['public' => true, 'private' => true], 'names', 'or' ),
+			'names'
+		);
+
+		$qp['post_status'] = array_diff( $statuses, $omit_stati );
 
 		if (!empty($q['published_post'])) {
 			$qp['p'] = (int) $q['published_post'];
@@ -249,13 +256,13 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 			$can_publish_types = array_intersect($can_publish_types, apply_filters('revisionary_manageable_types', $can_publish_types));
 
-			if ($can_publish_types) {
+			if ($can_publish_types){
 				$type_clause = "OR $p.post_type IN ('" . implode("','", $can_publish_types) . "')";
 			} else {
 				$type_clause = '';
 			}
 
-				$where .= $wpdb->prepare(" AND ($p.post_author = %d $type_clause)", $current_user->ID );
+			$where .= $wpdb->prepare(" AND ($p.post_author = %d $type_clause)", $current_user->ID );
 		} elseif ($revisionary->config_loaded) {
 			$where .= (array_filter($revisionary->enabled_post_types)) 
 			? " AND ($p.post_type IN ('" . implode("','", array_keys(array_filter($revisionary->enabled_post_types))) . "'))" 
@@ -263,7 +270,13 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		if (empty($args['suppress_author_clause'])) {
-			$status_csv = "'" . implode("','", get_post_stati(['public' => true, 'private' => true], 'names', 'or')) . "'";
+			$statuses = apply_filters(
+				'revisionary_main_post_statuses', 
+				get_post_stati( ['public' => true, 'private' => true], 'names', 'or' ),
+				'names'
+			);
+
+			$status_csv = "'" . implode("','", $statuses) . "'";
 			$where .= " AND $p.comment_count IN (SELECT ID FROM $wpdb->posts WHERE post_status IN ($status_csv))";
 		}
 
@@ -302,7 +315,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$arr['date_sched'] = __('Schedule');
 		}
 
-		$arr['published_post'] = __('Published Post', 'revisionary');
+		$arr['published_post'] = apply_filters('revisionary_published_post_caption', __('Published Post', 'revisionary'));
+
 		$arr['post_author'] = __('Post Author', 'revisionary');
 
 		return $arr;
@@ -603,7 +617,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if ( ! empty($_REQUEST['s']) ) {
 			$q['s'] = $_REQUEST['s'];
 		}
-		
+
 		if ( ! empty($_REQUEST['m']) ) {
 			$q['m'] = (int) $_REQUEST['m'];
 		}
@@ -650,7 +664,13 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			['has_cap_check' => true, 'source_alias' => 'p']
 		);
 
-		$status_csv = "'" . implode("','", get_post_stati(['public' => true, 'private' => true], 'names', 'or')) . "'";
+		$statuses = apply_filters(
+			'revisionary_main_post_statuses', 
+			get_post_stati( ['public' => true, 'private' => true], 'names', 'or' ),
+			'names'
+		);
+
+		$status_csv = "'" . implode("','", $statuses) . "'";
 		$count_query .= " AND p.post_status IN ($status_csv)";
 
 		// work around some versions of PressPermit inserting non-aliased post_type reference into where clause under some configurations
@@ -950,7 +970,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	}
 
 	public function column_title( $post, $simple_link = false ) {
-		$can_edit_post = current_user_can( 'edit_post', $post->ID ) || $simple_link;
+		$can_edit_post = current_user_can( 'edit_post', $post->ID) || $simple_link;
 
 		echo "<strong>";
 
