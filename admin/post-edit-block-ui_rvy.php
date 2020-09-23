@@ -106,6 +106,12 @@ class RVY_PostBlockEditUI {
             }
 
             $published_statuses = array_merge(get_post_stati(['public' => true]), get_post_stati(['private' => true]));
+        
+        	$revisable_statuses = apply_filters(
+				'revisionary_main_post_statuses', 
+				$published_statuses,
+				'object'
+			);
 
             $future_status = 'future-revision';
             $pending_status = 'pending-revision';
@@ -116,6 +122,7 @@ class RVY_PostBlockEditUI {
                 'ScheduleCaption' => ($do_scheduled_revisions) ? __('Schedule Revision', 'revisionary') : '',
                 'UpdateCaption' => __('Update'),
                 'publishedStatuses' => $published_statuses,
+                'revisableStatuses' => $revisable_statuses,
                 'revision' => ($do_pending_revisions) ? apply_filters('revisionary_pending_checkbox_caption', __('Pending Revision', 'revisionary'), $post) : '',
                 'revisionTitle' => esc_attr(__('Do not publish current changes yet, but save to Revision Queue', 'revisionary')), 
                 'defaultPending' => apply_filters('revisionary_default_pending_revision', false, $post ),
