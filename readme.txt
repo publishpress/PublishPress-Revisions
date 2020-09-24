@@ -100,6 +100,14 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.4-rc2 =
+* Feature : Voluntary revision submission for unpublished posts
+* Fixed : Revisors and other limited editors had editor elements hidden when adding a new post, under some site configurations
+* Fixed : If a post has multiple postmeta records using the same meta key, revision publication removed all but one record. Now support special treatment by defining key name(s) as value of constant REVISIONARY_DUPLICATE_META_KEYS
+* Fixed : Revision publication always set post publish date to current time. Now does only with enabled setting Revisions > Settings > Pending Revisions > Update Publish Date
+* Compat : PublishPress Authors - Authors could not be changed on Edit Revision screen with Gutenberg editor if PublishPress is also active
+* Compat : Gutenberg Ramp - Revision submission UI did not load for post types that have Gutenberg enabled
+
 = 2.3.12 - 27 Aug 2020 =
 * Fixed : WP 5.5 - Post previews did not display correctly for Revisors
 * Fixed : Pending, Scheduled revisions not listed in Revision Queue following mirroring of posts database table from another installation (or possibly under other conditions) 
