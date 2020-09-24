@@ -106,7 +106,7 @@ class RVY_PostBlockEditUI {
             }
 
             $published_statuses = array_merge(get_post_stati(['public' => true]), get_post_stati(['private' => true]));
-        	$revisable_statuses = rvy_filtered_statuses('object');
+        	$revisable_statuses = rvy_filtered_statuses('names');
             
             $future_status = 'future-revision';
             $pending_status = 'pending-revision';
@@ -163,7 +163,7 @@ class RVY_PostBlockEditUI {
                 'saveAs' =>     __('Submit Revision', 'revisionary'), 
                 'prePublish' => __( 'Workflow&hellip;', 'revisionary' ),
                 'redirectURL' => admin_url("edit.php?post_type={$post_type}&revision_submitted={$status}&post_id={$post_id}"),
-                'revisableStatuses' => rvy_filtered_statuses('object'),
+                'revisableStatuses' => rvy_filtered_statuses('names'),
             );  
         }
 
