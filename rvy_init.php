@@ -399,13 +399,7 @@ if (!empty($_REQUEST['rvy_flush_flags'])) {
 function revisionary_refresh_revision_flags() {
 	global $wpdb;
 
-	$statuses = apply_filters(
-		'revisionary_main_post_statuses', 
-		get_post_stati( ['public' => true, 'private' => true], 'names', 'or' ),
-		'names'
-	);
-
-	$status_csv = "'" . implode("','", $statuses) . "'";
+	$status_csv = "'" . implode("','", rvy_filtered_statuses()) . "'";
 	$arr_have_revisions = $wpdb->get_col("SELECT r.comment_count FROM $wpdb->posts r INNER JOIN $wpdb->posts p ON r.comment_count = p.ID WHERE p.post_status IN ($status_csv) AND r.post_status IN ('pending-revision', 'future-revision')");
 	$have_revisions = implode("','", array_map('intval', array_unique($arr_have_revisions)));
 
@@ -980,8 +974,8 @@ function rvy_init() {
 	$revisionary = new Revisionary();
 }
 
-function rvy_is_full_editor($post) {
-	global $current_user;
+function rvy_is_full_editor($post, $args = []) {
+	global $current_user, $revisionary;
 	
 	if (!$type_obj = get_post_type_object($post->post_type)) {
 		return false;
@@ -993,8 +987,13 @@ function rvy_is_full_editor($post) {
 		return false;
 	}
 
-	if (!empty($type_obj->cap->edit_published_posts) && empty($current_user->allcaps[$type_obj->cap->edit_published_posts])) {
-		return false;
+	if (!empty($args['check_publish_caps'])) {
+		if (!empty($type_obj->cap->edit_published_posts) && empty($current_user->allcaps[$type_obj->cap->edit_published_posts])) {
+			return false;
+		}
+	} else {
+		// @todo: skip_revision_allowance?
+		return $revisionary->canEditPost($post, ['simple_cap_check' => true]);
 	}
 
 	return true;
@@ -1076,4 +1075,12 @@ function rvy_set_ma_post_authors($post_id, $authors)
 
 	$authors = wp_list_pluck($authors, 'term_id');
 	wp_set_object_terms($post_id, $authors, 'author');
+}
+
+function rvy_filtered_statuses($output = 'names') {
+	return apply_filters(
+		'revisionary_main_post_statuses', 
+		get_post_stati( ['public' => true, 'private' => true], $output, 'or' ),
+		$output
+	);
 }

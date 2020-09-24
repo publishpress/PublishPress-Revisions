@@ -11,7 +11,7 @@ add_action( 'enqueue_block_editor_assets', array( 'RVY_PostBlockEditUI', 'act_ob
 class RVY_PostBlockEditUI {
 	public static function act_object_guten_scripts() {
         global $current_user, $revisionary, $pagenow;
-        
+
         if ('post-new.php' == $pagenow) {
             return;
         }
@@ -106,13 +106,8 @@ class RVY_PostBlockEditUI {
             }
 
             $published_statuses = array_merge(get_post_stati(['public' => true]), get_post_stati(['private' => true]));
-        
-        	$revisable_statuses = apply_filters(
-				'revisionary_main_post_statuses', 
-				$published_statuses,
-				'object'
-			);
-
+        	$revisable_statuses = rvy_filtered_statuses('object');
+            
             $future_status = 'future-revision';
             $pending_status = 'pending-revision';
             $args = array(
@@ -168,6 +163,7 @@ class RVY_PostBlockEditUI {
                 'saveAs' =>     __('Submit Revision', 'revisionary'), 
                 'prePublish' => __( 'Workflow&hellip;', 'revisionary' ),
                 'redirectURL' => admin_url("edit.php?post_type={$post_type}&revision_submitted={$status}&post_id={$post_id}"),
+                'revisableStatuses' => rvy_filtered_statuses('object'),
             );  
         }
 
