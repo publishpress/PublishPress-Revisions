@@ -120,7 +120,7 @@ jQuery(document).ready( function($) {
 	
 	// Initialization operations to perform once React loads the relevant elements
 	var RvyInitializeBlockEditorModifications = function() {
-		if ( ( $('button.editor-post-publish-button').length || $('button.editor-post-publish-panel__toggle').length ) && ( $('button.editor-post-switch-to-draft').length || $('button.editor-post-save-draft').length ) ) {
+		if ( ( $('button.editor-post-publish-button').length || $('button.editor-post-publish-panel__toggle').length ) && ( $('button.editor-post-switch-to-draft').length || $('button.editor-post-save-draft').length || $('div.publishpress-extended-post-status select:visible').length ) ) {
 			clearInterval(RvyInitInterval);
 			
 			if ( $('button.editor-post-publish-panel__toggle').length ) {

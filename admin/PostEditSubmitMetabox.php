@@ -138,10 +138,14 @@ class RvyPostEditSubmitMetabox
             <input type="submit" name="save" id="save-post" value="<?php echo $draft_label ?>"
                    tabindex="4" class="button button-highlighted"/>
         <?php elseif ($post_status_obj->moderation) : 
-            $status_label = (!empty($post_status_obj->labels->save_as)) ? $post_status_obj->labels->save_as : sprintf(__('Save as %s'), $post_status_obj->label);
-            ?>
-            <input type="submit" name="save" id="save-post" value="<?php echo $status_label ?>"
+            if (apply_filters('revisionary_display_save_as_button', true, $post, $args)):
+                $status_label = (!empty($post_status_obj->labels->save_as)) ? $post_status_obj->labels->save_as : sprintf(__('Save as %s'), $post_status_obj->label);
+                ?>
+                <input type="submit" name="save" id="save-post" value="<?php echo $status_label ?>"
                    tabindex="4" class="button button-highlighted"/>
+            <?php 
+            endif;
+            ?>
         <?php else : ?>
             <input type="submit" name="save" id="save-post" value="<?php esc_attr_e('Save'); ?>"
                    class="button button-highlighted" style="display:none"/>
