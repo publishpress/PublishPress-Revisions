@@ -43,7 +43,7 @@ class RevisionaryHistory
 
         if (!empty($_REQUEST['revision']) && is_scalar($_REQUEST['revision']) && !empty($_REQUEST['post_id']) && !is_numeric($_REQUEST['revision']) && rvy_is_revision_status(sanitize_key($_REQUEST['revision']))) {
             $revision_status = sanitize_key($_REQUEST['revision']);
-
+            
             $orderby = ('future-revision' == $revision_status) ? 'post_date' : 'ID';
             $order =   ('future-revision' == $revision_status) ? 'DESC' : 'ASC';
 
@@ -112,7 +112,7 @@ class RevisionaryHistory
                     }
                 }
 
-                if ((!current_user_can( 'read_post', $revision->ID ) && !current_user_can('edit_post', $revision->ID))) {
+                if ((!current_user_can('read_post', $revision->ID) && !current_user_can('edit_post', $revision->ID))) {
                     return;
                 }
 
@@ -687,11 +687,11 @@ class RevisionaryHistory
                 $content_from = ($content_from) ? "$content_from (" . wp_get_attachment_image_url($content_from, 'full') . ')' : '';
                 $content_to = ($content_to) ? "$content_to (" . wp_get_attachment_image_url($content_to, 'full') . ')' : '';
             
-            	// suppress false alarm for featured image clearance
+                // suppress false alarm for featured image clearance
                 if ($content_from && !$content_to) {
                     continue;
                 }
-            
+
             } elseif(('_requested_slug' == $field)) {
                 if ($content_to && !rvy_is_revision_status($compare_to->post_status)) {
                     $content_to = '';
@@ -702,10 +702,10 @@ class RevisionaryHistory
                 }
                 
                 if ($content_to && !$content_from) {
-                    if ($parent_post = get_post($published_id)) {
-                        $content_from = $parent_post->post_name;
-                    }
-                }
+	                if ($parent_post = get_post($published_id)) {
+	                    $content_from = $parent_post->post_name;
+	                }
+	            }
             }
 
             if ($is_beaver && !$content_to) {
@@ -1082,7 +1082,7 @@ class RevisionaryHistory
                                     }
                                 }
                             }
-                            
+
                             rvyLastID = rvyRevisionID;
                         }
                     }, 100);
@@ -1111,19 +1111,30 @@ class RevisionaryHistory
             return;
         }
 
-        $edit_published_cap = isset($type_obj->cap->edit_published_posts) ? $type_obj->cap->edit_published_posts : 'do_not_allow';
+        if ($main_post_id = rvy_post_id($post_id)) {
+            if ($main_post = get_post($main_post_id)) {
+                $main_post_status = get_post_status_object($main_post->post_status);
+            }
+        }
+
+        if (!empty($main_post) && !empty($main_post_status) && (empty($main_post_status->public) && empty($main_post_status->private))) {
+            $can_edit = $revisionary->canEditPost($main_post, ['skip_revision_allowance' => true]);
+        } else {
+            $edit_published_cap = isset($type_obj->cap->edit_published_posts) ? $type_obj->cap->edit_published_posts : 'do_not_allow';
+            $can_edit = agp_user_can($edit_published_cap, 0, 0, ['skip_revision_allowance' => true]);
+        }
 
         $show_preview_link = rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin();
 
         if ($show_preview_link) {
-            $preview_label = (empty($type_obj) || agp_user_can($edit_published_cap, 0, 0, ['skip_revision_allowance' => true])) 
+            $preview_label = (empty($type_obj) || $can_edit) 
             ?  __('Preview / Restore', 'revisionary')
             : __('Preview');
 
             $preview_url = rvy_preview_url($post);
         }
 
-        $manage_label = (empty($type_obj) || agp_user_can($edit_published_cap, 0, 0, ['skip_revision_allowance' => true])) 
+        $manage_label = (empty($type_obj) || $can_edit) 
         ?  __('Manage', 'revisionary')
         : __('List', 'revisionary');
 

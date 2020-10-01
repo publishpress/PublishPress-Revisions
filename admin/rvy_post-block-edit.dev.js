@@ -74,7 +74,12 @@ jQuery(document).ready( function($) {
 		var selectedDate = new Date( $('button.edit-post-post-schedule__toggle').html() );
 		var tdiff = selectedDate.getTime() - Date.now();
 
-		if ( tdiff > 1000 ) {
+		let postStatus = wp.data.select('core/editor').getCurrentPostAttribute('status');
+
+		var publishedStatuses = Object.keys(rvyObjEdit.publishedStatuses).map(function (key) { return rvyObjEdit.publishedStatuses[key]; });
+		var isPublished = publishedStatuses.indexOf(postStatus) >= 0;
+
+		if ((tdiff > 1000) && isPublished) {
 			let node = document.querySelector('button.editor-post-publish-button');
 			if (node && !$('input.rvy_save_as_revision:checked').length) {
 				node.innerText = `${rvyObjEdit.ScheduleCaption}`;
@@ -120,21 +125,22 @@ jQuery(document).ready( function($) {
 	if (rvyObjEdit.ScheduleCaption) {
     	var RvyDetectPublishOptionsDivInterval = setInterval(RvyDetectPublishOptionsDiv, 500);
 	}
-    
+	
 	// @todo: Don't show Pending Revision checkbox when post is not publish, private or a custom privacy status
 	// @todo: Fix formatting of Pending Revision checkbox when Pre-Publish check is enabled
     var RvySaveAsRevision = function() {
 		let postStatus = wp.data.select('core/editor').getCurrentPostAttribute('status');
 
-		var publishedStatuses = Object.keys(rvyObjEdit.publishedStatuses).map(function (key) { return rvyObjEdit.publishedStatuses[key]; });
+		var revisableStatuses = Object.keys(rvyObjEdit.revisableStatuses).map(function (key) { return rvyObjEdit.revisableStatuses[key]; });
 
-		if (publishedStatuses.indexOf(postStatus) >= 0) {
+		if (revisableStatuses.indexOf(postStatus) >= 0) {
 			if (rvyObjEdit.revision && !$('#rvy_save_as_revision').length) {
 				var attribs = rvyObjEdit.defaultPending ? ' checked="checked"' : '';
 				if (rvyObjEdit.defaultPending) {
 					RvyRecaptionElement('button.editor-post-publish-button', rvyObjEdit.SaveCaption);
 				}
 				$('button.editor-post-publish-button').after('<label style="-webkit-touch-callout: none;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;" title="' + rvyObjEdit.revisionTitle + '"><input type="checkbox" class="rvy_save_as_revision" id="rvy_save_as_revision"' + attribs + '>' + rvyObjEdit.revision + '&nbsp;</label>');
+				$('.editor-post-publish-panel__header-cancel-button').css('margin-bottom', '20px');  /* Pre-publish cancel button alignment when revision submission is enabled for unpublished posts */
 			}
 		} else {
 			$('#rvy_save_as_revision').parent('label').remove();

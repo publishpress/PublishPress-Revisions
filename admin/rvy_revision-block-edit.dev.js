@@ -164,7 +164,7 @@ jQuery(document).ready( function($) {
 				$(ediv + 'div.edit-post-post-schedule').hide();
 			}
 
-			$(ediv + '#publishpress-notifications').closest('div.edit-post-meta-boxes-area').hide();
+			$(ediv + '#publishpress-notifications').hide();
 		}
 
 		if ( $('button.editor-post-publish-button').length ) {

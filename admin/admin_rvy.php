@@ -170,7 +170,7 @@ class RevisionaryAdmin
 			if (in_array($post_status, ['pending-revision', 'future-revision'])) {
 				return true;
 			}
-		
+			
 			if (!agp_user_can('edit_post', $post_id, '', ['skip_revision_allowance' => true])) {
 				return true;
 			}
@@ -241,11 +241,10 @@ class RevisionaryAdmin
 			return;
 		}
 
-		$published_stati = get_post_stati(array('public' => true, 'private' => true), 'names', 'OR');
-
 		if (!empty($wp_query->posts)) {
 			foreach ($wp_query->posts as $row) {
-				if (in_array($listed_post_statuses[$row->ID], $published_stati)) {
+				if (in_array($listed_post_statuses[$row->ID], rvy_filtered_statuses())) {
+					// @todo: better cap check precision for filter-applied statuses
 					if (!$can_edit_published || (!$can_edit_others && !rvy_is_post_author($row))) {
 						$this->hide_quickedit []= $row->ID;
 					}
@@ -424,7 +423,7 @@ class RevisionaryAdmin
 
 				if ( $status_obj = get_post_status_object( $post->post_status ) ) {
 					// only apply revisionary UI for currently published or scheduled posts
-					if ( $status_obj->public || $status_obj->private || ( 'future' == $post->post_status ) ) {
+					if (in_array($post->post_status, rvy_filtered_statuses()) || ('future' == $post->post_status)) {
 						require_once( dirname(__FILE__).'/filters-admin-ui-item_rvy.php' );
 						$revisionary->filters_admin_item_ui = new RevisionaryAdminFiltersItemUI();
 					} elseif (rvy_is_revision_status($post->post_status) && !$revisionary->isBlockEditorActive()) {
@@ -485,9 +484,7 @@ class RevisionaryAdmin
 			return;
 		}
 
-		$status_obj = get_post_status_object( $post->post_status );
-		
-		if ( ! $status_obj || ( ! $status_obj->public && ! $status_obj->private && ( 'future' != $post->post_status ) ) || !rvy_is_supported_post_type($post->post_type) ) {
+		if (empty($post) || (!in_array($post->post_status, rvy_filtered_statuses()) && ('future' != $post->post_status)) || !rvy_is_supported_post_type($post->post_type)) {
 			return;
 		}
 
@@ -497,7 +494,7 @@ class RevisionaryAdmin
 			}
 		}
 
-		$caption = __( 'Save as Pending Revision', 'revisionary' );
+		$caption = apply_filters('revisionary_pending_checkbox_caption_classic', __( 'Save as Pending Revision', 'revisionary' ), $post);
 		$checked = (apply_filters('revisionary_default_pending_revision', false, $post )) ? "checked='checked'" : '';
 		
 		$title = esc_attr(__('Do not publish current changes yet, but save to Revision Queue', 'revisionary'));

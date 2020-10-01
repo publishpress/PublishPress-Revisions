@@ -27,8 +27,8 @@ class RevisionCreation {
 
         if ( isset($_POST['wp-preview']) && ( 'dopreview' == $_POST['wp-preview'] ) ) {
             return $data;
-        }
-
+		}
+		
         if ( empty( $postarr['ID'] ) || empty($revisionary->impose_pending_rev[ $postarr['ID'] ]) ) {
             return $data;
         }
@@ -38,20 +38,20 @@ class RevisionCreation {
 
         if ( $revisionary->doing_rest && ! $revisionary->rest->is_posts_request ) {
             return $data;
-        }
+		}
 
         if ( false !== strpos( urldecode($_SERVER['REQUEST_URI']), 'admin.php?page=rvy-revisions' ) ) {
             return $data;
         }
-        
+
         if ( isset($_POST['action']) && ( 'autosave' == $_POST['action'] ) ) {
             if ( $revisionary->doing_rest ) {
                 exit;
             } else {
                 rvy_halt( __('Autosave disabled when editing a published post/page to create a pending revision.', 'revisionary' ) );
             }
-        }
-        
+		}
+		
         return $this->flt_pending_revision_data($data, $postarr);
     }
 
@@ -61,7 +61,7 @@ class RevisionCreation {
 		} else {
 			global $revisionary;
 		}
-        
+		
         if (rvy_is_revision_status($status) || ('inherit' == $status)) {
 			return $status;
 		}
@@ -87,10 +87,9 @@ class RevisionCreation {
 		
 		// Make sure the stored post is published / scheduled		
 		// With Events Manager plugin active, Role Scoper 1.3 to 1.3.12 caused this filter to fire prematurely as part of object_id detection, flagging for pending_rev needlessly on update of an unpublished post
-		if ( $stored_post = get_post( $post_id ) )
-			$status_obj = get_post_status_object( $stored_post->post_status );
+		$stored_post = get_post($post_id);
 
-		if ( empty($status_obj) || ( ! $status_obj->public && ! $status_obj->private && ( 'future' != $stored_post->post_status ) ) ) {
+		if (empty($stored_post) || !isset($stored_post->post_status) || (!in_array($stored_post->post_status, rvy_filtered_statuses()) && ('future' != $stored_post->post_status))) {
 			return $status;
 		}
 		
@@ -133,7 +132,7 @@ class RevisionCreation {
 		} else {
 			global $revisionary;
 		}
-		
+
 		if ($revisionary->disable_revision_trigger) {
 			return $data;
 		}
@@ -154,8 +153,8 @@ class RevisionCreation {
 
         if ($return_data = apply_filters('revisionary_pending_revision_intercept', [], $data, $postarr, $published_post)) {
             return $return_data;
-        }
-
+		}
+		
         if ( $revisionary->isBlockEditorActive() && !$revisionary->doing_rest ) {
             if (!empty($_REQUEST['meta-box-loader']) && !empty($_REQUEST['action']) && ('editpost' == $_REQUEST['action'])) {
                 // Use logged revision ID from preceding REST query
@@ -254,15 +253,15 @@ class RevisionCreation {
 			}
 
 			if (defined('RVY_REVISION_CREATION_DO_UNSLASH')) {
-            	$data = wp_unslash( $data );
+				$data = wp_unslash( $data );
 			}
 
 			if ($bypass_data = apply_filters('revisionary_bypass_revision_creation', false, $data, $published_post)) {
 				return $bypass_data;
 			}
 
-            $revision_id = $this->create_revision($data, $postarr);
-            if (!is_scalar($revision_id)) { // update_post_data() returns array or object on update abandon / failure
+			$revision_id = $this->create_revision($data, $postarr);
+			if (!is_scalar($revision_id)) { // update_post_data() returns array or object on update abandon / failure
 				$data['ID'] = $revision_id;
 				return $data;
             }
@@ -309,8 +308,8 @@ class RevisionCreation {
 
             do_action( 'revisionary_save_revision', $post );
             do_action( "save_post_{$post->post_type}", $revision_id, $post, false );
-            do_action( 'save_post', $revision_id, $post, false );
-            do_action( 'wp_insert_post', $revision_id, $post, false );
+			do_action( 'save_post', $revision_id, $post, false );
+			do_action( 'wp_insert_post', $revision_id, $post, false );
             do_action( 'revisionary_saved_revision', $post );
         }
 
@@ -383,12 +382,12 @@ class RevisionCreation {
             if ( ! empty( $_REQUEST['prev_cc_user'] ) ) {
                 $args['selected_recipients'] = array_map('intval', $_REQUEST['prev_cc_user']);
             }
-            $revisionary->do_notifications( 'pending-revision', 'pending-revision', $postarr, $args );
-            rvy_halt( $msg, __('Pending Revision Created', 'revisionary') );
+			$revisionary->do_notifications( 'pending-revision', 'pending-revision', $postarr, $args );
+			rvy_halt( $msg, __('Pending Revision Created', 'revisionary') );
         } else {
         	// return currently stored published post data
 			$data = array_intersect_key((array) get_post($published_post->ID), $data);
-        }
+		}
 
         return $data;
     }
@@ -476,10 +475,10 @@ class RevisionCreation {
 		if ( empty( $stored_status_obj->public ) && empty( $stored_status_obj->private ) ) {
 			return $data;
 		}
-
+		
 		if ( empty($post_arr['post_date_gmt']) || ( strtotime($post_arr['post_date_gmt'] ) <= agp_time_gmt() ) ) {
 			// Allow continued processing for non-REST followup query after REST operation
-			if (empty($_REQUEST['meta-box-loader']) || empty($_REQUEST['action']) || ('editpost' != $_REQUEST['action'])) {
+			if (empty($_REQUEST['meta-box-loader']) || empty($_REQUEST['action']) || ('editpost' != $_REQUEST['action'])) {		
 				return apply_filters('revisionary_future_rev_submit_data', $data, $published_post);
 			}
 		}
@@ -523,6 +522,7 @@ class RevisionCreation {
 			$data = apply_filters('revisionary_future_rev_creation_data', $data, $published_post);
 
 			$revision_id = $this->create_revision($data, $post_arr);
+
 			if (!is_scalar($revision_id)) { // update_post_data() returns array or object on update abandon / failure
 				$data = array_intersect_key( (array) $published_post, array_fill_keys( array( 'ID', 'post_type', 'post_name', 'post_status', 'post_parent', 'post_author', 'post_content' ), true ) );
 				return $data;
@@ -624,10 +624,10 @@ class RevisionCreation {
 				wp_set_post_categories( $post_ID, $post_category );
 			}
 		}
-	
+
 		if (is_object_in_taxonomy( $post_type, 'post_tag' )) {
 			if (isset($postarr['tags_input'])) {
-			wp_set_post_tags( $post_ID, $postarr['tags_input'] );
+				wp_set_post_tags( $post_ID, $postarr['tags_input'] );
 
 			} elseif (isset($postarr['tags'])) {
 				wp_set_post_tags( $post_ID, $postarr['tags'] );

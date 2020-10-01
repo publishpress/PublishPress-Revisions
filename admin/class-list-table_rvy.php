@@ -22,7 +22,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		
 		$omit_types = ['forum', 'topic', 'reply'];
 		$this->post_types = array_diff( $this->post_types, $omit_types );
-		
+
 		add_filter('manage_revisionary-q_columns', [$this, 'rvy_pending_list_register_columns']);
 
 		add_action('manage_posts_custom_column', [$this, 'rvy_pending_custom_col'], 10, 2);
@@ -52,7 +52,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$qp['post_type'] = $this->post_types;
 		
 		$omit_stati = ['hidden'];
-		$qp['post_status'] = array_diff( get_post_stati( ['public' => true, 'private' => true], 'names', 'or' ), $omit_stati );
+
+		$qp['post_status'] = array_diff( rvy_filtered_statuses(), $omit_stati );
 
 		if (!empty($q['published_post'])) {
 			$qp['p'] = (int) $q['published_post'];
@@ -79,8 +80,6 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		remove_filter('posts_clauses', [$this, 'pre_query_filter'], 5, 2);
 		remove_filter('posts_clauses', [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
 		do_action('revisionary_queue_pre_query_done');
-
-		//echo($pre_query->request . '<br /><br />');
 
 		$this->published_post_ids = $pre_query->posts;
 
@@ -232,15 +231,20 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if (rvy_get_option('revisor_hide_others_revisions') && !current_user_can('administrator') 
 			&& !current_user_can('list_others_revisions') && empty($args['suppress_author_clause']) 
 		) {
+			$allow_post_types = apply_filters('revisionary_queue_allow_post_types', []);
+
 			$can_publish_types = [];
 			foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
 				$type_obj = get_post_type_object($post_type);
 
 				if (
-					isset($type_obj->cap->edit_published_posts)
-					&& agp_user_can($type_obj->cap->edit_published_posts, 0, '', ['skip_revision_allowance' => true])
-					&& !empty($current_user->allcaps[$type_obj->cap->edit_others_posts])
-					&& agp_user_can($type_obj->cap->publish_posts, 0, '', ['skip_revision_allowance' => true])
+					(
+					!empty($allow_post_types[$post_type]) 
+					|| (isset($type_obj->cap->edit_published_posts)
+						&& agp_user_can($type_obj->cap->edit_published_posts, 0, '', ['skip_revision_allowance' => true])
+						&& !empty($current_user->allcaps[$type_obj->cap->edit_others_posts])
+						&& agp_user_can($type_obj->cap->publish_posts, 0, '', ['skip_revision_allowance' => true])
+					))
 					&& (!empty($revisionary->enabled_post_types[$post_type]) || !$revisionary->config_loaded)
 				) {
 					$can_publish_types[]= $post_type;
@@ -249,13 +253,13 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 			$can_publish_types = array_intersect($can_publish_types, apply_filters('revisionary_manageable_types', $can_publish_types));
 
-			if ($can_publish_types) {
+			if ($can_publish_types){
 				$type_clause = "OR $p.post_type IN ('" . implode("','", $can_publish_types) . "')";
 			} else {
 				$type_clause = '';
 			}
 
-				$where .= $wpdb->prepare(" AND ($p.post_author = %d $type_clause)", $current_user->ID );
+			$where .= $wpdb->prepare(" AND ($p.post_author = %d $type_clause)", $current_user->ID );
 		} elseif ($revisionary->config_loaded) {
 			$where .= (array_filter($revisionary->enabled_post_types)) 
 			? " AND ($p.post_type IN ('" . implode("','", array_keys(array_filter($revisionary->enabled_post_types))) . "'))" 
@@ -263,7 +267,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		if (empty($args['suppress_author_clause'])) {
-			$status_csv = "'" . implode("','", get_post_stati(['public' => true, 'private' => true], 'names', 'or')) . "'";
+			$status_csv = "'" . implode("','", rvy_filtered_statuses()) . "'";
 			$where .= " AND $p.comment_count IN (SELECT ID FROM $wpdb->posts WHERE post_status IN ($status_csv))";
 		}
 
@@ -302,7 +306,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$arr['date_sched'] = __('Schedule');
 		}
 
-		$arr['published_post'] = __('Published Post', 'revisionary');
+		$arr['published_post'] = apply_filters('revisionary_published_post_caption', __('Published Post', 'revisionary'));
+
 		$arr['post_author'] = __('Post Author', 'revisionary');
 
 		return $arr;
@@ -454,13 +459,25 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		);
 
 		if ( is_post_type_viewable( $post_type_object ) ) {
-			$actions['view'] = sprintf(
-				'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
-				get_permalink( $post->ID ),
-				/* translators: %s: post title */
-				esc_attr( __( 'View published post', 'revisionary' ) ),
-				__( 'View' )
-			);
+			$status_obj = get_post_status_object($post->post_status);
+
+			if (!empty($status_obj->public) || !empty($status_obj->private)) {
+				$actions['view'] = sprintf(
+					'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
+					get_permalink( $post->ID ),
+					/* translators: %s: post title */
+					esc_attr( __( 'View published post', 'revisionary' ) ),
+					__( 'View' )
+				);
+			} else {
+				$actions['view'] = sprintf(
+					'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
+					get_preview_post_link( $post->ID ),
+					/* translators: %s: post title */
+					esc_attr( __( 'View published post', 'revisionary' ) ),
+					__( 'Preview' )
+				);
+			}
 		}
 
 		// todo: single query for all listed published posts
@@ -603,7 +620,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if ( ! empty($_REQUEST['s']) ) {
 			$q['s'] = $_REQUEST['s'];
 		}
-		
+
 		if ( ! empty($_REQUEST['m']) ) {
 			$q['m'] = (int) $_REQUEST['m'];
 		}
@@ -650,7 +667,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			['has_cap_check' => true, 'source_alias' => 'p']
 		);
 
-		$status_csv = "'" . implode("','", get_post_stati(['public' => true, 'private' => true], 'names', 'or')) . "'";
+		$status_csv = "'" . implode("','", rvy_filtered_statuses()) . "'";
 		$count_query .= " AND p.post_status IN ($status_csv)";
 
 		// work around some versions of PressPermit inserting non-aliased post_type reference into where clause under some configurations
@@ -729,7 +746,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$actions['approve_revision'] = __('Approve');
 			$actions['publish_revision'] = __('Publish');
 
-			if (revisionary()->getOption('scheduled_revisions')) {
+			if (rvy_get_option('scheduled_revisions')) {
 				$actions['unschedule_revision'] = __('Unschedule', 'revisionary');
 			}
 		}
@@ -950,7 +967,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	}
 
 	public function column_title( $post, $simple_link = false ) {
-		$can_edit_post = current_user_can( 'edit_post', $post->ID ) || $simple_link;
+		$can_edit_post = current_user_can( 'edit_post', $post->ID) || $simple_link;
 
 		echo "<strong>";
 

@@ -41,15 +41,7 @@ class Revisionary
 				if ($_post = get_post($revision_id)) {
 					if (!rvy_is_revision_status($_post->post_status)) {
 						if ($parent_post = get_post($_post->post_parent)) {
-							global $current_user;
-
-							$type_obj = get_post_type_object($parent_post->post_type);
-
-							if ($type_obj && (
-								!isset($type_obj->cap->edit_published_posts)
-								|| empty($current_user->allcaps[$type_obj->cap->edit_published_posts]) 
-								|| (($current_user->ID != $parent_post->ID) && empty($current_user->allcaps[$type_obj->cap->edit_published_posts]))
-							)) {
+							if (!$this->canEditPost($parent_post, ['simple_cap_check' => true])) {
 								return;
 							}
 						}
@@ -67,8 +59,8 @@ class Revisionary
 			require_once( dirname(__FILE__).'/front_rvy.php' );
 			$this->front = new RevisionaryFront();
 		}
-		
-		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && (!empty($_GET['preview']) && !empty($_REQUEST['preview_id']))) {
+
+		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && (!empty($_GET['preview']) && !empty($_REQUEST['preview_id']))) {			
 			if (defined('REVISIONARY_PREVIEW_WORKAROUND')) { // @todo: confirm this is no longer needed
 				if ($_post = get_post((int) $_REQUEST['preview_id'])) {
 					if (in_array($_post->post_status, ['pending-revision', 'future-revision']) && !$this->isBlockEditorActive()) {
@@ -151,7 +143,7 @@ class Revisionary
 
 		do_action( 'rvy_init', $this );
 	}
-	
+
 	function configurationLateInit() {
 		$this->setPostTypes();
 		$this->config_loaded = true;
@@ -171,6 +163,95 @@ class Revisionary
 
 		unset($this->enabled_post_types['attachment']);
 		$this->enabled_post_types = array_filter($this->enabled_post_types);
+	}
+
+	function canEditPost($post, $args = []) {
+		global $current_user;
+
+		static $last_result;
+
+		$args = (array) $args;
+		//$defaults = ['simple_cap_check' => false, 'skip_revision_allowance' => false, 'type_obj' => false];
+
+		if ($post && is_numeric($post)) {
+			$post = get_post($post);
+		}
+
+		$post_id = ($post && is_object($post) && !empty($post->ID)) ? $post->ID : 0;
+
+		if (!empty($last_result) && isset($last_result[$post_id])) {
+			return $last_result[$post_id];
+		}
+
+		if (!isset($last_result)) {
+			$last_result = [];
+		}
+
+		$return = false;
+
+		if (!$post) {
+			if (empty($args['type_obj']) || empty($args['simple_cap_check'])) {
+				return false;
+			}
+
+			$type_obj = $args['type_obj'];
+		} else {
+			if (!is_object($post) || empty($post->post_status)
+			|| !$type_obj = get_post_type_object($post->post_type)
+			) {
+				return false;
+			}
+
+			$status_obj = get_post_status_object($post->post_status);
+		}
+
+		if (!empty($args['simple_cap_check']) && (empty($status_obj) || !empty($status_obj->public) || !empty($status_obj->private))) {
+			if (!empty($args['skip_revision_allowance'])) {
+				$return = agp_user_can($type_obj->cap->edit_published_posts, 0, '', ['skip_revision_allowance' => true]);
+			} else {
+				$return = isset($type_obj->cap->edit_published_posts) && !empty($current_user->allcaps[$type_obj->cap->edit_published_posts]);
+			}
+		} else {
+			if (!empty($args['skip_revision_allowance'])) {
+				if (!$caps = map_meta_cap('edit_post', $post_id)) {
+					$last_result[$post_id] = false;
+					return false;
+				}
+
+				$return = true;
+
+				foreach($caps as $cap_name) {
+					$edit_posts_cap = (isset($type_obj->cap->edit_posts)) ? $type_obj->cap->edit_posts : 'edit_posts';
+					$edit_others_posts_cap = (isset($type_obj->cap->edit_others_posts)) ? $type_obj->cap->edit_others_posts : 'edit_others_posts';
+
+					if (in_array($cap_name, [$edit_posts_cap, $edit_others_posts_cap])) {
+						if (empty($current_user->allcaps[$cap_name])) {
+							$last_result[$post_id] = false;
+							return false;
+						}
+
+						continue; // only need to call agp_user_can() for capabilities that are ever granted implicitly (edit_published_pages, edit_private_pages etc.)
+					}
+				
+					if (!agp_user_can($cap_name, 0, '', ['skip_revision_allowance' => true])) {
+						$return = false;
+					}
+				}
+			} else {
+				$caps = map_meta_cap('edit_post', $current_user->ID, $post_id);
+
+				$return = true;
+				foreach($caps as $cap) {
+					if (empty($current_user->allcaps[$cap])) {
+						$return = false;
+						break;
+					}
+				}
+			}
+		}
+
+		$last_result[$post_id] = $return;
+		return $return;
 	}
 
 	/**
@@ -482,7 +563,7 @@ class Revisionary
 		
 		$rest_response = $this->rest->pre_dispatch( $rest_response, $rest_server, $request );
 
-		if ($this->rest->is_posts_request) {
+		if ($this->rest->is_posts_request) {			
 			if (empty($this->enabled_post_types[$this->rest->post_type])) {
 				return $rest_response;
 			}
@@ -508,7 +589,7 @@ class Revisionary
 		if ( ! $object_id || ! is_scalar($object_id) || ( $object_id < 0 ) )
 			return $caps;
 		
-		if ( ! rvy_get_option( 'require_edit_others_drafts' ) )
+		if ( ! rvy_get_option('require_edit_others_drafts') )
 			return $caps;
 
 		if ( $post = get_post( $object_id ) ) {
@@ -606,10 +687,16 @@ class Revisionary
 
 		return $bypass;
 	}
-	
+
 	function flt_post_map_meta_cap($caps, $cap, $user_id, $args) {
 		global $current_user;
-		
+
+		static $busy;
+
+		if (!empty($busy)) {
+			return $caps;
+		}
+
 		if (!in_array($cap, array('read_post', 'read_page', 'edit_post', 'edit_page', 'delete_post', 'delete_page'))) {
 			return $caps;
 		}
@@ -639,14 +726,16 @@ class Revisionary
 			if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST) || empty($_REQUEST['preview']) || !empty($_POST) || did_action('template_redirect')) {
 				if ($type_obj = get_post_type_object( $post->post_type )) {
 					if (isset($type_obj->cap->edit_published_posts)) {
-					$check_cap = in_array($cap, ['delete_post', 'delete_page']) ? $type_obj->cap->delete_published_posts : $type_obj->cap->edit_published_posts;
-					return array_merge($caps, [$check_cap]);
+						$check_cap = in_array($cap, ['delete_post', 'delete_page']) ? $type_obj->cap->delete_published_posts : $type_obj->cap->edit_published_posts;
+						return array_merge($caps, [$check_cap]);
 					} else {
 						return $caps;
 					}
 				}
 			}
 		}
+
+		$busy = true;
 
 		if (in_array($cap, ['read_post', 'read_page'])	// WP Query imposes edit_post capability requirement for front end viewing of protected statuses 
 			|| (!empty($_REQUEST['preview']) && in_array($cap, array('edit_post', 'edit_page')) && did_action('posts_selection') && !did_action('template_redirect'))
@@ -673,9 +762,10 @@ class Revisionary
 					
 					} else {
 						$caps []= $type_obj->cap->edit_posts;
-					}
+					} 
 				}
 
+				$busy = false;
 				return $caps;
 			}
 		} elseif (($post_id > 0) && $post && rvy_is_revision_status($post->post_status) 
@@ -698,20 +788,26 @@ class Revisionary
 
 		if (in_array($cap, array('edit_post', 'edit_page'))) {
 			if ($post && !empty($post->post_status)) {
-				if ($status_obj = get_post_status_object($post->post_status)) {
-					if (empty($status_obj->public) && empty($status_obj->private)) {
-						return $caps;
-					}
+				if (!in_array($post->post_status, rvy_filtered_statuses())) {
+					$busy = false;
+					return $caps;
 				}
 			}
-			
+
 			// Run reqd_caps array through the filter which is normally used to implicitly grant edit_published cap to Revisors
 			// Applying this adjustment to reqd_caps instead of user caps on 'edit_post' checks allows for better compat with PressPermit and other plugins
 			if ($grant_caps = $this->filter_caps(array(), $caps, array(0 => $cap, 1 => $user_id, 2 => $post_id), array('filter_context' => 'map_meta_cap'))) {
 				$caps = array_diff($caps, array_keys(array_filter($grant_caps)));
+
+				if (!$caps) {
+					if ($type_obj = get_post_type_object( $post->post_type )) {
+						$caps = [$type_obj->cap->edit_posts];
+					}
+				}
 			}
 		}
 
+		$busy = false;
 		return $caps;
 	}
 
@@ -721,7 +817,13 @@ class Revisionary
 
 	private function filter_caps($wp_blogcaps, $reqd_caps, $args, $internal_args = array()) {
 		global $current_user;
-		
+
+		static $busy;
+
+		if (!empty($busy)) {
+			return $wp_blogcaps;
+		}
+
 		if (!rvy_get_option('pending_revisions')) {
 			return $wp_blogcaps;
 		}
@@ -741,6 +843,8 @@ class Revisionary
 			}
 		}
 
+		$busy = true;
+
 		if ( ! empty($args[2]) )
 			$post_id = $args[2];
 		else
@@ -756,12 +860,14 @@ class Revisionary
 		}
 
 		if (empty($this->enabled_post_types[$object_type]) && $this->config_loaded) {
+			$busy = false;
 			return $wp_blogcaps;
 		}
 
 		// For 'edit_post' check, filter required capabilities via 'map_meta_cap' filter, then pass 'user_has_cap' unfiltered
 		if (in_array($args[0], array('edit_post', 'edit_page')) && ! $is_meta_cap_call) {
 			if (empty($post) || !rvy_is_revision_status($post->post_status)) {
+				$busy = false;
 				return $wp_blogcaps;
 			}
 		}
@@ -775,6 +881,7 @@ class Revisionary
 			) {
 				if (!apply_filters('revisionary_flag_as_post_update', false, $post_id, $reqd_caps, $args, $internal_args)) {
 					if ( ! in_array( $args[0], array( 'edit_published_pages', 'edit_others_pages', 'edit_private_pages', 'edit_pages', 'publish_pages', 'publish_posts' ) ) ) {
+						$busy = false;
 						return $wp_blogcaps;
 					}
 				}
@@ -805,11 +912,13 @@ class Revisionary
 		
 		$object_type_obj = get_post_type_object( $object_type );
 		
-		if ( empty( $object_type_obj->cap ) )
+		if ( empty( $object_type_obj->cap ) ) {
+			$busy = false;
 			return $wp_blogcaps;
+		}
 		
 		$cap = $object_type_obj->cap;
-		
+
 		//if (!empty($args[2]) && $post && rvy_is_revision_status($post->post_status)) {
 		if ($post && rvy_is_revision_status($post->post_status)) {
 			if (in_array($cap->edit_others_posts, $reqd_caps) ) {
@@ -825,16 +934,27 @@ class Revisionary
 		$this->skip_revision_allowance = !apply_filters('revisionary_apply_revision_allowance', !$this->skip_revision_allowance, $post_id);
 
 		if ( ! $this->skip_revision_allowance ) {
-			// Allow Contributors / Revisors to edit published post/page, with change stored as a revision pending review
-			$replace_caps = array( 'edit_published_posts', $edit_published_cap, 'edit_private_posts', $edit_private_cap );
+			$replace_caps = [];
 			
-			if ( ! strpos( $script_name, 'p-admin/edit.php' ) ) {
-				$replace_caps = array_merge( $replace_caps, array( $cap->publish_posts, 'publish_posts' ) );
+			if (!empty($post)) {
+				$status_obj = get_post_status_object($post->post_status);
+
+				if (!empty($status_obj->public) || !empty($status_obj->private)) {
+					// Allow Contributors / Revisors to edit published post/page, with change stored as a revision pending review
+					$replace_caps = array( 'edit_published_posts', $edit_published_cap, 'edit_private_posts', $edit_private_cap );
+					
+					if ( ! strpos( $script_name, 'p-admin/edit.php' ) ) {
+						$replace_caps = array_merge( $replace_caps, array( $cap->publish_posts, 'publish_posts' ) );
+					}
+				} elseif (in_array($post->post_status, rvy_filtered_statuses())) {
+					$replace_caps = apply_filters('revisionary_implicit_edit_caps', $replace_caps, $object_type_obj);
+				}
 			}
-			
+
 			if ( array_intersect( $reqd_caps, $replace_caps) ) {	// don't need to fudge the capreq for post.php unless existing post has public/private status
 				if ( is_preview() || rvy_wp_api_request() || strpos($script_name, 'p-admin/edit.php') || strpos($script_name, 'p-admin/widgets.php') 
-				|| ( !empty($post) && in_array( $post->post_status, array('publish', 'private') ) ) 
+				|| (!empty($post))
+				|| (strpos($script_name, 'p-admin/admin.php') && !empty($_REQUEST['page']) && ('revisionary-q' == $_REQUEST['page']))
 				) {
 					if ( $type_obj = get_post_type_object( $object_type ) ) {
 						if ( ! empty( $wp_blogcaps[ $type_obj->cap->edit_posts ] ) || $is_meta_cap_call) {
@@ -846,7 +966,7 @@ class Revisionary
 				}
 			}
 		}
-		
+
 		// Special provision for Pages - @todo: still needed?
 		if ( is_admin() && in_array( 'edit_others_posts', $reqd_caps ) && ( 'post' != $object_type ) ) {
 			// Allow contributors to edit published post/page, with change stored as a revision pending review
@@ -878,6 +998,7 @@ class Revisionary
 		}
 
 		// TODO: possible need to redirect revision cap check to published parent post/page ( RS cap-interceptor "maybe_revision" )
+		$busy = false;
 		return $wp_blogcaps;			
 	}
 
@@ -926,7 +1047,7 @@ class Revisionary
 			if (empty($this->enabled_post_types[$revision->post_type])) {
 				return $data;
 			}
-			
+
 			if (!rvy_is_revision_status($data['post_status'])) {
 				$revert_status = true;
 			} elseif ($revision) {
@@ -1028,7 +1149,7 @@ class Revisionary
 		 * It's a hairy conditional :(
 		 */
 		// phpcs:ignore WordPress.VIP.SuperGlobalInputUsage.AccessDetected, WordPress.Security.NonceVerification.NoNonceVerification
-		$conditions[] = $this->isWp5()
+		$conditions[] = ($this->isWp5() || $pluginsState['gutenberg'])
 						&& ! $pluginsState['classic-editor']
 						&& ! $pluginsState['gutenberg-ramp']
 						&& apply_filters('use_block_editor_for_post_type', true, $postType, PHP_INT_MAX);
@@ -1043,10 +1164,8 @@ class Revisionary
                         && (get_option('classic-editor-replace') === 'classic'
                             && isset($_GET['classic-editor__forget']));
 
-		/**
-		 * < 5.0 but Gutenberg plugin is active.
-		 */
-		$conditions[] = ! $this->isWp5() && ($pluginsState['gutenberg'] || $pluginsState['gutenberg-ramp']);
+		$conditions[] = $pluginsState['gutenberg-ramp'] 
+						&& apply_filters('use_block_editor_for_post', true, get_post(rvy_detect_post_id()), PHP_INT_MAX);
 
 		// Returns true if at least one condition is true.
 		return count(
