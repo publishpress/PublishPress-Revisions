@@ -992,6 +992,10 @@ function rvy_is_full_editor($post, $args = []) {
 			return false;
 		}
 	} else {
+		if (empty($revisionary)) {
+			return false;
+		}
+
 		// @todo: skip_revision_allowance?
 		return $revisionary->canEditPost($post, ['simple_cap_check' => true]);
 	}
@@ -1031,6 +1035,9 @@ function rvy_preview_url($revision, $args = []) {
 
 	$link_type = rvy_get_option('preview_link_type');
 
+	$status_obj = get_post_status_object(get_post_field('post_status', rvy_post_id($revision->ID)));
+	$post_is_published = $status_obj && (!empty($status_obj->public) || !empty($status_obj->private));
+
 	if ('id_only' == $link_type) {
 		// support using ids only if theme or plugins do not tolerate published post url and do not require standard format with revision slug
 		$preview_url = add_query_arg('preview', true, get_post_permalink($revision));
@@ -1041,7 +1048,7 @@ function rvy_preview_url($revision, $args = []) {
 		} else {
 			$id_arg = 'p';
 		}
-	} elseif ('revision_slug' == $link_type) {
+	} elseif (('revision_slug' == $link_type) || !$post_is_published) {
 		// support using actual revision slug in case theme or plugins do not tolerate published post url
 		$preview_url = add_query_arg('preview', true, get_permalink($revision));
 

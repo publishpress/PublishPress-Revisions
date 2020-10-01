@@ -459,13 +459,25 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		);
 
 		if ( is_post_type_viewable( $post_type_object ) ) {
-			$actions['view'] = sprintf(
-				'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
-				get_permalink( $post->ID ),
-				/* translators: %s: post title */
-				esc_attr( __( 'View published post', 'revisionary' ) ),
-				__( 'View' )
-			);
+			$status_obj = get_post_status_object($post->post_status);
+
+			if (!empty($status_obj->public) || !empty($status_obj->private)) {
+				$actions['view'] = sprintf(
+					'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
+					get_permalink( $post->ID ),
+					/* translators: %s: post title */
+					esc_attr( __( 'View published post', 'revisionary' ) ),
+					__( 'View' )
+				);
+			} else {
+				$actions['view'] = sprintf(
+					'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
+					get_preview_post_link( $post->ID ),
+					/* translators: %s: post title */
+					esc_attr( __( 'View published post', 'revisionary' ) ),
+					__( 'Preview' )
+				);
+			}
 		}
 
 		// todo: single query for all listed published posts

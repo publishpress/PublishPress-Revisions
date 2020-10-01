@@ -171,7 +171,11 @@ class RevisionaryFront {
 			if (current_user_can( 'read_post', $revision_id)) { 
 				$view_published = ($published_url) 
 				? sprintf(
-					__("%sCompare%s%sView&nbsp;Published&nbsp;Post%s", 'revisionary'),
+					apply_filters(
+						'revisionary_preview_compare_view_caption', 
+						__("%sCompare%s%sView&nbsp;Published&nbsp;Post%s", 'revisionary'),
+						$post // revision
+					),
 					"<span><a href='$diff_url' class='rvy_preview_linkspan' target='_revision_diff'>",
 					'</a></span>',
 					"<span><a href='$published_url' class='rvy_preview_linkspan'>",
@@ -181,7 +185,11 @@ class RevisionaryFront {
 			} else { // @todo
 				$view_published = ($published_url) 
 				? sprintf(
-					__("%sView&nbsp;Published&nbsp;Post%s", 'revisionary'), 
+					apply_filters(
+						'revisionary_preview_view_caption',
+						__("%sView&nbsp;Published&nbsp;Post%s", 'revisionary'), 
+						$post // revision
+					),
 					"<span><a href='$published_url' class='rvy_preview_linkspan'>",
 					"</a></span>"
 					) 
@@ -224,13 +232,17 @@ class RevisionaryFront {
 			} else {
 				switch ( $post->post_status ) {
 				case 'pending-revision' :
+					$approve_caption = __( 'Approve', 'revisionary' );
+
 					if ( strtotime( $post->post_date_gmt ) > agp_time_gmt() ) {
 						$class = 'pending_future';
-						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . __( 'Approve', 'revisionary' ) . '</a></span>' : '';
+						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . $approve_caption . '</a></span>' : '';
 						$message = sprintf( __('This is a Pending Revision (requested publish date: %s). %s %s %s', 'revisionary'), $date, $view_published, $edit_button, $publish_button );
 					} else {
 						$class = 'pending';
-						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . __( 'Publish now', 'revisionary' ) . '</a></span>' : '';
+						$status_obj = get_post_status_object(get_post_field('post_status', rvy_post_id($revision_id)));
+						$publish_caption = (!empty($status_obj->public) || !empty($status_obj->private)) ? __('Publish now', 'revisionary') : $approve_caption;
+						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . $publish_caption . '</a></span>' : '';
 						$message = sprintf( __('This is a Pending Revision. %s %s %s', 'revisionary'), $view_published, $edit_button, $publish_button );
 					}
 					break;
