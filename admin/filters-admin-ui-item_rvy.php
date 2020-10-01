@@ -120,16 +120,16 @@ jQuery(document).ready( function($) {
 	if (typeof(postL10n) != 'undefined') {
 		postL10n.update = "<?php _e('Submit Revision', 'revisionary' )?>";
 		postL10n.schedule = "<?php _e('Submit Scheduled Revision', 'revisionary' )?>";
-	} else {
-		setInterval(
-			function() {
-				if ($('#publish').val() != "<?php _e('Submit Revision', 'revisionary' )?>") {
-					$('#publish').val("<?php _e('Submit Revision', 'revisionary' )?>");
-				}
-			}
-			, 200
-		);
 	}
+
+	setInterval(
+		function() {
+			if ($('#publish').val() != "<?php _e('Submit Revision', 'revisionary' )?>") {
+				$('#publish').val("<?php _e('Submit Revision', 'revisionary' )?>");
+			}
+		}
+		, 200
+	);
 
 	var rvyNowCaption = "<?php _e( 'Current Time', 'revisionary' );?>";
 	$('#publishing-action #publish').show();
