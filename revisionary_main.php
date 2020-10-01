@@ -934,18 +934,26 @@ class Revisionary
 		$this->skip_revision_allowance = !apply_filters('revisionary_apply_revision_allowance', !$this->skip_revision_allowance, $post_id);
 
 		if ( ! $this->skip_revision_allowance ) {
-			// Allow Contributors / Revisors to edit published post/page, with change stored as a revision pending review
-			$replace_caps = array( 'edit_published_posts', $edit_published_cap, 'edit_private_posts', $edit_private_cap );
+			$replace_caps = [];
 			
-			if ( ! strpos( $script_name, 'p-admin/edit.php' ) ) {
-				$replace_caps = array_merge( $replace_caps, array( $cap->publish_posts, 'publish_posts' ) );
+			if (!empty($post)) {
+				$status_obj = get_post_status_object($post->post_status);
+
+				if (!empty($status_obj->public) || !empty($status_obj->private)) {
+					// Allow Contributors / Revisors to edit published post/page, with change stored as a revision pending review
+					$replace_caps = array( 'edit_published_posts', $edit_published_cap, 'edit_private_posts', $edit_private_cap );
+					
+					if ( ! strpos( $script_name, 'p-admin/edit.php' ) ) {
+						$replace_caps = array_merge( $replace_caps, array( $cap->publish_posts, 'publish_posts' ) );
+					}
+				} elseif (in_array($post->post_status, rvy_filtered_statuses())) {
+					$replace_caps = apply_filters('revisionary_implicit_edit_caps', $replace_caps, $object_type_obj);
+				}
 			}
-			
-			$replace_caps = apply_filters('revisionary_implicit_edit_caps', $replace_caps, $object_type_obj);
 
 			if ( array_intersect( $reqd_caps, $replace_caps) ) {	// don't need to fudge the capreq for post.php unless existing post has public/private status
 				if ( is_preview() || rvy_wp_api_request() || strpos($script_name, 'p-admin/edit.php') || strpos($script_name, 'p-admin/widgets.php') 
-				|| ( !empty($post) && in_array( $post->post_status, array('publish', 'private') ) )
+				|| (!empty($post))
 				|| (strpos($script_name, 'p-admin/admin.php') && !empty($_REQUEST['page']) && ('revisionary-q' == $_REQUEST['page']))
 				) {
 					if ( $type_obj = get_post_type_object( $object_type ) ) {
