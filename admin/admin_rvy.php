@@ -484,7 +484,7 @@ class RevisionaryAdmin
 			return;
 		}
 
-		if ( ! $status_obj || (!in_array($post->post_status, rvy_filtered_statuses()) && ('future' != $post->post_status)) || !rvy_is_supported_post_type($post->post_type) ) {
+		if (empty($post) || (!in_array($post->post_status, rvy_filtered_statuses()) && ('future' != $post->post_status)) || !rvy_is_supported_post_type($post->post_type)) {
 			return;
 		}
 
