@@ -134,13 +134,16 @@ jQuery(document).ready( function($) {
 		var revisableStatuses = Object.keys(rvyObjEdit.revisableStatuses).map(function (key) { return rvyObjEdit.revisableStatuses[key]; });
 
 		if (revisableStatuses.indexOf(postStatus) >= 0) {
-			if (rvyObjEdit.revision && !$('#rvy_save_as_revision').length) {
+			if ($('button.editor-post-publish-panel__toggle:visible').length && !$('div.editor-post-publish-panel:visible').length) {
+				$('#rvy_save_as_revision:visible').parent('label').hide();
+			} else {
 				var attribs = rvyObjEdit.defaultPending ? ' checked="checked"' : '';
 				if (rvyObjEdit.defaultPending) {
 					RvyRecaptionElement('button.editor-post-publish-button', rvyObjEdit.SaveCaption);
 				}
 				$('button.editor-post-publish-button').after('<label style="-webkit-touch-callout: none;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;" title="' + rvyObjEdit.revisionTitle + '"><input type="checkbox" class="rvy_save_as_revision" id="rvy_save_as_revision"' + attribs + '>' + rvyObjEdit.revision + '&nbsp;</label>');
 				$('.editor-post-publish-panel__header-cancel-button').css('margin-bottom', '20px');  /* Pre-publish cancel button alignment when revision submission is enabled for unpublished posts */
+				$('#rvy_save_as_revision').parent('label').last().show();
 			}
 		} else {
 			$('#rvy_save_as_revision').parent('label').remove();
