@@ -100,11 +100,10 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
-= 2.4.1 - 9 Oct 2020 =
-* Compat : PublishPress Permissions: On new post creation, Revisors get a Publish button instead of a Submit button. Publishing fails; the only way to submit successfully is Save Draft, then Submit for Review.
-* Compat : PublishPress Permissions - Revisions were not listed in Queue under some configurations with PublishPress Permissions active
-* Compat : PublishPress Permissions Pro - Redundant Pending Revision checkbox in Gutenberg editor if Status Control module is active with Permissions Pro > 3.3.6
+= 2.4.1-beta2 =
 * Fixed : With pre-Publish checks enabled in Gutenberg, after first save "Pending Revision" checkbox was moved off of pre-Publish Panel
+* Compat : PublishPress Permissions - Revisions were not listed in Queue under some configurations with PublishPress Permissions active
+* Compat : PublishPress Permissions Pro - redundant Pending Revision checkbox in Gutenberg editor if Status Control module is active with Permissions Pro > 3.3.6
 
 = 2.4 - 1 Oct 2020 =
 * Fixed : Revisors and other limited editors had editor elements hidden when adding a new post, under some site configurations
