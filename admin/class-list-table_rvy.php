@@ -173,7 +173,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	function pre_query_where_filter($where, $args = []) {
 		global $wpdb, $current_user, $revisionary;
 		
-		if (!current_user_can('administrator') && empty($args['suppress_author_clause'])) {
+		if (!current_user_can('administrator') && empty($args['suppress_author_clause']) && (!defined('PRESSPERMIT_COLLAB_VERSION') || defined('PRESSPERMIT_EXTRA_REVISION_QUEUE_FILTER'))) {
 			$p = (!empty($args['alias'])) ? $args['alias'] : $wpdb->posts;
 
 			$can_edit_others_types = [];
