@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.5
-Stable tag: 2.4
+Stable tag: 2.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -100,10 +100,11 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
-= 2.4.1-beta2 =
-* Fixed : With pre-Publish checks enabled in Gutenberg, after first save "Pending Revision" checkbox was moved off of pre-Publish Panel
+= 2.4.1 - 9 Oct 2020 =
+* Compat : PublishPress Permissions: On new post creation, Revisors get a Publish button instead of a Submit button. Publishing fails; the only way to submit successfully is Save Draft, then Submit for Review.
 * Compat : PublishPress Permissions - Revisions were not listed in Queue under some configurations with PublishPress Permissions active
-* Compat : PublishPress Permissions Pro - redundant Pending Revision checkbox in Gutenberg editor if Status Control module is active with Permissions Pro > 3.3.6
+* Compat : PublishPress Permissions Pro - Redundant Pending Revision checkbox in Gutenberg editor if Status Control module is active with Permissions Pro > 3.3.6
+* Fixed : With pre-Publish checks enabled in Gutenberg, after first save "Pending Revision" checkbox was moved off of pre-Publish Panel
 
 = 2.4 - 1 Oct 2020 =
 * Fixed : Revisors and other limited editors had editor elements hidden when adding a new post, under some site configurations
