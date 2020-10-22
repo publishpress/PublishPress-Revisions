@@ -411,7 +411,9 @@ class RevisionaryAdmin
 							$revisionary->do_notifications( $status, $status, (array) $revised_post, $args );
 						}
 						
-						rvy_halt( $revisionary->get_revision_msg( $revision, array( 'post_arr' => (array) $revision, 'post_id' => $revised_post->ID ) ) );
+						if (apply_filters('revisionary_do_submission_redirect', true)) {
+							rvy_halt( $revisionary->get_revision_msg( $revision, array( 'post_arr' => (array) $revision, 'post_id' => $revised_post->ID ) ) );
+						}
 					}
 				}
 			}
