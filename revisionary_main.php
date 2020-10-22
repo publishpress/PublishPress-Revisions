@@ -897,13 +897,20 @@ class Revisionary
 			$this->skip_revision_allowance = true;
 		}
 
+		$object_type_obj = get_post_type_object( $object_type );
+
 		if (rvy_get_option('revisor_lock_others_revisions')) {
-			if ($post && !rvy_is_full_editor($post)) {
+			if ($post && !rvy_is_full_editor(rvy_post_id($post->ID))) {
 				// Revisors are enabled to edit other users' posts for revision, but cannot edit other users' revisions unless cap is explicitly set sitewide
-				if ( rvy_is_revision_status($post->post_type) && ! $this->skip_revision_allowance ) {
+				if (rvy_is_revision_status($post->post_status) && !$this->skip_revision_allowance) {
 					if (!rvy_is_post_author($post)) {
 						if ( empty( $current_user->allcaps['edit_others_revisions'] ) ) {
 							$this->skip_revision_allowance = 1;
+
+							if ($object_type_obj && !empty($object_type_obj->cap->edit_others_posts)) {
+								$busy = false;
+								return array_diff_key($wp_blogcaps, [$object_type_obj->cap->edit_others_posts => true]);
+							}
 						}
 					}
 				}

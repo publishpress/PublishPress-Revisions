@@ -977,6 +977,10 @@ function rvy_init() {
 function rvy_is_full_editor($post, $args = []) {
 	global $current_user, $revisionary;
 	
+	if (is_numeric($post)) {
+		$post = get_post($post);
+	}
+
 	if (!$type_obj = get_post_type_object($post->post_type)) {
 		return false;
 	}
