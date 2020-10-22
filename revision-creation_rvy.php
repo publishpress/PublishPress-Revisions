@@ -383,7 +383,10 @@ class RevisionCreation {
                 $args['selected_recipients'] = array_map('intval', $_REQUEST['prev_cc_user']);
             }
 			$revisionary->do_notifications( 'pending-revision', 'pending-revision', $postarr, $args );
-			rvy_halt( $msg, __('Pending Revision Created', 'revisionary') );
+
+			if (apply_filters('revisionary_do_submission_redirect', true)) {
+				rvy_halt( $msg, __('Pending Revision Created', 'revisionary') );
+			}
         } else {
         	// return currently stored published post data
 			$data = array_intersect_key((array) get_post($published_post->ID), $data);
@@ -571,8 +574,10 @@ class RevisionCreation {
 			$data = array_intersect_key( (array) $published_post, array_fill_keys( array( 'ID', 'post_name', 'post_status', 'post_parent', 'post_author' ), true ) );
 			rvy_update_post_meta( $published_post->ID, "_new_scheduled_revision_{$current_user->ID}", $revision_id );
 		} else {
-			$msg = $revisionary->get_revision_msg( $revision_id, array( 'post_id' => $published_post->ID ) );
-			rvy_halt( $msg, __('Scheduled Revision Created', 'revisionary') );
+			if (apply_filters('revisionary_do_schedule_redirect', true)) {
+				$msg = $revisionary->get_revision_msg( $revision_id, array( 'post_id' => $published_post->ID ) );
+				rvy_halt( $msg, __('Scheduled Revision Created', 'revisionary') );
+			}
 		}
 
 		return apply_filters('revisionary_future_rev_return_data', $data, $published_post, $revision_id);

@@ -127,6 +127,14 @@ class RVY_PostBlockEditUI {
                 'previewURL' => $preview_url,
             );
 
+            if (defined('REVISIONARY_DISABLE_SUBMISSION_REDIRECT') || !apply_filters('revisionary_do_submission_redirect', true)) {
+                unset($args['redirectURLpending']);
+            }
+
+            if (defined('REVISIONARY_DISABLE_SCHEDULE_REDIRECT') || !apply_filters('revisionary_do_schedule_redirect', true)) {
+                unset($args['redirectURLscheduled']);
+            }
+
             if ($do_pending_revisions && $_revisions = rvy_get_post_revisions($post_id, 'pending-revision', ['orderby' => 'ID', 'order' => 'ASC'])) {
                 $status_obj = get_post_status_object('pending-revision');
                 $args['pendingRevisionsCaption'] = sprintf(_n('<span class="dashicons dashicons-edit"></span>&nbsp;%s Pending Revision', '<span class="dashicons dashicons-edit"></span>&nbsp;%s Pending Revisions', count($_revisions), 'revisionary'), count($_revisions));
@@ -165,6 +173,10 @@ class RVY_PostBlockEditUI {
                 'redirectURL' => admin_url("edit.php?post_type={$post_type}&revision_submitted={$status}&post_id={$post_id}"),
                 'revisableStatuses' => rvy_filtered_statuses('names'),
             );  
+
+            if (defined('REVISIONARY_DISABLE_SUBMISSION_REDIRECT') || !apply_filters('revisionary_do_submission_redirect', true)) {
+                unset($args['redirectURL']);
+            }
         }
 
         wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
