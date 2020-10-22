@@ -617,8 +617,14 @@ class Revisionary
 						$stati = array_diff( $stati, array( 'future' ) );
 					}
 
-					if ( in_array( $post->post_status, $stati ) ) {
-						$caps[]= "edit_others_drafts";
+					if ( in_array( $post->post_status, $stati ) ) {	// isset check because doing_cap_check property was undefined prior to Permissions 3.3.8
+						if ((!function_exists('presspermit') || (isset(presspermit()->doing_cap_check) && !presspermit()->doing_cap_check)) && empty($current_user->allcaps['edit_others_drafts']) && $post_type_obj) {
+							if (!empty($post_type_obj->cap->edit_others_posts)) {
+								$caps[] = str_replace('edit_', 'list_', $post_type_obj->cap->edit_others_posts);
+							}
+						} else {
+							$caps[]= "edit_others_drafts";
+						}
 					}
 				}
 			}
