@@ -917,8 +917,6 @@ class Revisionary
 			}
 		}
 		
-		$object_type_obj = get_post_type_object( $object_type );
-		
 		if ( empty( $object_type_obj->cap ) ) {
 			$busy = false;
 			return $wp_blogcaps;
