@@ -536,7 +536,7 @@ class Revisionary
 		return _rvy_act_rest_insert($post, $request, $unused);
 	}
 
-	private function handle_template( $template, $post_id, $validate = false ) {
+	public function handle_template( $template, $post_id, $validate = false ) {
 		update_post_meta( $post_id, '_wp_page_template', $template );
 	}
 
