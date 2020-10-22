@@ -568,17 +568,19 @@ class RevisionaryAdmin
 
 	function admin_print_scripts() {
 		if (class_exists('DS_Public_Post_Preview')) {
-			?>
-			<script type="text/javascript">
-			/* <![CDATA[ */
-			jQuery(document).ready( function($) {
-				setInterval(function() {
-					$("div.edit-post-post-status label:not(:contains('<?php _e('Enable public preview');?>')):not('[for=public-post-preview-url]')"). closest('div').hide();
-				}, 100);
-			});
-			/* ]]> */
-			</script>
-			<?php
+			$post_id = rvy_detect_post_id();
+			
+			if ($post_id && rvy_is_revision_status(get_post_field('post_status', $post_id))):?>
+				<script type="text/javascript">
+				/* <![CDATA[ */
+				jQuery(document).ready( function($) {
+					setInterval(function() {
+							$("div.edit-post-post-status label:not(:contains('<?php _e('Enable public preview');?>')):not('[for=public-post-preview-url]')").closest('div').closest('div.components-panel__row').hide();
+					}, 100);
+				});
+				/* ]]> */
+				</script>
+			<?php endif;
 		}
 	}
 
