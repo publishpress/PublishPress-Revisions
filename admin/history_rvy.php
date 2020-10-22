@@ -1096,6 +1096,8 @@ class RevisionaryHistory
     }
 
     function actPastRevisionDiffScripts() {
+        global $revisionary;
+        
         if (did_action('rvy_compare_revisions')) {
             return;
         }
