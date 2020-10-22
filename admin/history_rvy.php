@@ -279,7 +279,7 @@ class RevisionaryHistory
             return;
         }
 
-        if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+        if ( ! current_user_can( 'read_post', $post->ID ) ) {
             return;
         }
 
