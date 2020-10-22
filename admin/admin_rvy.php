@@ -155,7 +155,21 @@ class RevisionaryAdmin
 
 		add_filter('presspermit_disable_exception_ui', [$this, 'fltDisableExceptionUI'], 10, 4);
 
+		add_filter('presspermit_status_control_scripts', [$this, 'fltDisableStatusControlScripts']);
+
 		add_action('admin_menu', [$this, 'actSettingsPageMaybeRedirect'], 999);
+	}
+
+	public function fltDisableStatusControlScripts($enable_scripts) {
+		if ($post_id = rvy_detect_post_id()) {
+			if ($post = get_post($post_id)) {
+				if (!empty($post) && rvy_is_revision_status($post->post_status)) {
+					$enable_scripts = false;
+				}
+			}
+		}
+		
+		return $enable_scripts;
 	}
 
 	public function fltDisableExceptionUI($disable, $src_name, $post_id, $post_type = '') {
