@@ -98,6 +98,7 @@ $this->section_captions = array(
 		'role_definition' 	  	=> __('Role Definition', 'revisionary'),
 		'scheduled_revisions' 	=> __('Scheduled Revisions', 'revisionary'),
 		'pending_revisions'		=> __('Pending Revisions', 'revisionary'),
+		'revision_queue'		=> __('Revision Queue', 'revisionary'),		
 		'preview'				=> __('Preview / Approval', 'revisionary'),
 		'revisions'				=> __('Revision Options', 'revisionary'),
 		'notification'			=> __('Email Notification', 'revisionary')
@@ -105,11 +106,13 @@ $this->section_captions = array(
 );
 
 // TODO: replace individual _e calls with these (and section, tab captions)
-$this->option_captions = apply_filters('revisionary_option_captions', array(
+$this->option_captions = apply_filters('revisionary_option_captions', 
+	[
 	'pending_revisions' => __('Enable Pending Revisions', 'revisionary'),
 	'scheduled_revisions' => __('Enable Scheduled Revisions', 'revisionary'),
 	'revisor_lock_others_revisions' => __("Prevent Revisors from editing others&apos; revisions", 'revisionary'),
 	'revisor_hide_others_revisions' => __("Prevent Revisors from viewing others&apos; revisions", 'revisionary'),
+	'queue_query_all_posts' => 					__('Compatibility Mode', 'revisionary'),
 	'trigger_post_update_actions' => __('Revision publication triggers API actions to mimic post update', 'revisionary'),
 	'diff_display_strip_tags' => __('Strip html tags out of difference display', 'revisionary'),
 	'async_scheduled_publish' => __('Asynchronous Publishing', 'revisionary'),
@@ -128,7 +131,8 @@ $this->option_captions = apply_filters('revisionary_option_captions', array(
 	'preview_link_type' => __('Preview Link Type', 'revisionary'),
 	'compare_revisions_direct_approval' => __('Approve Button on Compare Revisions screen', 'revisionary'),
 	'copy_revision_comments_to_post' => __('Copy revision comments to published post', 'revisionary'),
-));
+	]
+);
 
 
 if ( defined('RVY_CONTENT_ROLES') ) {
@@ -148,8 +152,9 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'role_definition' => 	 array( 'revisor_role_add_custom_rolecaps', 'require_edit_others_drafts' ),
 	'scheduled_revisions' => array( 'scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date', ),
 	'pending_revisions'	=> 	 array( 'pending_revisions', 'pending_revision_update_post_date', ),
+	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'queue_query_all_posts'],
 	'preview' =>			 array( 'revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'),
-	'revisions'		=>		 array( 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'display_hints' ),
+	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'display_hints'],
 	'notification'	=>		 array( 'pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer' )
 ]
 ]);
@@ -374,6 +379,36 @@ $pending_revisions_available ) :
 endif;
 
 
+if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
+	$pending_revisions_available || $scheduled_revisions_available ) :
+	
+		$section = 'revision_queue';			// --- REVISION QUEUE SECTION ---
+	
+		if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
+			<tr valign="top"><th scope="row">
+			<?php echo $this->section_captions[$tab][$section]; ?>
+			</th><td>
+
+			<?php 
+			$hint = __('This restriction applies to users who are not full editors for the post type. To enable a role, give it the edit_others_revisions capability.', 'revisionary');
+			$this->option_checkbox( 'revisor_lock_others_revisions', $tab, $section, $hint, '' );
+			
+			$hint = __('This restriction applies to users who are not full editors for the post type. To enable a role, give it the list_others_revisions capability.', 'revisionary');
+			$this->option_checkbox( 'revisor_hide_others_revisions', $tab, $section, $hint, '' );
+
+			$hint = __('If some revisions are missing from the queue, disable a performance enhancement for better compatibility with themes and plugins.', 'revisionary');
+			$this->option_checkbox( 'queue_query_all_posts', $tab, $section, $hint, '' );
+		?>
+
+		<p style="padding-left:22px">
+		<a href="<?php echo add_query_arg('rvy_flush_flags', 1, esc_url($_SERVER['REQUEST_URI']))?>"><?php _e('Regenerate "post has revision" flags', 'revisionary');?></a>
+		</p>
+
+		</td></tr>
+	<?php endif; // any options accessable in this section
+endif;
+
+
 $section = 'preview';			// --- PREVIEW SECTION ---
 		
 if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
@@ -444,12 +479,6 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		<?php endif;?>
 
 		<?php 
-		$hint = __('This restriction applies to users who are not full editors for the post type. To enable a role, give it the edit_others_revisions capability.', 'revisionary');
-		$this->option_checkbox( 'revisor_lock_others_revisions', $tab, $section, $hint, '' );
-		
-		$hint = __('This restriction applies to users who are not full editors for the post type. To enable a role, give it the list_others_revisions capability.', 'revisionary');
-		$this->option_checkbox( 'revisor_hide_others_revisions', $tab, $section, $hint, '' );
-		
 		$hint = __('This may improve compatibility with some plugins.', 'revisionary');
 		$this->option_checkbox( 'trigger_post_update_actions', $tab, $section, $hint, '' );
 
@@ -463,9 +492,6 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		$this->option_checkbox( 'display_hints', $tab, $section, $hint, '' );
 		?>
 
-		<p style="padding-left:22px">
-		<a href="<?php echo add_query_arg('rvy_flush_flags', 1, esc_url($_SERVER['REQUEST_URI']))?>"><?php _e('Regenerate revision storage flags (for Revision Queue listing)', 'revisionary');?></a>
-		</p>
 		</td></tr>
 	<?php endif; // any options accessable in this section
 		
