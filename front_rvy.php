@@ -12,6 +12,24 @@ class RevisionaryFront {
 		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
 			add_filter('the_author', [$this, 'fltAuthor'], 20);
 		}
+
+		if (!empty($_REQUEST['_ppp'])) {
+			add_action('template_redirect', [$this, 'actRevisionPreviewRedirect'], 1);
+		}
+	}
+
+	public function actRevisionPreviewRedirect() {
+		if (!class_exists('DS_Public_Post_Preview')) {
+			return;
+		}
+
+		if ($_post = get_post(rvy_detect_post_id())) {
+			if (('revision' == $_post->post_type) && ('inherit' == $_post->post_status)) {
+				if ($url = get_permalink(rvy_post_id($_post->ID))) {
+					wp_redirect($url);
+				}
+			}
+		}
 	}
 
 	public function fltAuthor($display_name) {
