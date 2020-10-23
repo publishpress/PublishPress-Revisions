@@ -108,6 +108,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 * Change : Revision Settings - Revision Queue section, includes "Compatibility Mode" setting to prevent revisions from being hidden from the queue in the case of plugin integration issues
 * Fixed : "Prevent Revisors from editing others' revisions" setting was not applied
 * Fixed : Error when Revision submission includes a template setting
+* Fixed : Custom plugins path caused PHP error
 * Fixed : Revison Queue - PHP Notice "Undefined variable: post_id" when URL includes published_post argument
 * Feature : If Revisors are blocked from editing other users' drafts, those can now be included (unclickable) in Edit Pages if the list_others_pages capability is granted 
 * Feature : Support constant definitions REVISIONARY_DISABLE_SUBMISSION_REDIRECT, REVISIONARY_DISABLE_SCHEDULE_REDIRECT
