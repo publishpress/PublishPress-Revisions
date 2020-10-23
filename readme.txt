@@ -101,7 +101,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 == Changelog ==
 
 = 2.4.2 - 26 Oct 2020 =
-* Compat : PublishPress Permissions - Users assigned Revise permissions for a specific pages or categories could not compare Pending Revisions
+* Compat : PublishPress Permissions - Users assigned Revise permissions for specific pages or categories could not compare Pending Revisions
 * Compat : PublishPress Permissions Pro - With Status Control module active, Edit Revision screen had invalid "Workflow" button (also requires Permissions Pro 3.3.8)
 * Compat : Public Post Preview - Author selector was hidden in post editor
 * Compat : Public Post Preview - Make public post previews of published posts redirect to the published post
