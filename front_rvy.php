@@ -181,7 +181,7 @@ class RevisionaryFront {
 
 			$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
 
-			load_plugin_textdomain('revisionary', false, RVY_FOLDER . '/languages');
+			load_plugin_textdomain('revisionary', false, dirname(plugin_basename(REVISIONARY_FILE)) . '/languages');
 			
 			$published_url = ($published_post_id) ? get_permalink($published_post_id) : '';
 			$diff_url = admin_url("revision.php?revision=$revision_id");

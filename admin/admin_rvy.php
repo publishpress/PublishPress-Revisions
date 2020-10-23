@@ -530,7 +530,7 @@ class RevisionaryAdmin
 	
 	// adds an Options link next to Deactivate, Edit in Plugins listing
 	function flt_plugin_action_links($links, $file) {
-		if ( $file == RVY_BASENAME ) {
+		if ($file == plugin_basename(REVISIONARY_FILE)) {
 			$page = ( RVY_NETWORK ) ? 'rvy-net_options' : 'revisionary-settings';
 			$links[] = "<a href='admin.php?page=$page'>" . __awp('Settings') . "</a>";
 		}

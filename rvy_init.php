@@ -2,8 +2,8 @@
 if ( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 	die();
 
-if (defined('RVY_BASENAME')) {
-	define( 'RVY_NETWORK', awp_is_mu() && rvy_plugin_active_for_network( RVY_BASENAME ) );
+if (defined('REVISIONARY_FILE')) {
+	define('RVY_NETWORK', awp_is_mu() && rvy_plugin_active_for_network(plugin_basename(REVISIONARY_FILE)));
 }
 
 add_action('init', 'rvy_status_registrations', 40);
