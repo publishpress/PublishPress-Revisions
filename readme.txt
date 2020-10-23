@@ -114,7 +114,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 * Feature : New filters 'revisionary_do_submission_redirect', 'revisionary_do_schedule_redirect'
 
 = 2.4.1 - 9 Oct 2020 =
-* Compat : PublishPress Permissions: On new post creation, Revisors get a Publish button instead of a Submit button. Publishing fails; the only way to submit successfully is Save Draft, then Submit for Review.
+* Compat : PublishPress Permissions - On new post creation, Revisors get a Publish button instead of a Submit button. Publishing fails; the only way to submit successfully is Save Draft, then Submit for Review.
 * Compat : PublishPress Permissions - Revisions were not listed in Queue under some configurations with PublishPress Permissions active
 * Fixed : With pre-Publish checks enabled in Gutenberg, after first save "Pending Revision" checkbox was moved off of pre-Publish Panel
 
