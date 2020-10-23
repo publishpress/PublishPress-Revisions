@@ -181,7 +181,7 @@ class RevisionaryFront {
 
 			$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
 
-			load_plugin_textdomain('revisionary', false, RVY_FOLDER . '/languages');
+			load_plugin_textdomain('revisionary', false, dirname(plugin_basename(REVISIONARY_FILE)) . '/languages');
 			
 			$published_url = ($published_post_id) ? get_permalink($published_post_id) : '';
 			$diff_url = admin_url("revision.php?revision=$revision_id");
@@ -327,10 +327,7 @@ class RevisionaryFront {
 	}
 
 	function rvyFrontCSS() {
-		$wp_content = ( is_ssl() || ( is_admin() && defined('FORCE_SSL_ADMIN') && FORCE_SSL_ADMIN ) ) ? str_replace( 'http:', 'https:', WP_CONTENT_URL ) : WP_CONTENT_URL;
-		$path = $wp_content . '/plugins/' . RVY_FOLDER;
-		
-		echo '<link rel="stylesheet" href="' . $path . '/revisionary-front.css" type="text/css" />'."\n";
+		echo '<link rel="stylesheet" href="' . plugins_url('', REVISIONARY_FILE) . '/revisionary-front.css" type="text/css" />'."\n";
 	}
 	
 	function rvyEnqueuePreviewJS() {

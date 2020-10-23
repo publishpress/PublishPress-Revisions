@@ -35,7 +35,7 @@ function rvy_load_textdomain() {
 	if ( defined('RVY_TEXTDOMAIN_LOADED') )
 		return;
 
-	load_plugin_textdomain('revisionary', false, RVY_FOLDER . '/languages');
+	load_plugin_textdomain('revisionary', false, dirname(plugin_basename(REVISIONARY_FILE)) . '/languages');
 
 	define('RVY_TEXTDOMAIN_LOADED', true);
 }
