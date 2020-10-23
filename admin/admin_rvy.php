@@ -12,8 +12,7 @@
 if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 	die();
 
-$wp_content = ( is_ssl() || ( is_admin() && defined('FORCE_SSL_ADMIN') && FORCE_SSL_ADMIN ) ) ? str_replace( 'http:', 'https:', WP_CONTENT_URL ) : WP_CONTENT_URL;
-define ('RVY_URLPATH', $wp_content . '/plugins/' . RVY_FOLDER);
+define ('RVY_URLPATH', plugins_url('', REVISIONARY_FILE));
 
 class RevisionaryAdmin
 {
