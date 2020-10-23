@@ -225,6 +225,7 @@ add_action(
 			define( 'WP_CONTENT_DIR', str_replace('\\', '/', ABSPATH) . 'wp-content' );
 
 		define ('RVY_ABSPATH', WP_CONTENT_DIR . '/plugins/' . RVY_FOLDER);
+		define('RVY_ABSPATH', __DIR__);
 
 		if (is_admin() && !defined('REVISIONARY_PRO_VERSION')) {
 			require_once(__DIR__ . '/includes/CoreAdmin.php');
