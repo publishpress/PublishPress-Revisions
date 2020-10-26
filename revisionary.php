@@ -5,7 +5,7 @@
  * Description: Maintain published content with teamwork and precision using the Revisions model to submit, approve and schedule changes.
  * Author: PublishPress
  * Author URI: https://publishpress.com
- * Version: 2.4.1
+ * Version: 2.4.2
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 4.9.7
@@ -79,10 +79,11 @@ if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1
 	if ( is_admin() && strpos( $_SERVER['SCRIPT_NAME'], 'p-admin/plugins.php' ) && ! strpos( urldecode($_SERVER['REQUEST_URI']), 'deactivate' ) ) {
 		add_action('all_admin_notices', function()
 		{
-			if ( defined( 'RVY_FOLDER' ) )
-				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: "%2$s")', 'revisionary' ), RVY_VERSION, RVY_FOLDER );
-			else
+			if (defined('REVISIONARY_FILE')) {
+				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: "%2$s")', 'revisionary' ), RVY_VERSION, dirname(plugin_basename(REVISIONARY_FILE)) );
+			} else {
 				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)', 'revisionary' ), RVY_VERSION );
+			}
 		
 			echo "<div id='message' class='notice error' style='color:black'>" . $message . '</div>';
 		}, 5);
@@ -95,7 +96,7 @@ define('REVISIONARY_FILE', __FILE__);
 // register these functions before any early exits so normal activation/deactivation can still run with RS_DEBUG
 register_activation_hook(__FILE__, function() 
 	{
-		$current_version = '2.4.1';
+		$current_version = '2.4.2';
 
 		$last_ver = get_option('revisionary_last_version');
 
@@ -137,10 +138,11 @@ add_action(
 			if ( is_admin() && strpos( $_SERVER['SCRIPT_NAME'], 'p-admin/plugins.php' ) && ! strpos( urldecode($_SERVER['REQUEST_URI']), 'deactivate' ) ) {
 				add_action('all_admin_notices', function()
 				{
-					if ( defined( 'RVY_FOLDER' ) )
-						$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: "%2$s")', 'revisionary' ), RVY_VERSION, RVY_FOLDER );
-					else
+					if (defined('REVISIONARY_FILE')) {
+						$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: "%2$s")', 'revisionary' ), RVY_VERSION, dirname(plugin_basename(REVISIONARY_FILE)) );
+					} else {
 						$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)', 'revisionary' ), RVY_VERSION );
+					}
 				
 					echo "<div id='message' class='notice error' style='color:black'>" . $message . '</div>';
 				}, 5);
@@ -170,7 +172,7 @@ add_action(
 			return;
 		}
 
-		define('REVISIONARY_VERSION', '2.4.1');
+		define('REVISIONARY_VERSION', '2.4.2');
 
 		if ( ! defined( 'RVY_VERSION' ) ) {
 			define( 'RVY_VERSION', REVISIONARY_VERSION );  // back compat
@@ -178,10 +180,6 @@ add_action(
 
 		define ('COLS_ALL_RVY', 0);
 		define ('COL_ID_RVY', 1);
-
-		if (!get_option('revisionary_2_install_time')) {
-			update_option('revisionary_2_install_time', time());
-		}
 
 		if ( defined('RS_DEBUG') ) {
 			include_once( dirname(__FILE__).'/lib/debug.php');
@@ -206,10 +204,6 @@ add_action(
 				return;
 		}
 
-		// define URL
-		define ('RVY_BASENAME', plugin_basename(__FILE__) );
-		define ('RVY_FOLDER', dirname( plugin_basename(__FILE__) ) );
-
 		require_once( dirname(__FILE__).'/classes/PublishPress/Revisionary.php');
 		require_once( dirname(__FILE__).'/rvy_init.php');	// Contains activate, deactivate, init functions. Adds mod_rewrite_rules.
 		require_once( dirname(__FILE__).'/functions.php');
@@ -218,13 +212,7 @@ add_action(
 		if ( defined('RS_DEBUG') && is_admin() && ( strpos( urldecode($_SERVER['REQUEST_URI']), 'p-admin/plugin-editor.php' ) || strpos( urldecode($_SERVER['REQUEST_URI']), 'p-admin/plugins.php' ) ) && false === strpos( $_SERVER['REQUEST_URI'], 'activate' ) )
 			return;
 
-		if ( ! defined('WP_CONTENT_URL') )
-			define( 'WP_CONTENT_URL', site_url( 'wp-content', $scheme ) );
-
-		if ( ! defined('WP_CONTENT_DIR') )
-			define( 'WP_CONTENT_DIR', str_replace('\\', '/', ABSPATH) . 'wp-content' );
-
-		define ('RVY_ABSPATH', WP_CONTENT_DIR . '/plugins/' . RVY_FOLDER);
+		define('RVY_ABSPATH', __DIR__);
 
 		if (is_admin() && !defined('REVISIONARY_PRO_VERSION')) {
 			require_once(__DIR__ . '/includes/CoreAdmin.php');

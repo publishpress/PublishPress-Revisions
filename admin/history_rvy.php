@@ -279,7 +279,7 @@ class RevisionaryHistory
             return;
         }
 
-        if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+        if ( ! current_user_can( 'read_post', $post->ID ) ) {
             return;
         }
 
@@ -1096,6 +1096,8 @@ class RevisionaryHistory
     }
 
     function actPastRevisionDiffScripts() {
+        global $revisionary;
+        
         if (did_action('rvy_compare_revisions')) {
             return;
         }

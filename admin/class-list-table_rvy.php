@@ -34,7 +34,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			remove_action('the_post', [$multiple_authors_addon, 'fix_post'], 10);
 		}
 
-		if (!empty($_REQUEST['published_post']) && !get_post_meta($post_id, '_rvy_has_revisions', true)) {
+		if (!empty($_REQUEST['published_post']) && !get_post_meta($_REQUEST['published_post'], '_rvy_has_revisions', true)) {
 			revisionary_refresh_postmeta($_REQUEST['published_post']);
 		}
 	}
@@ -62,7 +62,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$qp['posts_per_page'] = -1;
 		$qp['fields'] = 'ids';
 		
-		$qp['meta_key'] = '_rvy_has_revisions';
+		if (!rvy_get_option('queue_query_all_posts')) { // support defeat of performance enhancement in case _has_revisions flag is not being stored reliably due to plugin integration issues
+			$qp['meta_key'] = '_rvy_has_revisions';
+		}
 
 		if (!empty($q['post_author'])) {
 			do_action('revisionary_queue_pre_query');
