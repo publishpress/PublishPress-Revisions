@@ -84,7 +84,7 @@ if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1
 			} else {
 				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)', 'revisionary' ), RVY_VERSION );
 			}
-		
+			
 			echo "<div id='message' class='notice error' style='color:black'>" . $message . '</div>';
 		}, 5);
 	}

@@ -624,7 +624,7 @@ class Revisionary
 								$caps[] = str_replace('edit_', 'list_', $post_type_obj->cap->edit_others_posts);
 							}
 						} else {
-							$caps[]= "edit_others_drafts";
+							$caps[] = "edit_others_drafts";
 						}
 					}
 				}

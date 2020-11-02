@@ -59,7 +59,7 @@ function rvy_revision_approve($revision_id = 0) {
 		if (!$batch_process) {
 			check_admin_referer( "approve-post_$post->ID|$revision->ID" );
 		}
-		
+
 		clean_post_cache($post->ID);
 		$published_url = get_permalink($post->ID);
 
@@ -126,7 +126,7 @@ function rvy_revision_approve($revision_id = 0) {
 			$last_arg = array( "revision_action" => 1, 'scheduled' => $revision->ID );
 			$scheduled = $revision->post_date;
 		}
-		
+
 		// Support workaround to prevent notification when an Administrator or Editor created the revision
         if (defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS')) {
 			global $current_user;
@@ -287,7 +287,7 @@ function rvy_revision_approve($revision_id = 0) {
 	if (!empty($update_next_publish_date)) {
 		rvy_update_next_publish_date();
 	}
-	
+
 	if (!$batch_process) {	
 		if ( ! $redirect ) {
 			if ( ! empty($post) && is_object($post) && ( 'post' != $post->post_type ) ) {
@@ -549,14 +549,14 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	}
 
 	if ($published_id != $revision_id) {
-	// @todo save change as past revision?
-	//$wpdb->delete($wpdb->posts, array('ID' => $revision_id));
-	$wpdb->update($wpdb->posts, array('post_type' => 'revision', 'post_status' => 'inherit', 'post_parent' => $post_id, 'comment_count' => 0), array('ID' => $revision_id));
+		// @todo save change as past revision?
+		//$wpdb->delete($wpdb->posts, array('ID' => $revision_id));
+		$wpdb->update($wpdb->posts, array('post_type' => 'revision', 'post_status' => 'inherit', 'post_parent' => $post_id, 'comment_count' => 0), array('ID' => $revision_id));
 
-	// @todo save change as past revision?
-	$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
+		// @todo save change as past revision?
+		$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
 	}
-
+	
 	update_post_meta($revision_id, '_rvy_published_gmt', $post_modified_gmt);
 
 	// If published revision was the last remaining pending / scheduled, clear _rvy_has_revisions postmeta flag 
@@ -832,14 +832,14 @@ function rvy_revision_unschedule($revision_id) {
 		if ( $type_obj = get_post_type_object( $revision->post_type ) ) {
 			if ( ! agp_user_can( $type_obj->cap->edit_post, $published_id, '', array( 'skip_revision_allowance' => true ) ) ) {
 				break;
+			}
 		}
-		}
-		
+
 		$wpdb->update( $wpdb->posts, array( 'post_status' => 'pending-revision' ), array( 'ID' => $revision->ID ) );
 		
 		rvy_update_next_publish_date();
 	} while (0);
-	
+
 	return true;
 }
 
@@ -851,7 +851,7 @@ function rvy_revision_publish($revision_id = false) {
 		$redirect = site_url();
 		$batch_process = false;
 	}
-	
+
 	do {
 		if ( !$revision = get_post($revision_id ) ) {
 			break;
@@ -1108,7 +1108,7 @@ function rvy_publish_scheduled_revisions($args = array()) {
 							} else {
 								$use_wp_roles = (defined('RVY_MONITOR_ROLES')) ? RVY_MONITOR_ROLES : 'administrator,editor';
 							}
-							
+	
 							$use_wp_roles = str_replace( ' ', '', $use_wp_roles );
 							$use_wp_roles = explode( ',', $use_wp_roles );
 							
@@ -1167,7 +1167,7 @@ function rvy_publish_scheduled_revisions($args = array()) {
 	}
 
 	rvy_update_next_publish_date();
-	
+
 	// if this was initiated by an asynchronous remote call, we're done.
 	if ( ! empty( $_GET['action']) && ( 'publish_scheduled_revisions' == $_GET['action'] ) ) {
 		exit( 0 );

@@ -3,7 +3,7 @@
 class RevisionaryFront {
 	function __construct() {
 		global $revisionary;
-		
+
 		if ( ! defined('RVY_CONTENT_ROLES') || !$revisionary->content_roles->is_direct_file_access() ) {
 			add_filter('posts_request', [$this, 'flt_view_revision'] );
 			add_action('template_redirect', [$this, 'act_template_redirect'], 5 );
@@ -168,7 +168,7 @@ class RevisionaryFront {
 			$color = '#ccc';
 			$class = '';
 			$message = '';
-			
+
 			// This topbar is presently only for those with restore / approve / publish rights
 			if ( $type_obj = get_post_type_object( $post->post_type ) ) {
 				$cap_name = $type_obj->cap->edit_post;	

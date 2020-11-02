@@ -159,8 +159,8 @@ jQuery(document).ready( function($) {
 			$(ediv + 'button.editor-post-switch-to-draft').hide();
 			$(ediv + 'div.editor-post-link').parent().hide();
 			$(ediv + 'div.components-notice-list').hide();	// autosave notice
-			
-			if(!rvyObjEdit.scheduledRevisionsEnabled) {
+
+			if (!rvyObjEdit.scheduledRevisionsEnabled) {
 				$(ediv + 'div.edit-post-post-schedule').hide();
 			}
 
@@ -212,7 +212,7 @@ jQuery(document).ready( function($) {
 				if (!$('a.editor-post-preview').next('a.rvy-post-preview').length) {
 					$('a.rvy-post-preview').insertAfter($('a.editor-post-preview'));
 				}
-	
+
 				if (rvyObjEdit.previewTitle && !$('a.editor-post-preview').attr('title')) {
 					$('div.edit-post-header__settings a.editor-post-preview').attr('title', rvyObjEdit.previewTitle);
 				}
@@ -234,7 +234,7 @@ jQuery(document).ready( function($) {
 		$('a.rvy-post-preview').hide();
 
 		if (!rvyObjEdit.multiPreviewActive) {
-		$('a.editor-post-preview').show();
+			$('a.editor-post-preview').show();
 		}
 
 		//$('a.revision-save-to-approve').show();
@@ -247,7 +247,7 @@ jQuery(document).ready( function($) {
 		$('a.rvy-post-preview').show();
 
 		if (!rvyObjEdit.multiPreviewActive) {
-		$('a.editor-post-preview').hide();
+			$('a.editor-post-preview').hide();
 		}
 	});
 });

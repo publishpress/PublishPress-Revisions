@@ -13,8 +13,8 @@ class RevisionaryEditRevisionUI {
 /* <![CDATA[ */
 jQuery(document).ready( function($) {
 	if (typeof(postL10n) != 'undefined') {
-	postL10n.update = "<?php _e('Update Revision', 'revisionary' )?>";
-	postL10n.saveDraft = "<?php _e('Update Revision', 'revisionary' )?>";
+		postL10n.update = "<?php _e('Update Revision', 'revisionary' )?>";
+		postL10n.saveDraft = "<?php _e('Update Revision', 'revisionary' )?>";
 	} else {
 		setInterval(
 			function() {

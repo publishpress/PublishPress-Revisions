@@ -84,7 +84,7 @@ class RevisionCreation {
 			$revisionary->impose_pending_rev[$post_id] = true;
 			return $status;
 		}
-		
+
 		// Make sure the stored post is published / scheduled		
 		// With Events Manager plugin active, Role Scoper 1.3 to 1.3.12 caused this filter to fire prematurely as part of object_id detection, flagging for pending_rev needlessly on update of an unpublished post
 		$stored_post = get_post($post_id);
@@ -391,7 +391,7 @@ class RevisionCreation {
 			$revisionary->do_notifications( 'pending-revision', 'pending-revision', $postarr, $args );
 
 			if (apply_filters('revisionary_do_submission_redirect', true)) {
-				rvy_halt( $msg, __('Pending Revision Created', 'revisionary') );
+				rvy_halt($msg, __('Pending Revision Created', 'revisionary'));
 			}
         } else {
         	// return currently stored published post data
