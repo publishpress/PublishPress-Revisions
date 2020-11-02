@@ -490,6 +490,8 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 
 		$hint = __( 'Show descriptive captions for PublishPress Revisions settings', 'revisionary' );
 		$this->option_checkbox( 'display_hints', $tab, $section, $hint, '' );
+
+		do_action('revisionary_option_ui_revision_options', $this);
 		?>
 
 		</td></tr>
