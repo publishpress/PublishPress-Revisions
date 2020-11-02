@@ -370,8 +370,14 @@ class RevisionCreation {
 
         if ( $revisionary->doing_rest || apply_filters('revisionary_limit_revision_fields', false, $post, $published_post) ) {
             // prevent alteration of published post, while allowing save operation to complete
-            $data = array_intersect_key( (array) $published_post, array_fill_keys( array( 'ID', 'post_type', 'post_name', 'post_status', 'post_parent', 'post_author', 'post_content' ), true ) );
         
+			$keys = array_fill_keys( array( 'post_type', 'post_name', 'post_status', 'post_parent', 'post_author', 'post_content' ), true );
+
+			if (!isset($data['ID']) || ($data['ID'] != $published_post->ID)) {
+				$keys['ID'] = true;
+			}
+
+            $data = array_intersect_key( (array) $published_post, $keys );
         }
 
         do_action('revisionary_created_revision', $post);
