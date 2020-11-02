@@ -641,6 +641,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	rvy_delete_past_revisions($revision_id);
 
+	rvy_delete_redundant_revisions($revision);
+
 	/**
 	 * Trigger after a revision has been applied.
 	 *
@@ -650,6 +652,21 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	do_action( 'revision_applied', $published->ID, $revision );
 
 	return $revision;
+}
+
+function rvy_delete_redundant_revisions($revision) {
+	global $wpdb, $current_user;
+
+	$wpdb->query(
+		$wpdb->prepare(
+			"DELETE FROM $wpdb->posts WHERE post_type = %s AND post_status = %s AND post_author = %d AND post_parent = %d AND ID > %d",
+			'revision',
+			'inherit',
+			$current_user->ID,
+			rvy_post_id($revision->ID),
+			$revision->ID
+		)
+	);
 }
 
 // Restore a past revision (post_status = inherit)
