@@ -672,7 +672,7 @@ class RevisionCreation {
 		}
 
 		// If term selections are not posted for revision, store current published terms
-		foreach(get_taxonomies(['public' => true]) as $taxonomy) {
+		foreach(get_taxonomies() as $taxonomy) {
 			if (empty($set_taxonomies[$taxonomy]) && !in_array($taxonomy, ['category', 'post_tag'])) {
 				if ($published_terms = wp_get_object_terms($published_post_id, $taxonomy, ['fields' => 'ids'])) {
 					wp_set_object_terms( $post_ID, $published_terms, $taxonomy );
