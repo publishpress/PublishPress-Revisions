@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.5
-Stable tag: 2.4.2
+Stable tag: 2.4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -100,6 +100,11 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.4.3 - 5 Nov 2020 =
+* Compat : Polylang - language settings were not stored to revision (Fix also applies to other plugins using hidden taxonomies)
+* Compat : Project Nami (Microsoft SQL Server / ODBC) - No confirmation redirect on revision submission
+* Lang : Added .pot file
+
 = 2.4.2 - 26 Oct 2020 =
 * Compat : PublishPress Permissions - Users assigned Revise permissions for specific pages or categories could not compare Pending Revisions
 * Compat : PublishPress Permissions Pro - With Status Control module active, Edit Revision screen had invalid "Workflow" button (also requires Permissions Pro 3.3.8)
@@ -112,7 +117,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 * Fixed : Revison Queue - PHP Notice "Undefined variable: post_id" when URL includes published_post argument
 * Feature : If Revisors are blocked from editing other users' drafts, those can now be included (unclickable) in Edit Pages if the list_others_pages capability is granted 
 * Feature : Support constant definitions REVISIONARY_DISABLE_SUBMISSION_REDIRECT, REVISIONARY_DISABLE_SCHEDULE_REDIRECT
-* Feature : New filters 'revisionary_do_submission_redirect', 'revisionary_do_schedule_redirect'
+* Feature : New filters "revisionary_do_submission_redirect", "revisionary_do_schedule_redirect"
 
 = 2.4.1 - 9 Oct 2020 =
 * Compat : PublishPress Permissions - On new post creation, Revisors get a Publish button instead of a Submit button. Publishing fails; the only way to submit successfully is Save Draft, then Submit for Review.

@@ -172,7 +172,7 @@ class RVY_PostBlockEditUI {
                 'prePublish' => __( 'Workflow&hellip;', 'revisionary' ),
                 'redirectURL' => admin_url("edit.php?post_type={$post_type}&revision_submitted={$status}&post_id={$post_id}"),
                 'revisableStatuses' => rvy_filtered_statuses('names'),
-            );  
+            );
 
             if (defined('REVISIONARY_DISABLE_SUBMISSION_REDIRECT') || !apply_filters('revisionary_do_submission_redirect', true)) {
                 unset($args['redirectURL']);

@@ -84,7 +84,7 @@ class RevisionCreation {
 			$revisionary->impose_pending_rev[$post_id] = true;
 			return $status;
 		}
-		
+
 		// Make sure the stored post is published / scheduled		
 		// With Events Manager plugin active, Role Scoper 1.3 to 1.3.12 caused this filter to fire prematurely as part of object_id detection, flagging for pending_rev needlessly on update of an unpublished post
 		$stored_post = get_post($post_id);
@@ -370,8 +370,14 @@ class RevisionCreation {
 
         if ( $revisionary->doing_rest || apply_filters('revisionary_limit_revision_fields', false, $post, $published_post) ) {
             // prevent alteration of published post, while allowing save operation to complete
-            $data = array_intersect_key( (array) $published_post, array_fill_keys( array( 'ID', 'post_type', 'post_name', 'post_status', 'post_parent', 'post_author', 'post_content' ), true ) );
         
+			$keys = array_fill_keys( array( 'post_type', 'post_name', 'post_status', 'post_parent', 'post_author', 'post_content' ), true );
+
+			if (!isset($data['ID']) || ($data['ID'] != $published_post->ID)) {
+				$keys['ID'] = true;
+			}
+
+            $data = array_intersect_key( (array) $published_post, $keys );
         }
 
         do_action('revisionary_created_revision', $post);
@@ -385,7 +391,7 @@ class RevisionCreation {
 			$revisionary->do_notifications( 'pending-revision', 'pending-revision', $postarr, $args );
 
 			if (apply_filters('revisionary_do_submission_redirect', true)) {
-				rvy_halt( $msg, __('Pending Revision Created', 'revisionary') );
+				rvy_halt($msg, __('Pending Revision Created', 'revisionary'));
 			}
         } else {
         	// return currently stored published post data
@@ -666,7 +672,7 @@ class RevisionCreation {
 		}
 
 		// If term selections are not posted for revision, store current published terms
-		foreach(get_taxonomies(['public' => true]) as $taxonomy) {
+		foreach(get_taxonomies() as $taxonomy) {
 			if (empty($set_taxonomies[$taxonomy]) && !in_array($taxonomy, ['category', 'post_tag'])) {
 				if ($published_terms = wp_get_object_terms($published_post_id, $taxonomy, ['fields' => 'ids'])) {
 					wp_set_object_terms( $post_ID, $published_terms, $taxonomy );

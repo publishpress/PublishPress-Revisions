@@ -115,6 +115,7 @@ class Revisionary
 		}
 
 		add_filter( 'wp_insert_post_data', array($this, 'flt_regulate_revision_status'), 100, 2 );
+		add_filter( 'wp_insert_post_data', array($this, 'fltODBCworkaround'), 101, 2 );
 
 		// REST logging
 		add_filter( 'rest_pre_dispatch', array( $this, 'rest_pre_dispatch' ), 10, 3 );
@@ -623,7 +624,7 @@ class Revisionary
 								$caps[] = str_replace('edit_', 'list_', $post_type_obj->cap->edit_others_posts);
 							}
 						} else {
-							$caps[]= "edit_others_drafts";
+							$caps[] = "edit_others_drafts";
 						}
 					}
 				}
@@ -1048,6 +1049,15 @@ class Revisionary
 		return $data;
 	}
 	
+	function fltODBCworkaround($data, $postarr) {
+		// ODBC does not support UPDATE of ID
+		if (function_exists('get_projectnami_version')) {
+			unset($data['ID']);
+		}
+
+		return $data;
+	}
+
 	function flt_regulate_revision_status($data, $postarr) {
 		// Revisions are not published by wp_update_post() execution; Prevent setting to a non-revision status
 		if (get_post_meta($postarr['ID'], '_rvy_base_post_id', true) && ('trash' != $data['post_status'])) {

@@ -5,7 +5,7 @@
  * Description: Maintain published content with teamwork and precision using the Revisions model to submit, approve and schedule changes.
  * Author: PublishPress
  * Author URI: https://publishpress.com
- * Version: 2.4.2
+ * Version: 2.4.3
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 4.9.7
@@ -84,7 +84,7 @@ if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1
 			} else {
 				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)', 'revisionary' ), RVY_VERSION );
 			}
-		
+			
 			echo "<div id='message' class='notice error' style='color:black'>" . $message . '</div>';
 		}, 5);
 	}
@@ -96,7 +96,7 @@ define('REVISIONARY_FILE', __FILE__);
 // register these functions before any early exits so normal activation/deactivation can still run with RS_DEBUG
 register_activation_hook(__FILE__, function() 
 	{
-		$current_version = '2.4.2';
+		$current_version = '2.4.3';
 
 		$last_ver = get_option('revisionary_last_version');
 
@@ -172,7 +172,7 @@ add_action(
 			return;
 		}
 
-		define('REVISIONARY_VERSION', '2.4.2');
+		define('REVISIONARY_VERSION', '2.4.3');
 
 		if ( ! defined( 'RVY_VERSION' ) ) {
 			define( 'RVY_VERSION', REVISIONARY_VERSION );  // back compat
