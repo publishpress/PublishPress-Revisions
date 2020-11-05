@@ -103,6 +103,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 = 2.4.3-beta4 =
 * Compat : Polylang - language settings were not stored to revision (Fix also applies to other plugins using hidden taxonomies)
 * Compat : Project Nami (Microsoft SQL Server / ODBC) - No confirmation redirect on revision submission
+* Lang : Added .pot file
 
 = 2.4.2 - 26 Oct 2020 =
 * Compat : PublishPress Permissions - Users assigned Revise permissions for specific pages or categories could not compare Pending Revisions
