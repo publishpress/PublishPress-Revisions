@@ -100,6 +100,9 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.4.4-beta =
+* Fixed : Compare Past Revisions - Editors did have "Preview / Restore" or "Manage" buttons
+
 = 2.4.3 - 5 Nov 2020 =
 * Compat : Polylang - language settings were not stored to revision (Fix also applies to other plugins using hidden taxonomies)
 * Compat : Project Nami (Microsoft SQL Server / ODBC) - No confirmation redirect on revision submission
