@@ -27,6 +27,26 @@ add_action('init', 'rvy_set_notification_buffer_cron');
 add_action('rvy_mail_buffer_hook', 'rvy_send_buffered_mail' );
 add_filter('cron_schedules', 'rvy_mail_buffer_cron_interval');
 
+add_filter('wp_insert_post_empty_content', '_rvy_buffer_post_content', 10, 2);
+
+add_action('update_post_metadata', '_rvy_limit_postmeta_update', 10, 5);
+add_action('delete_post_metadata', '_rvy_limit_postmeta_update', 10, 5);
+
+function _rvy_limit_postmeta_update($block_update, $object_id, $meta_key, $meta_value, $prev_value) {
+	global $current_user;
+	
+	if (in_array($meta_key, apply_filters('revisionary_protect_published_meta_keys', ['_thumbnail_id', '_wp_page_template']), $object_id)) {
+		if ($status_obj = get_post_status_object(get_post_field('post_status', $object_id))) {
+			if (!empty($status_obj->public) || !empty($status_obj->private)) {
+				if (get_transient("_rvy_pending_revision_{$current_user->ID}_{$object_id}") || !agp_user_can('edit_post', $object_id, '', ['skip_revision_allowance' => true])) {
+					$block_update = true;
+				}
+			}
+		}
+	}
+
+	return $block_update;
+}
 if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview']) 
 && ((empty($_REQUEST['preview_id']) && empty($_REQUEST['thumbnail_id']))
 || (!empty($_REQUEST['preview_id']) && rvy_is_revision_status(get_post_field('post_status', (int) $_REQUEST['preview_id'])))
@@ -34,6 +54,31 @@ if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview'])
 ) {
 	require_once('compat_rvy.php');
 	_rvy_jreviews_preview_compat();
+}
+
+function _rvy_buffer_post_content($maybe_empty, $postarr) {
+	global $wpdb;
+
+	if (empty($postarr['ID']) || defined('RVY_DISABLE_CONTENT_BUFFER')) { 
+		return $maybe_empty;
+	}
+
+	if ($status_obj = get_post_status_object(get_post_field('post_status', $postarr['ID']))) {
+		if (!empty($status_obj->public) || !empty($status_obj->private)) {
+			if (!agp_user_can('edit_post', $postarr['ID'], '', ['skip_revision_allowance' => true])) {
+				if ($raw_content = $wpdb->get_var(
+					$wpdb->prepare(
+						"SELECT post_content FROM $wpdb->posts WHERE ID = %d",
+						$postarr['ID']
+					)
+				)) {
+					set_transient('rvy_post_content_' . $postarr['ID'], $raw_content, 60);
+				}
+			}
+		}
+	}
+
+	return $maybe_empty;
 }
 
 function rvy_mail_check_buffer($new_msg = [], $args = []) {
