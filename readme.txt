@@ -100,7 +100,9 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
-= 2.4.4-beta =
+= 2.4.4 - 18 Nov 2020 =
+* Fixed : Revision submission caused Post Thumbnail to be cleared from the published post
+* Fixed : Revision submission by a Revisor caused corruption of published content (by slash removal) on some ACF installations
 * Fixed : Compare Past Revisions - Editors did have "Preview / Restore" or "Manage" buttons
 
 = 2.4.3 - 5 Nov 2020 =
