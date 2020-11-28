@@ -86,6 +86,7 @@ function rvy_metabox_notification_list() {
 				}
 			}
 
+			// boolean array with user IDs as array keys
 			$default_ids = apply_filters('revisionary_notify_publisher_default_ids', $publisher_ids, $object_id);
 		}
 		
@@ -129,6 +130,7 @@ function rvy_metabox_notification_list() {
 		echo("<div id='rvy_cclist_$topic'>");
 		
 		if ( $default_ids ) {
+			// array of WP_User objects
 			$post_publishers = apply_filters('revisionary_notify_publishers_eligible', $post_publishers, $object_id);
 			RevisionaryAgentsChecklist::agents_checklist( 'user', $post_publishers, $id_prefix, $default_ids );
 		} else {
