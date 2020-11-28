@@ -52,7 +52,7 @@ function _rvy_limit_postmeta_update($block_update, $object_id, $meta_key, $meta_
 
 // Make sure upstream capability filtering never allows unauthorized updating of published post content
 function _rvy_restore_published_content( $post_ID, $post_after, $post_before ) {
-	global $wpdb;
+	global $wpdb, $current_user;
 
 	if (defined('RVY_DISABLE_CONTENT_BUFFER')) {
 		return;
@@ -60,7 +60,9 @@ function _rvy_restore_published_content( $post_ID, $post_after, $post_before ) {
 
 	if ($status_obj = get_post_status_object(get_post_field('post_status', $post_ID))) {
 		if (!empty($status_obj->public) || !empty($status_obj->private)) {
-			if (!agp_user_can('edit_post', $post_ID, '', ['skip_revision_allowance' => true])) {
+			update_postmeta_cache($post_ID);
+			
+			if (rvy_get_post_meta($post_ID, "_save_as_revision_{$current_user->ID}", true) || !agp_user_can('edit_post', $post_ID, '', ['skip_revision_allowance' => true])) {
 				if ($post_content = get_transient('rvy_post_content_' . $post_ID)) {
 					$wpdb->update($wpdb->posts, ['post_content' => $post_content], ['ID' => $post_ID]);
 					delete_transient('rvy_post_content_' . $post_ID);
@@ -80,7 +82,7 @@ if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview'])
 }
 
 function _rvy_buffer_post_content($maybe_empty, $postarr) {
-	global $wpdb;
+	global $wpdb, $current_user;
 
 	if (empty($postarr['ID']) || defined('RVY_DISABLE_CONTENT_BUFFER')) { 
 		return $maybe_empty;
@@ -88,7 +90,7 @@ function _rvy_buffer_post_content($maybe_empty, $postarr) {
 
 	if ($status_obj = get_post_status_object(get_post_field('post_status', $postarr['ID']))) {
 		if (!empty($status_obj->public) || !empty($status_obj->private)) {
-			if (!agp_user_can('edit_post', $postarr['ID'], '', ['skip_revision_allowance' => true])) {
+			if (rvy_get_post_meta($postarr['ID'], "_save_as_revision_{$current_user->ID}", true) || !agp_user_can('edit_post', $postarr['ID'], '', ['skip_revision_allowance' => true])) {
 				if ($raw_content = $wpdb->get_var(
 					$wpdb->prepare(
 						"SELECT post_content FROM $wpdb->posts WHERE ID = %d",
