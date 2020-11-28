@@ -1103,7 +1103,7 @@ class Revisionary
 		}
 
 		// If Administrator opted to save as a pending revision, don't apply revision scheduling scripts
-		if (get_post_meta($post_arr['ID'], "_save_as_revision_{$current_user->ID}", true)) {
+		if (rvy_get_post_meta($post_arr['ID'], "_save_as_revision_{$current_user->ID}", true)) {
 			return $data;
 		}
 

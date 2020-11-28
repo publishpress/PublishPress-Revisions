@@ -169,6 +169,7 @@ class RvyPostEdit {
         );
 
         delete_post_meta( $post->ID, "_save_as_revision_{$current_user->ID}" );
+        update_postmeta_cache($post->ID);
     }
 
     function limitRevisionEditorUI() {
