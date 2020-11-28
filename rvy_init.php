@@ -189,12 +189,17 @@ class RVY_RestAPI {
     
     public static function get_new_scheduled_revision_flag( $object ) {
 		global $current_user;
-        return ( isset( $object['id'] ) ) ? get_post_meta( $object['id'], "_new_scheduled_revision_{$current_user->ID}", true ) : false;
+        return ( isset( $object['id'] ) ) ? rvy_get_post_meta( $object['id'], "_new_scheduled_revision_{$current_user->ID}", true ) : false;
 	}
 	
 	public static function get_save_as_revision_flag( $object ) {
 		global $current_user;
-        return ( isset( $object['id'] ) ) ? get_post_meta( $object['id'], "_save_as_revision_{$current_user->ID}", true ) : false;
+
+		if (!empty($object['id'])) {
+			return rvy_get_post_meta($object['id'], "_save_as_revision_{$current_user->ID}", true);
+		}
+
+		return false;
     }
 }
 
@@ -205,6 +210,8 @@ function rvy_ajax_handler() {
 		if ('save_as_revision' == $_REQUEST['rvy_ajax_field']) {
 			$save_revision = isset($_REQUEST['rvy_ajax_value']) && in_array($_REQUEST['rvy_ajax_value'], ['true', true, 1, '1'], true);
 			rvy_update_post_meta((int) $_REQUEST['post_id'], "_save_as_revision_{$current_user->ID}", $save_revision);
+			update_postmeta_cache($_REQUEST['post_id']);
+			//rvy_wpe_cache_flush();
 			exit;
 		}
 	}
@@ -215,8 +222,22 @@ function rvy_ajax_handler() {
 	}
 }
 
+function rvy_get_post_meta($post_id, $meta_key, $unused = false) {
+	global $wpdb;
+
+	return $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s and post_id = %d",
+				$meta_key,
+				$post_id
+			)
+		);
+}
+
 function rvy_update_post_meta($post_id, $meta_key, $meta_value) {
 	global $wpdb;
+
+	update_post_meta($post_id, $meta_key, $meta_value);
 
 	// some extra low-level database operations until the cause of meta sync failure with WP 5.5 can be determined
 	rvy_delete_post_meta($post_id, $meta_key);
@@ -1163,3 +1184,37 @@ function rvy_filtered_statuses($output = 'names') {
 		$output
 	);
 }
+
+/**
+ * Based on WP Engine Cache Flush by Aaron Holbrook
+ * https://github.org/a7/wpe-cache-flush/
+ * http://github.org/a7/
+ */
+/*
+function rvy_wpe_cache_flush() {
+    // Don't cause a fatal if there is no WpeCommon class
+    if ( ! class_exists( 'WpeCommon' ) ) {
+        return false;
+    }
+
+    if ( function_exists( 'WpeCommon::purge_memcached' ) ) {
+        \WpeCommon::purge_memcached();
+    }
+
+    if ( function_exists( 'WpeCommon::clear_maxcdn_cache' ) ) {
+        \WpeCommon::clear_maxcdn_cache();
+    }
+
+    if ( function_exists( 'WpeCommon::purge_varnish_cache' ) ) {
+        \WpeCommon::purge_varnish_cache();
+    }
+
+    global $wp_object_cache;
+    // Check for valid cache. Sometimes this is broken -- we don't know why! -- and it crashes when we flush.
+    // If there's no cache, we don't need to flush anyway.
+
+    if ( $wp_object_cache && is_object( $wp_object_cache ) ) {
+        @wp_cache_flush();
+    }
+}
+*/

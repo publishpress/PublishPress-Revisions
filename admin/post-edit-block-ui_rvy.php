@@ -160,6 +160,7 @@ class RVY_PostBlockEditUI {
             // clear scheduled revision redirect flag
             delete_post_meta( $post_id, "_new_scheduled_revision_{$current_user->ID}" );
             delete_post_meta( $post_id, "_save_as_revision_{$current_user->ID}" );
+            update_postmeta_cache($post_id);
 
         } elseif($do_pending_revisions) {
             //div.editor-post-publish-panel button.editor-post-publish-button
