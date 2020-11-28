@@ -40,7 +40,7 @@ function _rvy_limit_postmeta_update($block_update, $object_id, $meta_key, $meta_
 	if (in_array($meta_key, apply_filters('revisionary_protect_published_meta_keys', ['_thumbnail_id', '_wp_page_template']), $object_id)) {
 		if ($status_obj = get_post_status_object(get_post_field('post_status', $object_id))) {
 			if (!empty($status_obj->public) || !empty($status_obj->private)) {
-				if (get_transient("_rvy_pending_revision_{$current_user->ID}_{$object_id}") || !agp_user_can('edit_post', $object_id, '', ['skip_revision_allowance' => true])) {
+				if (rvy_get_post_meta($object_id, "_save_as_revision_{$current_user->ID}", true) || !agp_user_can('edit_post', $object_id, '', ['skip_revision_allowance' => true])) {
 					$block_update = true;
 				}
 			}
