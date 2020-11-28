@@ -732,7 +732,7 @@ class Revisionary
 			}
 		}
 
-		if ($post && ('future-revision' == $post->post_status)) {
+		if ($post && (('future-revision' == $post->post_status) || in_array($cap, ['read_post', 'read_page']))) {
 			if (in_array($cap, ['read_post', 'read_page'])) {
 				return $caps;
 			}
