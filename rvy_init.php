@@ -737,7 +737,10 @@ function rvy_check_duplicate_mail($new_msg, $sent_mail, $buffer) {
 	foreach([$sent_mail, $buffer] as $compare_set) {
 		foreach($compare_set as $sent) {
 			foreach(['address', 'title', 'message'] as $field) {
-				if ($new_msg[$field] != $sent[$field]) {
+				if (!isset($new_msg[$field]) 
+				|| !isset($sent[$field])
+				|| ($new_msg[$field] != $sent[$field])
+				) {
 					continue 2;
 				}
 			}
