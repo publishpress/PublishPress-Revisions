@@ -171,8 +171,8 @@ jQuery(document).ready( function($) {
 			$('button.editor-post-publish-button').hide();
 		}
 
-		if (rvyObjEdit.approvalURL && !RvyApprovalHidden && !$('button.revision-approve').length && $('button.editor-post-trash').filter(':visible').length) {
-			$('button.editor-post-trash').before(
+		if (rvyObjEdit.approvalURL && !RvyApprovalHidden && !$('button.revision-approve').length && $('div.edit-post-post-schedule').length) {
+			$('div.edit-post-post-schedule').after(
 				'<a href="' + rvyObjEdit.approvalURL + '" class="revision-approve" title="' + rvyObjEdit.approvalTitle + '"><button type="button" class="components-button revision-approve is-button is-default is-large">' + rvyObjEdit.approvalCaption + '</button></a>');
 			
 			if (rvyObjEdit.deletionURL) {
