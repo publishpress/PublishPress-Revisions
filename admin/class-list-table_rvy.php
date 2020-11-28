@@ -1130,6 +1130,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			<?php
 		endif;
 		$this->extra_tablenav( $which );
+
+		$_SERVER['REQUEST_URI'] = str_replace('#038;', '&', $_SERVER['REQUEST_URI']);
 		$this->pagination( $which );
 		?>
 
