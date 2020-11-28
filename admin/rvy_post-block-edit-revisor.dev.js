@@ -158,7 +158,7 @@ jQuery(document).ready( function($) {
 			$(ediv + 'button.editor-post-trash').hide();
 			$(ediv + 'button.editor-post-switch-to-draft').hide();
 			$(ediv + 'div.components-notice-list').hide();	// autosave notice
-			$(ediv + 'div.edit-post-post-status div.components-base-control__field input[type="checkbox"]').each(function(e){$('label[for="' + $(this).attr('id') + '"]').hide();}).hide().next('label').hide();
+			$(ediv + 'div.edit-post-post-status div.components-base-control__field input[type="checkbox"]').hide().next('label').hide();
 		}
 		
 	}
