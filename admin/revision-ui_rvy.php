@@ -86,7 +86,8 @@ function rvy_metabox_notification_list() {
 				}
 			}
 
-			$default_ids = $publisher_ids;
+			// boolean array with user IDs as array keys
+			$default_ids = apply_filters('revisionary_notify_publisher_default_ids', $publisher_ids, $object_id);
 		}
 		
 		if ( '1' === $notify_author ) {
@@ -128,9 +129,11 @@ function rvy_metabox_notification_list() {
 		
 		echo("<div id='rvy_cclist_$topic'>");
 		
-		if ( $default_ids )
+		if ( $default_ids ) {
+			// array of WP_User objects
+			$post_publishers = apply_filters('revisionary_notify_publishers_eligible', $post_publishers, $object_id);
 			RevisionaryAgentsChecklist::agents_checklist( 'user', $post_publishers, $id_prefix, $default_ids );
-		else {
+		} else {
 			if ( ( 'always' === $notify_editors ) && $publisher_ids )
 				_e( 'Publishers will be notified (but cannot be selected here).', 'revisionary' );
 			else

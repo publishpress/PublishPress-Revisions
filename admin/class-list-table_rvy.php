@@ -75,12 +75,14 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$qp['author'] = $q['post_author'];
 		}
 
+		$filter_name = (defined('REVISIONARY_QUEUE_LEGACY_FILTER')) ? 'posts_clauses' : 'posts_clauses_request';
+
 		do_action('revisionary_queue_pre_query');
-		add_filter('posts_clauses', [$this, 'pre_query_filter'], 5, 2);
-		add_filter('posts_clauses', [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
+		add_filter($filter_name, [$this, 'pre_query_filter'], 5, 2);
+		add_filter($filter_name, [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
 		$pre_query = new WP_Query( $qp );
-		remove_filter('posts_clauses', [$this, 'pre_query_filter'], 5, 2);
-		remove_filter('posts_clauses', [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
+		remove_filter($filter_name, [$this, 'pre_query_filter'], 5, 2);
+		remove_filter($filter_name, [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
 		do_action('revisionary_queue_pre_query_done');
 
 		$this->published_post_ids = $pre_query->posts;
@@ -140,9 +142,11 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		global $wp_query;
 
+		$filter_name = (defined('REVISIONARY_QUEUE_LEGACY_FILTER')) ? 'posts_clauses' : 'posts_clauses_request';
+
 		add_filter('presspermit_posts_clauses_intercept', [$this, 'flt_presspermit_posts_clauses_intercept'], 10, 4);
-		add_filter('posts_clauses', [$this, 'revisions_filter'], 5, 2);
-		add_filter('posts_clauses', [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
+		add_filter($filter_name, [$this, 'revisions_filter'], 5, 2);
+		add_filter($filter_name, [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
 
 		if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
 			remove_action('pre_get_posts', ['MultipleAuthors\\Classes\\Query', 'action_pre_get_posts']);
@@ -162,8 +166,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		//echo($wp_query->request);
 
 		remove_filter('presspermit_posts_clauses_intercept', [$this, 'flt_presspermit_posts_clauses_intercept'], 10, 4);
-		remove_filter('posts_clauses', [$this, 'revisions_filter'], 5, 2);
-		remove_filter('posts_clauses', [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
+		remove_filter($filter_name, [$this, 'revisions_filter'], 5, 2);
+		remove_filter($filter_name, [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
 
 		return $qr['post_status'];
 	}
@@ -228,7 +232,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		? "OR ($p.post_status = 'pending-revision' AND $p.post_author = '$current_user->ID')" 
 		: '';
 
-		$where .= " AND ($p.comment_count IN ($post_id_csv) $own_revision_clause)";
+		$where_append = "($p.comment_count IN ($post_id_csv) $own_revision_clause)";
 
 		if (rvy_get_option('revisor_hide_others_revisions') && !current_user_can('administrator') 
 			&& !current_user_can('list_others_revisions') && empty($args['suppress_author_clause']) 
@@ -261,17 +265,19 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				$type_clause = '';
 			}
 
-			$where .= $wpdb->prepare(" AND ($p.post_author = %d $type_clause)", $current_user->ID );
+			$where_append .= $wpdb->prepare(" AND ($p.post_author = %d $type_clause)", $current_user->ID );
 		} elseif ($revisionary->config_loaded) {
-			$where .= (array_filter($revisionary->enabled_post_types)) 
+			$where_append .= (array_filter($revisionary->enabled_post_types)) 
 			? " AND ($p.post_type IN ('" . implode("','", array_keys(array_filter($revisionary->enabled_post_types))) . "'))" 
 			: "AND 1=2";
 		}
 
 		if (empty($args['suppress_author_clause'])) {
 			$status_csv = "'" . implode("','", rvy_filtered_statuses()) . "'";
-			$where .= " AND $p.comment_count IN (SELECT ID FROM $wpdb->posts WHERE post_status IN ($status_csv))";
+			$where_append .= " AND $p.comment_count IN (SELECT ID FROM $wpdb->posts WHERE post_status IN ($status_csv))";
 		}
+
+		$where .= " AND $where_append";
 
 		return $where;
 	}
@@ -319,10 +325,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if ( ! $post = get_post( $post_id ) )
 			return;
 		
+		$request_url = add_query_arg($_REQUEST, admin_url('admin.php?page=revisionary-q'));
+
 		switch ($column_name) {
 			case 'post_type':
 				if ( $type_obj = get_post_type_object( get_post_field( 'post_type', $post->post_parent ) ) ) {
-					$link = add_query_arg( 'post_type', $type_obj->name, esc_url($_SERVER['REQUEST_URI']) );
+					$link = add_query_arg('post_type', $type_obj->name, $request_url);
 					echo "<a href='$link'>{$type_obj->labels->singular_name}</a>";
 				}
 
@@ -344,7 +352,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 							$label = ucwords($post->post_status);
 				}
 
-				$link = add_query_arg( 'post_status', $post->post_status, esc_url($_SERVER['REQUEST_URI']) );
+				$link = add_query_arg('post_status', $post->post_status, $request_url);
 				echo "<a href='$link'>$label</a>";
 
 				break;
@@ -413,7 +421,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					$authors_str = [];
 					foreach ($authors as $author) {
 						if (is_object($author)) {
-							$url           = add_query_arg('post_author', $author->ID, esc_url($_SERVER['REQUEST_URI']));
+							$url           = add_query_arg('post_author', $author->ID, $request_url);
 							$authors_str[] = '<a href="' . $url . '">' . esc_html($author->display_name) . '</a>';
 						}
 					}
@@ -426,7 +434,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					echo implode(', ', $authors_str);
 				} else {
 					$author_caption = get_the_author_meta('display_name', $parent_post->post_author);
-					echo $this->apply_edit_link(add_query_arg('post_author', $parent_post->post_author, esc_url($_SERVER['REQUEST_URI'])), $author_caption);
+					echo $this->apply_edit_link(add_query_arg('post_author', $parent_post->post_author, $request_url), $author_caption);
 				}
 		} // end switch
 	}
@@ -452,9 +460,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			);
 		}
 
+		$request_url = add_query_arg($_REQUEST, admin_url('admin.php?page=revisionary-q'));
+
 		$actions['list_filter'] = sprintf(
 			'<a href="%1$s" title="%2$s" aria-label="%2$s">%3$s</a>',
-			add_query_arg('published_post', $post->ID, esc_url($_SERVER['REQUEST_URI'])),
+
+			add_query_arg('published_post', $post->ID, $request_url),
 			/* translators: %s: post title */
 			esc_attr( sprintf( __( 'View only revisions of %s', 'revisionary' ), '&#8220;' . $post->post_title . '&#8221;' ) ),
 			__( 'Filter' )
@@ -1023,8 +1034,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		//if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
 		//	do_action("manage_{$post->post_type}_posts_custom_column", 'authors', $post->ID);
 		//} else {
+			$request_url = add_query_arg($_REQUEST, admin_url('admin.php?page=revisionary-q'));
+
 			$args = ['author' => get_the_author_meta( 'ID' )];
-			echo $this->apply_edit_link( add_query_arg('author', $args['author'], esc_url($_SERVER['REQUEST_URI'])), get_the_author() );
+			echo $this->apply_edit_link( add_query_arg('author', $args['author'], $request_url), get_the_author() );
 		//}
 	}
 
@@ -1123,6 +1136,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			<?php
 		endif;
 		$this->extra_tablenav( $which );
+
+		$_SERVER['REQUEST_URI'] = str_replace('#038;', '&', $_SERVER['REQUEST_URI']);
 		$this->pagination( $which );
 		?>
 

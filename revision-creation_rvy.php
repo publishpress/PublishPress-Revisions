@@ -80,7 +80,7 @@ class RevisionCreation {
 
 		global $current_user;
 
-		if (get_post_meta( $post_id, "_save_as_revision_{$current_user->ID}", true )) {
+		if (rvy_get_post_meta( $post_id, "_save_as_revision_{$current_user->ID}", true )) {
 			$revisionary->impose_pending_rev[$post_id] = true;
 			return $status;
 		}
