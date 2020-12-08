@@ -125,7 +125,7 @@ class RevisionCreation {
 
     // impose pending revision
     function flt_pending_revision_data( $data, $postarr ) {
-        global $wpdb, $current_user;
+        global $wpdb, $current_user, $pagenow;
 		
 		if (!empty($this->revisionary)) {
 			$revisionary = $this->revisionary;
@@ -135,6 +135,12 @@ class RevisionCreation {
 
 		if ($revisionary->disable_revision_trigger) {
 			return $data;
+		}
+
+		if (!empty($pagenow) && ('post.php' == $pagenow)) {
+			if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], ['delete', 'trash'])) {
+				return $data;
+			}
 		}
 
         if ( $revisionary->doing_rest && $revisionary->rest->is_posts_request && ! empty( $revisionary->rest->request ) ) {
@@ -327,7 +333,7 @@ class RevisionCreation {
                 $_author = reset($_authors);
 
                 if ($_author && empty($_author->ID)) { // @todo: is this still necessary?
-                    $_author = MultipleAuthors\Classes\Objects\Author::get_by_term_id($_author->term_id);
+                    $_author = \MultipleAuthors\Classes\Objects\Author::get_by_term_id($_author->term_id);
                 }
             }
 
@@ -336,7 +342,7 @@ class RevisionCreation {
             // If multiple authors could not be stored, restore original authors from published post
             if (empty($_authors) || (!empty($_author) && $_author->ID == $current_user->ID)) {
                 if (!$published_authors) {
-                    if ($author = MultipleAuthors\Classes\Objects\Author::get_by_user_id((int) $published_post->post_author)) {
+                    if ($author = \MultipleAuthors\Classes\Objects\Author::get_by_user_id((int) $published_post->post_author)) {
                         $published_authors = [$author];
                     }
                 }
