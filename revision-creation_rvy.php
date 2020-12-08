@@ -333,7 +333,7 @@ class RevisionCreation {
                 $_author = reset($_authors);
 
                 if ($_author && empty($_author->ID)) { // @todo: is this still necessary?
-                    $_author = MultipleAuthors\Classes\Objects\Author::get_by_term_id($_author->term_id);
+                    $_author = \MultipleAuthors\Classes\Objects\Author::get_by_term_id($_author->term_id);
                 }
             }
 
@@ -342,7 +342,7 @@ class RevisionCreation {
             // If multiple authors could not be stored, restore original authors from published post
             if (empty($_authors) || (!empty($_author) && $_author->ID == $current_user->ID)) {
                 if (!$published_authors) {
-                    if ($author = MultipleAuthors\Classes\Objects\Author::get_by_user_id((int) $published_post->post_author)) {
+                    if ($author = \MultipleAuthors\Classes\Objects\Author::get_by_user_id((int) $published_post->post_author)) {
                         $published_authors = [$author];
                     }
                 }
