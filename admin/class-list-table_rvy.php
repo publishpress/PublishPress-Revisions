@@ -163,6 +163,11 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$wp_query->query($qr);
 		do_action('revisionary_queue_done');
 
+		// prevent default display of all revisions
+		if (!$wp_query->posts) {
+			$wp_query->posts = [true];
+		}
+
 		//echo($wp_query->request);
 
 		remove_filter('presspermit_posts_clauses_intercept', [$this, 'flt_presspermit_posts_clauses_intercept'], 10, 4);
