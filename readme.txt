@@ -6,7 +6,7 @@ Author URI: https://publishpress.com
 Tags: revision, submit changes, workflow, collaboration, permissions, moderate, posts, schedule revisions
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
-Tested up to: 5.5
+Tested up to: 5.6
 Stable tag: 2.4.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -99,6 +99,12 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.4.6 - 8 Dec 2020 =
+* Fixed : If no revisions are accessible to user, all revisions were listed in Revision Queue
+* Fixed : Post deletion triggered revision submission redirect under some conditions
+* Compat : REST API Cache plugin - "Save as Revision" checkbox was ineffective
+* Compat : PublishPress Authors - revision submission failed under some conditions
 
 = 2.4.5 - 30 Nov 2020 =
 * Compat : WP Engine, Kinsta object cache - "Pending Revision" checkbox was ineffective
