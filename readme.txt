@@ -101,6 +101,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 == Changelog ==
 
 = 2.4.6 - 8 Dec 2020 =
+* Lang: Include a .pot file (translation template)
 * Fixed : If no revisions are accessible to user, all revisions were listed in Revision Queue
 * Fixed : Post deletion triggered revision submission redirect under some conditions
 * Compat : REST API Cache plugin - "Save as Revision" checkbox was ineffective
