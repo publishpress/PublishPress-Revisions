@@ -1189,6 +1189,49 @@ function rvy_filtered_statuses($output = 'names') {
 	);
 }
 
+// REST API Cache plugin compat
+add_action('init', 'my_post_types_config', 9999);
+
+function my_post_types_config() {
+	global $wp_post_types;
+
+	$uri = $_SERVER['REQUEST_URI'];
+
+	$rest_cache_active = false;
+	foreach(['rvy_ajax_field', 'rvy_ajax_value', 'revision_submitted'] as $param) {
+		if (strpos($uri, $param)) {
+			$rest_cache_active = true;
+			break;
+		}
+	}
+
+	$rest_cache_active = $rest_cache_active 
+	|| ((!empty($_REQUEST['wp-remove-post-lock']) || strpos($uri, '_locale')) && is_plugin_active('wp-rest-cache/wp-rest-cache.php'));
+
+	if ($rest_cache_active) {
+		foreach(array_keys($wp_post_types) as $key) {
+			$wp_post_types[$key]->rest_controller_class = 'WP_REST_Posts_Controller';
+		}
+	}
+}
+
+// REST API Cache plugin compat
+add_filter('wp_rest_cache/skip_caching', 'rvy_rest_cache_skip');
+
+function rvy_rest_cache_skip($skip) {
+	$uri = $_SERVER['REQUEST_URI'];
+	$uncached_params = array_merge($uncached_params, ['rvy_ajax_field', 'rvy_ajax_value', 'revision_submitted']);
+
+	foreach($uncached_params as $param) {
+		if (strpos($uri, $param)) {
+			$skip = true;
+			break;
+		}
+	}
+
+	return $skip;
+}
+
 /**
  * Based on WP Engine Cache Flush by Aaron Holbrook
  * https://github.org/a7/wpe-cache-flush/
