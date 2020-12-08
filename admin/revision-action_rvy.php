@@ -409,7 +409,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
 		if (!$published_authors = get_multiple_authors($published_id)) {
-			if ($author = MultipleAuthors\Classes\Objects\Author::get_by_user_id((int) $published->post_author)) {
+			if ($author = \MultipleAuthors\Classes\Objects\Author::get_by_user_id((int) $published->post_author)) {
 				$published_authors = [$author];
 			}
 		}
