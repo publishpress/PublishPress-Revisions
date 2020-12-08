@@ -125,7 +125,7 @@ class RevisionCreation {
 
     // impose pending revision
     function flt_pending_revision_data( $data, $postarr ) {
-        global $wpdb, $current_user;
+        global $wpdb, $current_user, $pagenow;
 		
 		if (!empty($this->revisionary)) {
 			$revisionary = $this->revisionary;
@@ -135,6 +135,12 @@ class RevisionCreation {
 
 		if ($revisionary->disable_revision_trigger) {
 			return $data;
+		}
+
+		if (!empty($pagenow) && ('post.php' == $pagenow)) {
+			if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], ['delete', 'trash'])) {
+				return $data;
+			}
 		}
 
         if ( $revisionary->doing_rest && $revisionary->rest->is_posts_request && ! empty( $revisionary->rest->request ) ) {
