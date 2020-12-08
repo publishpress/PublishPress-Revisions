@@ -1233,6 +1233,8 @@ function rvy_rest_cache_skip($skip) {
 }
 
 /**
+ * Full WPEngine cache flush (Hold for possible future use as needed)
+ *
  * Based on WP Engine Cache Flush by Aaron Holbrook
  * https://github.org/a7/wpe-cache-flush/
  * http://github.org/a7/
