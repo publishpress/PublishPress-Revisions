@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.6
-Stable tag: 2.4.6
+Stable tag: 2.4.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -100,7 +100,14 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.4.7 - 15 Dec 2020 =
+* Fixed : Pending Revision submission failed under some conditions (since 2.4.6)
+* Fixed : Compare Pending Revisions always credited assigned post author for Current Revision, now shows user who created the last published update. To revert to previous behavior, define constant RVY_LEGACY_COMPARE_REVISIONS_AUTHOR_DISPLAY.
+* Change : Clarify captions for permissions-related checkboxes in Revisions > Settings > Revision Queue
+* Compat : PublishPress Capabilities - organize Revisions capabilities into own area
+
 = 2.4.6 - 8 Dec 2020 =
+* Lang: Include a .pot file (translation template)
 * Fixed : If no revisions are accessible to user, all revisions were listed in Revision Queue
 * Fixed : Post deletion triggered revision submission redirect under some conditions
 * Compat : REST API Cache plugin - "Save as Revision" checkbox was ineffective

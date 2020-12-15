@@ -156,7 +156,14 @@ class RevisionaryAdmin
 
 		add_filter('presspermit_status_control_scripts', [$this, 'fltDisableStatusControlScripts']);
 
+		add_filter('cme_plugin_capabilities', [$this, 'fltPublishPressCapsSection']);
+
 		add_action('admin_menu', [$this, 'actSettingsPageMaybeRedirect'], 999);
+	}
+
+	public function fltPublishPressCapsSection($section_caps) {
+		$section_caps['PublishPress Revisions'] = ['edit_others_drafts', 'edit_others_revisions', 'list_others_revisions'];
+		return $section_caps;
 	}
 
 	public function fltDisableStatusControlScripts($enable_scripts) {

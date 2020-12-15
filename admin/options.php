@@ -110,8 +110,8 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	[
 	'pending_revisions' => 						__('Enable Pending Revisions', 'revisionary'),
 	'scheduled_revisions' => 					__('Enable Scheduled Revisions', 'revisionary'),
-	'revisor_lock_others_revisions' =>			__("Prevent Revisors from editing others&apos; revisions", 'revisionary'),
-	'revisor_hide_others_revisions' => 			__("Prevent Revisors from viewing others&apos; revisions", 'revisionary'),
+	'revisor_lock_others_revisions' =>			__("Editing others&apos; revisions requires role capability", 'revisionary'),
+	'revisor_hide_others_revisions' => 			__("Listing others&apos; revisions requires role capability", 'revisionary'),
 	'queue_query_all_posts' => 					__('Compatibility Mode', 'revisionary'),
 	'trigger_post_update_actions' => 			__('Revision publication triggers API actions to mimic post update', 'revisionary'),
 	'diff_display_strip_tags' => 				__('Strip html tags out of difference display', 'revisionary'),
@@ -856,24 +856,3 @@ function rvy_options( $sitewide = false, $customize_defaults = false ) {
 	$ui = RvyOptionUI::instance(compact('sitewide', 'customize_defaults'));
 	$ui->options_ui($sitewide, $customize_defaults);
 }
-
-function rvy_is_plugin_active($check_plugin_file)
-    {
-        $plugins = (array)get_option('active_plugins');
-        foreach ($plugins as $plugin_file) {
-            if (false !== strpos($plugin_file, $check_plugin_file)) {
-                return $plugin_file;
-            }
-        }
-
-        if (is_multisite()) {
-            $plugins = (array)get_site_option('active_sitewide_plugins');
-
-            // network activated plugin names are array keys
-            foreach (array_keys($plugins) as $plugin_file) {
-                if (false !== strpos($plugin_file, $check_plugin_file)) {
-                    return $plugin_file;
-                }
-            }
-        }
-    }
