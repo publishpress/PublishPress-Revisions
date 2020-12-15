@@ -808,7 +808,7 @@ class RevisionaryHistory
         }
 
         // If revisions are disabled, we only want autosaves and the current post.
-        if ( apply_filters('revisionary_revisions_disabled', false, $post) ) {
+        if ( $revisions_disabled = apply_filters('revisionary_revisions_disabled', false, $post) ) {
             foreach ( $revisions as $revision_id => $revision ) {
                 if ( ! wp_is_post_autosave( $revision ) ) {
                     unset( $revisions[ $revision_id ] );
@@ -847,6 +847,25 @@ class RevisionaryHistory
                 }
             } elseif ( $current ) {
                 $current_id = $revision->ID;
+            }
+
+            // Without this step, "Current Revision" shows stored post_author (or Multiple Authors), regardless of user(s) who made the last update
+            if ($current && !$revisions_disabled && !defined('RVY_LEGACY_COMPARE_REVISIONS_AUTHOR_DISPLAY')) {
+                if ($past_revisions = wp_get_post_revisions($post->ID, ['orderby' => 'ID', 'order' => 'DESC'])) {
+
+                    // Ignore autosaves. 
+                    foreach($past_revisions as $id => $past_revision) {
+                        if ( false !== strpos( $past_revision->post_name, "{$past_revision->post_parent}-autosave" ) ) {
+                            unset($past_revisions[$id]);
+                        }
+                    }
+
+                    if ($last_revision = array_shift($past_revisions)) {
+                        if ($last_revision->ID > $post->session_id) {
+                            $revision->post_author = $last_revision->post_author;
+                        }
+                    }
+                }
             }
 
             $edit_url = false;
