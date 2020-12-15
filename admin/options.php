@@ -856,24 +856,3 @@ function rvy_options( $sitewide = false, $customize_defaults = false ) {
 	$ui = RvyOptionUI::instance(compact('sitewide', 'customize_defaults'));
 	$ui->options_ui($sitewide, $customize_defaults);
 }
-
-function rvy_is_plugin_active($check_plugin_file)
-    {
-        $plugins = (array)get_option('active_plugins');
-        foreach ($plugins as $plugin_file) {
-            if (false !== strpos($plugin_file, $check_plugin_file)) {
-                return $plugin_file;
-            }
-        }
-
-        if (is_multisite()) {
-            $plugins = (array)get_site_option('active_sitewide_plugins');
-
-            // network activated plugin names are array keys
-            foreach (array_keys($plugins) as $plugin_file) {
-                if (false !== strpos($plugin_file, $check_plugin_file)) {
-                    return $plugin_file;
-                }
-            }
-        }
-    }
