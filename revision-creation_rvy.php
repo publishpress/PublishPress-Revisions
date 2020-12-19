@@ -33,6 +33,10 @@ class RevisionCreation {
             return $data;
         }
 
+		if (!empty($postarr['post_type']) && empty($revisionary->enabled_post_types[$postarr['post_type']])) {
+			return $data;
+		}
+
         // todo: consolidate functions
         $this->flt_pendingrev_post_status($data['post_status']);
 
@@ -113,6 +117,10 @@ class RevisionCreation {
 		} 
 			
 		if ( ! empty( $post_type ) ) {
+			if (empty($revisionary->enabled_post_types[$post_type])) {
+				return $status;
+			}
+
 			if ( $type_obj = get_post_type_object( $post_type ) ) {
 				if ( ! agp_user_can( $type_obj->cap->edit_post, $post_id, '', array( 'skip_revision_allowance' => true ) ) ) {
 					$revisionary->impose_pending_rev[$post_id] = true;
@@ -134,6 +142,10 @@ class RevisionCreation {
 		}
 
 		if ($revisionary->disable_revision_trigger) {
+			return $data;
+		}
+
+		if (!empty($postarr['post_type']) && empty($revisionary->enabled_post_types[$postarr['post_type']])) {
 			return $data;
 		}
 
@@ -421,6 +433,10 @@ class RevisionCreation {
 		}
 
 		if ( empty( $post_arr['ID'] ) ) {
+			return $data;
+		}
+
+		if (!empty($post_arr['post_type']) && empty($revisionary->enabled_post_types[$post_arr['post_type']])) {
 			return $data;
 		}
 		
