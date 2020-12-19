@@ -222,6 +222,30 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		return $clauses;
 	}
 
+	function append_revisions_where($where, $args=[]) {
+		global $wpdb;
+		
+		$where_append = '';
+		
+		if (defined('ICL_SITEPRESS_VERSION')) {
+			if (!empty($_REQUEST['lang'])) {
+				$lang = $_REQUEST['lang'];
+			} else {
+				global $sitepress;
+				if (!empty($sitepress) && method_exists($sitepress, 'get_admin_language_cookie')) {
+					$lang = $sitepress->get_admin_language_cookie();
+				}
+			}
+
+			if ($lang) {
+				$p = (!empty($args['alias'])) ? $args['alias'] : $wpdb->posts;
+				$where_append = " AND $p.comment_count IN (SELECT element_id FROM {$wpdb->prefix}icl_translations WHERE element_type LIKE 'post_%' AND language_code = '$lang')";
+			}
+		}
+
+		return $where_append;
+	}
+
 	function revisions_where_filter($where, $args = []) {
 		global $wpdb, $current_user, $revisionary;
 		
@@ -233,9 +257,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$post_id_csv = "'" . implode("','", $this->published_post_ids) . "'";
 		}
 
-		$own_revision_clause = (empty($_REQUEST['post_author']) || !empty($args['status_count'])) && empty($_REQUEST['published_post'])
-		? "OR ($p.post_status = 'pending-revision' AND $p.post_author = '$current_user->ID')" 
-		: '';
+		if ((empty($_REQUEST['post_author']) || !empty($args['status_count'])) && empty($_REQUEST['published_post'])) {
+			$own_revision_and = $this->append_revisions_where($where, $args);
+			$own_revision_clause = "OR ($p.post_status = 'pending-revision' AND $p.post_author = '$current_user->ID'{$own_revision_and})";
+		} else {
+			$own_revision_clause = '';
+		}
 
 		$where_append = "($p.comment_count IN ($post_id_csv) $own_revision_clause)";
 
