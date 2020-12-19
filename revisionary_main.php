@@ -162,11 +162,14 @@ class Revisionary
 	private function setPostTypes() {
 		$this->enabled_post_types = apply_filters(
 			'revisionary_enabled_post_types', 
+			array_diff_key(
 			array_merge(
 				array_fill_keys(
 					get_post_types(['public' => true]), true
 				),
 				['swfd-courses' => true]
+				),
+				['tablepress_table' => true]
 			)
 		);
 
