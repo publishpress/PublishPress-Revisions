@@ -165,6 +165,8 @@ jQuery(document).ready( function($) {
 			}
 
 			$(ediv + '#publishpress-notifications').hide();
+
+			$('#icl_div').closest('div.edit-post-meta-boxes-area').hide();
 		}
 
 		if ( $('button.editor-post-publish-button').length ) {
