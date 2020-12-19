@@ -82,9 +82,13 @@ if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview'])
 }
 
 function _rvy_buffer_post_content($maybe_empty, $postarr) {
-	global $wpdb, $current_user;
+	global $wpdb, $current_user, $revisionary;
 
 	if (empty($postarr['ID']) || defined('RVY_DISABLE_CONTENT_BUFFER')) { 
+		return $maybe_empty;
+	}
+
+	if (!empty($postarr['post_type']) && $revisionary && empty($revisionary->enabled_post_types[$postarr['post_type']])) {
 		return $maybe_empty;
 	}
 
