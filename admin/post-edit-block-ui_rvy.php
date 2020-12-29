@@ -171,6 +171,17 @@ class RVY_PostBlockEditUI {
             //div.editor-post-publish-panel button.editor-post-publish-button
             wp_enqueue_script( 'rvy_object_edit', RVY_URLPATH . "/admin/rvy_post-block-edit-revisor{$suffix}.js", array('jquery', 'jquery-form'), RVY_VERSION, true );
             
+            $userRevision = (defined('REVISIONARY_GUTEN_NOTICE')) ? revisionary()->getUserRevision($post_id, ['force_query' => true]) : false;
+
+            if ($userRevision) {
+                $editRevisionURL = (defined('REVISIONARY_GUTEN_NOTICE_LINK_WORKAROUND')) ? admin_url('post.php') . "?post=$userRevision&action=edit" : '';
+                $punc = $editRevisionURL ? ':' : '.';
+                $revisionExistsCaption = sprintf( __("You've already submitted a revision%s", 'revisionary'), $punc);
+                $editRevisionCaption = __('Edit the Revision', 'revisionary');
+            } else {
+                $editRevisionURL = $revisionExistsCaption = $editRevisionCaption = '';
+            }
+
             $status = 'pending-revision';
             $args = array(
                 'publish' =>    __('Submit Revision', 'revisionary'), 
@@ -178,7 +189,10 @@ class RVY_PostBlockEditUI {
                 'prePublish' => __( 'Workflow&hellip;', 'revisionary' ),
                 'redirectURL' => admin_url("edit.php?post_type={$post_type}&revision_submitted={$status}&post_id={$post_id}"),
                 'revisableStatuses' => rvy_filtered_statuses('names'),
+                'userRevision' => $userRevision,
                 'editRevisionURL' => $editRevisionURL,
+                'revisionExistsCaption' => $revisionExistsCaption,
+                'editRevisionCaption' => $editRevisionCaption,
             );
 
             if (defined('REVISIONARY_DISABLE_SUBMISSION_REDIRECT') || !apply_filters('revisionary_do_submission_redirect', true)) {
