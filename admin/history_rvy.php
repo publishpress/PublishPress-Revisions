@@ -877,7 +877,8 @@ class RevisionaryHistory
                 if ($can_restore) {
                     $published_post_id = rvy_post_id($revision->ID);
 
-	                if (rvy_get_option('compare_revisions_direct_approval') && agp_user_can( 'edit_post', $published_post_id, '', ['skip_revision_allowance' => true] ) ) {
+                    // For non-public types, force direct approval because preview is not available
+	                if ((($type_obj && empty($type_obj->public)) || rvy_get_option('compare_revisions_direct_approval')) && agp_user_can( 'edit_post', $published_post_id, '', ['skip_revision_allowance' => true] ) ) {
                         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
 
                         if (in_array($revision->post_status, ['pending-revision'])) {
@@ -1044,7 +1045,9 @@ class RevisionaryHistory
             $type_obj = get_post_type_object($post_type);
         }
 
-        $direct_approval = rvy_get_option('compare_revisions_direct_approval') && agp_user_can( 'edit_post', rvy_post_id($post_id), '', ['skip_revision_allowance' => true] );
+        // For non-public types, force direct approval because preview is not available
+        $direct_approval = (($type_obj && empty($type_obj->public)) || rvy_get_option('compare_revisions_direct_approval')) 
+        && agp_user_can('edit_post', rvy_post_id($post_id), '', ['skip_revision_allowance' => true]);
 
         if ($post_id) {
             $can_approve = agp_user_can('edit_post', rvy_post_id($post_id), 0, ['skip_revision_allowance' => true]);

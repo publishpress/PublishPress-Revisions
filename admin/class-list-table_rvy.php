@@ -1122,7 +1122,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		if ( is_post_type_viewable( $post_type_object ) ) {
-			if ( $can_read_post ) {
+			if ($can_read_post && $post_type_object && !empty($post_type_object->public)) {
 				if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
 					$preview_link = rvy_preview_url($post);
 
