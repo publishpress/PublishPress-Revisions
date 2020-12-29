@@ -100,6 +100,16 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.4.9-rc =
+* Compat : REST API Cache - REST caching failed for attachments
+
+= 2.4.9-beta3 =
+* Fixed : Non-public post types displayed ineffective preview link. Now suppress link or link to Compare Revisions screen instead.
+
+= 2.4.9-beta2 =
+* Fixed : Error loading Revisions > Settings page if nullstring license key is stored, on some installations
+* Feature : Display notice to Revisor if they have already submitted a revision (in Gutenberg only if constant REVISIONARY_GUTEN_NOTICE defined)
+
 = 2.4.8 - 17 Dec 2020 =
 * Compat : WPML - Revision Queue was not filtered by WPML language selector
 * Compat : WPML - Hide non-revisionable Languages settings in Revision editor
