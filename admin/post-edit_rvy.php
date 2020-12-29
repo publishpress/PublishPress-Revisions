@@ -92,7 +92,13 @@ class RvyPostEdit {
 
             $view_link = rvy_preview_url($post);
 
-            if ($can_publish = agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true))) {
+            $can_publish = agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
+
+            if ($type_obj && empty($type_obj->public)) {
+                $view_link = '';
+                $view_caption = '';
+                $view_title = '';
+            } elseif ($can_publish) {
                 $view_caption = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
                 $view_title = __('View / moderate saved revision', 'revisionary');
             } else {
@@ -237,7 +243,11 @@ class RvyPostEdit {
             	$url = add_query_arg('_thumbnail_id', $revisionary->last_autosave_id[$_post->ID], $url);
             }
         } elseif ($post && rvy_is_revision_status($post->post_status)) {
-            $url = rvy_preview_url($post);
+            $type_obj = get_post_type_object($post->post_type);
+
+            if ($type_obj && !empty($type_obj->public)) {
+            	$url = rvy_preview_url($post);
+        	}
         }
 
         return $url;
@@ -247,10 +257,15 @@ class RvyPostEdit {
         global $post;
 
         $type_obj = get_post_type_object($post->post_type);
+
+        if ($type_obj && empty($type_obj->public)) {
+            return $preview_caption;
+        }
+
         $can_publish = $type_obj && agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
         if ($can_publish) {
             $preview_caption = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
-        } else {
+        } elseif ($type_obj && !empty($type_obj->public)) {
             $preview_caption = __('View');
         }
 
@@ -261,10 +276,15 @@ class RvyPostEdit {
         global $post;
 
         $type_obj = get_post_type_object($post->post_type);
+
+        if ($type_obj && empty($type_obj->public)) {
+            return $preview_title;
+        }
+
         $can_publish = $type_obj && agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
         if ($can_publish) {
             $preview_title = __('View / moderate saved revision', 'revisionary');
-        } else {
+        } elseif ($type_obj && !empty($type_obj->public)) {
             $preview_title = __('View saved revision', 'revisionary');
         }
 

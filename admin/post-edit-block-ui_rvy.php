@@ -42,8 +42,13 @@ class RVY_PostBlockEditUI {
 
             if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
                 $view_link = rvy_preview_url($post);
+                $can_publish = agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
 
-                if ($can_publish = agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true))) {
+                if ($type_obj && empty($type_obj->public)) {
+                    $view_link = '';
+                    $view_caption = '';
+                    $view_title = '';
+                } elseif ($can_publish) {
                     $view_caption = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
                     $view_title = __('View / moderate saved revision', 'revisionary');
                 } else {
@@ -173,6 +178,7 @@ class RVY_PostBlockEditUI {
                 'prePublish' => __( 'Workflow&hellip;', 'revisionary' ),
                 'redirectURL' => admin_url("edit.php?post_type={$post_type}&revision_submitted={$status}&post_id={$post_id}"),
                 'revisableStatuses' => rvy_filtered_statuses('names'),
+                'editRevisionURL' => $editRevisionURL,
             );
 
             if (defined('REVISIONARY_DISABLE_SUBMISSION_REDIRECT') || !apply_filters('revisionary_do_submission_redirect', true)) {
