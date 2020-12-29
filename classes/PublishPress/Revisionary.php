@@ -72,4 +72,21 @@ class Revisions {
             return rvy_delete_option($option_basename, $sitewide);
         }
 	}
+    
+    public function getUserRevision($post_id, $args = []) {
+        global $wpdb, $current_user;
+
+        $args = (array) $args;
+        $user_id = (!empty($args['user_id'])) ? $args['user_id'] : $current_user->ID;
+
+        if (empty($args['force_query']) && !get_post_meta($post_id, '_rvy_has_revisions')) {
+            return false;
+        }
+
+        $revision_id = $wpdb->get_var(
+            "SELECT ID FROM $wpdb->posts WHERE comment_count = '$post_id' AND post_author = '$user_id' AND post_status IN ('pending-revision', 'future-revision') ORDER BY ID DESC LIMIT 1"
+        );
+
+        return $revision_id;
+    }
 }

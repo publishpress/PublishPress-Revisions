@@ -23,7 +23,25 @@ class RvyPostEdit {
 
         add_filter('revisionary_apply_revision_allowance', [$this, 'fltRevisionAllowance'], 5, 2);
 
+        add_action('all_admin_notices', [$this, 'actRevisionExistsNotice']);
+
         add_action('admin_head', [$this, 'actAdminBarPreventPostClobber'], 5);
+    }
+
+    function actRevisionExistsNotice() {
+        global $post, $current_user, $wpdb;
+
+        if (empty($post) || agp_user_can('edit_post', $post->ID, '', ['skip_revision_allowance' => true])) {
+            return;
+        }
+
+        if ($revision_id = revisionary()->getUserRevision($post->ID)) {
+            $url = admin_url('post.php') . "?post=$revision_id&action=edit";
+            $type_obj = get_post_type_object($post->post_type);
+            $type_label = (!empty($type_obj) && !empty($type_obj->labels->singular_name)) ? $type_obj->labels->singular_name : 'post';
+            $message = sprintf(__('You have already submitted a revision for this %s. %sEdit the revision%s.', 'revisionary'), $type_label, "<a href='$url'>", '</a>');
+            echo "<div id='message' class='notice notice-warning' style='color:black'>" . $message . '</div>';
+        }
     }
 
     function fltPostUpdatedMessage($messages) {
