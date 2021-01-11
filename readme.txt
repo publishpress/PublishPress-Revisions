@@ -100,8 +100,9 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
-= 2.4.9-rc =
+= 2.4.9-rc3 =
 * Compat : REST API Cache - REST caching failed for attachments
+* Change : Enable Compare Revisions link (for past revisions) in page editor for Revisor
 
 = 2.4.9-beta3 =
 * Fixed : Non-public post types displayed ineffective preview link. Now suppress link or link to Compare Revisions screen instead.
