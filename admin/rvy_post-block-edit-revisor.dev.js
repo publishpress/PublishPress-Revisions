@@ -137,7 +137,7 @@ jQuery(document).ready( function($) {
 			}
 			
 			$('select.editor-post-author__select').parent().hide();
-			$('div.edit-post-last-revision__panel').hide();
+			//$('div.edit-post-last-revision__panel').hide();
 			$('div.edit-post-post-visibility').hide();
 			$('button.editor-post-trash').hide();
 			$('button.editor-post-switch-to-draft').hide();
@@ -199,9 +199,10 @@ jQuery(document).ready( function($) {
 	var RvyHideElements = function() {
 		var ediv = 'div.edit-post-sidebar ';
 
-		if ( $(ediv + 'div.edit-post-post-visibility,' + ediv + 'div.edit-post-last-revision__panel,' + ediv + 'div.editor-post-link,' + ediv + 'select.editor-post-author__select:visible,' + ediv + 'div.components-base-control__field input[type="checkbox"]:visible,' + ediv + 'button.editor-post-switch-to-draft,' + ediv + 'button.editor-post-trash').length ) {
+		//if ( $(ediv + 'div.edit-post-post-visibility,' + ediv + 'div.edit-post-last-revision__panel,' + ediv + 'div.editor-post-link,' + ediv + 'select.editor-post-author__select:visible,' + ediv + 'div.components-base-control__field input[type="checkbox"]:visible,' + ediv + 'button.editor-post-switch-to-draft,' + ediv + 'button.editor-post-trash').length ) {
+		if ( $(ediv + 'div.edit-post-post-visibility,' + ediv + 'div.editor-post-link,' + ediv + 'select.editor-post-author__select:visible,' + ediv + 'div.components-base-control__field input[type="checkbox"]:visible,' + ediv + 'button.editor-post-switch-to-draft,' + ediv + 'button.editor-post-trash').length ) {
 			$(ediv + 'select.editor-post-author__select').parent().hide();
-			$(ediv + 'div.edit-post-last-revision__panel').hide();
+			//$(ediv + 'div.edit-post-last-revision__panel').hide();
 			$(ediv + 'div.edit-post-post-visibility').hide();
 			$(ediv + 'button.editor-post-trash').hide();
 			$(ediv + 'button.editor-post-switch-to-draft').hide();
