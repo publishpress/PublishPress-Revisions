@@ -173,7 +173,10 @@ class RvyPostEditSubmitMetabox
 
                 $type_obj = get_post_type_object($post->post_type);
                 $can_publish = $type_obj && agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
-                if ($can_publish) {
+                
+                if ($type_obj && empty($type_obj->public)) {
+                    return;
+                } elseif ($can_publish) {
                     $preview_button = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
                     $preview_title = __('View / moderate saved revision', 'revisionary');
                 } else {

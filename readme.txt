@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.6
-Stable tag: 2.4.8
+Stable tag: 2.4.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -99,6 +99,14 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.4.9 - 14 Jan 2021 =
+* Compat : REST API Cache - REST caching failed for attachments
+* Fixed : Non-public post types displayed ineffective preview link. Now suppress link or link to Compare Revisions screen instead.
+* Fixed : Error loading Revisions > Settings page if nullstring license key is stored, on some installations
+* Fixed : Deprecated jQuery event handlers
+* Feature : Display notice to Revisor if they have already submitted a revision (in Gutenberg only if constant REVISIONARY_GUTEN_NOTICE defined)
+* Change : Enable Compare Revisions link (for past revisions) in page editor for Revisor
 
 = 2.4.8 - 17 Dec 2020 =
 * Compat : WPML - Revision Queue was not filtered by WPML language selector

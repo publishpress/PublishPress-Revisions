@@ -137,23 +137,72 @@ jQuery(document).ready( function($) {
 			}
 			
 			$('select.editor-post-author__select').parent().hide();
-			$('div.edit-post-last-revision__panel').hide();
+			//$('div.edit-post-last-revision__panel').hide();
 			$('div.edit-post-post-visibility').hide();
 			$('button.editor-post-trash').hide();
 			$('button.editor-post-switch-to-draft').hide();
 
 			$('div.components-notice-list').hide();	// autosave notice
 			$('div.edit-post-post-status div.components-base-control__field input[type="checkbox"]').hide().next('label').hide(); // stick to top
+			if (rvyObjEdit.userRevision) {
+				if ($('button.editor-post-publish-button:visible').length && !$('div.have-revision-notice').length) {
+					// @todo: Gutenberg does not allow manually inserted html to contain links
+					var html = '<div class="components-notice is-warning" style="padding:0 0 0 8px"><div class="components-notice__content">' 
+					+ rvyObjEdit.revisionExistsCaption;
+					/*
+					+  '<a class="components-button is-link">'
+					+ rvyObjEdit.editRevisionCaption
+					+ '</a>'
+					*/
+
+					if (rvyObjEdit.editRevisionURL) {
+						html += ' <strong>' + rvyObjEdit.editRevisionURL + '</strong>';
+					}
+
+					html += '</div></div> ';
+
+					$('div.edit-post-header-toolbar__left').after('<div class="have-revision-notice">' + html + '</div>');
+				}
+				
+				/*
+				// @todo: Gutenberg does not allow this to be displayed to Revisors
+				wp.data.dispatch('core/notices').createInfoNotice(
+					'info', // Can be one of: success, info, warning, error.
+					rvyObjEdit.revisionExistsCaption,
+					{
+						id: 'rvyRevisionExistsNotice',
+						isDismissible: false,
+		
+						// Any actions the user can perform.
+						actions: [
+							{
+								url: rvyObjEdit.editRevisionURL,
+								label: rvyObjEdit.editRevisionCaption,
+							},
+				 			//{
+				 			//	label: ' or ',
+							//},
+				 			//{
+				 			//	url: another_url,
+				 			//	label: __('Another action'),
+							//},
+				  		]
+		  			}
+				);
+				*/
+			}
 		}
 	}
 	var RvyInitInterval = setInterval(RvyInitializeBlockEditorModifications, 50);
 
+
 	var RvyHideElements = function() {
 		var ediv = 'div.edit-post-sidebar ';
 
-		if ( $(ediv + 'div.edit-post-post-visibility,' + ediv + 'div.edit-post-last-revision__panel,' + ediv + 'div.editor-post-link,' + ediv + 'select.editor-post-author__select:visible,' + ediv + 'div.components-base-control__field input[type="checkbox"]:visible,' + ediv + 'button.editor-post-switch-to-draft,' + ediv + 'button.editor-post-trash').length ) {
+		//if ( $(ediv + 'div.edit-post-post-visibility,' + ediv + 'div.edit-post-last-revision__panel,' + ediv + 'div.editor-post-link,' + ediv + 'select.editor-post-author__select:visible,' + ediv + 'div.components-base-control__field input[type="checkbox"]:visible,' + ediv + 'button.editor-post-switch-to-draft,' + ediv + 'button.editor-post-trash').length ) {
+		if ( $(ediv + 'div.edit-post-post-visibility,' + ediv + 'div.editor-post-link,' + ediv + 'select.editor-post-author__select:visible,' + ediv + 'div.components-base-control__field input[type="checkbox"]:visible,' + ediv + 'button.editor-post-switch-to-draft,' + ediv + 'button.editor-post-trash').length ) {
 			$(ediv + 'select.editor-post-author__select').parent().hide();
-			$(ediv + 'div.edit-post-last-revision__panel').hide();
+			//$(ediv + 'div.edit-post-last-revision__panel').hide();
 			$(ediv + 'div.edit-post-post-visibility').hide();
 			$(ediv + 'button.editor-post-trash').hide();
 			$(ediv + 'button.editor-post-switch-to-draft').hide();
@@ -163,6 +212,7 @@ jQuery(document).ready( function($) {
 		
 	}
 	var RvyHideInterval = setInterval(RvyHideElements, 50);
+
 
 	/*
 	// If Publish button is clicked, current post status will be set to [user's next/max status progression]

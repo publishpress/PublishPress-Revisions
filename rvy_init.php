@@ -1154,6 +1154,12 @@ function rvy_preview_url($revision, $args = []) {
 		$$var = (!empty($args[$var])) ? $args[$var] : $defaults[$var]; 
 	}
 
+	if ($post_type_obj = get_post_type_object($revision->post_type)) {
+		if (empty($post_type_obj->public)) { // For non-public types, preview is not available so default to Compare Revisions screen
+			return apply_filters('revisionary_preview_url', admin_url("revision.php?revision=$revision->ID"), $revision, $args);
+		}
+	}
+
 	$link_type = rvy_get_option('preview_link_type');
 
 	$status_obj = get_post_status_object(get_post_field('post_status', rvy_post_id($revision->ID)));
@@ -1214,9 +1220,9 @@ function rvy_filtered_statuses($output = 'names') {
 }
 
 // REST API Cache plugin compat
-add_action('init', 'my_post_types_config', 9999);
+add_action('init', 'rvy_rest_cache_compat', 9999);
 
-function my_post_types_config() {
+function rvy_rest_cache_compat() {
 	global $wp_post_types;
 
 	$uri = $_SERVER['REQUEST_URI'];
@@ -1229,12 +1235,14 @@ function my_post_types_config() {
 		}
 	}
 
+	/*
 	$rest_cache_active = $rest_cache_active 
 	|| ((!empty($_REQUEST['wp-remove-post-lock']) || strpos($uri, '_locale')) && rvy_is_plugin_active('wp-rest-cache/wp-rest-cache.php'));
+	*/
 
 	if ($rest_cache_active) {
 		foreach(array_keys($wp_post_types) as $key) {
-			$wp_post_types[$key]->rest_controller_class = 'WP_REST_Posts_Controller';
+			$wp_post_types[$key]->rest_controller_class = ('attachment' == $key) ? 'WP_REST_Attachments_Controller' : 'WP_REST_Posts_Controller';
 		}
 	}
 }
