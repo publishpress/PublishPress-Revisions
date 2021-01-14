@@ -628,7 +628,7 @@ class RevisionaryAdmin
 			<script type="text/javascript">
 			/* <![CDATA[ */
 			jQuery(document).ready( function($) {
-				$('#rvy-rev-checkall').click(function() {
+				$('#rvy-rev-checkall').on('click', function() {
 					$('.rvy-rev-chk').attr( 'checked', this.checked );
 				});
 			});
