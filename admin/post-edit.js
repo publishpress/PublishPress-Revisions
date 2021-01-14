@@ -9,7 +9,7 @@ jQuery(document).ready( function($) {
 	if ( ! $('#timestampdiv a.now-timestamp').length ) {
 	 	$('#timestampdiv a.cancel-timestamp').after('<a href="#timestamp_now" class="now-timestamp hide-if-no-js button-now">' + rvyPostEdit.nowCaption + '</a>');
 	}
-	$('#timestampdiv a.now-timestamp').click(function(){
+	$('#timestampdiv a.now-timestamp').on('click', function(){
 		var nowDate = new Date();
 		var month = nowDate.getMonth() + 1;
 		if ( month.toString().length < 2 ) {
