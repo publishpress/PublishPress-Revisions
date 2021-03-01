@@ -49,8 +49,10 @@ class Revisionary
 				if ($_post = get_post($revision_id)) {
 					if (!rvy_is_revision_status($_post->post_status)) {
 						if ($parent_post = get_post($_post->post_parent)) {
-							if (!$this->canEditPost($parent_post, ['simple_cap_check' => true])) {
-								return;
+							if (!empty($_POST) || (!empty($_REQUEST['action']) && ('restore' == $_REQUEST['action']))) {
+								if (!$this->canEditPost($parent_post, ['simple_cap_check' => true])) {
+									return;
+								}
 							}
 						}
 					}
@@ -225,7 +227,7 @@ class Revisionary
 			}
 		} else {
 			if (!empty($args['skip_revision_allowance'])) {
-				if (!$caps = map_meta_cap('edit_post', $post_id)) {
+				if (!$caps = map_meta_cap('edit_post', $current_user->ID, $post_id)) {
 					$last_result[$post_id] = false;
 					return false;
 				}
