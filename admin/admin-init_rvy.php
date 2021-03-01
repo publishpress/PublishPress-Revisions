@@ -234,7 +234,15 @@ function rvy_admin_init() {
 			}
 		}
 		
-	} // endif action arg passed
+	} elseif (is_admin() && (false !== strpos($_SERVER['REQUEST_URI'], 'revision.php'))) { // endif action arg passed
+
+		$revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : $_REQUEST['to'];
+
+		if (('modified' == rvy_get_option('past_revisions_order_by')) && !rvy_is_revision_status(get_post_field('post_status', $revision_id))) {
+			require_once(dirname(__FILE__).'/history_rvy.php');
+			add_filter('query', ['RevisionaryHistory', 'fltOrderRevisionsByModified']);
+		}
+	}
 
 	if (defined('REVISIONARY_PRO_VERSION') && !empty($_REQUEST['rvy_ajax_settings'])) {
 		include_once(RVY_ABSPATH . '/includes-pro/pro-activation-ajax.php');

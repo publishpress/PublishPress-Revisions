@@ -131,6 +131,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'preview_link_type' => 						__('Preview Link Type', 'revisionary'),
 	'compare_revisions_direct_approval' => 		__('Approve Button on Compare Revisions screen', 'revisionary'),
 	'copy_revision_comments_to_post' => 		__('Copy revision comments to published post', 'revisionary'),
+	'past_revisions_order_by' =>				__('Compare Past Revisions ordering:')
 	]
 );
 
@@ -154,7 +155,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'pending_revisions'	=> 	 ['pending_revisions', 'pending_revision_update_post_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'queue_query_all_posts'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'],
-	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'display_hints'],
+	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'display_hints'],
 	'notification'	=>		 ['pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 ]
 ]);
@@ -487,6 +488,26 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 
 		$hint = '';
 		$this->option_checkbox( 'diff_display_strip_tags', $tab, $section, $hint, '' );
+
+		echo "<br />";
+
+		$id = 'past_revisions_order_by';
+		if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
+			echo $this->option_captions[$id];
+			
+			$this->all_options []= $id;
+			$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
+			
+			echo " <select name='$id' id='$id'>";
+			$captions = ['' => __('Post Date', 'revisionary'), 'modified' => __('Modification Date', 'revisionary')];
+			foreach ( $captions as $key => $value) {
+				$selected = ( $current_setting == $key ) ? 'selected="selected"' : '';
+				echo "\n\t<option value='$key' " . $selected . ">$captions[$key]</option>";
+			}
+			echo '</select>&nbsp;';
+			
+			echo "<br /><br />";
+		}
 
 		$hint = __( 'Show descriptive captions for PublishPress Revisions settings', 'revisionary' );
 		$this->option_checkbox( 'display_hints', $tab, $section, $hint, '' );
