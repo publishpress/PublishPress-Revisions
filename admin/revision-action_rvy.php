@@ -549,9 +549,17 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	}
 
 	if ($published_id != $revision_id) {
-		// @todo save change as past revision?
-		//$wpdb->delete($wpdb->posts, array('ID' => $revision_id));
-		$wpdb->update($wpdb->posts, array('post_type' => 'revision', 'post_status' => 'inherit', 'post_parent' => $post_id, 'comment_count' => 0), array('ID' => $revision_id));
+		$wpdb->update(
+			$wpdb->posts, 
+			['post_type' => 'revision', 
+			'post_status' => 'inherit', 
+			'post_date' => current_time('mysql'), 
+			'post_date_gmt' => current_time('mysql', 1), 
+			'post_parent' => $post_id, 
+			'comment_count' => 0
+			],
+			['ID' => $revision_id]
+		);
 
 		// @todo save change as past revision?
 		$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
