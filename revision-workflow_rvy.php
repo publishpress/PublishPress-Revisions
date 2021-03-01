@@ -186,7 +186,7 @@ class Rvy_Revision_Workflow_UI {
                 //$msg .= '<br /><br /></li><li>';
                 $msg .= sprintf( '<a href="%s">' . __('Keep editing the revision', 'revisionary') . '</a>', "post.php?post={$revision->ID}&amp;action=edit" );
                 $msg .= '<br /><br /></li><li>';
-                $msg .= sprintf( '<a href="%s">' . __('Go back to schedule another revision', 'revisionary') . '</a>', "javascript:history.back(1);" );
+                $msg .= sprintf( '<a href="%s">' . __('Go back to schedule another revision', 'revisionary') . '</a>', admin_url("post.php?post=$post_id&action=edit"));
                 $msg .= '<br /><br /></li><li>';
                 $msg .= sprintf( '<a href="%s">' . __('View Revision Queue', 'revisionary') . '</a>', "admin.php?page=revisionary-q&published_post=$post_id" );
                 $msg .= '<br /><br /></li><li>';
@@ -256,7 +256,7 @@ class Rvy_Revision_Workflow_UI {
                 $msg .= '<br /><br /></li><li>';
                 
                 if ( $future_date ) {
-                    $msg .= sprintf( '<a href="%s">' . __('Go back to submit another revision', 'revisionary') . '</a>', "javascript:history.back(1);" );
+                    $msg .= sprintf( '<a href="%s">' . __('Go back to submit another revision', 'revisionary') . '</a>', admin_url("post.php?post=$post_id&action=edit"));
                     $msg .= '<br /><br /></li><li>';
                 }
 
