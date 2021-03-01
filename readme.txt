@@ -100,6 +100,22 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.5-rc =
+* Fixed : After a Pending Revision is published, Compare Revisions screen for past revisions did not order it correctly
+* Fixed : Revisors could not access Compare Revisions screen unless PublishPress Permissions was active
+* Fixed : Some attachment fields implemented by third party plugins were not saved to Pending Revisions
+* Fixed : Revision submission - "submit another revision" link (following future date selection) led to submission failure on some sites
+* Compat : Elementor - Revisors can submit Pending Revisions
+* Compat : Divi - First-time edit of a revision triggered another "revision created" screen
+* Compat : Advanced Custom Fields - attachment image fields were cleared out of new revision
+* Compat : REST API Cache - "Save as Revision" checkbox ineffective on some installations
+* Compat : PublishPress - Editing a revision caused it to be converted to a non-revision draft
+* Compat : PublishPress - Custom Status module interfered with Revisions scripts on Edit Revision screen
+* Compat : PublishPress - Adding an Editorial Comment on the Edit Revision screen, then updating, caused revision to become inaccessible 
+* Compat : Some third party plugin interactions could cause Revision publication to fail, leaving published page unreadable
+* Change : Display a Revisions link (for past revisions) in Classic Editor for Revisor
+* Lang : Add Swedish translation
+
 = 2.4.9 - 14 Jan 2021 =
 * Compat : REST API Cache - REST caching failed for attachments
 * Fixed : Non-public post types displayed ineffective preview link. Now suppress link or link to Compare Revisions screen instead.
