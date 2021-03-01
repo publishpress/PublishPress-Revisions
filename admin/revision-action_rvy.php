@@ -469,7 +469,12 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		$revisionary->disable_revision_trigger = true;
 	}
 
-	$post_id = wp_update_post( $update );
+	if (defined('REVISIONARY_APPLY_REVISION_WP_UPDATE')) {
+		$post_id = wp_update_post( $update );
+	} else {
+		$wpdb->update($wpdb->posts, $update, ['ID' => $published->ID]);
+		$post_id = $published->ID;
+	}
 	
 	if (!empty($revisionary)) {
 		$revisionary->disable_revision_trigger = false;
