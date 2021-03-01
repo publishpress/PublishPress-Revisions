@@ -199,6 +199,25 @@ class RevisionCreation {
             $_POST['skip_sitepress_actions'] = true;
         }
 
+		// ACF: prevent this filter application, called by ACF after wp_update_post(), from stripping attachment field postmeta out of revision
+		add_filter('attachment_fields_to_save', 
+			function($fields) {
+				add_filter('update_post_metadata', ['\PublishPress\Revisions\RevisionCreation', 'fltInterruptPostMetaOperation']);
+				add_filter('delete_post_metadata', ['\PublishPress\Revisions\RevisionCreation', 'fltInterruptPostMetaOperation']);
+				return $fields;
+			},
+			1
+		);
+
+		add_filter('attachment_fields_to_save', 
+			function($fields) {
+				remove_filter('update_post_metadata', ['\PublishPress\Revisions\RevisionCreation', 'fltInterruptPostMetaOperation']);
+				remove_filter('delete_post_metadata', ['\PublishPress\Revisions\RevisionCreation', 'fltInterruptPostMetaOperation']);
+				return $fields;
+			},
+			999
+		);
+
         if (!empty($revision_id) && $post = get_post($revision_id)) {
             $post_ID = $revision_id;
             $post_arr['post_ID'] = $revision_id;
@@ -418,6 +437,10 @@ class RevisionCreation {
 
         return $data;
     }
+
+	static function fltInterruptPostMetaOperation($interrupt) {
+		return true;
+	}
 
     function flt_create_scheduled_rev( $data, $post_arr ) {
 		global $current_user, $wpdb;
