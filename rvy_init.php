@@ -430,6 +430,9 @@ function rvy_detect_post_id() {
 		require_once( dirname(__FILE__).'/rest_rvy.php' );
 		$post_id = Revisionary_REST::get_id_element($_SERVER['REQUEST_URI'], 1);
 
+	} elseif (defined('DOING_AJAX') && DOING_AJAX) {
+		$post_id = apply_filters('revisionary_detect_id', 0, ['is_ajax' => true]);
+
 	} else {
 		$post_id = 0;
 	}
