@@ -41,6 +41,7 @@ function rvy_default_options_sitewide() {
 		'display_pp_branding' => true,
 		'trigger_post_update_actions' => true,
 		'copy_revision_comments_to_post' => true,
+		'past_revisions_order_by' => true,
 	);
 
 	if ( $other_options = array_diff_key( rvy_default_options(), $def ) ) {
@@ -81,6 +82,7 @@ function rvy_default_options() {
 		'display_pp_branding' => 1,
 		'trigger_post_update_actions' => 0,
 		'copy_revision_comments_to_post' => 0,
+		'past_revisions_order_by' => '',
 	);
 
 	return $def;
