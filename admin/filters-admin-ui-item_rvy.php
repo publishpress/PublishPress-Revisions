@@ -151,7 +151,7 @@ jQuery(document).ready( function($) {
 	);
 	*/
 
-	if (!$revisionary->canEditPost($post, ['simple_cap_check' => true])):?>
+	if (!$revisionary->canEditPost($post, ['simple_cap_check' => true]) && defined('RVY_REVISOR_SUPPRESS_REVISIONS_LINK')):?>
 	<style>
 	div.num-revisions, div.misc-pub-revisions {display:none;}
 	</style>
