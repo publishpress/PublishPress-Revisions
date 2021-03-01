@@ -2,23 +2,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Revisionary Pro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-22 20:40-0500\n"
+"POT-Creation-Date: 2020-10-22 20:33-0500\n"
 "PO-Revision-Date: \n"
 "Language-Team: PublishPress <help@publishpress.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-KeywordsList: __;_e;_c;__ngettext;_n;rvy_po_trigger;__awp\n"
-"X-Poedit-Basepath: F:/snapshot/revisionary\n"
+"X-Poedit-Basepath: F:/snapshot/revisionary-pro\n"
 "X-Generator: Poedit 2.4.1\n"
 "Last-Translator: Kevin Behrens <kevin@publishpress.com>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Language: en_US\n"
-"X-Poedit-SearchPath-0: F:/snapshot/revisionary\n"
-"X-Poedit-SearchPath-1: F:/snapshot/revisionary/admin\n"
-"X-Poedit-SearchPath-2: F:/snapshot/revisionary/hardway\n"
-"X-Poedit-SearchPath-3: F:/snapshot/revisionary/lib\n"
+"X-Poedit-SearchPath-0: F:/snapshot/revisionary-pro\n"
+"X-Poedit-SearchPath-1: F:/snapshot/revisionary-pro/admin\n"
+"X-Poedit-SearchPath-2: F:/snapshot/revisionary-pro/hardway\n"
+"X-Poedit-SearchPath-3: F:/snapshot/revisionary-pro/lib\n"
 
 #: front_rvy.php:165
 msgid "M j, Y @ g:i a"
@@ -211,30 +211,26 @@ msgstr ""
 msgid "Return to Edit %s"
 msgstr ""
 
-#: revisionary.php:67
-msgid "<strong>This plugin can be deleted.</strong>"
-msgstr ""
-
-#: revisionary.php:83 revisionary.php:141
+#: revisionary-pro.php:49 revisionary-pro.php:129
 #, php-format
 msgid ""
 "Another copy of PublishPress Revisions (or Revisionary) is already activated "
 "(version %1$s: \"%2$s\")"
 msgstr ""
 
-#: revisionary.php:85 revisionary.php:143
+#: revisionary-pro.php:51 revisionary-pro.php:131
 #, php-format
 msgid ""
 "Another copy of PublishPress Revisions (or Revisionary) is already activated "
 "(version %1$s)"
 msgstr ""
 
-#: revisionary.php:161
+#: revisionary-pro.php:149
 #, php-format
 msgid "PublishPress Revisions requires PHP version %s or higher."
 msgstr ""
 
-#: revisionary.php:168
+#: revisionary-pro.php:156
 #, php-format
 msgid "PublishPress Revisions requires WordPress version %s or higher."
 msgstr ""
@@ -1519,11 +1515,311 @@ msgstr ""
 msgid "no %s revisions available."
 msgstr ""
 
+#: includes-pro/admin-load.php:55
+msgid "Current Post"
+msgstr ""
+
+#: includes-pro/compat.php:453
+msgid "Requested Slug"
+msgstr ""
+
+#: includes-pro/compat.php:461
+msgid "Author(s)"
+msgstr ""
+
+#: includes-pro/pro-load.php:30
+#, php-format
+msgid "%sCompare%s%sView&nbsp;Current&nbsp;Draft%s"
+msgstr ""
+
+#: includes-pro/pro-load.php:41
+#, php-format
+msgid "%sView&nbsp;Current&nbsp;Draft%s"
+msgstr ""
+
+#: includes-pro/pro-maint.php:47 includes-pro/pro-maint.php:61
+msgid "An error occurred. Please, try again or contact the support team."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:60
+#, php-format
+msgid ""
+"Your license key has expired. For continued priority support, <a href=\"%s"
+"\">please renew</a>."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:71
+#, php-format
+msgid ""
+"Your license key will expire today. For updates and priority support, <a "
+"href=\"%s\">please renew</a>."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:78
+#, php-format
+msgid ""
+"Your license key will expire in %d day. For updates and priority support, <a "
+"href=\"%s\">please renew</a>."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:92
+#, php-format
+msgid ""
+"For updates to PublishPress Revisions Pro, activate your <a href=\"%s"
+"\">PublishPress license key</a>."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:104
+msgid "Key Expired"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:107 includes-pro/SettingsLicense.php:118
+#: includes-pro/SettingsLicense.php:228
+msgid "Deactivate Key"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:110
+msgid "Key Activated"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:111 includes-pro/SettingsProUI.php:13
+msgid "License Key"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:114
+msgid "(please enter publishpress.com key)"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:118 includes-pro/SettingsLicense.php:227
+msgid "Activate Key"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:126
+msgid "review your account info"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:133
+msgid ""
+"note: Renewal does not require deactivation. If you do deactivate, re-entry "
+"of the license key will be required."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:137
+msgid ""
+"note: If you deactive, re-entry of the license key will be required for re-"
+"activation."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:171
+msgid "Version"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:192
+#, php-format
+msgid "view %s&nbsp;details"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:199
+#, php-format
+msgid "PublishPress Revisions Pro Version: %1$s %2$s"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:201
+msgid "update check / install"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:212 includes-pro/SettingsProUI.php:13
+msgid "Branding"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:229
+msgid "Connecting to publishpress.com server..."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:230
+msgid "The request could not be processed due to a connection failure."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:231
+msgid "Please enter the license key shown on your order receipt."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:232
+msgid "An unidentified error occurred."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:234
+msgid "The key has been deactivated."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:235
+msgid "The key has been activated."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:236
+msgid "The key has expired."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:237
+msgid "The key is invalid."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:238
+msgid "An unknown activation error occurred."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:239
+msgid "The key provided is not valid. Please double-check your entry."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:240
+msgid "This site is not valid to activate the key."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:241 includes-pro/SettingsLicense.php:247
+msgid "The key provided could not be validated by publishpress.com."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:242
+msgid "The key provided is already active on another site."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:243
+msgid "The key has already been activated on the allowed number of sites."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:244
+msgid "An unknown deactivation error occurred."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:245
+msgid "Unable to deactivate because the provided key is not valid."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:246
+msgid "This site is not valid to deactivate the key."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:248
+msgid "The key provided is not active on the specified site."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:253
+#, php-format
+msgid "If this is incorrect, <a href=\"%s\">request activation help</a>."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:254
+msgid "Please save settings before uploading site configuration."
+msgstr ""
+
+#: includes-pro/SettingsProUI.php:11
+msgid "Display PublishPress Branding in Admin"
+msgstr ""
+
+#: includes-pro/SettingsProUI.php:19
+msgid "Revision Submission for Unpublished Posts"
+msgstr ""
+
+#: includes-pro/SettingsProUI.php:29
+msgid ""
+"All users have pending revision checkbox available when editing an "
+"unpublished post."
+msgstr ""
+
+#: includes-pro/compat/divi.php:292
+msgid "Save"
+msgstr ""
+
+#: includes-pro/compat/divi.php:296
+msgid "Submit"
+msgstr ""
+
+#: includes-pro/library/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:242
+#, php-format
+msgid ""
+"There is a new version of %1$s available. %2$sView version %3$s details%4$s."
+msgstr ""
+
+#: includes-pro/library/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:250
+#, php-format
+msgid ""
+"There is a new version of %1$s available. %2$sView version %3$s details%4$s "
+"or %5$supdate now%6$s."
+msgstr ""
+
+#: includes-pro/library/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:493
+msgid "You do not have permission to install plugin updates"
+msgstr ""
+
+#: includes-pro/library/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:493
+msgid "Error"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/License.php:122
+msgid "An error occurred. Please, try again."
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:108
+msgid "Missing license"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:111
+msgid "Your license key is expired"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:114
+msgid "Your license key has been disabled"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:118
+msgid "Invalid license"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:121
+msgid "Your license is not active for this URL"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:124
+msgid "This appears to be an invalid license key for this product"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:127
+msgid "Your license key has reached its activation limit"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:132
+msgid "Activated"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:135
+msgid "Not validated yet"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:150
+msgid "Click here to read more about licenses."
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:151
+msgid "More information"
+msgstr ""
+
 #: lib/debug.php:182
 #, php-format
 msgid "%1$s queries in %2$s seconds. %3$s MB used."
 msgstr ""
 
-#: vendor/publishpress/wordpress-version-notices/src/Module/MenuLink/Module.php:129
-msgid "Amazing! We are redirecting you to our site..."
+#: vendor/alledia/wordpress-edd-license-integration/src/core/License.php:114
+msgid ""
+"Sorry, an error occurred. Please check the error log and contact the "
+"PublishPress support team."
+msgstr ""
+
+#: vendor/publishpress/edd-license-handler/EDD_License_Handler.php:123
+#, php-format
+msgid "%1$s License Key"
+msgstr ""
+
+#: vendor/publishpress/edd-license-handler/EDD_License_Handler.php:249
+msgid "Deactivate License"
 msgstr ""
