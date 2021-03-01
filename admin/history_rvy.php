@@ -12,6 +12,7 @@ class RevisionaryHistory
         add_action('admin_enqueue_scripts', [$this, 'actEnqueueScripts'], 10, 1);
         add_action('admin_head', [$this,'actRevisionDiffScripts']);
         add_action('admin_head', [$this, 'actPastRevisionDiffScripts'], 10, 1);
+        add_action('admin_print_scripts', [$this, 'actCompareRevisionsTweakUI']);
         add_filter('wp_prepare_revision_for_js', [$this, 'fltPrepareRevisionsForJS'], 10, 3);
 
         add_filter('wp_get_revision_ui_diff', [$this, 'fltGetRevisionUIDiff'], 10, 3);
@@ -30,6 +31,28 @@ class RevisionaryHistory
 	   if (did_action('load-revision.php')) {
 		$this->actLoadRevision();
 	   }
+    }
+
+    function actCompareRevisionsTweakUI() {
+        global $revisionary;
+
+        $revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : $_REQUEST['to'];
+
+        // Hide Restore button if user does not have permission
+        if ($_post = get_post($revision_id)) {
+            if (!rvy_is_revision_status($_post->post_status)) {
+                if ($parent_post = get_post($_post->post_parent)) {
+                    if (!$revisionary->canEditPost($parent_post, ['skip_revision_allowance' => true])) :
+        ?>
+						<style type='text/css'>
+				        input.restore-revision {display:none !important;}
+				        </style>
+				        <?php
+
+                    endif;
+                }
+            }
+        }
     }
 
     function actDisableProblemQueries(WP_Query $query) {
@@ -269,6 +292,14 @@ class RevisionaryHistory
 
     public function fltPrepareRevisionsForJS($revisions_data, $revision, $post) {
         return $revisions_data;
+    }
+
+    public static function fltOrderRevisionsByModified($qry) {
+        global $wpdb;
+
+        $qry = str_replace("ORDER BY $wpdb->posts.post_date", "ORDER BY $wpdb->posts.post_modified", $qry);
+
+        return $qry;
     }
 
     // port wp_ajax_get_revision_diffs() to support pending, scheduled revisions
@@ -649,6 +680,11 @@ class RevisionaryHistory
         }
 
         $to_meta = get_post_meta($compare_to->ID);
+
+        if (defined('ELEMENTOR_VERSION')) {
+            unset($to_meta['_elementor_data']);
+            unset($from_meta['_elementor_data']);
+        }
 
         $meta_fields = [];
 
