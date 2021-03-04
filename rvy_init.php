@@ -430,6 +430,9 @@ function rvy_detect_post_id() {
 		require_once( dirname(__FILE__).'/rest_rvy.php' );
 		$post_id = Revisionary_REST::get_id_element($_SERVER['REQUEST_URI'], 1);
 
+	} elseif (defined('DOING_AJAX') && DOING_AJAX) {
+		$post_id = apply_filters('revisionary_detect_id', 0, ['is_ajax' => true]);
+
 	} else {
 		$post_id = 0;
 	}
@@ -1235,14 +1238,15 @@ function rvy_rest_cache_compat() {
 		}
 	}
 
-	/*
 	$rest_cache_active = $rest_cache_active 
-	|| ((!empty($_REQUEST['wp-remove-post-lock']) || strpos($uri, '_locale')) && rvy_is_plugin_active('wp-rest-cache/wp-rest-cache.php'));
-	*/
+	|| (strpos($uri, '_locale=user') && strpos($uri, 'wp-json') && strpos($uri, '/posts/') && rvy_is_plugin_active('wp-rest-cache/wp-rest-cache.php'));
+	//|| ((!empty($_REQUEST['wp-remove-post-lock']) || strpos($uri, '_locale=user')) && rvy_is_plugin_active('wp-rest-cache/wp-rest-cache.php'));
 
 	if ($rest_cache_active) {
 		foreach(array_keys($wp_post_types) as $key) {
-			$wp_post_types[$key]->rest_controller_class = ('attachment' == $key) ? 'WP_REST_Attachments_Controller' : 'WP_REST_Posts_Controller';
+			if ((!empty($wp_post_types[$key]->rest_controller_class) && is_string($wp_post_types[$key]->rest_controller_class)) && false !== strpos('WP_Rest_Cache_Plugin', $wp_post_types[$key]->rest_controller_class)) {
+				$wp_post_types[$key]->rest_controller_class = ('attachment' == $key) ? 'WP_REST_Attachments_Controller' : 'WP_REST_Posts_Controller';
+			}
 		}
 	}
 }

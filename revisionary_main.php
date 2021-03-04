@@ -38,6 +38,10 @@ class Revisionary
 	function addFilters() {
 		global $script_name;
 
+		// Prevent PublishPress editorial comment insertion from altering comment_count field
+		add_action('pp_post_insert_editorial_comment', [$this, 'actInsertEditorialCommentPreserveCommentCount']);
+		add_filter('pre_wp_update_comment_count_now', [$this, 'fltUpdateCommentCountBypass'], 10, 3);
+		
 		// Ensure editing access to past revisions is not accidentally filtered. 
 		// @todo: Correct selective application of filtering downstream so Revisors can use a read-only Compare [Past] Revisions screen
 		//
@@ -49,8 +53,10 @@ class Revisionary
 				if ($_post = get_post($revision_id)) {
 					if (!rvy_is_revision_status($_post->post_status)) {
 						if ($parent_post = get_post($_post->post_parent)) {
-							if (!$this->canEditPost($parent_post, ['simple_cap_check' => true])) {
-								return;
+							if (!empty($_POST) || (!empty($_REQUEST['action']) && ('restore' == $_REQUEST['action']))) {
+								if (!$this->canEditPost($parent_post, ['simple_cap_check' => true])) {
+									return;
+								}
 							}
 						}
 					}
@@ -225,7 +231,7 @@ class Revisionary
 			}
 		} else {
 			if (!empty($args['skip_revision_allowance'])) {
-				if (!$caps = map_meta_cap('edit_post', $post_id)) {
+				if (!$caps = map_meta_cap('edit_post', $current_user->ID, $post_id)) {
 					$last_result[$post_id] = false;
 					return false;
 				}
@@ -1230,4 +1236,31 @@ class Revisionary
 
 		return $rvy_workflow_ui->get_revision_msg( $revision_id, $args );
 	}
+
+	// Restore comment_count field (main post ID) on PublishPress editorial comment insertion
+	function actInsertEditorialCommentPreserveCommentCount($comment) {
+		global $wpdb;
+
+		if ($comment && !empty($comment->comment_post_ID)) {
+			if ($_post = get_post($comment->comment_post_ID)) {
+				if (rvy_is_revision_status($_post->post_status)) {
+					$wpdb->update(
+						$wpdb->posts, 
+						['comment_count' => rvy_post_id($comment->comment_post_ID)], 
+						['ID' => $comment->comment_post_ID]
+					);
+				}
+			}
+		}
+	}
+
+	// Prevent wp_update_comment_count_now() from modifying Pending Revision comment_count field (main post ID)
+	function fltUpdateCommentCountBypass($count, $old, $post_id) {
+		if (rvy_is_revision_status(get_post_field('post_status', $post_id))) {
+			return rvy_post_id($post_id);
+		}
+
+		return $count;
+	}
+
 } // end Revisionary class

@@ -469,7 +469,12 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		$revisionary->disable_revision_trigger = true;
 	}
 
-	$post_id = wp_update_post( $update );
+	if (defined('REVISIONARY_APPLY_REVISION_WP_UPDATE')) {
+		$post_id = wp_update_post( $update );
+	} else {
+		$wpdb->update($wpdb->posts, $update, ['ID' => $published->ID]);
+		$post_id = $published->ID;
+	}
 	
 	if (!empty($revisionary)) {
 		$revisionary->disable_revision_trigger = false;
@@ -549,9 +554,17 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	}
 
 	if ($published_id != $revision_id) {
-		// @todo save change as past revision?
-		//$wpdb->delete($wpdb->posts, array('ID' => $revision_id));
-		$wpdb->update($wpdb->posts, array('post_type' => 'revision', 'post_status' => 'inherit', 'post_parent' => $post_id, 'comment_count' => 0), array('ID' => $revision_id));
+		$wpdb->update(
+			$wpdb->posts, 
+			['post_type' => 'revision', 
+			'post_status' => 'inherit', 
+			'post_date' => current_time('mysql'), 
+			'post_date_gmt' => current_time('mysql', 1), 
+			'post_parent' => $post_id, 
+			'comment_count' => 0
+			],
+			['ID' => $revision_id]
+		);
 
 		// @todo save change as past revision?
 		$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
@@ -1134,8 +1147,6 @@ function rvy_publish_scheduled_revisions($args = array()) {
 						}
 						
 						$to_addresses = array_unique( $to_addresses );
-						
-						//dump($to_addresses);
 						
 						foreach ( $to_addresses as $address ) {
 							rvy_mail( 

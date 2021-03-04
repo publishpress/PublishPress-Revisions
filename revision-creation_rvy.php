@@ -199,6 +199,25 @@ class RevisionCreation {
             $_POST['skip_sitepress_actions'] = true;
         }
 
+		// ACF: prevent this filter application, called by ACF after wp_update_post(), from stripping attachment field postmeta out of revision
+		add_filter('attachment_fields_to_save', 
+			function($fields) {
+				add_filter('update_post_metadata', ['\PublishPress\Revisions\RevisionCreation', 'fltInterruptPostMetaOperation']);
+				add_filter('delete_post_metadata', ['\PublishPress\Revisions\RevisionCreation', 'fltInterruptPostMetaOperation']);
+				return $fields;
+			},
+			1
+		);
+
+		add_filter('attachment_fields_to_save', 
+			function($fields) {
+				remove_filter('update_post_metadata', ['\PublishPress\Revisions\RevisionCreation', 'fltInterruptPostMetaOperation']);
+				remove_filter('delete_post_metadata', ['\PublishPress\Revisions\RevisionCreation', 'fltInterruptPostMetaOperation']);
+				return $fields;
+			},
+			999
+		);
+
         if (!empty($revision_id) && $post = get_post($revision_id)) {
             $post_ID = $revision_id;
             $post_arr['post_ID'] = $revision_id;
@@ -398,26 +417,32 @@ class RevisionCreation {
             $data = array_intersect_key( (array) $published_post, $keys );
         }
 
-        do_action('revisionary_created_revision', $post);
-
-        if (apply_filters('revisionary_do_revision_notice', !$revisionary->doing_rest, $post, $published_post)) {
-            $object_type = isset($postarr['post_type']) ? $postarr['post_type'] : '';
-            $args = compact( 'revision_id', 'published_post', 'object_type' );
-            if ( ! empty( $_REQUEST['prev_cc_user'] ) ) {
-                $args['selected_recipients'] = array_map('intval', $_REQUEST['prev_cc_user']);
-            }
-			$revisionary->do_notifications( 'pending-revision', 'pending-revision', $postarr, $args );
-
-			if (apply_filters('revisionary_do_submission_redirect', true)) {
-				rvy_halt($msg, __('Pending Revision Created', 'revisionary'));
+		if (!rvy_is_revision_status($published_post->post_status)) {
+	        do_action('revisionary_created_revision', $post);
+	
+	        if (apply_filters('revisionary_do_revision_notice', !$revisionary->doing_rest, $post, $published_post)) {
+	            $object_type = isset($postarr['post_type']) ? $postarr['post_type'] : '';
+	            $args = compact( 'revision_id', 'published_post', 'object_type' );
+	            if ( ! empty( $_REQUEST['prev_cc_user'] ) ) {
+	                $args['selected_recipients'] = array_map('intval', $_REQUEST['prev_cc_user']);
+	            }
+				$revisionary->do_notifications( 'pending-revision', 'pending-revision', $postarr, $args );
+	
+				if (apply_filters('revisionary_do_submission_redirect', true)) {
+					rvy_halt($msg, __('Pending Revision Created', 'revisionary'));
+				}
+	        } else {
+	        	// return currently stored published post data
+				$data = array_intersect_key((array) get_post($published_post->ID), $data);
 			}
-        } else {
-        	// return currently stored published post data
-			$data = array_intersect_key((array) get_post($published_post->ID), $data);
 		}
 
         return $data;
     }
+
+	static function fltInterruptPostMetaOperation($interrupt) {
+		return true;
+	}
 
     function flt_create_scheduled_rev( $data, $post_arr ) {
 		global $current_user, $wpdb;

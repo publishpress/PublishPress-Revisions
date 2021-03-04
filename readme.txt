@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.6
-Stable tag: 2.4.9
+Stable tag: 2.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -99,6 +99,20 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.5 - 4 Mar 2021 =
+* Fixed : After a Pending Revision is published, Compare Revisions screen for past revisions did not order it correctly
+* Fixed : Revisors could not access Compare Revisions screen unless PublishPress Permissions was active
+* Fixed : Some attachment fields implemented by third party plugins were not saved to Pending Revisions
+* Fixed : Revision submission - "submit another revision" link (following future date selection) led to submission failure on some sites
+* Compat : Advanced Custom Fields - attachment image fields were cleared out of new revision
+* Compat : REST API Cache - "Save as Revision" checkbox ineffective on some installations
+* Compat : PublishPress - Editing a revision caused it to be converted to a non-revision draft
+* Compat : PublishPress - Custom Status module interfered with Revisions scripts on Edit Revision screen
+* Compat : PublishPress - Adding an Editorial Comment on the Edit Revision screen, then updating, caused revision to become inaccessible 
+* Compat : Some third party plugin interactions could cause Revision publication to fail, leaving published page unreadable
+* Change : Display a Revisions link (for past revisions) in Classic Editor for Revisor
+* Lang : Add Swedish translation
 
 = 2.4.9 - 14 Jan 2021 =
 * Compat : REST API Cache - REST caching failed for attachments

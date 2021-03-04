@@ -6,9 +6,31 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 // This script executes on the 'init' action if is_admin() and $pagenow is 'post-new.php' or 'post.php' and the block editor is active.
 //
 
+if ($post_id = rvy_detect_post_id()) {
+    // PublishPress Custom Status module is not relevant to Edit Revision screen, conflicts with Revisions scripts
+    if (rvy_is_revision_status(get_post_field('post_status', $post_id))) {
+        add_filter(
+            'pp_module_dirs', 
+            function($pp_modules) {
+                unset($pp_modules['custom-status']);
+                return $pp_modules;
+            }
+        );
+    }
+}
+
+add_action( 'enqueue_block_editor_assets', ['RVY_PostBlockEditUI', 'disablePublishPressStatusesScripts'], 1);
 add_action( 'enqueue_block_editor_assets', array( 'RVY_PostBlockEditUI', 'act_object_guten_scripts' ) );
 
 class RVY_PostBlockEditUI {
+	public static function disablePublishPressStatusesScripts() {
+        global $publishpress;
+
+        if (!empty($publishpress) && !empty($publishpress->custom_status->module->options)) {
+            $publishpress->custom_status->module->options->post_types = [];
+        }
+    }
+
 	public static function act_object_guten_scripts() {
         global $current_user, $revisionary, $pagenow;
 
