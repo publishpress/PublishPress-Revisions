@@ -417,22 +417,24 @@ class RevisionCreation {
             $data = array_intersect_key( (array) $published_post, $keys );
         }
 
-        do_action('revisionary_created_revision', $post);
-
-        if (apply_filters('revisionary_do_revision_notice', !$revisionary->doing_rest, $post, $published_post)) {
-            $object_type = isset($postarr['post_type']) ? $postarr['post_type'] : '';
-            $args = compact( 'revision_id', 'published_post', 'object_type' );
-            if ( ! empty( $_REQUEST['prev_cc_user'] ) ) {
-                $args['selected_recipients'] = array_map('intval', $_REQUEST['prev_cc_user']);
-            }
-			$revisionary->do_notifications( 'pending-revision', 'pending-revision', $postarr, $args );
-
-			if (apply_filters('revisionary_do_submission_redirect', true)) {
-				rvy_halt($msg, __('Pending Revision Created', 'revisionary'));
+		if (!rvy_is_revision_status($published_post->post_status)) {
+	        do_action('revisionary_created_revision', $post);
+	
+	        if (apply_filters('revisionary_do_revision_notice', !$revisionary->doing_rest, $post, $published_post)) {
+	            $object_type = isset($postarr['post_type']) ? $postarr['post_type'] : '';
+	            $args = compact( 'revision_id', 'published_post', 'object_type' );
+	            if ( ! empty( $_REQUEST['prev_cc_user'] ) ) {
+	                $args['selected_recipients'] = array_map('intval', $_REQUEST['prev_cc_user']);
+	            }
+				$revisionary->do_notifications( 'pending-revision', 'pending-revision', $postarr, $args );
+	
+				if (apply_filters('revisionary_do_submission_redirect', true)) {
+					rvy_halt($msg, __('Pending Revision Created', 'revisionary'));
+				}
+	        } else {
+	        	// return currently stored published post data
+				$data = array_intersect_key((array) get_post($published_post->ID), $data);
 			}
-        } else {
-        	// return currently stored published post data
-			$data = array_intersect_key((array) get_post($published_post->ID), $data);
 		}
 
         return $data;
