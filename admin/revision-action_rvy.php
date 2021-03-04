@@ -1148,8 +1148,6 @@ function rvy_publish_scheduled_revisions($args = array()) {
 						
 						$to_addresses = array_unique( $to_addresses );
 						
-						//dump($to_addresses);
-						
 						foreach ( $to_addresses as $address ) {
 							rvy_mail( 
 								$address, 
