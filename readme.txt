@@ -100,11 +100,12 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
-= 2.5-rc =
+= 2.5 - 4 Mar 2021 =
 * Fixed : After a Pending Revision is published, Compare Revisions screen for past revisions did not order it correctly
 * Fixed : Revisors could not access Compare Revisions screen unless PublishPress Permissions was active
 * Fixed : Some attachment fields implemented by third party plugins were not saved to Pending Revisions
 * Fixed : Revision submission - "submit another revision" link (following future date selection) led to submission failure on some sites
+* Compat : Advanced Custom Fields - attachment image fields were cleared out of new revision
 * Compat : REST API Cache - "Save as Revision" checkbox ineffective on some installations
 * Compat : PublishPress - Editing a revision caused it to be converted to a non-revision draft
 * Compat : PublishPress - Custom Status module interfered with Revisions scripts on Edit Revision screen
