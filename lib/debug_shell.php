@@ -32,7 +32,7 @@ function rvy_log_mem_usage( $label, $display_total = true ) {
 }
 }
 
-if ( ! function_exists('dump') ) {
+if ( ! function_exists('dump') && !defined('REVISIONARY_NO_DUMP_FUNCTION') ) {
 function dump(&$var, $info = FALSE, $display_objects = true) { 
 	return; 
 }
