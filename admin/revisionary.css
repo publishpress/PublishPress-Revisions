@@ -440,8 +440,8 @@ table.diff {
 	width: 100%;
 }
 
-table.diff col.content {
-	width: 50%;
+table.diff col.content, table.diff tr td {
+	width: 50% !important;
 }
 
 table.diff tr {
