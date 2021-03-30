@@ -325,6 +325,21 @@ class RevisionCreation {
             $post_id = $published_post->ID;						  // passing args ensures back compat by using variables directly rather than retrieving revision, post data
             $object_type = isset($postarr['post_type']) ? $postarr['post_type'] : '';
             $msg = $revisionary->get_revision_msg( $revision_id, compact( 'data', 'post_id', 'object_type', 'future_date' ) );
+        
+			foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
+				if ($archived_val = rvy_get_transient("_archive_{$meta_key}_{$published_post->ID}")) {
+					switch ($meta_key) {
+						case '_thumbnail_id':
+							set_post_thumbnail($published_post->ID, $archived_val);
+							rvy_update_post_meta($published_post->ID, '_thumbnail_id', $archived_val);
+							break;
+	
+						case '_wp_page_template':
+							rvy_update_post_meta($published_post->ID, '_wp_page_template', $archived_val);
+							break;
+					}
+				}
+			}
         } else {
             $msg = __('Sorry, an error occurred while attempting to submit your revision!', 'revisionary') . ' ';
             rvy_halt( $msg, __('Revision Submission Error', 'revisionary') );
@@ -334,7 +349,7 @@ class RevisionCreation {
 		if ($revisionary->isBlockEditorActive()) {
 			if ($published_template = get_post_meta($published_post->ID, '_wp_page_template', true)) {
 				if (!get_post_meta($revision_id, '_wp_page_template', true)) {
-					update_post_meta($revision_id, '_wp_page_template', $published_template);
+					rvy_update_post_meta($revision_id, '_wp_page_template', $published_template);
 				}
 			}
 		}
@@ -589,6 +604,11 @@ class RevisionCreation {
 
 				update_post_meta($revision_id, '_rvy_base_post_id', $published_post->ID);
 				update_post_meta($published_post->ID, '_rvy_has_revisions', true);
+				
+				foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
+					$published_meta_val = get_post_meta($published_post->ID, $meta_key, true);
+					rvy_set_transient("_archive_{$meta_key}_{$published_post->ID}", $published_meta_val, 30);
+				}
 			} else {
 				$msg = __('Sorry, an error occurred while attempting to schedule your revision!', 'revisionary') . ' ';
 				rvy_halt( $msg, __('Revision Scheduling Error', 'revisionary') );
@@ -667,8 +687,11 @@ class RevisionCreation {
 		// Workaround for Gutenberg stripping post thumbnail, page template on revision creation
 		$archived_meta = [];
 		foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
-			$archived_meta[$meta_key] = get_post_meta($published_post_id, $meta_key, true);
+			if (!$archived_meta[$meta_key] = rvy_get_transient("_archive_{$meta_key}_{$published_post_id}")) {
+				$archived_meta[$meta_key] = get_post_meta($published_post_id, $meta_key, true);
+			}
 		}
+
 
 		// Use the newly generated $post_ID.
 		$where = array( 'ID' => $post_ID );
@@ -783,17 +806,16 @@ class RevisionCreation {
 				if ( $wp_error ) {
 					return new WP_Error( 'invalid_page_template', __( 'Invalid page template.', 'revisionary' ) );
 				}
-				update_post_meta( $post_ID, '_wp_page_template', 'default' );
+				rvy_update_post_meta( $post_ID, '_wp_page_template', 'default' );
 			} else {
-				update_post_meta( $post_ID, '_wp_page_template', $postarr['page_template'] );
+				rvy_update_post_meta( $post_ID, '_wp_page_template', $postarr['page_template'] );
 			}
 		}
 	
 		// Workaround for Gutenberg stripping post thumbnail, page template on revision creation
 		foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
 			if (!empty($archived_meta[$meta_key])) {
-				update_post_meta($published_post_id, $meta_key, $archived_meta[$meta_key]);
-				update_post_meta($published_post_id, "_archive_{$meta_key}", $archived_meta[$meta_key]);
+				rvy_update_post_meta($published_post_id, $meta_key, $archived_meta[$meta_key]);
 			}
 		}
 

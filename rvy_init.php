@@ -239,6 +239,48 @@ function rvy_get_post_meta($post_id, $meta_key, $unused = false) {
 		);
 }
 
+function rvy_get_transient($transient) {
+	global $wpdb;
+
+	$option_name = '_transient_' . $transient;
+
+	return $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT option_value FROM $wpdb->options WHERE option_name = %s",
+				$option_name
+			)
+		);
+}
+
+function rvy_set_transient($transient, $option_val, $timeout = 30) {
+	set_transient($transient, $option_val, $timeout);
+}
+
+function rvy_delete_transient($transient) {
+	global $wpdb;
+
+	$option_name = '_transient_timeout_' . $transient;
+
+	$wpdb->query(
+		$wpdb->prepare(
+			"DELETE FROM $wpdb->options WHERE option_name = %s",
+			$option_name
+		)
+	);
+
+	$option_name = '_transient_' . $transient;
+
+	$wpdb->get_var(
+			$wpdb->prepare(
+				"DELETE FROM $wpdb->options WHERE option_name = %s",
+				$option_name
+			)
+		);
+		
+	delete_transient($transient);
+
+}
+
 function rvy_update_post_meta($post_id, $meta_key, $meta_value) {
 	global $wpdb;
 

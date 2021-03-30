@@ -49,6 +49,20 @@ function _rvy_act_rest_insert( $post, $request, $unused ) {
             $revisionary->handle_template( $request['template'], $revision_id );
         }
 
+		foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
+            if ($archived_val = rvy_get_transient("_archive_{$meta_key}_{$post->ID}")) {
+                switch ($meta_key) {
+                    case '_thumbnail_id':
+                        set_post_thumbnail($post->ID, $archived_val);
+                        break;
+
+                    case '_wp_page_template':
+                        rvy_update_post_meta($post->ID, '_wp_page_template', $archived_val);
+                        break;
+                }
+            }
+        }
+		
         //if ( ! empty( $schema['properties']['meta'] ) && isset( $request['meta'] ) ) {
         //if (isset($request['meta']) && post_type_supports($post->post_type, 'custom-fields')) {
         if (isset($request['meta'])) {

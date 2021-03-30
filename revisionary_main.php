@@ -183,6 +183,24 @@ class Revisionary
 		$this->enabled_post_types = array_filter($this->enabled_post_types);
 	}
 
+	function actClearFlags($post_type, $post) {
+		global $current_user;
+
+		if (!empty($this->enabled_post_types[$post_type])) {
+			if (rvy_get_transient("_rvy_pending_revision_{$current_user->ID}_{$post->ID}")) {
+				rvy_delete_transient("_rvy_pending_revision_{$current_user->ID}_{$post->ID}");
+			} else {			
+				foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
+					$meta_val = rvy_get_post_meta($post->ID, $meta_key);
+
+					if (!empty($meta_val)) {
+						rvy_set_transient("_archive_{$meta_key}_{$post->ID}", $meta_val);
+					}
+				}
+			}
+		}
+	}
+
 	function canEditPost($post, $args = []) {
 		global $current_user;
 
@@ -436,7 +454,7 @@ class Revisionary
 
 			// revision was stored without a post_meta entry for this meta key, so copy it from published post
 			if ($published_val = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s AND post_id = %d", $meta_key, $published_post_id))) {
-				update_post_meta($revision->ID, $meta_key, $published_val);
+				rvy_update_post_meta($revision->ID, $meta_key, $published_val);
 			}
 		}
 	}
@@ -555,7 +573,7 @@ class Revisionary
 	}
 
 	public function handle_template( $template, $post_id, $validate = false ) {
-		update_post_meta( $post_id, '_wp_page_template', $template );
+		rvy_update_post_meta( $post_id, '_wp_page_template', $template );
 	}
 
 	public function handle_featured_media( $featured_media, $post_id ) {
