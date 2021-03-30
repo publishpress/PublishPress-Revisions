@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PublishPress Revisions Pro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-03 23:49-0500\n"
+"POT-Creation-Date: 2021-03-03 23:51-0500\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Kevin Behrens <kevin@publishpress.com>\n"
 "Language-Team: PublishPress <help@publishpress.com>\n"
@@ -11,15 +11,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_c;__ngettext;_n;rvy_po_trigger;__awp\n"
+"X-Poedit-Basepath: ..\n"
 "Language: en_US\n"
 "X-Generator: Poedit 2.4.2\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: admin\n"
 "X-Poedit-SearchPath-2: classes\n"
 "X-Poedit-SearchPath-3: hardway\n"
-"X-Poedit-SearchPath-4: includes\n"
+"X-Poedit-SearchPath-4: includes-pro\n"
 
 #: admin/PostEditSubmitMetabox.php:62
 #, php-format
@@ -47,6 +47,7 @@ msgstr ""
 #: admin/PostEditSubmitMetabox.php:136 admin/edit-revision-ui_rvy.php:16
 #: admin/edit-revision-ui_rvy.php:17 admin/edit-revision-ui_rvy.php:21
 #: admin/edit-revision-ui_rvy.php:22 admin/post-edit-block-ui_rvy.php:112
+#: includes-pro/compat/divi.php:306 includes-pro/compat/divi.php:307
 #: rvy_init.php:279 rvy_init.php:290
 msgid "Update Revision"
 msgstr ""
@@ -61,7 +62,7 @@ msgstr ""
 msgid "View / Publish"
 msgstr ""
 
-#: admin/PostEditSubmitMetabox.php:180 admin/history_rvy.php:1095
+#: admin/PostEditSubmitMetabox.php:180 admin/history_rvy.php:1094
 #: admin/post-edit-block-ui_rvy.php:74 admin/post-edit_rvy.php:120
 #: admin/post-edit_rvy.php:285
 msgid "View / Approve"
@@ -73,7 +74,7 @@ msgid "View / moderate saved revision"
 msgstr ""
 
 #: admin/PostEditSubmitMetabox.php:183 admin/class-list-table_rvy.php:516
-#: admin/history_rvy.php:1097 admin/post-edit-block-ui_rvy.php:77
+#: admin/history_rvy.php:1096 admin/post-edit-block-ui_rvy.php:77
 #: admin/post-edit_rvy.php:123 admin/post-edit_rvy.php:127
 #: admin/post-edit_rvy.php:287
 msgid "View"
@@ -95,7 +96,7 @@ msgstr ""
 #: admin/PostEditSubmitMetabox.php:244 admin/PostEditSubmitMetabox.php:320
 #: admin/PostEditSubmitMetabox.php:372 admin/admin_rvy.php:496
 #: admin/class-list-table_rvy.php:492 admin/class-list-table_rvy.php:1111
-#: admin/history_rvy.php:1139 front_rvy.php:219
+#: admin/history_rvy.php:1138 front_rvy.php:219
 msgid "Edit"
 msgstr ""
 
@@ -241,7 +242,7 @@ msgstr ""
 msgid "The revision was published."
 msgstr ""
 
-#: admin/admin_rvy.php:474 admin/history_rvy.php:963
+#: admin/admin_rvy.php:474 admin/history_rvy.php:962
 #: admin/revision-action_rvy.php:166 admin/revision-action_rvy.php:248
 #: admin/revision-ui_rvy.php:387 front_rvy.php:165
 msgid "M j, Y @ g:i a"
@@ -349,6 +350,8 @@ msgid "Revision"
 msgstr ""
 
 #: admin/class-list-table_rvy.php:336
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:148
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:135
 msgid "Status"
 msgstr ""
 
@@ -389,7 +392,7 @@ msgid "Y/m/d g:i:s a"
 msgstr ""
 
 #: admin/class-list-table_rvy.php:403 admin/class-list-table_rvy.php:1044
-#: admin/history_rvy.php:1010
+#: admin/history_rvy.php:1009
 #, php-format
 msgid "%s ago"
 msgstr ""
@@ -412,7 +415,7 @@ msgstr ""
 msgid "Missed schedule"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:463 admin/history_rvy.php:808
+#: admin/class-list-table_rvy.php:463 admin/history_rvy.php:807
 msgid "No author"
 msgstr ""
 
@@ -430,7 +433,7 @@ msgid "View published post"
 msgstr ""
 
 #: admin/class-list-table_rvy.php:524 admin/class-list-table_rvy.php:1137
-#: admin/history_rvy.php:1192 admin/revision-ui_rvy.php:397
+#: admin/history_rvy.php:1191 admin/revision-ui_rvy.php:397
 #: admin/revision-ui_rvy.php:419
 msgid "Preview"
 msgstr ""
@@ -458,12 +461,13 @@ msgstr ""
 msgid "All %s"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:792 admin/history_rvy.php:1095
+#: admin/class-list-table_rvy.php:792 admin/history_rvy.php:1094
 #: admin/post-edit_rvy.php:237 front_rvy.php:253
 msgid "Approve"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:793
+#: admin/class-list-table_rvy.php:793 includes-pro/compat/divi.php:306
+#: includes-pro/compat/divi.php:307
 msgid "Publish"
 msgstr ""
 
@@ -513,6 +517,7 @@ msgstr ""
 #: admin/filters-admin-ui-item_rvy.php:127
 #: admin/filters-admin-ui-item_rvy.php:128 admin/post-edit-block-ui_rvy.php:209
 #: admin/post-edit-block-ui_rvy.php:210
+#: includes-pro/compat/beaver-builder.php:170 includes-pro/compat/divi.php:310
 msgid "Submit Revision"
 msgstr ""
 
@@ -543,81 +548,81 @@ msgstr ""
 msgid "&larr; Return to editor"
 msgstr ""
 
-#: admin/history_rvy.php:471 admin/history_rvy.php:474
+#: admin/history_rvy.php:470 admin/history_rvy.php:473
 msgid "(no title)"
 msgstr ""
 
-#: admin/history_rvy.php:562 admin/options.php:502
+#: admin/history_rvy.php:561 admin/options.php:502
 msgid "Post Date"
 msgstr ""
 
-#: admin/history_rvy.php:563
+#: admin/history_rvy.php:562
 msgid "Post Parent"
 msgstr ""
 
-#: admin/history_rvy.php:564
+#: admin/history_rvy.php:563
 msgid "Menu Order"
 msgstr ""
 
-#: admin/history_rvy.php:565
+#: admin/history_rvy.php:564
 msgid "Comment Status"
 msgstr ""
 
-#: admin/history_rvy.php:566
+#: admin/history_rvy.php:565
 msgid "Ping Status"
 msgstr ""
 
-#: admin/history_rvy.php:691
+#: admin/history_rvy.php:690
 msgid "Page Template"
 msgstr ""
 
-#: admin/history_rvy.php:694
+#: admin/history_rvy.php:693 includes-pro/compat.php:308
 msgid "Featured Image"
 msgstr ""
 
-#: admin/history_rvy.php:703
+#: admin/history_rvy.php:702 includes-pro/compat.php:526
 msgid "Beaver Builder Data"
 msgstr ""
 
-#: admin/history_rvy.php:704
+#: admin/history_rvy.php:703 includes-pro/compat.php:527
 msgid "Beaver Builder Settings"
 msgstr ""
 
-#: admin/history_rvy.php:937
+#: admin/history_rvy.php:936
 msgid "Scheduled for "
 msgstr ""
 
-#: admin/history_rvy.php:942
+#: admin/history_rvy.php:941
 msgid "Requested for "
 msgstr ""
 
-#: admin/history_rvy.php:947
+#: admin/history_rvy.php:946
 msgid "Submitted "
 msgstr ""
 
-#: admin/history_rvy.php:952
+#: admin/history_rvy.php:951
 #, php-format
 msgid "%s%s ago"
 msgstr ""
 
-#: admin/history_rvy.php:952
+#: admin/history_rvy.php:951
 #, php-format
 msgid "%s%s from now"
 msgstr ""
 
-#: admin/history_rvy.php:1008
+#: admin/history_rvy.php:1007
 msgid "M j, Y @ H:i"
 msgstr ""
 
-#: admin/history_rvy.php:1191
+#: admin/history_rvy.php:1190
 msgid "Preview / Restore"
 msgstr ""
 
-#: admin/history_rvy.php:1198
+#: admin/history_rvy.php:1197
 msgid "Manage"
 msgstr ""
 
-#: admin/history_rvy.php:1199
+#: admin/history_rvy.php:1198
 msgid "List"
 msgstr ""
 
@@ -1313,6 +1318,309 @@ msgstr ""
 msgid "This is the Current Revision. %s"
 msgstr ""
 
+#: includes-pro/SettingsLicense.php:60
+#, php-format
+msgid "Your license key has expired. For continued priority support, <a href=\"%s\">please renew</a>."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:71
+#, php-format
+msgid "Your license key will expire today. For updates and priority support, <a href=\"%s\">please renew</a>."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:78
+#, php-format
+msgid "Your license key will expire in %d day. For updates and priority support, <a href=\"%s\">please renew</a>."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:92
+#, php-format
+msgid "For updates to PublishPress Revisions Pro, activate your <a href=\"%s\">PublishPress license key</a>."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:104
+msgid "Key Expired"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:107 includes-pro/SettingsLicense.php:118
+#: includes-pro/SettingsLicense.php:228
+msgid "Deactivate Key"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:110
+msgid "Key Activated"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:111 includes-pro/SettingsProUI.php:14
+msgid "License Key"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:114
+msgid "(please enter publishpress.com key)"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:118 includes-pro/SettingsLicense.php:227
+msgid "Activate Key"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:126
+msgid "review your account info"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:133
+msgid "note: Renewal does not require deactivation. If you do deactivate, re-entry of the license key will be required."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:137
+msgid "note: If you deactive, re-entry of the license key will be required for re-activation."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:171
+msgid "Version"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:192
+#, php-format
+msgid "view %s&nbsp;details"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:199
+#, php-format
+msgid "PublishPress Revisions Pro Version: %1$s %2$s"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:201
+msgid "update check / install"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:212 includes-pro/SettingsProUI.php:14
+msgid "Branding"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:229
+msgid "Connecting to publishpress.com server..."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:230
+msgid "The request could not be processed due to a connection failure."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:231
+msgid "Please enter the license key shown on your order receipt."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:232
+msgid "An unidentified error occurred."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:234
+msgid "The key has been deactivated."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:235
+msgid "The key has been activated."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:236
+msgid "The key has expired."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:237
+msgid "The key is invalid."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:238
+msgid "An unknown activation error occurred."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:239
+msgid "The key provided is not valid. Please double-check your entry."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:240
+msgid "This site is not valid to activate the key."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:241 includes-pro/SettingsLicense.php:247
+msgid "The key provided could not be validated by publishpress.com."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:242
+msgid "The key provided is already active on another site."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:243
+msgid "The key has already been activated on the allowed number of sites."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:244
+msgid "An unknown deactivation error occurred."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:245
+msgid "Unable to deactivate because the provided key is not valid."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:246
+msgid "This site is not valid to deactivate the key."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:248
+msgid "The key provided is not active on the specified site."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:253
+#, php-format
+msgid "If this is incorrect, <a href=\"%s\">request activation help</a>."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:254
+msgid "Please save settings before uploading site configuration."
+msgstr ""
+
+#: includes-pro/SettingsProUI.php:12
+msgid "Display PublishPress Branding in Admin"
+msgstr ""
+
+#: includes-pro/SettingsProUI.php:20
+msgid "Revision Submission for Unpublished Posts"
+msgstr ""
+
+#: includes-pro/SettingsProUI.php:23
+msgid "Prevent Redundant Revisions"
+msgstr ""
+
+#: includes-pro/SettingsProUI.php:40
+msgid "All users have pending revision checkbox available when editing an unpublished post."
+msgstr ""
+
+#: includes-pro/SettingsProUI.php:46
+msgid "Prevent REST requests from generating revisions (which may be stored without ACF fields)"
+msgstr ""
+
+#: includes-pro/admin-load.php:55
+msgid "Current Post"
+msgstr ""
+
+#: includes-pro/compat.php:523
+msgid "Requested Slug"
+msgstr ""
+
+#: includes-pro/compat.php:531
+msgid "Author(s)"
+msgstr ""
+
+#: includes-pro/compat/divi.php:193 revision-creation_rvy.php:433
+msgid "Pending Revision Created"
+msgstr ""
+
+#: includes-pro/compat/divi.php:310
+msgid "Save"
+msgstr ""
+
+#: includes-pro/compat/elementor.php:135
+msgid "Revision Submitted"
+msgstr ""
+
+#: includes-pro/compat/elementor.php:149
+msgid "Revise"
+msgstr ""
+
+#: includes-pro/library/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:242
+#: vendor/alledia/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:242
+#, php-format
+msgid "There is a new version of %1$s available. %2$sView version %3$s details%4$s."
+msgstr ""
+
+#: includes-pro/library/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:250
+#: vendor/alledia/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:250
+#, php-format
+msgid "There is a new version of %1$s available. %2$sView version %3$s details%4$s or %5$supdate now%6$s."
+msgstr ""
+
+#: includes-pro/library/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:493
+#: vendor/alledia/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:493
+msgid "You do not have permission to install plugin updates"
+msgstr ""
+
+#: includes-pro/library/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:493
+#: vendor/alledia/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:493
+msgid "Error"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/License.php:122
+msgid "An error occurred. Please, try again."
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:108
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:89
+msgid "Missing license"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:111
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:92
+msgid "Your license key is expired"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:114
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:95
+msgid "Your license key has been disabled"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:118
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:99
+msgid "Invalid license"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:121
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:102
+msgid "Your license is not active for this URL"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:124
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:106
+msgid "This appears to be an invalid license key for this product"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:127
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:112
+msgid "Your license key has reached its activation limit"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:132
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:119
+msgid "Activated"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:135
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:122
+msgid "Not validated yet"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:150
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:138
+msgid "Click here to read more about licenses."
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:151
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:141
+msgid "More information"
+msgstr ""
+
+#: includes-pro/pro-load.php:47
+#, php-format
+msgid "%sCompare%s%sView&nbsp;Current&nbsp;Draft%s"
+msgstr ""
+
+#: includes-pro/pro-load.php:58
+#, php-format
+msgid "%sView&nbsp;Current&nbsp;Draft%s"
+msgstr ""
+
+#: includes-pro/pro-maint.php:47 includes-pro/pro-maint.php:61
+msgid "An error occurred. Please, try again or contact the support team."
+msgstr ""
+
 #: lib/debug.php:187
 #, php-format
 msgid "%1$s queries in %2$s seconds. %3$s MB used."
@@ -1328,10 +1636,6 @@ msgstr ""
 
 #: revision-creation_rvy.php:331
 msgid "Revision Submission Error"
-msgstr ""
-
-#: revision-creation_rvy.php:433
-msgid "Pending Revision Created"
 msgstr ""
 
 #: revision-creation_rvy.php:594
@@ -1438,26 +1742,22 @@ msgstr ""
 msgid "Return to Edit %s"
 msgstr ""
 
-#: revisionary.php:67
-msgid "<strong>This plugin can be deleted.</strong>"
-msgstr ""
-
-#: revisionary.php:83 revisionary.php:142
+#: revisionary-pro.php:49 revisionary-pro.php:111
 #, php-format
 msgid "Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: \"%2$s\")"
 msgstr ""
 
-#: revisionary.php:85 revisionary.php:144
+#: revisionary-pro.php:51 revisionary-pro.php:113
 #, php-format
 msgid "Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)"
 msgstr ""
 
-#: revisionary.php:163
+#: revisionary-pro.php:132
 #, php-format
 msgid "PublishPress Revisions requires PHP version %s or higher."
 msgstr ""
 
-#: revisionary.php:170
+#: revisionary-pro.php:139
 #, php-format
 msgid "PublishPress Revisions requires WordPress version %s or higher."
 msgstr ""
@@ -1482,6 +1782,6 @@ msgstr ""
 msgid "Revision Workflow"
 msgstr ""
 
-#: vendor/publishpress/wordpress-version-notices/src/Module/MenuLink/Module.php:129
-msgid "Amazing! We are redirecting you to our site..."
+#: vendor/alledia/wordpress-edd-license-integration/src/core/License.php:114
+msgid "Sorry, an error occurred. Please check the error log and contact the PublishPress support team."
 msgstr ""
