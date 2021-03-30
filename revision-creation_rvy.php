@@ -600,15 +600,16 @@ class RevisionCreation {
 			}
 
 			if ($revision_id) {
-				set_transient("_rvy_scheduled_revision_{$current_user->ID}_{$post_arr['ID']}", $revision_id, 30);
+				rvy_set_transient("_rvy_scheduled_revision_{$current_user->ID}_{$post_arr['ID']}", $revision_id, 30);
 
 				rvy_update_post_meta($revision_id, '_rvy_base_post_id', $published_post->ID);
 				rvy_update_post_meta($published_post->ID, '_rvy_has_revisions', true);
-				
+
 				foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
 					$published_meta_val = get_post_meta($published_post->ID, $meta_key, true);
 					rvy_set_transient("_archive_{$meta_key}_{$published_post->ID}", $published_meta_val, 30);
 				}
+
 			} else {
 				$msg = __('Sorry, an error occurred while attempting to schedule your revision!', 'revisionary') . ' ';
 				rvy_halt( $msg, __('Revision Scheduling Error', 'revisionary') );
