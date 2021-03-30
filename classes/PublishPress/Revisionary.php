@@ -79,7 +79,7 @@ class Revisions {
         $args = (array) $args;
         $user_id = (!empty($args['user_id'])) ? $args['user_id'] : $current_user->ID;
 
-        if (empty($args['force_query']) && !get_post_meta($post_id, '_rvy_has_revisions')) {
+        if (empty($args['force_query']) && !rvy_get_post_meta($post_id, '_rvy_has_revisions')) {
             return false;
         }
 
