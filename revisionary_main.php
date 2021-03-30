@@ -115,6 +115,8 @@ class Revisionary
 		
 		add_action( 'deleted_post', [$this, 'actDeletedPost']);
 
+		add_action( 'add_meta_boxes', [$this, 'actClearFlags'], 10, 2 );
+
 		if ( rvy_get_option( 'pending_revisions' ) ) {
 			// special filtering to support Contrib editing of published posts/pages to revision
 			add_filter('pre_post_status', array($this, 'flt_pendingrev_post_status') );
