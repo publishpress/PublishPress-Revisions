@@ -187,7 +187,7 @@ class RevisionCreation {
 		// sanity check: don't create revision if same user created another pending revision for this post less than 5 seconds ago
 		$min_seconds = (!empty($this->options['min_seconds'])) ? $this->options['min_seconds'] : 5;
 
-		$last_revision = $wpdb->get_row($wpdb->prepare("SELECT ID, post_modified_gmt FROM $wpdb->posts WHERE comment_count = %d AND post_author = %d ORDER BY post_modified_gmt DESC LIMIT 1", $published_post->ID, $current_user->ID));	
+		$last_revision = $wpdb->get_row($wpdb->prepare("SELECT ID, post_modified_gmt FROM $wpdb->posts WHERE post_status IN ('pending-revision', 'future-revision') AND comment_count = %d AND post_author = %d ORDER BY post_modified_gmt DESC LIMIT 1", $published_post->ID, $current_user->ID));	
 
 		if ($last_revision && (strtotime(current_time('mysql', 1)) - strtotime($last_revision->post_modified_gmt) < $min_seconds )) {
 			// return currently stored published post data
