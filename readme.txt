@@ -100,6 +100,16 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.5.1 - 30 Mar 2021 =
+* Fixed : Revisors could not preview other users' pending revisions, even if they are listed in Revision Queue (Permissions integration requires 3.5.1)
+* Fixed : Post Title changes were not applied at revision publication
+* Fixed : Database error on revision publication, on some installations
+* Fixed : Compare Revisions - uneven column widths with WordPress 5.7
+* Feature : Option to update modified date on revision publication
+* Compat : PublishPress - Custom Status dropdown was hidden in post editor
+* Compat : Kinsta object cache - Revision submission using "Save as Revision" checkbox failed
+* Compat : Kinsta object cache - Revision submission clears Featured Image from published post
+
 = 2.5 - 4 Mar 2021 =
 * Fixed : After a Pending Revision is published, Compare Revisions screen for past revisions did not order it correctly
 * Fixed : Revisors could not access Compare Revisions screen unless PublishPress Permissions was active
