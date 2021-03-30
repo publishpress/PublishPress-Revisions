@@ -223,7 +223,8 @@ function rvy_ajax_handler() {
 	global $current_user;
 
 	if (!empty($_REQUEST['rvy_ajax_field']) && !empty($_REQUEST['post_id'])) {
-		if ('save_as_revision' == $_REQUEST['rvy_ajax_field']) {
+		// @todo: make these query args consistent
+		if (in_array($_REQUEST['rvy_ajax_field'], ['save_as_pending', 'save_as_revision'])) {
 			$save_revision = isset($_REQUEST['rvy_ajax_value']) && in_array($_REQUEST['rvy_ajax_value'], ['true', true, 1, '1'], true);
 			rvy_update_post_meta((int) $_REQUEST['post_id'], "_save_as_revision_{$current_user->ID}", $save_revision);
 			update_postmeta_cache($_REQUEST['post_id']);
