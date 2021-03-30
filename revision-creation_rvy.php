@@ -191,7 +191,7 @@ class RevisionCreation {
 
 		if ($last_revision && (strtotime(current_time('mysql', 1)) - strtotime($last_revision->post_modified_gmt) < $min_seconds )) {
 			// return currently stored published post data
-			$data = array_intersect_key((array) get_post($published_post->ID), $data);
+			$data = array_merge($data, (array) get_post($published_post->ID));
 			return $data;
 		}
 
