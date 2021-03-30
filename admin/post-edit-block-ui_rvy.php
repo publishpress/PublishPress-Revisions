@@ -26,8 +26,12 @@ class RVY_PostBlockEditUI {
 	public static function disablePublishPressStatusesScripts() {
         global $publishpress;
 
-        if (!empty($publishpress) && !empty($publishpress->custom_status->module->options)) {
-            $publishpress->custom_status->module->options->post_types = [];
+        if ($post_id = rvy_detect_post_id()) {
+            if (rvy_is_revision_status(get_post_field('post_status', $post_id))) {
+		        if (!empty($publishpress) && !empty($publishpress->custom_status->module->options)) {
+		            $publishpress->custom_status->module->options->post_types = [];
+		        }
+		    }
         }
     }
 
