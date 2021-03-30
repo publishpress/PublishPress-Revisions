@@ -472,8 +472,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	if (defined('REVISIONARY_APPLY_REVISION_WP_UPDATE')) {
 		$post_id = wp_update_post( $update );
 	} else {
-		$wpdb->update($wpdb->posts, $update, ['ID' => $published->ID]);
-		$post_id = $published->ID;
+		// update without filter, action applications
+		$post_id = rvy_update_post( $update );
 	}
 	
 	if (!empty($revisionary)) {
@@ -497,31 +497,36 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		$update_fields['post_content'] = $revision_content;
 	}
 	
-	$wpdb->update($wpdb->posts, $update_fields, array('ID' => $post_id));
-
 	$_post = get_post($post_id);
 
 	// prevent published post status being set to future when a scheduled revision is manually published before the stored post_date
 	if ($_post && ($_post->post_status != $published->post_status)) {
-		$wpdb->update($wpdb->posts, array('post_status' => $published->post_status), array('ID' => $post_id));
+		$update_fields['post_status'] = $published->post_status;
+	}
+
+	if (
+		(('pending-revision' == $revision->post_status) && rvy_get_option('pending_revision_update_modified_date'))
+		|| (('future-revision' == $revision->post_status) && rvy_get_option('scheduled_revision_update_modified_date'))
+	) {
+		$post_modified = current_time('mysql');
+		$post_modified_gmt = current_time('mysql', 1);
+
+		$update_fields['post_modified'] = $post_modified;
+		$update_fields['post_modified_gmt'] = $post_modified_gmt;
+	} else {
+		$post_modified = get_post_field('post_modified', $post_id);
+		$post_modified_gmt = get_post_field('post_modified_gmt', $post_id);
 	}
 
 	if (
 		(('pending-revision' == $revision->post_status) && rvy_get_option('pending_revision_update_post_date'))
 		|| (('future-revision' == $revision->post_status) && rvy_get_option('scheduled_revision_update_post_date'))
 	) {
-		if ($_post) {
-			if ($_post->post_date_gmt != $_post->post_modified_gmt) {
-				$wpdb->update(
-					$wpdb->posts, 
-					['post_date' => $_post->post_modified, 'post_date_gmt' => $_post->post_modified_gmt], 
-					['ID' => $post_id]
-				);
-			}
-		}
+		$update_fields['post_date'] = $post_modified;
+		$update_fields['post_date_gmt'] = $post_modified_gmt;
 	}
 
-	$post_modified_gmt = get_post_field('post_modified_gmt', $post_id);
+	$wpdb->update($wpdb->posts, $update_fields, ['ID' => $post_id]);
 
 	// also copy all stored postmeta from revision
 	global $revisionary;
@@ -570,7 +575,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
 	}
 	
-	update_post_meta($revision_id, '_rvy_published_gmt', $post_modified_gmt);
+	rvy_update_post_meta($revision_id, '_rvy_published_gmt', $post_modified_gmt);
 
 	// If published revision was the last remaining pending / scheduled, clear _rvy_has_revisions postmeta flag 
 	revisionary_refresh_postmeta($post_id);
@@ -639,7 +644,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		(('pending-revision' == $revision->post_status) && !rvy_get_option('pending_revision_update_post_date'))
 		|| (('future-revision' == $revision->post_status) && !rvy_get_option('scheduled_revision_update_post_date'))
 	) {
-		if ($_post) {
+		if ($_post = get_post($post_id)) {
 			$set_dates = (('pending-revision' == $revision->post_status) && ($_post->post_date_gmt != $_post->post_modified_gmt))
 			? ['post_date' => $revision->post_date, 'post_date_gmt' => $revision->post_date_gmt]
 			: ['post_date' => $published->post_date, 'post_date_gmt' => $published->post_date_gmt];
@@ -1328,4 +1333,81 @@ function revisionary_copy_terms( $from_post_id, $to_post_id, $mirror_empty = fal
 			}
 		}
 	}	
+}
+
+function rvy_update_post($postarr = []) {
+	global $wpdb;
+	
+	if ( is_object( $postarr ) ) {
+		// Non-escaped post was passed.
+		$postarr = get_object_vars( $postarr );
+		$postarr = wp_slash( $postarr );
+	}
+
+	// First, get all of the original fields.
+	$post = get_post( $postarr['ID'], ARRAY_A );
+
+	if ( is_null( $post ) ) {
+		return 0;
+	}
+
+	// Escape data pulled from DB.
+	$post = wp_slash( $post );
+
+	// Merge old and new fields with new fields overwriting old ones.
+	$postarr = sanitize_post( array_merge( $post, $postarr ), 'db' );
+
+	// Get the post ID and GUID.
+	$post_before = get_post( $postarr['ID'] );
+
+	if ( empty( $postarr['ID'] ) || is_null( $post_before ) ) {
+		return 0;
+	}
+
+	$data = array_intersect_key(
+		$postarr, 
+		array_fill_keys(['post_author', 'post_date', 'post_date_gmt', 'post_content', 'post_content_filtered', 'post_title', 'post_excerpt', 'comment_status', 'post_password', 'pinged', 'menu_order', 'post_mime_type'], true)
+	);
+
+	$data['guid'] = get_post_field( 'guid', $postarr['ID'] );
+
+	$data['post_type'] = (empty( $postarr['post_type'] )) ? 'post' : $postarr['post_type'];
+	$data['post_status'] = (empty( $postarr['post_status'] )) ? 'draft' : $postarr['post_status'];
+
+	$data['post_modified']     = current_time( 'mysql' );
+	$data['post_modified_gmt'] = current_time( 'mysql', 1 );
+
+	$data['ping_status'] = empty( $postarr['ping_status'] ) ? get_default_comment_status( $data['post_type'], 'pingback' ) : $postarr['ping_status'];
+	$data['to_ping'] = sanitize_trackback_urls( $postarr['to_ping'] );
+
+	$data['post_parent'] = (int) $postarr['post_parent'];
+
+	// For an update, don't modify the post_name if it wasn't supplied as an argument.
+	$data['post_name'] = (!isset( $postarr['post_name'] ) ) ? $post_before->post_name : $postarr['post_name'];
+	$data['post_name'] = wp_unique_post_slug( $data['post_name'], $postarr['ID'], $data['post_status'], $data['post_type'], $data['post_parent'] );
+
+	$emoji_fields = array( 'post_title', 'post_content', 'post_excerpt' );
+
+	foreach ( $emoji_fields as $emoji_field ) {
+		if ( isset( $data[ $emoji_field ] ) ) {
+			$charset = $wpdb->get_col_charset( $wpdb->posts, $emoji_field );
+
+			if ( 'utf8' === $charset ) {
+				$data[ $emoji_field ] = wp_encode_emoji( $data[ $emoji_field ] );
+			}
+		}
+	}
+
+	$data  = wp_unslash( $data );
+	$where = array( 'ID' => $postarr['ID'] );
+
+	if ( false === $wpdb->update( $wpdb->posts, $data, $where ) ) {
+		return 0;
+	}
+
+	clean_post_cache( $postarr['ID'] );
+
+	$post = get_post( $postarr['ID'] );
+
+	return $postarr['ID'];
 }

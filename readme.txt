@@ -6,8 +6,8 @@ Author URI: https://publishpress.com
 Tags: revision, submit changes, workflow, collaboration, permissions, moderate, posts, schedule revisions
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
-Tested up to: 5.6
-Stable tag: 2.5
+Tested up to: 5.7
+Stable tag: 2.5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -99,6 +99,16 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.5.1 - 30 Mar 2021 =
+* Fixed : Revisors could not preview other users' pending revisions, even if they are listed in Revision Queue (Permissions integration requires 3.5.1)
+* Fixed : Post Title changes were not applied at revision publication
+* Fixed : Database error on revision publication, on some installations
+* Fixed : Compare Revisions - uneven column widths with WordPress 5.7
+* Feature : Option to update modified date on revision publication
+* Compat : PublishPress - Custom Status dropdown was hidden in post editor
+* Compat : Kinsta object cache - Revision submission using "Save as Revision" checkbox failed
+* Compat : Kinsta object cache - Revision submission clears Featured Image from published post
 
 = 2.5 - 4 Mar 2021 =
 * Fixed : After a Pending Revision is published, Compare Revisions screen for past revisions did not order it correctly

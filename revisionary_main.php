@@ -22,6 +22,7 @@ class Revisionary
 	var $last_autosave_id = [];
 	var $last_revision = [];
 	var $disable_revision_trigger = false;
+	var $internal_meta_update = false;
 
 	var $config_loaded = false;		// configuration related to post types and statuses must be loaded late on the init action
 	var $enabled_post_types = [];	// enabled_post_types property is set (keyed by post type slug) late on the init action. 
@@ -115,6 +116,8 @@ class Revisionary
 		
 		add_action( 'deleted_post', [$this, 'actDeletedPost']);
 
+		add_action( 'add_meta_boxes', [$this, 'actClearFlags'], 10, 2 );
+
 		if ( rvy_get_option( 'pending_revisions' ) ) {
 			// special filtering to support Contrib editing of published posts/pages to revision
 			add_filter('pre_post_status', array($this, 'flt_pendingrev_post_status') );
@@ -181,6 +184,24 @@ class Revisionary
 
 		unset($this->enabled_post_types['attachment']);
 		$this->enabled_post_types = array_filter($this->enabled_post_types);
+	}
+
+	function actClearFlags($post_type, $post) {
+		global $current_user;
+
+		if (!empty($this->enabled_post_types[$post_type])) {
+			if (rvy_get_transient("_rvy_pending_revision_{$current_user->ID}_{$post->ID}")) {
+				rvy_delete_transient("_rvy_pending_revision_{$current_user->ID}_{$post->ID}");
+			} else {			
+				foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
+					$meta_val = rvy_get_post_meta($post->ID, $meta_key);
+
+					if (!empty($meta_val)) {
+						rvy_set_transient("_archive_{$meta_key}_{$post->ID}", $meta_val);
+					}
+				}
+			}
+		}
 	}
 
 	function canEditPost($post, $args = []) {
@@ -436,7 +457,7 @@ class Revisionary
 
 			// revision was stored without a post_meta entry for this meta key, so copy it from published post
 			if ($published_val = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s AND post_id = %d", $meta_key, $published_post_id))) {
-				update_post_meta($revision->ID, $meta_key, $published_val);
+				rvy_update_post_meta($revision->ID, $meta_key, $published_val);
 			}
 		}
 	}
@@ -555,7 +576,7 @@ class Revisionary
 	}
 
 	public function handle_template( $template, $post_id, $validate = false ) {
-		update_post_meta( $post_id, '_wp_page_template', $template );
+		rvy_update_post_meta( $post_id, '_wp_page_template', $template );
 	}
 
 	public function handle_featured_media( $featured_media, $post_id ) {
@@ -1077,7 +1098,7 @@ class Revisionary
 
 	function flt_regulate_revision_status($data, $postarr) {
 		// Revisions are not published by wp_update_post() execution; Prevent setting to a non-revision status
-		if (get_post_meta($postarr['ID'], '_rvy_base_post_id', true) && ('trash' != $data['post_status'])) {
+		if (rvy_get_post_meta($postarr['ID'], '_rvy_base_post_id', true) && ('trash' != $data['post_status'])) {
 			if (!$revision = get_post($postarr['ID'])) {
 				return $data;
 			}
