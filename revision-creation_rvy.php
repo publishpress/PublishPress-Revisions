@@ -315,8 +315,8 @@ class RevisionCreation {
 			$revisionary->last_revision[$published_post->ID] = $revision_id;
             set_transient("_rvy_pending_revision_{$current_user->ID}_{$published_post->ID}", $revision_id, 30);
 
-            update_post_meta($revision_id, '_rvy_base_post_id', $published_post->ID);
-            update_post_meta($published_post->ID, '_rvy_has_revisions', true);
+            rvy_update_post_meta($revision_id, '_rvy_base_post_id', $published_post->ID);
+            rvy_update_post_meta($published_post->ID, '_rvy_has_revisions', true);
 
 			if (!empty($requested_slug)) {
 				add_post_meta($revision_id, '_requested_slug', $requested_slug);
@@ -602,8 +602,8 @@ class RevisionCreation {
 			if ($revision_id) {
 				set_transient("_rvy_scheduled_revision_{$current_user->ID}_{$post_arr['ID']}", $revision_id, 30);
 
-				update_post_meta($revision_id, '_rvy_base_post_id', $published_post->ID);
-				update_post_meta($published_post->ID, '_rvy_has_revisions', true);
+				rvy_update_post_meta($revision_id, '_rvy_base_post_id', $published_post->ID);
+				rvy_update_post_meta($published_post->ID, '_rvy_has_revisions', true);
 				
 				foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
 					$published_meta_val = get_post_meta($published_post->ID, $meta_key, true);
@@ -752,7 +752,7 @@ class RevisionCreation {
 	
 		if ( ! empty( $postarr['meta_input'] ) ) {
 			foreach ( $postarr['meta_input'] as $field => $value ) {
-				update_post_meta( $post_ID, $field, $value );
+				rvy_update_post_meta( $post_ID, $field, $value );
 			}
 		}
 	
@@ -770,7 +770,7 @@ class RevisionCreation {
 			}
 	
 			if ( ! empty( $postarr['context'] ) ) {
-				update_post_meta( $post_ID, '_wp_attachment_context', $postarr['context'], true );
+				rvy_update_post_meta( $post_ID, '_wp_attachment_context', $postarr['context'], true );
 			}
 		}
 	

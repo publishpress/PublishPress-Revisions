@@ -34,6 +34,7 @@ add_action('post_updated', '_rvy_restore_published_content', 99, 3);
 add_action('update_post_metadata', '_rvy_limit_postmeta_update', 10, 5);
 add_action('delete_post_metadata', '_rvy_limit_postmeta_update', 10, 5);
 
+	function() {
 function _rvy_limit_postmeta_update($block_update, $object_id, $meta_key, $meta_value, $prev_value) {
 	global $current_user;
 	
@@ -63,9 +64,9 @@ function _rvy_restore_published_content( $post_ID, $post_after, $post_before ) {
 			update_postmeta_cache($post_ID);
 			
 			if (rvy_get_post_meta($post_ID, "_save_as_revision_{$current_user->ID}", true) || !agp_user_can('edit_post', $post_ID, '', ['skip_revision_allowance' => true])) {
-				if ($post_content = get_transient('rvy_post_content_' . $post_ID)) {
+				if ($post_content = rvy_get_transient('rvy_post_content_' . $post_ID)) {
 					$wpdb->update($wpdb->posts, ['post_content' => $post_content], ['ID' => $post_ID]);
-					delete_transient('rvy_post_content_' . $post_ID);
+					rvy_delete_transient('rvy_post_content_' . $post_ID);
 				}
 			}
 		}
@@ -101,7 +102,7 @@ function _rvy_buffer_post_content($maybe_empty, $postarr) {
 						$postarr['ID']
 					)
 				)) {
-					set_transient('rvy_post_content_' . $postarr['ID'], $raw_content, 60);
+					rvy_set_transient('rvy_post_content_' . $postarr['ID'], $raw_content, 60);
 				}
 			}
 		}
@@ -545,7 +546,7 @@ function revisionary_refresh_postmeta($post_id, $set_value = null, $args = []) {
 	}
 
 	if ($set_value) {
-		update_post_meta($post_id, '_rvy_has_revisions', $set_value);
+		rvy_update_post_meta($post_id, '_rvy_has_revisions', $set_value);
 	} else {
 		delete_post_meta($post_id, '_rvy_has_revisions');
 	}
@@ -570,7 +571,7 @@ function revisionary_refresh_revision_flags() {
 	
 	if ($posts_missing_flag = array_diff($arr_have_revisions, $have_flag_ids)) {
 		foreach($posts_missing_flag as $post_id) {
-			update_post_meta($post_id, '_rvy_has_revisions', true);
+			rvy_update_post_meta($post_id, '_rvy_has_revisions', true);
 		}
 	}
 }
@@ -935,7 +936,7 @@ function rvy_post_id($revision_id) {
 	}
 
 	$busy = true;
-	$published_id = get_post_meta( $revision_id, '_rvy_base_post_id', true );
+	$published_id = rvy_get_post_meta( $revision_id, '_rvy_base_post_id', true );
 	$busy = false;
 
 	if (empty($published_id)) {
@@ -946,7 +947,7 @@ function rvy_post_id($revision_id) {
 			} elseif('revision' == $_post->post_type) {
 				return $_post->post_parent;
 			} else {
-				update_post_meta( $revision_id, '_rvy_base_post_id', $_post->comment_count );
+				rvy_update_post_meta( $revision_id, '_rvy_base_post_id', $_post->comment_count );
 				return $_post->comment_count;
 			}
 		}
@@ -1025,7 +1026,7 @@ function revisionary_copy_meta_field( $meta_key, $from_post_id, $to_post_id, $mi
 				$wpdb->prepare("SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s AND post_id = %d", $meta_key, $from_post_id )
 			)
 		) {
-			update_post_meta($to_post_id, $meta_key, $source_meta->meta_value);
+			rvy_update_post_meta($to_post_id, $meta_key, $source_meta->meta_value);
 
 		} elseif ($mirror_empty && in_array($meta_key, apply_filters('revisionary_removable_meta_fields', [], $to_post_id))) {
 			// Disable postmeta deletion until further testing

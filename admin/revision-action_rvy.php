@@ -570,7 +570,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
 	}
 	
-	update_post_meta($revision_id, '_rvy_published_gmt', $post_modified_gmt);
+	rvy_update_post_meta($revision_id, '_rvy_published_gmt', $post_modified_gmt);
 
 	// If published revision was the last remaining pending / scheduled, clear _rvy_has_revisions postmeta flag 
 	revisionary_refresh_postmeta($post_id);
