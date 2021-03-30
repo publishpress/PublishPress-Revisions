@@ -53,7 +53,7 @@ function _rvy_set_ma_post_authors_custom_field($post_id, $authors)
 
 		if (!empty($names)) {
 			$names = implode(', ', $names);
-			update_post_meta($post_id, $metadata, $names);
+			rvy_update_post_meta($post_id, $metadata, $names);
 		} else {
 			delete_post_meta($post_id, $metadata);
 		}
