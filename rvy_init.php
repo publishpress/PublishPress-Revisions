@@ -294,7 +294,9 @@ function rvy_delete_transient($transient) {
 function rvy_update_post_meta($post_id, $meta_key, $meta_value) {
 	global $wpdb;
 
+	$revisionary->internal_meta_update = true;
 	update_post_meta($post_id, $meta_key, $meta_value);
+	$revisionary->internal_meta_update = true;
 
 	// some extra low-level database operations until the cause of meta sync failure with WP 5.5 can be determined
 	rvy_delete_post_meta($post_id, $meta_key);
