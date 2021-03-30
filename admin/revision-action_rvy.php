@@ -497,31 +497,36 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		$update_fields['post_content'] = $revision_content;
 	}
 	
-	$wpdb->update($wpdb->posts, $update_fields, array('ID' => $post_id));
-
 	$_post = get_post($post_id);
 
 	// prevent published post status being set to future when a scheduled revision is manually published before the stored post_date
 	if ($_post && ($_post->post_status != $published->post_status)) {
-		$wpdb->update($wpdb->posts, array('post_status' => $published->post_status), array('ID' => $post_id));
+		$update_fields['post_status'] = $published->post_status;
+	}
+
+	if (
+		(('pending-revision' == $revision->post_status) && rvy_get_option('pending_revision_update_modified_date'))
+		|| (('future-revision' == $revision->post_status) && rvy_get_option('scheduled_revision_update_modified_date'))
+	) {
+		$post_modified = current_time('mysql');
+		$post_modified_gmt = current_time('mysql', 1);
+
+		$update_fields['post_modified'] = $post_modified;
+		$update_fields['post_modified_gmt'] = $post_modified_gmt;
+	} else {
+		$post_modified = get_post_field('post_modified', $post_id);
+		$post_modified_gmt = get_post_field('post_modified_gmt', $post_id);
 	}
 
 	if (
 		(('pending-revision' == $revision->post_status) && rvy_get_option('pending_revision_update_post_date'))
 		|| (('future-revision' == $revision->post_status) && rvy_get_option('scheduled_revision_update_post_date'))
 	) {
-		if ($_post) {
-			if ($_post->post_date_gmt != $_post->post_modified_gmt) {
-				$wpdb->update(
-					$wpdb->posts, 
-					['post_date' => $_post->post_modified, 'post_date_gmt' => $_post->post_modified_gmt], 
-					['ID' => $post_id]
-				);
-			}
-		}
+		$update_fields['post_date'] = $post_modified;
+		$update_fields['post_date_gmt'] = $post_modified_gmt;
 	}
 
-	$post_modified_gmt = get_post_field('post_modified_gmt', $post_id);
+	$wpdb->update($wpdb->posts, $update_fields, ['ID' => $post_id]);
 
 	// also copy all stored postmeta from revision
 	global $revisionary;
@@ -639,7 +644,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		(('pending-revision' == $revision->post_status) && !rvy_get_option('pending_revision_update_post_date'))
 		|| (('future-revision' == $revision->post_status) && !rvy_get_option('scheduled_revision_update_post_date'))
 	) {
-		if ($_post) {
+		if ($_post = get_post($post_id)) {
 			$set_dates = (('pending-revision' == $revision->post_status) && ($_post->post_date_gmt != $_post->post_modified_gmt))
 			? ['post_date' => $revision->post_date, 'post_date_gmt' => $revision->post_date_gmt]
 			: ['post_date' => $published->post_date, 'post_date_gmt' => $published->post_date_gmt];

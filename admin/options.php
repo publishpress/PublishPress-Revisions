@@ -118,6 +118,8 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'async_scheduled_publish' => 				__('Asynchronous Publishing', 'revisionary'),
 	'scheduled_revision_update_post_date' => 	__('Update Publish Date', 'revisionary'),
 	'pending_revision_update_post_date' => 		__('Update Publish Date', 'revisionary'),
+	'scheduled_revision_update_modified_date' => __('Update Modified Date', 'revisionary'),
+	'pending_revision_update_modified_date' => 	__('Update Modified Date', 'revisionary'),
 	'pending_rev_notify_author' => 				__('Email original Author when a Pending Revision is submitted', 'revisionary'),
 	'rev_approval_notify_author' => 			__('Email the original Author when a Pending Revision is approved', 'revisionary'),
 	'rev_approval_notify_revisor' => 			__('Email the Revisor when a Pending Revision is approved', 'revisionary'),
@@ -151,8 +153,8 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 'features' => [
 	'license' =>			 ['edd_key'],
 	'role_definition' => 	 ['revisor_role_add_custom_rolecaps', 'require_edit_others_drafts'],
-	'scheduled_revisions' => ['scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date'],
-	'pending_revisions'	=> 	 ['pending_revisions', 'pending_revision_update_post_date'],
+	'scheduled_revisions' => ['scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date'],
+	'pending_revisions'	=> 	 ['pending_revisions', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'queue_query_all_posts'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'],
 	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'display_hints'],
@@ -346,6 +348,9 @@ $scheduled_revisions_available ) :
 		$hint = __( 'When a scheduled revision is published, update post publish date to current time.', 'revisionary' );
 		$this->option_checkbox( 'scheduled_revision_update_post_date', $tab, $section, $hint, '' );
 
+		$hint = __( 'When a scheduled revision is published, update post modified date to current time.', 'revisionary' );
+		$this->option_checkbox( 'scheduled_revision_update_modified_date', $tab, $section, $hint, '' );
+
 		$hint = __( 'Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
 		$this->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
 		?>
@@ -372,6 +377,9 @@ $pending_revisions_available ) :
 		
 		$hint = __( 'When a pending revision is published, update post publish date to current time.', 'revisionary' );
 		$this->option_checkbox( 'pending_revision_update_post_date', $tab, $section, $hint, '' );
+
+		$hint = __( 'When a pending revision is published, update post modified date to current time.', 'revisionary' );
+		$this->option_checkbox( 'pending_revision_update_modified_date', $tab, $section, $hint, '' );
 
 		do_action('revisionary_option_ui_pending_revisions', $this);
 		?>
