@@ -34,7 +34,16 @@ add_action('post_updated', '_rvy_restore_published_content', 99, 3);
 add_action('update_post_metadata', '_rvy_limit_postmeta_update', 10, 5);
 add_action('delete_post_metadata', '_rvy_limit_postmeta_update', 10, 5);
 
+add_action('init', 
 	function() {
+		global $kinsta_cache;
+
+		if (!empty($kinsta_cache)) {
+			remove_action('init', [$kinsta_cache, 'init_cache'], 20);
+		}
+	}
+);
+
 function _rvy_limit_postmeta_update($block_update, $object_id, $meta_key, $meta_value, $prev_value) {
 	global $current_user;
 	
