@@ -399,9 +399,9 @@ class RevisionaryAdmin
 
 			// Workaround for Gutenberg stripping published thumbnail, page template on revision creation
 			foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
-				if ($archived_val = get_post_meta($revised_post->ID, "_archive_{$meta_key}", true)) {
-					update_post_meta($revised_post->ID, $meta_key, $archived_val);
-					delete_post_meta($revised_post->ID, "_archive_{$meta_key}");
+				if ($archived_val = rvy_get_transient("_archive_{$meta_key}_{$revised_post->ID}")) {
+					rvy_update_post_meta($revised_post->ID, $meta_key, $archived_val);
+					rvy_delete_transient("_archive_{$meta_key}_{$revised_post->ID}");
 				}
 			}
 
