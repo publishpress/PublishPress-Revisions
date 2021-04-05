@@ -306,6 +306,8 @@ class Rvy_Revision_Workflow_UI {
             case 'rev_submission_notify_admin' :
             case 'rev_approval_notify_admin' :
 
+                do_action('presspermit_init_rvy_interface');
+
                 if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') && ! defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS') ) {
                     global $revisionary;
                     
