@@ -1100,6 +1100,8 @@ function rvy_publish_scheduled_revisions($args = array()) {
 						// if it was not stored, or cleared, use default recipients
 						$to_addresses = array();
 						
+						do_action('presspermit_init_rvy_interface');
+
 						if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') && ! defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS') ) { // e-mail to Scheduled Revision Montiors metagroup if Role Scoper is activated
 							global $revisionary;
 							
