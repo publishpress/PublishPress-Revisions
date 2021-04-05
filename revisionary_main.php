@@ -168,8 +168,8 @@ class Revisionary
 	}
 
 	// This is intentionally called twice: once for code that fires on 'init' and then very late on 'init' for types which were registered late on 'init'
-	private function setPostTypes() {
-		$this->enabled_post_types = apply_filters(
+	public function setPostTypes() {
+		$enabled_post_types = apply_filters(
 			'revisionary_enabled_post_types', 
 			array_diff_key(
 			array_merge(
@@ -181,6 +181,21 @@ class Revisionary
 				['tablepress_table' => true]
 			)
 		);
+
+		if (!defined('REVISIONARY_NO_PRIVATE_TYPES')) {
+			$private_types = get_post_types(['public' => false], 'object');
+			
+			// by default, enable non-public post types that have type-specific capabilities defined
+			foreach($private_types as $post_type => $type_obj) {
+				if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages']))
+				|| defined('REVISIONARY_ENABLE_' . strtoupper($post_type) . '_TYPE')
+				) {
+					$enabled_post_types[$post_type] = true;
+				}
+			}
+		}
+
+		$this->enabled_post_types = array_merge($this->enabled_post_types, $enabled_post_types);
 
 		unset($this->enabled_post_types['attachment']);
 		$this->enabled_post_types = array_filter($this->enabled_post_types);
