@@ -179,6 +179,12 @@ class RevisionaryAdmin
 	}
 
 	public function fltDisableExceptionUI($disable, $src_name, $post_id, $post_type = '') {
+		global $pagenow;
+
+		if (!empty($pagenow) && ('term.php' == $pagenow)) {
+			return $disable;
+		}
+		
 		if (!$post_id) {
 			// Permissions version < 3.1.4 always passes zero value $post_id
 			$post_id = rvy_detect_post_id();
