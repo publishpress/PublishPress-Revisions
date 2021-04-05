@@ -104,6 +104,12 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.5.3 - 5 Apr 2021 =
+* Compat : WP Rest Cache - Revision submission from Gutenberg failed
+* Compat : PublishPress Permissions - Edit Category / Term: Permissions metaboxes were not displayed
+* Compat : PublishPress Permissions - Pending Revision Monitors group ineffective; notifications were sent to all Editors and Administrators (also requires PublishPress Permissions 3.5.1)
+* Compat : Enable revisioning of non-public post types if they have type-specific capabilities defined
+
 = 2.5.2 - 30 Mar 2021 =
 * Fixed : Fatal error due to incorrect vendor library load request
 
