@@ -176,7 +176,7 @@ class RevisionCreation {
         if ( $revisionary->isBlockEditorActive() && !$revisionary->doing_rest ) {
             if (!empty($_REQUEST['meta-box-loader']) && !empty($_REQUEST['action']) && ('editpost' == $_REQUEST['action'])) {
                 // Use logged revision ID from preceding REST query
-                if (!$revision_id = rvy_get_transient("_rvy_pending_revision_{$current_user->ID}_{$postarr['ID']}")) {
+                if (!$revision_id = (int) rvy_get_transient("_rvy_pending_revision_{$current_user->ID}_{$postarr['ID']}")) {
                     return $data;
                 }
             } else {
@@ -515,7 +515,7 @@ class RevisionCreation {
 		if ( $revisionary->isBlockEditorActive() && !$revisionary->doing_rest ) {
 			if (!empty($_REQUEST['meta-box-loader']) && !empty($_REQUEST['action']) && ('editpost' == $_REQUEST['action'])) {
 				// Use logged revision ID from preceding REST query
-				if (!$revision_id = rvy_get_transient("_rvy_scheduled_revision_{$current_user->ID}_{$post_arr['ID']}")) {
+				if (!$revision_id = (int) rvy_get_transient("_rvy_scheduled_revision_{$current_user->ID}_{$post_arr['ID']}")) {
 					return $data;
 				}
 			} else {
