@@ -255,12 +255,14 @@ function rvy_get_transient($transient) {
 
 	$option_name = '_transient_' . $transient;
 
-	return $wpdb->get_var(
+	$val = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT option_value FROM $wpdb->options WHERE option_name = %s",
 				$option_name
 			)
 		);
+
+	return (is_null($val)) ? '' : $val;
 }
 
 function rvy_set_transient($transient, $option_val, $timeout = 30) {
