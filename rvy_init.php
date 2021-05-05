@@ -241,6 +241,8 @@ function rvy_ajax_handler() {
 function rvy_get_post_meta($post_id, $meta_key, $unused = false) {
 	global $wpdb;
 
+	$post_id = (is_object($post_id)) ? $post_id->ID : $post_id;
+
 	return $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s and post_id = %d",
