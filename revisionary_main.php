@@ -134,6 +134,8 @@ class Revisionary
 		add_filter( 'wp_insert_post_data', array($this, 'flt_regulate_revision_status'), 100, 2 );
 		add_filter( 'wp_insert_post_data', array($this, 'fltODBCworkaround'), 101, 2 );
 
+		add_filter('wp_insert_post_data', [$this, 'fltRemoveInvalidPostDataKeys'], 999, 2);
+
 		// REST logging
 		add_filter( 'rest_pre_dispatch', array( $this, 'rest_pre_dispatch' ), 10, 3 );
 
@@ -1073,6 +1075,11 @@ class Revisionary
 		require_once( dirname(__FILE__).'/revision-creation_rvy.php' );
 		$rvy_creation = new PublishPress\Revisions\RevisionCreation(['revisionary' => $this]);
 		return $rvy_creation->flt_pendingrev_post_status($status);
+	}
+
+	function fltRemoveInvalidPostDataKeys($data, $postarr) {
+		unset($data['filter']);
+		return $data;
 	}
 
 	function flt_maybe_insert_revision($data, $postarr) {
