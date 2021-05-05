@@ -104,7 +104,9 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
-= 2.5.3 - 5 Apr 2021 =
+= 2.5.4-beta =
+* Compat : TablePress - Tables could not be updated by non-Administrators
+= 2.5.3 - 6 Apr 2021 =
 * Compat : WP Rest Cache - Revision submission from Gutenberg failed
 * Compat : PublishPress Permissions - Edit Category / Term: Permissions metaboxes were not displayed
 * Compat : PublishPress Permissions - Pending Revision Monitors group ineffective; notifications were sent to all Editors and Administrators (also requires PublishPress Permissions 3.5.1)
