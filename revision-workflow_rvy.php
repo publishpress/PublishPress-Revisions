@@ -57,7 +57,7 @@ class Rvy_Revision_Workflow_UI {
 
             if ( $admin_notify ) {
                 // establish the publisher recipients
-                $recipient_ids = self::getRecipients('rev_submission_notify_admin', compact('type_obj', 'published_post'));
+                $recipient_ids = apply_filters('revisionary_submission_notify_admin', self::getRecipients('rev_submission_notify_admin', compact('type_obj', 'published_post')));
                 
                 if ( ( 'always' != $admin_notify ) && $selected_recipients ) {
                     // intersect default recipients with selected recipients
