@@ -1308,4 +1308,25 @@ class Revisionary
 		return $count;
 	}
 
+	public function isRESTurl() {
+		static $arr_url;
+	
+		if (!isset($arr_url)) {
+			$arr_url = parse_url(get_option('siteurl'));
+		}
+	
+		if ($arr_url) {
+			$path = isset($arr_url['path']) ? $arr_url['path'] : '';
+	
+			if (0 === strpos($_SERVER['REQUEST_URI'], $path . '/wp-json/oembed/')) {
+				return false;	
+			}
+	
+			if (0 === strpos($_SERVER['REQUEST_URI'], $path . '/wp-json/')) {
+				return true;
+			}
+		}
+	
+		return false;
+	}
 } // end Revisionary class
