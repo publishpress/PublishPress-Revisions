@@ -1012,7 +1012,7 @@ class Revisionary
 					// Allow Contributors / Revisors to edit published post/page, with change stored as a revision pending review
 					$replace_caps = array( 'edit_published_posts', $edit_published_cap, 'edit_private_posts', $edit_private_cap );
 					
-					if ( ! strpos( $script_name, 'p-admin/edit.php' ) ) {
+					if (!strpos($script_name, 'p-admin/edit.php') && (empty($_REQUEST['page']) || ('pp-calendar' != $_REQUEST['page']))) {
 						$replace_caps = array_merge( $replace_caps, array( $cap->publish_posts, 'publish_posts' ) );
 					}
 				} elseif (in_array($post->post_status, rvy_filtered_statuses())) {
