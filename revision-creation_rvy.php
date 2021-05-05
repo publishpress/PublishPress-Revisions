@@ -365,6 +365,11 @@ class RevisionCreation {
             do_action( 'revisionary_saved_revision', $post );
         }
 
+		// Stop WooCommerce from setting new pending revision Products to "out of stock"
+		if (get_post_meta($revision_id, '_stock_status')) {
+			revisionary_copy_meta_field('_stock_status', $published_post->ID, $revision_id);
+		}
+
         if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
             // Make sure Multiple Authors plugin does not change post_author value for revisor. Authors taxonomy terms can be revisioned for published post.
             $wpdb->update($wpdb->posts, ['post_author' => $current_user->ID], ['ID' => $revision_id]);
