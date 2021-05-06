@@ -134,6 +134,8 @@ class Revisionary
 		add_filter( 'wp_insert_post_data', array($this, 'flt_regulate_revision_status'), 100, 2 );
 		add_filter( 'wp_insert_post_data', array($this, 'fltODBCworkaround'), 101, 2 );
 
+		add_filter('wp_insert_post_data', [$this, 'fltRemoveInvalidPostDataKeys'], 999, 2);
+
 		// REST logging
 		add_filter( 'rest_pre_dispatch', array( $this, 'rest_pre_dispatch' ), 10, 3 );
 
@@ -169,17 +171,11 @@ class Revisionary
 
 	// This is intentionally called twice: once for code that fires on 'init' and then very late on 'init' for types which were registered late on 'init'
 	public function setPostTypes() {
-		$enabled_post_types = apply_filters(
-			'revisionary_enabled_post_types', 
-			array_diff_key(
-			array_merge(
+		$enabled_post_types = array_merge(
 				array_fill_keys(
 					get_post_types(['public' => true]), true
 				),
 				['swfd-courses' => true]
-				),
-				['tablepress_table' => true]
-			)
 		);
 
 		if (!defined('REVISIONARY_NO_PRIVATE_TYPES')) {
@@ -194,6 +190,14 @@ class Revisionary
 				}
 			}
 		}
+
+		$enabled_post_types = apply_filters(
+			'revisionary_enabled_post_types', 
+			array_diff_key(
+				$enabled_post_types,
+				['tablepress_table' => true]
+			)
+		);
 
 		$this->enabled_post_types = array_merge($this->enabled_post_types, $enabled_post_types);
 
@@ -1008,7 +1012,7 @@ class Revisionary
 					// Allow Contributors / Revisors to edit published post/page, with change stored as a revision pending review
 					$replace_caps = array( 'edit_published_posts', $edit_published_cap, 'edit_private_posts', $edit_private_cap );
 					
-					if ( ! strpos( $script_name, 'p-admin/edit.php' ) ) {
+					if (!strpos($script_name, 'p-admin/edit.php') && (empty($_REQUEST['page']) || ('pp-calendar' != $_REQUEST['page']))) {
 						$replace_caps = array_merge( $replace_caps, array( $cap->publish_posts, 'publish_posts' ) );
 					}
 				} elseif (in_array($post->post_status, rvy_filtered_statuses())) {
@@ -1071,6 +1075,11 @@ class Revisionary
 		require_once( dirname(__FILE__).'/revision-creation_rvy.php' );
 		$rvy_creation = new PublishPress\Revisions\RevisionCreation(['revisionary' => $this]);
 		return $rvy_creation->flt_pendingrev_post_status($status);
+	}
+
+	function fltRemoveInvalidPostDataKeys($data, $postarr) {
+		unset($data['filter']);
+		return $data;
 	}
 
 	function flt_maybe_insert_revision($data, $postarr) {
@@ -1299,4 +1308,25 @@ class Revisionary
 		return $count;
 	}
 
+	public function isRESTurl() {
+		static $arr_url;
+	
+		if (!isset($arr_url)) {
+			$arr_url = parse_url(get_option('siteurl'));
+		}
+	
+		if ($arr_url) {
+			$path = isset($arr_url['path']) ? $arr_url['path'] : '';
+	
+			if (0 === strpos($_SERVER['REQUEST_URI'], $path . '/wp-json/oembed/')) {
+				return false;	
+			}
+	
+			if (0 === strpos($_SERVER['REQUEST_URI'], $path . '/wp-json/')) {
+				return true;
+			}
+		}
+	
+		return false;
+	}
 } // end Revisionary class

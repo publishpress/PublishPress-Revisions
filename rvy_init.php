@@ -241,6 +241,8 @@ function rvy_ajax_handler() {
 function rvy_get_post_meta($post_id, $meta_key, $unused = false) {
 	global $wpdb;
 
+	$post_id = (is_object($post_id)) ? $post_id->ID : $post_id;
+
 	return $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s and post_id = %d",
@@ -302,7 +304,7 @@ function rvy_update_post_meta($post_id, $meta_key, $meta_value) {
 	$revisionary->internal_meta_update = true;
 
 	// some extra low-level database operations until the cause of meta sync failure with WP 5.5 can be determined
-	//rvy_delete_post_meta($post_id, $meta_key);
+	rvy_delete_post_meta($post_id, $meta_key);
 
 	if ($meta_value) {
 		$wpdb->insert(
