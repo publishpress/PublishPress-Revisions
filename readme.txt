@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.7
-Stable tag: 2.5.3
+Stable tag: 2.5.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -107,6 +107,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 = 2.5.4 - 6 May 2021 =
 * Fixed : Database error on Revision approval - Unknown column 'filter' in 'field list' for query UPDATE `wp_posts` SET `post_author` = 
 * Compat : TablePress - Tables could not be updated by non-Administrators
+
 = 2.5.3 - 6 Apr 2021 =
 * Compat : WP Rest Cache - Revision submission from Gutenberg failed
 * Compat : PublishPress Permissions - Edit Category / Term: Permissions metaboxes were not displayed
