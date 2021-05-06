@@ -104,7 +104,8 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
-= 2.5.4-beta =
+= 2.5.4 - 6 May 2021 =
+* Fixed : Database error on Revision approval - Unknown column 'filter' in 'field list' for query UPDATE `wp_posts` SET `post_author` = 
 * Compat : TablePress - Tables could not be updated by non-Administrators
 = 2.5.3 - 6 Apr 2021 =
 * Compat : WP Rest Cache - Revision submission from Gutenberg failed
