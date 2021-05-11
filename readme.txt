@@ -11,13 +11,13 @@ Stable tag: 2.5.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin gives you control over updating published content. Users can submit revisions. You can approve or reject them.
+PublishPress Revisions gives you control over updating published content. Users can submit revisions. You can approve or reject them.
 
 == Description ==
 
-WordPress Revisions are a powerful way to track where your site has been. But what about where it's going?
+PublishPress Revisions gives you control over updating published content. Users can submit revisions. You can approve or reject them.
 
-To moderate or schedule changes to published posts, just install PublishPress Revisions and let the teamwork begin. There is no need to learn or configure complex new screens because PublishPress Revisions works with familiar WordPress UI, including the Gutenberg and the Classic Editor.
+Your users can update posts using the normal WordPress editor, but their changes will not be published automatically. Instead, the changes are stored as a revision that can be approved, rejected or scheduled. PublishPress Revisions works with the familiar WordPress interface, including Gutenberg and the Classic Editor.
 
 The Free version of PublishPress Revisions supports the WordPress core. The Pro version of PublishPress Revisions supports ACF, Yoast SEO, PODS, WooCommerce, WPML, Elementor, Beaver Builder, and many more plugins and themes.
 
