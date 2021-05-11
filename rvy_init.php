@@ -356,7 +356,7 @@ function rvy_status_registrations() {
 	));
 
 	foreach(rvy_get_manageable_types() as $post_type) {
-		add_filter("rest_{$post_type}_collection_params", function($query_params, $post_type) 
+		add_filter("rest_{$post_type}_collection_params", function($query_params, $post_type = '') 
 			{
 				$query_params['status']['items']['enum'] []= 'pending-revision';
 				$query_params['status']['items']['enum'] []= 'future-revision';
