@@ -105,7 +105,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 == Changelog ==
 
 = 2.5.5-beta =
-* Fixed : Fatal error in post editor on some sites (Uncaught ArgumentCountError: Too few arguments to function)
+* Fixed : Fatal error in post editor on sites that apply filter "rest_{$post_type}_collection_params" incorrectly (Uncaught ArgumentCountError: Too few arguments to function)
 
 = 2.5.4 - 6 May 2021 =
 * Fixed : Database error on Revision approval - Unknown column 'filter' in 'field list' for query UPDATE `wp_posts` SET `post_author` = 
