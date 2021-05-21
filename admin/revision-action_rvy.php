@@ -1371,6 +1371,10 @@ function rvy_update_post($postarr = []) {
 		array_fill_keys(['post_author', 'post_date', 'post_date_gmt', 'post_content', 'post_content_filtered', 'post_title', 'post_excerpt', 'comment_status', 'post_password', 'pinged', 'menu_order', 'post_mime_type'], true)
 	);
 
+	if (!class_exists('WPCom_Markdown') || defined('RVY_DISABLE_MARKDOWN_WORKAROUND')) {
+		unset($data['post_content_filtered']);
+	}
+
 	$data['guid'] = get_post_field( 'guid', $postarr['ID'] );
 
 	$data['post_type'] = (empty( $postarr['post_type'] )) ? 'post' : $postarr['post_type'];
