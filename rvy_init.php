@@ -303,8 +303,16 @@ function rvy_update_post_meta($post_id, $meta_key, $meta_value) {
 	update_post_meta($post_id, $meta_key, $meta_value);
 	$revisionary->internal_meta_update = true;
 
-	// some extra low-level database operations until the cause of meta sync failure with WP 5.5 can be determined
-	rvy_delete_post_meta($post_id, $meta_key);
+	static $skip_deletion_keys;
+	
+	if (!isset($skip_deletion_keys)) {
+		$skip_deletion_keys = apply_filters('revisionary_multi_row_meta_keys', []);
+	}
+
+	if (!in_array($meta_key, $skip_deletion_keys)) {
+		// some extra low-level database operations until the cause of meta sync failure with WP 5.5 can be determined
+		rvy_delete_post_meta($post_id, $meta_key);
+	}
 
 	if ($meta_value) {
 		$wpdb->insert(
