@@ -540,3 +540,11 @@ margin-top: 2px;
 #rvy_save_as_revision {
 margin-right: 4px;
 }
+
+.toplevel_page_revisionary-q .pressshack-admin-wrapper a {
+color: #2271B1;
+}
+
+.pressshack-admin-wrapper footer a {
+color: #655997 !important;
+}
