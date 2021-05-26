@@ -1160,6 +1160,10 @@ function rvy_is_full_editor($post, $args = []) {
 		$post = get_post($post);
 	}
 
+	if (empty($post) || !is_object($post)) {
+		return false;
+	}
+
 	if (!$type_obj = get_post_type_object($post->post_type)) {
 		return false;
 	}
