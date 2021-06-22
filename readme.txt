@@ -104,6 +104,14 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.6 - 23 Jun 2021 =
+* Fixed : Background fatal error on some sites on revision scheduling
+* Fixed : Scheduled Page Revisions - If published page has a non-default template which was not changed in the revision, the Compare and Edit Revision screens indicated a change to default template. This change was not actually applied unless the stored revision was updated prior to publication.   
+* Feature : Option to send notifications on Revision Update
+* Feature : Option to redirect to confirmation screen after Revision Update
+* Compat : Custom Permalinks plugin
+* API : New filters allow submission confirmation message to be customized: revisionary_submit_message_links, revisionary_submit_message, revisionary_schedule_message_links, revisionary_schedule_message
+
 = 2.5.5 - 26 May 2021 =
 * Compat : Google Web Stories - Loss of story data due to clearance of post_content_filtered column
 * Fixed : Fatal error in post editor on sites that apply filter "rest_{$post_type}_collection_params" incorrectly (Uncaught ArgumentCountError: Too few arguments to function)
