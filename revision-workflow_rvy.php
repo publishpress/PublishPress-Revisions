@@ -298,23 +298,31 @@ class Rvy_Revision_Workflow_UI {
             
                 $msg .= '<ul>';
                 
-                if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
+                $links = [
+                    'edit' => sprintf( '<a href="%s">' . __('Keep editing the revision', 'revisionary') . '</a>', "post.php?post={$revision->ID}&amp;action=edit" ),
+                    'back' => sprintf( '<a href="%s">' . __('Go back to schedule another revision', 'revisionary') . '</a>', admin_url("post.php?post=$post_id&action=edit")),
+                    'queue' => sprintf( '<a href="%s">' . __('View Revision Queue', 'revisionary') . '</a>', "admin.php?page=revisionary-q&published_post=$post_id" ),
+                    'manage' => sprintf( '<a href="%s">' . $manage_link->caption . '</a>', admin_url($manage_link->uri) )
+                ];
+
+                if ($show_preview_link = rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
                     $preview_link = rvy_preview_url($revision);
-                    $msg .= '<li>' . sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link );
-                    $preview_link = remove_query_arg('preview_id', $preview_link);
-                    $msg .= '<br /><br /></li><li>';
+
+                    $links = array_merge(
+                        ['preview' => sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link )],
+                        $links
+                    );
                 }
 
-                //$msg .= sprintf( '<a href="%s">' . __('Go to Revisions Manager', 'revisionary') . '</a>', "admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=view" );
-                //$msg .= '<br /><br /></li><li>';
-                $msg .= sprintf( '<a href="%s">' . __('Keep editing the revision', 'revisionary') . '</a>', "post.php?post={$revision->ID}&amp;action=edit" );
-                $msg .= '<br /><br /></li><li>';
-                $msg .= sprintf( '<a href="%s">' . __('Go back to schedule another revision', 'revisionary') . '</a>', admin_url("post.php?post=$post_id&action=edit"));
-                $msg .= '<br /><br /></li><li>';
-                $msg .= sprintf( '<a href="%s">' . __('View Revision Queue', 'revisionary') . '</a>', "admin.php?page=revisionary-q&published_post=$post_id" );
-                $msg .= '<br /><br /></li><li>';
-                $msg .= sprintf( '<a href="%s">' . $manage_link->caption . '</a>', admin_url($manage_link->uri) );
-                $msg .= '</li></ul>';
+                $links = apply_filters('revisionary_schedule_message_links', $links, $revision, $args);
+
+                foreach($links as $link_id => $link) {
+                    $msg .= "<li>{$links[$link_id]}<br /><br /></li>";                    
+                }
+
+                $msg .= '</ul>';
+
+                $msg = apply_filters('revisionary_schedule_message', $msg, $revision, $args);
 
                 break;
 
@@ -365,29 +373,32 @@ class Rvy_Revision_Workflow_UI {
 
                 $type_obj = get_post_type_object($revision->post_type);
 
-                if (($type_obj && !empty($type_obj->public)) && (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin())) {
+                $links = [
+                    'edit' => sprintf( '<a href="%s">' . __('Keep editing the revision', 'revisionary') . '</a>', "post.php?post={$revision->ID}&amp;action=edit" ),
+                    'back' => sprintf( '<a href="%s">' . __('Go back to submit another revision', 'revisionary') . '</a>', admin_url("post.php?post=$post_id&action=edit")),
+                    'queue' => sprintf( '<a href="%s">' . __('View Revision Queue', 'revisionary') . '</a>', "admin.php?page=revisionary-q&published_post=$post_id" ),
+                    'manage' => sprintf( '<a href="%s">' . $manage_link->caption . '</a>', admin_url($manage_link->uri) )
+                ];
+
+                if ($show_preview_link = $type_obj && !empty($type_obj->public) && rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
                     $preview_link = rvy_preview_url($revision);
                     $preview_link = remove_query_arg('preview_id', $preview_link);
 
-                    $msg .= '<li>';
-                    $msg .= sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link );
-                    $msg .= '<br /><br /></li>';
+                    $links = array_merge(
+                        ['preview' => sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link )],
+                        $links
+                    );
                 }
 
-                $msg .= '<li>';
-                $msg .= sprintf( '<a href="%s">' . __('Keep editing the revision', 'revisionary') . '</a>', "post.php?post={$revision->ID}&amp;action=edit" );
-                $msg .= '<br /><br /></li><li>';
+                $links = apply_filters('revisionary_submit_message_links', $links, $revision, $args);
                 
-                if ( $future_date ) {
-                    $msg .= sprintf( '<a href="%s">' . __('Go back to submit another revision', 'revisionary') . '</a>', admin_url("post.php?post=$post_id&action=edit"));
-                    $msg .= '<br /><br /></li><li>';
+                foreach($links as $link_id => $link) {
+                    $msg .= "<li>{$links[$link_id]}<br /><br /></li>";                    
                 }
 
-                $msg .= sprintf( '<a href="%s">' . __('View Revision Queue', 'revisionary') . '</a>', "admin.php?page=revisionary-q&published_post=$post_id" );
-                $msg .= '<br /><br /></li><li>';
+                $msg .= '</ul>';
 
-                $msg .= sprintf( '<a href="%s">' . $manage_link->caption . '</a>', admin_url($manage_link->uri) );
-                $msg .= '</li></ul>';
+                $msg = apply_filters('revisionary_submit_message', $msg, $revision, $args);
             }
         }
 
