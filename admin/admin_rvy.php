@@ -117,6 +117,12 @@ class RevisionaryAdmin
 			}
 		}
 		
+		if (!empty($_REQUEST['page']) && ('revisionary-q' == $_REQUEST['page'])) {
+			if ( (!empty($_REQUEST['revision_updated'])) && ! empty($_REQUEST['post_id']) ) {
+				add_action( 'admin_menu', array( &$this, 'handle_update_redirect' ) );
+			}
+		}
+
 		if ( strpos( $request_uri, 'edit.php' ) ) {
 			if ( ! empty($_REQUEST['revision_submitted']) && ! empty($_REQUEST['post_id']) ) {
 				add_action( 'admin_menu', array( &$this, 'handle_submission_redirect' ) );
@@ -427,6 +433,27 @@ class RevisionaryAdmin
 							rvy_halt( $revisionary->get_revision_msg( $revision, array( 'post_arr' => (array) $revision, 'post_id' => $revised_post->ID ) ) );
 						}
 					}
+				}
+			}
+		}
+	}
+
+	function handle_update_redirect() {
+		global $revisionary;
+
+		if (!rvy_get_option('revision_update_redirect')) {
+			return;
+		}
+
+		if ( $revision = get_post( (int) $_REQUEST['post_id'] ) ) {
+			if (rvy_is_post_author($revision)) {
+				// Note: Revision Update notification is triggered by 'post_updated' action.
+
+				if (apply_filters('revisionary_do_submission_redirect', true)) {
+					rvy_halt( $revisionary->get_revision_msg(
+						$revision, 
+						['post_arr' => (array) $revision, 'post_id' => rvy_post_id($revision->ID)]
+					));
 				}
 			}
 		}
