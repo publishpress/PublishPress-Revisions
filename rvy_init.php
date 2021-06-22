@@ -299,9 +299,15 @@ function rvy_delete_transient($transient) {
 function rvy_update_post_meta($post_id, $meta_key, $meta_value) {
 	global $wpdb, $revisionary;
 
-	$revisionary->internal_meta_update = true;
+	if (!empty($revisionary)) {
+		$revisionary->internal_meta_update = true;
+	}
+
 	update_post_meta($post_id, $meta_key, $meta_value);
-	$revisionary->internal_meta_update = true;
+
+	if (!empty($revisionary)) {
+		$revisionary->internal_meta_update = true;
+	}
 
 	static $skip_deletion_keys;
 	
