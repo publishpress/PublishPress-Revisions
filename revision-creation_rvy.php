@@ -626,6 +626,15 @@ class RevisionCreation {
 		// Pro: better compatibility in third party action handlers
 		$revision_id = (int) $revision_id;
 
+		// Prevent unintended clearance of Page Template on revision submission
+		if ($revisionary->isBlockEditorActive()) {
+			if ($published_template = get_post_meta($published_post->ID, '_wp_page_template', true)) {
+				if (!get_post_meta($revision_id, '_wp_page_template', true)) {
+					rvy_update_post_meta($revision_id, '_wp_page_template', $published_template);
+				}
+			}
+		}
+
 		if (!$revisionary->doing_rest) {
 			$_POST['ID'] = $revision_id;
 			$_REQUEST['ID'] = $revision_id;
