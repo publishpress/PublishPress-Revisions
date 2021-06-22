@@ -3,9 +3,39 @@
 *
 * By Kevin Behrens
 *
-* Copyright 2019, PublishPress
+* Copyright 2021, PublishPress
 */
 jQuery(document).ready( function($) {
+	/**
+	 *  Redirect back to edit.php if a save operation triggers scheduled revision creation
+	 */
+	$(document).on('click', 'button.editor-post-publish-button,button.editor-post-save-draft', function() {
+		var redirectCheckSaveInterval = setInterval( function() {
+			let saving = wp.data.select('core/editor').isSavingPost();
+
+			if ( saving ) {
+				clearInterval(redirectCheckSaveInterval);
+			
+				var redirectCheckSaveDoneInterval = setInterval( function() {
+					let saving = wp.data.select('core/editor').isSavingPost();
+		
+					if ( ! saving ) {
+						clearInterval(redirectCheckSaveDoneInterval);
+
+						let goodsave = wp.data.select('core/editor').didPostSaveRequestSucceed();
+						if ( goodsave ) {
+                            var redirectProp = 'redirectURLupdate';
+                                         
+							if ( typeof rvyObjEdit[redirectProp] != 'undefined' ) {
+								$(location).attr("href", rvyObjEdit[redirectProp]);
+							}
+                        }
+					}
+				}, 50 );
+			}
+		}, 10 );
+	});
+
 	/***** Redirect back to edit.php if user won't be able to futher edit after changing post status *******/
 	$(document).on('click', 'button.editor-post-publish-button,button.editor-post-save-draft', function() {
 		$('a.rvy-post-preview').remove();

@@ -149,6 +149,8 @@ class Revisionary
 		add_action('save_post', array($this, 'actSavePost'), 20, 2);
 		add_action('delete_post', [$this, 'actDeletePost'], 10, 3);
 
+		add_action('post_updated', [$this, 'actUpdateRevision'], 10, 2);
+
 		if (!defined('REVISIONARY_PRO_VERSION')) {
 			add_action('revisionary_created_revision', [$this, 'act_save_revision_followup'], 5);
 		}
@@ -549,6 +551,23 @@ class Revisionary
 			);
 
 			revisionary_refresh_postmeta(rvy_post_id($post->ID), null, ['ignore_revisions' => [$post->ID]]);
+		}
+	}
+
+	function actUpdateRevision($post_id, $revision) {
+		if (rvy_is_revision_status($revision->post_status) /*&& rvy_is_post_author($revision)*/ 
+		&& (rvy_get_option('revision_update_redirect')) 
+		) {
+			$published_post = get_post(rvy_post_id($revision));
+
+			if (apply_filters('revisionary_do_revision_notice', !$this->doing_rest, $revision, $published_post)) {
+				if (rvy_get_option('revision_update_redirect') && apply_filters('revisionary_do_submission_redirect', true) && !$this->isBlockEditorActive()) {
+					$future_date = !empty($revision->post_date) && (strtotime($revision->post_date_gmt) > agp_time_gmt());
+					
+					$msg = $this->get_revision_msg( $revision->ID, ['data' => (array) $revision, 'post_id' => $revision->ID, 'object_type' => $published_post->post_type, 'future_date' => $future_date]);
+					rvy_halt($msg, __('Pending Revision Updated', 'revisionary'));
+				}
+			}
 		}
 	}
 
