@@ -441,7 +441,7 @@ class Rvy_Revision_Workflow_UI {
                     
                     if ( $type_obj ) {
                         $revisionary->skip_revision_allowance = true;
-                        $post_publisher_ids = $revisionary->content_roles->users_who_can( $type_obj->cap->edit_post, $published_post->ID, array( 'cols' => 'id', 'user_ids' => $recipient_ids ) );
+                        $post_publisher_ids = $revisionary->content_roles->users_who_can( 'edit_post', $published_post->ID, array( 'cols' => 'id', 'user_ids' => $recipient_ids ) );
                         $revisionary->skip_revision_allowance = false;
                         $recipient_ids = array_intersect( $recipient_ids, $post_publisher_ids );
                     }
