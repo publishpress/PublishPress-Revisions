@@ -10,129 +10,27 @@
 function rvy_metabox_notification_list() {
 		global $revisionary;
 		
-		$topic = 'pending_revision';
-
 		$notify_editors = (string) rvy_get_option('pending_rev_notify_admin');
 		$notify_author = (string) rvy_get_option('pending_rev_notify_author');
 	
 		if ( ( '1' !== $notify_editors ) && ( '1' !== (string) $notify_author ) )
 			return;
 		
-		$object_type = awp_post_type_from_uri();
 		$object_id = rvy_detect_post_id();
 
-		$id_prefix = 'prev_cc';
+		require_once( dirname(REVISIONARY_FILE) . '/revision-workflow_rvy.php' );
+		$result = Rvy_Revision_Workflow_UI::default_notification_recipients($object_id);
 
-		$post_publishers = array();
-		$publisher_ids = array();
-		$default_ids = array();
-		
-		$type_obj = get_post_type_object( $object_type );
-		
-		if ( '1' === $notify_editors ) {
-			if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') && ! defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS') ) {
-				global $revisionary;
-				
-				$monitor_groups_enabled = true;
-				$revisionary->content_roles->ensure_init();
-				
-				if ( $publisher_ids = $revisionary->content_roles->get_metagroup_members( 'Pending Revision Monitors' ) ) {
-					if ( $type_obj ) {
-						$revisionary->skip_revision_allowance = true;
-						$cols = ( defined('COLS_ALL_RS') ) ? COLS_ALL_RS : 'all';
-						$post_publishers = $revisionary->content_roles->users_who_can( $type_obj->cap->edit_post, $object_id, array( 'cols' => $cols, 'force_refresh' => true, 'user_ids' => $publisher_ids ) );
-						$revisionary->skip_revision_allowance = false;
-						
-						$can_publish_post = array();
-						foreach ( $post_publishers as $key => $user ) {
-							$can_publish_post []= $user->ID;
-							
-							if ( ! in_array( $user->ID, $publisher_ids ) )
-								unset(  $post_publishers[$key] );
-						}
-						
-						$publisher_ids = array_intersect( $publisher_ids, $can_publish_post );
-						$publisher_ids = array_fill_keys( $publisher_ids, true );
-					}
-				}
-			}
-			
-			if ( ! $publisher_ids && ( empty($monitor_groups_enabled) || ! defined('RVY_FORCE_MONITOR_GROUPS') ) ) {
-				// If RS is not active, default to sending to all Administrators and Editors who can publish the post
-				require_once(ABSPATH . 'wp-admin/includes/user.php');
-				
-				if ( defined( 'SCOPER_MONITOR_ROLES' ) )
-					$use_wp_roles = SCOPER_MONITOR_ROLES;
-				else
-					$use_wp_roles = ( defined( 'RVY_MONITOR_ROLES' ) ) ? RVY_MONITOR_ROLES : 'administrator,editor';
-				
-				$use_wp_roles = str_replace( ' ', '', $use_wp_roles );
-				$use_wp_roles = explode( ',', $use_wp_roles );
-				
-				$recipients = array();
-				
-				foreach ( $use_wp_roles as $role_name ) {
-					$search = new WP_User_Query( "search=&role=$role_name" );
-					$recipients = array_merge( $recipients, $search->results );
-				}
-				
-				foreach ( $recipients as $_user ) {	
-					$reqd_caps = map_meta_cap( $type_obj->cap->edit_post, $_user->ID, $object_id );
-
-					if ( ! array_diff( $reqd_caps, array_keys( array_intersect( $_user->allcaps, array( true, 1, '1' ) ) ) ) ) {
-						$post_publishers []= $_user;
-						$publisher_ids [$_user->ID] = true;
-					}
-				}
-			}
-
-			// boolean array with user IDs as array keys
-			$default_ids = apply_filters('revisionary_notify_publisher_default_ids', $publisher_ids, $object_id);
-		}
-		
-		if ( '1' === $notify_author ) {
-			global $post;
-	
-			if (function_exists('get_multiple_authors')) {
-				$author_ids = [];
-				foreach(get_multiple_authors($post) as $_author) {
-					$author_ids []= $_author->ID;
-				}	
-			} else {
-				$author_ids = [$post->post_author];
-			}
-
-			foreach($author_ids as $author_id) {
-				if ( empty( $default_ids[$author_id] ) ) {
-					if ( defined('RVY_CONTENT_ROLES') ) {
-						$revisionary->skip_revision_allowance = true;
-						$cols = ( defined('COLS_ALL_RS') ) ? COLS_ALL_RS : 'all';
-						$author_notify = (bool) $revisionary->content_roles->users_who_can( 'edit_post', $object_id, array( 'cols' => $cols, 'force_refresh' => true, 'user_ids' => (array) $author_id ) );
-						$revisionary->skip_revision_allowance = false;
-					} else {
-						$_user = new WP_User($author_id);
-						$reqd_caps = map_meta_cap( $type_obj->cap->edit_post, $_user->ID, $object_id );
-						$author_notify = ! array_diff( $reqd_caps, array_keys( array_intersect( $_user->allcaps, array( true, 1, '1' ) ) ) );
-					}
-
-					if ( $author_notify ) {
-						$default_ids[$author_id] = true;
-
-						$user = new WP_User( $author_id );
-						$post_publishers[] = $user;
-					}
-				}
-			}
+		foreach (['default_ids', 'post_publishers', 'publisher_ids'] as $var) {
+            $$var = $result[$var];
 		}
 		
 		require_once('agents_checklist_rvy.php');
 		
-		echo("<div id='rvy_cclist_$topic'>");
+		echo("<div id='rvy_cclist_pending_revision'>");
 		
 		if ( $default_ids ) {
-			// array of WP_User objects
-			$post_publishers = apply_filters('revisionary_notify_publishers_eligible', $post_publishers, $object_id);
-			RevisionaryAgentsChecklist::agents_checklist( 'user', $post_publishers, $id_prefix, $default_ids );
+			RevisionaryAgentsChecklist::agents_checklist( 'user', $post_publishers, 'prev_cc', $default_ids );
 		} else {
 			if ( ( 'always' === $notify_editors ) && $publisher_ids )
 				_e( 'Publishers will be notified (but cannot be selected here).', 'revisionary' );

@@ -1,6 +1,123 @@
 <?php
 
 class Rvy_Revision_Workflow_UI {
+    public static function default_notification_recipients($object_id, $args = []) {
+        global $revisionary;
+        
+        $notify_editors = (string) rvy_get_option('pending_rev_notify_admin');
+        $notify_author = (string) rvy_get_option('pending_rev_notify_author');
+    
+        // @todo: always pull post type from post based on $object_id? (confirm no execution timing issues with Post retrieval)
+        $object_type = (!empty($args['object_type'])) ? $args['object_type'] : awp_post_type_from_uri();
+    
+        $post_publishers = array();
+        $publisher_ids = array();
+        $default_ids = array();
+        
+        $type_obj = get_post_type_object( $object_type );
+        
+        if ( '1' === $notify_editors ) {
+            if ( defined('RVY_CONTENT_ROLES') && ! defined('SCOPER_DEFAULT_MONITOR_GROUPS') && ! defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS') ) {
+                $monitor_groups_enabled = true;
+                $revisionary->content_roles->ensure_init();
+    
+                if ( $publisher_ids = $revisionary->content_roles->get_metagroup_members( 'Pending Revision Monitors' ) ) {
+                    if ( $type_obj ) {
+                        $revisionary->skip_revision_allowance = true;
+                        $cols = ( defined('COLS_ALL_RS') ) ? COLS_ALL_RS : 'all';
+                        $post_publishers = $revisionary->content_roles->users_who_can( 'edit_post', $object_id, array( 'cols' => $cols, 'force_refresh' => true, 'user_ids' => $publisher_ids ) );
+                        $revisionary->skip_revision_allowance = false;
+
+                        $can_publish_post = array();
+                        foreach ( $post_publishers as $key => $user ) {
+                            $can_publish_post []= $user->ID;
+                            
+                            if ( ! in_array( $user->ID, $publisher_ids ) )
+                                unset(  $post_publishers[$key] );
+                        }
+                        
+                        $publisher_ids = array_intersect( $publisher_ids, $can_publish_post );
+                        $publisher_ids = array_fill_keys( $publisher_ids, true );
+                    }
+                }
+            }
+            
+            if ( ! $publisher_ids && ( empty($monitor_groups_enabled) || ! defined('RVY_FORCE_MONITOR_GROUPS') ) ) {
+                // If RS is not active, default to sending to all Administrators and Editors who can publish the post
+                require_once(ABSPATH . 'wp-admin/includes/user.php');
+                
+                if ( defined( 'SCOPER_MONITOR_ROLES' ) )
+                    $use_wp_roles = SCOPER_MONITOR_ROLES;
+                else
+                    $use_wp_roles = ( defined( 'RVY_MONITOR_ROLES' ) ) ? RVY_MONITOR_ROLES : 'administrator,editor';
+                
+                $use_wp_roles = str_replace( ' ', '', $use_wp_roles );
+                $use_wp_roles = explode( ',', $use_wp_roles );
+                
+                $recipients = array();
+                
+                foreach ( $use_wp_roles as $role_name ) {
+                    $search = new WP_User_Query( "search=&role=$role_name" );
+                    $recipients = array_merge( $recipients, $search->results );
+                }
+                
+                foreach ( $recipients as $_user ) {	
+                    $reqd_caps = map_meta_cap( $type_obj->cap->edit_post, $_user->ID, $object_id );
+    
+                    if ( ! array_diff( $reqd_caps, array_keys( array_intersect( $_user->allcaps, array( true, 1, '1' ) ) ) ) ) {
+                        $post_publishers []= $_user;
+                        $publisher_ids [$_user->ID] = true;
+                    }
+                }
+            }
+    
+            // boolean array with user IDs as array keys
+            $default_ids = apply_filters('revisionary_notify_publisher_default_ids', $publisher_ids, $object_id);
+        }
+        
+        if ( '1' === $notify_author ) {
+            global $post;
+    
+            if (function_exists('get_multiple_authors')) {
+                $author_ids = [];
+                foreach(get_multiple_authors($post) as $_author) {
+                    $author_ids []= $_author->ID;
+                }	
+            } else {
+                $author_ids = [$post->post_author];
+            }
+    
+            foreach($author_ids as $author_id) {
+                if ( empty( $default_ids[$author_id] ) ) {
+                    if ( defined('RVY_CONTENT_ROLES') ) {
+                        $revisionary->skip_revision_allowance = true;
+                        $cols = ( defined('COLS_ALL_RS') ) ? COLS_ALL_RS : 'all';
+                        $author_notify = (bool) $revisionary->content_roles->users_who_can( 'edit_post', $object_id, array( 'cols' => $cols, 'force_refresh' => true, 'user_ids' => (array) $author_id ) );
+                        $revisionary->skip_revision_allowance = false;
+                    } else {
+                        $_user = new WP_User($author_id);
+                        $reqd_caps = map_meta_cap( $type_obj->cap->edit_post, $_user->ID, $object_id );
+                        $author_notify = ! array_diff( $reqd_caps, array_keys( array_intersect( $_user->allcaps, array( true, 1, '1' ) ) ) );
+                    }
+    
+                    if ( $author_notify ) {
+                        $default_ids[$author_id] = true;
+    
+                        $user = new WP_User( $author_id );
+                        $post_publishers[] = $user;
+                    }
+                }
+            }
+        }
+    
+        if ($default_ids) {
+            // array of WP_User objects
+            $post_publishers = apply_filters('revisionary_notify_publishers_eligible', $post_publishers, $object_id);
+        }
+    
+        return compact('default_ids', 'post_publishers', 'publisher_ids');
+    }
+
     function do_notifications( $notification_type, $status, $post_arr, $args ) {
         global $revisionary, $current_user;
         
@@ -36,9 +153,15 @@ class Rvy_Revision_Workflow_UI {
             
             $blogname = wp_specialchars_decode( get_option('blogname'), ENT_QUOTES );
             
-            $title = sprintf( __('[%s] Pending Revision Notification', 'revisionary'), $blogname );
+            if (!empty($args['update'])) {
+                $title = sprintf( __('[%s] Pending Revision Update', 'revisionary'), $blogname );
+                
+                $message = sprintf( __('A pending revision to the %1$s "%2$s" has been updated.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
+            } else {
+            	$title = sprintf( __('[%s] Pending Revision Notification', 'revisionary'), $blogname );
             
-            $message = sprintf( __('A pending revision to the %1$s "%2$s" has been submitted.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
+            	$message = sprintf( __('A pending revision to the %1$s "%2$s" has been submitted.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
+            }
             
             $message .= sprintf( __('It was submitted by %1$s.', 'revisionary' ), $current_user->display_name ) . "\r\n\r\n";
 
