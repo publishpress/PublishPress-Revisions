@@ -556,11 +556,26 @@ class Revisionary
 
 	function actUpdateRevision($post_id, $revision) {
 		if (rvy_is_revision_status($revision->post_status) /*&& rvy_is_post_author($revision)*/ 
-		&& (rvy_get_option('revision_update_redirect')) 
+		&& (rvy_get_option('revision_update_redirect') || rvy_get_option('revision_update_notifications')) 
 		) {
 			$published_post = get_post(rvy_post_id($revision));
 
 			if (apply_filters('revisionary_do_revision_notice', !$this->doing_rest, $revision, $published_post)) {
+				if (('pending-revision' == $revision->post_status) && rvy_get_option('revision_update_notifications')) {
+					$args = ['update' => true, 'revision_id' => $revision->ID, 'published_post' => $published_post, 'object_type' => $published_post->post_type];
+					
+					if ( !empty( $_REQUEST['prev_cc_user'] ) ) {
+						$args['selected_recipients'] = array_map('intval', $_REQUEST['prev_cc_user']);
+					} else {
+						// If the UI that triggered this notification does not support recipient selection, send to default recipients for this post
+						require_once( dirname(__FILE__) . '/revision-workflow_rvy.php' );
+						$result = Rvy_Revision_Workflow_UI::default_notification_recipients($published_post->ID, ['object_type' => $published_post->post_type]);
+						$args['selected_recipients'] = array_keys(array_filter($result['default_ids']));
+					}
+
+					$this->do_notifications('pending-revision', 'pending-revision', (array) $revision, $args);
+				}
+
 				if (rvy_get_option('revision_update_redirect') && apply_filters('revisionary_do_submission_redirect', true) && !$this->isBlockEditorActive()) {
 					$future_date = !empty($revision->post_date) && (strtotime($revision->post_date_gmt) > agp_time_gmt());
 					
