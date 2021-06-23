@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.7
-Stable tag: 2.5.5
+Stable tag: 2.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -103,6 +103,14 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.6 - 23 Jun 2021 =
+* Fixed : Background fatal error on some sites on revision scheduling
+* Fixed : Scheduled Page Revisions - If published page has a non-default template which was not changed in the revision, the Compare and Edit Revision screens indicated a change to default template. This change was not actually applied unless the stored revision was updated prior to publication.   
+* Feature : Option to send notifications on Revision Update
+* Feature : Option to redirect to confirmation screen after Revision Update
+* Compat : Custom Permalinks plugin
+* API : New filters allow submission confirmation message to be customized: revisionary_submit_message_links, revisionary_submit_message, revisionary_schedule_message_links, revisionary_schedule_message
 
 = 2.5.5 - 26 May 2021 =
 * Compat : Google Web Stories - Loss of story data due to clearance of post_content_filtered column

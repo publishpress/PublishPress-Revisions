@@ -149,6 +149,8 @@ class Revisionary
 		add_action('save_post', array($this, 'actSavePost'), 20, 2);
 		add_action('delete_post', [$this, 'actDeletePost'], 10, 3);
 
+		add_action('post_updated', [$this, 'actUpdateRevision'], 10, 2);
+
 		if (!defined('REVISIONARY_PRO_VERSION')) {
 			add_action('revisionary_created_revision', [$this, 'act_save_revision_followup'], 5);
 		}
@@ -160,6 +162,29 @@ class Revisionary
 		add_action('wp_insert_post', [$this, 'actLogPreviewAutosave'], 10, 2);
 
 		add_filter('post_link', [$this, 'fltEditRevisionUpdatedLink'], 99, 3);
+
+		if (defined('CUSTOM_PERMALINKS_PLUGIN_VERSION') && !is_admin() && !$this->doing_rest) {
+
+			function enable_custom_permalinks_workaround($retval) {
+				add_filter('query', [$this, 'flt_custom_permalinks_query']);
+				return $retval;
+			}
+		
+			function disable_custom_permalinks_workaround($retval) {
+				remove_filter('query', [$this, 'flt_custom_permalinks_query']);
+				return $retval;
+			}
+
+			add_filter('custom_permalinks_request_ignore', function($retval) {
+				add_filter('query', [$this, 'flt_custom_permalinks_query']);
+				return $retval;
+			});
+
+			add_filter('cp_remove_like_query', function($retval) {
+				remove_filter('query', [$this, 'flt_custom_permalinks_query']);
+				return $retval;
+			});
+		}
 
 		do_action( 'rvy_init', $this );
 	}
@@ -526,6 +551,38 @@ class Revisionary
 			);
 
 			revisionary_refresh_postmeta(rvy_post_id($post->ID), null, ['ignore_revisions' => [$post->ID]]);
+		}
+	}
+
+	function actUpdateRevision($post_id, $revision) {
+		if (rvy_is_revision_status($revision->post_status) /*&& rvy_is_post_author($revision)*/ 
+		&& (rvy_get_option('revision_update_redirect') || rvy_get_option('revision_update_notifications')) 
+		) {
+			$published_post = get_post(rvy_post_id($revision));
+
+			if (apply_filters('revisionary_do_revision_notice', !$this->doing_rest, $revision, $published_post)) {
+				if (('pending-revision' == $revision->post_status) && rvy_get_option('revision_update_notifications')) {
+					$args = ['update' => true, 'revision_id' => $revision->ID, 'published_post' => $published_post, 'object_type' => $published_post->post_type];
+					
+					if ( !empty( $_REQUEST['prev_cc_user'] ) ) {
+						$args['selected_recipients'] = array_map('intval', $_REQUEST['prev_cc_user']);
+					} else {
+						// If the UI that triggered this notification does not support recipient selection, send to default recipients for this post
+						require_once( dirname(__FILE__) . '/revision-workflow_rvy.php' );
+						$result = Rvy_Revision_Workflow_UI::default_notification_recipients($published_post->ID, ['object_type' => $published_post->post_type]);
+						$args['selected_recipients'] = array_keys(array_filter($result['default_ids']));
+					}
+
+					$this->do_notifications('pending-revision', 'pending-revision', (array) $revision, $args);
+				}
+
+				if (rvy_get_option('revision_update_redirect') && apply_filters('revisionary_do_submission_redirect', true) && !$this->isBlockEditorActive()) {
+					$future_date = !empty($revision->post_date) && (strtotime($revision->post_date_gmt) > agp_time_gmt());
+					
+					$msg = $this->get_revision_msg( $revision->ID, ['data' => (array) $revision, 'post_id' => $revision->ID, 'object_type' => $published_post->post_type, 'future_date' => $future_date]);
+					rvy_halt($msg, __('Pending Revision Updated', 'revisionary'));
+				}
+			}
 		}
 	}
 
@@ -1328,5 +1385,19 @@ class Revisionary
 		}
 	
 		return false;
+	}
+
+	function flt_custom_permalinks_query($query) {
+		global $wpdb;
+
+		if (strpos($query, " WHERE pm.meta_key = 'custom_permalink' ") && strpos($query, "$wpdb->posts AS p")) {
+			$query = str_replace(
+				" ORDER BY FIELD(",
+				" AND p.post_status NOT IN ('pending-revision', 'future-revision') ORDER BY FIELD(",
+				$query
+			);
+		}
+
+		return $query;
 	}
 } // end Revisionary class

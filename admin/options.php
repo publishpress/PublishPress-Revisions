@@ -113,7 +113,9 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'revisor_lock_others_revisions' =>			__("Editing others&apos; revisions requires role capability", 'revisionary'),
 	'revisor_hide_others_revisions' => 			__("Listing others&apos; revisions requires role capability", 'revisionary'),
 	'queue_query_all_posts' => 					__('Compatibility Mode', 'revisionary'),
-	'trigger_post_update_actions' => 			__('Revision publication triggers API actions to mimic post update', 'revisionary'),
+	'revision_update_redirect' =>				__('Confirmation redirect on Revision Update', 'revisionary'),
+	'revision_update_notifications' =>			__('Also notify on Revision Update', 'revisionary'),
+	'trigger_post_update_actions' => 			__('Revision Publication: API actions to mimic Post Update', 'revisionary'),
 	'diff_display_strip_tags' => 				__('Hide html tags on Compare Revisions screen', 'revisionary'),
 	'async_scheduled_publish' => 				__('Asynchronous Publishing', 'revisionary'),
 	'scheduled_revision_update_post_date' => 	__('Update Publish Date', 'revisionary'),
@@ -158,7 +160,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'queue_query_all_posts'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'],
 	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'display_hints'],
-	'notification'	=>		 ['pending_rev_notify_admin', 'pending_rev_notify_author', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
+	'notification'	=>		 ['pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_redirect', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 ]
 ]);
 
@@ -575,6 +577,14 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 				echo "<br />";
 			}
 			
+			if (rvy_get_option('pending_rev_notify_admin') || rvy_get_option('pending_rev_notify_author')) {
+				$hint = '';
+				$this->option_checkbox( 'revision_update_notifications', $tab, $section, $hint, '' );
+			}
+
+			$hint = '';
+			$this->option_checkbox( 'revision_update_redirect', $tab, $section, $hint, '' );
+
 			$hint = '';
 			$this->option_checkbox( 'pending_rev_notify_revisor', $tab, $section, $hint, '' );
 			

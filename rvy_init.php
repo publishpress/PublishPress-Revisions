@@ -299,9 +299,15 @@ function rvy_delete_transient($transient) {
 function rvy_update_post_meta($post_id, $meta_key, $meta_value) {
 	global $wpdb, $revisionary;
 
-	$revisionary->internal_meta_update = true;
+	if (!empty($revisionary)) {
+		$revisionary->internal_meta_update = true;
+	}
+
 	update_post_meta($post_id, $meta_key, $meta_value);
-	$revisionary->internal_meta_update = true;
+
+	if (!empty($revisionary)) {
+		$revisionary->internal_meta_update = true;
+	}
 
 	static $skip_deletion_keys;
 	
@@ -1302,7 +1308,7 @@ function rvy_rest_cache_compat() {
 	$uri = $_SERVER['REQUEST_URI'];
 
 	$rest_cache_active = false;
-	foreach(['rvy_ajax_field', 'rvy_ajax_value', 'revision_submitted'] as $param) {
+	foreach(['rvy_ajax_field', 'rvy_ajax_value', 'revision_submitted', 'revision_updated'] as $param) {
 		if (strpos($uri, $param)) {
 			$rest_cache_active = true;
 			break;
@@ -1327,7 +1333,7 @@ add_filter('wp_rest_cache/skip_caching', 'rvy_rest_cache_skip');
 
 function rvy_rest_cache_skip($skip) {
 	$uri = $_SERVER['REQUEST_URI'];
-	$uncached_params = array_merge($uncached_params, ['rvy_ajax_field', 'rvy_ajax_value', 'revision_submitted']);
+	$uncached_params = array_merge($uncached_params, ['rvy_ajax_field', 'rvy_ajax_value', 'revision_submitted', 'revision_updated']);
 
 	foreach($uncached_params as $param) {
 		if (strpos($uri, $param)) {

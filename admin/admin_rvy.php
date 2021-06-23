@@ -117,6 +117,12 @@ class RevisionaryAdmin
 			}
 		}
 		
+		if (!empty($_REQUEST['page']) && ('revisionary-q' == $_REQUEST['page'])) {
+			if ( (!empty($_REQUEST['revision_updated'])) && ! empty($_REQUEST['post_id']) ) {
+				add_action( 'admin_menu', array( &$this, 'handle_update_redirect' ) );
+			}
+		}
+
 		if ( strpos( $request_uri, 'edit.php' ) ) {
 			if ( ! empty($_REQUEST['revision_submitted']) && ! empty($_REQUEST['post_id']) ) {
 				add_action( 'admin_menu', array( &$this, 'handle_submission_redirect' ) );
@@ -414,6 +420,7 @@ class RevisionaryAdmin
 			if ( $revisions = rvy_get_post_revisions( $revised_post->ID, $status, array( 'order' => 'DESC', 'orderby' => 'ID' ) ) ) {  // @todo: retrieve revision_id in block editor js, pass as redirect arg
 				foreach( $revisions as $revision ) {
 					if (rvy_is_post_author($revision)) {
+						// @todo: move to a 'save_post' action handler
 						if ( time() - strtotime( $revision->post_modified_gmt ) < 90 ) { // sanity check in finding the revision that was just submitted
 							$args = array( 'revision_id' => $revision->ID, 'published_post' => $revised_post, 'object_type' => $revised_post->post_type );
 							if ( ! empty( $_REQUEST['cc'] ) ) {
@@ -427,6 +434,27 @@ class RevisionaryAdmin
 							rvy_halt( $revisionary->get_revision_msg( $revision, array( 'post_arr' => (array) $revision, 'post_id' => $revised_post->ID ) ) );
 						}
 					}
+				}
+			}
+		}
+	}
+
+	function handle_update_redirect() {
+		global $revisionary;
+
+		if (!rvy_get_option('revision_update_redirect')) {
+			return;
+		}
+
+		if ( $revision = get_post( (int) $_REQUEST['post_id'] ) ) {
+			if (rvy_is_post_author($revision)) {
+				// Note: Revision Update notification is triggered by 'post_updated' action.
+
+				if (apply_filters('revisionary_do_submission_redirect', true)) {
+					rvy_halt( $revisionary->get_revision_msg(
+						$revision, 
+						['post_arr' => (array) $revision, 'post_id' => rvy_post_id($revision->ID)]
+					));
 				}
 			}
 		}

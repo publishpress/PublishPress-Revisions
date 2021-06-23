@@ -113,6 +113,7 @@ class RVY_PostBlockEditUI {
             global $wp_version;
 
             $args = array(
+                'redirectURLupdate' => admin_url("admin.php?page=revisionary-q&post_type={$post_type}&revision_updated={$post->post_status}&post_id={$post_id}"),
                 'saveRevision' => __('Update Revision'),
                 'viewURL' => $view_link,
                 'viewCaption' => $view_caption,
@@ -126,6 +127,10 @@ class RVY_PostBlockEditUI {
                 'scheduledRevisionsEnabled' => $do_scheduled_revisions,
                 'multiPreviewActive' => version_compare($wp_version, '5.5-beta', '>=')
             );
+
+            if (defined('REVISIONARY_DISABLE_SUBMISSION_REDIRECT') || !apply_filters('revisionary_do_update_redirect', true)) {
+                unset($args['redirectURLupdate']);
+            }
 
         } elseif ( agp_user_can( $type_obj->cap->edit_post, $post_id, '', array( 'skip_revision_allowance' => true ) ) ) {
             wp_enqueue_script( 'rvy_object_edit', RVY_URLPATH . "/admin/rvy_post-block-edit{$suffix}.js", array('jquery', 'jquery-form'), RVY_VERSION, true );
