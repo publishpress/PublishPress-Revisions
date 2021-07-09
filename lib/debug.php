@@ -39,7 +39,7 @@ function rvy_bt_die( $die = true ) {
     } else {
 	    dump(debug_backtrace(),false,false);
     }
-        
+	
 	if ( $die )
 		die;
 }

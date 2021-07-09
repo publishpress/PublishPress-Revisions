@@ -123,8 +123,8 @@ class RevisionaryAdmin
 			}
 		}
 
-		if ( strpos( $request_uri, 'edit.php' ) ) {
-			if ( ! empty($_REQUEST['revision_submitted']) && ! empty($_REQUEST['post_id']) ) {
+		if (strpos($request_uri, 'edit.php')) {
+			if ((!empty($_REQUEST['revision_submitted'])) && !empty($_REQUEST['post_id'])) {
 				add_action( 'admin_menu', array( &$this, 'handle_submission_redirect' ) );
 			}
 			
