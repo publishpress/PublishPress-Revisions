@@ -21,7 +21,7 @@ class Revisionary_REST {
 			
 			if ( $type_obj = get_post_type_object( $post_type ) ) {
 				if ( $orig_cap == $type_obj->cap->read_post ) {
-					$orig_cap = $type_obj->cap->edit_post;
+					$orig_cap = 'edit_post';
 				}
 			}
 		}

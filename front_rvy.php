@@ -177,14 +177,12 @@ class RevisionaryFront {
 			$message = '';
 
 			// This topbar is presently only for those with restore / approve / publish rights
-			if ( $type_obj = get_post_type_object( $post->post_type ) ) {
-				$cap_name = $type_obj->cap->edit_post;	
-			}
+			$type_obj = get_post_type_object( $post->post_type );
 
 			$orig_skip = ! empty( $revisionary->skip_revision_allowance );
 			$revisionary->skip_revision_allowance = true;
 
-			$can_publish = agp_user_can( $cap_name, $published_post_id, '', array( 'skip_revision_allowance' => true ) );
+			$can_publish = agp_user_can('edit_post', $published_post_id, '', ['skip_revision_allowance' => true]);
 
 			$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
 

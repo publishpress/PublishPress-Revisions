@@ -172,7 +172,8 @@ class RvyPostEditSubmitMetabox
                 $preview_link = rvy_preview_url($post);
 
                 $type_obj = get_post_type_object($post->post_type);
-                $can_publish = $type_obj && agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
+
+                $can_publish = agp_user_can('edit_post', rvy_post_id($post->ID), '', ['skip_revision_allowance' => true]);
                 
                 if ($type_obj && empty($type_obj->public)) {
                     return;
