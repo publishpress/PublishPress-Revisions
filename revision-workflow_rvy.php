@@ -158,11 +158,11 @@ class Rvy_Revision_Workflow_UI {
                 
                 $message = sprintf( __('A pending revision to the %1$s "%2$s" has been updated.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
             } else {
-            	$title = sprintf( __('[%s] Pending Revision Notification', 'revisionary'), $blogname );
-            
-            	$message = sprintf( __('A pending revision to the %1$s "%2$s" has been submitted.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
+                $title = sprintf( __('[%s] Pending Revision Notification', 'revisionary'), $blogname );
+                
+                $message = sprintf( __('A pending revision to the %1$s "%2$s" has been submitted.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
             }
-            
+
             $message .= sprintf( __('It was submitted by %1$s.', 'revisionary' ), $current_user->display_name ) . "\r\n\r\n";
 
             if ( $revision_id ) {

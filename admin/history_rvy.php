@@ -850,6 +850,7 @@ class RevisionaryHistory
                     unset( $revisions[ $revision_id ] );
                 }
             }
+            
             $revisions = [$post->ID => $post] + $revisions;
         }
 
