@@ -115,7 +115,7 @@ default :
 	}
 
 	if ( $type_obj = get_post_type_object( $rvy_post->post_type ) ) {
-		$edit_cap = $type_obj->cap->edit_post;
+		$edit_cap = 'edit_post';
 		$edit_others_cap = $type_obj->cap->edit_others_posts;
 		$delete_cap = $type_obj->cap->delete_post;
 	}

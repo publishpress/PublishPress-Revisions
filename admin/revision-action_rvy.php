@@ -51,9 +51,8 @@ function rvy_revision_approve($revision_id = 0) {
 			break;
 		}
 
-		if ( $type_obj = get_post_type_object( $post->post_type ) ) {
-			if ( ! agp_user_can( $type_obj->cap->edit_post, $post->ID, '', array( 'skip_revision_allowance' => true ) ) )
-				break;
+		if (!agp_user_can('edit_post', $post->ID, '', ['skip_revision_allowance' => true])) {
+			break;
 		}
 
 		if (!$batch_process) {
@@ -323,9 +322,8 @@ function rvy_revision_restore() {
 		if ( !$post = get_post( $revision->post_parent ) )
 			break;
 
-		if ( $type_obj = get_post_type_object( $post->post_type ) ) {
-			if ( ! agp_user_can( $type_obj->cap->edit_post, $revision->post_parent, '', array( 'skip_revision_allowance' => true ) ) )
-				break;
+		if (!agp_user_can('edit_post', $revision->post_parent, '', ['skip_revision_allowance' => true])) {
+			break;
 		}
 
 		check_admin_referer( "restore-post_{$post->ID}|$revision->ID" );
@@ -847,10 +845,8 @@ function rvy_revision_unschedule($revision_id) {
 			break;
 		}
 
-		if ( $type_obj = get_post_type_object( $revision->post_type ) ) {
-			if ( ! agp_user_can( $type_obj->cap->edit_post, $published_id, '', array( 'skip_revision_allowance' => true ) ) ) {
-				break;
-			}
+		if (!agp_user_can('edit_post', $published_id, '', ['skip_revision_allowance' => true])) {
+			break;
 		}
 
 		$wpdb->update( $wpdb->posts, array( 'post_status' => 'pending-revision' ), array( 'ID' => $revision->ID ) );
@@ -887,9 +883,8 @@ function rvy_revision_publish($revision_id = false) {
 			break;
 		}
 
-		if ( $type_obj = get_post_type_object( $post->post_type ) ) {
-			if ( ! agp_user_can( $type_obj->cap->edit_post, $post->ID, '', array( 'skip_revision_allowance' => true ) ) )
-				break;
+		if (!agp_user_can('edit_post', $post->ID, '', ['skip_revision_allowance' => true])) {
+			break;
 		}
 
 		if (!$batch_process) {
@@ -1109,15 +1104,17 @@ function rvy_publish_scheduled_revisions($args = array()) {
 							$revisionary->content_roles->ensure_init();
 	
 							if ( $default_ids = $revisionary->content_roles->get_metagroup_members( 'Scheduled Revision Monitors' ) ) {
-								if ( $type_obj = get_post_type_object( $object_type ) ) {
-									$revisionary->skip_revision_allowance = true;
-									$cols = ( defined('COLS_ALL_RS') ) ? COLS_ALL_RS : 'all';
-									$post_publishers = $revisionary->content_roles->users_who_can( $type_obj->cap->edit_post, $object_id, array( 'cols' => $cols ) );
-									$revisionary->skip_revision_allowance = false;
-									
-									foreach ( $post_publishers as $user )
-										if ( in_array( $user->ID, $default_ids ) )
-											$to_addresses []= $user->user_email;
+								$revisionary->skip_revision_allowance = true;
+								$cols = ( defined('COLS_ALL_RS') ) ? COLS_ALL_RS : 'all';
+
+								$post_publishers = $revisionary->content_roles->users_who_can('edit_post', $object_id, array( 'cols' => $cols ) );
+
+								$revisionary->skip_revision_allowance = false;
+								
+								foreach ($post_publishers as $user) {
+									if (in_array($user->ID, $default_ids)) {
+										$to_addresses []= $user->user_email;
+									}
 								}
 							}
 						} 

@@ -62,8 +62,8 @@ class Rvy_Revision_Workflow_UI {
                 }
                 
                 foreach ( $recipients as $_user ) {	
-                    $reqd_caps = map_meta_cap( $type_obj->cap->edit_post, $_user->ID, $object_id );
-    
+                    $reqd_caps = map_meta_cap( 'edit_post', $_user->ID, $object_id );
+
                     if ( ! array_diff( $reqd_caps, array_keys( array_intersect( $_user->allcaps, array( true, 1, '1' ) ) ) ) ) {
                         $post_publishers []= $_user;
                         $publisher_ids [$_user->ID] = true;
@@ -96,7 +96,7 @@ class Rvy_Revision_Workflow_UI {
                         $revisionary->skip_revision_allowance = false;
                     } else {
                         $_user = new WP_User($author_id);
-                        $reqd_caps = map_meta_cap( $type_obj->cap->edit_post, $_user->ID, $object_id );
+                        $reqd_caps = map_meta_cap( 'edit_post', $_user->ID, $object_id );
                         $author_notify = ! array_diff( $reqd_caps, array_keys( array_intersect( $_user->allcaps, array( true, 1, '1' ) ) ) );
                     }
     
@@ -481,8 +481,8 @@ class Rvy_Revision_Workflow_UI {
                     if ( $recipient_ids && $type_obj ) {
                         foreach( $recipient_ids as $key => $user_id ) {
                             $_user = new WP_User($user_id);
-                            $reqd_caps = map_meta_cap( $type_obj->cap->edit_post, $user_id, $published_post->ID );
-                            
+                            $reqd_caps = map_meta_cap( 'edit_post', $user_id, $published_post->ID );
+
                             if ( array_diff( $reqd_caps, array_keys( array_intersect( $_user->allcaps, array( true, 1, '1' ) ) ) ) ) {
                                 unset( $recipient_ids[$key] );
                             }

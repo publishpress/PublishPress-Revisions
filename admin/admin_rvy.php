@@ -469,8 +469,7 @@ class RevisionaryAdmin
 			if ( $post && rvy_is_supported_post_type($post->post_type)) {
 				if ( $revisionary->isBlockEditorActive() ) {
 					if ( ! $post->ID && ! is_content_administrator_rvy() ) {
-						$type_obj = get_post_type_object( $post->post_type );
-						if ( $type_obj && ! agp_user_can( $type_obj->cap->edit_post, $post->ID, '', array( 'skip_revision_allowance' => true ) ) ) {
+						if (!agp_user_can('edit_post', $post->ID, '', ['skip_revision_allowance' => true])) {
 							wp_deregister_script( 'autosave' );
 							wp_dequeue_script( 'autosave' );
 						}
@@ -544,10 +543,8 @@ class RevisionaryAdmin
 			return;
 		}
 
-		if ( $type_obj = get_post_type_object( $post->post_type ) ) {
-			if ( ! agp_user_can( $type_obj->cap->edit_post, $post->ID, '', array( 'skip_revision_allowance' => true ) ) ) {
-				return;
-			}
+		if (!agp_user_can('edit_post', $post->ID, '', ['skip_revision_allowance' => true])) {
+			return;
 		}
 
 		$caption = apply_filters('revisionary_pending_checkbox_caption_classic', __( 'Save as Pending Revision', 'revisionary' ), $post);
@@ -787,9 +784,7 @@ class RevisionaryAdmin
 			$object_id = rvy_detect_post_id();
 
 			if ( $object_id ) {
-				$type_obj = get_post_type_object( $object_type );
-
-				if ( $type_obj && !empty($post) && (rvy_is_revision_status($post->post_status) || ! agp_user_can( $type_obj->cap->edit_post, $object_id, '', array( 'skip_revision_allowance' => true ) ) ) ) { 
+				if (!empty($post) && (rvy_is_revision_status($post->post_status) || !agp_user_can('edit_post', $object_id, '', ['skip_revision_allowance' => true]))) { 
 					//if ( 'page' == $object_type )
 						//$unrevisable_css_ids = array( 'pageauthordiv', 'pagecustomdiv', 'pageslugdiv', 'pagecommentstatusdiv' );
 				 	//else

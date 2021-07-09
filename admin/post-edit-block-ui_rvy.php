@@ -68,7 +68,7 @@ class RVY_PostBlockEditUI {
 
             if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
                 $view_link = rvy_preview_url($post);
-                $can_publish = agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
+                $can_publish = agp_user_can('edit_post', rvy_post_id($post->ID), '', ['skip_revision_allowance' => true]);
 
                 if ($type_obj && empty($type_obj->public)) {
                     $view_link = '';
@@ -132,7 +132,7 @@ class RVY_PostBlockEditUI {
                 unset($args['redirectURLupdate']);
             }
 
-        } elseif ( agp_user_can( $type_obj->cap->edit_post, $post_id, '', array( 'skip_revision_allowance' => true ) ) ) {
+        } elseif (agp_user_can('edit_post', $post_id, '', ['skip_revision_allowance' => true])) {
             wp_enqueue_script( 'rvy_object_edit', RVY_URLPATH . "/admin/rvy_post-block-edit{$suffix}.js", array('jquery', 'jquery-form'), RVY_VERSION, true );
 
             $args = array();

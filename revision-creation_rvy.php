@@ -121,10 +121,8 @@ class RevisionCreation {
 				return $status;
 			}
 
-			if ( $type_obj = get_post_type_object( $post_type ) ) {
-				if ( ! agp_user_can( $type_obj->cap->edit_post, $post_id, '', array( 'skip_revision_allowance' => true ) ) ) {
-					$revisionary->impose_pending_rev[$post_id] = true;
-				}
+			if (!agp_user_can('edit_post', $post_id, '', ['skip_revision_allowance' => true])) {
+				$revisionary->impose_pending_rev[$post_id] = true;
 			}
 		}
 		
@@ -559,10 +557,8 @@ class RevisionCreation {
 			}
 		}
 
-		if ( $type_obj = get_post_type_object( $published_post->post_type ) ) {
-			if ( ! agp_user_can( $type_obj->cap->edit_post, $published_post->ID, $current_user->ID, array( 'skip_revision_allowance' => true ) ) ) {
-				return $data;
-			}
+		if (!agp_user_can('edit_post', $published_post->ID, $current_user->ID, ['skip_revision_allowance' => true])) {
+			return $data;
 		}
 		
 		// @todo: need to filter post parent?

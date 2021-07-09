@@ -24,8 +24,7 @@ class RevisionaryAdminFiltersItemUI {
 
 			$object_id = rvy_detect_post_id();
 			
-			if ( $type_obj = get_post_type_object( $object_type ) ) {
-				if ( ! $object_id || agp_user_can( $type_obj->cap->edit_post, $object_id, '', array( 'skip_revision_allowance' => true ) ) ) {
+			if (!$object_id || agp_user_can('edit_post', $object_id, '', ['skip_revision_allowance' => true])) {
 					// for logged user who can fully edit a published post, clarify the meaning of setting future publish date
 					
 					// @todo: pass post id value, admin URL into JS to support ajax call
@@ -101,7 +100,6 @@ class RevisionaryAdminFiltersItemUI {
 					return;
 				}
 			}
-		}
 
 		wp_deregister_script( 'autosave' );
 		wp_dequeue_script( 'autosave' );
@@ -220,8 +218,7 @@ jQuery(document).ready( function($) {
 							
 					// Remove Revision Notification List metabox if this user is NOT submitting a pending revision
 					} elseif ( 'pending_revision_notify' == $box_id ) {
-						if ( $type_obj = get_post_type_object( $object_type ) ) {
-							if ( ! $object_id || ! rvy_get_option('pending_rev_notify_admin') || agp_user_can( $type_obj->cap->edit_post, $object_id, '', array( 'skip_revision_allowance' => true ) ) )
+						if (!$object_id || !rvy_get_option('pending_rev_notify_admin') || agp_user_can('edit_post', $object_id, '', ['skip_revision_allowance' => true])) {
 								unset( $wp_meta_boxes[$object_type][$context][$priority][$box_id] );
 						}
 					}
