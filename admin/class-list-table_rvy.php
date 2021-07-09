@@ -37,6 +37,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if (!empty($_REQUEST['published_post']) && !rvy_get_post_meta($_REQUEST['published_post'], '_rvy_has_revisions', true)) {
 			revisionary_refresh_postmeta($_REQUEST['published_post']);
 		}
+
+		$this->correctCommentCounts();
 	}
 
 	function do_query( $q = false ) {
@@ -320,6 +322,18 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		return $clauses;
 	}
 	
+	function correctCommentCounts() {
+		global $wpdb;
+
+		if ($revision_ids = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_status IN ('pending-revision', 'future-revision') AND comment_count = 0")) {
+			foreach($revision_ids as $revision_id) {
+				if ($main_post_id = get_post_meta($revision_id, '_rvy_base_post_id', true)) {
+					$wpdb->update($wpdb->posts, ['comment_count' => $main_post_id], ['ID' => $revision_id]);
+				}
+			}
+		}
+	}
+
 	function rvy_pending_list_register_columns( $columns ) {
 		global $wp_query;
 		foreach( $wp_query->posts as $post ) {
