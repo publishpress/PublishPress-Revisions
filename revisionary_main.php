@@ -150,6 +150,7 @@ class Revisionary
 		add_action('delete_post', [$this, 'actDeletePost'], 10, 3);
 
 		add_action('post_updated', [$this, 'actUpdateRevision'], 10, 2);
+		add_action('post_updated', [$this, 'actUpdateRevisionFixCommentCount'], 999, 2);
 
 		if (!defined('REVISIONARY_PRO_VERSION')) {
 			add_action('revisionary_created_revision', [$this, 'act_save_revision_followup'], 5);
@@ -581,6 +582,18 @@ class Revisionary
 					
 					$msg = $this->get_revision_msg( $revision->ID, ['data' => (array) $revision, 'post_id' => $revision->ID, 'object_type' => $published_post->post_type, 'future_date' => $future_date]);
 					rvy_halt($msg, __('Pending Revision Updated', 'revisionary'));
+				}
+			}
+		}
+	}
+
+	function actUpdateRevisionFixCommentCount($post_id, $revision) {
+		global $wpdb;
+		
+		if (rvy_is_revision_status($revision->post_status)) {
+			if (empty($revision->comment_count)) {
+				if ($main_post_id = get_post_meta($revision->ID, '_rvy_base_post_id', true)) {
+					$wpdb->update($wpdb->posts, ['comment_count' => $main_post_id], ['ID' => $revision->ID]);
 				}
 			}
 		}
