@@ -160,7 +160,7 @@ if ( ! $revision_status )
 <div class="wrap">
 
 <?php
-if ( ! $can_fully_edit_post = agp_user_can( $edit_cap, $rvy_post->ID, '', array( 'skip_revision_allowance' => true ) ) ) {
+if (!$can_fully_edit_post = agp_user_can( $edit_cap, $rvy_post->ID, '', ['skip_revision_allowance' => true])) {
 	// post-assigned Revisor role is sufficient to edit others' revisions, but post-assigned Contributor role is not
 	$_can_edit_others = (!rvy_get_option('revisor_lock_others_revisions') || rvy_is_full_editor($rvy_post)) && agp_user_can( $edit_others_cap, $rvy_post->ID, 0, ['skip_revision_allowance' => true] );
 }

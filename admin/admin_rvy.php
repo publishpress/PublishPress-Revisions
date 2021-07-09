@@ -250,9 +250,9 @@ class RevisionaryAdmin
 				return;
 			}
 	
-			$can_edit_others = agp_user_can($type_obj->cap->edit_others_posts, 0, '', array('skip_revision_allowance' => true));
+			$can_edit_others = agp_user_can($type_obj->cap->edit_others_posts, 0, '', ['skip_revision_allowance' => true]);
 
-			$can_edit_published = isset($type_obj->cap->edit_published_posts) && agp_user_can($type_obj->cap->edit_published_posts, 0, '', array('skip_revision_allowance' => true));
+			$can_edit_published = isset($type_obj->cap->edit_published_posts) && agp_user_can($type_obj->cap->edit_published_posts, 0, '', ['skip_revision_allowance' => true]);
 			
 			if (!$can_edit_others || !$can_edit_published) {
 				$listed_post_statuses = array();
