@@ -16,27 +16,6 @@ class RevisionaryFront {
 		if (!empty($_REQUEST['_ppp'])) {
 			add_action('template_redirect', [$this, 'actRevisionPreviewRedirect'], 1);
 		}
-
-		// Some ACF implementations cause the current revision (post_status = 'inherit') to be loaded as queried object prior to taxonomy field value retrieval
-		// However, don't force revision_id elsewhere because main post / current revision ID seems to be required for some other template rendering. 
-		add_filter("acf/load_value", [$this, 'fltACFenablePostFilter'], 1);
-		add_filter("acf/load_value", [$this, 'fltACFdisablePostFilter'], 9999);
-	}
-
-	public function fltACFenablePostFilter($val) {
-		add_filter("acf/decode_post_id", [$this, 'fltACFdecodePostID'], 10, 2);
-		return $val;
-	}
-
-	public function fltACFdisablePostFilter($val) {
-		remove_filter("acf/decode_post_id", [$this, 'fltACFdecodePostID'], 10, 2);
-		return $val;
-	}
-
-	public function fltACFdecodePostID($args, $post_id) {
-		// ( 'type', 'id' )
-		$args['id'] = rvy_detect_post_id();
-		return $args;
 	}
 
 	public function actRevisionPreviewRedirect() {
