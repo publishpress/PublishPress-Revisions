@@ -1133,7 +1133,7 @@ class Revisionary
 				$use_cap_req = $cap->edit_posts;
 			else
 				$use_cap_req = $edit_published_cap;
-				
+			
 			if ( ! empty( $wp_blogcaps[$use_cap_req] ) )
 				$wp_blogcaps['edit_others_posts'] = true;
 		}
