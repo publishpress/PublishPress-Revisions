@@ -1096,8 +1096,12 @@ function rvy_init() {
 	if ( is_admin() ) {
 		require_once( dirname(__FILE__).'/admin/admin-init_rvy.php' );
 		rvy_load_textdomain();
-		rvy_admin_init();
-
+		
+		if (defined('REVISIONARY_BULK_ACTION_EARLY_EXECUTION')) {
+			rvy_admin_init();
+		} else {
+			add_action('wp_loaded', 'rvy_admin_init');
+		}
 	} else {		// @todo: fix links instead
 		// fill in the missing args for Pending / Scheduled revision preview link from Edit Posts / Pages
 		if ( isset($_SERVER['HTTP_REFERER']) 
