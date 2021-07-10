@@ -16,6 +16,8 @@ class RevisionaryFront {
 		if (!empty($_REQUEST['_ppp'])) {
 			add_action('template_redirect', [$this, 'actRevisionPreviewRedirect'], 1);
 		}
+
+		do_action('revisionary_front_init');
 	}
 
 	public function actRevisionPreviewRedirect() {
