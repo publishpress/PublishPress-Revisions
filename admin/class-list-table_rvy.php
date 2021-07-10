@@ -303,7 +303,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		} elseif ($revisionary->config_loaded) {
 			$where_append .= (array_filter($revisionary->enabled_post_types)) 
 			? " AND ($p.post_type IN ('" . implode("','", array_keys(array_filter($revisionary->enabled_post_types))) . "'))" 
-			: "AND 1=2";
+			: " AND 1=2";
 		}
 
 		if (empty($args['suppress_author_clause'])) {
