@@ -104,6 +104,16 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.6.1 - 12 Jul 2021 =
+* Fixed : Pending / Scheduled Revisions could become disassociated from main post due to third party plugin interactions
+* Compat : Permissions - Specific Permissions were not applied for editing / approval of custom post types under some conditions 
+* Fixed : Users without full editing capabilities could not submit a pending revision with a future date selection
+* Fixed : Revision Previews were cached on some browsers
+* Fixed : Preview of front page revisions did not trigger front page template display
+* Fixed : Bulk Approval of revisions failed / caused PHP Notice on some sites due to post type not being registered early enough
+* Fixed : Pending Revision checkbox default selection from 'revisionary_default_pending_revision' filter application did not trigger revision submission 
+* Lang : Revision Queue - Remove sample English translation "My Revisionz"
+
 = 2.6 - 23 Jun 2021 =
 * Fixed : Background fatal error on some sites on revision scheduling
 * Fixed : Scheduled Page Revisions - If published page has a non-default template which was not changed in the revision, the Compare and Edit Revision screens indicated a change to default template. This change was not actually applied unless the stored revision was updated prior to publication.   
