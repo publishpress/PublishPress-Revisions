@@ -473,7 +473,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		// update without filter, action applications
 		$post_id = rvy_update_post( $update );
 	}
-	
+
 	if (!empty($revisionary)) {
 		$revisionary->disable_revision_trigger = false;
 	}

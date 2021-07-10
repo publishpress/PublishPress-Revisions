@@ -109,7 +109,7 @@ class RevisionaryFront {
 		if ( is_admin() ) {
 			return;
 		}
-		
+
 		global $wp_query, $revisionary;
 		if ($wp_query->is_404) {
 			return;

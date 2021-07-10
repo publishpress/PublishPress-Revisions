@@ -6,10 +6,9 @@
  * @license     GPLv2 or later
  * @since       1.0.0
  */
-
 function rvy_metabox_notification_list() {
 		global $revisionary;
-		
+
 		$notify_editors = (string) rvy_get_option('pending_rev_notify_admin');
 		$notify_author = (string) rvy_get_option('pending_rev_notify_author');
 	
@@ -23,8 +22,8 @@ function rvy_metabox_notification_list() {
 
 		foreach (['default_ids', 'post_publishers', 'publisher_ids'] as $var) {
             $$var = $result[$var];
-		}
-		
+        }
+
 		require_once('agents_checklist_rvy.php');
 		
 		echo("<div id='rvy_cclist_pending_revision'>");
@@ -100,7 +99,7 @@ function rvy_post_revision_title( $revision, $link = true, $date_field = 'post_d
 		} else {
 			$link = rvy_preview_url($revision);
 		}
-		
+
 		$date = "<a href='$link' target='_blank'>$date</a>";
 	}
 

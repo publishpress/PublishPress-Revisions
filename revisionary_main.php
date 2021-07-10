@@ -999,6 +999,7 @@ class Revisionary
 
 		if ( $post = get_post( $post_id ) ) {
 			$object_type = $post->post_type;								// todo: better API?
+
 		} elseif (($post_id == -1) && defined('PRESSPERMIT_PRO_VERSION') && !empty(presspermit()->meta_cap_post)) {  // wp_cache_add(-1) does not work for map_meta_cap call on get-revision-diffs ajax call 
 			$post = presspermit()->meta_cap_post;
 			$object_type = $post->post_type;
@@ -1101,7 +1102,7 @@ class Revisionary
 				if (!empty($status_obj->public) || !empty($status_obj->private)) {
 					// Allow Contributors / Revisors to edit published post/page, with change stored as a revision pending review
 					$replace_caps = array( 'edit_published_posts', $edit_published_cap, 'edit_private_posts', $edit_private_cap );
-					
+
 					if (!strpos($script_name, 'p-admin/edit.php') && (empty($_REQUEST['page']) || ('pp-calendar' != $_REQUEST['page']))) {
 						$replace_caps = array_merge( $replace_caps, array( $cap->publish_posts, 'publish_posts' ) );
 					}
