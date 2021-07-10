@@ -143,7 +143,14 @@ class RVY_PostBlockEditUI {
 
             $published_statuses = array_merge(get_post_stati(['public' => true]), get_post_stati(['private' => true]));
         	$revisable_statuses = rvy_filtered_statuses('names');
-            
+
+            if ($default_pending = apply_filters('revisionary_default_pending_revision', false, $post)) {
+                add_action('shutdown', function() {
+                    global $current_user, $post;    
+                    rvy_update_post_meta($post->ID, "_save_as_revision_{$current_user->ID}", true);
+                });
+            }
+
             $future_status = 'future-revision';
             $pending_status = 'pending-revision';
             $args = array(
@@ -156,7 +163,7 @@ class RVY_PostBlockEditUI {
                 'revisableStatuses' => $revisable_statuses,
                 'revision' => ($do_pending_revisions) ? apply_filters('revisionary_pending_checkbox_caption', __('Pending Revision', 'revisionary'), $post) : '',
                 'revisionTitle' => esc_attr(__('Do not publish current changes yet, but save to Revision Queue', 'revisionary')), 
-                'defaultPending' => apply_filters('revisionary_default_pending_revision', false, $post ),
+                'defaultPending' => $default_pending,
                 'revisionTitleFuture' => esc_attr(__('Do not schedule current changes yet, but save to Revision Queue', 'revisionary')), 
                 'ajaxurl' => admin_url(''),
                 'SaveCaption' => ($do_pending_revisions) ? __('Save Revision', 'revisionary') : '',
