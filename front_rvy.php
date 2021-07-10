@@ -144,7 +144,7 @@ class RevisionaryFront {
 		if (rvy_is_revision_status($post->post_status) || ('revision' == $post->post_type) || (!empty($_REQUEST['mark_current_revision']))) {
 			add_filter('redirect_canonical', array($this, 'flt_revision_preview_url'), 10, 2);
 			
-			$published_post_id = rvy_post_id($revision_id);	
+			$published_post_id = rvy_post_id($revision_id);
 
 			do_action('revisionary_preview_load', $revision_id, $published_post_id);
 
