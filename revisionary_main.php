@@ -1014,7 +1014,14 @@ class Revisionary
 				) || empty( $_REQUEST['action'] ) || ( 'editpost' != $_REQUEST['action'] ) 
 			) {
 				if (!apply_filters('revisionary_flag_as_post_update', false, $post_id, $reqd_caps, $args, $internal_args)) {
-					if ( ! in_array( $args[0], array( 'edit_published_pages', 'edit_others_pages', 'edit_private_pages', 'edit_pages', 'publish_pages', 'publish_posts' ) ) ) {
+					if ($post_type_obj = get_post_type_object($object_type)) {
+						$cap = $post_type_obj->cap;
+						$cap_names = [$cap->edit_published_posts, $cap->edit_others_posts, $cap->edit_private_posts, $cap->edit_posts, $cap->publish_posts];
+					} else {
+						$cap_names = ['edit_published_pages', 'edit_others_pages', 'edit_private_pages', 'edit_pages', 'publish_pages', 'publish_posts'];
+					}
+
+					if (!in_array($args[0], $cap_names)) {
 						$busy = false;
 						return $wp_blogcaps;
 					}
