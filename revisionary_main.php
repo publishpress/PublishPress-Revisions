@@ -187,6 +187,8 @@ class Revisionary
 			});
 		}
 
+		add_filter("option_page_on_front", [$this, 'fltOptionPageOnFront']);
+
 		do_action( 'rvy_init', $this );
 	}
 
@@ -336,6 +338,17 @@ class Revisionary
 
 		$last_result[$post_id] = $return;
 		return $return;
+	}
+
+	public function fltOptionPageOnFront($front_page_id) {
+		global $post;
+
+		// extra caution and perf optimization for front end execution
+		if (!empty($post) && is_object($post) && rvy_is_revision_status($post->post_status) && ($post->comment_count == $front_page_id)) {
+			return $post->ID;
+		} 
+
+		return $front_page_id;
 	}
 
 	/**
