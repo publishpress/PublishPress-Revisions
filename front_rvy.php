@@ -146,6 +146,8 @@ class RevisionaryFront {
 			
 			$published_post_id = rvy_post_id($revision_id);	
 
+			do_action('revisionary_preview_load', $revision_id, $published_post_id);
+
 			if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && !defined('REVISIONARY_DISABLE_MA_PREVIEW_CORRECTION') && rvy_is_revision_status($post->post_status)) {
 				$_authors = get_multiple_authors($revision_id);
 			
