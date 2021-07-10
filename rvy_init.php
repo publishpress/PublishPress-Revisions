@@ -1279,6 +1279,10 @@ function rvy_preview_url($revision, $args = []) {
 		$preview_url = add_query_arg('post_type', $post_type, $preview_url);
 	}
 
+	if (!defined('REVISIONARY_PREVIEW_NO_CACHEBUST')) {
+		$preview_url = add_query_arg('nc', substr(md5(rand()), 1, 8), $preview_url);
+	}
+
 	return apply_filters('revisionary_preview_url', $preview_url, $revision, $args);
 }
 
