@@ -1096,10 +1096,11 @@ function rvy_init() {
 	if ( is_admin() ) {
 		require_once( dirname(__FILE__).'/admin/admin-init_rvy.php' );
 		rvy_load_textdomain();
-		
-		if (defined('REVISIONARY_BULK_ACTION_EARLY_EXECUTION')) {
+
+		if (defined('REVISIONARY_BULK_ACTION_EARLY_EXECUTION') || !isset($_REQUEST['action2'])) {
 			rvy_admin_init();
 		} else {
+			// bulk approval fails on some sites due to post types not registered early enough
 			add_action('wp_loaded', 'rvy_admin_init');
 		}
 	} else {		// @todo: fix links instead
