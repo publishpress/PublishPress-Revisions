@@ -450,7 +450,7 @@ class RevisionaryAdmin
 			if (rvy_is_post_author($revision)) {
 				// Note: Revision Update notification is triggered by 'post_updated' action.
 
-				if (apply_filters('revisionary_do_submission_redirect', true)) {
+				if (apply_filters('revisionary_do_update_redirect', true, $revision)) {
 					rvy_halt( $revisionary->get_revision_msg(
 						$revision, 
 						['post_arr' => (array) $revision, 'post_id' => rvy_post_id($revision->ID)]
