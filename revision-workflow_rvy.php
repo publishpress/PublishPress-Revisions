@@ -120,7 +120,7 @@ class Rvy_Revision_Workflow_UI {
 
     function do_notifications( $notification_type, $status, $post_arr, $args ) {
         global $revisionary, $current_user;
-        
+
         if ( 'pending-revision' != $notification_type ) {
             return;
         }
@@ -146,6 +146,7 @@ class Rvy_Revision_Workflow_UI {
 
         $admin_notify = rvy_get_option( 'pending_rev_notify_admin' );
         $author_notify = rvy_get_option( 'pending_rev_notify_author' );
+
         if ( ( $admin_notify || $author_notify ) && $revision_id ) {
             $type_obj = get_post_type_object( $object_type );
             $type_caption = $type_obj->labels->singular_name;
@@ -297,7 +298,7 @@ class Rvy_Revision_Workflow_UI {
                 $msg = __('Your modification was saved as a Scheduled Revision.', 'revisionary') . ' ';
             
                 $msg .= '<ul>';
-                
+
                 $links = [
                     'edit' => sprintf( '<a href="%s">' . __('Keep editing the revision', 'revisionary') . '</a>', "post.php?post={$revision->ID}&amp;action=edit" ),
                     'back' => sprintf( '<a href="%s">' . __('Go back to schedule another revision', 'revisionary') . '</a>', admin_url("post.php?post=$post_id&action=edit")),
@@ -391,7 +392,7 @@ class Rvy_Revision_Workflow_UI {
                 }
 
                 $links = apply_filters('revisionary_submit_message_links', $links, $revision, $args);
-                
+
                 foreach($links as $link_id => $link) {
                     $msg .= "<li>{$links[$link_id]}<br /><br /></li>";                    
                 }

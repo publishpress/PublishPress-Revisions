@@ -489,7 +489,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		<div id="revisions-pro-descript" class="activating"><?php echo $descript; ?></div>
 		<?php endif;?>
 
-		<?php 
+		<?php
 		$hint = __('This may improve compatibility with some plugins.', 'revisionary');
 		$this->option_checkbox( 'trigger_post_update_actions', $tab, $section, $hint, '' );
 

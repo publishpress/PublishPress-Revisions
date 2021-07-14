@@ -44,6 +44,7 @@ add_action('init',
 	}
 );
 
+
 function _rvy_limit_postmeta_update($block_update, $object_id, $meta_key, $meta_value, $prev_value) {
 	global $current_user;
 	
@@ -228,6 +229,7 @@ function rvy_ajax_handler() {
 			$save_revision = isset($_REQUEST['rvy_ajax_value']) && in_array($_REQUEST['rvy_ajax_value'], ['true', true, 1, '1'], true);
 			rvy_update_post_meta((int) $_REQUEST['post_id'], "_save_as_revision_{$current_user->ID}", $save_revision);
 			update_postmeta_cache($_REQUEST['post_id']);
+
 			exit;
 		}
 	}

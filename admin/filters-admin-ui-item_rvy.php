@@ -219,7 +219,7 @@ jQuery(document).ready( function($) {
 					// Remove Revision Notification List metabox if this user is NOT submitting a pending revision
 					} elseif ( 'pending_revision_notify' == $box_id ) {
 						if (!$object_id || !rvy_get_option('pending_rev_notify_admin') || agp_user_can('edit_post', $object_id, '', ['skip_revision_allowance' => true])) {
-								unset( $wp_meta_boxes[$object_type][$context][$priority][$box_id] );
+							unset( $wp_meta_boxes[$object_type][$context][$priority][$box_id] );
 						}
 					}
 				}
