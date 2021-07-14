@@ -590,7 +590,7 @@ class Revisionary
 					$this->do_notifications('pending-revision', 'pending-revision', (array) $revision, $args);
 				}
 
-				if (rvy_get_option('revision_update_redirect') && apply_filters('revisionary_do_submission_redirect', true) && !$this->isBlockEditorActive()) {
+				if (rvy_get_option('revision_update_redirect') && apply_filters('revisionary_do_update_redirect', true, $revision) && !$this->isBlockEditorActive()) {
 					$future_date = !empty($revision->post_date) && (strtotime($revision->post_date_gmt) > agp_time_gmt());
 					
 					$msg = $this->get_revision_msg( $revision->ID, ['data' => (array) $revision, 'post_id' => $revision->ID, 'object_type' => $published_post->post_type, 'future_date' => $future_date]);

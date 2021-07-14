@@ -128,7 +128,7 @@ class RVY_PostBlockEditUI {
                 'multiPreviewActive' => version_compare($wp_version, '5.5-beta', '>=')
             );
 
-            if (defined('REVISIONARY_DISABLE_SUBMISSION_REDIRECT') || !rvy_get_option('revision_update_redirect') || !apply_filters('revisionary_do_update_redirect', true)) {
+            if (defined('REVISIONARY_DISABLE_SUBMISSION_REDIRECT') || !rvy_get_option('revision_update_redirect') || !apply_filters('revisionary_do_update_redirect', true, $post)) {
                 unset($args['redirectURLupdate']);
             }
 
