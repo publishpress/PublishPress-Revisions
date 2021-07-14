@@ -104,9 +104,10 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
-= 2.6.1 - 12 Jul 2021 =
+= 2.6.1 - 14 Jul 2021 =
 * Fixed : Pending / Scheduled Revisions could become disassociated from main post due to third party plugin interactions
 * Compat : Permissions - Specific Permissions were not applied for editing / approval of custom post types under some conditions 
+* Fixed : Revision Update triggered redirect back to Revision Queue even if "Confirmation redirect on Revision Update" setting disabled
 * Fixed : Users without full editing capabilities could not submit a pending revision with a future date selection
 * Fixed : Revision Previews were cached on some browsers
 * Fixed : Preview of front page revisions did not trigger front page template display
