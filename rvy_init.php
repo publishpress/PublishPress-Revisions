@@ -44,6 +44,7 @@ add_action('init',
 	}
 );
 
+
 function _rvy_limit_postmeta_update($block_update, $object_id, $meta_key, $meta_value, $prev_value) {
 	global $current_user;
 	
@@ -228,6 +229,7 @@ function rvy_ajax_handler() {
 			$save_revision = isset($_REQUEST['rvy_ajax_value']) && in_array($_REQUEST['rvy_ajax_value'], ['true', true, 1, '1'], true);
 			rvy_update_post_meta((int) $_REQUEST['post_id'], "_save_as_revision_{$current_user->ID}", $save_revision);
 			update_postmeta_cache($_REQUEST['post_id']);
+
 			exit;
 		}
 	}
@@ -1096,8 +1098,13 @@ function rvy_init() {
 	if ( is_admin() ) {
 		require_once( dirname(__FILE__).'/admin/admin-init_rvy.php' );
 		rvy_load_textdomain();
-		rvy_admin_init();
 
+		if (defined('REVISIONARY_BULK_ACTION_EARLY_EXECUTION') || !isset($_REQUEST['action2'])) {
+			rvy_admin_init();
+		} else {
+			// bulk approval fails on some sites due to post types not registered early enough
+			add_action('wp_loaded', 'rvy_admin_init');
+		}
 	} else {		// @todo: fix links instead
 		// fill in the missing args for Pending / Scheduled revision preview link from Edit Posts / Pages
 		if ( isset($_SERVER['HTTP_REFERER']) 
@@ -1279,6 +1286,10 @@ function rvy_preview_url($revision, $args = []) {
 		$preview_url = add_query_arg('post_type', $post_type, $preview_url);
 	}
 
+	if (!defined('REVISIONARY_PREVIEW_NO_CACHEBUST')) {
+		$preview_url = add_query_arg('nc', substr(md5(rand()), 1, 8), $preview_url);
+	}
+
 	return apply_filters('revisionary_preview_url', $preview_url, $revision, $args);
 }
 
@@ -1346,7 +1357,7 @@ function rvy_rest_cache_skip($skip) {
 }
 
 /**
- * Full WPEngine cache flush (Hold for possible future use as needed)
+ * Full WP Engine cache flush (Hold for possible future use as needed)
  *
  * Based on WP Engine Cache Flush by Aaron Holbrook
  * https://github.org/a7/wpe-cache-flush/

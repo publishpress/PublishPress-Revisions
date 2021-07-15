@@ -28,9 +28,9 @@ $bulk_counts = array(
 	'deleted'   => isset( $_REQUEST['deleted'] )   ? absint( $_REQUEST['deleted'] )   : 0,
 	'updated' => 0,
 	'locked' => 0,
-	'approved_count' => isset( $_REQUEST['approved_count'] )   ? absint( $_REQUEST['approved_count'] )   : 0,
-	'unscheduled_count' => isset( $_REQUEST['unscheduled_count'] ) ? absint( $_REQUEST['unscheduled_count'] )   : 0,
-	'published_count' => isset( $_REQUEST['published_count'] )   ? absint( $_REQUEST['published_count'] )   : 0,
+	'approved_count' => isset( $_REQUEST['approved_count'] ) ? absint( $_REQUEST['approved_count'] ) : 0,
+	'unscheduled_count' => isset( $_REQUEST['unscheduled_count'] ) ? absint( $_REQUEST['unscheduled_count'] ) : 0,
+	'published_count' => isset( $_REQUEST['published_count'] ) ? absint( $_REQUEST['published_count'] ) : 0,
 	'trashed' => 0,
 	'untrashed' => 0,
 );

@@ -16,6 +16,8 @@ class RevisionaryFront {
 		if (!empty($_REQUEST['_ppp'])) {
 			add_action('template_redirect', [$this, 'actRevisionPreviewRedirect'], 1);
 		}
+
+		do_action('revisionary_front_init');
 	}
 
 	public function actRevisionPreviewRedirect() {
@@ -107,7 +109,7 @@ class RevisionaryFront {
 		if ( is_admin() ) {
 			return;
 		}
-		
+
 		global $wp_query, $revisionary;
 		if ($wp_query->is_404) {
 			return;
@@ -142,7 +144,9 @@ class RevisionaryFront {
 		if (rvy_is_revision_status($post->post_status) || ('revision' == $post->post_type) || (!empty($_REQUEST['mark_current_revision']))) {
 			add_filter('redirect_canonical', array($this, 'flt_revision_preview_url'), 10, 2);
 			
-			$published_post_id = rvy_post_id($revision_id);	
+			$published_post_id = rvy_post_id($revision_id);
+
+			do_action('revisionary_preview_load', $revision_id, $published_post_id);
 
 			if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && !defined('REVISIONARY_DISABLE_MA_PREVIEW_CORRECTION') && rvy_is_revision_status($post->post_status)) {
 				$_authors = get_multiple_authors($revision_id);
@@ -177,14 +181,12 @@ class RevisionaryFront {
 			$message = '';
 
 			// This topbar is presently only for those with restore / approve / publish rights
-			if ( $type_obj = get_post_type_object( $post->post_type ) ) {
-				$cap_name = $type_obj->cap->edit_post;	
-			}
+			$type_obj = get_post_type_object( $post->post_type );
 
 			$orig_skip = ! empty( $revisionary->skip_revision_allowance );
 			$revisionary->skip_revision_allowance = true;
 
-			$can_publish = agp_user_can( $cap_name, $published_post_id, '', array( 'skip_revision_allowance' => true ) );
+			$can_publish = agp_user_can('edit_post', $published_post_id, '', ['skip_revision_allowance' => true]);
 
 			$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
 

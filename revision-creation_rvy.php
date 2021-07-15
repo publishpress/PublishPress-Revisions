@@ -76,7 +76,7 @@ class RevisionCreation {
 			$post_id = (int) $_POST['post_ID'];
 		} else {
 			$post_id = rvy_detect_post_id();
-		} 
+		}
 		
 		if ( empty( $post_id ) || !is_scalar($post_id) ) {
 			return $status;
@@ -121,10 +121,8 @@ class RevisionCreation {
 				return $status;
 			}
 
-			if ( $type_obj = get_post_type_object( $post_type ) ) {
-				if ( ! agp_user_can( $type_obj->cap->edit_post, $post_id, '', array( 'skip_revision_allowance' => true ) ) ) {
-					$revisionary->impose_pending_rev[$post_id] = true;
-				}
+			if (!agp_user_can('edit_post', $post_id, '', ['skip_revision_allowance' => true])) {
+				$revisionary->impose_pending_rev[$post_id] = true;
 			}
 		}
 		
@@ -426,8 +424,8 @@ class RevisionCreation {
         }
 
         if ( $revisionary->doing_rest || apply_filters('revisionary_limit_revision_fields', false, $post, $published_post) ) {
-            // prevent alteration of published post, while allowing save operation to complete
-        
+			// prevent alteration of published post, while allowing save operation to complete
+			
 			$keys = array_fill_keys( array( 'post_type', 'post_name', 'post_status', 'post_parent', 'post_author', 'post_content' ), true );
 
 			if (!isset($data['ID']) || ($data['ID'] != $published_post->ID)) {
@@ -438,21 +436,21 @@ class RevisionCreation {
         }
 
 		if (!rvy_is_revision_status($published_post->post_status)) {
-	        do_action('revisionary_created_revision', $post);
-	
-	        if (apply_filters('revisionary_do_revision_notice', !$revisionary->doing_rest, $post, $published_post)) {
-	            $object_type = isset($postarr['post_type']) ? $postarr['post_type'] : '';
-	            $args = compact( 'revision_id', 'published_post', 'object_type' );
-	            if ( ! empty( $_REQUEST['prev_cc_user'] ) ) {
-	                $args['selected_recipients'] = array_map('intval', $_REQUEST['prev_cc_user']);
-	            }
+			do_action('revisionary_created_revision', $post);
+
+			if (apply_filters('revisionary_do_revision_notice', !$revisionary->doing_rest, $post, $published_post)) {
+				$object_type = isset($postarr['post_type']) ? $postarr['post_type'] : '';
+				$args = compact( 'revision_id', 'published_post', 'object_type' );
+				if ( ! empty( $_REQUEST['prev_cc_user'] ) ) {
+					$args['selected_recipients'] = array_map('intval', $_REQUEST['prev_cc_user']);
+				}
 				$revisionary->do_notifications( 'pending-revision', 'pending-revision', $postarr, $args );
-	
+
 				if (apply_filters('revisionary_do_submission_redirect', true)) {
 					rvy_halt($msg, __('Pending Revision Created', 'revisionary'));
 				}
-	        } else {
-	        	// return currently stored published post data
+			} else {
+				// return currently stored published post data
 				$data = array_intersect_key((array) get_post($published_post->ID), $data);
 			}
 		}
@@ -559,10 +557,8 @@ class RevisionCreation {
 			}
 		}
 
-		if ( $type_obj = get_post_type_object( $published_post->post_type ) ) {
-			if ( ! agp_user_can( $type_obj->cap->edit_post, $published_post->ID, $current_user->ID, array( 'skip_revision_allowance' => true ) ) ) {
-				return $data;
-			}
+		if (!agp_user_can('edit_post', $published_post->ID, $current_user->ID, ['skip_revision_allowance' => true])) {
+			return $data;
 		}
 		
 		// @todo: need to filter post parent?

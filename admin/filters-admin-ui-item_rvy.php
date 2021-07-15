@@ -24,82 +24,80 @@ class RevisionaryAdminFiltersItemUI {
 
 			$object_id = rvy_detect_post_id();
 			
-			if ( $type_obj = get_post_type_object( $object_type ) ) {
-				if ( ! $object_id || agp_user_can( $type_obj->cap->edit_post, $object_id, '', array( 'skip_revision_allowance' => true ) ) ) {
-					// for logged user who can fully edit a published post, clarify the meaning of setting future publish date
-					
-					// @todo: pass post id value, admin URL into JS to support ajax call
-					?>
-					<script type="text/javascript">
-					/* <![CDATA[ */
-					jQuery(document).ready( function($) {
-						var postL10nschedule = "<?php _e('Schedule Revision', 'revisionary' )?>";
+			if (!$object_id || agp_user_can('edit_post', $object_id, '', ['skip_revision_allowance' => true])) {
+				// for logged user who can fully edit a published post, clarify the meaning of setting future publish date
+				
+				// @todo: pass post id value, admin URL into JS to support ajax call
+				?>
+				<script type="text/javascript">
+				/* <![CDATA[ */
+				jQuery(document).ready( function($) {
+					var postL10nschedule = "<?php _e('Schedule Revision', 'revisionary' )?>";
 
-						// Apply "Schedule Revision" button caption even if post is private
-						$('#timestampdiv a.save-timestamp').click( function() {
-							var aa = $('#aa').val(), mm = $('#mm').val(), jj = $('#jj').val(), hh = $('#hh').val(), mn = $('#mn').val();
-							var attemptedDate = new Date( aa, mm - 1, jj, hh, mn );
-							var currentDate = new Date( $('#cur_aa').val(), $('#cur_mm').val() -1, $('#cur_jj').val(), $('#cur_hh').val(), $('#cur_mn').val() );
+					// Apply "Schedule Revision" button caption even if post is private
+					$('#timestampdiv a.save-timestamp').click( function() {
+						var aa = $('#aa').val(), mm = $('#mm').val(), jj = $('#jj').val(), hh = $('#hh').val(), mn = $('#mn').val();
+						var attemptedDate = new Date( aa, mm - 1, jj, hh, mn );
+						var currentDate = new Date( $('#cur_aa').val(), $('#cur_mm').val() -1, $('#cur_jj').val(), $('#cur_hh').val(), $('#cur_mn').val() );
 
-							if ( ! $('#timestampdiv a.save-timestamp').is(':visible') || ! $('#visibility-radio-private').attr('checked') || $('#publish').val() == postL10nschedule ) {
-								//return;
-							} else {
-								// Confirm valid date
-								if ( attemptedDate.getFullYear() == aa && (1 + attemptedDate.getMonth()) == mm && attemptedDate.getDate() == jj && attemptedDate.getMinutes() == mn ) {
-									// If button caption should be "Schedule Revision," set it. Otherwise, no change
-									if ( attemptedDate > currentDate ) {
-										if ($('#original_post_status').val() != 'future') {
-											$('#publish').val( postL10nschedule );
-										}
-									} 
-								}
+						if ( ! $('#timestampdiv a.save-timestamp').is(':visible') || ! $('#visibility-radio-private').attr('checked') || $('#publish').val() == postL10nschedule ) {
+							//return;
+						} else {
+							// Confirm valid date
+							if ( attemptedDate.getFullYear() == aa && (1 + attemptedDate.getMonth()) == mm && attemptedDate.getDate() == jj && attemptedDate.getMinutes() == mn ) {
+								// If button caption should be "Schedule Revision," set it. Otherwise, no change
+								if ( attemptedDate > currentDate ) {
+									if ($('#original_post_status').val() != 'future') {
+										$('#publish').val( postL10nschedule );
+									}
+								} 
+							}
+						}
+
+						// If button caption should be "Schedule Revision," set it. Otherwise, no change
+						if ( attemptedDate > currentDate ) {
+							if ($('#original_post_status').val() != 'future') {
+								$('#publish').val( postL10nschedule );
 							}
 
-							// If button caption should be "Schedule Revision," set it. Otherwise, no change
-							if ( attemptedDate > currentDate ) {
-								if ($('#original_post_status').val() != 'future') {
-									$('#publish').val( postL10nschedule );
-								}
-
-								var data = {'rvy_ajax_field': 'set_future_date', 'rvy_ajax_value': 1, 'post_id': <?php echo $object_id;?>};
-							} else {
-								var data = {'rvy_ajax_field': 'set_future_date', 'rvy_ajax_value': 0, 'post_id': <?php echo $object_id;?>};
+							var data = {'rvy_ajax_field': 'set_future_date', 'rvy_ajax_value': 1, 'post_id': <?php echo $object_id;?>};
+						} else {
+							var data = {'rvy_ajax_field': 'set_future_date', 'rvy_ajax_value': 0, 'post_id': <?php echo $object_id;?>};
+						}
+						
+						$.ajax({
+							url: '<?php echo admin_url('');?>', 
+							data: data,
+							dataType: "html", 
+							success: function(response){
+							}, 
+							error: function(data){}
 							}
-							
-							$.ajax({
-								url: '<?php echo admin_url('');?>', 
-								data: data,
-								dataType: "html", 
-								success: function(response){
-								}, 
-								error: function(data){}
-								}
-							);
+						);
 
-						} );
+					} );
 
-						$('#rvy_save_as_pending_rev').click( function() {
-							var set_for_pending = $('#rvy_save_as_pending_rev').prop('checked') ? 1 : 0;
-							var data = {'rvy_ajax_field': 'save_as_pending', 'rvy_ajax_value': set_for_pending, 'post_id': <?php echo $object_id;?>};
-							
-							$.ajax({
-								url: '<?php echo admin_url('');?>', 
-								data: data,
-								dataType: "html", 
-								success: function(response){
-								}, 
-								error: function(data){}
-								}
-							);
+					$('#rvy_save_as_pending_rev').click( function() {
+						var set_for_pending = $('#rvy_save_as_pending_rev').prop('checked') ? 1 : 0;
+						var data = {'rvy_ajax_field': 'save_as_pending', 'rvy_ajax_value': set_for_pending, 'post_id': <?php echo $object_id;?>};
+						
+						$.ajax({
+							url: '<?php echo admin_url('');?>', 
+							data: data,
+							dataType: "html", 
+							success: function(response){
+							}, 
+							error: function(data){}
+							}
+						);
 
-						});
 					});
-					/* ]]> */
-					</script>
-					<?php
-					
-					return;
-				}
+				});
+				/* ]]> */
+				</script>
+				<?php
+				
+				return;
 			}
 		}
 
@@ -220,9 +218,8 @@ jQuery(document).ready( function($) {
 							
 					// Remove Revision Notification List metabox if this user is NOT submitting a pending revision
 					} elseif ( 'pending_revision_notify' == $box_id ) {
-						if ( $type_obj = get_post_type_object( $object_type ) ) {
-							if ( ! $object_id || ! rvy_get_option('pending_rev_notify_admin') || agp_user_can( $type_obj->cap->edit_post, $object_id, '', array( 'skip_revision_allowance' => true ) ) )
-								unset( $wp_meta_boxes[$object_type][$context][$priority][$box_id] );
+						if (!$object_id || !rvy_get_option('pending_rev_notify_admin') || agp_user_can('edit_post', $object_id, '', ['skip_revision_allowance' => true])) {
+							unset( $wp_meta_boxes[$object_type][$context][$priority][$box_id] );
 						}
 					}
 				}

@@ -110,7 +110,7 @@ class RvyPostEdit {
 
             $view_link = rvy_preview_url($post);
 
-            $can_publish = agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
+            $can_publish = agp_user_can('edit_post', rvy_post_id($post->ID), '', ['skip_revision_allowance' => true]);
 
             if ($type_obj && empty($type_obj->public)) {
                 $view_link = '';
@@ -220,7 +220,7 @@ class RvyPostEdit {
             return;
         }
 
-        $can_publish = agp_user_can( $type_obj->cap->edit_post, rvy_post_id($post->ID), '', array( 'skip_revision_allowance' => true ) );
+        $can_publish = agp_user_can('edit_post', rvy_post_id($post->ID), '', ['skip_revision_allowance' => true]);
 
         if ($can_publish && rvy_is_revision_status($post->post_status)):?>
             <?php
@@ -280,7 +280,8 @@ class RvyPostEdit {
             return $preview_caption;
         }
 
-        $can_publish = $type_obj && agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
+        $can_publish = agp_user_can('edit_post', rvy_post_id($post->ID), '', ['skip_revision_allowance' => true]);
+        
         if ($can_publish) {
             $preview_caption = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
         } elseif ($type_obj && !empty($type_obj->public)) {
@@ -299,7 +300,8 @@ class RvyPostEdit {
             return $preview_title;
         }
 
-        $can_publish = $type_obj && agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
+        $can_publish = agp_user_can('edit_post', rvy_post_id($post->ID), '', ['skip_revision_allowance' => true]);
+        
         if ($can_publish) {
             $preview_title = __('View / moderate saved revision', 'revisionary');
         } elseif ($type_obj && !empty($type_obj->public)) {
@@ -335,7 +337,7 @@ class RvyPostEdit {
             return;
         }
 
-		if ( $type_obj && ! agp_user_can( $type_obj->cap->edit_post, $post->ID, '', array( 'skip_revision_allowance' => true ) ) ) {
+        if (!agp_user_can('edit_post', $post->ID, '', ['skip_revision_allowance' => true])) {
             return;
         }
 

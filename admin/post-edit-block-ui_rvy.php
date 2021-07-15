@@ -68,7 +68,7 @@ class RVY_PostBlockEditUI {
 
             if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
                 $view_link = rvy_preview_url($post);
-                $can_publish = agp_user_can($type_obj->cap->edit_post, rvy_post_id($post->ID), '', array('skip_revision_allowance' => true));
+                $can_publish = agp_user_can('edit_post', rvy_post_id($post->ID), '', ['skip_revision_allowance' => true]);
 
                 if ($type_obj && empty($type_obj->public)) {
                     $view_link = '';
@@ -128,11 +128,11 @@ class RVY_PostBlockEditUI {
                 'multiPreviewActive' => version_compare($wp_version, '5.5-beta', '>=')
             );
 
-            if (defined('REVISIONARY_DISABLE_SUBMISSION_REDIRECT') || !apply_filters('revisionary_do_update_redirect', true)) {
+            if (defined('REVISIONARY_DISABLE_SUBMISSION_REDIRECT') || !rvy_get_option('revision_update_redirect') || !apply_filters('revisionary_do_update_redirect', true, $post)) {
                 unset($args['redirectURLupdate']);
             }
 
-        } elseif ( agp_user_can( $type_obj->cap->edit_post, $post_id, '', array( 'skip_revision_allowance' => true ) ) ) {
+        } elseif (agp_user_can('edit_post', $post_id, '', ['skip_revision_allowance' => true])) {
             wp_enqueue_script( 'rvy_object_edit', RVY_URLPATH . "/admin/rvy_post-block-edit{$suffix}.js", array('jquery', 'jquery-form'), RVY_VERSION, true );
 
             $args = array();
@@ -143,7 +143,14 @@ class RVY_PostBlockEditUI {
 
             $published_statuses = array_merge(get_post_stati(['public' => true]), get_post_stati(['private' => true]));
         	$revisable_statuses = rvy_filtered_statuses('names');
-            
+
+            if ($default_pending = apply_filters('revisionary_default_pending_revision', false, $post)) {
+                add_action('shutdown', function() {
+                    global $current_user, $post;    
+                    rvy_update_post_meta($post->ID, "_save_as_revision_{$current_user->ID}", true);
+                });
+            }
+
             $future_status = 'future-revision';
             $pending_status = 'pending-revision';
             $args = array(
@@ -156,7 +163,7 @@ class RVY_PostBlockEditUI {
                 'revisableStatuses' => $revisable_statuses,
                 'revision' => ($do_pending_revisions) ? apply_filters('revisionary_pending_checkbox_caption', __('Pending Revision', 'revisionary'), $post) : '',
                 'revisionTitle' => esc_attr(__('Do not publish current changes yet, but save to Revision Queue', 'revisionary')), 
-                'defaultPending' => apply_filters('revisionary_default_pending_revision', false, $post ),
+                'defaultPending' => $default_pending,
                 'revisionTitleFuture' => esc_attr(__('Do not schedule current changes yet, but save to Revision Queue', 'revisionary')), 
                 'ajaxurl' => admin_url(''),
                 'SaveCaption' => ($do_pending_revisions) ? __('Save Revision', 'revisionary') : '',

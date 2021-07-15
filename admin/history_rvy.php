@@ -850,6 +850,7 @@ class RevisionaryHistory
                     unset( $revisions[ $revision_id ] );
                 }
             }
+            
             $revisions = [$post->ID => $post] + $revisions;
         }
 
@@ -859,7 +860,7 @@ class RevisionaryHistory
 
         $type_obj = get_post_type_object($post->post_type);
         
-        $can_restore = agp_user_can( $type_obj->cap->edit_post, $post->ID, '', ['skip_revision_allowance' => true] );
+        $can_restore = agp_user_can('edit_post', $post->ID, '', ['skip_revision_allowance' => true]);
 
         $current_id  = false;
 

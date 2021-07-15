@@ -6,8 +6,8 @@ Author URI: https://publishpress.com
 Tags: revision, submit changes, workflow, collaboration, permissions, moderate, posts, schedule revisions
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
-Tested up to: 5.7
-Stable tag: 2.6
+Tested up to: 5.8
+Stable tag: 2.6.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -103,6 +103,17 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.6.1 - 15 Jul 2021 =
+* Fixed : Pending / Scheduled Revisions could become disassociated from main post due to third party plugin interactions
+* Compat : Permissions - Specific Permissions were not applied for editing / approval of custom post types under some conditions 
+* Fixed : Revision Update triggered redirect back to Revision Queue even if "Confirmation redirect on Revision Update" setting disabled
+* Fixed : Users without full editing capabilities could not submit a pending revision with a future date selection
+* Fixed : Revision Previews were cached on some browsers
+* Fixed : Preview of front page revisions did not trigger front page template display
+* Fixed : Bulk Approval of revisions failed / caused PHP Notice on some sites due to post type not being registered early enough
+* Fixed : Pending Revision checkbox default selection from 'revisionary_default_pending_revision' filter application did not trigger revision submission 
+* Lang : Revision Queue - Remove sample English translation "My Revisionz"
 
 = 2.6 - 23 Jun 2021 =
 * Fixed : Background fatal error on some sites on revision scheduling

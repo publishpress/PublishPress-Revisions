@@ -6,10 +6,9 @@
  * @license     GPLv2 or later
  * @since       1.0.0
  */
-
 function rvy_metabox_notification_list() {
 		global $revisionary;
-		
+
 		$notify_editors = (string) rvy_get_option('pending_rev_notify_admin');
 		$notify_author = (string) rvy_get_option('pending_rev_notify_author');
 	
@@ -23,8 +22,8 @@ function rvy_metabox_notification_list() {
 
 		foreach (['default_ids', 'post_publishers', 'publisher_ids'] as $var) {
             $$var = $result[$var];
-		}
-		
+        }
+
 		require_once('agents_checklist_rvy.php');
 		
 		echo("<div id='rvy_cclist_pending_revision'>");
@@ -100,7 +99,7 @@ function rvy_post_revision_title( $revision, $link = true, $date_field = 'post_d
 		} else {
 			$link = rvy_preview_url($revision);
 		}
-		
+
 		$date = "<a href='$link' target='_blank'>$date</a>";
 	}
 
@@ -212,9 +211,7 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 	$rows = '';
 	$class = false;
 	
-	$type_obj = get_post_type_object( $post->post_type );
-	
-	$can_edit_post = agp_user_can( $type_obj->cap->edit_post, $post->ID, '', array( 'skip_revision_allowance' => true ) );
+	$can_edit_post = agp_user_can('edit_post', $post->ID, '', ['skip_revision_allowance' => true]);
 	
 	$hide_others_revisions = ! $can_edit_post && empty($current_user->allcaps['list_others_revisions']) && rvy_get_option('revisor_hide_others_revisions');
 	
