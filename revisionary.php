@@ -5,13 +5,13 @@
  * Description: Maintain published content with teamwork and precision using the Revisions model to submit, approve and schedule changes.
  * Author: PublishPress
  * Author URI: https://publishpress.com
- * Version: 2.6.1-rc2
+ * Version: 2.6.1
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 4.9.7
  * Requires PHP: 5.6.20
  * 
- * Copyright (c) 2020 PublishPress
+ * Copyright (c) 2021 PublishPress
  *
  * GNU General Public License, Free Software Foundation <https://www.gnu.org/licenses/gpl-3.0.html>
  *
@@ -96,7 +96,7 @@ define('REVISIONARY_FILE', __FILE__);
 // register these functions before any early exits so normal activation/deactivation can still run with RS_DEBUG
 register_activation_hook(__FILE__, function() 
 	{
-		$current_version = '2.6.1-rc2';
+		$current_version = '2.6.1';
 
 		$last_ver = get_option('revisionary_last_version');
 
@@ -172,7 +172,7 @@ add_action(
 			return;
 		}
 
-		define('REVISIONARY_VERSION', '2.6.1-rc2');
+		define('REVISIONARY_VERSION', '2.6.1');
 
 		if ( ! defined( 'RVY_VERSION' ) ) {
 			define( 'RVY_VERSION', REVISIONARY_VERSION );  // back compat
