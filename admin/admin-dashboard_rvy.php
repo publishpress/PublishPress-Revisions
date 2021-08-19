@@ -1,11 +1,13 @@
 <?php
 add_action ( 'dashboard_glance_items', 'rvy_glance_pending' );
 
-function rvy_glance_pending() {
+function rvy_glance_pending( $items = array() ) {
 	if ( ( defined( 'SCOPER_VERSION' ) || defined( 'PP_VERSION' ) || defined( 'PPCE_VERSION' ) || defined( 'RVY_CONTENT_ROLES' ) ) && ! defined( 'USE_RVY_RIGHTNOW' ) )
 		return;
 
 	global $revisionary;
+
+	ob_start();
 
 	foreach (array_keys($revisionary->enabled_post_types) as $post_type) {
 		$cache_key = _count_posts_cache_key( $post_type );
@@ -42,4 +44,8 @@ function rvy_glance_pending() {
 			}
 		}
 	}
+
+	$items[] = ob_get_clean();
+
+	return $items;
 }
