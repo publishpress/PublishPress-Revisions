@@ -349,6 +349,17 @@ function rvy_delete_post_meta($post_id, $meta_key) {
 }
 
 function rvy_status_registrations() {
+	register_post_status('draft-revision', array(
+		'label' => __('Working Copy', 'revisionary'),
+		'labels' => (object)['publish' => __('Publish Revision', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Working Copies', 'revisionary'), 'short' => __('Draft', 'revisionary') ],
+		'protected' => true,
+		'internal' => true,
+		'label_count' => _n_noop('Working Copies <span class="count">(%s)</span>', 'Working Copies <span class="count">(%s)</span>'),  // @todo: confirm API will support a fixed string
+		'exclude_from_search' => false,
+		'show_in_admin_all_list' => false,
+		'show_in_admin_status_list' => false,
+	));
+	
 	register_post_status('pending-revision', array(
 		'label' => __('Pending Revision', 'revisionary'),
 		'labels' => (object)['publish' => __('Publish Revision', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Pending Revisions', 'revisionary'), 'short' => __('Pending', 'revisionary') ],
