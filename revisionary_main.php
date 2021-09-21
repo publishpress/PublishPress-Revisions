@@ -52,7 +52,7 @@ class Revisionary
 			
 			if ($revision_id) {
 				if ($_post = get_post($revision_id)) {
-					if (!rvy_is_revision_status($_post->post_status)) {
+					if (!rvy_in_revision_workflow($_post)) {
 						if ($parent_post = get_post($_post->post_parent)) {
 							if (!empty($_POST) || (!empty($_REQUEST['action']) && ('restore' == $_REQUEST['action']))) {
 								if (!$this->canEditPost($parent_post, ['simple_cap_check' => true])) {
@@ -344,7 +344,7 @@ class Revisionary
 		global $post;
 
 		// extra caution and perf optimization for front end execution
-		if (!empty($post) && is_object($post) && rvy_is_revision_status($post->post_status) && ($post->comment_count == $front_page_id)) {
+		if (!empty($post) && is_object($post) && rvy_in_revision_workflow($post) && ($post->comment_count == $front_page_id)) {
 			return $post->ID;
 		} 
 
@@ -556,7 +556,7 @@ class Revisionary
 
 		$post = get_post($post_id);
 
-		if ($post && rvy_is_revision_status($post->post_status)) {
+		if ($post && rvy_in_revision_workflow($post)) {
 			$wpdb->query(
 				$wpdb->prepare(
 					"DELETE FROM $wpdb->postmeta WHERE post_id = %d", 
@@ -569,8 +569,8 @@ class Revisionary
 	}
 
 	function actUpdateRevision($post_id, $revision) {
-		if (rvy_is_revision_status($revision->post_status) /*&& rvy_is_post_author($revision)*/ 
-		&& (rvy_get_option('revision_update_redirect') || rvy_get_option('revision_update_notifications')) 
+		if (rvy_in_revision_workflow($revision)
+		&& (rvy_get_option('revision_update_notifications')) 
 		) {
 			$published_post = get_post(rvy_post_id($revision));
 
@@ -603,7 +603,7 @@ class Revisionary
 	function actUpdateRevisionFixCommentCount($post_id, $revision) {
 		global $wpdb;
 		
-		if (rvy_is_revision_status($revision->post_status)) {
+		if (rvy_in_revision_workflow($revision)) {
 			if (empty($revision->comment_count)) {
 				if ($main_post_id = get_post_meta($revision->ID, '_rvy_base_post_id', true)) {
 					$wpdb->update($wpdb->posts, ['comment_count' => $main_post_id], ['ID' => $revision->ID]);
@@ -617,7 +617,7 @@ class Revisionary
 	// * published post ID is stored to comment_count column is used for query efficiency 
 	function flt_get_comments_number($count, $post_id) {
 		if ($post = get_post($post_id)) {
-			if (rvy_is_revision_status($post->post_status)) {
+			if (rvy_in_revision_workflow($post)) {
 				$count = 0;
 			}
 		}
@@ -734,7 +734,7 @@ class Revisionary
 			return $caps;
 
 		if ( $post = get_post( $object_id ) ) {
-			if ( ('revision' != $post->post_type) && ! rvy_is_revision_status($post->post_status) ) {
+			if ( ('revision' != $post->post_type) && ! rvy_in_revision_workflow($post) ) {
 				if (empty($this->enabled_post_types[$post->post_type])) {
 					return $caps;
 				}
@@ -887,7 +887,7 @@ class Revisionary
 		if (in_array($cap, ['read_post', 'read_page'])	// WP Query imposes edit_post capability requirement for front end viewing of protected statuses 
 			|| (!empty($_REQUEST['preview']) && in_array($cap, array('edit_post', 'edit_page')) && did_action('posts_selection') && !did_action('template_redirect'))
 		) {
-			if ($post && rvy_is_revision_status($post->post_status)) {
+			if ($post && rvy_in_revision_workflow($post)) {
 				$type_obj = get_post_type_object($post->post_type);
 
 				if ($type_obj && !empty($type_obj->cap->edit_others_posts)) {
@@ -915,7 +915,7 @@ class Revisionary
 				$busy = false;
 				return $caps;
 			}
-		} elseif (($post_id > 0) && $post && rvy_is_revision_status($post->post_status) 
+		} elseif (($post_id > 0) && $post && rvy_in_revision_workflow($post) 
 			&& rvy_get_option('revisor_lock_others_revisions') && !rvy_is_post_author($post) && !rvy_is_full_editor($post)
 		) {
 			if ($type_obj = get_post_type_object( $post->post_type )) {
@@ -1232,7 +1232,7 @@ class Revisionary
 				}
 			}
 
-			if (!empty($revert_status) && rvy_is_revision_status($revision->post_status)) {
+			if (!empty($revert_status) && rvy_in_revision_workflow($revision)) {
 				$data['post_status'] = $revision->post_status;
 			}
 		}
@@ -1392,7 +1392,7 @@ class Revisionary
 
 	// Prevent wp_update_comment_count_now() from modifying Pending Revision comment_count field (main post ID)
 	function fltUpdateCommentCountBypass($count, $old, $post_id) {
-		if (rvy_is_revision_status(get_post_field('post_status', $post_id))) {
+		if (rvy_in_revision_workflow($post_id)) {
 			return rvy_post_id($post_id);
 		}
 

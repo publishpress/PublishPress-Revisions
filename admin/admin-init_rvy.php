@@ -106,7 +106,7 @@ function rvy_admin_init() {
 						continue;
 					}
 					
-					if (!rvy_is_revision_status($revision->post_status)) {
+					if (!rvy_in_revision_workflow($revision)) {
 						continue;
 					}
 					
@@ -181,7 +181,7 @@ function rvy_admin_init() {
 					if ( ! $revision = get_post($post_id) )
 						continue;
 					
-					if ( ! rvy_is_revision_status($revision->post_status) )
+					if ( ! rvy_in_revision_workflow($revision) )
 						continue;
 					
 					if ( ! current_user_can('administrator') && ! current_user_can( 'delete_post', rvy_post_id($revision->ID) ) ) {  // @todo: review Administrator cap check
@@ -238,7 +238,7 @@ function rvy_admin_init() {
 
 		$revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : $_REQUEST['to'];
 
-		if (('modified' == rvy_get_option('past_revisions_order_by')) && !rvy_is_revision_status(get_post_field('post_status', $revision_id))) {
+		if (('modified' == rvy_get_option('past_revisions_order_by')) && !rvy_in_revision_workflow($revision_id)) {
 			require_once(dirname(__FILE__).'/history_rvy.php');
 			add_filter('query', ['RevisionaryHistory', 'fltOrderRevisionsByModified']);
 		}

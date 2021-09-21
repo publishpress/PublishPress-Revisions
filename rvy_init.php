@@ -85,7 +85,7 @@ function _rvy_restore_published_content( $post_ID, $post_after, $post_before ) {
 
 if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview']) 
 && ((empty($_REQUEST['preview_id']) && empty($_REQUEST['thumbnail_id']))
-|| (!empty($_REQUEST['preview_id']) && rvy_is_revision_status(get_post_field('post_status', (int) $_REQUEST['preview_id'])))
+|| (!empty($_REQUEST['preview_id']) && rvy_in_revision_workflow((int) $_REQUEST['preview_id']))
 )
 ) {
 	require_once('compat_rvy.php');
@@ -963,42 +963,6 @@ function rvy_is_status_published( $status ) {
 	return false;
 }
 
-function rvy_revision_statuses() {
-	return array_map('sanitize_key', (array) apply_filters('rvy_revision_statuses', array('pending-revision', 'future-revision')));
-}
-
-function rvy_is_revision_status($status) {
-	return in_array($status, rvy_revision_statuses());
-}
-
-function rvy_post_id($revision_id) {
-	static $busy;
-
-	if (!empty($busy)) {
-		return;
-	}
-
-	$busy = true;
-	$published_id = rvy_get_post_meta( $revision_id, '_rvy_base_post_id', true );
-	$busy = false;
-
-	if (empty($published_id)) {
-		if ($_post = get_post($revision_id)) {
-			// if ID passed in is not a revision, return it as is
-			if (('revision' != $_post->post_type) && !rvy_is_revision_status($_post->post_status)) {
-				return $revision_id;
-			} elseif('revision' == $_post->post_type) {
-				return $_post->post_parent;
-			} else {
-				rvy_update_post_meta( $revision_id, '_rvy_base_post_id', $_post->comment_count );
-				return $_post->comment_count;
-			}
-		}
-	}
-
-	return ($published_id) ? $published_id : 0;
-}
-
 function rvy_halt( $msg, $title = '' ) {
 	if ( ! $title ) {
 		$title = __( 'Revision Workflow', 'revisionary' );
@@ -1125,7 +1089,7 @@ function rvy_init() {
 			if ( ! empty($_GET['p']) ) {
 				if ( rvy_get_option( 'scheduled_revisions' ) || rvy_get_option( 'pending_revisions' ) ) {
 					if ( $post = get_post( $_GET['p'] ) ) {
-						if (rvy_is_revision_status($post->post_status)) {
+						if (rvy_in_revision_workflow($post)) {
 							$_GET['preview'] = 1;
 						}
 					}

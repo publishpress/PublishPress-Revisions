@@ -36,7 +36,7 @@ class RevisionaryFront {
 
 	public function fltAuthor($display_name) {
 		if ($_post = get_post(rvy_detect_post_id())) {
-			if (rvy_is_revision_status($_post->post_status)) {
+			if (rvy_in_revision_workflow($_post)) {
 				// we only need this workaround when multiple authors were not successfully stored
 				if ($authors = get_multiple_authors($_post->ID, false)) {
 					return $display_name;
@@ -141,14 +141,14 @@ class RevisionaryFront {
 			}
 		}
 
-		if (rvy_is_revision_status($post->post_status) || ('revision' == $post->post_type) || (!empty($_REQUEST['mark_current_revision']))) {
+		if (rvy_in_revision_workflow($post) || ('revision' == $post->post_type) || (!empty($_REQUEST['mark_current_revision']))) {
 			add_filter('redirect_canonical', array($this, 'flt_revision_preview_url'), 10, 2);
 			
 			$published_post_id = rvy_post_id($revision_id);
 
 			do_action('revisionary_preview_load', $revision_id, $published_post_id);
 
-			if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && !defined('REVISIONARY_DISABLE_MA_PREVIEW_CORRECTION') && rvy_is_revision_status($post->post_status)) {
+			if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && !defined('REVISIONARY_DISABLE_MA_PREVIEW_CORRECTION') && rvy_in_revision_workflow($post)) {
 				$_authors = get_multiple_authors($revision_id);
 			
 				if (count($_authors) == 1) {
@@ -250,7 +250,7 @@ class RevisionaryFront {
 			if (('revision' == $post->post_type) && (get_post_field('post_modified_gmt', $post->post_parent) == get_post_meta($revision_id, '_rvy_published_gmt', true) && empty($_REQUEST['mark_current_revision']))
 			) {
 				if ($post = get_post($post->post_parent)) {
-					if ('revision' != $post->post_type && !rvy_is_revision_status($post->post_status)) {
+					if ('revision' != $post->post_type && !rvy_in_revision_workflow($post)) {
 						$url = add_query_arg('mark_current_revision', 1, get_permalink($post->ID));
 						wp_redirect($url);
 						exit;

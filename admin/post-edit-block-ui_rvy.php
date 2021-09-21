@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 if ($post_id = rvy_detect_post_id()) {
     // PublishPress Custom Status module is not relevant to Edit Revision screen, conflicts with Revisions scripts
-    if (rvy_is_revision_status(get_post_field('post_status', $post_id))) {
+    if (rvy_in_revision_workflow($post_id)) {
         add_filter(
             'pp_module_dirs', 
             function($pp_modules) {
@@ -27,7 +27,7 @@ class RVY_PostBlockEditUI {
         global $publishpress;
 
         if ($post_id = rvy_detect_post_id()) {
-            if (rvy_is_revision_status(get_post_field('post_status', $post_id))) {
+            if (rvy_in_revision_workflow($post_id)) {
 		        if (!empty($publishpress) && !empty($publishpress->custom_status->module->options)) {
 		            $publishpress->custom_status->module->options->post_types = [];
 		        }
@@ -63,7 +63,7 @@ class RVY_PostBlockEditUI {
         $do_pending_revisions = rvy_get_option('pending_revisions');
         $do_scheduled_revisions = rvy_get_option('scheduled_revisions');
 
-        if ( ('revision' == $post_type) || rvy_is_revision_status($post->post_status) ) {
+        if (('revision' == $post->post_type) || rvy_in_revision_workflow($post)) {
             wp_enqueue_script( 'rvy_object_edit', RVY_URLPATH . "/admin/rvy_revision-block-edit{$suffix}.js", array('jquery', 'jquery-form'), RVY_VERSION, true );
 
             if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {

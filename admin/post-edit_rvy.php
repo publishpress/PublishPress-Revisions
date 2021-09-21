@@ -329,7 +329,7 @@ class RvyPostEdit {
     function act_post_submit_revisions_links() {
         global $post;
         
-        if (rvy_is_revision_status($post->post_status)) {
+        if (rvy_in_revision_workflow($post)) {
             return;
         }
         

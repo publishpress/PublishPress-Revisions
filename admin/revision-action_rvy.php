@@ -837,7 +837,7 @@ function rvy_revision_unschedule($revision_id) {
 			break;
 		}
 
-		if (!rvy_is_revision_status($revision->post_status)) {
+		if (!rvy_in_revision_workflow($revision)) {
 			break;
 		}
 
