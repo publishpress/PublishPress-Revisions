@@ -96,6 +96,7 @@ $this->tab_captions = array( 'features' => __( 'Settings', 'revisionary' ), 'opt
 $this->section_captions = array(
 	'features' => array(
 		'role_definition' 	  	=> __('Role Definition', 'revisionary'),
+		'working_copy'			=> __('Working Copies', 'revisionary'),
 		'scheduled_revisions' 	=> __('Scheduled Changes', 'revisionary'),
 		'pending_revisions'		=> __('Change Requests', 'revisionary'),
 		'revision_queue'		=> __('Revision Queue', 'revisionary'),		
@@ -108,8 +109,10 @@ $this->section_captions = array(
 // TODO: replace individual _e calls with these (and section, tab captions)
 $this->option_captions = apply_filters('revisionary_option_captions', 
 	[
+	'copy_posts_capability' =>					__("Working Copies require role capability", 'revisionary'),
 	'pending_revisions' => 						__('Enable Change Requests', 'revisionary'),
 	'scheduled_revisions' => 					__('Enable Scheduled Changes', 'revisionary'),
+	'revise_posts_capability' =>				__("Change Requests require role capability", 'revisionary'),
 	'revisor_lock_others_revisions' =>			__("Editing others&apos; revisions requires role capability", 'revisionary'),
 	'revisor_hide_others_revisions' => 			__("Listing others&apos; revisions requires role capability", 'revisionary'),
 	'queue_query_all_posts' => 					__('Compatibility Mode', 'revisionary'),
@@ -155,8 +158,9 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 'features' => [
 	'license' =>			 ['edd_key'],
 	'role_definition' => 	 ['revisor_role_add_custom_rolecaps', 'require_edit_others_drafts'],
+	'working_copy' =>		 ['copy_posts_capability'],
 	'scheduled_revisions' => ['scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date'],
-	'pending_revisions'	=> 	 ['pending_revisions', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
+	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'queue_query_all_posts'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'],
 	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'display_hints'],
@@ -330,35 +334,32 @@ $table_class = 'form-table rs-form-table';
 		</td></tr>
 	<?php endif; // any options accessable in this section
 
+
+$section = 'working_copy';			// --- WORKING COPIES SECTION ---
+
+if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
+	<tr valign="top"><th scope="row">
+	<?php echo $this->section_captions[$tab][$section]; ?>
+	</th><td>
+	
+	<?php 
+	$hint = __('This restriction applies to users who are not full editors for the post type. To enable a role, add capabilities: copy_posts, copy_others_pages, etc.', 'revisionary');
+	$this->option_checkbox( 'copy_posts_capability', $tab, $section, $hint, '' );
+	
+	if (defined('PRESSPERMIT_VERSION')) :?>
+		<div class="rs-subtext">
+		<?php _e('To expand the Posts / Pages listing for non-Editors, add capabilities: list_others_pages, list_published_posts, etc.', 'revisionary'); ?>
+		</div>
+	<?php endif;
+
+	//do_action('revisionary_option_ui_working_copies', $this);
+	?>
+	</td></tr>
+<?php endif; // any options accessable in this section
+
+
 $pending_revisions_available = ! RVY_NETWORK || $sitewide || empty( $rvy_options_sitewide['pending_revisions'] ) || rvy_get_option( 'pending_revisions', true );
 $scheduled_revisions_available = ! RVY_NETWORK || $sitewide || empty( $rvy_options_sitewide['scheduled_revisions'] ) || rvy_get_option( 'scheduled_revisions', true );
-
-if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
-$scheduled_revisions_available ) :
-
-	$section = 'scheduled_revisions';			// --- SCHEDULED REVISIONS SECTION ---
-
-	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-		<tr valign="top"><th scope="row">
-		<?php echo $this->section_captions[$tab][$section]; ?>
-		</th><td>
-		
-		<?php 
-		$hint = __( 'If a currently published post or page is edited and a future date set, the change will not be applied until the selected date.', 'revisionary' );
-		$this->option_checkbox( 'scheduled_revisions', $tab, $section, $hint, '' );
-		
-		$hint = __( 'When a scheduled change is published, update post publish date to current time.', 'revisionary' );
-		$this->option_checkbox( 'scheduled_revision_update_post_date', $tab, $section, $hint, '' );
-
-		$hint = __( 'When a scheduled change is published, update post modified date to current time.', 'revisionary' );
-		$this->option_checkbox( 'scheduled_revision_update_modified_date', $tab, $section, $hint, '' );
-
-		$hint = __( 'Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
-		$this->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
-		?>
-		</td></tr>
-	<?php endif; // any options accessable in this section
-endif;
 
 if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
 $pending_revisions_available ) :
@@ -377,6 +378,9 @@ $pending_revisions_available ) :
 		);
 		$this->option_checkbox( 'pending_revisions', $tab, $section, $hint, '' );
 		
+		$hint = __('This restriction applies to users who are not full editors for the post type. To enable a role, add capabilities: revise_posts, revise_others_pages, etc.', 'revisionary');
+		$this->option_checkbox( 'revise_posts_capability', $tab, $section, $hint, '' );
+		
 		$hint = __( 'When a change request is published, update post publish date to current time.', 'revisionary' );
 		$this->option_checkbox( 'pending_revision_update_post_date', $tab, $section, $hint, '' );
 
@@ -389,6 +393,32 @@ $pending_revisions_available ) :
 	<?php endif; // any options accessable in this section
 endif;
 
+if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
+	$scheduled_revisions_available ) :
+
+	$section = 'scheduled_revisions';			// --- SCHEDULED REVISIONS SECTION ---
+
+	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
+		<tr valign="top"><th scope="row">
+		<?php echo $this->section_captions[$tab][$section]; ?>
+		</th><td>
+		
+		<?php 
+		$hint = __( 'If a currently published post or page is edited and a future date set, the change will not be applied until the selected date.', 'revisionary' );
+		$this->option_checkbox( 'scheduled_revisions', $tab, $section, $hint, '' );
+		
+		$hint = __( 'When a scheduled change is published, update post publish date to current time.', 'revisionary' );
+		$this->option_checkbox( 'scheduled_revision_update_post_date', $tab, $section, $hint, '' );
+
+		$hint = __( 'When a scheduled change is published, update post modified date to current time.', 'revisionary' );
+		$this->option_checkbox( 'scheduled_revision_update_modified_date', $tab, $section, $hint, '' );
+
+		$hint = __( 'Publish scheduled changes asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
+		$this->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
+		?>
+		</td></tr>
+	<?php endif; // any options accessable in this section
+endif;
 
 if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
 	$pending_revisions_available || $scheduled_revisions_available ) :

@@ -13,7 +13,9 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 // Setting scope: For Network installations, which Revisionary options should default to site-wide control?
 function rvy_default_options_sitewide() {
 	$def = array(
+		'copy_posts_capability' => true,
 		'pending_revisions' => true,
+		'revise_posts_capability' => true,
 		'scheduled_revisions' => true,
 		'async_scheduled_publish' => true,
 		'pending_rev_notify_admin' => true,
@@ -58,7 +60,9 @@ function rvy_default_options_sitewide() {
 // Default values for Revisionary settings
 function rvy_default_options() {
 	$def = array(
+		'copy_posts_capability' => 0,
 		'pending_revisions' => 1,
+		'revise_posts_capability' => 0,
 		'scheduled_revisions' => 1,
 		'async_scheduled_publish' => 1,
 		'pending_rev_notify_admin' => 1,
