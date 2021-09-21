@@ -441,12 +441,13 @@ function revisionary_publish_scheduled() {
 	rvy_publish_scheduled_revisions();
 }
 
-function revisionary_refresh_postmeta($post_id, $set_value = null, $args = []) {
+function revisionary_refresh_postmeta($post_id, $args = []) {
 	global $wpdb;
 
 	$ignore_revisions = (!empty($args['ignore_revisions'])) ? $args['ignore_revisions'] : [];
 
-	if (is_null($set_value)) {
+	$ignore_clause = ($ignore_revisions) ? " AND ID NOT IN (" . implode(",", array_map('intval', $ignore_revisions)) . ")" : '';
+
 	$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
 
 	$has_revisions = $wpdb->get_var(
@@ -458,7 +459,6 @@ function revisionary_refresh_postmeta($post_id, $set_value = null, $args = []) {
 	);
 
 	$set_value = !empty($has_revisions);
-	}
 
 	if ($set_value) {
 		rvy_update_post_meta($post_id, '_rvy_has_revisions', $set_value);

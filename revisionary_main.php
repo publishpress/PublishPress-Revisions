@@ -343,7 +343,7 @@ class Revisionary
 				)
 			);
 
-			revisionary_refresh_postmeta(rvy_post_id($post->ID), null, ['ignore_revisions' => [$post->ID]]);
+			revisionary_refresh_postmeta(rvy_post_id($post->ID), ['ignore_revisions' => [$post->ID]]);
 		}
 	}
 
