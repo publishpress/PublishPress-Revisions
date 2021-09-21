@@ -100,14 +100,6 @@ function _rvy_no_redirect_filter($redirect, $orig) {
 	return $redirect;
 }
 
-function rvy_maybe_redirect() {
-	// temporary provision for 2.0 beta testers
-	if (strpos($_SERVER['REQUEST_URI'], 'page=rvy-moderation')) {
-		wp_redirect(str_replace('page=rvy-moderation', 'page=revisionary-q', esc_url($_SERVER['REQUEST_URI'])));
-		exit;
-	}
-}
-
 function rvy_ajax_handler() {
 	global $current_user, $wpdb;
 
