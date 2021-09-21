@@ -100,6 +100,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$qr['post_type'] = $qp['post_type'];
 
+		$qr['post_status'] = rvy_revision_base_statuses();
+
 		if (isset($qr['m']) && strlen($qr['m']) == 6) {
 			$qr['date_query'] = [
 				'column' => ( ! empty($_REQUEST['post_mime_type']) && 'future-revision' == $_REQUEST['post_mime_type'] ) ? 'post_date' : 'post_modified',
@@ -702,7 +704,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$q['m'] = (int) $_REQUEST['m'];
 		}
 		
-		$num_posts = $this->count_revisions($post_types, $statuses);
+		$num_posts = $this->count_revisions($post_types, $revision_statuses);
 
 		$links = [];
 		$links['all'] = '';
@@ -766,7 +768,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		$all_count = 0;
-		foreach($statuses as $status) {
+		foreach($revision_statuses as $status) {
 			if (!isset($num_posts->$status)) {
 				$num_posts->$status = 0;
 			}

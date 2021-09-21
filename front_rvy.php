@@ -227,8 +227,12 @@ class RevisionaryFront {
 				$edit_button = '';
 			}
 
-			if ($can_edit = current_user_can('edit_post', rvy_post_id($revision_id))) {
-				if ( in_array( $post->post_status, array( 'pending-revision' ) ) ) {
+			if ( in_array( $post->post_mime_type, array( 'draft-revision' ) ) ) {
+				if ($can_edit = current_user_can('edit_post', $revision_id)) {
+					$publish_url = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=submit$redirect_arg"), "submit-post_$published_post_id|$revision_id" );
+				}
+			} elseif ($can_edit = current_user_can('edit_post', rvy_post_id($revision_id))) {
+				if ( in_array( $post->post_mime_type, array( 'pending-revision' ) ) ) {
 					$publish_url = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|$revision_id" );
 				
 				} elseif ( in_array( $post->post_mime_type, array( 'future-revision' ) ) ) {
@@ -255,6 +259,23 @@ class RevisionaryFront {
 				}
 			} else {
 				switch ( $post->post_mime_type ) {
+				case 'draft-revision' :
+					$class = 'draft';
+					$status_obj = get_post_status_object(get_post_field('post_status', rvy_post_id($revision_id)));
+
+					if (current_user_can("set_revision_pending-revision", $revision_id)) {
+						$publish_caption = __( 'Submit', 'revisionary' );
+						$publish_button = '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan rvy-submit-revision">' . $publish_caption . '</a></span>';
+					} else {
+						$publish_button = '';
+					}
+
+					$message = sprintf( __('This is a Working Copy. %s %s %s', 'revisionary'), $view_published, $edit_button, $publish_button );
+					
+					break;
+
+					// alternate: no break here; output hidden pending-revision top bar
+
 				case 'pending-revision' :
 					$approve_caption = __( 'Approve', 'revisionary' );
 
@@ -289,15 +310,7 @@ class RevisionaryFront {
 					$message = sprintf( __('This is a Scheduled Change (for publication on %s). %s %s %s', 'revisionary'), $date, $view_published, $edit_button, $publish_button );
 					break;
 
-				case 'inherit' :
-					if ( current_user_can('edit_post', $revision_id ) ) {
-						$class = 'past';
-						$date = agp_date_i18n( $datef, strtotime( $post->post_modified ) );
-						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . __( 'Restore', 'revisionary' ) . '</a></span>' : '';
-						$message = sprintf( __('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, $view_published, $publish_button );
-					}
-					break;
-
+				case '' :
 				default:
 					if (!empty($_REQUEST['mark_current_revision'])) {
 						$class = 'published';
@@ -307,8 +320,13 @@ class RevisionaryFront {
 						}
 						
 						$message = sprintf( __('This is the Current Revision. %s', 'revisionary'), $edit_button );
-					} else {
-						return;
+					} elseif ('inherit' == $post->post_status) {
+						if ( current_user_can('edit_post', $revision_id ) ) {
+							$class = 'past';
+							$date = agp_date_i18n( $datef, strtotime( $post->post_modified ) );
+							$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . __( 'Restore', 'revisionary' ) . '</a></span>' : '';
+							$message = sprintf( __('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, $view_published, $publish_button );
+						}
 					}
 				}
 

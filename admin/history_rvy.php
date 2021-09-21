@@ -2,11 +2,13 @@
 class RevisionaryHistory
 {	
     private $published_post_ids = [];
-    private $post_status = 'pending-revision';
+    private $revision_status = [];
     private $revision_id = 0;
     private $authors = [];
 
 	function __construct() {
+        $this->revision_status = ['draft-revision', 'pending-revision'];
+
         add_action('load-revision.php', [$this, 'actLoadRevision']);
 
         add_action('admin_enqueue_scripts', [$this, 'actEnqueueScripts'], 10, 1);

@@ -385,6 +385,7 @@ function rvy_status_registrations() {
 	foreach(rvy_get_manageable_types() as $post_type) {
 		add_filter("rest_{$post_type}_collection_params", function($query_params, $post_type = '') 
 			{
+				$query_params['status']['items']['enum'] []= 'draft-revision';
 				$query_params['status']['items']['enum'] []= 'pending-revision';
 				$query_params['status']['items']['enum'] []= 'future-revision';
 				return $query_params;
@@ -395,7 +396,8 @@ function rvy_status_registrations() {
 	// WP > 5.3: Don't allow revision statuses to be blocked at the REST API level. Our own filters are sufficient to regulate their usage.
 	add_action( 'rest_api_init', function() {
 			global $wp_post_statuses;
-			foreach( ['pending-revision', 'future-revision'] as $status) {
+
+			foreach(rvy_revision_statuses() as $status) {
 				if (isset($wp_post_statuses[$status])) {
 					$wp_post_statuses[$status]->internal = false;
 				}
@@ -405,7 +407,8 @@ function rvy_status_registrations() {
 
 	add_action( 'rest_api_init', function() {
 		global $wp_post_statuses;
-		foreach( ['pending-revision', 'future-revision'] as $status) {
+
+		foreach(rvy_revision_statuses() as $status) {
 			if (isset($wp_post_statuses[$status])) {
 				$wp_post_statuses[$status]->internal = true;
 			}
