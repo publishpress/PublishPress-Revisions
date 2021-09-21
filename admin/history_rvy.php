@@ -40,7 +40,7 @@ class RevisionaryHistory
 
         // Hide Restore button if user does not have permission
         if ($_post = get_post($revision_id)) {
-            if (!rvy_is_revision_status($_post->post_status)) {
+            if (!rvy_in_revision_workflow($_post)) {
                 if ($parent_post = get_post($_post->post_parent)) {
                     if (!$revisionary->canEditPost($parent_post)) :
         ?>
@@ -107,13 +107,13 @@ class RevisionaryHistory
                 // global variable used by WP core
                 $post = $revision;
 
-                if (rvy_is_revision_status($revision->post_status)) {
+                if (rvy_in_revision_workflow($revision)) {
                     if ( ! $published_post = get_post( rvy_post_id($revision->ID) ) ) {
                         return;
                     }
                 } else {
                     if ($from && $from_revision = get_post($from)) {
-                        if (rvy_is_revision_status($from_revision->post_status)) {
+                        if (rvy_in_revision_workflow($from_revision)) {
                             $_revision_id = $revision_id;   // @todo: eliminate this?
                             $revision = $from_revision;
                             $revision_id = $from;
@@ -125,11 +125,11 @@ class RevisionaryHistory
                     }
                 }
 
-                if (!rvy_is_revision_status($revision->post_status)) {
+                if (!rvy_in_revision_workflow($revision)) {
                     return;
                 }
 
-                if (!$published_post && !rvy_is_revision_status($from_revision->post_status)) {
+                if (!$published_post && !rvy_in_revision_workflow($from_revision)) {
                     if (!$published_post = get_post($revision->post_parent)) {
                         return;
                     }
@@ -262,7 +262,7 @@ class RevisionaryHistory
             }
         }
 
-        $post_id = (rvy_is_revision_status($revision->post_status)) ? rvy_post_id($revision->ID) : $revision->post_parent;
+        $post_id = (rvy_in_revision_workflow($revision)) ? rvy_post_id($revision->ID) : $revision->post_parent;
 
         if (!$post = get_post($post_id)) {
             return;
@@ -340,7 +340,7 @@ class RevisionaryHistory
             return;
         }
 
-        if (!rvy_is_revision_status($revision->post_status)) {
+        if (!rvy_in_revision_workflow($revision)) {
             return;
         }
 
@@ -425,9 +425,7 @@ class RevisionaryHistory
             return $return;
         }
 
-        $from_status = ($compare_from) ? $compare_from->post_status : '';
-
-        if (!rvy_is_revision_status($from_status) && ! rvy_is_revision_status($compare_to->post_status)) {
+        if (!rvy_in_revision_workflow($compare_from) && !rvy_in_revision_workflow($compare_to)) {
             return $return;
         }
 
@@ -665,8 +663,8 @@ class RevisionaryHistory
             );
 
             if ($is_beaver 
-            && (!$other_term_names && !rvy_is_revision_status($compare_from->post_status)) 
-            || (!$term_names && !rvy_is_revision_status($compare_to->post_status))
+            && (!$other_term_names && !rvy_in_revision_workflow($compare_from)) 
+            || (!$term_names && !rvy_in_revision_workflow($compare_to))
             ) {
                 continue;
             }
@@ -737,11 +735,11 @@ class RevisionaryHistory
                 }
 
             } elseif(('_requested_slug' == $field)) {
-                if ($content_to && !rvy_is_revision_status($compare_to->post_status)) {
+                if ($content_to && !rvy_in_revision_workflow($compare_to)) {
                     $content_to = '';
                 }
 
-                if ($content_from && !rvy_is_revision_status($compare_from->post_status)) {
+                if ($content_from && !rvy_in_revision_workflow($compare_from)) {
                     $content_from = '';
                 }
                 
@@ -916,7 +914,7 @@ class RevisionaryHistory
             $edit_url = false;
 
             // Until Reject button is implemented, just route to Preview screen so revision can be edited / deleted if necessary
-            if ($current || rvy_is_revision_status($revision->post_mime_type)) {
+            if ($current || rvy_in_revision_workflow($revision)) {
                 $restore_link = rvy_preview_url($revision);  // default to revision preview link
                 
                 if ($can_restore) {
@@ -963,7 +961,7 @@ class RevisionaryHistory
 
             $time_diff_label = ($now_gmt > $modified_gmt) ? __( '%s%s ago' ) : __( '%s%s from now', 'revisionary');
 
-            $use_multiple_authors = function_exists('get_multiple_authors') && !rvy_is_revision_status($revision->post_status);
+            $use_multiple_authors = function_exists('get_multiple_authors') && !rvy_in_revision_workflow($revision);
 
             // Just track single post_author for revision.  Changes to Authors taxonomy will be applied to published post.
             $author_key = $this->loadAuthorInfo($revision, $use_multiple_authors, compact('show_avatars'));
