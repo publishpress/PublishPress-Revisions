@@ -79,7 +79,7 @@ default :
 	
 	if ( ! $revision = wp_get_post_revision( $revision_id ) ) {
 		if ($revision = get_post($revision_id)) {
-			if (!rvy_is_revision_status($revision->post_status)) {
+			if (!rvy_in_revision_workflow($revision)) {
 				$revision = false;
 			}
 		}
