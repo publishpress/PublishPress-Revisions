@@ -88,6 +88,9 @@ function rvy_mail_buffer_cron_interval( $schedules ) {
 /*=================== End WP-Cron implementation ====================*/
 
 
+/*
+ * Revision previews: prevent redirect for non-standard post url
+ */
 function _rvy_no_redirect_filter($redirect, $orig) {
 	global $current_user, $wpdb;
 
