@@ -255,8 +255,6 @@ class Revisionary
 	function canEditPost($post, $args = []) {
 		global $current_user;
 
-		static $last_result;
-
 		$args = (array) $args;
 		//$defaults = ['simple_cap_check' => false, 'type_obj' => false];
 
