@@ -1176,6 +1176,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					_x('Compare', 'revisions', 'revisionary')
 				);
 			}
+
+			$actions = apply_filters('revisionary_queue_row_actions', $actions, $post);
 		}
 
 		return $this->row_actions( $actions );

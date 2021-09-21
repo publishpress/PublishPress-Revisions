@@ -906,8 +906,7 @@ $js_call = "javascript:if (confirm('$msg')) {return true;} else {return false;}"
 <p style='clear:both'></p>
 
 <?php 
-global $revisionary;
-$revisionary->admin->publishpressFooter();
+do_action('revisionary_admin_footer');
 ?>
 
 </div>
