@@ -28,8 +28,7 @@ class RevisionaryAdmin
 		add_action('revisionary_admin_footer', [$this, 'publishpressFooter']);
 
 		if ( ! defined('XMLRPC_REQUEST') && ! strpos($script_name, 'p-admin/async-upload.php' ) ) {
-			global $blog_id;
-			if ( RVY_NETWORK && ( is_main_site($blog_id) ) ) {
+			if ( RVY_NETWORK && ( is_main_site() ) ) {
 				require_once( dirname(__FILE__).'/admin_lib-mu_rvy.php' );
 				add_action('admin_menu', 'rvy_mu_site_menu', 15 );
 			}

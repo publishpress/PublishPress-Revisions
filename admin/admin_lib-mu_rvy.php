@@ -4,8 +4,6 @@ function rvy_mu_site_menu() {
 	if ( ! current_user_can( 'manage_options' ) )
 		return;
 
-	$path = RVY_ABSPATH;
-	
 	// WP MU site options
 	if ( awp_is_mu() ) {
 		// Network-Wide Settings

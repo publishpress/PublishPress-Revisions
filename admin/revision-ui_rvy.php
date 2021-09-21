@@ -45,28 +45,6 @@ function rvy_metabox_notification_list() {
 		echo('</div>');
 }
 
-
-function rvy_metabox_revisions( $status ) {
-	global $revisionary;
-
-	$property_name = $status . '_revisions';
-	if ( ! empty( $revisionary->filters_admin_item_ui->$property_name ) )
-		echo $revisionary->filters_admin_item_ui->$property_name;
-	
-	elseif ( ! empty( $_GET['post'] ) ) {
-		$args = array( 'format' => 'list', 'parent' => false );
-		rvy_list_post_revisions( (int) $_GET['post'], $status, $args );
-	}
-}
-
-function rvy_metabox_revisions_pending() {
-	rvy_metabox_revisions( 'pending-revision' );
-}
-
-function rvy_metabox_revisions_future() {
-	rvy_metabox_revisions( 'future-revision' );
-}
-
 /**
  * Retrieve formatted date timestamp of a revision (linked to that revisions's page).
  *

@@ -11,7 +11,6 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
  */
 class Revisionary
 {		
-	var $filters_admin_item_ui; // object ref - RevisionaryAdminFiltersItemUI
 	var $content_roles;			// object ref - instance of RevisionaryContentRoles subclass, set by external plugin
 	var $doing_rest = false;
 	var $rest = '';				// object ref - Revisionary_REST
