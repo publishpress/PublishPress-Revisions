@@ -306,13 +306,13 @@ class RevisionaryFront {
 
 					if ( strtotime( $post->post_date_gmt ) > agp_time_gmt() ) {
 						$class = 'pending_future';
-						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . $approve_caption . '</a></span>' : '';
+						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan rvy-approve-revision">' . $approve_caption . '</a></span>' : '';
 						$message = sprintf( __('This is a Change Request (requested publish date: %s). %s %s %s', 'revisionary'), $date, $view_published, $edit_button, $publish_button );
 					} else {
 						$class = 'pending';
 						$status_obj = get_post_status_object(get_post_field('post_status', rvy_post_id($revision_id)));
 						$publish_caption = (!empty($status_obj->public) || !empty($status_obj->private)) ? __('Publish now', 'revisionary') : $approve_caption;
-						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . $publish_caption . '</a></span>' : '';
+						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan rvy-approve-revision">' . $publish_caption . '</a></span>' : '';
 						$message = sprintf( __('This is a Change Request. %s %s %s', 'revisionary'), $view_published, $edit_button, $publish_button );
 					}
 					break;
