@@ -573,17 +573,15 @@ function revisionary_refresh_postmeta($post_id, $set_value = null, $args = []) {
 	$ignore_revisions = (!empty($args['ignore_revisions'])) ? $args['ignore_revisions'] : [];
 
 	if (is_null($set_value)) {
-		$revision_status_csv = "'pending-revision', 'future-revision'";
+	$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
 
-		$ignore_clause = ($ignore_revisions) ? " AND ID NOT IN (" . implode(",", array_map('intval', $ignore_revisions)) . ")" : '';
-
-		$has_revisions = $wpdb->get_var(
-			// account for post deletion
-			$wpdb->prepare(
-				"SELECT ID FROM $wpdb->posts WHERE post_status IN ($revision_status_csv) $ignore_clause AND comment_count = %d LIMIT 1",
-				$post_id
-			)
-		);
+	$has_revisions = $wpdb->get_var(
+		// account for post deletion
+		$wpdb->prepare(
+			"SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ($revision_status_csv) $ignore_clause AND comment_count = %d LIMIT 1",
+			$post_id
+		)
+	);
 
 		$set_value = !empty($has_revisions);
 	}
@@ -602,8 +600,15 @@ if (!empty($_REQUEST['rvy_flush_flags'])) {
 function revisionary_refresh_revision_flags() {
 	global $wpdb;
 
-	$status_csv = "'" . implode("','", rvy_filtered_statuses()) . "'";
-	$arr_have_revisions = $wpdb->get_col("SELECT r.comment_count FROM $wpdb->posts r INNER JOIN $wpdb->posts p ON r.comment_count = p.ID WHERE p.post_status IN ($status_csv) AND r.post_status IN ('pending-revision', 'future-revision')");
+	$status_csv = rvy_filtered_statuses(['return' => 'csv']);
+	$revision_base_status_csv = rvy_revision_base_statuses(['return' => 'csv']);
+	$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+
+	$arr_have_revisions = $wpdb->get_col(
+		"SELECT r.comment_count FROM $wpdb->posts r INNER JOIN $wpdb->posts p ON r.comment_count = p.ID"
+		. " WHERE p.post_status IN ($status_csv) AND r.post_status IN ($revision_base_status_csv) AND r.post_mime_type IN ($revision_status_csv)"
+	);
+	
 	$have_revisions = implode("','", array_map('intval', array_unique($arr_have_revisions)));
 
 	if ($ids = $wpdb->get_col("SELECT meta_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_has_revisions' AND post_id NOT IN ('$have_revisions')")) {

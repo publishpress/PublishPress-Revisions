@@ -1227,8 +1227,8 @@ class Revisionary
 			if (!rvy_is_revision_status($postarr['post_mime_type']) || !in_array($postarr['post_status'], rvy_revision_base_statuses())) {
 				$revert_status = true;
 			} elseif ($revision) {
-				if (($data['post_status'] != $revision->post_status) 
-				&& (('future-revision' == $revision->post_status) || ('future-revision' == $postarr['post_status']))
+				if (($data['post_mime_type'] != $revision->post_mime_type) || ($data['post_status'] != $revision->post_status)
+				&& (('future-revision' == $revision->post_mime_type) || ('future-revision' == $postarr['post_mime_type']))
 				) {
 					$revert_status = true;
 				}
@@ -1236,6 +1236,7 @@ class Revisionary
 
 			if (!empty($revert_status) && rvy_in_revision_workflow($revision)) {
 				$data['post_status'] = $revision->post_status;
+				$data['post_mime_type'] = $revision->post_mime_type;
 			}
 		}
 
