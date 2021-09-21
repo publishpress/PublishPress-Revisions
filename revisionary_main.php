@@ -22,6 +22,9 @@ class Revisionary
 
 	// minimal config retrieval to support pre-init usage by WP_Scoped_User before text domain is loaded
 	function __construct() {
+	}
+
+	function init() {
 		if (is_admin() && (false !== strpos($_SERVER['REQUEST_URI'], 'revision.php')) && (!empty($_REQUEST['revision']))) {
 			add_action('init', [$this, 'addFilters'], PHP_INT_MAX);
 		} else {

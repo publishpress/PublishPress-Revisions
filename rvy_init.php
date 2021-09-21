@@ -998,6 +998,7 @@ function rvy_init() {
 
 	global $revisionary;
 	$revisionary = new Revisionary();
+	$revisionary->init();
 }
 
 function rvy_is_full_editor($post, $args = []) {
