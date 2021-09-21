@@ -78,7 +78,7 @@ function rvy_admin_init() {
 			$post_status = preg_replace('/[^a-z0-9_-]+/i', '', sanitize_key($_REQUEST['post_status']));
 			// Verify the post status exists.
 			if ( get_post_status_object( $post_status ) ) {
-				$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_type=%s AND post_status = %s", $post_type, $post_status ) );
+				$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_type=%s AND post_mime_type = %s", $post_type, $post_status ) );
 			}
 			$doaction = 'delete';
 		} elseif ( isset( $_REQUEST['media'] ) ) {
@@ -120,7 +120,7 @@ function rvy_admin_init() {
 						}
 					}
 	
-					if (('future-revision' == $revision->post_status) && ('publish_revision' == $doaction)) {
+					if (('future-revision' == $revision->post_mime_type) && ('publish_revision' == $doaction)) {
 						if (rvy_revision_publish($revision->ID)) {
 							$approved++;
 						}
@@ -149,7 +149,7 @@ function rvy_admin_init() {
 						continue;
 					}
 					
-					if ('future-revision' != $revision->post_status) {
+					if ('future-revision' != $revision->post_mime_type) {
 						continue;
 					}
 					
@@ -185,7 +185,7 @@ function rvy_admin_init() {
 						continue;
 					
 					if ( ! current_user_can('administrator') && ! current_user_can( 'delete_post', rvy_post_id($revision->ID) ) ) {  // @todo: review Administrator cap check
-						if (('pending-revision' != $revision->post_status) || !rvy_is_post_author($revision)) {	// allow submitters to delete their own still-pending revisions
+						if (!in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) || !rvy_is_post_author($revision)) {	// allow submitters to delete their own still-pending revisions
 							wp_die( __('Sorry, you are not allowed to delete this revision.', 'revisionary') );
 						}
 					} 
@@ -327,11 +327,15 @@ function rvy_get_post_revisions($post_id, $status = 'inherit', $args = '' ) {
 		$$var = ( isset( $args[$var] ) ) ? $args[$var] : $defaults[$var];
 	}
 	
-	if (!in_array( 
-		$status, 
-		array_merge(rvy_revision_statuses(), array('inherit')) 
-	) ) {
-		return [];
+	if (!$status) {
+		$all_rev_statuses_clause = " AND (post_mime_type = 'draft-revision' OR post_mime_type = 'pending-revision' OR post_mime_type = 'future-revision')";
+	} else {
+		if (!in_array( 
+			$status, 
+			array_merge(rvy_revision_statuses(), array('inherit')) 
+		) ) {
+			return [];
+		}
 	}
 
 	if ( COL_ID_RVY == $fields ) {
@@ -355,15 +359,26 @@ function rvy_get_post_revisions($post_id, $status = 'inherit', $args = '' ) {
 				)
 			);
 		} else {
-			$revisions = $wpdb->get_col(
-				$wpdb->prepare(
-				"SELECT ID FROM $wpdb->posts "
-				. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
-					. " WHERE pm_published.meta_value = %s AND post_status = %s",
-					$post_id,
-					$status
-				)
-			);
+			if (!empty($all_rev_statuses_clause)) { 
+				$revisions = $wpdb->get_col(
+					$wpdb->prepare(
+					"SELECT ID FROM $wpdb->posts "
+					. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
+						. " WHERE pm_published.meta_value = %s $all_rev_statuses_clause",
+						$post_id
+					)
+				);
+			} else {
+				$revisions = $wpdb->get_col(
+					$wpdb->prepare(
+					"SELECT ID FROM $wpdb->posts "
+					. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
+						. " WHERE pm_published.meta_value = %s AND post_mime_type = %s",
+						$post_id,
+						$status
+					)
+				);
+			}
 		}
 
 		if ( $return_flipped )
@@ -388,15 +403,34 @@ function rvy_get_post_revisions($post_id, $status = 'inherit', $args = '' ) {
 				)
 			);
 		} else {
-			$revisions = $wpdb->get_results(
-				$wpdb->prepare(
-				"SELECT * FROM $wpdb->posts "
-				. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
-					. " WHERE pm_published.meta_value = %d AND post_status = %s $order_clause",
-					$post_id,
-					$status
-				)
-			);
+			if (!empty($all_rev_statuses_clause)) { 
+
+				$test = $wpdb->prepare(
+					"SELECT * FROM $wpdb->posts "
+					. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
+						. " WHERE pm_published.meta_value = %d $all_rev_statuses_clause $order_clause",
+						$post_id
+				);
+
+				$revisions = $wpdb->get_results(
+					$wpdb->prepare(
+					"SELECT * FROM $wpdb->posts "
+					. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
+						. " WHERE pm_published.meta_value = %d $all_rev_statuses_clause $order_clause",
+						$post_id
+					)
+				);
+			} else {
+				$revisions = $wpdb->get_results(
+					$wpdb->prepare(
+					"SELECT * FROM $wpdb->posts "
+					. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
+						. " WHERE pm_published.meta_value = %d AND post_mime_type = %s $order_clause",
+						$post_id,
+						$status
+					)
+				);
+			}
 		}
 	}
 

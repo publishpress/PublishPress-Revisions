@@ -116,12 +116,27 @@ register_activation_hook(__FILE__, function()
 			require_once(dirname(__FILE__).'/activation_rvy.php');
 		}
 
+		// import from Revisionary 1.x
 		new RevisionaryActivation(['import_legacy' => true]);
+
+		// convert pending / scheduled revisions to v3.0 format
+		global $wpdb;
+		
+		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+		$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = post_status WHERE post_status IN ($revision_status_csv)");
+		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft' WHERE post_status IN ('draft-revision')");
+		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending' WHERE post_status IN ('pending-revision')");
+		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'future' WHERE post_status IN ('future-revision')");
 	}
 );
 
 register_deactivation_hook(__FILE__, function()
 	{
+		// convert pending / scheduled revisions to v2.x format, which also prevents them from being listed as regular drafts / pending posts
+		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+		$wpdb->query("UPDATE $wpdb->posts SET post_status = post_mime_type WHERE post_mime_type IN ($revision_status_csv)");
+		$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = '' WHERE post_mime_type IN ($revision_status_csv)");
+		
 		if ($timestamp = wp_next_scheduled('rvy_mail_buffer_hook')) {
 		   wp_unschedule_event( $timestamp,'rvy_mail_buffer_hook');
 		}

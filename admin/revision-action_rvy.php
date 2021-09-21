@@ -66,11 +66,11 @@ function rvy_revision_approve($revision_id = 0) {
 		
 		// If requested publish date is in the past or now, publish the revision
 		if ( strtotime( $revision->post_date_gmt ) <= agp_time_gmt() ) {
-			$status_obj = get_post_status_object( $revision->post_status );
+			$status_obj = get_post_status_object( $revision->post_mime_type );
 
 			global $wpdb;
 
-			if ( empty($status_obj->public) && empty($status_obj->private) ) { // && ( 'future-revision' != $revision->post_status ) ) {
+			if ( empty($status_obj->public) && empty($status_obj->private) ) { // && ( 'future-revision' != $revision->post_mime_type ) ) {
 				$db_action = true;
 				
 				if ('revision' == $revision->post_type) {
@@ -88,7 +88,7 @@ function rvy_revision_approve($revision_id = 0) {
 					
 					clean_post_cache( $revision->ID );
 				} else {
-					$_result = rvy_apply_revision($revision->ID, $revision->post_status);
+					$_result = rvy_apply_revision($revision->ID, $revision->post_mime_type);
 					if (!$_result || is_wp_error($_result)) {
 						// Go ahead with the normal redirect because the revision may have been approved / published already.
 						// If revision does not exist, preview's Not Found will prevent false impression of success.
@@ -107,9 +107,9 @@ function rvy_revision_approve($revision_id = 0) {
 
 		// If requested publish date is in the future, schedule the revision
 		} else {
-			if ( 'future-revision' != $revision->post_status ) {
+			if ( 'future-revision' != $revision->post_mime_type ) {
 				global $wpdb;
-				$wpdb->update( $wpdb->posts, array( 'post_status' => 'future-revision' ), array( 'ID' => $revision->ID ) );
+				$wpdb->update( $wpdb->posts, array( 'post_mime_type' => 'future-revision' ), array( 'ID' => $revision->ID ) );
 				
 				$update_next_publish_date = true;
 				
@@ -425,12 +425,13 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 			'comment_count' => $published->comment_count,
 			'post_name' => $published->post_name,
 			'guid' => $published->guid,
+			'post_mime_type' => $published->post_mime_type
 		)
 	);
 
 	if (
-		(('pending-revision' == $revision->post_status) && !rvy_get_option('pending_revision_update_post_date'))
-		|| (('future-revision' == $revision->post_status) && !rvy_get_option('scheduled_revision_update_post_date'))
+		(in_array($revision->post_mime_type, ['pending-revision', 'draft-revision']) && !rvy_get_option('pending_revision_update_post_date'))
+		|| (('future-revision' == $revision->post_mime_type) && !rvy_get_option('scheduled_revision_update_post_date'))
 	) {
 		$update = array_merge(
 			$update, 
@@ -488,7 +489,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	// Apply requested slug, if applicable. 
 	// Otherwise, work around unexplained reversion of editor-modified post slug back to default format on some sites  @todo: identify plugin interaction
-	$update_fields = ['post_name' => $set_slug, 'guid' => $published->guid, 'post_type' => $published->post_type];
+	$update_fields = ['post_name' => $set_slug, 'guid' => $published->guid, 'post_type' => $published->post_type, 'post_status' => $published->post_status, 'post_mime_type' => $published->post_mime_type, 'post_parent' => $published->post_parent];
 
 	// Prevent wp_insert_post() from stripping inline html styles
 	if (!defined('RVY_DISABLE_REVISION_CONTENT_PASSTHRU')) {
@@ -503,8 +504,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	}
 
 	if (
-		(('pending-revision' == $revision->post_status) && rvy_get_option('pending_revision_update_modified_date'))
-		|| (('future-revision' == $revision->post_status) && rvy_get_option('scheduled_revision_update_modified_date'))
+		(in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && rvy_get_option('pending_revision_update_modified_date'))
+		|| (('future-revision' == $revision->post_mime_type) && rvy_get_option('scheduled_revision_update_modified_date'))
 	) {
 		$post_modified = current_time('mysql');
 		$post_modified_gmt = current_time('mysql', 1);
@@ -517,8 +518,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	}
 
 	if (
-		(('pending-revision' == $revision->post_status) && rvy_get_option('pending_revision_update_post_date'))
-		|| (('future-revision' == $revision->post_status) && rvy_get_option('scheduled_revision_update_post_date'))
+		(in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && rvy_get_option('pending_revision_update_post_date'))
+		|| (('future-revision' == $revision->post_mime_type) && rvy_get_option('scheduled_revision_update_post_date'))
 	) {
 		$update_fields['post_date'] = $post_modified;
 		$update_fields['post_date_gmt'] = $post_modified_gmt;
@@ -532,7 +533,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	$is_imported = get_post_meta($revision_id, '_rvy_imported_revision', true);
 
 	// work around bug in < 2.0.7 that saved all scheduled revisions without terms
-	if (!$is_imported && ('future-revision' == $revision->post_status)) {
+	if (!$is_imported && ('future-revision' == $revision->post_mime_type)) {
 		if ($install_time = get_option('revisionary_2_install_time')) {
 			if (strtotime($revision->post_modified_gmt) < $install_time) {
 				$is_imported = true;
@@ -564,7 +565,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 			'post_date' => current_time('mysql'), 
 			'post_date_gmt' => current_time('mysql', 1), 
 			'post_parent' => $post_id, 
-			'comment_count' => 0
+			'comment_count' => 0,
+			'post_mime_type' => $published->post_mime_type
 			],
 			['ID' => $revision_id]
 		);
@@ -639,11 +641,11 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	// Prevent post date from being set to current time unless Revisionary settings call for that
 	if (
-		(('pending-revision' == $revision->post_status) && !rvy_get_option('pending_revision_update_post_date'))
-		|| (('future-revision' == $revision->post_status) && !rvy_get_option('scheduled_revision_update_post_date'))
+		(in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && !rvy_get_option('pending_revision_update_post_date'))
+		|| (('future-revision' == $revision->post_mime_type) && !rvy_get_option('scheduled_revision_update_post_date'))
 	) {
 		if ($_post = get_post($post_id)) {
-			$set_dates = (('pending-revision' == $revision->post_status) && ($_post->post_date_gmt != $_post->post_modified_gmt))
+			$set_dates = (('future-revision' != $revision->post_mime_type) && ($_post->post_date_gmt != $_post->post_modified_gmt))
 			? ['post_date' => $revision->post_date, 'post_date_gmt' => $revision->post_date_gmt]
 			: ['post_date' => $published->post_date, 'post_date_gmt' => $published->post_date_gmt];
 
@@ -690,7 +692,7 @@ function rvy_do_revision_restore( $revision_id, $actual_revision_status = '' ) {
 	global $wpdb;
 
 	if ( $revision = wp_get_post_revision( $revision_id ) ) {
-		if ('future-revision' == $revision->post_status) {
+		if ('future-revision' == $revision->post_mime_type) {
 			rvy_publish_scheduled_revisions(array('force_revision_id' => $revision->ID));
 			return $revision;
 		}
@@ -741,7 +743,7 @@ function rvy_revision_delete() {
 		
 		// before deleting the revision, note its status for redirect
 		wp_delete_post_revision( $revision_id );
-		$redirect = "admin.php?page=rvy-revisions&revision={$revision->post_parent}&action=view&revision_status={$revision->post_status}&deleted=1";
+		$redirect = "admin.php?page=rvy-revisions&revision={$revision->post_parent}&action=view&revision_status={$revision->post_mime_type}&deleted=1";
 
 		rvy_delete_past_revisions($revision_id);
 
@@ -807,7 +809,7 @@ function rvy_revision_bulk_delete() {
 			}
 	
 			// before deleting the revision, note its status for redirect
-			$revision_status = $revision->post_status;
+			$revision_status = $revision->post_mime_type;
 			wp_delete_post( $revision_id );
 			$delete_count++;
 
@@ -871,7 +873,7 @@ function rvy_revision_publish($revision_id = false) {
 			break;
 		}
 
-		if ( 'future-revision' != $revision->post_status ) {
+		if ( 'future-revision' != $revision->post_mime_type ) {
 			break;
 		}
 
@@ -948,14 +950,14 @@ function rvy_publish_scheduled_revisions($args = array()) {
 	if (!empty($args['force_revision_id']) && is_scalar($args['force_revision_id'])) {
 		$results = $wpdb->get_results( 
 			$wpdb->prepare( 
-				"SELECT * FROM $wpdb->posts WHERE post_status = 'future-revision' AND ID = %d",
+				"SELECT * FROM $wpdb->posts WHERE post_mime_type = 'future-revision' AND ID = %d",
 				(int) $args['force_revision_id']
 			)
 		);
 	} else {
 		$results = $wpdb->get_results( 
 			$wpdb->prepare(
-				"SELECT * FROM $wpdb->posts WHERE post_status = 'future-revision' AND post_date_gmt <= %s ORDER BY post_date_gmt DESC",
+				"SELECT * FROM $wpdb->posts WHERE post_mime_type = 'future-revision' AND post_date_gmt <= %s ORDER BY post_date_gmt DESC",
 				$time_gmt
 			)
 		);
@@ -1177,7 +1179,7 @@ function rvy_publish_scheduled_revisions($args = array()) {
 		if ( $skip_revision_ids ) {
 			// if more than one scheduled revision was not yet published, convert the older ones to regular revisions
 			$id_clause = "AND ID IN ('" . implode( "','", array_keys($skip_revision_ids) ) . "')";
-			$wpdb->query( "UPDATE $wpdb->posts SET post_type = 'revision', post_status = 'inherit' WHERE post_status = 'future-revision' $id_clause" );
+			$wpdb->query( "UPDATE $wpdb->posts SET post_type = 'revision', post_status = 'inherit' WHERE post_mime_type = 'future-revision' $id_clause" );
 		}
 	}
 
@@ -1194,7 +1196,7 @@ function rvy_publish_scheduled_revisions($args = array()) {
 function rvy_update_next_publish_date() {
 	global $wpdb;
 	
-	if ( $next_publish_date_gmt = $wpdb->get_var( "SELECT post_date_gmt FROM $wpdb->posts WHERE post_status = 'future-revision' ORDER BY post_date_gmt ASC LIMIT 1" ) ) {
+	if ( $next_publish_date_gmt = $wpdb->get_var( "SELECT post_date_gmt FROM $wpdb->posts WHERE post_mime_type = 'future-revision' ORDER BY post_date_gmt ASC LIMIT 1" ) ) {
 		// wp_schedule_single_event( strtotime( $next_publish_date_gmt ), 'publish_revision_rvy' );  // @todo: wp_cron testing
 	} else {
 		$next_publish_date_gmt = '2035-01-01 00:00:00';

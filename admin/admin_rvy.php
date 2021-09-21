@@ -211,11 +211,10 @@ class RevisionaryAdmin
 		return $disable;
 	}
 
-	// Prevent PublishPress Revisions statuses from confusing the page listing
-	public function pre_get_posts($wp_query) {
-		$stati = array_diff(get_post_stati(), apply_filters('revisionary_cmstpv_omit_statuses', ['pending-revision', 'future-revision'], rvy_detect_post_type()));
-		$wp_query->query['post_status'] = $stati;
-		$wp_query->query_vars['post_status'] = $stati;
+	// Prevent PublishPress Revisions statuses from confusing the CMS Tree Page View plugin page listing
+	public function cmstpv_compat_get_posts($wp_query) {
+		$wp_query->query['post_mime_type'] = '';
+		$wp_query->query_vars['post_mime_type'] = '';
 	}
 
 	public function fltAdminPostsListing() {
