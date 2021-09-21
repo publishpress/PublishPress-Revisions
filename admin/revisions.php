@@ -177,7 +177,8 @@ if ( 'diff' != $action ) {
 if ( $is_administrator = is_content_administrator_rvy() ) {
 	global $wpdb;
 
-	$status_csv = implode("','", array_merge(rvy_revision_statuses(), ['inherit']));
+	$base_status_csv = implode("','", array_merge(rvy_revision_base_statuses(), ['inherit']));
+	$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
 
 	$results = $wpdb->get_results( 
 		$wpdb->prepare(
