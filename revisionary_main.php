@@ -401,7 +401,7 @@ class Revisionary
 	function get_last_revision($post_id, $user_id) {
 		require_once(dirname(__FILE__).'/admin/admin-init_rvy.php');
 
-		if ( $revisions = rvy_get_post_revisions( $post_id, 'pending-revision', array( 'order' => 'DESC', 'orderby' => 'ID' ) ) ) {  // @todo: retrieve revision_id in block editor js, pass as redirect arg
+		if ( $revisions = rvy_get_post_revisions( $post_id, '', array( 'order' => 'DESC', 'orderby' => 'ID' ) ) ) {  // @todo: retrieve revision_id in block editor js, pass as redirect arg
 			foreach( $revisions as $revision ) {
 				if (rvy_is_post_author($revision, $user_id)) {
 					return $revision;
