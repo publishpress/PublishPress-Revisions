@@ -707,7 +707,7 @@ class RevisionaryHistory
         $meta_fields['_wp_attachment_metadata'] = __('Attachment Meta', 'revisionary');
         */
 
-        if (defined('REVISIONARY_PRO_VERSION') && defined('FL_BUILDER_VERSION') && defined('REVISIONARY_BEAVER_BUILDER_DIFF')) {  // todo: move to filter
+        if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && defined('FL_BUILDER_VERSION') && defined('REVISIONARY_BEAVER_BUILDER_DIFF')) {  // todo: move to filter
             $meta_fields['_fl_builder_data'] = __('Beaver Builder Data', 'revisionary');
             $meta_fields['_fl_builder_data_settings'] = __('Beaver Builder Settings', 'revisionary');
         }

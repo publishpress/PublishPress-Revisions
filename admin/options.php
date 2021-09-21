@@ -304,7 +304,7 @@ $table_class = 'form-table rs-form-table';
 <?php
 // possible TODO: replace redundant hardcoded IDs with $id
 
-	if (defined('REVISIONARY_PRO_VERSION')) {
+	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 		require_once(RVY_ABSPATH . '/includes-pro/SettingsLicense.php');
 		$license_ui = new RevisionaryLicenseSettings();
 		$license_ui->display($sitewide, $customize_defaults);
@@ -479,7 +479,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		</th><td>
 		
 		<?php
-		if (!defined('REVISIONARY_PRO_VERSION')) :
+		if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) :
 		$descript = sprintf(
 			__('For compatibility with Advanced Custom Fields, Beaver Builder and WPML, upgrade to <a href="%s" target="_blank">PublishPress Revisions Pro</a>.', 'revisionary'),
 			'https://publishpress.com/revisionary/'

@@ -682,7 +682,7 @@ class RevisionaryAdmin
 		// all required JS functions are present in Role Scoper JS; TODO: review this for future version changes as necessary
 		// TODO: replace some of this JS with equivalent JQuery
 		if ( ! defined('SCOPER_VERSION') )
-			wp_enqueue_script( 'rvy', RVY_URLPATH . "/admin/revisionary.js", array('jquery'), RVY_VERSION, true );
+			wp_enqueue_script( 'rvy', RVY_URLPATH . "/admin/revisionary.js", array('jquery'), PUBLISHPRESS_REVISIONS_VERSION, true );
 	}
 
 	function moderation_queue() {
@@ -736,7 +736,7 @@ class RevisionaryAdmin
 			add_action('revisionary_page_revisionary-settings', 'rvy_omit_site_options' );	
 		}
 
-		if (!defined('REVISIONARY_PRO_VERSION')) {
+		if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 			add_submenu_page(
 	            'revisionary-q', 
 	            __('Upgrade to Pro', 'revisionary'), 
@@ -862,7 +862,7 @@ class RevisionaryAdmin
 	}
 
 	function publishpressFooter() {
-		if (defined('REVISIONARY_PRO_VERSION') && !rvy_get_option('display_pp_branding')) {
+		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !rvy_get_option('display_pp_branding')) {
 			return;
 		}
 

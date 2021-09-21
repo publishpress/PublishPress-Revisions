@@ -922,9 +922,9 @@ function rvy_mail( $address, $title, $message, $args ) {
 }
 
 function rvy_settings_scripts() {
-	if (defined('REVISIONARY_PRO_VERSION')) {
+	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 		$suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '.dev' : '';
-		wp_enqueue_script('revisionary-pro-settings', plugins_url('', REVISIONARY_FILE) . "/includes-pro/settings-pro{$suffix}.js", ['jquery', 'jquery-form'], REVISIONARY_VERSION, true);
+		wp_enqueue_script('revisionary-pro-settings', plugins_url('', REVISIONARY_FILE) . "/includes-pro/settings-pro{$suffix}.js", ['jquery', 'jquery-form'], PUBLISHPRESS_REVISIONS_VERSION, true);
 	}
 }
 

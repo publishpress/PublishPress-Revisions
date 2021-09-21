@@ -105,7 +105,7 @@ register_activation_hook(__FILE__, function()
 			require_once(dirname(__FILE__).'/rvy_init.php');
 			revisionary_refresh_revision_flags();
 
-			// mirror to REVISIONARY_VERSION
+			// mirror to PUBLISHPRESS_REVISIONS_VERSION
 			update_option('revisionary_last_version', $current_version);
 		}
 
@@ -187,10 +187,10 @@ add_action(
 			return;
 		}
 
-		define('REVISIONARY_VERSION', '2.6.1');
+		define('PUBLISHPRESS_REVISIONS_VERSION', '2.6.1');
 
 		if ( ! defined( 'RVY_VERSION' ) ) {
-			define( 'RVY_VERSION', REVISIONARY_VERSION );  // back compat
+			define( 'RVY_VERSION', PUBLISHPRESS_REVISIONS_VERSION );  // back compat
 		}
 
 		define ('COLS_ALL_RVY', 0);
@@ -229,7 +229,7 @@ add_action(
 
 		define('RVY_ABSPATH', __DIR__);
 
-		if (is_admin() && !defined('REVISIONARY_PRO_VERSION')) {
+		if (is_admin() && !defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 			require_once(__DIR__ . '/includes/CoreAdmin.php');
 			new \PublishPress\Revisions\CoreAdmin();
 		}
