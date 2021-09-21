@@ -365,7 +365,7 @@ function rvy_dismissable_notice( $msg_id, $message ) {
 	endif;
 }
 
-function rvy_get_post_revisions($post_id, $status = 'inherit', $args = '' ) {
+function rvy_get_post_revisions($post_id, $status = '', $args = '' ) {
 	global $wpdb;
 	
 	$defaults = array( 'order' => 'DESC', 'orderby' => 'post_modified_gmt', 'use_memcache' => true, 'fields' => COLS_ALL_RVY, 'return_flipped' => false );
