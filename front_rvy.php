@@ -69,13 +69,15 @@ class RevisionaryFront {
 	}
 	
 	function flt_view_revision($request) {
+		global $current_user;
+
 		//WP post/page preview passes this arg
 		if ( ! empty( $_GET['preview_id'] ) ) {
 			$published_post_id = (int) $_GET['preview_id'];
 			
 			remove_filter( 'posts_request', array( &$this, 'flt_view_revision' ) ); // no infinite recursion!
 
-			if ( $preview = wp_get_post_autosave($published_post_id) )
+			if ( $preview = wp_get_post_autosave($published_post_id, $current_user->ID) )
 				$request = str_replace( "ID = '$published_post_id'", "ID = '$preview->ID'", $request );
 				
 			add_filter( 'posts_request', array( &$this, 'flt_view_revision' ) );
