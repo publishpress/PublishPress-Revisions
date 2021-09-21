@@ -914,7 +914,7 @@ class RevisionaryHistory
 		        $modified_gmt = strtotime( $revision->post_date_gmt . ' +0000' );
 
             } else {
-                $date_prefix = __('Submitted ', 'revisionary');
+                $date_prefix = __('Modified ', 'revisionary');
                 $modified     = strtotime( $revision->post_modified );
 		        $modified_gmt = strtotime( $revision->post_modified_gmt . ' +0000' );
             }
