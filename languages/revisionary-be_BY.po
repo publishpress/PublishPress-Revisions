@@ -16,8 +16,7 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e;_c;__ngettext;_n;rvy_po_trigger\n"
 "X-Poedit-SearchPath-0: E:\\www\\wp29c\\wp-content\\plugins\\revisionary\n"
 "X-Poedit-SearchPath-1: E:\\www\\wp29c\\wp-content\\plugins\\revisionary\\admin\n"
-"X-Poedit-SearchPath-2: E:\\www\\wp29c\\wp-content\\plugins\\revisionary\\hardway\n"
-"X-Poedit-SearchPath-3: E:\\www\\wp29c\\wp-content\\plugins\\revisionary\\lib\n"
+"X-Poedit-SearchPath-2: E:\\www\\wp29c\\wp-content\\plugins\\revisionary\\lib\n"
 
 #: E:\www\wp29c\wp-content\plugins\revisionary/front_rvy.php:106
 #, php-format

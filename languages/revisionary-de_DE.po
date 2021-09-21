@@ -17,8 +17,7 @@ msgstr ""
 "Language: de\n"
 "X-Poedit-SearchPath-0: F:/snapshot/revisionary\n"
 "X-Poedit-SearchPath-1: F:/snapshot/revisionary/admin\n"
-"X-Poedit-SearchPath-2: F:/snapshot/revisionary/hardway\n"
-"X-Poedit-SearchPath-3: F:/snapshot/revisionary/lib\n"
+"X-Poedit-SearchPath-2: F:/snapshot/revisionary/lib\n"
 
 #: F:\snapshot\revisionary/front_rvy.php:143
 msgid "M j, Y @ g:i a"
