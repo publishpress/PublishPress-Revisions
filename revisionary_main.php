@@ -535,7 +535,9 @@ class Revisionary
 			return;
 		}
 
-		$any_trashed_posts = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_status = 'trash' AND comment_count > 0 LIMIT 1");
+		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+
+		$any_trashed_posts = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_status = 'trash' AND comment_count > 0 AND post_mime_type IN ($revision_status_csv) LIMIT 1");
 
 		$trashed_clause = ($any_trashed_posts) 
 		? $wpdb->prepare( 
@@ -545,7 +547,7 @@ class Revisionary
 
 		$post_ids = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT ID FROM $wpdb->posts WHERE (post_status IN ('pending-revision', 'future-revision') AND comment_count = %d) $trashed_clause", 
+				"SELECT ID FROM $wpdb->posts WHERE (post_mime_type IN ($revision_status_csv) AND comment_count = %d) $trashed_clause", 
 				$post_id
 			)
 		);
@@ -575,7 +577,7 @@ class Revisionary
 			$published_post = get_post(rvy_post_id($revision));
 
 			if (apply_filters('revisionary_do_revision_notice', !$this->doing_rest, $revision, $published_post)) {
-				if (('pending-revision' == $revision->post_status) && rvy_get_option('revision_update_notifications')) {
+				if (('future-revision' != $revision->post_mime_type) && rvy_get_option('revision_update_notifications')) {
 					$args = ['update' => true, 'revision_id' => $revision->ID, 'published_post' => $published_post, 'object_type' => $published_post->post_type];
 					
 					if ( !empty( $_REQUEST['prev_cc_user'] ) ) {
@@ -864,7 +866,7 @@ class Revisionary
 			}
 		}
 
-		if ($post && (('future-revision' == $post->post_status) || in_array($cap, ['read_post', 'read_page']))) {
+		if ($post && (('future-revision' == $post->post_mime_type) || in_array($cap, ['read_post', 'read_page']))) {
 			if (in_array($cap, ['read_post', 'read_page'])) {
 				return $caps;
 			}
@@ -1222,7 +1224,7 @@ class Revisionary
 				return $data;
 			}
 
-			if (!rvy_is_revision_status($data['post_status'])) {
+			if (!rvy_is_revision_status($postarr['post_mime_type']) || !in_array($postarr['post_status'], rvy_revision_base_statuses())) {
 				$revert_status = true;
 			} elseif ($revision) {
 				if (($data['post_status'] != $revision->post_status) 

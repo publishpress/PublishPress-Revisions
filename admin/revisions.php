@@ -107,7 +107,7 @@ default :
 			break;
 
 		// actual status of compared objects overrides any revision_Status arg passed in
-		$revision_status = $revision->post_status;
+		$revision_status = $revision->post_mime_type;
 
 		if (!current_user_can( 'edit_post', $rvy_post->ID ) && !rvy_is_post_author($revision)) {
 			wp_die();
@@ -168,7 +168,7 @@ if (!$can_fully_edit_post = agp_user_can( $edit_cap, $rvy_post->ID, '', ['skip_r
 if ( 'diff' != $action ) {
 	$can_edit = ( ( 'revision' == $revision->post_type ) || rvy_is_revision_status($revision->post_status) ) && (
 		$can_fully_edit_post || 
-		( (rvy_is_post_author($revision) || $_can_edit_others) && ('pending-revision' == $revision->post_status) ) 
+		( (rvy_is_post_author($revision) || $_can_edit_others) && (in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) ))
 		);
 }
 ?>
@@ -181,10 +181,10 @@ if ( $is_administrator = is_content_administrator_rvy() ) {
 
 	$results = $wpdb->get_results( 
 		$wpdb->prepare(
-			"SELECT post_status, COUNT( * ) AS num_posts FROM {$wpdb->posts}"
-			. " WHERE post_status IN ('$status_csv')"
-			. " AND ((post_type = 'revision' AND post_status = 'inherit' AND post_parent = %d) OR (post_type != 'revision' AND post_status != 'inherit' AND comment_count = %d))"
-			. " GROUP BY post_status",
+			"SELECT post_mime_type, COUNT( * ) AS num_posts FROM {$wpdb->posts}"
+			. " WHERE post_status IN ('$base_status_csv')"
+			. " AND ((post_type = 'revision' AND post_status = 'inherit' AND post_parent = %d) OR (post_type != 'revision' AND post_mime_type IN ($revision_status_csv) AND comment_count = %d))"
+			. " GROUP BY post_mime_type",
 			$rvy_post->ID,
 			$rvy_post->ID
 		)
