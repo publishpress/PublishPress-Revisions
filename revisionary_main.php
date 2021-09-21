@@ -820,11 +820,9 @@ class Revisionary
 		}
 
 		if ($post = get_post($post_id)) {
-			if ('inherit' == $post->post_status) {
-				return $caps;
-			}
-
-			if (empty($this->enabled_post_types[$post->post_type]) && $this->config_loaded) {
+			if (('inherit' == $post->post_status)
+			|| empty($this->enabled_post_types[$post->post_type]) && $this->config_loaded
+			) {
 				return $caps;
 			}
 		}
@@ -906,9 +904,11 @@ class Revisionary
 				}
 			}
 
+			$busy = true;
+
 			// Run reqd_caps array through the filter which is normally used to implicitly grant edit_published cap to Revisors
 			// Applying this adjustment to reqd_caps instead of user caps on 'edit_post' checks allows for better compat with PressPermit and other plugins
-			if ($grant_caps = $this->filter_caps(array(), $caps, array(0 => $cap, 1 => $user_id, 2 => $post_id), array('filter_context' => 'map_meta_cap'))) {
+			if ($grant_caps = $this->filter_caps(array(), $caps, array(0 => $cap, 1 => $user_id, 2 => $post_id))) {
 				$caps = array_diff($caps, array_keys(array_filter($grant_caps)));
 
 				if (!$caps) {
@@ -934,192 +934,40 @@ class Revisionary
 			return $wp_blogcaps;
 		}
 
-		$script_name = $_SERVER['SCRIPT_NAME'];
-		
-		if ( ( defined( 'PRESSPERMIT_VERSION' ) || defined( 'PP_VERSION' ) || defined( 'PPC_VERSION' ) ) && ( strpos( $script_name, 'p-admin/post.php' ) || rvy_wp_api_request() ) ) {
-			$support_publish_cap = empty( $_REQUEST['publish'] ) && ! is_array($args[0]) && ( false !== strpos( $args[0], 'publish_' ) );  // TODO: support custom publish cap prefix without perf hit?
-		}
+		$post_id = ( ! empty($args[2]) ) ? $args[2] : rvy_detect_post_id();
 
-		$is_meta_cap_call = is_array($internal_args) && !empty($internal_args['filter_context']) && ('map_meta_cap' == $internal_args['filter_context']);
-
-		// Featured image selection by Revisor
-		if (($this->doing_rest || (defined('DOING_AJAX') && DOING_AJAX)) && ('edit_media' == reset($reqd_caps) || 'edit_others_media' == reset($reqd_caps)) && (count($reqd_caps) == 1)) {
-			if (!empty($wp_blogcaps['upload_files'])) {
-				return array_merge($wp_blogcaps, array('edit_media' => true, 'edit_others_media' => true));
+		if (!$post = get_post($post_id)) {
+			if (($post_id == -1) && defined('PRESSPERMIT_PRO_VERSION') && !empty(presspermit()->meta_cap_post)) {  // wp_cache_add(-1) does not work for map_meta_cap call on get-revision-diffs ajax call 
+				$post = presspermit()->meta_cap_post;
 			}
 		}
 
-		$busy = true;
-
-		if ( ! empty($args[2]) )
-			$post_id = $args[2];
-		else
-			$post_id = rvy_detect_post_id();
-
-		if ( $post = get_post( $post_id ) ) {
-			$object_type = $post->post_type;								// todo: better API?
-
-		} elseif (($post_id == -1) && defined('PRESSPERMIT_PRO_VERSION') && !empty(presspermit()->meta_cap_post)) {  // wp_cache_add(-1) does not work for map_meta_cap call on get-revision-diffs ajax call 
-			$post = presspermit()->meta_cap_post;
-			$object_type = $post->post_type;
-		} else {
-			$object_type = rvy_detect_post_type();
-		}
-
-		if (empty($this->enabled_post_types[$object_type]) && $this->config_loaded) {
-			$busy = false;
+		if (empty($post) || (empty($this->enabled_post_types[$post->post_type]) && $this->config_loaded)) {
 			return $wp_blogcaps;
 		}
 
-		// For 'edit_post' check, filter required capabilities via 'map_meta_cap' filter, then pass 'user_has_cap' unfiltered
-		if (in_array($args[0], array('edit_post', 'edit_page')) && ! $is_meta_cap_call) {
-			if (empty($post) || !rvy_is_revision_status($post->post_status)) {
-				$busy = false;
-				return $wp_blogcaps;
-			}
-		}
+		if (rvy_in_revision_workflow($post)) {
+			$object_type_obj = get_post_type_object($post->post_type);
 
-		if ( ! in_array( $args[0], array( 'edit_post', 'edit_page', 'delete_post', 'delete_page' ) ) && empty($support_publish_cap) ) {			
-			if ( ( 
-				( ! strpos( $script_name, 'p-admin/post.php' ) || empty( $_POST ) ) 
-				&& ! $this->doing_rest && ! rvy_wp_api_request() 
-				&& ( ! defined('DOING_AJAX') || ! DOING_AJAX )
-				) || empty( $_REQUEST['action'] ) || ( 'editpost' != $_REQUEST['action'] ) 
-			) {
-				if (!apply_filters('revisionary_flag_as_post_update', false, $post_id, $reqd_caps, $args, $internal_args)) {
-					if ($post_type_obj = get_post_type_object($object_type)) {
-						$cap = $post_type_obj->cap;
-						$cap_names = [$cap->edit_published_posts, $cap->edit_others_posts, $cap->edit_private_posts, $cap->edit_posts, $cap->publish_posts];
-					} else {
-						$cap_names = ['edit_published_pages', 'edit_others_pages', 'edit_private_pages', 'edit_pages', 'publish_pages', 'publish_posts'];
-					}
-
-					if (!in_array($args[0], $cap_names)) {
-						$busy = false;
-						return $wp_blogcaps;
-					}
-				}
-			}
-		}
-
-		// integer value indicates internally triggered on previous execution of this filter
-		if ( 1 === $this->skip_revision_allowance ) {
-			$this->skip_revision_allowance = false;
-		}
-
-		if (!empty($_REQUEST['action']) && ('inline-save' == $_REQUEST['action']) && !rvy_is_revision_status($post->post_status)) {
-			$this->skip_revision_allowance = true;
-		}
-
-		$object_type_obj = get_post_type_object( $object_type );
-
-		if (rvy_get_option('revisor_lock_others_revisions')) {
-			if ($post && !rvy_is_full_editor(rvy_post_id($post->ID))) {
-				// Revisors are enabled to edit other users' posts for revision, but cannot edit other users' revisions unless cap is explicitly set sitewide
-				if (rvy_is_revision_status($post->post_status) && !$this->skip_revision_allowance) {
-					if (!rvy_is_post_author($post)) {
-						if ( empty( $current_user->allcaps['edit_others_revisions'] ) ) {
-							$this->skip_revision_allowance = 1;
-
-							if ($object_type_obj && !empty($object_type_obj->cap->edit_others_posts)) {
-								$busy = false;
-								return array_diff_key($wp_blogcaps, [$object_type_obj->cap->edit_others_posts => true]);
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		if ( empty( $object_type_obj->cap ) ) {
-			$busy = false;
-			return $wp_blogcaps;
-		}
-		
-		$cap = $object_type_obj->cap;
-
-		//if (!empty($args[2]) && $post && rvy_is_revision_status($post->post_status)) {
-		if ($post && rvy_is_revision_status($post->post_status)) {
-			if (in_array($cap->edit_others_posts, $reqd_caps) ) {
+			// If edit_others capability is being required for this post type, apply edit_others_revisions capability
+			if (!empty($object_type_obj->cap) && in_array($object_type_obj->cap->edit_others_posts, $reqd_caps)) {
 				if (!empty($current_user->allcaps['edit_others_revisions']) || !rvy_get_option('revisor_lock_others_revisions')) {
-					$wp_blogcaps[$cap->edit_others_posts] = true;
+					$wp_blogcaps[$object_type_obj->cap->edit_others_posts] = true;
 				}
 			}
-		}
-
-		$edit_published_cap = ( isset($cap->edit_published_posts) ) ? $cap->edit_published_posts : "edit_published_{$object_type}s";
-		$edit_private_cap = ( isset($cap->edit_private_posts) ) ? $cap->edit_private_posts : "edit_private_{$object_type}s";
-
-		$this->skip_revision_allowance = !apply_filters('revisionary_apply_revision_allowance', !$this->skip_revision_allowance, $post_id);
-
-		if ( ! $this->skip_revision_allowance ) {
-			$replace_caps = [];
-			
-			if (!empty($post)) {
-				$status_obj = get_post_status_object($post->post_status);
-
-				if (!empty($status_obj->public) || !empty($status_obj->private)) {
-					// Allow Contributors / Revisors to edit published post/page, with change stored as a revision pending review
-					$replace_caps = array( 'edit_published_posts', $edit_published_cap, 'edit_private_posts', $edit_private_cap );
-
-					if (!strpos($script_name, 'p-admin/edit.php') && (empty($_REQUEST['page']) || ('pp-calendar' != $_REQUEST['page']))) {
-						$replace_caps = array_merge( $replace_caps, array( $cap->publish_posts, 'publish_posts' ) );
-					}
-				} elseif (in_array($post->post_status, rvy_filtered_statuses())) {
-					$replace_caps = apply_filters('revisionary_implicit_edit_caps', $replace_caps, $object_type_obj);
-				}
-			}
-
-			if ( array_intersect( $reqd_caps, $replace_caps) ) {	// don't need to fudge the capreq for post.php unless existing post has public/private status
-				if ( is_preview() || rvy_wp_api_request() || strpos($script_name, 'p-admin/edit.php') || strpos($script_name, 'p-admin/widgets.php') 
-				|| (!empty($post))
-				|| (strpos($script_name, 'p-admin/admin.php') && !empty($_REQUEST['page']) && ('revisionary-q' == $_REQUEST['page']))
-				) {
-					if ( $type_obj = get_post_type_object( $object_type ) ) {
-						if ( ! empty( $wp_blogcaps[ $type_obj->cap->edit_posts ] ) || $is_meta_cap_call) {
-							foreach ( $replace_caps as $replace_cap_name ) {
-								$wp_blogcaps[$replace_cap_name] = true;
-							}
-						}
-					}
-				}
-			}
-		}
-
-		// Special provision for Pages - @todo: still needed?
-		if ( is_admin() && in_array( 'edit_others_posts', $reqd_caps ) && ( 'post' != $object_type ) ) {
-			// Allow contributors to edit published post/page, with change stored as a revision pending review
-			if ( ! rvy_metaboxes_started() && ! strpos($script_name, 'p-admin/revision.php') && false === strpos(urldecode($_SERVER['REQUEST_URI']), 'admin.php?page=rvy-revisions' )  ) // don't enable contributors to view/restore revisions
-				$use_cap_req = $cap->edit_posts;
-			else
-				$use_cap_req = $edit_published_cap;
-			
-			if ( ! empty( $wp_blogcaps[$use_cap_req] ) )
-				$wp_blogcaps['edit_others_posts'] = true;
-		}
-
-		if (!empty($args[0]) && ('edit_post' == $args[0]) && !defined('REVISIONARY_DISABLE_REVISION_CAP_WORKAROUND') && array_diff($reqd_caps, array_keys(array_filter($wp_blogcaps)))) {
-			// If checking capability for a revision, also grant permission if user has capability for published post
-			$published_id = rvy_post_id($args[2]);
-			if ($published_id && ($published_id != $args[2])) {
-				remove_filter('map_meta_cap', array($this, 'flt_post_map_meta_cap'), 5, 4);
-				remove_filter('user_has_cap', array($this, 'flt_user_has_cap' ), 98, 3);
-				remove_filter('map_meta_cap', array($this, 'flt_limit_others_drafts' ), 10, 4);
+		
+			// Grant edit permission for revision if user can edit main post
+			if (!empty($args[0]) && ('edit_post' == $args[0]) && array_diff($reqd_caps, array_keys(array_filter($wp_blogcaps)))) {
+				$this->skip_filtering = true;
 
 				if (current_user_can('edit_post', $args[2])) {
 					$wp_blogcaps = array_merge($wp_blogcaps, array_fill_keys($reqd_caps, true));
 				}
 
 				$this->skip_filtering = false;
-
-				add_filter('map_meta_cap', array($this, 'flt_post_map_meta_cap'), 5, 4);
-				add_filter('user_has_cap', array($this, 'flt_user_has_cap' ), 98, 3);
-				add_filter('map_meta_cap', array($this, 'flt_limit_others_drafts' ), 10, 4);
 			}
 		}
 
-		// TODO: possible need to redirect revision cap check to published parent post/page ( RS cap-interceptor "maybe_revision" )
-		$busy = false;
 		return $wp_blogcaps;			
 	}
 
