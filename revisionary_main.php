@@ -39,8 +39,6 @@ class Revisionary
 	function addFilters() {
 		global $script_name;
 
-		// Prevent PublishPress editorial comment insertion from altering comment_count field
-		add_action('pp_post_insert_editorial_comment', [$this, 'actInsertEditorialCommentPreserveCommentCount']);
 		add_filter('pre_wp_update_comment_count_now', [$this, 'fltUpdateCommentCountBypass'], 10, 3);
 		
 		// Ensure editing access to past revisions is not accidentally filtered. 
@@ -68,6 +66,9 @@ class Revisionary
 		$this->setPostTypes();
 
 		rvy_refresh_options_sitewide();
+
+		require_once( dirname(__FILE__).'/classes/PublishPress/Revisions/PluginCompat.php' );
+		new PublishPress\Revisions\PluginCompat();
 
 		// NOTE: $_GET['preview'] and $_GET['post_type'] arguments are set by rvy_init() at response to ?p= request when the requested post is a revision.
 		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && (((!empty($_GET['preview']) || !empty($_GET['_ppp'])) && empty($_REQUEST['preview_id'])) || !empty($_GET['mark_current_revision']))) { // preview_id indicates a regular preview via WP core, based on autosave revision
@@ -132,8 +133,7 @@ class Revisionary
 		}
 
 		add_filter( 'wp_insert_post_data', array($this, 'flt_regulate_revision_status'), 100, 2 );
-		add_filter( 'wp_insert_post_data', array($this, 'fltODBCworkaround'), 101, 2 );
-
+		
 		add_filter('wp_insert_post_data', [$this, 'fltRemoveInvalidPostDataKeys'], 999, 2);
 
 		// REST logging
@@ -156,36 +156,10 @@ class Revisionary
 			add_action('revisionary_created_revision', [$this, 'act_save_revision_followup'], 5);
 		}
 
-		add_filter('publishpress_notif_workflow_receiver_post_authors', [$this, 'flt_publishpress_notification_authors'], 10, 3);
-
-		add_filter('presspermit_exception_clause', [$this, 'fltPressPermitExceptionClause'], 10, 4);
-
 		add_action('wp_insert_post', [$this, 'actLogPreviewAutosave'], 10, 2);
 
 		add_filter('post_link', [$this, 'fltEditRevisionUpdatedLink'], 99, 3);
 
-		if (defined('CUSTOM_PERMALINKS_PLUGIN_VERSION') && !is_admin() && !$this->doing_rest) {
-
-			function enable_custom_permalinks_workaround($retval) {
-				add_filter('query', [$this, 'flt_custom_permalinks_query']);
-				return $retval;
-			}
-		
-			function disable_custom_permalinks_workaround($retval) {
-				remove_filter('query', [$this, 'flt_custom_permalinks_query']);
-				return $retval;
-			}
-
-			add_filter('custom_permalinks_request_ignore', function($retval) {
-				add_filter('query', [$this, 'flt_custom_permalinks_query']);
-				return $retval;
-			});
-
-			add_filter('cp_remove_like_query', function($retval) {
-				remove_filter('query', [$this, 'flt_custom_permalinks_query']);
-				return $retval;
-			});
-		}
 
 		add_filter("option_page_on_front", [$this, 'fltOptionPageOnFront']);
 
@@ -310,61 +284,6 @@ class Revisionary
 		return $front_page_id;
 	}
 
-	/**
-	 * Filters the list of PublishPress Notification receivers, but triggers only when "Authors of the Content" is selected in Notification settings.
-	 *
-	 * @param array $receivers
-	 * @param WP_Post $workflow
-	 * @param array $args
-	 */
-	function flt_publishpress_notification_authors($receivers, $workflow, $args) {
-		global $current_user;
-
-		if (empty($args['post']) || !rvy_is_revision_status($args['post']->post_status)) {
-			return $receivers;
-		}
-
-		$revision = $args['post'];
-		$recipient_ids = [];
-
-		if ($revision->post_author != $current_user->ID) {
-			$recipient_ids []= $revision->post_author;
-		}
-
-		$post_author = get_post_field('post_author', rvy_post_id($revision->ID));
-		
-		if (!in_array($post_author, [$current_user->ID, $revision->post_author])) {
-			$recipient_ids []= $post_author;
-		}
-
-		foreach($recipient_ids as $user_id) {
-			$channel = get_user_meta($user_id, 'psppno_workflow_channel_' . $workflow->ID, true);
-
-			// If no channel is set yet, use the default one
-			if (empty($channel)) {
-				if (!isset($notification_options)) {
-					// Avoid reference to PublishPress module class, object schema
-					$notification_options = get_option('publishpress_improved_notifications_options');
-				}
-
-				if (!empty($notification_options) && !empty($notification_options->default_channels)) {
-					if (!empty($notification_options->default_channels[$workflow->ID])) {
-						$channel = $notification_options->default_channels[$workflow->ID];
-					}
-				}
-			}
-
-			// @todo: config retrieval method for Slack, other channels
-			if (!empty($channel) && ('email' == $channel)) {
-				if ($user = new WP_User($user_id)) {
-					$receivers []= "{$channel}:{$user->user_email}";
-				}
-			}
-		}
-
-		return $receivers;
-	}
-
 	// On post deletion, clear corresponding _rvy_has_revisions postmeta flag
 	function actDeletedPost($post_id) {
 		delete_post_meta($post_id, '_rvy_has_revisions');
@@ -412,32 +331,6 @@ class Revisionary
 		}
 	}
 	
-	function fltPressPermitExceptionClause($clause, $required_operation, $post_type, $args) {
-		//"$src_table.ID $logic ('" . implode("','", $ids) . "')",
-
-		if (empty($this->enabled_post_types[$post_type]) && $this->config_loaded) {
-			return $clause;
-		}
-
-		if (('edit' == $required_operation) && in_array($post_type, rvy_get_manageable_types()) 
-		) {
-			foreach(['mod', 'src_table', 'logic', 'ids'] as $var) {
-				if (!empty($args[$var])) {
-					$$var =  $args[$var];
-				} else {
-					return $clause;
-				}
-			}
-
-			if ('include' == $mod) {
-				$clause = "(($clause) OR ($src_table.post_status IN ('pending-revision', 'future-revision') AND $src_table.comment_count IN ('" . implode("','", $ids) . "')))";
-			} elseif ('exclude' == $mod) {
-				$clause = "(($clause) AND ($src_table.post_status NOT IN ('pending-revision', 'future-revision') OR $src_table.comment_count NOT IN ('" . implode("','", $ids) . "')))";
-			}
-		}
-
-		return $clause;
-	}
 
 	function act_save_revision_followup($revision) {
 		global $wpdb;
@@ -1010,16 +903,6 @@ class Revisionary
 		
 		return $data;
 	}
-	
-	function fltODBCworkaround($data, $postarr) {
-		// ODBC does not support UPDATE of ID
-		if (function_exists('get_projectnami_version')) {
-			unset($data['ID']);
-		}
-
-		return $data;
-	}
-
 	function flt_regulate_revision_status($data, $postarr) {
 		// Revisions are not published by wp_update_post() execution; Prevent setting to a non-revision status
 		if (rvy_get_post_meta($postarr['ID'], '_rvy_base_post_id', true) && ('trash' != $data['post_status'])) {
@@ -1181,23 +1064,6 @@ class Revisionary
 		do_action('revisionary_get_rev_msg', $revision_id, $args);
 
 		return $rvy_workflow_ui->get_revision_msg( $revision_id, $args );
-	}
-
-	// Restore comment_count field (main post ID) on PublishPress editorial comment insertion
-	function actInsertEditorialCommentPreserveCommentCount($comment) {
-		global $wpdb;
-
-		if ($comment && !empty($comment->comment_post_ID)) {
-			if ($_post = get_post($comment->comment_post_ID)) {
-				if (rvy_is_revision_status($_post->post_status)) {
-					$wpdb->update(
-						$wpdb->posts, 
-						['comment_count' => rvy_post_id($comment->comment_post_ID)], 
-						['ID' => $comment->comment_post_ID]
-					);
-				}
-			}
-		}
 	}
 
 	// Prevent wp_update_comment_count_now() from modifying Pending Revision comment_count field (main post ID)
