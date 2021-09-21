@@ -11,10 +11,10 @@ require_once(dirname(__FILE__).'/utils.php');
 
 add_action('init', 'rvy_status_registrations', 40);
 
-if (did_action('set_current_user')) {
+if (did_action('wp_loaded')) {
 	rvy_ajax_handler();
 } else {
-	add_action( 'set_current_user', 'rvy_ajax_handler', 20);
+	add_action( 'wp_loaded', 'rvy_ajax_handler', 20);
 }
 
 if (!empty($_REQUEST['preview']) && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id'])) {
