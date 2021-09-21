@@ -137,6 +137,14 @@ class RevisionaryFront {
 
 		global $wp_query, $revisionary;
 		if ($wp_query->is_404) {
+			if (!empty($_REQUEST['base_post'])) {
+				if ($post = get_post(intval($_REQUEST['base_post']))) {
+					$url = get_permalink($_REQUEST['base_post']);
+					wp_redirect($url);
+					exit;
+				}
+			}
+
 			return;
 		}
 
