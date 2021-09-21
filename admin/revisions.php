@@ -34,13 +34,7 @@ if ( ! empty($_GET['right']) )
 	$right = absint($_GET['right']);
 else
 	$right = '';
-
-/*
-if ( ! empty($_GET['revision_status']) )
-	$revision_status = sanitize_key($_GET['revision_status']);
-else
-	$revision_status = '';
-*/	
+	
 $revision_status = 'inherit';
 
 if ( ! empty($_GET['action']) )
