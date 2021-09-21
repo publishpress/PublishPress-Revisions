@@ -342,7 +342,7 @@ class RvyPostEdit {
 	            ?>
 	            <div class="misc-pub-section">
 	            <?php
-	            echo $caption;
+	            printf(__('%sScheduled Changes: %s', 'revisionary'), '<span class="dashicons dashicons-clock"></span>&nbsp;', '<b>' . count($_revisions) . '</b>');
 	            ?>
 	            <a class="hide-if-no-js"
                     href="<?php echo esc_url($url); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions', 'revisionary'); ?></a>
@@ -363,7 +363,7 @@ class RvyPostEdit {
 	            ?>
 	            <div class="misc-pub-section">
 	            <?php
-	            echo $caption;
+	            printf(__('%sChange Requests: %s', 'revisionary'), '<span class="dashicons dashicons-edit"></span>&nbsp;', '<b>' . count($_revisions) . '</b>');
 	            ?>
 	            <a class="hide-if-no-js"
                     href="<?php echo esc_url($url); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions', 'revisionary'); ?></a>
