@@ -139,8 +139,6 @@ class Revisionary
 			add_action('revisionary_created_revision', [$this, 'act_save_revision_followup'], 5);
 		}
 
-		add_action('wp_insert_post', [$this, 'actLogPreviewAutosave'], 10, 2);
-
 		add_filter('post_link', [$this, 'fltEditRevisionUpdatedLink'], 99, 3);
 
 
@@ -335,13 +333,6 @@ class Revisionary
 
 		return $permalink;
 	}
-
-	function actLogPreviewAutosave($post_id, $post) {
-		if ('inherit' == $post->post_status && strpos($post->post_name, 'autosave')) {
-			$this->last_autosave_id[$post->post_parent] = $post_id;
-		}
-	}
-	
 
 	function act_save_revision_followup($revision) {
 		global $wpdb;
