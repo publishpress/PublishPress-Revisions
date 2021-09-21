@@ -160,7 +160,37 @@ class Revisionary
 
 		add_filter("option_page_on_front", [$this, 'fltOptionPageOnFront']);
 
+		if (!is_admin()) {
+			add_action('admin_bar_menu', [$this, 'adminToolbarItem'], 100);
+		}
+
 		do_action( 'rvy_init', $this );
+	}
+
+	function adminToolbarItem($admin_bar) {
+		global $post;
+
+		if (!empty($post) && !rvy_in_revision_workflow($post) && ('revision' != $post->post_type) && rvy_is_supported_post_type($post->post_type)) {
+			$status_obj = get_post_status_object($post->post_status);
+
+			if (!empty($status_obj->public) || !empty($status_obj->private) || rvy_get_option('pending_revision_unpublished')) {
+				if ($type_obj = get_post_type_object($post->post_type)) {
+
+					if (current_user_can('copy_post', $post->ID)) {
+						$admin_bar->add_menu([
+								'id'    => 'rvy-create-revision',
+								'title' => 'New Working Copy', // Your menu title
+								//'href'  => wp_nonce_url(rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise&amp;front=1"), "submit-post_{$post->ID}"), // URL
+								'href'  => rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise&amp;front=1"), // URL
+								'meta'  => [
+									'target' => '_blank',
+								]
+							]
+						);
+					}
+				}
+			}
+		}
 	}
 
 	function configurationLateInit() {
