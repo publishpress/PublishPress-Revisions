@@ -1138,12 +1138,20 @@ function rvy_set_ma_post_authors($post_id, $authors)
 	wp_set_object_terms($post_id, $authors, 'author');
 }
 
-function rvy_filtered_statuses($output = 'names') {
-	return apply_filters(
+function rvy_filtered_statuses($args = []) {
+	$defaults = ['output' => 'names', 'return' => 'array'];
+	$args = array_merge($defaults, $args);
+	foreach (array_keys($defaults) as $var) {
+		$$var = $args[$var];
+	}
+
+	$arr = apply_filters(
 		'revisionary_main_post_statuses', 
 		get_post_stati( ['public' => true, 'private' => true], $output, 'or' ),
 		$output
 	);
+
+	return ('csv' == $return) ? "'" . implode("','", $arr) . "'" : $arr;
 }
 
 // REST API Cache plugin compat
