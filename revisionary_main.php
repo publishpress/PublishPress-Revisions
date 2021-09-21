@@ -77,18 +77,6 @@ class Revisionary
 		}
 
 		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && (!empty($_GET['preview']) && !empty($_REQUEST['preview_id']))) {			
-			if (defined('REVISIONARY_PREVIEW_WORKAROUND')) { // @todo: confirm this is no longer needed
-				if ($_post = get_post((int) $_REQUEST['preview_id'])) {
-					if (in_array($_post->post_status, ['pending-revision', 'future-revision']) && !$this->isBlockEditorActive()) {
-						if (empty($_REQUEST['_thumbnail_id']) || !get_post((int) $_REQUEST['_thumbnail_id'])) {
-							$preview_url = rvy_preview_url($_post);
-							wp_redirect($preview_url);
-							exit;
-						}
-					}
-				}
-			}
-
 			if (!defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
 				require_once(dirname(__FILE__).'/classes/PublishPress/Revisions/PostPreview.php');
 				new PublishPress\Revisions\PostPreview();
@@ -601,11 +589,9 @@ class Revisionary
 		
 		$object_id = ( is_array($args) && ! empty($args[0]) ) ? $args[0] : $args;
 		
-		if ( ! $object_id || ! is_scalar($object_id) || ( $object_id < 0 ) )
+		if ( ! $object_id || ! is_scalar($object_id) || ( $object_id < 0 ) || ! rvy_get_option('require_edit_others_drafts') ) {
 			return $caps;
-		
-		if ( ! rvy_get_option('require_edit_others_drafts') )
-			return $caps;
+		}
 
 		if ( $post = get_post( $object_id ) ) {
 			if ( ('revision' != $post->post_type) && ! rvy_in_revision_workflow($post) ) {
