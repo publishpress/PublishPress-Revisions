@@ -185,10 +185,14 @@ if ( $is_administrator = is_content_administrator_rvy() ) {
 		)
 	);
 	
-	$num_revisions = array( 'inherit' => 0, 'pending-revision' => 0, 'future-revision' => 0 );
-	foreach( $results as $row )
-		$num_revisions[$row->post_status] = $row->num_posts;
-		
+	$num_revisions = array( '' => 0, 'pending-revision' => 0, 'future-revision' => 0 );
+	foreach( $results as $row ) {
+		$num_revisions[$row->post_mime_type] = $row->num_posts;
+	}
+
+	$num_revisions['inherit'] = $num_revisions[''];
+	unset($num_revisions['']);
+
 	$num_revisions = (object) $num_revisions;
 }
 
