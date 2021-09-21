@@ -98,8 +98,6 @@ class Revisionary
 		
 		add_action( 'wpmu_new_blog', array( $this, 'act_new_blog'), 10, 2 );
 		
-		//add_action( 'wp_loaded', array( &$this, 'set_revision_capdefs' ) );
-		
 		add_action( 'deleted_post', [$this, 'actDeletedPost']);
 
 		add_action( 'add_meta_boxes', [$this, 'actClearFlags'], 10, 2 );
