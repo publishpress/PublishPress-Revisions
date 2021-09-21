@@ -170,7 +170,7 @@ function rvy_revision_approve($revision_id = 0) {
 					$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
 				}
 
-				$message .= __( 'Editor: ', 'revisionary' ) . admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
+				$message .= __( 'Editor: ', 'revisionary' ) . rvy_admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
 			} else {
 				$message .= __( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";	
 			}
@@ -252,7 +252,7 @@ function rvy_revision_approve($revision_id = 0) {
 						$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
 					}
 
-					$message .= __( 'Editor: ', 'revisionary' ) . admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
+					$message .= __( 'Editor: ', 'revisionary' ) . rvy_admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
 				} else {
 					$message .= __( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";	
 				}

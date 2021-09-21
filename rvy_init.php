@@ -1218,7 +1218,7 @@ function rvy_preview_url($revision, $args = []) {
 
 	if ($post_type_obj = get_post_type_object($revision->post_type)) {
 		if (empty($post_type_obj->public)) { // For non-public types, preview is not available so default to Compare Revisions screen
-			return apply_filters('revisionary_preview_url', admin_url("revision.php?revision=$revision->ID"), $revision, $args);
+			return apply_filters('revisionary_preview_url', rvy_admin_url("revision.php?revision=$revision->ID"), $revision, $args);
 		}
 	}
 

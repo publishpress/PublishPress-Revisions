@@ -97,3 +97,12 @@ function rvy_post_id($revision_id) {
 	return ($published_id) ? $published_id : 0;
 }
 
+// Append a random argument for cache busting
+function rvy_nc_url($url) {
+    return add_query_arg('nc', substr(md5(rand()), 1, 8), $url);
+}
+
+// Complete an admin URL, appending a random argument for cache busting
+function rvy_admin_url($partial_admin_url) {
+    return rvy_nc_url( admin_url($partial_admin_url) );
+}

@@ -193,7 +193,7 @@ class RevisionaryFront {
 			load_plugin_textdomain('revisionary', false, dirname(plugin_basename(REVISIONARY_FILE)) . '/languages');
 			
 			$published_url = ($published_post_id) ? get_permalink($published_post_id) : '';
-			$diff_url = admin_url("revision.php?revision=$revision_id");
+			$diff_url = rvy_admin_url("revision.php?revision=$revision_id");
 			
 			if ((!rvy_get_option('revisor_hide_others_revisions') && !empty($type_obj) && current_user_can($type_obj->cap->edit_posts)) || current_user_can('read_post', $revision_id)) { 
 				$view_published = ($published_url) 
@@ -224,7 +224,7 @@ class RevisionaryFront {
 			}
 
 			if (agp_user_can('edit_post', $revision_id)) {
-				$edit_url = admin_url("post.php?action=edit&amp;post=$revision_id");
+				$edit_url = rvy_admin_url("post.php?action=edit&amp;post=$revision_id");
 				$edit_button = "<span><a href='$edit_url' class='rvy_preview_linkspan'>" . __('Edit', 'revisionary') . '</a></span>';
 			} else {
 				$edit_button = '';
@@ -232,13 +232,13 @@ class RevisionaryFront {
 
 			if ($can_edit = agp_user_can('edit_post', rvy_post_id($revision_id), 0, ['skip_revision_allowance' => true])) {
 				if ( in_array( $post->post_status, array( 'pending-revision' ) ) ) {
-					$publish_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|$revision_id" );
+					$publish_url = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|$revision_id" );
 				
-					$publish_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|$revision_id" );
 				} elseif ( in_array( $post->post_mime_type, array( 'future-revision' ) ) ) {
+					$publish_url = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|$revision_id" );
 				
 				} elseif ( in_array( $post->post_status, array( 'inherit' ) ) ) {
-					$publish_url = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=restore$redirect_arg"), "restore-post_$published_post_id|$revision_id" );
+					$publish_url = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=restore$redirect_arg"), "restore-post_$published_post_id|$revision_id" );
 				
 				} else {
 					$publish_url = '';
@@ -286,7 +286,7 @@ class RevisionaryFront {
 						$reload_link = '';
 					}
 
-					$edit_url = admin_url("post.php?action=edit&amp;post=$revision_id");
+					$edit_url = rvy_admin_url("post.php?action=edit&amp;post=$revision_id");
 					$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . __( 'Publish now', 'revisionary' ) . '</a></span>' : '';
 					$publish_button .= $reload_link;
 					$message = sprintf( __('This is a Scheduled Revision (for publication on %s). %s %s %s', 'revisionary'), $date, $view_published, $edit_button, $publish_button );

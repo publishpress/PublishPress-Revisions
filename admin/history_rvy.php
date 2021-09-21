@@ -937,7 +937,7 @@ class RevisionaryHistory
                         }
 
                         if (agp_user_can('edit_post', $revision->ID)) {
-                            $edit_url = admin_url("post.php?action=edit&amp;post=$revision->ID");
+                            $edit_url = rvy_admin_url("post.php?action=edit&amp;post=$revision->ID");
                         }
 	                } 
                 }
@@ -1073,7 +1073,7 @@ class RevisionaryHistory
             'to'             => $selected_revision_id,
             'from'           => $from,
             'diffData'       => $diffs,
-            'baseUrl'        => parse_url( admin_url( 'revision.php' ), PHP_URL_PATH ),
+            'baseUrl'        => parse_url( rvy_admin_url( 'revision.php' ), PHP_URL_PATH ),
             'compareTwoMode' => absint( $compare_two_mode ), // Apparently booleans are not allowed
             'revisionIds'    => array_keys( $revisions ),
         ];
@@ -1210,7 +1210,7 @@ class RevisionaryHistory
         ?  __('Manage', 'revisionary')
         : __('List', 'revisionary');
 
-        $manage_url = admin_url("admin.php?page=rvy-revisions&revision=$post_id&action=view");
+        $manage_url = rvy_admin_url("admin.php?page=rvy-revisions&revision=$post_id&action=view");
         ?>
         <script type="text/javascript">
         /* <![CDATA[ */

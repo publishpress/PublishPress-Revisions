@@ -205,7 +205,7 @@ foreach ( array_keys($revision_status_captions) as $_revision_status ) {
 		$link = "admin.php?page=rvy-revisions&amp;revision={$post_id}&amp;revision_status=$_revision_status";
 		$target = '';
 	} else {
-		$link = admin_url("admin.php?page=revisionary-q&published_post={$rvy_post->ID}&post_status={$_revision_status}");
+		$link = rvy_admin_url("admin.php?page=revisionary-q&published_post={$rvy_post->ID}&post_status={$_revision_status}");
 		$target = "target='_blank'";
 	}
 

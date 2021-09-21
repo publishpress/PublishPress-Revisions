@@ -174,9 +174,9 @@ class Rvy_Revision_Workflow_UI {
                     $message .= __( 'Preview and Approval: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
                 }
 
-                $message .= __( 'Revision Queue: ', 'revisionary' ) . admin_url("admin.php?page=revisionary-q&published_post={$published_post->ID}") . "\r\n\r\n";
+                $message .= __( 'Revision Queue: ', 'revisionary' ) . rvy_admin_url("admin.php?page=revisionary-q&published_post={$published_post->ID}") . "\r\n\r\n";
                 
-                $message .= __( 'Edit Revision: ', 'revisionary' ) . admin_url("post.php?action=edit&post={$revision_id}") . "\r\n";
+                $message .= __( 'Edit Revision: ', 'revisionary' ) . rvy_admin_url("post.php?action=edit&post={$revision_id}") . "\r\n";
             }
 
             if ( $admin_notify ) {

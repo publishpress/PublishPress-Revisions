@@ -388,7 +388,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if ( ! $post = get_post( $post_id ) )
 			return;
 		
-		$request_url = add_query_arg($_REQUEST, admin_url('admin.php?page=revisionary-q'));
+		$request_url = add_query_arg($_REQUEST,rvy_admin_url('admin.php?page=revisionary-q'));
 
 		switch ($column_name) {
 			case 'post_type':
@@ -526,7 +526,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			);
 		}
 
-		$request_url = add_query_arg($_REQUEST, admin_url('admin.php?page=revisionary-q'));
+		$request_url = add_query_arg($_REQUEST, rvy_admin_url('admin.php?page=revisionary-q'));
 
 		$actions['list_filter'] = sprintf(
 			'<a href="%1$s" title="%2$s" aria-label="%2$s">%3$s</a>',
@@ -1105,7 +1105,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		//if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
 		//	do_action("manage_{$post->post_type}_posts_custom_column", 'authors', $post->ID);
 		//} else {
-			$request_url = add_query_arg($_REQUEST, admin_url('admin.php?page=revisionary-q'));
+			$request_url = add_query_arg($_REQUEST, rvy_admin_url('admin.php?page=revisionary-q'));
 
 			$args = ['author' => get_the_author_meta( 'ID' )];
 			echo $this->apply_edit_link( add_query_arg('author', $args['author'], $request_url), get_the_author() );
