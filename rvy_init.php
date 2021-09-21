@@ -361,22 +361,22 @@ function rvy_status_registrations() {
 	));
 	
 	register_post_status('pending-revision', array(
-		'label' => __('Pending Revision', 'revisionary'),
-		'labels' => (object)['publish' => __('Publish Revision', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Pending Revisions', 'revisionary'), 'short' => __('Pending', 'revisionary') ],
+		'label' => __('Change Request', 'revisionary'),
+		'labels' => (object)['publish' => __('Publish Changes', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Change Requests', 'revisionary'), 'short' => __('Entry', 'revisionary') ],
 		'protected' => true,
 		'internal' => true,
-		'label_count' => _n_noop('Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>'),
+		'label_count' => _n_noop('Change Requests <span class="count">(%s)</span>', 'Change Requests <span class="count">(%s)</span>'),
 		'exclude_from_search' => false,
 		'show_in_admin_all_list' => false,
 		'show_in_admin_status_list' => false,
 	));
 
 	register_post_status('future-revision', array(
-		'label' => __('Scheduled Revision', 'revisionary'),
-		'labels' => (object)['publish' => __('Publish Revision', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Scheduled Revisions', 'revisionary'), 'short' => __('Scheduled', 'revisionary')],
+		'label' => __('Scheduled Change', 'revisionary'),
+		'labels' => (object)['publish' => __('Publish Changes', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Scheduled Changes', 'revisionary'), 'short' => __('Scheduled', 'revisionary')],
 		'protected' => true,
 		'internal' => true,
-		'label_count' => _n_noop('Scheduled <span class="count">(%s)</span>', 'Scheduled <span class="count">(%s)</span>'),
+		'label_count' => _n_noop('Scheduled Changes <span class="count">(%s)</span>', 'Scheduled Changes <span class="count">(%s)</span>'),
 		'exclude_from_search' => false,
 		'show_in_admin_all_list' => false,
 		'show_in_admin_status_list' => false,

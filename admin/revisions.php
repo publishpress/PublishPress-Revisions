@@ -214,11 +214,14 @@ foreach ( array_keys($revision_status_captions) as $_revision_status ) {
 		case 'inherit':
 			$status_caption = __( 'Past Revisions', 'revisionary' );
 			break;
+		case 'draft-revision':
+			$status_caption = __( 'Working Copies', 'revisionary' );
+			break;
 		case 'pending-revision':
-			$status_caption = __( 'Pending Revisions', 'revisionary' );
+			$status_caption = __( 'Change Requests', 'revisionary' );
 			break;
 		case 'future-revision':
-			$status_caption = __( 'Scheduled Revisions', 'revisionary' );
+			$status_caption = __( 'Scheduled Changes', 'revisionary' );
 			break;
 	}
 	

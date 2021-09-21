@@ -163,7 +163,7 @@ jQuery(document).ready( function($) {
 		if ( rvy_get_option( 'pending_revisions' ) ) {
 			require_once( dirname(__FILE__).'/revision-ui_rvy.php' );
 			
-			add_meta_box( 'pending_revisions', __( 'Pending Revisions', 'revisionary'), 'rvy_metabox_revisions_pending', $object_type );
+			add_meta_box( 'pending_revisions', __( 'Change Requests', 'revisionary'), [$this, 'rvy_metabox_revisions_pending'], $object_type );
 			
 			$admin_notify = (string) rvy_get_option( 'pending_rev_notify_admin' );
 			$author_notify = (string) rvy_get_option( 'pending_rev_notify_author' );
@@ -176,7 +176,7 @@ jQuery(document).ready( function($) {
 		if ( rvy_get_option( 'scheduled_revisions' ) ) {
 			require_once( dirname(__FILE__).'/revision-ui_rvy.php' );
 
-			add_meta_box( 'future_revisions', __( 'Scheduled Revisions', 'revisionary'), 'rvy_metabox_revisions_future', $object_type );
+			add_meta_box( 'future_revisions', __( 'Scheduled Changes', 'revisionary'), [$this, 'rvy_metabox_revisions_future'], $object_type );
 		}
 	}
 	
