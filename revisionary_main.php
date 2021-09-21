@@ -130,7 +130,7 @@ class Revisionary
 		}
 
 		add_filter( 'wp_insert_post_data', array($this, 'flt_regulate_revision_status'), 100, 2 );
-		
+
 		add_filter('wp_insert_post_data', [$this, 'fltRemoveInvalidPostDataKeys'], 999, 2);
 
 		// REST logging
@@ -637,17 +637,6 @@ class Revisionary
 		}
 	}
 	
-	// we generally want Revisors to edit other users' posts, but not other users' revisions
-	// @todo: impose edit_others_revisions requirement via filter 
-	/*
-	function set_revision_capdefs() {
-		global $wp_post_types;
-		if ( 'edit_others_posts' == $wp_post_types['revision']->cap->edit_others_posts ) {
-			$wp_post_types['revision']->cap->edit_others_posts = 'edit_others_revisions';
-			//$wp_post_types['revision']->cap->delete_others_posts = 'delete_others_revisions';
-		}
-	}
-	*/
 	
 	function act_new_blog( $blog_id, $user_id ) {
 		rvy_add_revisor_role( $blog_id );
