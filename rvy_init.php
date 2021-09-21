@@ -583,7 +583,7 @@ function revisionary_refresh_postmeta($post_id, $set_value = null, $args = []) {
 		)
 	);
 
-		$set_value = !empty($has_revisions);
+	$set_value = !empty($has_revisions);
 	}
 
 	if ($set_value) {
@@ -1184,7 +1184,6 @@ function rvy_is_full_editor($post, $args = []) {
 			return false;
 		}
 
-		// @todo: skip_revision_allowance?
 		return $revisionary->canEditPost($post, ['simple_cap_check' => true]);
 	}
 

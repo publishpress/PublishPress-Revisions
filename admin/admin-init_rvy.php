@@ -110,9 +110,7 @@ function rvy_admin_init() {
 						continue;
 					}
 					
-					if ( !$is_administrator 
-					&& !agp_user_can('edit_post', rvy_post_id($revision->ID), '', ['skip_revision_allowance' => true])
-					) {
+					if (!$is_administrator && !current_user_can('edit_post', rvy_post_id($revision->ID))) {
 						if (count($post_ids) == 1) {
 							wp_die( __('Sorry, you are not allowed to approve this revision.', 'revisionary') );
 						} else {
@@ -153,9 +151,7 @@ function rvy_admin_init() {
 						continue;
 					}
 					
-					if ( !$is_administrator 
-					&& !agp_user_can('edit_post', rvy_post_id($revision->ID), '', ['skip_revision_allowance' => true])
-					) {
+					if (!$is_administrator && !current_user_can('edit_post', rvy_post_id($revision->ID))) {
 						if (count($post_ids) == 1) {
 							wp_die( __('Sorry, you are not allowed to approve this revision.', 'revisionary') );
 						} else {

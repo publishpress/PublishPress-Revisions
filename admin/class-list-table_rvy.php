@@ -205,7 +205,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			
 			foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
 				if ($type_obj = get_post_type_object($post_type)) {
-					if (agp_user_can($type_obj->cap->edit_others_posts, 0, '', ['skip_revision_allowance' => true])) {
+					if (current_user_can($type_obj->cap->edit_others_posts)) {
 						$can_edit_others_types[]= $post_type;
 					}
 				}
@@ -295,9 +295,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					(
 					!empty($allow_post_types[$post_type]) 
 					|| (isset($type_obj->cap->edit_published_posts)
-						&& agp_user_can($type_obj->cap->edit_published_posts, 0, '', ['skip_revision_allowance' => true])
+						&& current_user_can($type_obj->cap->edit_published_posts)
 						&& !empty($current_user->allcaps[$type_obj->cap->edit_others_posts])
-						&& agp_user_can($type_obj->cap->publish_posts, 0, '', ['skip_revision_allowance' => true])
+						&& current_user_can($type_obj->cap->publish_posts)
 					))
 					&& (!empty($revisionary->enabled_post_types[$post_type]) || !$revisionary->config_loaded)
 				) {

@@ -13,7 +13,6 @@ class Revisionary
 {		
 	var $admin;					// object ref - RevisionaryAdmin
 	var $filters_admin_item_ui; // object ref - RevisionaryAdminFiltersItemUI
-	var $skip_revision_allowance = false;
 	var $content_roles;			// object ref - instance of RevisionaryContentRoles subclass, set by external plugin
 	var $doing_rest = false;
 	var $rest = '';				// object ref - Revisionary_REST
@@ -257,87 +256,46 @@ class Revisionary
 		static $last_result;
 
 		$args = (array) $args;
-		//$defaults = ['simple_cap_check' => false, 'skip_revision_allowance' => false, 'type_obj' => false];
+		//$defaults = ['simple_cap_check' => false, 'type_obj' => false];
 
-		if ($post && is_numeric($post)) {
+		if (is_numeric($post)) {
 			$post = get_post($post);
 		}
 
-		$post_id = ($post && is_object($post) && !empty($post->ID)) ? $post->ID : 0;
-
-		if (!empty($last_result) && isset($last_result[$post_id])) {
-			return $last_result[$post_id];
+		if (!is_object($post) 
+		|| empty($post->ID)
+		|| !$type_obj = get_post_type_object($post->post_type)
+		|| !$status_obj = get_post_status_object($post->post_status)
+		) {
+			return false;
 		}
 
-		if (!isset($last_result)) {
-			$last_result = [];
-		}
-
-		$return = false;
-
-		if (!$post) {
-			if (empty($args['type_obj']) || empty($args['simple_cap_check'])) {
-				return false;
-			}
-
-			$type_obj = $args['type_obj'];
+		if (!empty($args['simple_cap_check']) && (!empty($status_obj->public) || !empty($status_obj->private))) {
+			return isset($type_obj->cap->edit_published_posts) && !empty($current_user->allcaps[$type_obj->cap->edit_published_posts]);
 		} else {
-			if (!is_object($post) || empty($post->post_status)
-			|| !$type_obj = get_post_type_object($post->post_type)
-			) {
-				return false;
+			static $last_result;
+
+			if (!isset($last_result)) {
+				$last_result = [];
+			
+			} elseif (!empty($last_result) && isset($last_result[$post->ID])) {
+				return $last_result[$post->ID];
 			}
 
-			$status_obj = get_post_status_object($post->post_status);
+			$caps = map_meta_cap('edit_post', $current_user->ID, $post->ID);
+
+			$return = true;
+
+			foreach($caps as $cap) {
+				if (empty($current_user->allcaps[$cap])) {
+					$return = false;
+					break;
+				}
+			}
+
+			$last_result[$post->ID] = $return;
+			return $return;
 		}
-
-		if (!empty($args['simple_cap_check']) && (empty($status_obj) || !empty($status_obj->public) || !empty($status_obj->private))) {
-			if (!empty($args['skip_revision_allowance'])) {
-				$return = agp_user_can($type_obj->cap->edit_published_posts, 0, '', ['skip_revision_allowance' => true]);
-			} else {
-				$return = isset($type_obj->cap->edit_published_posts) && !empty($current_user->allcaps[$type_obj->cap->edit_published_posts]);
-			}
-		} else {
-			if (!empty($args['skip_revision_allowance'])) {
-				if (!$caps = map_meta_cap('edit_post', $current_user->ID, $post_id)) {
-					$last_result[$post_id] = false;
-					return false;
-				}
-
-				$return = true;
-
-				foreach($caps as $cap_name) {
-					$edit_posts_cap = (isset($type_obj->cap->edit_posts)) ? $type_obj->cap->edit_posts : 'edit_posts';
-					$edit_others_posts_cap = (isset($type_obj->cap->edit_others_posts)) ? $type_obj->cap->edit_others_posts : 'edit_others_posts';
-
-					if (in_array($cap_name, [$edit_posts_cap, $edit_others_posts_cap])) {
-						if (empty($current_user->allcaps[$cap_name])) {
-							$last_result[$post_id] = false;
-							return false;
-						}
-
-						continue; // only need to call agp_user_can() for capabilities that are ever granted implicitly (edit_published_pages, edit_private_pages etc.)
-					}
-				
-					if (!agp_user_can($cap_name, 0, '', ['skip_revision_allowance' => true])) {
-						$return = false;
-					}
-				}
-			} else {
-				$caps = map_meta_cap('edit_post', $current_user->ID, $post_id);
-
-				$return = true;
-				foreach($caps as $cap) {
-					if (empty($current_user->allcaps[$cap])) {
-						$return = false;
-						break;
-					}
-				}
-			}
-		}
-
-		$last_result[$post_id] = $return;
-		return $return;
 	}
 
 	public function fltOptionPageOnFront($front_page_id) {
@@ -749,7 +707,7 @@ class Revisionary
 
 				if (!rvy_is_post_author($post) && $status_obj && ! $status_obj->public && ! $status_obj->private) {
 					$post_type_obj = get_post_type_object( $post->post_type );
-					if (isset($post_type_obj->cap->edit_published_posts) && agp_user_can( $post_type_obj->cap->edit_published_posts, 0, '', ['skip_revision_allowance' => true])) {	// don't require any additional caps for sitewide Editors
+					if (isset($post_type_obj->cap->edit_published_posts) && current_user_can( $post_type_obj->cap->edit_published_posts)) {	// don't require any additional caps for sitewide Editors
 						return $caps;
 					}
 			

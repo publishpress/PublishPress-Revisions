@@ -280,9 +280,7 @@ class RvyPostEdit {
             return $preview_caption;
         }
 
-        $can_publish = agp_user_can('edit_post', rvy_post_id($post->ID), '', ['skip_revision_allowance' => true]);
-        
-        if ($can_publish) {
+        if (current_user_can('edit_post', rvy_post_id($post->ID))) {
             $preview_caption = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
         } elseif ($type_obj && !empty($type_obj->public)) {
             $preview_caption = __('View');
@@ -300,9 +298,7 @@ class RvyPostEdit {
             return $preview_title;
         }
 
-        $can_publish = agp_user_can('edit_post', rvy_post_id($post->ID), '', ['skip_revision_allowance' => true]);
-        
-        if ($can_publish) {
+        if (current_user_can('edit_post', rvy_post_id($post->ID))) {
             $preview_title = __('View / moderate saved revision', 'revisionary');
         } elseif ($type_obj && !empty($type_obj->public)) {
             $preview_title = __('View saved revision', 'revisionary');
@@ -329,15 +325,8 @@ class RvyPostEdit {
     function act_post_submit_revisions_links() {
         global $post;
         
-        if (rvy_in_revision_workflow($post)) {
-            return;
-        }
-        
-        if (!$type_obj = get_post_type_object( $post->post_type )) {
-            return;
-        }
-
-        if (!agp_user_can('edit_post', $post->ID, '', ['skip_revision_allowance' => true])) {
+        // These links do not apply when editing a revision
+        if (rvy_in_revision_workflow($post) || !current_user_can('edit_post', $post->ID) || !rvy_is_supported_post_type($post->post_type)) {
             return;
         }
 

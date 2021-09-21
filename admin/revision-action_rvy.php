@@ -51,8 +51,12 @@ function rvy_revision_approve($revision_id = 0) {
 			break;
 		}
 
-		if (!agp_user_can('edit_post', $post->ID, '', ['skip_revision_allowance' => true])) {
-			break;
+		if (!current_user_can('edit_post', $post->ID)) {
+			if ($batch_process) {
+				break;
+			} else {
+				return;
+			}
 		}
 
 		if (!$batch_process) {
@@ -322,7 +326,7 @@ function rvy_revision_restore() {
 		if ( !$post = get_post( $revision->post_parent ) )
 			break;
 
-		if (!agp_user_can('edit_post', $revision->post_parent, '', ['skip_revision_allowance' => true])) {
+		if (!current_user_can('edit_post', $revision->post_parent)) {
 			break;
 		}
 
@@ -847,7 +851,7 @@ function rvy_revision_unschedule($revision_id) {
 			break;
 		}
 
-		if (!agp_user_can('edit_post', $published_id, '', ['skip_revision_allowance' => true])) {
+		if (!current_user_can('edit_post', $published_id)) {
 			break;
 		}
 
@@ -885,7 +889,7 @@ function rvy_revision_publish($revision_id = false) {
 			break;
 		}
 
-		if (!agp_user_can('edit_post', $post->ID, '', ['skip_revision_allowance' => true])) {
+		if (!current_user_can('edit_post', $post->ID)) {
 			break;
 		}
 
@@ -1106,12 +1110,9 @@ function rvy_publish_scheduled_revisions($args = array()) {
 							$revisionary->content_roles->ensure_init();
 	
 							if ( $default_ids = $revisionary->content_roles->get_metagroup_members( 'Scheduled Revision Monitors' ) ) {
-								$revisionary->skip_revision_allowance = true;
 								$cols = ( defined('COLS_ALL_RS') ) ? COLS_ALL_RS : 'all';
 
 								$post_publishers = $revisionary->content_roles->users_who_can('edit_post', $object_id, array( 'cols' => $cols ) );
-
-								$revisionary->skip_revision_allowance = false;
 								
 								foreach ($post_publishers as $user) {
 									if (in_array($user->ID, $default_ids)) {

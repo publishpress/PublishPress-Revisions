@@ -132,7 +132,7 @@ class RVY_PostBlockEditUI {
                 unset($args['redirectURLupdate']);
             }
 
-        } elseif (agp_user_can('edit_post', $post_id, '', ['skip_revision_allowance' => true])) {
+        } elseif (current_user_can('edit_post', $post->ID)) {
             wp_enqueue_script( 'rvy_object_edit', RVY_URLPATH . "/admin/rvy_post-block-edit{$suffix}.js", array('jquery', 'jquery-form'), RVY_VERSION, true );
 
             $args = array();

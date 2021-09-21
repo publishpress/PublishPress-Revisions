@@ -23,10 +23,8 @@ class Rvy_Revision_Workflow_UI {
     
                 if ( $publisher_ids = $revisionary->content_roles->get_metagroup_members( 'Pending Revision Monitors' ) ) {
                     if ( $type_obj ) {
-                        $revisionary->skip_revision_allowance = true;
                         $cols = ( defined('COLS_ALL_RS') ) ? COLS_ALL_RS : 'all';
                         $post_publishers = $revisionary->content_roles->users_who_can( 'edit_post', $object_id, array( 'cols' => $cols, 'force_refresh' => true, 'user_ids' => $publisher_ids ) );
-                        $revisionary->skip_revision_allowance = false;
 
                         $can_publish_post = array();
                         foreach ( $post_publishers as $key => $user ) {
@@ -90,10 +88,8 @@ class Rvy_Revision_Workflow_UI {
             foreach($author_ids as $author_id) {
                 if ( empty( $default_ids[$author_id] ) ) {
                     if ( defined('RVY_CONTENT_ROLES') ) {
-                        $revisionary->skip_revision_allowance = true;
                         $cols = ( defined('COLS_ALL_RS') ) ? COLS_ALL_RS : 'all';
                         $author_notify = (bool) $revisionary->content_roles->users_who_can( 'edit_post', $object_id, array( 'cols' => $cols, 'force_refresh' => true, 'user_ids' => (array) $author_id ) );
-                        $revisionary->skip_revision_allowance = false;
                     } else {
                         $_user = new WP_User($author_id);
                         $reqd_caps = map_meta_cap( 'edit_post', $_user->ID, $object_id );
@@ -134,7 +130,7 @@ class Rvy_Revision_Workflow_UI {
         }
 
         // Support workaround to prevent notification when an Administrator or Editor voluntarily creates a pending revision
-        if (defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS') && agp_user_can('edit_post', $published_post->ID, 0, ['skip_revision_allowance' => true])) {
+        if (defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS') && current_user_can('edit_post', $published_post->ID)) {
             return;
         }
 
@@ -452,9 +448,7 @@ class Rvy_Revision_Workflow_UI {
                     $recipient_ids = $revisionary->content_roles->get_metagroup_members( 'Pending Revision Monitors' );
                     
                     if ( $type_obj ) {
-                        $revisionary->skip_revision_allowance = true;
                         $post_publisher_ids = $revisionary->content_roles->users_who_can( 'edit_post', $published_post->ID, array( 'cols' => 'id', 'user_ids' => $recipient_ids ) );
-                        $revisionary->skip_revision_allowance = false;
                         $recipient_ids = array_intersect( $recipient_ids, $post_publisher_ids );
                     }
 

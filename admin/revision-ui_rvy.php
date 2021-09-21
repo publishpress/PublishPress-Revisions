@@ -211,7 +211,7 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 	$rows = '';
 	$class = false;
 	
-	$can_edit_post = agp_user_can('edit_post', $post->ID, '', ['skip_revision_allowance' => true]);
+	$can_edit_post = current_user_can('edit_post', $post->ID);
 	
 	$hide_others_revisions = ! $can_edit_post && empty($current_user->allcaps['list_others_revisions']) && rvy_get_option('revisor_hide_others_revisions');
 	

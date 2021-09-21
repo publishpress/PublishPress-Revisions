@@ -42,7 +42,7 @@ class RevisionaryHistory
         if ($_post = get_post($revision_id)) {
             if (!rvy_is_revision_status($_post->post_status)) {
                 if ($parent_post = get_post($_post->post_parent)) {
-                    if (!$revisionary->canEditPost($parent_post, ['skip_revision_allowance' => true])) :
+                    if (!$revisionary->canEditPost($parent_post)) :
         ?>
 						<style type='text/css'>
 				        input.restore-revision {display:none !important;}
@@ -868,7 +868,7 @@ class RevisionaryHistory
 
         $type_obj = get_post_type_object($post->post_type);
         
-        $can_restore = agp_user_can('edit_post', $post->ID, '', ['skip_revision_allowance' => true]);
+        $can_restore = current_user_can('edit_post', $post->ID);
 
         $current_id  = false;
 
@@ -923,7 +923,7 @@ class RevisionaryHistory
                     $published_post_id = rvy_post_id($revision->ID);
 
                     // For non-public types, force direct approval because preview is not available
-	                if ((($type_obj && empty($type_obj->public)) || rvy_get_option('compare_revisions_direct_approval')) && agp_user_can( 'edit_post', $published_post_id, '', ['skip_revision_allowance' => true] ) ) {
+	                if ((($type_obj && empty($type_obj->public)) || rvy_get_option('compare_revisions_direct_approval')) && current_user_can( 'edit_post', $published_post_id) ) {
                         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
 
                         //if (in_array($revision->post_mime_type, ['draft-revision'])) {
@@ -936,7 +936,7 @@ class RevisionaryHistory
                             $restore_link = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|{$revision->ID}" );
                         }
 
-                        if (agp_user_can('edit_post', $revision->ID)) {
+                        if (current_user_can('edit_post', $revision->ID)) {
                             $edit_url = rvy_admin_url("post.php?action=edit&amp;post=$revision->ID");
                         }
 	                } 
@@ -1095,12 +1095,12 @@ class RevisionaryHistory
 
         // For non-public types, force direct approval because preview is not available
         $direct_approval = (($type_obj && empty($type_obj->public)) || rvy_get_option('compare_revisions_direct_approval')) 
-        && agp_user_can('edit_post', rvy_post_id($post_id), '', ['skip_revision_allowance' => true]);
+        && current_user_can('edit_post', rvy_post_id($post_id));
 
         if ($post_id) {
-            $can_approve = agp_user_can('edit_post', rvy_post_id($post_id), 0, ['skip_revision_allowance' => true]);
+            $can_approve = current_user_can('edit_post', rvy_post_id($post_id));
         } else {
-            $can_approve = isset($type_obj->cap->edit_published_posts) && agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true]);
+            $can_approve = isset($type_obj->cap->edit_published_posts) && current_user_can($type_obj->cap->edit_published_posts);
         }
 
         if (empty($type_obj) || $can_approve) {
@@ -1190,10 +1190,10 @@ class RevisionaryHistory
         }
 
         if (!empty($main_post) && !empty($main_post_status) && (empty($main_post_status->public) && empty($main_post_status->private))) {
-            $can_edit = $revisionary->canEditPost($main_post, ['skip_revision_allowance' => true]);
+            $can_edit = $revisionary->canEditPost($main_post);
         } else {
             $edit_published_cap = isset($type_obj->cap->edit_published_posts) ? $type_obj->cap->edit_published_posts : 'do_not_allow';
-            $can_edit = agp_user_can($edit_published_cap, 0, 0, ['skip_revision_allowance' => true]);
+            $can_edit = current_user_can($edit_published_cap);
         }
 
         $show_preview_link = rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin();
