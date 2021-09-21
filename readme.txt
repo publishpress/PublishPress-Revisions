@@ -104,6 +104,11 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 3.0-beta =
+* New revision submission mechanism: create a working copy first instead of editing existing post. Then submit as a Change Request before scheduling or publication
+* Adjusted Revision Queue filter captions
+* Permissions integration: revise_others_posts, revise_others_pages, etc. capabilties are equivalent to list_others capabilities in allowing uneditable items to be listed
+
 = 2.6.1 - 15 Jul 2021 =
 * Fixed : Pending / Scheduled Revisions could become disassociated from main post due to third party plugin interactions
 * Compat : Permissions - Specific Permissions were not applied for editing / approval of custom post types under some conditions 
