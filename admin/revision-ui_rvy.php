@@ -353,6 +353,19 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 wp_nonce_field( 'rvy-revisions' ); 
 ?>
 
+<?php
+// add Ajax goodies we need for fancy publish date editing in Revisions Manager and role duration/content date limit editing Bulk Role Admin
+?>
+<script type="text/javascript">
+/* <![CDATA[ */
+jQuery(document).ready( function($) {
+	$('#rvy-rev-checkall').on('click', function() {
+		$('.rvy-rev-chk').attr( 'checked', this.checked );
+	});
+});
+/* ]]> */
+</script>
+
 <table class="widefat post-revisions" cellspacing="0">
 	<col class="rvy-col1" />
 	<col class="rvy-col2" />
