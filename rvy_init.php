@@ -904,31 +904,6 @@ if ( in_array( basename($_SERVER['PHP_SELF']), array('admin.php', 'admin-ajax.ph
 	add_action( 'wp_ajax_rvy_dismiss_msg', '_revisionary_dashboard_dismiss_msg' );
 }
 
-function revisionary_copy_meta_field( $meta_key, $from_post_id, $to_post_id, $mirror_empty = true ) {
-	global $wpdb;
-
-	if ( ! $to_post_id )
-		return;
-	
-	if ( $_post = $wpdb->get_row( 
-		$wpdb->prepare(
-			"SELECT * FROM $wpdb->posts WHERE ID = %d",
-			$from_post_id
-		)
-	) ) {
-		if ( $source_meta = $wpdb->get_row( 
-				$wpdb->prepare("SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s AND post_id = %d", $meta_key, $from_post_id )
-			)
-		) {
-			rvy_update_post_meta($to_post_id, $meta_key, $source_meta->meta_value);
-
-		} elseif ($mirror_empty && in_array($meta_key, apply_filters('revisionary_removable_meta_fields', [], $to_post_id))) {
-			// Disable postmeta deletion until further testing
-			delete_post_meta($to_post_id, $meta_key);
-		}
-	}
-}
-
 function rvy_is_network_activated($plugin_file = '')
 {
 	if (!$plugin_file && defined('REVISIONARY_FILE')) {
