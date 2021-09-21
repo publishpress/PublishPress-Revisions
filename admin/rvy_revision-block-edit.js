@@ -20,13 +20,13 @@ if(rvyObjEdit.ajaxurl&&!$('div.edit-post-revision-status').length&&$(refSelector
 +'</div>'
 +'</div>');if(rvyObjEdit[rvyObjEdit.currentStatus+'ActionURL']){var url=rvyObjEdit[rvyObjEdit.currentStatus+'ActionURL'];}else{var url='javascript:void(0)';}
 if(rvyObjEdit[rvyObjEdit.currentStatus+'ActionCaption']){$(refSelector).after('<div class="rvy-creation-ui"><a href="'+url+'" class="revision-approve">'
-+'<button type="button" class="components-button revision-approve is-button is-default is-large">'
++'<button type="button" class="components-button revision-approve is-button is-primary">'
 +rvyObjEdit[rvyObjEdit.currentStatus+'ActionCaption']+'</button></a>'
-+'<button type="button" class="components-button revision-approve revision-created is-button is-default is-large" style="display: none">'
++'<div class="revision-created" style="display: none">'
 +'<span class="revision-approve revision-created">'
 +rvyObjEdit[rvyObjEdit.currentStatus+'CompletedCaption']+'</span> '
-+'<a href="'+rvyObjEdit[rvyObjEdit.currentStatus+'CompletedURL']+'" class="revision-approve revision-edit" target="_blank">'
-+rvyObjEdit[rvyObjEdit.currentStatus+'CompletedLinkCaption']+'</a></button>'
++'<a href="'+rvyObjEdit[rvyObjEdit.currentStatus+'CompletedURL']+'" class="revision-approve revision-edit components-button is-tertiary" target="_blank">'
++rvyObjEdit[rvyObjEdit.currentStatus+'CompletedLinkCaption']+'</a></div>'
 +'</div>');}
 if(RvyApprovalLocked!=$('button.revision-approve').prop('disabled')){if(RvyApprovalLocked){$('button.revision-approve').html('Revision needs update.');}else{$('button.revision-approve').html(rvyObjEdit[rvyObjEdit.currentStatus+'ActionCaption']);}}
 $('button.revision-approve').prop('disabled',RvyApprovalLocked&&('pending'==rvyObjEdit.currentStatus));$('.edit-post-post-schedule__toggle').after('<button class="components-button is-tertiary post-schedule-footnote" disabled>'+rvyObjEdit.onApprovalCaption+'</button>');if(rvyObjEdit[rvyObjEdit.currentStatus+'DeletionURL']){$('button.editor-post-trash').wrap('<a href="'+rvyObjEdit[rvyObjEdit.currentStatus+'DeletionURL']+'"></a>');}}
