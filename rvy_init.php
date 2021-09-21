@@ -18,10 +18,8 @@ if (did_action('set_current_user')) {
 }
 
 if (!empty($_REQUEST['preview']) && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id'])) {
-		add_filter('redirect_canonical', '_rvy_no_redirect_filter', 10, 2);
-	}
-
-add_action('init', 'rvy_maybe_redirect', 1);
+	add_filter('redirect_canonical', '_rvy_no_redirect_filter', 10, 2);
+}
 
 /*======== WP-Cron implentation for Email Notification Buffer ========*/
 add_action('init', 'rvy_set_notification_buffer_cron');
@@ -925,8 +923,7 @@ function rvy_init() {
 	*/
 
 	if ( is_admin() ) {
-		require_once( dirname(__FILE__).'/admin/admin-init_rvy.php' );
-		rvy_load_textdomain();
+		require_once(dirname(__FILE__).'/admin/admin-init_rvy.php');
 
 		if (defined('REVISIONARY_BULK_ACTION_EARLY_EXECUTION') || !isset($_REQUEST['action2'])) {
 			rvy_admin_init();

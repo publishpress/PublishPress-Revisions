@@ -46,6 +46,8 @@ function rvy_load_textdomain() {
 }
 
 function rvy_admin_init() {
+	rvy_load_textdomain();
+
 	// @todo: clean up "Restore Revision" URL on Diff screen
 	if (!empty($_GET['amp;revision']) && !empty($_GET['amp;action']) && !empty($_GET['amp;_wpnonce'])) {
 		$_GET['revision'] = $_GET['amp;revision'];

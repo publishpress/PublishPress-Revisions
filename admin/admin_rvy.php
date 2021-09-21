@@ -30,10 +30,10 @@ class RevisionaryAdmin
 				add_action('admin_menu', 'rvy_mu_site_menu', 15 );
 			}
 			
-			add_action('admin_menu', array(&$this,'build_menu'));
+			add_action('admin_menu', [$this, 'build_menu']);
 			
 			if ( strpos($script_name, 'p-admin/plugins.php') ) {
-				add_filter( 'plugin_row_meta', array(&$this, 'flt_plugin_action_links'), 10, 2 );
+				add_filter( 'plugin_row_meta', [$this, 'flt_plugin_action_links'], 10, 2 );
 			}
 		}
 
@@ -175,7 +175,6 @@ class RevisionaryAdmin
 		if ( empty($rvy_default_options) )
 			rvy_refresh_default_options();
 
-		global $blog_id;
 		if ( ! RVY_NETWORK || ( count($rvy_options_sitewide) != count($rvy_default_options) ) ) {
 			add_submenu_page( 'revisionary-q', __('PublishPress Revisions Settings', 'revisionary'), __('Settings', 'revisionary'), 'read', 'revisionary-settings', 'rvy_omit_site_options');
 			add_action('revisionary_page_revisionary-settings', 'rvy_omit_site_options' );	
