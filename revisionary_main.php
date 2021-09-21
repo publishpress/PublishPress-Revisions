@@ -22,6 +22,7 @@ class Revisionary
 	var $last_revision = [];
 	var $disable_revision_trigger = false;
 	var $internal_meta_update = false;
+	var $skip_filtering = false;
 
 	var $config_loaded = false;		// configuration related to post types and statuses must be loaded late on the init action
 	var $enabled_post_types = [];	// enabled_post_types property is set (keyed by post type slug) late on the init action. 
@@ -682,6 +683,10 @@ class Revisionary
 
 	// prevent revisors from editing other users' regular drafts and pending posts
 	function flt_limit_others_drafts( $caps, $meta_cap, $user_id, $args ) {
+		if (!empty($this->skip_filtering)) {
+			return $caps;
+		}
+
 		if ( ! in_array( $meta_cap, array( 'edit_post', 'edit_page' ) ) )
 			return $caps;
 		
@@ -800,7 +805,7 @@ class Revisionary
 
 		static $busy;
 
-		if (!empty($busy)) {
+		if (!empty($busy) || !empty($this->skip_filtering)) {
 			return $caps;
 		}
 
@@ -925,13 +930,7 @@ class Revisionary
 	private function filter_caps($wp_blogcaps, $reqd_caps, $args, $internal_args = array()) {
 		global $current_user;
 
-		static $busy;
-
-		if (!empty($busy)) {
-			return $wp_blogcaps;
-		}
-
-		if (!rvy_get_option('pending_revisions')) {
+		if (!empty($this->skip_filtering) || !rvy_get_option('pending_revisions')) {
 			return $wp_blogcaps;
 		}
 
@@ -1110,6 +1109,8 @@ class Revisionary
 				if (current_user_can('edit_post', $args[2])) {
 					$wp_blogcaps = array_merge($wp_blogcaps, array_fill_keys($reqd_caps, true));
 				}
+
+				$this->skip_filtering = false;
 
 				add_filter('map_meta_cap', array($this, 'flt_post_map_meta_cap'), 5, 4);
 				add_filter('user_has_cap', array($this, 'flt_user_has_cap' ), 98, 3);
