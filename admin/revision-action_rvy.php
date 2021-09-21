@@ -466,21 +466,11 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	$revision_content = $update['post_content'];
 
-	global $revisionary;
-	
-	if (!empty($revisionary)) {
-		$revisionary->disable_revision_trigger = true;
-	}
-
 	if (defined('REVISIONARY_APPLY_REVISION_WP_UPDATE')) {
 		$post_id = wp_update_post( $update );
 	} else {
 		// update without filter, action applications
 		$post_id = rvy_update_post( $update );
-	}
-
-	if (!empty($revisionary)) {
-		$revisionary->disable_revision_trigger = false;
 	}
 
 	if ( ! $post_id || is_wp_error( $post_id ) ) {

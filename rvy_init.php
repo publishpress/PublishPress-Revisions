@@ -11,8 +11,6 @@ require_once(dirname(__FILE__).'/utils.php');
 
 add_action('init', 'rvy_status_registrations', 40);
 
-add_action( 'rest_api_init', array( 'RVY_RestAPI', 'register_scheduled_rev_meta_field' ) );
-
 if (did_action('set_current_user')) {
 	rvy_ajax_handler();
 } else {
@@ -30,13 +28,6 @@ add_action('init', 'rvy_set_notification_buffer_cron');
 add_action('rvy_mail_buffer_hook', 'rvy_send_buffered_mail' );
 add_filter('cron_schedules', 'rvy_mail_buffer_cron_interval');
 
-add_filter('wp_insert_post_empty_content', '_rvy_buffer_post_content', 10, 2);
-
-add_action('post_updated', '_rvy_restore_published_content', 99, 3);
-
-add_action('update_post_metadata', '_rvy_limit_postmeta_update', 10, 5);
-add_action('delete_post_metadata', '_rvy_limit_postmeta_update', 10, 5);
-
 add_action('init', 
 	function() {
 		global $kinsta_cache;
@@ -47,45 +38,6 @@ add_action('init',
 	}
 );
 
-
-function _rvy_limit_postmeta_update($block_update, $object_id, $meta_key, $meta_value, $prev_value) {
-	global $current_user;
-	
-	if (in_array($meta_key, apply_filters('revisionary_protect_published_meta_keys', ['_thumbnail_id', '_wp_page_template']), $object_id)) {
-		if ($status_obj = get_post_status_object(get_post_field('post_status', $object_id))) {
-			if (!empty($status_obj->public) || !empty($status_obj->private)) {
-				if (rvy_get_post_meta($object_id, "_save_as_revision_{$current_user->ID}", true) || !agp_user_can('edit_post', $object_id, '', ['skip_revision_allowance' => true])) {
-					$block_update = true;
-				}
-			}
-		}
-	}
-
-	return $block_update;
-}
-
-// Make sure upstream capability filtering never allows unauthorized updating of published post content
-function _rvy_restore_published_content( $post_ID, $post_after, $post_before ) {
-	global $wpdb, $current_user;
-
-	if (defined('RVY_DISABLE_CONTENT_BUFFER')) {
-		return;
-	}
-
-	if ($status_obj = get_post_status_object(get_post_field('post_status', $post_ID))) {
-		if (!empty($status_obj->public) || !empty($status_obj->private)) {
-			update_postmeta_cache($post_ID);
-			
-			if (rvy_get_post_meta($post_ID, "_save_as_revision_{$current_user->ID}", true) || !agp_user_can('edit_post', $post_ID, '', ['skip_revision_allowance' => true])) {
-				if ($post_content = rvy_get_transient('rvy_post_content_' . $post_ID)) {
-					$wpdb->update($wpdb->posts, ['post_content' => $post_content], ['ID' => $post_ID]);
-					rvy_delete_transient('rvy_post_content_' . $post_ID);
-				}
-			}
-		}
-	}
-}
-
 if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview']) 
 && ((empty($_REQUEST['preview_id']) && empty($_REQUEST['thumbnail_id']))
 || (!empty($_REQUEST['preview_id']) && rvy_in_revision_workflow((int) $_REQUEST['preview_id']))
@@ -93,35 +45,6 @@ if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview'])
 ) {
 	require_once('compat_rvy.php');
 	_rvy_jreviews_preview_compat();
-}
-
-function _rvy_buffer_post_content($maybe_empty, $postarr) {
-	global $wpdb, $current_user, $revisionary;
-
-	if (empty($postarr['ID']) || defined('RVY_DISABLE_CONTENT_BUFFER')) { 
-		return $maybe_empty;
-	}
-
-	if (!empty($postarr['post_type']) && $revisionary && empty($revisionary->enabled_post_types[$postarr['post_type']])) {
-		return $maybe_empty;
-	}
-
-	if ($status_obj = get_post_status_object(get_post_field('post_status', $postarr['ID']))) {
-		if (!empty($status_obj->public) || !empty($status_obj->private)) {
-			if (rvy_get_post_meta($postarr['ID'], "_save_as_revision_{$current_user->ID}", true) || !agp_user_can('edit_post', $postarr['ID'], '', ['skip_revision_allowance' => true])) {
-				if ($raw_content = $wpdb->get_var(
-					$wpdb->prepare(
-						"SELECT post_content FROM $wpdb->posts WHERE ID = %d",
-						$postarr['ID']
-					)
-				)) {
-					rvy_set_transient('rvy_post_content_' . $postarr['ID'], $raw_content, 60);
-				}
-			}
-		}
-	}
-
-	return $maybe_empty;
 }
 
 function rvy_mail_check_buffer($new_msg = [], $args = []) {
@@ -185,43 +108,6 @@ function rvy_maybe_redirect() {
 	}
 }
 
-class RVY_RestAPI {
-    // register a postmeta field to flag the need for a redirect following scheduled revision creation
-    public static function register_scheduled_rev_meta_field() {
-			global $revisionary;
-
-			foreach(array_keys($revisionary->enabled_post_types) as $post_type ) {
-				// Thanks to Josh Pollock for demonstrating this:
-				// https://torquemag.io/2015/07/working-with-post-meta-data-using-the-wordpress-rest-api/
-				register_rest_field( $post_type, 'new_scheduled_revision', array(
-					'get_callback' => array( 'RVY_RestAPI', 'get_new_scheduled_revision_flag' ),
-					'schema' => null,
-					)
-				);
-
-				register_rest_field( $post_type, 'save_as_revision', array(
-					'get_callback' => array( 'RVY_RestAPI', 'get_save_as_revision_flag' ),
-					'schema' => null,
-					)
-				);
-			}
-    }
-    
-    public static function get_new_scheduled_revision_flag( $object ) {
-		global $current_user;
-        return ( isset( $object['id'] ) ) ? rvy_get_post_meta( $object['id'], "_new_scheduled_revision_{$current_user->ID}", true ) : false;
-	}
-	
-	public static function get_save_as_revision_flag( $object ) {
-		global $current_user;
-
-		if (!empty($object['id'])) {
-			return rvy_get_post_meta($object['id'], "_save_as_revision_{$current_user->ID}", true);
-		}
-
-		return false;
-    }
-}
 
 function rvy_ajax_handler() {
 	global $current_user;
@@ -244,61 +130,7 @@ function rvy_ajax_handler() {
 }
 
 function rvy_get_post_meta($post_id, $meta_key, $unused = false) {
-	global $wpdb;
-
-	$post_id = (is_object($post_id)) ? $post_id->ID : $post_id;
-
-	return $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s and post_id = %d",
-				$meta_key,
-				$post_id
-			)
-		);
-}
-
-function rvy_get_transient($transient) {
-	global $wpdb;
-
-	$option_name = '_transient_' . $transient;
-
-	$val = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT option_value FROM $wpdb->options WHERE option_name = %s",
-				$option_name
-			)
-		);
-
-	return (is_null($val)) ? '' : $val;
-}
-
-function rvy_set_transient($transient, $option_val, $timeout = 30) {
-	set_transient($transient, $option_val, $timeout);
-}
-
-function rvy_delete_transient($transient) {
-	global $wpdb;
-
-	$option_name = '_transient_timeout_' . $transient;
-
-	$wpdb->query(
-		$wpdb->prepare(
-			"DELETE FROM $wpdb->options WHERE option_name = %s",
-			$option_name
-		)
-	);
-
-	$option_name = '_transient_' . $transient;
-
-	$wpdb->get_var(
-			$wpdb->prepare(
-				"DELETE FROM $wpdb->options WHERE option_name = %s",
-				$option_name
-			)
-		);
-		
-	delete_transient($transient);
-
+	return get_post_meta($post_id, $meta_key, true);
 }
 
 function rvy_update_post_meta($post_id, $meta_key, $meta_value) {
@@ -313,40 +145,10 @@ function rvy_update_post_meta($post_id, $meta_key, $meta_value) {
 	if (!empty($revisionary)) {
 		$revisionary->internal_meta_update = true;
 	}
-
-	static $skip_deletion_keys;
-	
-	if (!isset($skip_deletion_keys)) {
-		$skip_deletion_keys = apply_filters('revisionary_multi_row_meta_keys', []);
-	}
-
-	if (!in_array($meta_key, $skip_deletion_keys)) {
-		// some extra low-level database operations until the cause of meta sync failure with WP 5.5 can be determined
-		rvy_delete_post_meta($post_id, $meta_key);
-	}
-
-	if ($meta_value) {
-		$wpdb->insert(
-			$wpdb->postmeta, 
-			['meta_value' => $meta_value, 'meta_key' => $meta_key, 'post_id' => $post_id]
-		);
-	}
 }
 
 function rvy_delete_post_meta($post_id, $meta_key) {
-	global $wpdb;
-
 	delete_post_meta($post_id, $meta_key);
-
-	// some extra low-level database operations until the cause of meta sync failure with WP 5.5 can be determined
-
-	$wpdb->query(
-		$wpdb->prepare(
-			"DELETE FROM $wpdb->postmeta WHERE meta_key = %s AND post_id = %d",
-			$meta_key,
-			$post_id
-		)
-	);
 
 	//wp_cache_delete($post_id, 'post_meta');
 }

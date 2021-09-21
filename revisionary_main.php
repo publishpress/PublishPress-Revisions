@@ -16,11 +16,6 @@ class Revisionary
 	var $content_roles;			// object ref - instance of RevisionaryContentRoles subclass, set by external plugin
 	var $doing_rest = false;
 	var $rest = '';				// object ref - Revisionary_REST
-	var $impose_pending_rev = [];
-	var $save_future_rev = [];
-	var $last_autosave_id = [];
-	var $last_revision = [];
-	var $disable_revision_trigger = false;
 	var $internal_meta_update = false;
 	var $skip_filtering = false;
 
@@ -86,7 +81,6 @@ class Revisionary
 		if ( ! is_content_administrator_rvy() ) {
 			add_filter( 'map_meta_cap', array($this, 'flt_post_map_meta_cap'), 5, 4);
 			add_filter( 'user_has_cap', array( $this, 'flt_user_has_cap' ), 98, 3 );
-			add_filter( 'pp_has_cap_bypass', array( $this, 'flt_has_cap_bypass' ), 10, 4 );
 
 			add_filter( 'map_meta_cap', array( $this, 'flt_limit_others_drafts' ), 10, 4 );
 		}
@@ -100,17 +94,8 @@ class Revisionary
 		
 		add_action( 'deleted_post', [$this, 'actDeletedPost']);
 
-		add_action( 'add_meta_boxes', [$this, 'actClearFlags'], 10, 2 );
 
-		if ( rvy_get_option( 'pending_revisions' ) ) {
-			// special filtering to support Contrib editing of published posts/pages to revision
-			add_filter('pre_post_status', array($this, 'flt_pendingrev_post_status') );
-			add_filter('wp_insert_post_data', array($this, 'flt_maybe_insert_revision'), 2, 2);
-		}
-		
 		if ( rvy_get_option('scheduled_revisions') ) {
-			add_filter('wp_insert_post_data', array($this, 'flt_create_scheduled_rev'), 3, 2 );  // other filters will have a chance to apply at actual publish time
-
 			// users who have edit_published capability for post/page can create a scheduled revision by modifying post date to a future date (without setting "future" status explicitly)
 			add_filter( 'wp_insert_post_data', array($this, 'flt_insert_post_data'), 99, 2 );
 		}
@@ -134,13 +119,6 @@ class Revisionary
 
 		add_action('post_updated', [$this, 'actUpdateRevision'], 10, 2);
 		add_action('post_updated', [$this, 'actUpdateRevisionFixCommentCount'], 999, 2);
-
-		if (!defined('REVISIONARY_PRO_VERSION')) {
-			add_action('revisionary_created_revision', [$this, 'act_save_revision_followup'], 5);
-		}
-
-		add_filter('post_link', [$this, 'fltEditRevisionUpdatedLink'], 99, 3);
-
 
 		add_filter("option_page_on_front", [$this, 'fltOptionPageOnFront']);
 
@@ -218,24 +196,6 @@ class Revisionary
 		$this->enabled_post_types = array_filter($this->enabled_post_types);
 	}
 
-	function actClearFlags($post_type, $post) {
-		global $current_user;
-
-		if (!empty($this->enabled_post_types[$post_type])) {
-			if (rvy_get_transient("_rvy_pending_revision_{$current_user->ID}_{$post->ID}")) {
-				rvy_delete_transient("_rvy_pending_revision_{$current_user->ID}_{$post->ID}");
-			} else {			
-				foreach(['_thumbnail_id', '_wp_page_template'] as $meta_key) {
-					$meta_val = rvy_get_post_meta($post->ID, $meta_key);
-
-					if (!empty($meta_val)) {
-						rvy_set_transient("_archive_{$meta_key}_{$post->ID}", $meta_val);
-					}
-				}
-			}
-		}
-	}
-
 	function canEditPost($post, $args = []) {
 		global $current_user;
 
@@ -296,82 +256,6 @@ class Revisionary
 	// On post deletion, clear corresponding _rvy_has_revisions postmeta flag
 	function actDeletedPost($post_id) {
 		delete_post_meta($post_id, '_rvy_has_revisions');
-	}
-
-	function fltEditRevisionUpdatedLink($permalink, $post, $leavename) {
-		static $busy = false;
-
-		if ($busy) {
-			return $permalink;
-		}
-
-		$params = (!$this->doing_rest || empty($this->rest->request)) ? $_REQUEST : $this->rest->request->get_params();
-
-		if ((empty($params['action']) || ('edit' != $params['action']))
-			&& (empty($params['context']) || ('edit' != $params['context']))
-		) {
-			return $permalink;
-		}
-
-		if ($post_id = rvy_detect_post_id()) {
-			if (rvy_is_revision_status(get_post_field('post_status', $post_id))) {
-				if ($published_post_id = rvy_post_id($post_id)) {
-					$match_ids = [$post_id];
-					
-					if (!$this->isBlockEditorActive()) {
-						$match_ids []= $published_post_id;
-					}
-
-					if (in_array($post->ID, $match_ids)) {
-						$busy = true;
-						$permalink = get_permalink($published_post_id);
-						$busy = false;
-					}
-				}
-			}
-		}
-
-		return $permalink;
-	}
-
-	function act_save_revision_followup($revision) {
-		global $wpdb;
-
-		// To ensure no postmeta is dropped from revision, copy any missing keys from published post
-		$fields = ['_thumbnail_id', '_wp_page_template'];
-
-		if ($can_remove_empty_fields = apply_filters('revisionary_removable_meta_fields', [], $revision->ID)) {
-			if (!$fields = array_diff(['_thumbnail_id', '_wp_page_template'], $can_remove_meta_fields)) {
-				return;
-			}
-		}
-
-		if (!$published_post_id = rvy_post_id($revision->ID)) {
-			return;
-		}
-
-		$field_csv = implode("','", array_map('sanitize_key', $fields));
-
-		$target_meta = $wpdb->get_results( 
-			$wpdb->prepare(
-				"SELECT meta_key, meta_value, meta_id FROM $wpdb->postmeta WHERE post_id = %d AND meta_key IN ('$field_csv') GROUP BY meta_key",
-				$revision->ID
-			)
-			, ARRAY_A 
-		);
-
-		foreach($fields as $meta_key) {
-			foreach($target_meta as $row) {
-				if ($row['meta_key'] == $meta_key) {
-					continue 2;
-				}
-			}
-
-			// revision was stored without a post_meta entry for this meta key, so copy it from published post
-			if ($published_val = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s AND post_id = %d", $meta_key, $published_post_id))) {
-				rvy_update_post_meta($revision->ID, $meta_key, $published_val);
-			}
-		}
 	}
 
 	function actSavePost($post_id, $post) {
@@ -445,13 +329,6 @@ class Revisionary
 
 					$this->do_notifications('pending-revision', 'pending-revision', (array) $revision, $args);
 				}
-
-				if (rvy_get_option('revision_update_redirect') && apply_filters('revisionary_do_update_redirect', true, $revision) && !$this->isBlockEditorActive()) {
-					$future_date = !empty($revision->post_date) && (strtotime($revision->post_date_gmt) > agp_time_gmt());
-					
-					$msg = $this->get_revision_msg( $revision->ID, ['data' => (array) $revision, 'post_id' => $revision->ID, 'object_type' => $published_post->post_type, 'future_date' => $future_date]);
-					rvy_halt($msg, __('Pending Revision Updated', 'revisionary'));
-				}
 			}
 		}
 	}
@@ -519,29 +396,6 @@ class Revisionary
 		wp_redirect($published_url);
 	}
 
-	function act_rest_insert( $post, $request, $unused ) {
-		require_once( dirname(__FILE__).'/rest-insert_rvy.php' );
-		return _rvy_act_rest_insert($post, $request, $unused);
-	}
-
-	public function handle_template( $template, $post_id, $validate = false ) {
-		rvy_update_post_meta( $post_id, '_wp_page_template', $template );
-	}
-
-	public function handle_featured_media( $featured_media, $post_id ) {
-		$featured_media = (int) $featured_media;
-		if ( $featured_media ) {
-			$result = set_post_thumbnail( $post_id, $featured_media );
-			if ( $result ) {
-				return true;
-			} else {
-				return new WP_Error( 'rest_invalid_featured_media', __( 'Invalid featured media ID.', 'revisionary' ), array( 'status' => 400 ) );
-			}
-		} else {
-			return delete_post_thumbnail( $post_id );
-		}
-	}
-
 	// log post type and ID from REST handler for reference by subsequent PP filters 
 	function rest_pre_dispatch( $rest_response, $rest_server, $request ) {
 		$this->doing_rest = true;
@@ -549,22 +403,7 @@ class Revisionary
 		require_once( dirname(__FILE__).'/rest_rvy.php' );
 		$this->rest = new Revisionary_REST();
 		
-		$rest_response = $this->rest->pre_dispatch( $rest_response, $rest_server, $request );
-
-		if ($this->rest->is_posts_request) {			
-			if (empty($this->enabled_post_types[$this->rest->post_type])) {
-				return $rest_response;
-			}
-
-			add_action( 
-				"rest_insert_{$this->rest->post_type}", 
-				array($this, 'act_rest_insert'), 
-				10, 
-				3 
-			);
-		}
-
-		return $rest_response;
+		return $this->rest->pre_dispatch( $rest_response, $rest_server, $request );
 	}
 
 	// prevent revisors from editing other users' regular drafts and pending posts
@@ -636,22 +475,7 @@ class Revisionary
 		rvy_add_revisor_role( $blog_id );
 	}
 	
-	function flt_has_cap_bypass( $bypass, $wp_sitecaps, $pp_reqd_caps, $args ) {
-		global $pp_attributes;
-
-		if (empty($pp_attributes)) {
-			return $wp_sitecaps;
-		}
-
-		if ( ! $pp_attributes->is_metacap( $args[0] ) && ( ! array_intersect( $pp_reqd_caps, array_keys($pp_attributes->condition_cap_map) )
-		|| ( is_admin() && strpos( $_SERVER['SCRIPT_NAME'], 'p-admin/post.php' ) && ! is_array($args[0]) && ( false !== strpos( $args[0], 'publish_' ) && empty( $_REQUEST['publish'] ) ) ) )
-		) {						// @todo: simplify (Press Permit filter for publish_posts cap check which determines date selector visibility)
-			return $wp_sitecaps;
-		}
-
-		return $bypass;
-	}
-
+	
 	function flt_post_map_meta_cap($caps, $cap, $user_id, $args) {
 		global $current_user;
 
@@ -823,25 +647,9 @@ class Revisionary
 		return $wp_blogcaps;			
 	}
 
-	function flt_pendingrev_post_status($status) {
-		require_once( dirname(__FILE__).'/revision-creation_rvy.php' );
-		$rvy_creation = new PublishPress\Revisions\RevisionCreation(['revisionary' => $this]);
-		return $rvy_creation->flt_pendingrev_post_status($status);
-	}
-
 	function fltRemoveInvalidPostDataKeys($data, $postarr) {
 		unset($data['filter']);
 		return $data;
-	}
-
-	function flt_maybe_insert_revision($data, $postarr) {
-		if (!empty($postarr['post_type']) && empty($this->enabled_post_types[ $postarr['post_type'] ])) {
-			return $data;
-		}
-
-		require_once( dirname(__FILE__).'/revision-creation_rvy.php' );
-		$rvy_creation = new PublishPress\Revisions\RevisionCreation(['revisionary' => $this]);
-		return $rvy_creation->flt_maybe_insert_revision($data, $postarr);
 	}
 
 	// If Scheduled Revisions are enabled, don't allow WP to force current post status to future based on publish date
@@ -892,23 +700,6 @@ class Revisionary
 		return $data;
 	}
 
-	function flt_create_scheduled_rev( $data, $post_arr ) {
-		global $current_user;
-
-		if (!empty($post_arr['post_type']) && empty($this->enabled_post_types[ $post_arr['post_type'] ])) {
-			return $data;
-		}
-
-		// If Administrator opted to save as a pending revision, don't apply revision scheduling scripts
-		if (rvy_get_post_meta($post_arr['ID'], "_save_as_revision_{$current_user->ID}", true)) {
-			return $data;
-		}
-
-		require_once( dirname(__FILE__).'/revision-creation_rvy.php' );
-		$rvy_creation = new PublishPress\Revisions\RevisionCreation(['revisionary' => $this]);
-		return $rvy_creation->flt_create_scheduled_rev( $data, $post_arr );
-	}
-
 	function do_notifications( $notification_type, $status, $post_arr, $args ) {
 		global $rvy_workflow_ui;
 		if ( ! isset( $rvy_workflow_ui ) ) {
@@ -917,18 +708,6 @@ class Revisionary
 		}
 		
 		return $rvy_workflow_ui->do_notifications( $notification_type, $status, $post_arr, $args );
-	}
-
-	function get_revision_msg( $revision_id, $args ) {
-		global $rvy_workflow_ui;
-		if ( ! isset( $rvy_workflow_ui ) ) {
-			require_once( dirname(__FILE__).'/revision-workflow_rvy.php' );
-			$rvy_workflow_ui = new Rvy_Revision_Workflow_UI();
-		}
-
-		do_action('revisionary_get_rev_msg', $revision_id, $args);
-
-		return $rvy_workflow_ui->get_revision_msg( $revision_id, $args );
 	}
 
 	// Prevent wp_update_comment_count_now() from modifying Pending Revision comment_count field (main post ID)
