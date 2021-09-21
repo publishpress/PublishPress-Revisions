@@ -2,9 +2,13 @@
 /**
  * @package     PublishPress\Revisions\RevisionaryAdmin
  * @author      PublishPress <help@publishpress.com>
- * @copyright   Copyright (c) 2019 PublishPress. All rights reserved.
+ * @copyright   Copyright (c) 2021 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
+ * 
+ * Scripts and filter / action handlers applicable for all wp-admin URLs 
+ * 
+ * Selectively load other classes based on URL
  */
 
 if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )

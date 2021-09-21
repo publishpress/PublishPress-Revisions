@@ -1,4 +1,9 @@
 <?php
+
+/*
+ * Legacy functions for listing Past Revisions, with bulk deletion
+ */
+
 /**
  * @package     PublishPress\Revisions\RevisionManagerUI
  * @author      PublishPress <help@publishpress.com>

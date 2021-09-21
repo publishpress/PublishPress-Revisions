@@ -5,13 +5,12 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 /**
  * @package     PublishPress\Revisions
  * @author      PublishPress <help@publishpress.com>
- * @copyright   Copyright (c) 2020 PublishPress. All rights reserved.
+ * @copyright   Copyright (c) 2021 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
  */
 class Revisionary
 {		
-	var $admin;					// object ref - RevisionaryAdmin
 	var $filters_admin_item_ui; // object ref - RevisionaryAdminFiltersItemUI
 	var $content_roles;			// object ref - instance of RevisionaryContentRoles subclass, set by external plugin
 	var $doing_rest = false;
@@ -89,8 +88,8 @@ class Revisionary
 
 		if ( is_admin() ) {
 			require_once( dirname(__FILE__).'/admin/admin_rvy.php');
-			$this->admin = new RevisionaryAdmin();
-		}	
+			new RevisionaryAdmin();
+		}
 		
 		add_action( 'wpmu_new_blog', array( $this, 'act_new_blog'), 10, 2 );
 		
@@ -785,6 +784,8 @@ class Revisionary
 		
 		return $data;
 	}
+
+	// @todo: confirm this is still needed
 	function flt_regulate_revision_status($data, $postarr) {
 		// Revisions are not published by wp_update_post() execution; Prevent setting to a non-revision status
 		if (rvy_get_post_meta($postarr['ID'], '_rvy_base_post_id', true) && ('trash' != $data['post_status'])) {
