@@ -257,7 +257,7 @@ class RevisionaryFront {
 					}
 				}
 			} else {
-				switch ( $post->post_status ) {
+				switch ( $post->post_mime_type ) {
 				case 'pending-revision' :
 					$approve_caption = __( 'Approve', 'revisionary' );
 
