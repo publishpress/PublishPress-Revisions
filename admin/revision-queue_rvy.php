@@ -168,8 +168,7 @@ $_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated
 <br class="clear" />
 
 <?php
-global $revisionary;
-$revisionary->admin->publishpressFooter();
+do_action('revisionary_admin_footer');
 ?>
 
 </div>
