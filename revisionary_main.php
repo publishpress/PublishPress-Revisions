@@ -224,7 +224,7 @@ class Revisionary
 			'revisionary_enabled_post_types', 
 			array_diff_key(
 				$enabled_post_types,
-				['tablepress_table' => true]
+				['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true]
 			)
 		);
 
