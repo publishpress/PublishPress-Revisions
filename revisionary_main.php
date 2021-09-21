@@ -460,15 +460,12 @@ class Revisionary
 
 		if ( $post = get_post( $object_id ) ) {
 			if ( ('revision' != $post->post_type) && ! rvy_in_revision_workflow($post) ) {
-				if (empty($this->enabled_post_types[$post->post_type])) {
+				if (empty($this->enabled_post_types[$post->post_type])
+				|| !apply_filters('revisionary_require_edit_others_drafts', true, $post->post_type, $post->post_status, $args)) {
 					return $caps;
 				}
 
 				$status_obj = get_post_status_object( $post->post_status );
-
-				if (!apply_filters('revisionary_require_edit_others_drafts', true, $post->post_type, $post->post_status, $args)) {
-					return $caps;
-				}
 
 				if (!rvy_is_post_author($post) && $status_obj && ! $status_obj->public && ! $status_obj->private) {
 					$post_type_obj = get_post_type_object( $post->post_type );
