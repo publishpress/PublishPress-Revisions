@@ -110,9 +110,6 @@ class Revisionary
 		
 		add_action( 'wpmu_new_blog', array( $this, 'act_new_blog'), 10, 2 );
 		
-		add_filter( 'posts_results', array( $this, 'inherit_status_workaround' ) );
-		add_filter( 'the_posts', array( $this, 'undo_inherit_status_workaround' ) );
-	
 		//add_action( 'wp_loaded', array( &$this, 'set_revision_capdefs' ) );
 		
 		add_action( 'deleted_post', [$this, 'actDeletedPost']);
@@ -651,27 +648,6 @@ class Revisionary
 		}
 	}
 	*/
-	
-	// @todo: still needed?
-	// work around WP query_posts behavior (won't allow preview on posts unless status is public, private or protected)
-	function inherit_status_workaround( $results ) {
-		global $wp_post_statuses;
-		
-		if ( isset( $this->orig_inherit_protected_value ) )
-			return $results;
-		
-		$this->orig_inherit_protected_value = $wp_post_statuses['inherit']->protected;
-		
-		$wp_post_statuses['inherit']->protected = true;
-		return $results;
-	}
-	
-	function undo_inherit_status_workaround( $results ) {
-		if ( ! empty( $this->orig_inherit_protected_value ) )
-			$wp_post_statuses['inherit']->protected = $this->orig_inherit_protected_value;
-		
-		return $results;
-	}
 	
 	function act_new_blog( $blog_id, $user_id ) {
 		rvy_add_revisor_role( $blog_id );

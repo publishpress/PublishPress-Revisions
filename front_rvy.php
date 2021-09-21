@@ -17,6 +17,9 @@ class RevisionaryFront {
 			add_action('template_redirect', [$this, 'actRevisionPreviewRedirect'], 1);
 		}
 
+		add_filter('posts_results', [$this, 'inherit_status_workaround']);
+		add_filter('the_posts', [$this, 'undo_inherit_status_workaround']);
+
 		do_action('revisionary_front_init');
 	}
 
@@ -102,6 +105,26 @@ class RevisionaryFront {
 		}
 
 		return $request;
+	}
+
+	// work around WP query_posts behavior (won't allow preview on posts unless status is public, private or protected)
+	function inherit_status_workaround( $results ) {
+		global $wp_post_statuses;
+		
+		if ( isset( $this->orig_inherit_protected_value ) )
+			return $results;
+		
+		$this->orig_inherit_protected_value = $wp_post_statuses['inherit']->protected;
+		
+		$wp_post_statuses['inherit']->protected = true;
+		return $results;
+	}
+	
+	function undo_inherit_status_workaround( $results ) {
+		if ( ! empty( $this->orig_inherit_protected_value ) )
+			$wp_post_statuses['inherit']->protected = $this->orig_inherit_protected_value;
+		
+		return $results;
 	}
 
 	// allows for front-end viewing of a revision by those who can edit the current revision (also needed for post preview by users editing for pending revision)
