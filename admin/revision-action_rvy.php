@@ -994,7 +994,7 @@ function rvy_publish_scheduled_revisions($args = array()) {
 				$type_caption = $type_obj->labels->singular_name;
 				
 				if ( rvy_get_option( 'publish_scheduled_notify_revisor' ) ) {
-					$title = sprintf( __('[%s] Scheduled Revision Publication Notice', 'revisionary' ), $blogname );
+					$title = sprintf( __('[%s] Scheduled Change Publication Notice', 'revisionary' ), $blogname );
 					$message = sprintf( __('The scheduled revision you submitted for the %1$s "%2$s" has been published.', 'revisionary' ), $type_caption, $row->post_title ) . "\r\n\r\n";
 
 					if ( ! empty($post->ID) )
@@ -1016,8 +1016,8 @@ function rvy_publish_scheduled_revisions($args = array()) {
 
 				// Prior to 1.3, notification was sent to author even if also revision submitter
 				if ( ( ( $post->post_author != $row->post_author ) || defined( 'RVY_LEGACY_SCHEDULED_REV_POST_AUTHOR_NOTIFY' ) ) && rvy_get_option( 'publish_scheduled_notify_author' ) ) {
-					$title = sprintf( __('[%s] Scheduled Revision Publication Notice', 'revisionary' ), $blogname );
-					$message = sprintf( __('A scheduled revision to your %1$s "%2$s" has been published.', 'revisionary' ), $type_caption, $post->post_title ) . "\r\n\r\n";
+					$title = sprintf( __('[%s] Scheduled Change Publication Notice', 'revisionary' ), $blogname );
+					$message = sprintf( __('A scheduled change to your %1$s "%2$s" has been published.', 'revisionary' ), $type_caption, $post->post_title ) . "\r\n\r\n";
 
 					if ( $revisor = new WP_User( $row->post_author ) )
 						$message .= sprintf( __('It was submitted by %1$s.'), $revisor->display_name ) . "\r\n\r\n";
@@ -1084,9 +1084,9 @@ function rvy_publish_scheduled_revisions($args = array()) {
 					}
 					
 					if (empty($skip_notification)) {
-						$title = sprintf(__('[%s] Scheduled Revision Publication'), $blogname );
+						$title = sprintf(__('[%s] Scheduled Change Publication'), $blogname );
 						
-						$message = sprintf( __('A scheduled revision to the %1$s "%2$s" has been published.'), $type_caption, $row->post_title ) . "\r\n\r\n";
+						$message = sprintf( __('A scheduled change to the %1$s "%2$s" has been published.'), $type_caption, $row->post_title ) . "\r\n\r\n";
 	
 						if ( $author = new WP_User( $row->post_author ) )
 							$message .= sprintf( __('It was submitted by %1$s.'), $author->display_name ) . "\r\n\r\n";
