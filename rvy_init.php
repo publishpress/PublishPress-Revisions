@@ -1160,7 +1160,7 @@ function rvy_rest_cache_compat() {
 	$uri = $_SERVER['REQUEST_URI'];
 
 	$rest_cache_active = false;
-	foreach(['rvy_ajax_field', 'rvy_ajax_value', 'revision_submitted', 'revision_updated'] as $param) {
+	foreach(['rvy_ajax_field', 'rvy_ajax_value'] as $param) {
 		if (strpos($uri, $param)) {
 			$rest_cache_active = true;
 			break;
@@ -1185,7 +1185,7 @@ add_filter('wp_rest_cache/skip_caching', 'rvy_rest_cache_skip');
 
 function rvy_rest_cache_skip($skip) {
 	$uri = $_SERVER['REQUEST_URI'];
-	$uncached_params = array_merge($uncached_params, ['rvy_ajax_field', 'rvy_ajax_value', 'revision_submitted', 'revision_updated']);
+	$uncached_params = array_merge($uncached_params, ['rvy_ajax_field', 'rvy_ajax_value']);
 
 	foreach($uncached_params as $param) {
 		if (strpos($uri, $param)) {
