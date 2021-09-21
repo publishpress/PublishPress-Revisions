@@ -823,6 +823,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			}
 		}
 
+		$actions['submit_revision'] = __('Submit');
+
 		if ($approval_potential = apply_filters('revisionary_bulk_action_approval', $approval_potential)) {
 			$actions['approve_revision'] = __('Approve');
 			$actions['publish_revision'] = __('Publish');
