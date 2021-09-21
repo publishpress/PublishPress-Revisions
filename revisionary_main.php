@@ -78,6 +78,8 @@ class Revisionary
 			}
 		}
 		
+		add_filter('map_meta_cap', [$this, 'fltStatusChangeCap'], 5, 4);
+
 		if ( ! is_content_administrator_rvy() ) {
 			add_filter( 'map_meta_cap', array($this, 'flt_post_map_meta_cap'), 5, 4);
 			add_filter( 'user_has_cap', array( $this, 'flt_user_has_cap' ), 98, 3 );
@@ -122,6 +124,8 @@ class Revisionary
 
 		add_filter("option_page_on_front", [$this, 'fltOptionPageOnFront']);
 
+		add_filter('posts_clauses', [$this, 'fltPostsClauses'], 10, 2);
+
 		if (!is_admin()) {
 			add_action('admin_bar_menu', [$this, 'adminToolbarItem'], 100);
 		}
@@ -158,6 +162,41 @@ class Revisionary
 	function configurationLateInit() {
 		$this->setPostTypes();
 		$this->config_loaded = true;
+	}
+
+	public function fltPostsClauses($clauses, $_wp_query, $args = []) {
+		global $wpdb;
+
+		$defaults = [
+			'is_revisions_query' => false,
+            'post_types' => [],
+            'source_alias' => false,
+        ];
+        $args = array_merge($defaults, (array)$args);
+        foreach (array_keys($defaults) as $var) {
+            $$var = $args[$var];
+        }
+
+		if ($is_revisions_query || !empty($_wp_query->is_revisions_query) || !empty($_wp_query->query['is_revisions_query']) || $_wp_query->is_preview) {
+			return $clauses;
+		}
+
+		// Allow revision retrieval by front end editors / previews
+		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST)) {
+			return $clauses;
+		}
+
+		if (empty($clauses['where'])) {
+			$clauses['where'] = '1=1';
+		}
+
+		$src_table = ($source_alias) ? $source_alias : $wpdb->posts;
+        $args['src_table'] = $src_table;
+
+		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+		$clauses['where'] .= " AND $src_table.post_mime_type NOT IN ($revision_status_csv)";
+
+		return $clauses;
 	}
 
 	// This is intentionally called twice: once for code that fires on 'init' and then very late on 'init' for types which were registered late on 'init'
@@ -461,7 +500,83 @@ class Revisionary
 		
 		return $caps;
 	}
-	
+
+	function fltStatusChangeCap($caps, $cap, $user_id, $args) {
+		global $current_user;
+		
+		if ('copy_post' == $cap) {
+			if (!empty($args[0])) {
+				$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
+			} else {
+				$post_id = 0;
+			}
+
+			if (rvy_in_revision_workflow($post_id)) {
+				return $caps;
+			}
+
+			$filter_args = [];
+
+			if (!$can_copy = rvy_is_full_editor($post_id)) {
+				if ($_post = get_post($post_id)) {
+					$type_obj = get_post_type_object($_post->post_type);
+				}
+
+				if (!empty($type_obj)) {
+					if (rvy_get_option("copy_posts_capability")) {					
+						$base_prop = (rvy_is_post_author($post_id)) ? 'edit_posts' : 'edit_others_posts';
+						$copy_cap_name = str_replace('edit_', 'copy_', $type_obj->cap->$base_prop);
+						$can_copy = current_user_can($copy_cap_name);
+					} else {
+						$can_copy = current_user_can($type_obj->cap->edit_posts);
+					}
+
+					$filter_args = compact('type_obj');
+				}
+			}
+
+			// allow PublishPress Permissions to apply 'copy' exceptions
+			if ($can_copy = apply_filters('revisionary_can_copy', $can_copy, $post_id, 'draft', 'draft-revision', $filter_args)) {
+				$caps = ['read'];
+			}
+		
+		} elseif ('set_revision_pending-revision' == $cap) {
+			if (!empty($args[0])) {
+				$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
+			} else {
+				$post_id = 0;
+			}
+
+			if (!rvy_in_revision_workflow($post_id)) {
+				return $caps;
+			}
+
+			$filter_args = [];
+
+			if ($can_submit = current_user_can('edit_post', $post_id)) {  // require basic editing capabilties for revision ID
+				$main_post_id = rvy_post_id($post_id);
+
+				if (rvy_get_option("revise_posts_capability") && !rvy_is_full_editor($main_post_id)) { // bypass capability check for those with full editing caps on main post
+					if ($_post = get_post($post_id)) {
+						if ($type_obj = get_post_type_object($_post->post_type)) {
+							$base_prop = (rvy_is_post_author($main_post_id)) ? 'edit_posts' : 'edit_others_posts';
+							$submit_cap_name = str_replace('edit_', 'revise_', $type_obj->cap->$base_prop);
+							$can_submit = current_user_can($submit_cap_name);
+							$filter_args = compact('main_post_id', 'type_obj');
+						}
+					}
+				}
+			}
+
+			// allow PublishPress Permissions to apply 'revise' exceptions
+			if ($can_submit = apply_filters('revisionary_can_submit', $can_submit, $post_id, 'pending', 'pending-revision', $filter_args)) {
+				$caps = ['read'];
+			}
+		}
+
+		return $caps;
+	}
+
 	function set_content_roles( $content_roles_obj ) {
 		$this->content_roles = $content_roles_obj;
 

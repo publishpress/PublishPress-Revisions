@@ -536,15 +536,65 @@ margin-right: 6px;
 margin-top: 2px;
 }
 
-
-#rvy_save_as_revision {
-margin-right: 4px;
-}
-
 .toplevel_page_revisionary-q .pressshack-admin-wrapper a {
 color: #2271B1;
 }
 
 .pressshack-admin-wrapper footer a {
 color: #655997 !important;
+}
+
+
+div.components-panel button.revision-approve {
+width: 100%;
+margin: 15px 0 15px 0;
+justify-content: center;
+color: #070;
+border-color: #070;
+font-weight: bold;
+}
+
+div.rvy-revision-created {
+text-align: center;
+}
+
+div.components-panel button.revision-created {
+color: black;
+cursor: default;
+}
+
+div.components-panel a.revision-edit {
+text-decoration: underline;
+color: #135e96;
+font-weight: normal;
+text-align: left;
+padding: 0 0 0 7px;
+}
+
+button.post-schedule-footnote {
+color: black !important;
+background-color: white !important;
+padding-left: 2px !important;
+}
+
+button.edit-post-post-schedule__toggle {
+padding-right: 2px !important;
+}
+
+div.components-panel a.revision-approve{
+text-decoration: none;
+}
+
+/* Classic */
+#submitpost #revision-compare {
+margin: 5px 10px 10px 5px;
+}
+
+#submitpost div.rvy-revision-approve {
+line-height: 2.1;
+}
+
+#submitpost div.rvy-revision-approve a, #submitpost div.rvy-revision-approve a:link, #submitpost div.rvy-revision-approve a:visited {
+color: #070;
+font-weight: bold;
 }

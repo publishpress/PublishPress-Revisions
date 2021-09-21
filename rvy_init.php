@@ -108,19 +108,93 @@ function rvy_maybe_redirect() {
 	}
 }
 
-
 function rvy_ajax_handler() {
-	global $current_user;
+	global $current_user, $wpdb;
 
-	if (!empty($_REQUEST['rvy_ajax_field']) && !empty($_REQUEST['post_id'])) {
-		// @todo: make these query args consistent
-		if (in_array($_REQUEST['rvy_ajax_field'], ['save_as_pending', 'save_as_revision'])) {
-			$save_revision = isset($_REQUEST['rvy_ajax_value']) && in_array($_REQUEST['rvy_ajax_value'], ['true', true, 1, '1'], true);
-			rvy_update_post_meta((int) $_REQUEST['post_id'], "_save_as_revision_{$current_user->ID}", $save_revision);
-			update_postmeta_cache($_REQUEST['post_id']);
+	if (!empty($_REQUEST['rvy_ajax_field'])) {
+		if ($post_id = intval($_REQUEST['rvy_ajax_value'])) {
 
-			exit;
+			switch ($_REQUEST['rvy_ajax_field']) {
+				case 'create_revision':
+					if (current_user_can('copy_post', $post_id)) {
+						$time_gmt = (!empty($_REQUEST['rvy_date_selection'])) ? intval($_REQUEST['rvy_date_selection']) : '';
+
+						require_once( dirname(REVISIONARY_FILE).'/revision-creation_rvy.php' );
+						$rvy_creation = new PublishPress\Revisions\RevisionCreation();
+						$rvy_creation->createRevision($post_id, 'draft-revision', compact('time_gmt'));
+					}
+					exit;
+
+				case 'submit_revision':
+					// capability check is applied within function to support batch execution without redundant checks
+					//if (current_user_can('set_revision_pending-revision', $post_id)) {
+						require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');	
+						rvy_revision_submit($post_id);
+						$check_autosave = true;
+					//}
+					break;
+
+				case 'create_scheduled_revision':
+					if (!empty($_REQUEST['rvy_date_selection'])) {
+						$time_gmt = intval($_REQUEST['rvy_date_selection']);
+
+						if (current_user_can('edit_post', $post_id)) {
+							require_once( dirname(REVISIONARY_FILE).'/revision-creation_rvy.php' );
+							$rvy_creation = new PublishPress\Revisions\RevisionCreation();
+							$rvy_creation->createRevision($post_id, 'future-revision', compact('time_gmt'));
+						}
+					}
+
+					break;
+
+				/*
+				case 'approve_revision':
+					require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');	
+					rvy_revision_approve($post_id);
+					$check_autosave = true;
+					break;
+
+				case 'publish_revision':
+					require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');	
+					rvy_revision_publish($post_id);
+					$check_autosave = true;
+					break;
+				*/
+
+				default:
+			}
+
+			if (!empty($check_autosave) && !defined('REVISIONARY_IGNORE_REVISION_AUTOSAVE')) {
+				if ($autosave_post = PublishPress\Revisions\Utils::get_post_autosave($post_id, $current_user->ID)) {
+					$main_post = get_post($post_id);
+
+					// If revision autosave is newer than revision post_updated date, copy over post data
+					if (strtotime($autosave_post->post_modified_gmt) > strtotime($main_post->post_modified_gmt)) {
+						$set_post_properties = [       
+							'post_content',
+							'post_content_filtered',
+							'post_title',
+							'post_excerpt',
+						];
+
+						foreach($set_post_properties as $prop) {
+							if (!empty($autosave_post->$prop)) {
+								$update_data[$prop] = $autosave_post->$prop;
+							}
+						}
+
+						$wpdb->update($wpdb->posts, $update_data, ['ID' => $post_id]);
+
+						$wpdb->delete($wpdb->posts, ['ID' => $autosave_post->ID]);
+
+						// For taxonomies and meta keys not stored for the autosave, use published copies
+						//revisionary_copy_terms($autosave_post->ID, $post_id, ['empty_target_only' => true]);
+						//revisionary_copy_postmeta($autosave_post->ID, $post_id, ['empty_target_only' => true]);
+					}
+				}
+			}
 		}
+
 	}
 
 	if (defined('DOING_AJAX') && DOING_AJAX && ('get-revision-diffs' == $_REQUEST['action'])) {

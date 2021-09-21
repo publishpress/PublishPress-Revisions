@@ -14,10 +14,116 @@ add_action( '_wp_put_post_revision', 'rvy_review_revision' );
 function rvy_revision_diff() {
 }
 
+function rvy_revision_create($post_id = 0) {
+	if (!$post_id) {
+		$post_id = (int) $_REQUEST['post'];
+	}
+
+	if (current_user_can('copy_post', $post_id)) {
+		require_once( dirname(REVISIONARY_FILE).'/revision-creation_rvy.php' );
+		$rvy_creation = new PublishPress\Revisions\RevisionCreation();
+		$rvy_creation->createRevision($post_id, 'draft-revision');
+	}
+}
+
+// Submits a revision (moving it to pending-revision status)
+function rvy_revision_submit($revision_id = 0) {
+	global $wpdb, $revisionary;
+
+	//require_once( ABSPATH . 'wp-admin/admin.php');
+
+	if (!$revision_id) {
+		$batch_process = false;
+
+		if (empty($_GET['revision'])) {
+			return;
+		}
+
+		$revision_id = (int) $_GET['revision'];
+	} else {
+		$batch_process = true;
+	}
+
+	$redirect = '';
+
+	do {
+		if (!$revision = get_post($revision_id)) {
+			break;
+		}
+
+		if (!in_array($revision->post_status, ['draft', 'pending'])) {
+			break;
+		}
+
+		if (!current_user_can('set_revision_pending-revision', $revision_id)) {
+			break;
+		}
+
+		if (!$published_id = rvy_post_id($revision_id)) {
+			break;
+		}
+
+		if (!$post = get_post($published_id)) {
+			break;
+		}
+
+		if (!$batch_process) {
+			check_admin_referer( "submit-post_$post->ID|$revision->ID" );
+		}
+
+		$status_obj = get_post_status_object( $revision->post_mime_type );
+
+		// safeguard: make sure this hasn't already been published
+		if ( empty($status_obj->public) && empty($status_obj->private) ) {
+			$wpdb->update($wpdb->posts, ['post_status' => 'pending', 'post_mime_type' => 'pending-revision'], ['ID' => $revision_id]);
+
+			require_once( dirname(REVISIONARY_FILE).'/revision-workflow_rvy.php' );
+			$rvy_workflow_ui = new Rvy_Revision_Workflow_UI();
+
+			$args = ['revision_id' => $revision->ID, 'published_post' => $post, 'object_type' => $post->post_type];
+			$rvy_workflow_ui->do_notifications('pending-revision', 'pending-revision', (array) $post, $args );
+		} else {
+			$approval_error = true;
+		}
+
+		if ( !empty($_REQUEST['rvy_redirect']) && 'edit' == $_REQUEST['rvy_redirect'] ) {
+			$last_arg = array( 'revision_action' => 1, 'published_post' => $revision->ID );
+			$redirect = add_query_arg( $last_arg, "post.php?post=$revision_id&action=edit" );
+		} else {
+			$redirect = rvy_preview_url($revision, ['post_type' => $post->post_type]);
+		}
+
+	} while (0);
+
+	if (!$batch_process) {	
+		if ( ! $redirect ) {
+			if ( ! empty($post) && is_object($post) && ( 'post' != $post->post_type ) ) {
+				$redirect = "edit.php?post_type={$post->post_type}";
+			} else
+				$redirect = 'edit.php';
+		}
+	}
+
+	if (empty($approval_error)) {
+		do_action( 'revision_submitted', $revision->post_parent, $revision->ID );
+	}
+
+	if (!$batch_process) {
+		wp_redirect( $redirect );
+		exit;
+	}
+
+	if (empty($approval_error)) {
+		return true;
+	}
+}
+
 // schedules publication of a revision ( or publishes if requested publish date has already passed )
 function rvy_revision_approve($revision_id = 0) {
-	require_once( ABSPATH . 'wp-admin/admin.php');
-	
+	global $current_user, $wpdb;
+
+	//require_once( ABSPATH . 'wp-admin/admin.php');
+
 	if (!$revision_id) {
 		$batch_process = false;
 
@@ -63,6 +169,37 @@ function rvy_revision_approve($revision_id = 0) {
 			check_admin_referer( "approve-post_$post->ID|$revision->ID" );
 		}
 
+		if (!empty($_REQUEST['editor']) && !defined('REVISIONARY_IGNORE_AUTOSAVE')) {
+			if ($autosave_post = \PublishPress\Revisions\Utils::get_post_autosave($revision_id, $current_user->ID)) {
+				if (strtotime($autosave_post->post_modified_gmt) > strtotime($revision->post_modified_gmt)) {
+					$set_post_properties = [       
+						'post_content',
+						'post_content_filtered',
+						'post_title',
+						'post_excerpt',
+					];
+					
+					$update_data = [];
+
+					foreach($set_post_properties as $prop) {
+						if (!empty($autosave_post) && !empty($autosave_post->$prop)) {
+							$update_data[$prop] = $autosave_post->$prop;
+						}
+					}
+
+					if ($update_data) {
+						$wpdb->update($wpdb->posts, $update_data, ['ID' => $revision_id]);
+					}
+
+					// For taxonomies and meta keys not stored for the autosave, use published copies
+					//revisionary_copy_terms($autosave_post->ID, $revision_id, ['empty_target_only' => true]);
+					//revisionary_copy_postmeta($autosave_post->ID, $revision_id, ['empty_target_only' => true]);
+					
+					$wpdb->delete($wpdb->posts, ['ID' => $autosave_post->ID]);
+				}
+			}
+		}
+
 		clean_post_cache($post->ID);
 		$published_url = get_permalink($post->ID);
 
@@ -98,6 +235,10 @@ function rvy_revision_approve($revision_id = 0) {
 						// If revision does not exist, preview's Not Found will prevent false impression of success.
 						$approval_error = true;
 						break;
+					}
+
+					if (!empty($update_data)) {
+						$wpdb->update($wpdb->posts, $update_data, ['ID' => $published_id]);
 					}
 
 					clean_post_cache($post->ID);
@@ -315,7 +456,7 @@ function rvy_revision_approve($revision_id = 0) {
 }
 
 function rvy_revision_restore() {
-	require_once( ABSPATH . 'wp-admin/admin.php');
+	//require_once( ABSPATH . 'wp-admin/admin.php');
 	$revision_id = (int) $_GET['revision'];
 	$redirect = '';
 	
@@ -347,13 +488,9 @@ function rvy_revision_restore() {
 		wp_restore_post_revision( $revision->ID, array( 'post_content', 'post_title', 'post_date', 'post_date_gmt', 'post_modified', 'post_modified_gmt' ) );
 
 		// restore previous meta fields
+		revisionary_copy_postmeta($revision, $post->ID);
 
-		if (!defined('REVISIONARY_PRO_VERSION') || apply_filters('revisionary_copy_core_postmeta', true, $revision, $post, false)) {
-			revisionary_copy_meta_field('_thumbnail_id', $revision->ID, $post->ID, false);
-			revisionary_copy_meta_field('_wp_page_template', $revision->ID, $post->ID, false);
-		}
-
-		revisionary_copy_terms($revision->ID, $post->ID, false);
+		revisionary_copy_terms($revision, $post->ID);
 
 		rvy_format_content( $revision->post_content, $revision->post_content_filtered, $post->ID );
 
@@ -522,7 +659,6 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	$wpdb->update($wpdb->posts, $update_fields, ['ID' => $post_id]);
 
 	// also copy all stored postmeta from revision
-	global $revisionary;
 
 	$is_imported = get_post_meta($revision_id, '_rvy_imported_revision', true);
 
@@ -535,14 +671,11 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 	}
 
-	if (!defined('REVISIONARY_PRO_VERSION') || apply_filters('revisionary_copy_core_postmeta', true, $revision, $published, !$is_imported)) {
-		revisionary_copy_meta_field('_thumbnail_id', $revision->ID, $published->ID, !$is_imported);
-		revisionary_copy_meta_field('_wp_page_template', $revision->ID, $published->ID, !$is_imported);
-	}
+	revisionary_copy_postmeta($revision, $published->ID, ['apply_empty' => !$is_imported]);
 
 	// Allow Multiple Authors revisions to be applied to published post. Revision post_author is forced to actual submitting user.
 	//$skip_taxonomies = (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) ? ['author'] : [];
-	revisionary_copy_terms($revision_id, $post_id, !$is_imported);
+	revisionary_copy_terms($revision_id, $post_id, ['apply_empty' => !$is_imported]);
 
 	if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && $published_authors) {
 		// Make sure Multiple Authors values were not wiped due to incomplete revision data
@@ -715,7 +848,7 @@ function rvy_do_revision_restore( $revision_id, $actual_revision_status = '' ) {
 }
 
 function rvy_revision_delete() {
-	require_once( ABSPATH . 'wp-admin/admin.php');
+	//require_once( ABSPATH . 'wp-admin/admin.php');
 	$revision_id = (int) $_GET['revision'];
 	$redirect = '';
 	
@@ -759,7 +892,7 @@ function rvy_revision_delete() {
 }
 
 function rvy_revision_bulk_delete() {
-	require_once( ABSPATH . 'wp-admin/admin.php');
+	//require_once( ABSPATH . 'wp-admin/admin.php');
 
 	check_admin_referer( 'rvy-revisions' );
 	
@@ -845,7 +978,7 @@ function rvy_revision_unschedule($revision_id) {
 			break;
 		}
 
-		$wpdb->update( $wpdb->posts, array( 'post_status' => 'pending-revision' ), array( 'ID' => $revision->ID ) );
+		$wpdb->update( $wpdb->posts, array( 'post_status' => 'draft-revision' ), array( 'ID' => $revision->ID ) );
 		
 		rvy_update_next_publish_date();
 	} while (0);
@@ -1259,73 +1392,6 @@ function rvy_format_content( $content, $content_filtered, $post_id, $args = arra
 	return $formatted_content;
 }
 
-function revisionary_copy_terms( $from_post_id, $to_post_id, $mirror_empty = false ) {
-	global $wpdb;
-
-	if ( ! $to_post_id )
-		return;
-	
-	//if (false===$skip_taxonomies) { @todo: $args
-		$skip_taxonomies = array();	
-	//}
-
-	if ($skip_taxonomies = apply_filters('revisionary_skip_taxonomies', $skip_taxonomies, $from_post_id, $to_post_id)) {
-		$tx_join = "INNER JOIN $wpdb->term_taxonomy AS tt ON tt.term_taxonomy_id = tr.term_taxonomy_id ";
-		$tx_where = "tt.taxonomy NOT IN ('" . implode("','", array_map('sanitize_key', array_filter($skip_taxonomies))) . "') AND ";
-	} else {
-		$tx_join = '';
-		$tx_where = '';
-	}
-
-	if ($_post = $wpdb->get_row( 
-		$wpdb->prepare(
-			"SELECT * FROM $wpdb->posts WHERE ID = %d",
-			$from_post_id 
-		) 
-	)) {
-		$source_terms = $wpdb->get_col( 
-			$wpdb->prepare(
-				"SELECT term_taxonomy_id FROM $wpdb->term_relationships AS tr {$tx_join}WHERE {$tx_where}tr.object_id = %d",
-				$from_post_id
-			)
-		);
-
-		$target_terms = $wpdb->get_col( 
-			$wpdb->prepare(
-				"SELECT term_taxonomy_id FROM $wpdb->term_relationships AS tr {$tx_join}WHERE {$tx_where}tr.object_id = %d",
-				$to_post_id
-			)
-		);
-
-		if ( $add_terms = array_diff($source_terms, $target_terms) ) {
-			// todo: single query
-			foreach($add_terms as $tt_id) {
-				$wpdb->query(
-					$wpdb->prepare(
-						"INSERT INTO $wpdb->term_relationships (object_id, term_taxonomy_id) VALUES (%d, %d)",
-						$to_post_id,
-						$tt_id
-					)
-				);
-			}
-		}
-		
-		if ($source_terms || ($mirror_empty && !defined('FL_BUILDER_VERSION'))) {
-			if ( $delete_terms = array_diff($target_terms, $source_terms) ) {
-				// todo: single query
-				foreach($delete_terms as $tt_id) {
-					$wpdb->query(
-						$wpdb->prepare(
-							"DELETE FROM $wpdb->term_relationships WHERE object_id = %d AND term_taxonomy_id = %d",
-							$to_post_id,
-							$tt_id
-						)
-					);
-				}
-			}
-		}
-	}	
-}
 
 function rvy_update_post($postarr = []) {
 	global $wpdb;

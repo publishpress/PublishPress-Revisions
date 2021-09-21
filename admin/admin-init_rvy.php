@@ -19,14 +19,16 @@ if ( in_array( $pagenow, array( 'edit.php', 'post.php', 'post-new.php', 'plugins
 function _rvy_post_edit_ui() {
 	global $pagenow, $revisionary;
 
-	if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ) ) ) {
-		if ( $pagenow == 'post.php' ) {
-			require_once( dirname(__FILE__).'/post-edit_rvy.php' );
-			$revisionary->post_edit_ui = new RvyPostEdit();
-		}
+	if (in_array($pagenow, ['post.php', 'post-new.php'])) {
+		if ($pagenow == 'post.php') {
+			require_once( dirname(__FILE__).'/post-editor-workflow-ui_rvy.php' );
 
-		if (\PublishPress\Revisions\Utils::isBlockEditorActive()) {
-			require_once( dirname(__FILE__).'/post-edit-block-ui_rvy.php' );
+			if (\PublishPress\Revisions\Utils::isBlockEditorActive()) {
+				require_once( dirname(__FILE__).'/post-edit-block-ui_rvy.php' );
+			} else {
+				require_once( dirname(__FILE__).'/post-edit_rvy.php' );
+				$revisionary->post_edit_ui = new RvyPostEdit();
+			}
 		}
 	} elseif ('edit.php' == $pagenow) {
 		require_once( dirname(__FILE__).'/admin-posts_rvy.php' );
@@ -74,7 +76,11 @@ function rvy_admin_init() {
 
 		check_admin_referer('bulk-revision-queue');
 
-		$sendback = remove_query_arg( array('trashed', 'untrashed', 'approved_count', 'published_count', 'deleted', 'locked', 'ids', 'posts', '_wp_nonce', '_wp_http_referer'), wp_get_referer() );
+		if (!$url = str_replace('#038;', '&', wp_get_referer())) {
+			$url = admin_url("admin.php?page=revisionary-q");
+		}
+
+		$sendback = remove_query_arg( array('trashed', 'untrashed', 'submitted_count', 'approved_count', 'published_count', 'deleted', 'locked', 'ids', 'posts', '_wp_nonce', '_wp_http_referer'), $url);
 	
 		if ( 'delete_all' == $doaction ) {
 			// Prepare for deletion of all posts with a specified post status (i.e. Empty trash).
@@ -139,6 +145,41 @@ function rvy_admin_init() {
 	
 				break;
 	
+			case 'submit_revision' :
+				$submitted = 0;
+				$is_administrator = current_user_can('administrator');
+
+				require_once( dirname(__FILE__).'/revision-action_rvy.php');
+	
+				foreach ((array) $post_ids as $post_id) {
+					if (!$revision = get_post($post_id)) {
+						continue;
+					}
+					
+					if ('draft' != $revision->post_status) {
+						continue;
+					}
+					
+					if (!$is_administrator && !current_user_can('set_revision_pending-revision', $revision->ID)) {
+						if (count($post_ids) == 1) {
+							wp_die( __('Sorry, you are not allowed to submit this revision.', 'revisionary') );
+						} else {
+							continue;
+						}
+					}	
+
+					if (rvy_revision_submit($revision->ID)) {
+						$submitted++;
+					}
+				}
+	
+				if ($submitted) {
+					$arg = 'submitted_count';
+					$sendback = add_query_arg($arg, $submitted, $sendback);
+				}
+
+				break;
+
 			case 'unschedule_revision' :
 				$unscheduled = 0;
 				$is_administrator = current_user_can('administrator');
@@ -219,6 +260,14 @@ function rvy_admin_init() {
 				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
 				add_action( 'wp_loaded', 'rvy_revision_delete' );
 				
+			} elseif ( ! empty($_GET['action']) && ('revise' == $_GET['action']) ) {
+				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
+				add_action( 'wp_loaded', 'rvy_revision_create' );
+
+			} elseif ( ! empty($_GET['action']) && ('submit' == $_GET['action']) ) {
+				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
+				add_action( 'wp_loaded', 'rvy_revision_submit' );
+
 			} elseif ( ! empty($_GET['action']) && ('approve' == $_GET['action']) ) {
 				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
 				add_action( 'wp_loaded', 'rvy_revision_approve' );

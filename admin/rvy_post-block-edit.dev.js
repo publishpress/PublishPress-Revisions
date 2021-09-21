@@ -1,182 +1,11 @@
 /**
-* Block Editor Modifications for Revisionary (Non-restricted Editor)
+* Block Editor Modifications
 *
-* By Kevin Behrens
-*
-* Copyright 2019, PublishPress
+* Copyright 2021, PublishPress
 */
 
 jQuery(document).ready( function($) {
-	/**
-	 *  Redirect back to edit.php if a save operation triggers scheduled revision creation
-	 */
-	$(document).on('click', 'button.editor-post-publish-button,button.editor-post-save-draft', function() {
-		var redirectCheckSaveInterval = setInterval( function() {
-			let saving = wp.data.select('core/editor').isSavingPost();
-
-			if ( saving ) {
-				clearInterval(redirectCheckSaveInterval);
-			
-				var redirectCheckSaveDoneInterval = setInterval( function() {
-					let saving = wp.data.select('core/editor').isSavingPost();
-		
-					if ( ! saving ) {
-						clearInterval(redirectCheckSaveDoneInterval);
-
-						let goodsave = wp.data.select('core/editor').didPostSaveRequestSucceed();
-						if ( goodsave ) {
-                            let savedAsRevision = wp.data.select('core/editor').getCurrentPostAttribute('save_as_revision');
-
-                            if ( savedAsRevision ) {
-                                var redirectProp = 'redirectURLpending';
-                            } else {
-                                let savedScheduledRevision = wp.data.select('core/editor').getCurrentPostAttribute('new_scheduled_revision');
-                                
-                                if ( savedScheduledRevision ) {
-                                    var redirectProp = 'redirectURLscheduled';
-                                }
-                            }
-                            
-                            if (typeof redirectProp != 'undefined') {     
-								if ( typeof rvyObjEdit[redirectProp] != 'undefined' ) {
-									var rurl = rvyObjEdit[redirectProp];
-									var recipients = $('input[name="prev_cc_user[]"]:checked');
-									
-									if ( recipients.length ) {
-										var cc = recipients.map(function() {
-											return $(this).val();
-										}).get().join(',');
-
-										rurl = rurl + '&cc=' + cc;
-									}
-
-									$(location).attr("href", rurl);
-                                }
-                            }
-                        }
-					}
-				}, 50 );
-			}
-		}, 10 );
-	});
-
-	/**
-	 *  If date is set to future, change Publish button caption to "Schedule Revision",
-	 *  Then set a self-interval to refresh that status once the selected date is no longer future.
-	 * 
-	 *  If the selected date is already past, change Publish button back to "Update"
-	 */
-	var RvySelectedFutureDate = false;
-
-	var RvyRefreshPublishButtonCaptionWrapper = function() { RvyRefreshPublishButtonCaption(); }
-
-	var RvyRefreshPublishButtonCaption = function() {
-		var selectedDate = new Date( $('button.edit-post-post-schedule__toggle').html() );
-		var tdiff = selectedDate.getTime() - Date.now();
-
-		let postStatus = wp.data.select('core/editor').getCurrentPostAttribute('status');
-
-		var publishedStatuses = Object.keys(rvyObjEdit.publishedStatuses).map(function (key) { return rvyObjEdit.publishedStatuses[key]; });
-		var isPublished = publishedStatuses.indexOf(postStatus) >= 0;
-
-		if ((tdiff > 1000) && isPublished) {
-			let node = document.querySelector('button.editor-post-publish-button');
-			if (node && !$('input.rvy_save_as_revision:checked').length) {
-				node.innerText = `${rvyObjEdit.ScheduleCaption}`;
-				$('input.rvy_save_as_revision').closest('label').attr('title', rvyObjEdit.revisionTitleFuture);
-			}
-			RvySelectedFutureDate = true;
-			setTimeout(RvyRefreshPublishButtonCaptionWrapper, tdiff + 2000);
-		} else {
-			if ( tdiff <= 0 ) {
-				if ( RvySelectedFutureDate ) { // If button isn't already recaptioned, don't mess with it or even query for it
-					let node = document.querySelector('button.editor-post-publish-button');
-					if (node) {
-						node.innerText = `${rvyObjEdit.UpdateCaption}`;
-						$('input.rvy_save_as_revision').closest('label').attr('title', rvyObjEdit.revisionTitle);
-					}
-				}
-			}
-		}
-	}
-	
-	/**
-	 *  Detect date selection by display, then closure of popup dialog
-	 */
-	var RvyDetectPublishOptionsDivClosureInterval = false;
-	var RvyRefreshPublishButtonCaptionInterval = false;
-	var RvyDetectPublishOptionsDiv = function() {
-		if ( $('div.edit-post-post-schedule__dialog').length ) {
-			clearInterval( RvyDetectPublishOptionsDivInterval );
-			RvyRefreshPublishButtonCaptionInterval = setInterval(RvyRefreshPublishButtonCaption, 500);
-
-			var RvyDetectPublishOptionsClosure = function() {
-				if ( ! $('div.edit-post-post-schedule__dialog').length ) {
-					clearInterval(RvyDetectPublishOptionsDivClosureInterval);
-					clearInterval(RvyRefreshPublishButtonCaptionWrapper);
-					RvyDetectPublishOptionsDivInterval = setInterval(RvyDetectPublishOptionsDiv, 500);
-					RvyRefreshPublishButtonCaption();
-				}
-			}
-			RvyDetectPublishOptionsDivClosureInterval = setInterval(RvyDetectPublishOptionsClosure, 200);
-		}
-	}
-
-	if (rvyObjEdit.ScheduleCaption) {
-    	var RvyDetectPublishOptionsDivInterval = setInterval(RvyDetectPublishOptionsDiv, 500);
-	}
-	
-	// @todo: Don't show Pending Revision checkbox when post is not publish, private or a custom privacy status
-	// @todo: Fix formatting of Pending Revision checkbox when Pre-Publish check is enabled
-    var RvySaveAsRevision = function() {
-		let postStatus = wp.data.select('core/editor').getCurrentPostAttribute('status');
-
-		var revisableStatuses = Object.keys(rvyObjEdit.revisableStatuses).map(function (key) { return rvyObjEdit.revisableStatuses[key]; });
-
-		if (revisableStatuses.indexOf(postStatus) >= 0) {
-			if ($('button.editor-post-publish-panel__toggle:visible').length && !$('div.editor-post-publish-panel:visible').length) {
-				$('#rvy_save_as_revision:visible').parent('label').hide();
-			} else {
-				if (rvyObjEdit.revision && !$('#rvy_save_as_revision:visible').length) {
-					$('#rvy_save_as_revision').parent('label').remove();
-
-					var attribs = rvyObjEdit.defaultPending ? ' checked="checked"' : '';
-					
-					if (rvyObjEdit.defaultPending) {
-						RvyRecaptionElement('button.editor-post-publish-button', rvyObjEdit.SaveCaption);
-					}
-
-					$('button.editor-post-publish-button').last().after('<label style="-webkit-touch-callout: none;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;" title="' + rvyObjEdit.revisionTitle + '"><input type="checkbox" class="rvy_save_as_revision" id="rvy_save_as_revision"' + attribs + '>' + rvyObjEdit.revision + '&nbsp;</label>');
-					$('.editor-post-publish-panel__header-cancel-button').css('margin-bottom', '20px');  /* Pre-publish cancel button alignment when revision submission is enabled for unpublished posts */
-				}
-
-				$('#rvy_save_as_revision').parent('label').last().show();
-			}
-		} else {
-			$('#rvy_save_as_revision').parent('label').remove();
-		}
-	}
-    var RvyRecaptionSaveDraftInterval = setInterval(RvySaveAsRevision, 100);
-	
-	function RvyRecaptionElement(btnSelector, btnCaption) {
-		let node = document.querySelector(btnSelector);
-
-		if (node) {
-			document.querySelector(btnSelector).innerText = `${btnCaption}`;
-		}
-	}
-
-    $(document).on('click', '#rvy_save_as_revision', function(){
-        var data = {'rvy_ajax_field': 'save_as_revision', 'rvy_ajax_value': $(this).prop('checked'), 'post_id': wp.data.select('core/editor').getCurrentPostId()};
-        $.ajax({url: rvyObjEdit.ajaxurl, data: data, dataType: "html", success: function(){}, error: function(){}});
-
-        if($(this).prop('checked')) {
-            RvyRecaptionElement('button.editor-post-publish-button', rvyObjEdit.SaveCaption);
-        } else {
-            RvyRecaptionElement('button.editor-post-publish-button', rvyObjEdit.UpdateCaption);
-        }
-	});
-	
+	// Add links for Pending and / or Scheduled Revisions diff screens
 	if (rvyObjEdit.scheduledRevisionsURL || rvyObjEdit.pendingRevisionsURL) {
 		var RvyPendingRevPanel = function() {
 			var ediv = 'div.edit-post-sidebar ';
@@ -193,6 +22,209 @@ jQuery(document).ready( function($) {
 
 			$('div.edit-post-last-revision__panel').css('height', 'inherit');
 		}
-		var RvyPendingRevPanelInt = setInterval(RvyPendingRevPanel, 200);
+		setInterval(RvyPendingRevPanel, 200);
 	}
+
+	var rvyIsPublished = false;
+
+	var RvySubmissionUI = function() {
+		if (rvyObjEdit.ajaxurl && !$('button.revision-approve').length) {
+			
+			var html = '<div class="rvy-creation-ui"><a href="javascript:void(0)" class="revision-approve" title="' 
+			+ rvyObjEdit.actionTitle + '"><button type="button" class="components-button revision-approve revision-create is-button is-default is-large">' 
+			+ rvyObjEdit.actionCaption + '</button></a>'
+			
+			+ '<button type="button" class="components-button revision-approve revision-created is-button is-default is-large" style="display: none">' 
+			+ '<span class="revision-approve revision-created">'
+			+ rvyObjEdit.completedCaption + '</span> '
+
+			+ '<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">' 
+			+ rvyObjEdit.completedLinkCaption + '</a></button>';
+			
+			if (rvyObjEdit.scheduleCaption) {
+				let postStatus = wp.data.select('core/editor').getCurrentPostAttribute('status');
+				var publishedStatuses = Object.keys(rvyObjEdit.publishedStatuses).map(function (key) { return rvyObjEdit.publishedStatuses[key]; });
+				rvyIsPublished = publishedStatuses.indexOf(postStatus) >= 0;
+
+				if (rvyIsPublished) {
+					html += '<a href="javascript:void(0)" style="display: none" class="revision-approve revision-schedule" title="' 
+					+ rvyObjEdit.scheduleTitle + '"><button type="button" class="components-button revision-approve revision-schedule is-button is-default is-large">' 
+					+ rvyObjEdit.scheduleCaption + '</button></a>'
+					
+					+ '<button type="button" class="components-button revision-approve revision-scheduled is-button is-default is-large" style="display: none">' 
+					+ '<span class="revision-approve revision-scheduled">'
+					+ rvyObjEdit.scheduledCaption + '</span> '
+
+					+ '<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">' 
+					+ rvyObjEdit.scheduledLinkCaption + '</a></button>';
+				}
+			}
+
+			html += '</div>';
+			
+			$('div.edit-post-post-schedule').after(html);
+
+			if (rvyCreationDisabled) {
+				$('button.revision-approve').prop('disabled', 'disabled');
+				$('button.revision-schedule').prop('disabled', 'disabled');
+				$('a.revision-approve').attr('title', rvyObjEdit.actionDisabledTitle);
+				$('a.revision-schedule').attr('title', rvyObjEdit.scheduleDisabledTitle);
+			} else {
+				$('button.revision-approve').prop('disabled', false);
+				$('button.revision-schedule').prop('disabled', false);
+				$('a.revision-approve').attr('title', rvyObjEdit.actionTitle);
+				$('a.revision-schedule').attr('title', rvyObjEdit.scheduleTitle);
+			}
+		}
+	}
+	var RvyUIInterval = setInterval(RvySubmissionUI, 200);
+
+	function RvyGetRandomInt(max) {
+		return Math.floor(Math.random() * max);
+	}
+
+	var rvyCreationDisabled = false;
+
+	$(document).on('click', 'div.postbox-container', function() {
+		rvyCreationDisabled = true;
+		$('button.revision-approve').prop('disabled', 'disabled');
+		$('button.revision-schedule').prop('disabled', 'disabled');
+		$('a.revision-approve').attr('title', rvyObjEdit.actionDisabledTitle);
+		$('a.revision-schedule').attr('title', rvyObjEdit.scheduleDisabledTitle);
+	});
+
+	$(document).on('click', 'button.editor-post-publish-button', function() {
+		rvyCreationDisabled = false;
+		$('button.revision-approve').prop('disabled', false);
+		$('button.revision-schedule').prop('disabled', false);
+		$('a.revision-approve').attr('title', rvyObjEdit.actionTitle);
+		$('a.revision-schedule').attr('title', rvyObjEdit.scheduleTitle);
+	});
+
+	$(document).on('click', 'button.revision-create', function() {
+		if ($('a.revision-create').attr('disabled')) {
+			return;
+		}
+
+		var revisionaryCreateDone = function () {
+			$('.revision-create').hide();
+			$('.revision-created').show();
+
+			$('button.revision-created a').attr('href', rvyObjEdit.completedURL);
+		}
+
+		var revisionaryCreateError = function (data, txtStatus) {
+			$('div.rvy-creation-ui').html(rvyObjEdit.errorCaption);
+		}
+
+		var data = {'rvy_ajax_field': 'create_revision', 'rvy_ajax_value': wp.data.select('core/editor').getCurrentPostId(), 'rvy_date_selection': RvyTimeSelection, 'nc': RvyGetRandomInt(99999999)};
+
+		$.ajax({
+			url: rvyObjEdit.ajaxurl,
+			data: data,
+			dataType: "html",
+			success: revisionaryCreateDone,
+			error: revisionaryCreateError
+		});
+	});
+
+	$(document).on('click', 'button.revision-schedule', function() {
+		if ($('a.revision-schedule').attr('disabled')) {
+			return;
+		}
+
+		var revisionaryScheduleDone = function () {
+			$('.revision-schedule').hide();
+			$('.revision-scheduled').show();
+
+			$('button.revision-scheduled a').attr('href', rvyObjEdit.scheduledURL);
+		}
+
+		var revisionaryScheduleError = function (data, txtStatus) {
+			$('div.rvy-creation-ui').html(rvyObjEdit.errorCaption);
+		}
+
+		var data = {'rvy_ajax_field': 'create_scheduled_revision', 'rvy_ajax_value': wp.data.select('core/editor').getCurrentPostId(), 'rvy_date_selection': RvyTimeSelection, 'nc': RvyGetRandomInt(99999999)};
+
+		$.ajax({
+			url: rvyObjEdit.ajaxurl,
+			data: data,
+			dataType: "html",
+			success: revisionaryScheduleDone,
+			error: revisionaryScheduleError
+		});
+	});
+
+	/**
+	 *  If date is set to future, change Publish button caption to "Schedule Revision",
+	 *  Then set a self-interval to refresh that status once the selected date is no longer future.
+	 * 
+	 *  If the selected date is already past, change Publish button back to "Update"
+	 */
+	var RvySelectedFutureDate = false;
+	var RvyTimeSelection = '';
+
+	var RvyRefreshScheduleButton = function() {
+		var selectedDateHTML = $('button.edit-post-post-schedule__toggle').html();
+
+		if (! /\d/.test(selectedDateHTML) || !rvyIsPublished) {
+			RvyTimeSelection = '';
+			$('.rvy-creation-ui .revision-schedule').hide();
+			$('.rvy-creation-ui .revision-scheduled').hide();
+			$('.rvy-creation-ui .revision-created').hide();
+			$('.rvy-creation-ui .revision-create').show();
+			return;
+		}
+
+		var selectedDate = new Date( selectedDateHTML );
+		
+
+		RvyTimeSelection = selectedDate.getTime();
+		var tdiff = RvyTimeSelection - Date.now();
+
+		RvyTimeSelection = RvyTimeSelection / 1000; // pass seconds to server
+
+		if ((tdiff > 1000)) {
+			RvySelectedFutureDate = true;
+
+			$('.rvy-creation-ui .revision-create').hide();
+			$('.rvy-creation-ui .revision-created').hide();
+			$('.rvy-creation-ui .revision-scheduled').hide();
+			$('.rvy-creation-ui .revision-schedule').show();
+
+		} else {
+			$('.rvy-creation-ui .revision-schedule').hide();
+			$('.rvy-creation-ui .revision-scheduled').hide();
+			$('.rvy-creation-ui .revision-created').hide();
+			$('.rvy-creation-ui .revision-create').show();
+
+			if ( tdiff <= 0 ) {
+				if ( RvySelectedFutureDate ) { // If button isn't already recaptioned, don't mess with it or even query for it
+					RvyTimeSelection = '';
+				}
+			}
+		}
+	}
+
+	/**
+	 *  Detect date selection by display, then closure of popup dialog
+	 */
+	var RvyDetectPublishOptionsDivClosureInterval = false;
+	var RvyDetectPublishOptionsDiv = function() {
+		if ( $('div.edit-post-post-schedule__dialog').length ) {
+			clearInterval( RvyDetectPublishOptionsDivInterval );
+
+			var RvyDetectPublishOptionsClosure = function() {
+				if ( ! $('div.edit-post-post-schedule__dialog').length ) {
+					clearInterval(RvyDetectPublishOptionsDivClosureInterval);
+					RvyDetectPublishOptionsDivInterval = setInterval(RvyDetectPublishOptionsDiv, 500);
+
+					RvyRefreshScheduleButton();
+				}
+			}
+			RvyDetectPublishOptionsDivClosureInterval = setInterval(RvyDetectPublishOptionsClosure, 200);
+		}
+	}
+
+    var RvyDetectPublishOptionsDivInterval = setInterval(RvyDetectPublishOptionsDiv, 500);
 });
