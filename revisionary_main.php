@@ -833,19 +833,4 @@ class Revisionary
 
 		return $count;
 	}
-
-
-	function flt_custom_permalinks_query($query) {
-		global $wpdb;
-
-		if (strpos($query, " WHERE pm.meta_key = 'custom_permalink' ") && strpos($query, "$wpdb->posts AS p")) {
-			$query = str_replace(
-				" ORDER BY FIELD(",
-				" AND p.post_status NOT IN ('pending-revision', 'future-revision') ORDER BY FIELD(",
-				$query
-			);
-		}
-
-		return $query;
-	}
 } // end Revisionary class
