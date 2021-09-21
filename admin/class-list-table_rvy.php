@@ -319,7 +319,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		if (empty($args['suppress_author_clause'])) {
-			$status_csv = "'" . implode("','", rvy_filtered_statuses()) . "'";
+			$status_csv = rvy_filtered_statuses(['return' => 'csv']);
 			$where_append .= " AND $p.comment_count IN (SELECT ID FROM $wpdb->posts WHERE post_status IN ($status_csv))";
 		}
 
@@ -746,7 +746,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			['has_cap_check' => true, 'source_alias' => 'p']
 		);
 
-		$status_csv = "'" . implode("','", rvy_filtered_statuses()) . "'";
+		$status_csv = rvy_filtered_statuses(['return' => 'csv']);
 		$count_query .= " AND p.post_status IN ($status_csv)";
 
 		// work around some versions of PressPermit inserting non-aliased post_type reference into where clause under some configurations
