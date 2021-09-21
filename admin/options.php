@@ -116,7 +116,6 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'revisor_lock_others_revisions' =>			__("Editing others&apos; revisions requires role capability", 'revisionary'),
 	'revisor_hide_others_revisions' => 			__("Listing others&apos; revisions requires role capability", 'revisionary'),
 	'queue_query_all_posts' => 					__('Compatibility Mode', 'revisionary'),
-	'revision_update_redirect' =>				__('Confirmation redirect on Revision Update', 'revisionary'),
 	'revision_update_notifications' =>			__('Also notify on Revision Update', 'revisionary'),
 	'trigger_post_update_actions' => 			__('Revision Publication: API actions to mimic Post Update', 'revisionary'),
 	'diff_display_strip_tags' => 				__('Hide html tags on Compare Revisions screen', 'revisionary'),
@@ -164,7 +163,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'queue_query_all_posts'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'],
 	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'display_hints'],
-	'notification'	=>		 ['pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_redirect', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
+	'notification'	=>		 ['pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 ]
 ]);
 
@@ -613,9 +612,6 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			}
 
 			$hint = '';
-			$this->option_checkbox( 'revision_update_redirect', $tab, $section, $hint, '' );
-
-			$hint = '';
 			$this->option_checkbox( 'pending_rev_notify_revisor', $tab, $section, $hint, '' );
 			
 			echo '<br />';
@@ -648,6 +644,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		
 		if( $pending_revisions_available ) {
 			if ( in_array( 'pending_rev_notify_admin', $this->form_options[$tab][$section] ) || in_array( 'pending_rev_notify_author', $this->form_options[$tab][$section] ) ) {
+				/*  // @todo: PublishPress Notifications integration
 				if ( $this->display_hints ) {
 					echo '<div class="rs-subtext">';
 					if ( defined('RVY_CONTENT_ROLES') )
@@ -656,6 +653,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 						printf( __('Note: "by default" means Change Request creators can customize email notification recipients before submitting.  For more flexibility in moderation and notification, install the %1$s PublishPress Permissions Pro%2$s plugin.', 'revisionary'), "<a href='https://publishpress.com/presspermit/'>", '</a>' );
 					echo '</div>';
 				}
+				*/
 			}
 		}
 
