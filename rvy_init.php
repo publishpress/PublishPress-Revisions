@@ -1065,6 +1065,10 @@ function rvy_is_post_author($post, $user = false) {
 }
 
 function rvy_preview_url($revision, $args = []) {
+	if (is_scalar($revision)) {
+		$revision = get_post($revision);
+	}
+	
 	$defaults = ['post_type' => $revision->post_type];  // support preview url for past revisions, which are stored with post_type = 'revision'
 	foreach(array_keys($defaults) as $var) {
 		$$var = (!empty($args[$var])) ? $args[$var] : $defaults[$var]; 
@@ -1116,7 +1120,7 @@ function rvy_preview_url($revision, $args = []) {
 	}
 
 	if (!defined('REVISIONARY_PREVIEW_NO_CACHEBUST')) {
-		$preview_url = add_query_arg('nc', substr(md5(rand()), 1, 8), $preview_url);
+		$preview_url = rvy_nc_url($preview_url);
 	}
 
 	return apply_filters('revisionary_preview_url', $preview_url, $revision, $args);
