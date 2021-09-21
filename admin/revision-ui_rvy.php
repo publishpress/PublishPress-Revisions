@@ -213,13 +213,13 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 	
 	foreach ( $revisions as $revision ) {
 		if ( $status && ( $status != $revision->post_status ) ) 		 // support arg to display only past / pending / future revisions
-			if ( ('revision' == $revision->post_type) || rvy_is_revision_status($revision->post_status) )  // but always display current rev
+			if ( ('revision' == $revision->post_type) || rvy_in_revision_workflow($revision) )  // but always display current rev
 				continue;
 		
 		if ( 'revision' === $type && wp_is_post_autosave( $revision ) )
 			continue;
 			
-		if ( $hide_others_revisions && ( ( 'revision' == $revision->post_type ) || rvy_is_revision_status($revision->post_status) ) && !rvy_is_post_author($revision) )
+		if ( $hide_others_revisions && ( ( 'revision' == $revision->post_type ) || rvy_in_revision_workflow($revision) ) && !rvy_is_post_author($revision) )
 			continue;
 		
 		// todo: set up buffering to restore this in case we (or some other plugin) impose revision-specific read capability
