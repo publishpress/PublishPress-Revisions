@@ -17,9 +17,7 @@ define ('RVY_URLPATH', plugins_url('', REVISIONARY_FILE));
 class RevisionaryAdmin
 {
 	var $revision_save_in_progress;
-	private $post_revision_count = array();
 	private $hide_quickedit = array();
-	private $trashed_revisions;
 
 	function __construct() {
 		global $pagenow, $post;
@@ -129,20 +127,10 @@ class RevisionaryAdmin
 			}
 			
 			add_filter( 'get_post_time', array(&$this, 'flt_get_post_time'), 10, 3 );
-
-			if ( ! empty( $_REQUEST['revision_action'] ) ) {
-				add_action( 'all_admin_notices', array( &$this, 'revision_action_notice' ) );
-			}
 		}
 
 		add_action( 'post_submitbox_start', array( &$this, 'pending_rev_checkbox' ) );
 		add_action( 'post_submitbox_misc_actions', array( &$this, 'publish_metabox_time_display' ) );
-
-		add_action('admin_enqueue_scripts', [$this, 'fltAdminPostsListing'], 50);  // 'the_posts' filter is not applied on edit.php for hierarchical types
-
-		add_filter('display_post_states', [$this, 'flt_display_post_states'], 50, 2);
-		add_filter( 'page_row_actions', array($this, 'revisions_row_action_link' ) );
-		add_filter( 'post_row_actions', array($this, 'revisions_row_action_link' ) );
 
 		if (!empty($_REQUEST['post_status']) && ('trash' == $_REQUEST['post_status'])) {
 			add_filter('display_post_states', [$this, 'fltTrashedPostState'], 20, 2 );
@@ -215,170 +203,6 @@ class RevisionaryAdmin
 	public function cmstpv_compat_get_posts($wp_query) {
 		$wp_query->query['post_mime_type'] = '';
 		$wp_query->query_vars['post_mime_type'] = '';
-	}
-
-	public function fltAdminPostsListing() {
-		global $wpdb, $wp_query, $typenow;
-
-		$listed_ids = array();
-
-		if ( ! empty( $wp_query->posts ) ) {
-			foreach ($wp_query->posts as $row) {
-				$listed_ids[] = $row->ID;
-			}	
-		}
-
-		if ($listed_ids) {
-			$id_csv = implode("','", array_map('intval', $listed_ids));
-			$results = $wpdb->get_results(
-				"SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN('$id_csv') AND post_status IN ('pending-revision', 'future-revision') GROUP BY comment_count"
-			);
-			
-			foreach($results as $row) {
-				$this->post_revision_count[$row->published_post] = $row->num_revisions;
-			}
-		}
-
-		static $can_edit_published;
-		static $can_edit_others;
-		static $listed_post_statuses;
-
-		if (is_null($can_edit_others) && ! empty( $wp_query->posts ) ) {
-			if (!$type_obj = get_post_type_object($typenow)) {
-				$limit_quickedit = false;
-				return;
-			}
-	
-			$can_edit_others = agp_user_can($type_obj->cap->edit_others_posts, 0, '', ['skip_revision_allowance' => true]);
-
-			$can_edit_published = isset($type_obj->cap->edit_published_posts) && agp_user_can($type_obj->cap->edit_published_posts, 0, '', ['skip_revision_allowance' => true]);
-			
-			if (!$can_edit_others || !$can_edit_published) {
-				$listed_post_statuses = array();
-				$ids = array();
-				foreach ($wp_query->posts as $row) {
-					$ids []= $row->ID;
-				}
-
-				$id_csv = implode("','", array_map('intval', $ids));
-				$results = $wpdb->get_results("SELECT ID, post_status FROM $wpdb->posts WHERE ID IN ('$id_csv')");
-				foreach($results as $row ) {
-					$listed_post_statuses[$row->ID] = $row->post_status;
-				}
-			}
-		}
-		
-		if ($can_edit_others && $can_edit_published) {
-			return;
-		}
-
-		if (!empty($wp_query->posts)) {
-			foreach ($wp_query->posts as $row) {
-				if (in_array($listed_post_statuses[$row->ID], rvy_filtered_statuses())) {
-					// @todo: better cap check precision for filter-applied statuses
-					if (!$can_edit_published || (!$can_edit_others && !rvy_is_post_author($row))) {
-						$this->hide_quickedit []= $row->ID;
-					}
-				}
-			}
-		}
-	}
-
-	private function logTrashedRevisions() {
-		global $wpdb, $wp_query;
-			
-		if (!empty($wp_query) && !empty($wp_query->posts)) {
-			$listed_ids = [];
-			
-			foreach($wp_query->posts AS $row) {
-				$listed_ids []= $row->ID;
-			}
-
-			$listed_post_csv = implode("','", array_map('intval', $listed_ids));
-			$this->trashed_revisions = $wpdb->get_col("SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_base_post_id' AND post_id IN ('$listed_post_csv')");
-		} else {
-			$this->trashed_revisions = [];
-		}
-	}
-
-	/**
-	 * Adds "Pending Revision" or "Scheduled Revision" to the list of display states for trashed revisions in the Posts list table.
-	 *
-	 * @param array   $post_states An array of post display states.
-	 * @param WP_Post $post        The current post object.
-	 * @return array Filtered array of post display states.
-	 */
-	public function fltTrashedPostState($post_states, $post) {
-		if (!$post->comment_count) { // revisions buffer base post id to comment_count column for perf
-			return $post_states;
-		}
-
-		if (!isset($this->trashed_revisions)) {
-			$this->logTrashedRevisions();
-		}
-
-		if (in_array($post->ID, $this->trashed_revisions)) {		
-			if ($orig_revision_status = get_post_meta($post->ID, '_wp_trash_meta_status', true)) {
-				if ($status_obj = get_post_status_object($orig_revision_status)) {
-					$post_states['rvy_revision'] = $status_obj->label;
-				}
-			}
-
-			if (!isset($post_states['rvy_revision'])) {
-				$post_states['rvy_revision'] = __('Pending Revision', 'revisionary');
-			}
-		}
-
-		return $post_states;
-	}
-
-	function fltCommentsNumber($comment_count, $post_id) {
-		if (isset($this->trashed_revisions) && in_array($post_id, $this->trashed_revisions)) {
-			$comment_count = 0;
-		}
-
-		return $comment_count;
-	}
-
-	function flt_display_post_states($post_states, $post) {
-		if (!empty($this->post_revision_count[$post->ID]) && !defined('REVISIONARY_SUPPRESS_POST_STATE_DISPLAY')) {
-			$post_states []= __('Has Revision', 'revisionary');
-		}
-
-		return $post_states;
-	}
-
-	function revisions_row_action_link($actions = array()) {
-		global $post;
-
-		if (empty($this->post_revision_count[$post->ID])) {
-			return $actions;
-		}
-
-		if ( 'trash' != $post->post_status && current_user_can( 'edit_post', $post->ID ) && wp_check_post_lock( $post->ID ) === false ) {
-			$actions['revision_queue'] = "<a href='admin.php?page=revisionary-q&published_post=$post->ID'>" . __('Revision Queue', 'revisionary') . '</a>';
-		}
-
-		return $actions;
-	}
-
-	function revision_action_notice() {
-			if ( ! empty($_GET['restored_post'] ) ) {
-				$msg = __('The revision was restored.', 'revisionary');
-				
-			} elseif ( ! empty($_GET['scheduled'] ) ) {
-				$msg = __('The revision was scheduled for publication.', 'revisionary');
-		
-			} elseif ( ! empty($_GET['published_post'] ) ) {
-				$msg = __('The revision was published.', 'revisionary');
-			} else {
-				return;
-			}
-
-			?>
-			<div class='updated'><?php echo $msg ?>
-			</div>
-			<?php	
 	}
 
 	function flt_dashboard_recent_posts_query_args( $query_args ) {

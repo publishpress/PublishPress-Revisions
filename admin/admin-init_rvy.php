@@ -28,6 +28,9 @@ function _rvy_post_edit_ui() {
 		if ($revisionary->isBlockEditorActive()) {
 			require_once( dirname(__FILE__).'/post-edit-block-ui_rvy.php' );
 		}
+	} elseif ('edit.php' == $pagenow) {
+		require_once( dirname(__FILE__).'/admin-posts_rvy.php' );
+		new RevisionaryAdminPosts();
 	}
 }
 
