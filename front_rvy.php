@@ -359,14 +359,12 @@ class RevisionaryFront {
 
 				add_action('wp_enqueue_scripts', [$this, 'rvyEnqueuePreviewJS']);
 
-				if (!defined('REVISIONARY_PREVIEW_BAR_RELATIVE')) {
+				if (apply_filters('revisionary_admin_bar_absolute', !defined('REVISIONARY_PREVIEW_BAR_RELATIVE'))) {
 					add_action('wp_print_footer_scripts', [$this, 'rvyPreviewJS'], 50);
 				}
 
-				$html = '<div class="rvy_view_revision rvy_view_' . $class . '">' .
-						'<span class="rvy_preview_msgspan">' . $message . '</span>';
-
-				$html .= '</div>';
+				$html = '<div id="pp_revisions_top_bar" class="rvy_view_revision rvy_view_' . $class . '">' .
+						'<span class="rvy_preview_msgspan">' . $message . '</span></div>';
 
 				new RvyScheduledHtml( $html, 'wp_head', 99 );  // this should be inserted at the top of <body> instead, but currently no way to do it 
 			}
