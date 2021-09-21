@@ -6,6 +6,9 @@ if (defined('REVISIONARY_FILE')) {
 	define('RVY_NETWORK', awp_is_mu() && rvy_plugin_active_for_network(plugin_basename(REVISIONARY_FILE)));
 }
 
+require_once(dirname(__FILE__).'/functions.php');
+require_once(dirname(__FILE__).'/utils.php');
+
 add_action('init', 'rvy_status_registrations', 40);
 
 add_action( 'rest_api_init', array( 'RVY_RestAPI', 'register_scheduled_rev_meta_field' ) );

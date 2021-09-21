@@ -25,7 +25,7 @@ function _rvy_post_edit_ui() {
 			$revisionary->post_edit_ui = new RvyPostEdit();
 		}
 
-		if ($revisionary->isBlockEditorActive()) {
+		if (\PublishPress\Revisions\Utils::isBlockEditorActive()) {
 			require_once( dirname(__FILE__).'/post-edit-block-ui_rvy.php' );
 		}
 	} elseif ('edit.php' == $pagenow) {
