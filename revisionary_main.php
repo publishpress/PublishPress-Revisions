@@ -532,16 +532,7 @@ class Revisionary
 
 		$revision = $this->get_last_revision($published_post_id, $current_user->ID);
 
-		$usec = 0;
-		$delay = 50 * 1000;
-		$limit = 15 * 1000 * 1000;
-		while ((!$revision || ($revision->ID <= $last_user_revision_id)) && ($usec < $limit)) {
-			usleep($delay);
-			$revision = $this->get_last_revision($published_post_id, $current_user->ID);
-			$usec = $usec + $delay;
-		}
-
-		if ($revision && ($usec < $limit)) {
+		if ($revision) {
 			$preview_link = rvy_preview_url($revision);
 			wp_redirect($preview_link);
 			exit;
