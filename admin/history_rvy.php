@@ -62,8 +62,6 @@ class RevisionaryHistory
     public function actLoadRevision() {
         global $wpdb, $post;
 
-        //wp_reset_vars( array( 'revision', 'action', 'from', 'to' ) );
-
         if (!empty($_REQUEST['revision']) && is_scalar($_REQUEST['revision']) && !empty($_REQUEST['post_id']) && !is_numeric($_REQUEST['revision']) && rvy_is_revision_status(sanitize_key($_REQUEST['revision']))) {
             $revision_status = sanitize_key($_REQUEST['revision']);
             
@@ -78,8 +76,8 @@ class RevisionaryHistory
             $revision_id = (isset($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : '';
         }
 
-        $from = (isset($_REQUEST['from'])) ? (int) $_REQUEST['from'] : ''; // absint( $from );
-        $to = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : ''; // absint( $to );
+        $from = (isset($_REQUEST['from'])) ? (int) $_REQUEST['from'] : '';
+        $to = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : '';
 
         $from = is_numeric( $from ) ? absint( $from ) : null;
         if ( ! $revision_id ) {
@@ -166,18 +164,6 @@ class RevisionaryHistory
         do_action('rvy_compare_revisions');
 
         require ABSPATH . 'wp-admin/includes/revision.php';
-
-        /*
-        // Empty post_type means either malformed object found, or no valid parent was found.
-        if ( ! $redirect && empty( $post->post_type ) ) {
-            $redirect = 'edit.php';
-        }
-
-        if ( ! empty( $redirect ) ) {
-            wp_redirect( $redirect );
-            exit;
-        }
-        */
 
         // This is so that the correct "Edit" menu item is selected.
         if ( ! empty( $published_post->post_type ) && 'post' != $published_post->post_type ) {
@@ -350,37 +336,9 @@ class RevisionaryHistory
             return;
         }
 
-        // prime cache
-        //$revisions = wp_get_post_revisions( $post->ID, array( 'check_enabled' => false ) );
-    
         $return = array();
         @set_time_limit( 0 );
         
-        /*
-        foreach ( $_REQUEST['compare'] as $compare_key ) {
-            list( $compare_from, $compare_to ) = explode( ':', $compare_key ); // from:to
-
-            $return[] = array(
-                'id'     => $compare_key,
-                'fields' => $this->getRevisionUIDiff( $post, $compare_from, $compare_to ),
-            );
-
-            foreach($rvy_revisions as $rvy_revision) {
-                if ($compare_from && $compare_from != $rvy_revision->ID) {
-                    $return[] = array(
-                        'id'     => "{$compare_from}:{$rvy_revision->ID}",
-                        'fields' => $this->getRevisionUIDiff( $post, $compare_from, $rvy_revision->ID ),
-                    );
-
-                    $return[] = array(
-                        'id'     => "{$rvy_revision->ID}:{$compare_from}",
-                        'fields' => $this->getRevisionUIDiff( $post, $rvy_revision->ID, $compare_from ),
-                    );
-                }
-            }
-        }
-        */
-
         $current_revision_id  = $post->ID;
 
         $return[] = [

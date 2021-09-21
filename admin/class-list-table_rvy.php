@@ -178,8 +178,6 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$wp_query->posts = [true];
 		}
 
-		//echo($wp_query->request);
-
 		remove_filter('presspermit_posts_clauses_intercept', [$this, 'flt_presspermit_posts_clauses_intercept'], 10, 4);
 		remove_filter($filter_name, [$this, 'revisions_filter'], 5, 2);
 		remove_filter($filter_name, [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
@@ -686,7 +684,6 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 	/**
 	 *
-	 * @global array $locked_post_status This seems to be deprecated.
 	 * @return array
 	 */
 	protected function get_views() {
@@ -776,7 +773,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 			if (!empty($num_posts->$status)) {
 				$status_obj = get_post_status_object($status);
-				
+
 				$status_label = $status_obj ? sprintf(
 					translate_nooped_plural( $status_obj->label_count, $num_posts->$status ),
 					number_format_i18n( $num_posts->$status )
@@ -1022,16 +1019,6 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					// use post status and post type column headers to reset filter, but not for sorting
 					$_url = remove_query_arg($orderby, $current_url);
 					
-					/*
-					if (!empty($_REQUEST['post_status']) && ('future-revision' == $_REQUEST['post_status'])) {
-						$order = 'ASC';
-						$orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array('post_type', 'post_status'))) ?  : 'date_sched';
-					} else {
-						$order = 'DESC';
-						$orderby = 'date';
-					}
-					*/
-
 					$column_display_name = '<a href="' . esc_url($_url) . '"><span>' . $column_display_name . '</span><span class="sorting-indicator"></span></a>';
 				} else {
 					$column_display_name = '<a href="' . esc_url( add_query_arg( compact( 'orderby', 'order' ), $current_url ) ) . '"><span>' . $column_display_name . '</span><span class="sorting-indicator"></span></a>';

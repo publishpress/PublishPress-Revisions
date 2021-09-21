@@ -161,7 +161,7 @@ function rvy_post_revision_title( $revision, $link = true, $date_field = 'post_d
 function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 	if ( !$post = get_post( $post_id ) )
 		return;
-	
+
 	$defaults = array( 'parent' => false, 'right' => false, 'left' => false, 'format' => 'list', 'type' => 'all', 'echo' => true, 'date_field' => '', 'current_id' => 0 );
 	$args = wp_parse_args( $args, $defaults );
 
