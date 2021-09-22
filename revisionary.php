@@ -132,6 +132,8 @@ register_activation_hook(__FILE__, function()
 
 register_deactivation_hook(__FILE__, function()
 	{
+		global $wpdb;
+
 		// convert pending / scheduled revisions to v2.x format, which also prevents them from being listed as regular drafts / pending posts
 		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
 		$wpdb->query("UPDATE $wpdb->posts SET post_status = post_mime_type WHERE post_mime_type IN ($revision_status_csv)");
