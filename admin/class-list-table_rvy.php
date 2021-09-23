@@ -198,7 +198,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	function pre_query_where_filter($where, $args = []) {
 		global $wpdb, $current_user, $revisionary;
 		
-		if (!current_user_can('administrator') && empty($args['suppress_author_clause']) && (!defined('PRESSPERMIT_COLLAB_VERSION') || defined('PRESSPERMIT_EXTRA_REVISION_QUEUE_FILTER'))) {
+		if (!current_user_can('administrator') && empty($args['suppress_author_clause'])) { //} && (!defined('PRESSPERMIT_COLLAB_VERSION') || defined('PRESSPERMIT_EXTRA_REVISION_QUEUE_FILTER'))) {
 			$p = (!empty($args['alias'])) ? $args['alias'] : $wpdb->posts;
 
 			$can_edit_others_types = [];
@@ -660,7 +660,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$query = "SELECT post_mime_type, COUNT( * ) AS num_posts FROM {$wpdb->posts} WHERE $where";
 		$query .= ' GROUP BY post_mime_type';
 
-		$query = apply_filters('presspermit_posts_request', $query, ['has_cap_check' => true]);  // has_cap_check argument triggers inclusion of revision statuses
+		// @todo: review Permissions integration for revision count filtering
+		//$query = apply_filters('presspermit_posts_request', $query, ['has_cap_check' => true]);  // has_cap_check argument triggers inclusion of revision statuses
 
 		$results = (array) $wpdb->get_results( $query, ARRAY_A );
 	
@@ -1167,20 +1168,21 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					);
 				}
 			}
-
-			//if ( current_user_can( 'read_post', $post->ID ) ) { // @todo make this work for Author with Revision exceptions
-			if ( $can_read_post || $can_edit_post ) {  
-				$actions['diff'] = sprintf(
-					'<a href="%1$s" class="" title="%2$s" aria-label="%2$s" target="_revision_diff">%3$s</a>',
-					admin_url("revision.php?revision=$post->ID"),
-					/* translators: %s: post title */
-					esc_attr( sprintf( __('Compare Changes', 'revisionary'), $title ) ),
-					_x('Compare', 'revisions', 'revisionary')
-				);
-			}
-
-			$actions = apply_filters('revisionary_queue_row_actions', $actions, $post);
 		}
+
+		//if ( current_user_can( 'read_post', $post->ID ) ) { // @todo make this work for Author with Revision exceptions
+		if ( $can_read_post || $can_edit_post ) {  
+			$actions['diff'] = sprintf(
+				'<a href="%1$s" class="" title="%2$s" aria-label="%2$s" target="_revision_diff">%3$s</a>',
+				admin_url("revision.php?revision=$post->ID"),
+				/* translators: %s: post title */
+				esc_attr( sprintf( __('Compare Changes', 'revisionary'), $title ) ),
+				_x('Compare', 'revisions', 'revisionary')
+			);
+		}
+
+		$actions = apply_filters('revisionary_queue_row_actions', $actions, $post);
+
 
 		return $this->row_actions( $actions );
 	}

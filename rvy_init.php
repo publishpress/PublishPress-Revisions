@@ -223,7 +223,7 @@ function rvy_delete_post_meta($post_id, $meta_key) {
 function rvy_status_registrations() {
 	register_post_status('draft-revision', array(
 		'label' => __('Working Copy', 'revisionary'),
-		'labels' => (object)['publish' => __('Publish Revision', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Working Copies', 'revisionary'), 'short' => __('Draft', 'revisionary') ],
+		'labels' => (object)['publish' => __('Publish Changes', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Working Copies', 'revisionary'), 'short' => __('Draft', 'revisionary') ],
 		'protected' => true,
 		'internal' => true,
 		'label_count' => _n_noop('Working Copies <span class="count">(%s)</span>', 'Working Copies <span class="count">(%s)</span>'),  // @todo: confirm API will support a fixed string

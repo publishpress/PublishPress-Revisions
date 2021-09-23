@@ -418,14 +418,19 @@ function rvy_revision_approve($revision_id = 0) {
 			}
 		}
 
-		if ( empty( $_REQUEST['rvy_redirect'] ) && ! $scheduled ) {
+		$type_obj = get_post_type_object($post->post_type);
+
+		if ( empty( $_REQUEST['rvy_redirect'] ) && ! $scheduled && is_post_type_viewable($type_obj) ) {
 			$redirect = $published_url;
 		} elseif ( !empty($_REQUEST['rvy_redirect']) && 'edit' == $_REQUEST['rvy_redirect'] ) {
 			$redirect = add_query_arg( $last_arg, "post.php?post=$revision_id&action=edit" );
-		} else {
-			$redirect = rvy_preview_url($revision, ['post_type' => $post->post_type]);
-		}
 
+		} elseif (is_post_type_viewable($type_obj)) {
+			$redirect = rvy_preview_url($revision, ['post_type' => $post->post_type]);
+		} else {
+			$redirect = admin_url("post.php?post={$post->ID}&action=edit");
+		}
+		
 	} while (0);
 	
 	if (!empty($update_next_publish_date)) {
