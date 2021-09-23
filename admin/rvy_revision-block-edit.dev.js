@@ -245,7 +245,7 @@ jQuery(document).ready( function($) {
 
 			if (rvyObjEdit.viewURL) {
 				original = $('div.edit-post-header__settings a.editor-post-preview');
-				$(original).after(original.clone().attr('href', rvyObjEdit.viewURL).attr('target', '_blank').removeClass('editor-post-preview').addClass('rvy-post-preview'));
+				$(original).after(original.clone().attr('href', rvyObjEdit.viewURL).attr('target', '_blank').removeClass('editor-post-preview is-tertiary').addClass('rvy-post-preview is-secondary'));
 				$(original).hide();
 
 				if (rvyObjEdit.multiPreviewActive) {

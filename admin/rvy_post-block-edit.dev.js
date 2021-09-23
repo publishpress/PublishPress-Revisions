@@ -29,39 +29,39 @@ jQuery(document).ready( function($) {
 
 	var RvySubmissionUI = function() {
 		if (rvyObjEdit.ajaxurl && !$('button.revision-approve').length) {
-			
-			var html = '<div class="rvy-creation-ui"><a href="javascript:void(0)" class="revision-approve" title="' 
-			+ rvyObjEdit.actionTitle + '"><button type="button" class="components-button revision-approve revision-create is-button is-default is-large">' 
+
+			var html = '<div class="rvy-creation-ui"><a href="javascript:void(0)" class="revision-approve" title="'
+			+ rvyObjEdit.actionTitle + '"><button type="button" class="components-button revision-approve revision-create is-primary">' 
 			+ rvyObjEdit.actionCaption + '</button></a>'
-			
-			+ '<button type="button" class="components-button revision-approve revision-created is-button is-default is-large" style="display: none">' 
+
+			+ '<button type="button" class="components-button revision-approve revision-created is-button is-default is-large" style="display: none">'
 			+ '<span class="revision-approve revision-created">'
 			+ rvyObjEdit.completedCaption + '</span> '
 
-			+ '<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">' 
+			+ '<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">'
 			+ rvyObjEdit.completedLinkCaption + '</a></button>';
-			
+
 			if (rvyObjEdit.scheduleCaption) {
 				let postStatus = wp.data.select('core/editor').getCurrentPostAttribute('status');
 				var publishedStatuses = Object.keys(rvyObjEdit.publishedStatuses).map(function (key) { return rvyObjEdit.publishedStatuses[key]; });
 				rvyIsPublished = publishedStatuses.indexOf(postStatus) >= 0;
 
 				if (rvyIsPublished) {
-					html += '<a href="javascript:void(0)" style="display: none" class="revision-approve revision-schedule" title="' 
-					+ rvyObjEdit.scheduleTitle + '"><button type="button" class="components-button revision-approve revision-schedule is-button is-default is-large">' 
+					html += '<a href="javascript:void(0)" style="display: none" class="revision-approve revision-schedule" title="'
+					+ rvyObjEdit.scheduleTitle + '"><button type="button" class="components-button revision-approve revision-schedule is-button is-default is-large">'
 					+ rvyObjEdit.scheduleCaption + '</button></a>'
-					
-					+ '<button type="button" class="components-button revision-approve revision-scheduled is-button is-default is-large" style="display: none">' 
+
+					+ '<button type="button" class="components-button revision-approve revision-scheduled is-button is-default is-large" style="display: none">'
 					+ '<span class="revision-approve revision-scheduled">'
 					+ rvyObjEdit.scheduledCaption + '</span> '
 
-					+ '<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">' 
+					+ '<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">'
 					+ rvyObjEdit.scheduledLinkCaption + '</a></button>';
 				}
 			}
 
 			html += '</div>';
-			
+
 			$('div.edit-post-post-schedule').after(html);
 
 			if (rvyCreationDisabled) {
@@ -158,7 +158,7 @@ jQuery(document).ready( function($) {
 	/**
 	 *  If date is set to future, change Publish button caption to "Schedule Revision",
 	 *  Then set a self-interval to refresh that status once the selected date is no longer future.
-	 * 
+	 *
 	 *  If the selected date is already past, change Publish button back to "Update"
 	 */
 	var RvySelectedFutureDate = false;
@@ -177,7 +177,7 @@ jQuery(document).ready( function($) {
 		}
 
 		var selectedDate = new Date( selectedDateHTML );
-		
+
 
 		RvyTimeSelection = selectedDate.getTime();
 		var tdiff = RvyTimeSelection - Date.now();

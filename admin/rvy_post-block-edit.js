@@ -3,7 +3,7 @@ if(rvyObjEdit.pendingRevisionsURL&&!$(ediv+'div.edit-post-last-revision__panel a
 $('div.edit-post-last-revision__panel').css('height','inherit');}
 setInterval(RvyPendingRevPanel,200);}
 var rvyIsPublished=false;var RvySubmissionUI=function(){if(rvyObjEdit.ajaxurl&&!$('button.revision-approve').length){var html='<div class="rvy-creation-ui"><a href="javascript:void(0)" class="revision-approve" title="'
-+rvyObjEdit.actionTitle+'"><button type="button" class="components-button revision-approve revision-create is-button is-default is-large">'
++rvyObjEdit.actionTitle+'"><button type="button" class="components-button revision-approve revision-create is-primary">'
 +rvyObjEdit.actionCaption+'</button></a>'
 +'<button type="button" class="components-button revision-approve revision-created is-button is-default is-large" style="display: none">'
 +'<span class="revision-approve revision-created">'
