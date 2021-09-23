@@ -100,6 +100,8 @@ register_activation_hook(__FILE__, function()
 
 		$last_ver = get_option('revisionary_last_version');
 
+		require_once(dirname(__FILE__).'/functions.php');
+
 		if ($current_version != $last_ver) {
 			require_once( dirname(__FILE__).'/lib/agapetry_wp_core_lib.php');
 			require_once(dirname(__FILE__).'/rvy_init.php');
