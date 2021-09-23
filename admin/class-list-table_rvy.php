@@ -1168,20 +1168,21 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					);
 				}
 			}
-
-			//if ( current_user_can( 'read_post', $post->ID ) ) { // @todo make this work for Author with Revision exceptions
-			if ( $can_read_post || $can_edit_post ) {  
-				$actions['diff'] = sprintf(
-					'<a href="%1$s" class="" title="%2$s" aria-label="%2$s" target="_revision_diff">%3$s</a>',
-					admin_url("revision.php?revision=$post->ID"),
-					/* translators: %s: post title */
-					esc_attr( sprintf( __('Compare Changes', 'revisionary'), $title ) ),
-					_x('Compare', 'revisions', 'revisionary')
-				);
-			}
-
-			$actions = apply_filters('revisionary_queue_row_actions', $actions, $post);
 		}
+
+		//if ( current_user_can( 'read_post', $post->ID ) ) { // @todo make this work for Author with Revision exceptions
+		if ( $can_read_post || $can_edit_post ) {  
+			$actions['diff'] = sprintf(
+				'<a href="%1$s" class="" title="%2$s" aria-label="%2$s" target="_revision_diff">%3$s</a>',
+				admin_url("revision.php?revision=$post->ID"),
+				/* translators: %s: post title */
+				esc_attr( sprintf( __('Compare Changes', 'revisionary'), $title ) ),
+				_x('Compare', 'revisions', 'revisionary')
+			);
+		}
+
+		$actions = apply_filters('revisionary_queue_row_actions', $actions, $post);
+
 
 		return $this->row_actions( $actions );
 	}
