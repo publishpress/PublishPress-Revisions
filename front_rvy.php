@@ -272,6 +272,7 @@ class RevisionaryFront {
 
 			if ( in_array( $post->post_mime_type, array( 'draft-revision' ) ) ) {
 				if ($can_edit = current_user_can('edit_post', $revision_id)) {
+					$submit_url = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision=$revision_id&action=submit$redirect_arg"), "submit-post_$published_post_id|$revision_id" );
 					$publish_url =  wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision=$revision_id&action=approve$redirect_arg"), "approve-post_$published_post_id|$revision_id" );
 				}
 			} elseif ($can_edit = current_user_can('edit_post', rvy_post_id($revision_id))) {
@@ -306,11 +307,17 @@ class RevisionaryFront {
 					$class = 'draft';
 					$status_obj = get_post_status_object(get_post_field('post_status', rvy_post_id($revision_id)));
 
-					if (current_user_can("set_revision_pending-revision", $revision_id)) {
-						$publish_caption = __( 'Submit', 'revisionary' );
-						$publish_button = '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan rvy-submit-revision">' . $publish_caption . '</a></span>';
+					if (!empty($submit_url) && current_user_can("set_revision_pending-revision", $revision_id)) {
+						$submit_caption = __( 'Submit', 'revisionary' );
+						$publish_button = '<span><a href="' . $submit_url . '" class="rvy_preview_linkspan rvy-submit-revision">' . $submit_caption . '</a></span>';
 					} else {
 						$publish_button = '';
+					}
+
+					if ($can_publish) {
+						$publish_caption = (!empty($status_obj->public) || !empty($status_obj->private)) ? __('Publish now', 'revisionary') : $approve_caption;
+						$publish_caption = str_replace(' ', '&nbsp;', $publish_caption);
+						$publish_button .= ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan rvy-approve-revision">' . $publish_caption . '</a></span>' : '';
 					}
 
 					$message = sprintf( __('This is a Working Copy. %s %s %s', 'revisionary'), $view_published, $edit_button, $publish_button );
