@@ -660,7 +660,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$query = "SELECT post_mime_type, COUNT( * ) AS num_posts FROM {$wpdb->posts} WHERE $where";
 		$query .= ' GROUP BY post_mime_type';
 
-		$query = apply_filters('presspermit_posts_request', $query, ['has_cap_check' => true]);  // has_cap_check argument triggers inclusion of revision statuses
+		// @todo: review Permissions integration for revision count filtering
+		//$query = apply_filters('presspermit_posts_request', $query, ['has_cap_check' => true]);  // has_cap_check argument triggers inclusion of revision statuses
 
 		$results = (array) $wpdb->get_results( $query, ARRAY_A );
 	
