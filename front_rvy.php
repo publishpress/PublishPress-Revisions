@@ -272,17 +272,17 @@ class RevisionaryFront {
 
 			if ( in_array( $post->post_mime_type, array( 'draft-revision' ) ) ) {
 				if ($can_edit = current_user_can('edit_post', $revision_id)) {
-					$publish_url = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=submit$redirect_arg"), "submit-post_$published_post_id|$revision_id" );
+					$publish_url =  wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision=$revision_id&action=approve$redirect_arg"), "approve-post_$published_post_id|$revision_id" );
 				}
 			} elseif ($can_edit = current_user_can('edit_post', rvy_post_id($revision_id))) {
 				if ( in_array( $post->post_mime_type, array( 'pending-revision' ) ) ) {
-					$publish_url = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|$revision_id" );
+					$publish_url = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision=$revision_id&action=approve$redirect_arg"), "approve-post_$published_post_id|$revision_id" );
 				
 				} elseif ( in_array( $post->post_mime_type, array( 'future-revision' ) ) ) {
-					$publish_url = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|$revision_id" );
+					$publish_url = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision=$revision_id&action=publish$redirect_arg"), "publish-post_$published_post_id|$revision_id" );
 				
 				} elseif ( in_array( $post->post_status, array( 'inherit' ) ) ) {
-					$publish_url = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision=$revision_id&amp;action=restore$redirect_arg"), "restore-post_$published_post_id|$revision_id" );
+					$publish_url = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision=$revision_id&action=restore$redirect_arg"), "restore-post_$published_post_id|$revision_id" );
 				
 				} else {
 					$publish_url = '';
