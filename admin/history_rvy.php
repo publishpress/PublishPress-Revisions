@@ -881,13 +881,13 @@ class RevisionaryHistory
                     $published_post_id = rvy_post_id($revision->ID);
 
                     // For non-public types, force direct approval because preview is not available
-	                if ((($type_obj && empty($type_obj->public)) || rvy_get_option('compare_revisions_direct_approval')) && current_user_can( 'edit_post', $published_post_id) ) {
+	                if ((($type_obj && !is_post_type_viewable($type_obj)) || rvy_get_option('compare_revisions_direct_approval')) && current_user_can( 'edit_post', $published_post_id) ) {
                         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
 
                         //if (in_array($revision->post_mime_type, ['draft-revision'])) {
                         //    $restore_link = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=submit$redirect_arg"), "submit-post_$published_post_id|{$revision->ID}" );
                         
-                        if (in_array($revision->post_mime_type, ['pending-revision'])) {
+                        if (in_array($revision->post_mime_type, ['draft-revision', 'pending-revision'])) {
                             $restore_link = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|{$revision->ID}" );
                         
                         } elseif (in_array($revision->post_mime_type, ['future-revision'])) {
@@ -1052,7 +1052,7 @@ class RevisionaryHistory
         }
 
         // For non-public types, force direct approval because preview is not available
-        $direct_approval = (($type_obj && empty($type_obj->public)) || rvy_get_option('compare_revisions_direct_approval')) 
+        $direct_approval = (($type_obj && !is_post_type_viewable($type_obj)) || rvy_get_option('compare_revisions_direct_approval')) 
         && current_user_can('edit_post', rvy_post_id($post_id));
 
         if ($post_id) {
