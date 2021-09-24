@@ -579,11 +579,21 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		(in_array($revision->post_mime_type, ['pending-revision', 'draft-revision']) && !rvy_get_option('pending_revision_update_post_date'))
 		|| (('future-revision' == $revision->post_mime_type) && !rvy_get_option('scheduled_revision_update_post_date'))
 	) {
+		// @todo: how was post_date_gmt of published post previously set to zero?
+		if (('0000-00-00 00:00:00' == $published->post_date_gmt) && ('0000-00-00 00:00:00' != $published->post_date)) {
+			// reconstruct post_date_gmt from stored post_date
+			$timestamp = strtotime($published->post_date);
+			$zone_diff = strtotime(current_time('mysql', 'gmt')) - strtotime(current_time('mysql'));
+			$set_date_gmt = gmdate('Y-m-d H:i:s', $timestamp + $zone_diff);
+		} else {
+			$set_date_gmt = $published->post_date_gmt;
+		}
+
 		$update = array_merge(
 			$update, 
 			array(
 				'post_date' => $published->post_date,
-				'post_date_gmt' => $published->post_date_gmt,
+				'post_date_gmt' => $set_date_gmt,
 			)
 		);
 	}
@@ -645,13 +655,13 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	) {
 		$post_modified = current_time('mysql');
 		$post_modified_gmt = current_time('mysql', 1);
-
-		$update_fields['post_modified'] = $post_modified;
-		$update_fields['post_modified_gmt'] = $post_modified_gmt;
 	} else {
-		$post_modified = get_post_field('post_modified', $post_id);
-		$post_modified_gmt = get_post_field('post_modified_gmt', $post_id);
+		$post_modified = $published->post_modified;
+		$post_modified_gmt = $published->post_modified_gmt;
 	}
+
+	$update_fields['post_modified'] = $post_modified;
+	$update_fields['post_modified_gmt'] = $post_modified_gmt;
 
 	if (
 		(in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && rvy_get_option('pending_revision_update_post_date'))
@@ -659,6 +669,10 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	) {
 		$update_fields['post_date'] = $post_modified;
 		$update_fields['post_date_gmt'] = $post_modified_gmt;
+
+	} elseif (!empty($update['post_date'])) {
+		$update_fields['post_date'] = $update['post_date'];
+		$update_fields['post_date_gmt'] = $update['post_date_gmt'];
 	}
 
 	$wpdb->update($wpdb->posts, $update_fields, ['ID' => $post_id]);
@@ -768,24 +782,6 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 			if (function_exists('presspermit')) {
 				unset(presspermit()->flags['ignore_save_post']);
 			}
-		}
-	}
-
-	// Prevent post date from being set to current time unless Revisionary settings call for that
-	if (
-		(in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && !rvy_get_option('pending_revision_update_post_date'))
-		|| (('future-revision' == $revision->post_mime_type) && !rvy_get_option('scheduled_revision_update_post_date'))
-	) {
-		if ($_post = get_post($post_id)) {
-			$set_dates = (('future-revision' != $revision->post_mime_type) && ($_post->post_date_gmt != $_post->post_modified_gmt))
-			? ['post_date' => $revision->post_date, 'post_date_gmt' => $revision->post_date_gmt]
-			: ['post_date' => $published->post_date, 'post_date_gmt' => $published->post_date_gmt];
-
-			$wpdb->update(
-				$wpdb->posts, 
-				$set_dates, 
-				['ID' => $published->ID]
-			);
 		}
 	}
 
