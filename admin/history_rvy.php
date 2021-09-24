@@ -522,15 +522,23 @@ class RevisionaryHistory
             }
         }
         
+        $compare_fields = [
+            'post_date' =>      __('Post Date', 'revisionary'), 
+            'post_parent' =>    __('Post Parent', 'revisionary'), 
+            'menu_order' =>     __('Menu Order', 'revisionary'), 
+            'comment_status' => __('Comment Status', 'revisionary'), 
+            'ping_status' =>    __('Ping Status', 'revisionary'), 
+        ];
+
+        if (
+        ((('future-revision' == $compare_from->post_mime_type) || ('future-revision' == $compare_to->post_mime_type)) && !rvy_get_option('scheduled_revision_update_post_date'))
+        || ((in_array($compare_from->post_mime_type, ['draft-revision', 'pending-revision']) || in_array($compare_to->post_mime_type, ['draft-revision', 'pending-revision'])) && !rvy_get_option('pending_revision_update_post_date'))
+        ) {
+            unset($compare_fields['post_date']);
+        }
+
         // === Add core post fields which cannot normally be versioned
-        foreach( apply_filters('revisionary_compare_post_fields',
-            [
-                'post_date' =>      __('Post Date', 'revisionary'), 
-                'post_parent' =>    __('Post Parent', 'revisionary'), 
-                'menu_order' =>     __('Menu Order', 'revisionary'), 
-                'comment_status' => __('Comment Status', 'revisionary'), 
-                'ping_status' =>    __('Ping Status', 'revisionary'), 
-            ]) as $field => $name
+        foreach( apply_filters('revisionary_compare_post_fields', $compare_fields) as $field => $name
         ) {
             // don't display post date difference when it's set to a future date for scheduling 
             if (strtotime($compare_to->post_date_gmt) > agp_time_gmt() || ('future-revision' == $compare_to->post_mime_type)) {
