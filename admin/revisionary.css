@@ -622,3 +622,8 @@ font-weight: bold;
   background: none;
   border: none;
 }
+
+/* Button with icon */
+.ppr-purple-button > span.dashicons {
+  margin-right: 5px;
+}

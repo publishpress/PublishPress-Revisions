@@ -6,11 +6,15 @@
 * Copyright 2021, PublishPress
 */
 jQuery(document).ready( function($) {
-	function RvyRecaptionElement(btnSelector, btnCaption) {
+	function RvyRecaptionElement(btnSelector, btnCaption, btnIcon = '') {
 		let node = document.querySelector(btnSelector);
 
 		if (node) {
 			document.querySelector(btnSelector).innerText = `${btnCaption}`;
+
+			if(btnIcon){
+				document.querySelector(btnSelector).innerHTML = `<span class="dashicons dashicons-${btnIcon}"></span>${btnCaption}`;
+			}
 		}
 	}
 
@@ -144,6 +148,7 @@ jQuery(document).ready( function($) {
 				$(refSelector).after(
 					'<div class="rvy-creation-ui"><a href="' + url + '" class="revision-approve">'
 					+ '<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button">'
+					+ '<span class="dashicons dashicons-yes"></span>'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</button></a>'
 
 					+ '<div class="revision-created" style="display: none">'
@@ -250,7 +255,7 @@ jQuery(document).ready( function($) {
 			}
 
 			if (rvyObjEdit.viewCaption) {
-				RvyRecaptionElement('div.edit-post-header__settings a.rvy-post-preview', rvyObjEdit.viewCaption);
+				RvyRecaptionElement('div.edit-post-header__settings a.rvy-post-preview', rvyObjEdit.viewCaption, 'visibility');
 			}
 
 			if (rvyObjEdit.viewTitle) {
