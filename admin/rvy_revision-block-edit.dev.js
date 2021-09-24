@@ -143,14 +143,14 @@ jQuery(document).ready( function($) {
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']) {
 				$(refSelector).after(
 					'<div class="rvy-creation-ui"><a href="' + url + '" class="revision-approve">'
-					+ '<button type="button" class="components-button revision-approve is-button is-primary">'
+					+ '<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</button></a>'
 
 					+ '<div class="revision-created" style="display: none">'
 					+ '<span class="revision-approve revision-created">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
 
-					+ '<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-approve revision-edit components-button is-tertiary" target="_blank">'
+					+ '<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-approve revision-edit components-button is-tertiary ppr-purple-button" target="_blank">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a></div>'
 
 					+ '</div>'
@@ -245,12 +245,8 @@ jQuery(document).ready( function($) {
 
 			if (rvyObjEdit.viewURL) {
 				original = $('div.edit-post-header__settings a.editor-post-preview');
-				$(original).after(original.clone().attr('href', rvyObjEdit.viewURL).attr('target', '_blank').removeClass('editor-post-preview is-tertiary').addClass('rvy-post-preview is-secondary'));
+				$(original).after(original.clone().attr('href', rvyObjEdit.viewURL).attr('target', '_blank').removeClass('editor-post-preview is-tertiary').addClass('rvy-post-preview is-primary ppr-purple-button'));
 				$(original).hide();
-
-				if (rvyObjEdit.multiPreviewActive) {
-					$('.rvy-post-preview').removeClass('components-button').css('height', 'inherit').css('text-decoration', 'none');
-				}
 			}
 
 			if (rvyObjEdit.viewCaption) {

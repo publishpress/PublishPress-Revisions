@@ -31,14 +31,14 @@ jQuery(document).ready( function($) {
 		if (rvyObjEdit.ajaxurl && !$('button.revision-approve').length) {
 
 			var html = '<div class="rvy-creation-ui"><a href="javascript:void(0)" class="revision-approve" title="'
-			+ rvyObjEdit.actionTitle + '"><button type="button" class="components-button revision-approve revision-create is-primary">' 
+			+ rvyObjEdit.actionTitle + '"><button type="button" class="components-button revision-approve revision-create is-primary ppr-purple-button">'
 			+ rvyObjEdit.actionCaption + '</button></a>'
 
-			+ '<button type="button" class="components-button revision-approve revision-created is-button is-default is-large" style="display: none">'
+			+ '<button type="button" class="revision-approve revision-created ppr-clear-button" style="display: none">'
 			+ '<span class="revision-approve revision-created">'
 			+ rvyObjEdit.completedCaption + '</span> '
 
-			+ '<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">'
+			+ '<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-tertiary ppr-purple-button" target="_blank">'
 			+ rvyObjEdit.completedLinkCaption + '</a></button>';
 
 			if (rvyObjEdit.scheduleCaption) {
@@ -48,14 +48,14 @@ jQuery(document).ready( function($) {
 
 				if (rvyIsPublished) {
 					html += '<a href="javascript:void(0)" style="display: none" class="revision-approve revision-schedule" title="'
-					+ rvyObjEdit.scheduleTitle + '"><button type="button" class="components-button revision-approve revision-schedule is-button is-default is-large">'
+					+ rvyObjEdit.scheduleTitle + '"><button type="button" class="components-button revision-approve revision-schedule is-primary ppr-purple-button">'
 					+ rvyObjEdit.scheduleCaption + '</button></a>'
 
-					+ '<button type="button" class="components-button revision-approve revision-scheduled is-button is-default is-large" style="display: none">'
+					+ '<button type="button" class="revision-approve revision-scheduled ppr-clear-button" style="display: none">'
 					+ '<span class="revision-approve revision-scheduled">'
 					+ rvyObjEdit.scheduledCaption + '</span> '
 
-					+ '<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">'
+					+ '<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-tertiary ppr-purple-button" target="_blank">'
 					+ rvyObjEdit.scheduledLinkCaption + '</a></button>';
 				}
 			}
