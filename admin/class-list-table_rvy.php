@@ -611,6 +611,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$total_items = $wp_query->found_posts;
 		
+		// auto-flush revision flags 
+		if (!$total_items && !rvy_get_option('queue_query_all_posts') && !get_transient('revisionary_flushed_has_revision_flag')) {
+			revisionary_refresh_revision_flags();
+			set_transient('revisionary_flushed_has_revision_flag', true, 60);
+		}
+
 		$this->set_pagination_args( [
 			'total_items' => $total_items,
 			'per_page' => $per_page
