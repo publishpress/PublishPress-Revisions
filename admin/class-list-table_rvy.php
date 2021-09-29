@@ -739,7 +739,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				$link_class = '';
 			}
 
-			$links['mine'] = sprintf(__('%sMy Copies & Changes%s (%s)', 'revisionary'), "<a href='admin.php?page=revisionary-q&author=$current_user->ID'{$link_class}>", '</a>', "<span class='count'>$my_count</span>");
+			$links['mine'] = sprintf(
+				apply_filters('revisionary_my_copies_label', __('%sMy Copies & Changes%s (%s)', 'revisionary')), 
+				"<a href='admin.php?page=revisionary-q&author=$current_user->ID'{$link_class}>", '</a>', "<span class='count'>$my_count</span>"
+			);
 		}
 
 		$where = $this->revisions_where_filter( 
