@@ -282,6 +282,23 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$where_append = "($p.comment_count IN ($post_id_csv) $own_revision_clause)";
 
+		$status_csv = rvy_filtered_statuses(['return' => 'csv']);
+
+		$own_posts = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT ID FROM $wpdb->posts WHERE post_status IN ($status_csv) AND post_author = %d",
+				$current_user->ID
+			)
+			);
+
+		if (rvy_get_option('admin_revisions_to_own_posts')) {
+			$own_posts = apply_filters('revisionary_own_post_ids', $own_posts, $current_user->ID);
+		} else {
+			$own_posts = [];
+		}
+
+		$own_posts_csv = "'" . implode("','", $own_posts) . "'";
+
 		if (rvy_get_option('revisor_hide_others_revisions') && !current_user_can('administrator') 
 			&& !current_user_can('list_others_revisions') && empty($args['suppress_author_clause']) 
 		) {
@@ -313,7 +330,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				$type_clause = '';
 			}
 
-			$where_append .= $wpdb->prepare(" AND ($p.post_author = %d $type_clause)", $current_user->ID );
+			$where_append .= $wpdb->prepare(" AND (($p.post_author = %d $type_clause) OR ($p.comment_count IN ($own_posts_csv) $type_clause))", $current_user->ID );
+
 		} elseif ($revisionary->config_loaded) {
 			$where_append .= (array_filter($revisionary->enabled_post_types)) 
 			? " AND ($p.post_type IN ('" . implode("','", array_keys(array_filter($revisionary->enabled_post_types))) . "'))" 

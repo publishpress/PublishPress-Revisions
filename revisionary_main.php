@@ -675,10 +675,12 @@ class Revisionary
 					if ((!empty($type_obj->cap->edit_others_posts) && empty($current_user->allcaps[$type_obj->cap->edit_others_posts])) 
 					|| (!empty($type_obj->cap->edit_published_posts) && empty($current_user->allcaps[$type_obj->cap->edit_published_posts]))
 					) {
-						if (!empty($current_user->allcaps['edit_others_revisions'])) {
-							$caps[] = 'edit_others_revisions';
-						} else {
-							$caps []= 'do_not_allow';	// @todo: implement this within user_has_cap filters?
+						if (!rvy_get_option('admin_revisions_to_own_posts') || !current_user_can('edit_post', rvy_post_id($post_id))) {
+							if (!empty($current_user->allcaps['edit_others_revisions'])) {
+								$caps[] = 'edit_others_revisions';
+							} else {
+								$caps []= 'do_not_allow';	// @todo: implement this within user_has_cap filters?
+							}
 						}
 					}
 				}
@@ -742,6 +744,9 @@ class Revisionary
 			if (!empty($object_type_obj->cap) && in_array($object_type_obj->cap->edit_others_posts, $reqd_caps)) {
 				if (!empty($current_user->allcaps['edit_others_revisions']) || !rvy_get_option('revisor_lock_others_revisions')) {
 					$wp_blogcaps[$object_type_obj->cap->edit_others_posts] = true;
+				
+				} elseif (rvy_get_option('admin_revisions_to_own_posts') && current_user_can('edit_post', rvy_post_id($post_id))) {
+					$wp_blogcaps[$object_type_obj->cap->edit_others_posts] = true;
 				}
 			}
 		
@@ -749,7 +754,7 @@ class Revisionary
 			if (!empty($args[0]) && ('edit_post' == $args[0]) && array_diff($reqd_caps, array_keys(array_filter($wp_blogcaps)))) {
 				$this->skip_filtering = true;
 
-				if (current_user_can('edit_post', $args[2])) {
+				if (rvy_get_option('admin_revisions_to_own_posts') && current_user_can('edit_post', rvy_post_id($post_id))) {
 					$wp_blogcaps = array_merge($wp_blogcaps, array_fill_keys($reqd_caps, true));
 				}
 
