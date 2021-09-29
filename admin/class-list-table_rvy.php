@@ -69,10 +69,13 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		if (!empty($q['post_author'])) {
+			// @todo: confirm separate query for post counts with post_author view filter is no longer needed
+			/*
 			do_action('revisionary_queue_pre_query');
 			$_pre_query = new WP_Query( $qp );
 			$this->published_post_count_ids = $_pre_query->posts;
 			do_action('revisionary_queue_pre_query_done');
+			*/
 
 			$qp['author'] = $q['post_author'];
 		}
@@ -198,24 +201,27 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	function pre_query_where_filter($where, $args = []) {
 		global $wpdb, $current_user, $revisionary;
 		
-		if (!current_user_can('administrator') && empty($args['suppress_author_clause'])) { //} && (!defined('PRESSPERMIT_COLLAB_VERSION') || defined('PRESSPERMIT_EXTRA_REVISION_QUEUE_FILTER'))) {
-			$p = (!empty($args['alias'])) ? $args['alias'] : $wpdb->posts;
-
-			$can_edit_others_types = [];
+		if (!current_user_can('administrator') && empty($args['suppress_author_clause']) && empty($_REQUEST['post_author'])) { //} && (!defined('PRESSPERMIT_COLLAB_VERSION') || defined('PRESSPERMIT_EXTRA_REVISION_QUEUE_FILTER'))) {
+			if (rvy_get_option('revisor_hide_others_revisions') && !current_user_can('list_others_revisions') ) {
 			
-			foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
-				if ($type_obj = get_post_type_object($post_type)) {
-					if (current_user_can($type_obj->cap->edit_others_posts)) {
-						$can_edit_others_types[]= $post_type;
+				$p = (!empty($args['alias'])) ? $args['alias'] : $wpdb->posts;
+
+				$can_edit_others_types = [];
+
+				foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
+					if ($type_obj = get_post_type_object($post_type)) {
+						if (current_user_can($type_obj->cap->edit_others_posts)) {
+							$can_edit_others_types[]= $post_type;
+						}
 					}
 				}
+
+				$can_edit_others_types = apply_filters('revisionary_queue_edit_others_types', $can_edit_others_types);
+
+				$type_clause = ($can_edit_others_types) ? "OR $p.post_type IN ('" . implode("','", $can_edit_others_types) . "')" : '';
+
+				$where .= $wpdb->prepare(" AND ($p.post_author = %d $type_clause)", $current_user->ID );
 			}
-
-			$can_edit_others_types = apply_filters('revisionary_queue_edit_others_types', $can_edit_others_types);
-
-			$type_clause = ($can_edit_others_types) ? "OR $p.post_type IN ('" . implode("','", $can_edit_others_types) . "')" : '';
-
-			$where .= $wpdb->prepare(" AND ($p.post_author = %d $type_clause)", $current_user->ID );
 		}
 
 		return $where;
