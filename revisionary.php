@@ -200,6 +200,10 @@ add_action(
 		define ('COLS_ALL_RVY', 0);
 		define ('COL_ID_RVY', 1);
 
+		if (!defined('AUTOSAVE_INTERVAL')) { // note: 
+			define('AUTOSAVE_INTERVAL', 3);
+		}
+
 		if ( defined('RS_DEBUG') ) {
 			include_once( dirname(__FILE__).'/lib/debug.php');
 			add_action( 'admin_footer', 'rvy_echo_usage_message' );
