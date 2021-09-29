@@ -44,7 +44,7 @@ vertical-align: text-bottom;
 }
 
 .rs-blue, .rs-blue a, .rs-blue a:link, .rs-blue a:visited {
-color: blue;	
+color: blue;
 }
 
 .rs-backtan {
@@ -85,7 +85,7 @@ padding: 0.2em 0.5em 0.2em 0.5em;
 }
 
 .agp-unselected_agent {
-border: none;	
+border: none;
 }
 
 #wpbody-content .agp-selected_agent {
@@ -94,7 +94,7 @@ border-right: 1px solid #ccc;
 border-top: 1px solid #ccc;
 border-bottom: none;
 }
-	
+
 #wpbody-content .agp-selected_agent a{
 color: black;
 text-decoration: none;
@@ -138,7 +138,7 @@ float: left;
 width: 100%;
 }
 
-.rs-agents_list_auto li { 
+.rs-agents_list_auto li {
 list-style: none;
 float: left;
 margin: 0.3em 1.5em 0.3em 0;
@@ -149,12 +149,12 @@ margin: 0;
 font-size: auto;
 padding: 0;
 }
- 
+
 .rs-agents_emsized {
 clear: both;
 width: 100%;
 }
- 
+
 .rs-agents_emsized ul {
 margin: 0 0 1em 0;
 padding: 0;
@@ -251,7 +251,7 @@ border-bottom: 4px solid #CDD7BA;
 .rs-backgray #rs-admin_table tr, .rs-backgray #rs-realm_table tr, .rs-backgray #realm_adjustments tr, .rs-backgray #rs-advanced_table tr {
 border-bottom: 4px solid #d8d8d8;
 }
-    
+
 #rs-admin_table tr td, #rs-realm_table tr td, #realm_adjustments tr td, #rs-advanced_table tr td {
 padding: 1em 0 1em 0;
 }
@@ -280,7 +280,7 @@ margin-left: 1.5em;
 }
 
 .rs-revision_top_action {
-font-family: Verdana, Arial, Helvetica, sans-serif; 
+font-family: Verdana, Arial, Helvetica, sans-serif;
 font-size: 24px;
 font-style: normal;
 }
@@ -299,7 +299,7 @@ font-weight: bold;
 }
 
 .rvy_select_status a {
-margin-right: 1em;	
+margin-right: 1em;
 }
 
 .rvy_current_status a {
@@ -307,12 +307,12 @@ font-size: 150%;
 }
 
 .rvy-agents-checklist {
-padding:0.5em 0 0.5em 0.5em;	
+padding:0.5em 0 0.5em 0.5em;
 }
 
 #rvy-agents-checklist-spacer {
 clear: both;
-height: 1px;	
+height: 1px;
 }
 
 .rvy-list-horiz {
@@ -334,23 +334,23 @@ box-shadow: 0 0 0 1px #ddd;
 }
 
 .rvy-revision-row {
-white-space: nowrap;	
+white-space: nowrap;
 }
 
 .rvy-col1 {
-width: 35%;	
+width: 35%;
 }
 .rvy-col2 {
-width: 25%;	
+width: 25%;
 }
 .rvy-col3 {
-width: 10%;	
+width: 10%;
 }
 .rvy-col4 {
-width: 15%;	
+width: 15%;
 }
 .rvy-col5 {
-width: 15%;	
+width: 15%;
 }
 
 .rvy-editor-table {
@@ -365,15 +365,15 @@ margin: 0;
 }
 
 span.rvy-restore-link {
-margin-left: 2em;	
+margin-left: 2em;
 }
 
 div.rvy-restore-link {
-margin-top: 20px;	
+margin-top: 20px;
 }
 
 .rvy-message {
-margin-bottom: 0;	
+margin-bottom: 0;
 }
 
 .rvy-date-selection {
@@ -399,7 +399,7 @@ clear: both;
 }
 
 .rvy-revision-field {
-margin: 2em 0 0 0;	
+margin: 2em 0 0 0;
 }
 
 .rvy-agents-filter {

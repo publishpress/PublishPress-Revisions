@@ -44,7 +44,7 @@ jQuery(document).ready( function($) {
 			var RvyDetectPublishOptionsClosure = function() {
 				if ( ! $('div.components-modal__header').length ) {
 					clearInterval(RvyDetectPublishOptionsDivClosureInterval);
-					
+
 					$('span.pp-recaption-button').hide(); //.addClass('force-regen');
 					RvyInitInterval = setInterval(RvyInitializeBlockEditorModifications, 50);
 					RvyDetectPublishOptionsDivInterval = setInterval(RvyDetectPublishOptionsDiv, 1000);
@@ -58,12 +58,12 @@ jQuery(document).ready( function($) {
 
 	/************* RECAPTION PRE-PUBLISH AND PUBLISH BUTTONS ****************/
 	rvyObjEdit.publishCaptionCurrent = rvyObjEdit.publish;
-	
+
 	// Initialization operations to perform once React loads the relevant elements
 	var RvyInitializeBlockEditorModifications = function() {
 		if ( ( $('button.editor-post-publish-button').length || $('button.editor-post-publish-panel__toggle').length ) && ( $('button.editor-post-switch-to-draft').length || $('button.editor-post-save-draft').length ) ) {
 			clearInterval(RvyInitInterval);
-			
+
 			if ( $('button.editor-post-publish-panel__toggle').length ) {
 				if ( typeof rvyObjEdit.prePublish != 'undefined' && rvyObjEdit.prePublish ) {
 					RvyRecaptionElement('button.editor-post-publish-panel__toggle', rvyObjEdit.prePublish);
@@ -71,12 +71,12 @@ jQuery(document).ready( function($) {
 
 				// Presence of pre-publish button means publish button is not loaded yet. Start looking for it once Pre-Publish button is clicked.
 				$(document).on('click', 'button.editor-post-publish-panel__toggle,span.pp-recaption-prepublish-button', function() {
-					RvySetPublishButtonCaption('', false, true); // nullstring: set caption to value queued in rvyObjEdit.publishCaptionCurrent 
+					RvySetPublishButtonCaption('', false, true); // nullstring: set caption to value queued in rvyObjEdit.publishCaptionCurrent
 				});
 			} else {
 				RvySetPublishButtonCaption(rvyObjEdit.publish, false, true);
 			}
-			
+
 			$('select.editor-post-author__select').parent().hide();
 			$('button.editor-post-trash').parent().show();
 			$('button.editor-post-switch-to-draft').hide();
@@ -128,12 +128,12 @@ jQuery(document).ready( function($) {
 			$(refSelector).before(
 				'<div class="components-panel__row rvy-creation-ui edit-post-revision-status">'
 				+ '<span>' + rvyObjEdit.statusLabel + '</span>'
-				+ '<div class="components-dropdown rvy-current-status">' 
+				+ '<div class="components-dropdown rvy-current-status">'
 				+ rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']
 				+ '</div>'
 				+ '</div>'
 			);
-			
+
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL']) {
 				var url = rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL'];
 			} else {
@@ -224,7 +224,7 @@ jQuery(document).ready( function($) {
 			}
 
 			var data = {'rvy_ajax_field': rvyObjEdit[rvyObjEdit.currentStatus + 'AjaxField'], 'rvy_ajax_value': wp.data.select('core/editor').getCurrentPostId(), 'nc': RvyGetRandomInt(99999999)};
-			
+
 			$.ajax({
 				url: rvyObjEdit.ajaxurl,
 				data: data,
@@ -242,7 +242,7 @@ jQuery(document).ready( function($) {
 		}
 
 		if (($('div.edit-post-header__settings a.editor-post-preview:visible').length || $('div.block-editor-post-preview__dropdown button.block-editor-post-preview__button-toggle:visible').length) && !$('a.rvy-post-preview').length) {
-			
+
 			if (rvyObjEdit.viewURL) {
 				original = $('div.edit-post-header__settings a.editor-post-preview');
 				$(original).after(original.clone().attr('href', rvyObjEdit.viewURL).attr('target', '_blank').removeClass('editor-post-preview').addClass('rvy-post-preview'));

@@ -40,7 +40,7 @@ jQuery(document).ready( function($) {
 
 			+ '<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">' 
 			+ rvyObjEdit.completedLinkCaption + '</a></button>';
-			
+
 			if (rvyObjEdit.scheduleCaption) {
 				let postStatus = wp.data.select('core/editor').getCurrentPostAttribute('status');
 				var publishedStatuses = Object.keys(rvyObjEdit.publishedStatuses).map(function (key) { return rvyObjEdit.publishedStatuses[key]; });
@@ -61,7 +61,7 @@ jQuery(document).ready( function($) {
 			}
 
 			html += '</div>';
-			
+
 			$('div.edit-post-post-schedule').after(html);
 
 			if (rvyCreationDisabled) {
@@ -158,7 +158,7 @@ jQuery(document).ready( function($) {
 	/**
 	 *  If date is set to future, change Publish button caption to "Schedule Revision",
 	 *  Then set a self-interval to refresh that status once the selected date is no longer future.
-	 * 
+	 *
 	 *  If the selected date is already past, change Publish button back to "Update"
 	 */
 	var RvySelectedFutureDate = false;
@@ -177,7 +177,7 @@ jQuery(document).ready( function($) {
 		}
 
 		var selectedDate = new Date( selectedDateHTML );
-		
+
 
 		RvyTimeSelection = selectedDate.getTime();
 		var tdiff = RvyTimeSelection - Date.now();
