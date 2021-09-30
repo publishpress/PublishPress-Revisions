@@ -76,7 +76,8 @@ class RvyPostEdit {
         }
 
         if (current_user_can('edit_post', rvy_post_id($post->ID))) {
-            $preview_caption = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('Preview / Approve', 'revisionary');
+            $preview_caption = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
+
         } elseif ($type_obj && !empty($type_obj->public)) {
             $preview_caption = __('View');
         }
