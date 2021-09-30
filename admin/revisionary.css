@@ -576,6 +576,10 @@ div.components-panel a.revision-approve{
 text-decoration: none;
 }
 
+.components-button.editor-post-last-revision__title {
+height: auto;
+}
+
 /* Classic */
 #submitpost #revision-compare {
 margin: 5px 10px 10px 5px;
