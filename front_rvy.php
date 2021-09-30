@@ -181,6 +181,15 @@ class RevisionaryFront {
 
 			do_action('revisionary_preview_load', $revision_id, $published_post_id);
 
+			if (!defined('REVISIONARY_PREVIEW_NO_META_MIRROR')) {
+				// For display integrity, copy any missing keys from published post. Note: Any fields missing from revision are left unmodified at revision approval.
+				revisionary_copy_postmeta($published_post_id, $revision_id, ['empty_target_only' => true]);
+			}
+	
+			if (!defined('REVISIONARY_PREVIEW_NO_TERM_MIRROR')) {
+				revisionary_copy_terms($published_post_id, $revision_id, ['empty_target_only' => true]);
+			}
+
 			if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && !defined('REVISIONARY_DISABLE_MA_PREVIEW_CORRECTION') && rvy_in_revision_workflow($post)) {
 				$_authors = get_multiple_authors($revision_id);
 			
