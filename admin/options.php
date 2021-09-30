@@ -115,6 +115,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'revise_posts_capability' =>				__("Change Requests require role capability", 'revisionary'),
 	'revisor_lock_others_revisions' =>			__("Editing others&apos; revisions requires role capability", 'revisionary'),
 	'revisor_hide_others_revisions' => 			__("Listing others&apos; revisions requires role capability", 'revisionary'),
+	'admin_revisions_to_own_posts' =>			__("Users can always administer revisions to their own editable posts", 'revisionary'),
 	'queue_query_all_posts' => 					__('Compatibility Mode', 'revisionary'),
 	'revision_update_notifications' =>			__('Also notify on Revision Update', 'revisionary'),
 	'trigger_post_update_actions' => 			__('Revision Publication: API actions to mimic Post Update', 'revisionary'),
@@ -160,7 +161,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'working_copy' =>		 ['copy_posts_capability'],
 	'scheduled_revisions' => ['scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date'],
 	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
-	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'queue_query_all_posts'],
+	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'queue_query_all_posts'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'],
 	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'display_hints'],
 	'notification'	=>		 ['pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
@@ -435,6 +436,9 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 			
 			$hint = __('This restriction applies to users who are not full editors for the post type. To enable a role, give it the list_others_revisions capability.', 'revisionary');
 			$this->option_checkbox( 'revisor_hide_others_revisions', $tab, $section, $hint, '' );
+
+			$hint = __('Bypass the above restrictions for others\' revisions to logged in user\'s own posts.', 'revisionary');
+			$this->option_checkbox( 'admin_revisions_to_own_posts', $tab, $section, $hint, '' );
 
 			$hint = __('If some revisions are missing from the queue, disable a performance enhancement for better compatibility with themes and plugins.', 'revisionary');
 			$this->option_checkbox( 'queue_query_all_posts', $tab, $section, $hint, '' );

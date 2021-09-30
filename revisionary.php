@@ -5,7 +5,7 @@
  * Description: Maintain published content with teamwork and precision using the Revisions model to submit, approve and schedule changes.
  * Author: PublishPress
  * Author URI: https://publishpress.com
- * Version: 3.0-beta3
+ * Version: 3.0-beta3.3
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 4.9.7
@@ -96,9 +96,11 @@ define('REVISIONARY_FILE', __FILE__);
 // register these functions before any early exits so normal activation/deactivation can still run with RS_DEBUG
 register_activation_hook(__FILE__, function() 
 	{
-		$current_version = '3.0-beta3';
+		$current_version = '3.0-beta3.3';
 
 		$last_ver = get_option('revisionary_last_version');
+
+		require_once(dirname(__FILE__).'/functions.php');
 
 		if ($current_version != $last_ver) {
 			require_once( dirname(__FILE__).'/lib/agapetry_wp_core_lib.php');
@@ -189,7 +191,7 @@ add_action(
 			return;
 		}
 
-		define('PUBLISHPRESS_REVISIONS_VERSION', '3.0-beta3');
+		define('PUBLISHPRESS_REVISIONS_VERSION', '3.0-beta3.3');
 
 		if ( ! defined( 'RVY_VERSION' ) ) {
 			define( 'RVY_VERSION', PUBLISHPRESS_REVISIONS_VERSION );  // back compat
@@ -197,6 +199,10 @@ add_action(
 
 		define ('COLS_ALL_RVY', 0);
 		define ('COL_ID_RVY', 1);
+
+		if (!defined('AUTOSAVE_INTERVAL')) { // note: 
+			define('AUTOSAVE_INTERVAL', 3);
+		}
 
 		if ( defined('RS_DEBUG') ) {
 			include_once( dirname(__FILE__).'/lib/debug.php');

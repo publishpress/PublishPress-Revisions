@@ -69,10 +69,13 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		if (!empty($q['post_author'])) {
+			// @todo: confirm separate query for post counts with post_author view filter is no longer needed
+			/*
 			do_action('revisionary_queue_pre_query');
 			$_pre_query = new WP_Query( $qp );
 			$this->published_post_count_ids = $_pre_query->posts;
 			do_action('revisionary_queue_pre_query_done');
+			*/
 
 			$qp['author'] = $q['post_author'];
 		}
@@ -198,24 +201,27 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	function pre_query_where_filter($where, $args = []) {
 		global $wpdb, $current_user, $revisionary;
 		
-		if (!current_user_can('administrator') && empty($args['suppress_author_clause'])) { //} && (!defined('PRESSPERMIT_COLLAB_VERSION') || defined('PRESSPERMIT_EXTRA_REVISION_QUEUE_FILTER'))) {
-			$p = (!empty($args['alias'])) ? $args['alias'] : $wpdb->posts;
-
-			$can_edit_others_types = [];
+		if (!current_user_can('administrator') && empty($args['suppress_author_clause']) && empty($_REQUEST['post_author'])) { //} && (!defined('PRESSPERMIT_COLLAB_VERSION') || defined('PRESSPERMIT_EXTRA_REVISION_QUEUE_FILTER'))) {
+			if (rvy_get_option('revisor_hide_others_revisions') && !current_user_can('list_others_revisions') ) {
 			
-			foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
-				if ($type_obj = get_post_type_object($post_type)) {
-					if (current_user_can($type_obj->cap->edit_others_posts)) {
-						$can_edit_others_types[]= $post_type;
+				$p = (!empty($args['alias'])) ? $args['alias'] : $wpdb->posts;
+
+				$can_edit_others_types = [];
+
+				foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
+					if ($type_obj = get_post_type_object($post_type)) {
+						if (current_user_can($type_obj->cap->edit_others_posts)) {
+							$can_edit_others_types[]= $post_type;
+						}
 					}
 				}
+
+				$can_edit_others_types = apply_filters('revisionary_queue_edit_others_types', $can_edit_others_types);
+
+				$type_clause = ($can_edit_others_types) ? "OR $p.post_type IN ('" . implode("','", $can_edit_others_types) . "')" : '';
+
+				$where .= $wpdb->prepare(" AND ($p.post_author = %d $type_clause)", $current_user->ID );
 			}
-
-			$can_edit_others_types = apply_filters('revisionary_queue_edit_others_types', $can_edit_others_types);
-
-			$type_clause = ($can_edit_others_types) ? "OR $p.post_type IN ('" . implode("','", $can_edit_others_types) . "')" : '';
-
-			$where .= $wpdb->prepare(" AND ($p.post_author = %d $type_clause)", $current_user->ID );
 		}
 
 		return $where;
@@ -282,6 +288,23 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$where_append = "($p.comment_count IN ($post_id_csv) $own_revision_clause)";
 
+		$status_csv = rvy_filtered_statuses(['return' => 'csv']);
+
+		$own_posts = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT ID FROM $wpdb->posts WHERE post_status IN ($status_csv) AND post_author = %d",
+				$current_user->ID
+			)
+			);
+
+		if (rvy_get_option('admin_revisions_to_own_posts')) {
+			$own_posts = apply_filters('revisionary_own_post_ids', $own_posts, $current_user->ID);
+		} else {
+			$own_posts = [];
+		}
+
+		$own_posts_csv = "'" . implode("','", $own_posts) . "'";
+
 		if (rvy_get_option('revisor_hide_others_revisions') && !current_user_can('administrator') 
 			&& !current_user_can('list_others_revisions') && empty($args['suppress_author_clause']) 
 		) {
@@ -313,7 +336,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				$type_clause = '';
 			}
 
-			$where_append .= $wpdb->prepare(" AND ($p.post_author = %d $type_clause)", $current_user->ID );
+			$where_append .= $wpdb->prepare(" AND (($p.post_author = %d $type_clause) OR ($p.comment_count IN ($own_posts_csv) $type_clause))", $current_user->ID );
+
 		} elseif ($revisionary->config_loaded) {
 			$where_append .= (array_filter($revisionary->enabled_post_types)) 
 			? " AND ($p.post_type IN ('" . implode("','", array_keys(array_filter($revisionary->enabled_post_types))) . "'))" 
@@ -611,6 +635,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$total_items = $wp_query->found_posts;
 		
+		// auto-flush revision flags 
+		if (!$total_items && !rvy_get_option('queue_query_all_posts') && !get_transient('revisionary_flushed_has_revision_flag')) {
+			revisionary_refresh_revision_flags();
+			set_transient('revisionary_flushed_has_revision_flag', true, 60);
+		}
+
 		$this->set_pagination_args( [
 			'total_items' => $total_items,
 			'per_page' => $per_page
@@ -733,7 +763,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				$link_class = '';
 			}
 
-			$links['mine'] = sprintf(__('%sMy Copies & Changes%s (%s)', 'revisionary'), "<a href='admin.php?page=revisionary-q&author=$current_user->ID'{$link_class}>", '</a>', "<span class='count'>$my_count</span>");
+			$links['mine'] = sprintf(
+				apply_filters('revisionary_my_copies_label', __('%sMy Copies & Changes%s (%s)', 'revisionary')), 
+				"<a href='admin.php?page=revisionary-q&author=$current_user->ID'{$link_class}>", '</a>', "<span class='count'>$my_count</span>"
+			);
 		}
 
 		$where = $this->revisions_where_filter( 
