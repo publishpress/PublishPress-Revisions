@@ -101,6 +101,15 @@ class RevisionaryAdmin
 		add_filter('presspermit_status_control_scripts', [$this, 'fltDisableStatusControlScripts']);
 
 		add_filter('cme_plugin_capabilities', [$this, 'fltPublishPressCapsSection']);
+
+		if (defined('AUTOSAVE_INTERVAL') && (AUTOSAVE_INTERVAL > 5) && !defined('PP_REVISIONS_IGNORE_AUTOSAVE_INTERVAL')) {
+			if (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'revisionary-q'])) {	
+				add_action('all_admin_notices', function() {
+					$message = sprintf(__( 'For proper results, please set the AUTOSAVE_INTERVAL constant to 5 or lower.', 'revisionary' ));
+					echo "<div id='message' class='notice error' style='color:black'>" . $message . '</div>';
+				});
+			}
+		}
 	}
 
 	function admin_scripts() {
