@@ -427,7 +427,12 @@ class Revisionary
 		$revision = $this->get_last_revision($published_post_id, $current_user->ID);
 
 		if ($revision) {
-			$preview_link = rvy_preview_url($revision);
+			$args = [];
+			if (!empty($_REQUEST['nc'])) { // with a specified link target, avoid multiple browser tabs the same editor instance
+				$args['nc'] = $_REQUEST['nc'];
+			}
+
+			$preview_link = rvy_preview_url($revision, $args);
 			wp_redirect($preview_link);
 			exit;
 		}

@@ -155,7 +155,7 @@ jQuery(document).ready( function($) {
 					+ '<span class="revision-approve revision-created">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
 
-					+ '<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-approve revision-edit components-button is-tertiary ppr-purple-button" target="_blank">'
+					+ '<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-approve revision-edit components-button is-tertiary ppr-purple-button" target="pp_revisions_copy">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a></div>'
 
 					+ '</div>'

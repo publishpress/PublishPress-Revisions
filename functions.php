@@ -232,8 +232,9 @@ function rvy_post_id($revision_id) {
 }
 
 // Append a random argument for cache busting
-function rvy_nc_url($url) {
-    return add_query_arg('nc', substr(md5(rand()), 1, 8), $url);
+function rvy_nc_url($url, $args = []) {
+    $nc = (!empty($args['nc'])) ? $args['nc'] : substr(md5(rand()), 1, 8);
+    return add_query_arg('nc', $nc, $url);
 }
 
 // Complete an admin URL, appending a random argument for cache busting

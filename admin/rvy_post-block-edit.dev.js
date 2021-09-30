@@ -38,7 +38,7 @@ jQuery(document).ready( function($) {
 			+ '<span class="revision-approve revision-created">'
 			+ rvyObjEdit.completedCaption + '</span> '
 
-			+ '<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-tertiary ppr-purple-button" target="_blank">'
+			+ '<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-tertiary ppr-purple-button" target="pp_revisions_copy">'
 			+ rvyObjEdit.completedLinkCaption + '</a></button>';
 
 			if (rvyObjEdit.scheduleCaption) {
@@ -55,7 +55,7 @@ jQuery(document).ready( function($) {
 					+ '<span class="revision-approve revision-scheduled">'
 					+ rvyObjEdit.scheduledCaption + '</span> '
 
-					+ '<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-tertiary ppr-purple-button" target="_blank">'
+					+ '<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-tertiary ppr-purple-button" target="pp_revisions_copy">'
 					+ rvyObjEdit.scheduledLinkCaption + '</a></button>';
 				}
 			}
