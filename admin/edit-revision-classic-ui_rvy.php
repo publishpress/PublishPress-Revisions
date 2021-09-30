@@ -96,7 +96,7 @@ class RevisionaryEditRevisionClassicUI {
 				$view_caption = '';
 				$view_title = '';
 			} elseif ($can_publish) {
-				$view_caption = ('future-revision' == $post->post_mime_type) ? __('View / Publish', 'revisionary') : __('Preview / Approve', 'revisionary');
+				$view_caption = ('future-revision' == $post->post_mime_type) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
 				$view_title = __('View / moderate saved revision', 'revisionary');
 			} else {
 				$view_caption = __('View');
