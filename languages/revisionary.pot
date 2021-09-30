@@ -47,7 +47,7 @@ msgstr ""
 #: admin/RevisionEditSubmitMetabox.php:114
 #: admin/edit-revision-classic-ui_rvy.php:99 admin/history_rvy.php:1064
 #: admin/post-edit_rvy.php:79 admin/post-editor-workflow-ui_rvy.php:41
-msgid "View / Approve"
+msgid "Preview / Approve"
 msgstr ""
 
 #: admin/RevisionEditSubmitMetabox.php:115

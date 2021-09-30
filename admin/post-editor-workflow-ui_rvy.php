@@ -38,7 +38,7 @@ class PostEditorWorkflowUI {
                 $vars['viewTitle'] = '';
 
             } elseif ($can_publish) {
-                $vars['viewCaption'] = ('future-revision' == $post->post_mime_type) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
+                $vars['viewCaption'] = ('future-revision' == $post->post_mime_type) ? __('View / Publish', 'revisionary') : __('Preview / Approve', 'revisionary');
                 $vars['viewTitle'] =  __('View / moderate saved revision', 'revisionary');
             } else {
                 $vars['viewCaption'] = __('View');
@@ -133,7 +133,7 @@ class PostEditorWorkflowUI {
         if ($do_scheduled_revisions && $_revisions = rvy_get_post_revisions($post->ID, 'future-revision', ['orderby' => 'ID', 'order' => 'ASC'])) {
             $status_obj = get_post_status_object('future-revision');
             $vars['scheduledRevisionsCaption'] = sprintf(_n('<span class="dashicons dashicons-clock"></span>&nbsp;%s Scheduled Change', '<span class="dashicons dashicons-clock"></span>&nbsp;%s Scheduled Changes', count($_revisions), 'revisionary'), count($_revisions));
-            
+
             $vars['scheduledRevisionsURL'] = rvy_admin_url("revision.php?post_id=$post->ID&revision=future-revision");
         } else {
             $vars['scheduledRevisionsURL'] = '';

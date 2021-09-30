@@ -7,7 +7,7 @@ display:inline-flex;
 }
 
 /* Gutenberg */
-a.rvy-post-preview, a.rvy-post-preview.components-button.is-large {
+a.rvy-post-preview.components-button.is-large {
 margin-right:5px;
 text-decoration: none;
 height: inherit;

@@ -722,7 +722,7 @@ msgstr "Visa"
 #: admin/post-edit_rvy.php:96 admin/post-edit_rvy.php:251
 #: admin/history_rvy.php:1037 admin/PostEditSubmitMetabox.php:173
 #: admin/post-edit-block-ui_rvy.php:43
-msgid "View / Approve"
+msgid "Preview / Approve"
 msgstr "Visa / Godkänn"
 
 #: admin/post-edit_rvy.php:96 admin/post-edit_rvy.php:251

@@ -6,11 +6,15 @@
 * Copyright 2021, PublishPress
 */
 jQuery(document).ready( function($) {
-	function RvyRecaptionElement(btnSelector, btnCaption) {
+	function RvyRecaptionElement(btnSelector, btnCaption, btnIcon = '') {
 		let node = document.querySelector(btnSelector);
 
 		if (node) {
 			document.querySelector(btnSelector).innerText = `${btnCaption}`;
+
+			if(btnIcon){
+				document.querySelector(btnSelector).innerHTML = `<span class="dashicons dashicons-${btnIcon}"></span>${btnCaption}`;
+			}
 		}
 	}
 
@@ -143,16 +147,17 @@ jQuery(document).ready( function($) {
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']) {
 				$(refSelector).after(
 					'<div class="rvy-creation-ui"><a href="' + url + '" class="revision-approve">'
-					+ '<button type="button" class="components-button revision-approve is-button is-default is-large">' 
+					+ '<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button">'
+					+ '<span class="dashicons dashicons-yes"></span>'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</button></a>'
-					
-					+ '<button type="button" class="components-button revision-approve revision-created is-button is-default is-large" style="display: none">' 
+
+					+ '<div class="revision-created" style="display: none">'
 					+ '<span class="revision-approve revision-created">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
 
-					+ '<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-approve revision-edit" target="_blank">' 
-					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a></button>'
-					
+					+ '<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-approve revision-edit components-button is-tertiary ppr-purple-button" target="_blank">'
+					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a></div>'
+
 					+ '</div>'
 				);
 			}
@@ -238,19 +243,15 @@ jQuery(document).ready( function($) {
 	var RvyRecaptionSaveDraft = function() {
 		if ($('button.editor-post-save-draft:not(.rvy-recaption)').length) {
 			RvyRecaptionElement('button.editor-post-save-draft:not(.rvy-recaption)', rvyObjEdit.saveRevision);
-			$('button.editor-post-save-draft:not(.rvy-recaption)').addClass('rvy-recaption');
+			$('button.editor-post-save-draft:not(.rvy-recaption)').removeClass('is-tertiary').addClass('ppr-purple-button is-secondary rvy-recaption');
 		}
 
 		if (($('div.edit-post-header__settings a.editor-post-preview:visible').length || $('div.block-editor-post-preview__dropdown button.block-editor-post-preview__button-toggle:visible').length) && !$('a.rvy-post-preview').length) {
 
 			if (rvyObjEdit.viewURL) {
 				original = $('div.edit-post-header__settings a.editor-post-preview');
-				$(original).after(original.clone().attr('href', rvyObjEdit.viewURL).attr('target', '_blank').removeClass('editor-post-preview').addClass('rvy-post-preview'));
+				$(original).after(original.clone().attr('href', rvyObjEdit.viewURL).attr('target', '_blank').removeClass('editor-post-preview is-tertiary').addClass('rvy-post-preview is-secondary ppr-purple-button'));
 				$(original).hide();
-
-				if (rvyObjEdit.multiPreviewActive) {
-					$('.rvy-post-preview').removeClass('components-button').css('height', 'inherit').css('text-decoration', 'none');
-				}
 			}
 
 			if (rvyObjEdit.viewCaption) {

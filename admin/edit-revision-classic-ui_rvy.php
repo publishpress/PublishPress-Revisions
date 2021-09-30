@@ -41,7 +41,7 @@ class RevisionaryEditRevisionClassicUI {
 			/* <![CDATA[ */
 			jQuery(document).ready( function($) {
 				$('#publish').val("<?php _e('Submit Changes', 'revisionary' )?>");
-				
+
 				if (typeof(postL10n) != 'undefined') {
 					postL10n.update = "<?php _e('Submit Changes', 'revisionary' )?>";
 					postL10n.schedule = "<?php _e('Submit Change Schedule', 'revisionary' )?>";
@@ -63,7 +63,7 @@ class RevisionaryEditRevisionClassicUI {
 			/* <![CDATA[ */
 			jQuery(document).ready( function($) {
 				$('#publish').val("<?php _e('Update Revision', 'revisionary' )?>");
-				
+
 				if (typeof(postL10n) != 'undefined') {
 					postL10n.update = "<?php _e('Update Revision', 'revisionary' )?>";
 
@@ -96,7 +96,7 @@ class RevisionaryEditRevisionClassicUI {
 				$view_caption = '';
 				$view_title = '';
 			} elseif ($can_publish) {
-				$view_caption = ('future-revision' == $post->post_mime_type) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
+				$view_caption = ('future-revision' == $post->post_mime_type) ? __('View / Publish', 'revisionary') : __('Preview / Approve', 'revisionary');
 				$view_title = __('View / moderate saved revision', 'revisionary');
 			} else {
 				$view_caption = __('View');
@@ -143,27 +143,27 @@ class RevisionaryEditRevisionClassicUI {
 			$object_type = (!empty($post->post_type)) ? $post->post_type : awp_post_type_from_uri();
 
 			$unrevisable_css_ids = apply_filters('rvy_hidden_meta_boxes', ['authordiv', 'visibility', 'postcustom', 'pagecustom']);
-				
+
 			if (rvy_in_revision_workflow($post)) {
 				$unrevisable_css_ids = array_merge($unrevisable_css_ids, ['publish', 'slugdiv', 'edit-slug-box']);
 			}
 
 			echo( "\n<style type='text/css'>\n<!--\n" );
-				
+
 			foreach ( $unrevisable_css_ids as $id ) {
 				// thanks to piemanek for tip on using remove_meta_box for any core admin div
 				remove_meta_box($id, $object_type, 'normal');
 				remove_meta_box($id, $object_type, 'advanced');
-				
+
 				// also hide via CSS in case the element is not a metabox
 				echo "#$id { display: none !important; }\n";  // this line adapted from Clutter Free plugin by Mark Jaquith
 			}
-				
+
 			echo "-->\n</style>\n";
-			
+
 			// display the current status, but hide edit link
 			echo "\n<style type='text/css'>\n<!--\n.edit-post-status { display: none !important; }\n-->\n</style>\n";  // this line adapted from Clutter Free plugin by Mark Jaquith
-		}	
+		}
 	}
 
 	public function fltEditorUIstatus($status, $post, $args) {
@@ -227,7 +227,7 @@ class RevisionaryEditRevisionClassicUI {
 		$messages['post'][1] = $preview_msg;
 		$messages['page'][1] = $preview_msg;
 		$messages[$post->post_type][1] = $preview_msg;
-	
+
         return $messages;
 	}
 }

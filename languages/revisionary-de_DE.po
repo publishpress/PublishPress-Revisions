@@ -809,7 +809,7 @@ msgstr "M j, Y @ H:i"
 #: F:\snapshot\revisionary/admin/post-edit_rvy.php:96
 #: F:\snapshot\revisionary/admin/post-edit_rvy.php:249
 #: F:\snapshot\revisionary/admin/PostEditSubmitMetabox.php:173
-msgid "View / Approve"
+msgid "Preview / Approve"
 msgstr "Ansehen / Genehmigen"
 
 #: F:\snapshot\revisionary/admin/history_rvy.php:1119

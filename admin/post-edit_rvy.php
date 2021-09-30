@@ -76,7 +76,7 @@ class RvyPostEdit {
         }
 
         if (current_user_can('edit_post', rvy_post_id($post->ID))) {
-            $preview_caption = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
+            $preview_caption = ('future-revision' == $post->post_status) ? __('View / Publish', 'revisionary') : __('Preview / Approve', 'revisionary');
         } elseif ($type_obj && !empty($type_obj->public)) {
             $preview_caption = __('View');
         }
@@ -104,7 +104,7 @@ class RvyPostEdit {
 
     function act_post_submit_revisions_links() {
         global $post;
-        
+
         // These links do not apply when editing a revision
         if (rvy_in_revision_workflow($post) || !current_user_can('edit_post', $post->ID) || !rvy_is_supported_post_type($post->post_type)) {
             return;
@@ -152,7 +152,7 @@ class RvyPostEdit {
                     }
                 }
             }
-            
+
         }
 
         return $wp_blogcaps;

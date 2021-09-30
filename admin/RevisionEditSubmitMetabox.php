@@ -86,7 +86,7 @@ class RvyRevisionEditSubmitMetabox
         ?>
         <input type="submit" name="save" id="save-post" value="<?php echo $draft_label ?>"
                 tabindex="4" class="button button-highlighted"/>
-    
+
         <span class="spinner" style="margin:2px 2px 0"></span>
         <?php
     }
@@ -107,11 +107,11 @@ class RvyRevisionEditSubmitMetabox
             $type_obj = get_post_type_object($post->post_type);
 
             $can_publish = current_user_can('edit_post', rvy_post_id($post->ID));
-            
+
             if ($type_obj && empty($type_obj->public)) {
                 return;
             } elseif ($can_publish) {
-                $preview_button = ('future-revision' == $post->post_mime_type) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
+                $preview_button = ('future-revision' == $post->post_mime_type) ? __('View / Publish', 'revisionary') : __('Preview / Approve', 'revisionary');
                 $preview_title = __('View / moderate saved revision', 'revisionary');
             } else {
                 $preview_button = __('View');
@@ -146,7 +146,7 @@ class RvyRevisionEditSubmitMetabox
         echo $status_label;
         ?>
         </span>&nbsp;
-  
+
         <?php /* Output status select for js consistency with date select OK / Cancel */?>
         <div id="post-status-select" class="hide-if-js" style="display:none">
             <select name='post_status' id='post_status' tabindex='4'>
@@ -179,10 +179,10 @@ class RvyRevisionEditSubmitMetabox
 
         } elseif (strtotime($post->post_date_gmt) > agp_time_gmt()) {
             $stamp =__('Publish on: %s');
-        
+
         } else {
             $stamp = __('Publish <b>on approval</b>', 'revisionary');
-        } 
+        }
 
         $date = '<b>' . date_i18n($datef, strtotime($post->post_date)) . '</b>';
 
