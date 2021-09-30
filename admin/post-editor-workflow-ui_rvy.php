@@ -38,11 +38,16 @@ class PostEditorWorkflowUI {
                 $vars['viewTitle'] = '';
 
             } elseif ($can_publish) {
-                $vars['viewCaption'] = ('future-revision' == $post->post_mime_type) ? __('View / Publish', 'revisionary') : __('Preview / Approve', 'revisionary');
-                $vars['viewTitle'] =  __('View / moderate saved revision', 'revisionary');
+                if (version_compare($wp_version, '5.5-beta', '>=')) {
+                    $vars['viewCaption'] = ('future-revision' == $post->post_mime_type) ? __('Preview / Publish', 'revisionary') : __('Preview / Approve', 'revisionary');
+                } else {
+                    $vars['viewCaption'] = ('future-revision' == $post->post_mime_type) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
+                }
+
+                $vars['viewTitle'] =  __('View / Approve saved changes', 'revisionary');
             } else {
-                $vars['viewCaption'] = __('View');
-                $vars['viewTitle'] =  __('View saved revision', 'revisionary');
+                $vars['viewCaption'] = version_compare($wp_version, '5.5-beta', '>=') ? __('Preview / Submit') :  __('View / Submit');
+                $vars['viewTitle'] =  __('View / Submit saved changes', 'revisionary');
             }
         } else {
             $vars['viewURL']  = '';
@@ -50,7 +55,7 @@ class PostEditorWorkflowUI {
             $vars['viewTitle'] =  '';
         }
 
-        $vars['preview_title'] = __('View unsaved changes', 'revisionary');
+        $vars['previewTitle'] = __('View unsaved changes', 'revisionary');
 
         $_revisions = wp_get_post_revisions($post->ID);
         if ($_revisions && count($_revisions) > 1) {

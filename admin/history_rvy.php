@@ -22,7 +22,7 @@ class RevisionaryHistory
 
         add_action('parse_query', [$this, 'actDisableProblemQueries'], 5);
 
-        // Thin Out Revisions plugin breaks Preview / Approve button on Compare Pending Revisions screen
+        // Thin Out Revisions plugin breaks View / Approve button on Compare Pending Revisions screen
         if (class_exists('HM_TOR_Plugin_Loader')) {
             global $hm_tor_plugin_loader;
             if (!empty($hm_tor_plugin_loader)) {
@@ -1070,7 +1070,7 @@ class RevisionaryHistory
         }
 
         if (empty($type_obj) || $can_approve) {
-            $button_label = $direct_approval ? __('Approve', 'revisionary') : __('Preview / Approve', 'revisionary');
+            $button_label = $direct_approval ? __('Approve', 'revisionary') : __('View / Approve', 'revisionary');
         } else {
             $button_label = __('View', 'revisionary');
         }
