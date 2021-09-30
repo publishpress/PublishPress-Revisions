@@ -605,6 +605,19 @@ font-weight: bold;
   box-shadow: inset 0 0 0 1px #fff, 0 0 0 var(--wp-admin-border-width-focus) #483f6b;
 }
 
+/* Secondary button in purple requires these 3 classes together for <button> and <a> tags */
+.ppr-purple-button.components-button.is-secondary {
+  color: #655997;
+  box-shadow: inset 0 0 0 1px #655997;
+}
+
+.ppr-purple-button.components-button.is-secondary:hover,
+.ppr-purple-button.components-button.is-secondary:focus,
+.ppr-purple-button.components-button.is-secondary:active {
+  color: #483f6b;
+  box-shadow: inset 0 0 0 1px #483f6b;
+}
+
 /* Tertiary button in purple requires these 3 classes together for <button> and <a> tags */
 .ppr-purple-button.components-button.is-tertiary {
   color: #655997;

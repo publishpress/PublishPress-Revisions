@@ -939,7 +939,7 @@ msgstr "Afficher / révision modérée enregistrée"
 #: admin/post-edit_rvy.php:96 admin/post-edit_rvy.php:249
 #: admin/history_rvy.php:1036 admin/PostEditSubmitMetabox.php:173
 #: admin/post-edit-block-ui_rvy.php:43
-msgid "View / Approve"
+msgid "Preview / Approve"
 msgstr "Afficher / Approuver"
 
 #: admin/post-edit_rvy.php:96 admin/post-edit_rvy.php:249

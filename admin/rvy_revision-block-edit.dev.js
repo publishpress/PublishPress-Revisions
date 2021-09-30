@@ -243,19 +243,19 @@ jQuery(document).ready( function($) {
 	var RvyRecaptionSaveDraft = function() {
 		if ($('button.editor-post-save-draft:not(.rvy-recaption)').length) {
 			RvyRecaptionElement('button.editor-post-save-draft:not(.rvy-recaption)', rvyObjEdit.saveRevision);
-			$('button.editor-post-save-draft:not(.rvy-recaption)').addClass('rvy-recaption');
+			$('button.editor-post-save-draft:not(.rvy-recaption)').removeClass('is-tertiary').addClass('ppr-purple-button is-secondary rvy-recaption');
 		}
 
 		if (($('div.edit-post-header__settings a.editor-post-preview:visible').length || $('div.block-editor-post-preview__dropdown button.block-editor-post-preview__button-toggle:visible').length) && !$('a.rvy-post-preview').length) {
 
 			if (rvyObjEdit.viewURL) {
 				original = $('div.edit-post-header__settings a.editor-post-preview');
-				$(original).after(original.clone().attr('href', rvyObjEdit.viewURL).attr('target', '_blank').removeClass('editor-post-preview is-tertiary').addClass('rvy-post-preview is-primary ppr-purple-button'));
+				$(original).after(original.clone().attr('href', rvyObjEdit.viewURL).attr('target', '_blank').removeClass('editor-post-preview is-tertiary').addClass('rvy-post-preview is-secondary ppr-purple-button'));
 				$(original).hide();
 			}
 
 			if (rvyObjEdit.viewCaption) {
-				RvyRecaptionElement('div.edit-post-header__settings a.rvy-post-preview', rvyObjEdit.viewCaption, 'visibility');
+				RvyRecaptionElement('div.edit-post-header__settings a.rvy-post-preview', rvyObjEdit.viewCaption);
 			}
 
 			if (rvyObjEdit.viewTitle) {
