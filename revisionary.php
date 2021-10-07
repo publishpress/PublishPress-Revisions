@@ -117,6 +117,15 @@ register_activation_hook(__FILE__, function()
 		}
 
 		new RevisionaryActivation(['import_legacy' => true]);
+
+		// convert pending / scheduled revisions from v3.0 format
+		if (!defined('PUBLISHPRESS_REVISIONS_SKIP_V2_CONVERSION')) {
+			global $wpdb;
+			$wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft-revision' WHERE post_status IN ('draft') AND post_mime_type IN ('draft-revision')");
+			$wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending-revision' WHERE post_status IN ('pending') AND post_mime_type IN ('pending-revision')");
+			$wpdb->query("UPDATE $wpdb->posts SET post_status = 'future-revision' WHERE post_status IN ('future') AND post_mime_type IN ('future-revision')");
+			//$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = '' WHERE post_status IN ('draft-revision', 'pending-revision', 'future-revision')");
+		}
 	}
 );
 
