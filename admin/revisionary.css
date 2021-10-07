@@ -546,7 +546,8 @@ div.components-panel div.revision-created {
 	margin: 15px 0 15px 0;
 }
 
-.ppr-purple-button.components-button.is-tertiary {
+.edit-post-sidebar .ppr-purple-button.components-button.is-tertiary,
+.edit-post-sidebar .ppr-purple-button.components-button.is-secondary {
 	padding: 0 7px;
 }
 
