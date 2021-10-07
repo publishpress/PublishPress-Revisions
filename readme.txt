@@ -104,6 +104,10 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.6.2 - 7 Oct 2021 =
+* Change : Maintenance queries run at plugin activation to convert version 3.0 revisions back to 2.6 encoding
+* API : Support for WPML Translation Management support in Pro version
+
 = 2.6.1 - 15 Jul 2021 =
 * Fixed : Pending / Scheduled Revisions could become disassociated from main post due to third party plugin interactions
 * Compat : Permissions - Specific Permissions were not applied for editing / approval of custom post types under some conditions 
