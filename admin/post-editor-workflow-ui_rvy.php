@@ -78,7 +78,7 @@ class PostEditorWorkflowUI {
             $vars['draftActionCaption'] = __('Submit Change Request', 'revisionary');
             $vars['draftActionURL'] = ''; // wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=submit$redirect_arg"), "submit-post_$published_post_id|{$post->ID}" );
             $vars['draftCompletedCaption'] = __('Changes Submitted.', 'revisionary');
-            $vars['draftCompletedLinkCaption'] = __('view', 'revisionary');
+            $vars['draftCompletedLinkCaption'] = __('Preview', 'revisionary');
             $vars['draftCompletedURL'] = rvy_preview_url($post);
         } else {
             $vars['draftActionCaption'] = '';
@@ -153,7 +153,7 @@ class PostEditorWorkflowUI {
                 'actionTitle' => esc_attr(__('Create a working copy of this post', 'revisionary')),
                 'actionDisabledTitle' => esc_attr(__('Update post before creating copy.', 'revisionary')),
                 'completedCaption' => __('Working Copy Ready.', 'revisionary'),
-                'completedLinkCaption' => __('view', 'revisionary'),
+                'completedLinkCaption' => __('Preview', 'revisionary'),
                 'completedURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
                 'errorCaption' => __('Error Creating Copy', 'revisionary'),
                 'ajaxurl' => rvy_admin_url(''),
@@ -172,7 +172,7 @@ class PostEditorWorkflowUI {
                 'scheduleTitle' => '',
                 'scheduleDisabledTitle' => esc_attr(__('For custom field changes, edit a scheduled copy.', 'revisionary')),
                 'scheduledCaption' => __('Changes are Scheduled.', 'revisionary'),
-                'scheduledLinkCaption' => __('view', 'revisionary'),
+                'scheduledLinkCaption' => __('Preview', 'revisionary'),
                 'scheduledURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
             ));
         }
