@@ -85,6 +85,11 @@ class RevisionCreation {
 		global $current_user;
 
 		if (rvy_get_post_meta( $post_id, "_save_as_revision_{$current_user->ID}", true )) {
+			if (!empty($_POST)) {
+				$_POST['skip_sitepress_actions'] = true;
+				$_REQUEST['skip_sitepress_actions'] = true;
+			}
+
 			$revisionary->impose_pending_rev[$post_id] = true;
 			return $status;
 		}
@@ -99,6 +104,11 @@ class RevisionCreation {
 		
 		if ( ! empty( $_POST['rvy_save_as_pending_rev'] ) && ! empty($post_id) ) {
 			$revisionary->impose_pending_rev[$post_id] = true;
+			
+			if (!empty($_POST)) {
+				$_POST['skip_sitepress_actions'] = true;
+				$_REQUEST['skip_sitepress_actions'] = true;
+			}
 		}
 		
 		if ( is_content_administrator_rvy() )
@@ -123,6 +133,11 @@ class RevisionCreation {
 
 			if (!agp_user_can('edit_post', $post_id, '', ['skip_revision_allowance' => true])) {
 				$revisionary->impose_pending_rev[$post_id] = true;
+
+				if (!empty($_POST)) {
+					$_POST['skip_sitepress_actions'] = true;
+					$_REQUEST['skip_sitepress_actions'] = true;
+				}
 			}
 		}
 		
@@ -194,7 +209,8 @@ class RevisionCreation {
 		}
 
         if (!empty($_POST)) {
-            $_POST['skip_sitepress_actions'] = true;
+			$_POST['skip_sitepress_actions'] = true;
+			$_REQUEST['skip_sitepress_actions'] = true;
         }
 
 		// ACF: prevent this filter application, called by ACF after wp_update_post(), from stripping attachment field postmeta out of revision
@@ -296,6 +312,7 @@ class RevisionCreation {
 			}
 
 			$revision_id = $this->create_revision($data, $postarr);
+
 			if (!is_scalar($revision_id)) { // update_post_data() returns array or object on update abandon / failure
 				$data['ID'] = $revision_id;
 				return $data;
@@ -308,7 +325,12 @@ class RevisionCreation {
         $revision_id = (int) $revision_id;
 
         unset($revisionary->impose_pending_rev[ $published_post->ID ]);
-        
+		
+		if (defined('WPML_TM_VERSION')) {
+			// don't let revision submission trigger needs_update flagging
+			remove_action( 'wpml_tm_save_post', 'wpml_tm_save_post', 10, 3 );
+		}
+
         if ( $revision_id ) {
 			$revisionary->last_revision[$published_post->ID] = $revision_id;
             rvy_set_transient("_rvy_pending_revision_{$current_user->ID}_{$published_post->ID}", $revision_id, 30);
@@ -356,11 +378,15 @@ class RevisionCreation {
             $_POST['ID'] = $revision_id;
             $_REQUEST['ID'] = $revision_id;
 
-            do_action( 'revisionary_save_revision', $post );
-            do_action( "save_post_{$post->post_type}", $revision_id, $post, false );
-			do_action( 'save_post', $revision_id, $post, false );
-			do_action( 'wp_insert_post', $revision_id, $post, false );
-            do_action( 'revisionary_saved_revision', $post );
+			do_action( 'revisionary_save_revision', $post );
+			
+			if (rvy_option('revision_submit_trigger_post_actions')) {
+				do_action( "save_post_{$post->post_type}", $revision_id, $post, false );
+				do_action( 'save_post', $revision_id, $post, false );
+				do_action( 'wp_insert_post', $revision_id, $post, false );
+			}
+			
+			do_action( 'revisionary_saved_revision', $post );
         }
 
 		// Stop WooCommerce from setting new pending revision Products to "out of stock"
@@ -561,6 +587,11 @@ class RevisionCreation {
 			return $data;
 		}
 		
+		if (!empty($_POST)) {
+			$_POST['skip_sitepress_actions'] = true;
+			$_REQUEST['skip_sitepress_actions'] = true;
+        }
+
 		// @todo: need to filter post parent?
 
 		$data['post_status'] = 'future-revision';
@@ -610,7 +641,6 @@ class RevisionCreation {
 					$published_meta_val = get_post_meta($published_post->ID, $meta_key, true);
 					rvy_set_transient("_archive_{$meta_key}_{$published_post->ID}", $published_meta_val, 30);
 				}
-
 			} else {
 				$msg = __('Sorry, an error occurred while attempting to schedule your revision!', 'revisionary') . ' ';
 				rvy_halt( $msg, __('Revision Scheduling Error', 'revisionary') );
@@ -621,6 +651,11 @@ class RevisionCreation {
 	
 		// Pro: better compatibility in third party action handlers
 		$revision_id = (int) $revision_id;
+
+		if (defined('WPML_TM_VERSION')) {
+			// don't let revision submission trigger needs_update flagging
+			remove_action( 'wpml_tm_save_post', 'wpml_tm_save_post', 10, 3 );
+		}
 
 		// Prevent unintended clearance of Page Template on revision submission
 		if ($revisionary->isBlockEditorActive()) {
@@ -636,9 +671,13 @@ class RevisionCreation {
 			$_REQUEST['ID'] = $revision_id;
 
 			do_action( 'revisionary_save_revision', $post );
-			do_action( "save_post_{$post->post_type}", $revision_id, $post, false );
-			do_action( 'save_post', $revision_id, $post, false );
-			do_action( 'wp_insert_post', $revision_id, $post, false );
+
+			if (rvy_option('revision_submit_trigger_post_actions')) {
+				do_action( "save_post_{$post->post_type}", $revision_id, $post, false );
+				do_action( 'save_post', $revision_id, $post, false );
+				do_action( 'wp_insert_post', $revision_id, $post, false );
+			}
+
 			do_action( 'revisionary_saved_revision', $post );
 		}
 
@@ -689,6 +728,11 @@ class RevisionCreation {
 				return 0;
 			}
 		}
+
+		if (!empty($_POST)) {
+			$_POST['skip_sitepress_actions'] = true;
+			$_REQUEST['skip_sitepress_actions'] = true;
+        }
 
 		$post_ID = (int) $wpdb->insert_id; // revision_id
 		$revision_id = $post_ID;
@@ -830,18 +874,20 @@ class RevisionCreation {
 			}
 		}
 
-		if ( 'attachment' !== $postarr['post_type'] ) {
-			$previous_status = '';
-			wp_transition_post_status( $data['post_status'], $previous_status, $post );
-		} else {
-			/**
-			 * Fires once an attachment has been added.
-			 *
-			 * @param int $post_ID Attachment ID.
-			 */
-			do_action( 'add_attachment', $post_ID );
-	
-			return $data;
+		if (rvy_get_option('revision_submit_trigger_post_actions')) {
+			if ( 'attachment' !== $postarr['post_type'] ) {
+				$previous_status = '';
+				wp_transition_post_status( $data['post_status'], $previous_status, $post );
+			} else {
+				/**
+				 * Fires once an attachment has been added.
+				 *
+				 * @param int $post_ID Attachment ID.
+				 */
+				do_action( 'add_attachment', $post_ID );
+		
+				return $data;
+			}
 		}
 
 		$data['ID'] = $revision_id;

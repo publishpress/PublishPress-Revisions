@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.8
-Stable tag: 2.6.1
+Stable tag: 2.6.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -103,6 +103,10 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.6.2 - 7 Oct 2021 =
+* Change : Maintenance queries run at plugin activation to convert version 3.0 revisions back to 2.6 encoding
+* API : Support for WPML Translation Management support in Pro version
 
 = 2.6.1 - 15 Jul 2021 =
 * Fixed : Pending / Scheduled Revisions could become disassociated from main post due to third party plugin interactions
