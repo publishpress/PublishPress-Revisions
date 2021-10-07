@@ -115,6 +115,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'queue_query_all_posts' => 					__('Compatibility Mode', 'revisionary'),
 	'revision_update_redirect' =>				__('Confirmation redirect on Revision Update', 'revisionary'),
 	'revision_update_notifications' =>			__('Also notify on Revision Update', 'revisionary'),
+	'revision_submit_trigger_post_actions' => 	__('Revision Submission: API actions for Post Creation', 'revisionary'),
 	'trigger_post_update_actions' => 			__('Revision Publication: API actions to mimic Post Update', 'revisionary'),
 	'diff_display_strip_tags' => 				__('Hide html tags on Compare Revisions screen', 'revisionary'),
 	'async_scheduled_publish' => 				__('Asynchronous Publishing', 'revisionary'),
@@ -159,7 +160,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'pending_revisions'	=> 	 ['pending_revisions', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'queue_query_all_posts'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'],
-	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'display_hints'],
+	'revisions'		=>		 ['revision_submit_trigger_post_actions', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'display_hints'],
 	'notification'	=>		 ['pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_redirect', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 ]
 ]);
@@ -490,6 +491,9 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		<?php endif;?>
 
 		<?php
+		$hint = __('Some plugins may need this disabled.', 'revisionary');
+		$this->option_checkbox( 'revision_submit_trigger_post_actions', $tab, $section, $hint, '' );
+
 		$hint = __('This may improve compatibility with some plugins.', 'revisionary');
 		$this->option_checkbox( 'trigger_post_update_actions', $tab, $section, $hint, '' );
 
@@ -743,6 +747,31 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		
 		?>
 		</td></tr>
+
+		<?php
+		if ((defined('REVISIONARY_PRO_VERSION') || defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) && defined('ICL_SITEPRESS_VERSION') && defined('WPML_TM_VERSION')) :?>
+
+		<tr valign="top"><th scope="row">
+		<?php _e('WPML Translation Management', 'revisionary') ?>
+		</th></td>
+		<td>
+		<p>
+		<?php
+		$url = admin_url('admin.php?page=revisionary-settings&rvy_wpml_sync_needs_update=1');
+		?>
+		<a href="<?php echo($url);?>"><?php _e('Sync "Needs Update" flags', 'revisionary');?></a>
+
+		<div class="rs-subtext">
+		<?php 
+		_e('Set "Needs Update" for any post with translations which was updated (possibly by revision approval) more recently than its translations.', 'revisionary');
+		?>
+		</div>
+
+		</p>
+		</td></tr>
+
+		<?php endif;?>
+
 		<!--
 		<tr valign="top"><th scope="row">
 		<?php _e('Documentation', 'revisionary') ?>
