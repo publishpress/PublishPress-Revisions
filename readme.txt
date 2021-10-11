@@ -104,6 +104,9 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 2.6.3 - 11 Oct 2021 =
+* Fixed : Classic Editor - Error submitting a pending or scheduled revision
+
 = 2.6.2 - 7 Oct 2021 =
 * Change : Maintenance queries run at plugin activation to convert version 3.0 revisions back to 2.6 encoding
 * API : Support for WPML Translation Management support in Pro version
