@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.8
-Stable tag: 2.6.2
+Stable tag: 2.6.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -103,6 +103,9 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 2.6.3 - 11 Oct 2021 =
+* Fixed : Classic Editor - Error submitting a pending or scheduled revision
 
 = 2.6.2 - 7 Oct 2021 =
 * Change : Maintenance queries run at plugin activation to convert version 3.0 revisions back to 2.6 encoding
