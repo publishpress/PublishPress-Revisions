@@ -380,7 +380,7 @@ class RevisionCreation {
 
 			do_action( 'revisionary_save_revision', $post );
 			
-			if (rvy_option('revision_submit_trigger_post_actions')) {
+			if (rvy_get_option('revision_submit_trigger_post_actions')) {
 				do_action( "save_post_{$post->post_type}", $revision_id, $post, false );
 				do_action( 'save_post', $revision_id, $post, false );
 				do_action( 'wp_insert_post', $revision_id, $post, false );
@@ -672,7 +672,7 @@ class RevisionCreation {
 
 			do_action( 'revisionary_save_revision', $post );
 
-			if (rvy_option('revision_submit_trigger_post_actions')) {
+			if (rvy_get_option('revision_submit_trigger_post_actions')) {
 				do_action( "save_post_{$post->post_type}", $revision_id, $post, false );
 				do_action( 'save_post', $revision_id, $post, false );
 				do_action( 'wp_insert_post', $revision_id, $post, false );
