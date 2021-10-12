@@ -80,7 +80,8 @@ if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1
 		add_action('all_admin_notices', function()
 		{
 			if (defined('REVISIONARY_FILE')) {
-				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: "%2$s")', 'revisionary' ), RVY_VERSION, dirname(plugin_basename(REVISIONARY_FILE)) );
+				$other_version = (defined('REVISIONARY_VERSION')) ? REVISIONARY_VERSION : PUBLISHPRESS_REVISIONS_VERSION;
+				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: "%2$s")', 'revisionary' ), $other_version, dirname(plugin_basename(REVISIONARY_FILE)) );
 			} else {
 				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)', 'revisionary' ), RVY_VERSION );
 			}
