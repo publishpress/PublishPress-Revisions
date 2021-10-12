@@ -151,6 +151,10 @@ jQuery(document).ready( function($) {
 					+ '<span class="dashicons dashicons-yes"></span>'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</button></a>'
 
+					+ '<div class="revision-submitting" style="display: none;">'
+					+ '<span class="revision-approve revision-submitting">'
+					+ rvyObjEdit[rvyObjEdit.currentStatus + 'InProcessCaption'] + '</span><span class="spinner ppr-submission-spinner" style=""></span></div>'
+
 					+ '<div class="revision-created" style="display: none">'
 					+ '<span class="revision-approve revision-created">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
@@ -211,10 +215,77 @@ jQuery(document).ready( function($) {
 		$('button.revision-approve').prop('disabled', 'disabled');
 	});
 
+	var rvyIsAutosaveStarted = false;
+	var rvyIsAutosaveDone = false;
+
 	$(document).on('click', 'button.revision-approve', function() {
-		if (!rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL']) {
+		// If autosave approvals are ever enabled, we will need this
+		var isSubmission = (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL'] == "");
+
+		$('button.revision-approve').hide();
+		$('div.revision-submitting').show().css('display', 'block');
+		$('div.revision-submitting span.ppr-submission-spinner').css('visibility', 'visible');
+
+		if (!wp.data.select('core/editor').isEditedPostDirty()) {
+			if (isSubmission) {
+				rvySubmitCopy();
+			}
+
+			return;
+		}
+
+		rvyIsAutosaveStarted = false;
+		rvyIsAutosaveDone = false;
+
+		wp.data.dispatch('core/editor').autosave();
+
+		var tmrNoAutosave = setTimeout(() => {
+			if (!rvyIsAutosaveStarted) {
+				clearInterval(intAutosaveWatch);
+
+				if (isSubmission) {
+					rvySubmitCopy();
+				}
+			}
+		}, 10000);
+
+		var intAutosaveDoneWatch;
+
+		var intAutosaveWatch = setInterval(() => {
+			if (wp.data.select('core/editor').isAutosavingPost()) {
+				rvyIsAutosaveStarted = true; 
+				clearInterval(intAutosaveWatch);
+				clearTimeout(tmrNoAutosave);
+
+				var tmrAutosaveTimeout = setTimeout(() => {
+					if (!rvyIsAutosaveDone) {
+						clearInterval(intAutosaveWatch);
+
+						if (isSubmission) {
+							rvySubmitCopy();
+						}
+					}
+				}, 10000);
+
+				intAutosaveDoneWatch = setInterval(() => {
+					if (!wp.data.select('core/editor').isAutosavingPost()) {
+						rvyIsAutosaveDone = true;
+						clearInterval(intAutosaveDoneWatch);
+						clearTimeout(tmrAutosaveTimeout);
+
+						if (isSubmission) {
+							rvySubmitCopy();
+						}
+					}
+				}, 100);
+			}
+		}, 100);
+	});
+
+	function rvySubmitCopy() {
 			var revisionaryCreateDone = function () {
 				$('.revision-approve').hide();
+			$('div.revision-submitting').hide();
 				$('.revision-created').show();
 
 				// @todo: abstract this for other workflows
@@ -238,7 +309,6 @@ jQuery(document).ready( function($) {
 				error: revisionaryCreateError
 			});
 		}
-	});
 
 	var RvyRecaptionSaveDraft = function() {
 		if ($('button.editor-post-save-draft:not(.rvy-recaption)').length) {
