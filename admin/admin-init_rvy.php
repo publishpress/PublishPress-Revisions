@@ -329,7 +329,7 @@ function rvy_intro_message($abbreviated = false) {
 
 function rvy_migration_message() {
 	return sprintf(
-		__('<strong>Revisionary is now PublishPress Revisions!</strong> Note the new Revisions menu and %sRevision Queue%s screen, where Change Requests and Scheduled Changes are listed. %s', 'revisionary'),
+		__('<strong>Revisionary is now PublishPress Revisions!</strong> Note the new Revisions menu and %sRevision Queue%s screen, where Revisions are listed. %s', 'revisionary'),
 		'<a href="' . admin_url('admin.php?page=revisionary-q') . '">',
 		'</a>',
 		'<div style="margin-top:10px">' . rvy_intro_message(true) . '</div>'
