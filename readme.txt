@@ -104,7 +104,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
-= 3.0-beta =
+= 3.0 =
 * New revision submission mechanism: create a working copy first instead of editing existing post. Then submit as a Change Request before scheduling or publication
 * Changes to plugin-related UI in Post / Revision editor
 * Admin Bar includes Create Working Copy button
