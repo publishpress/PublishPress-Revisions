@@ -15,6 +15,7 @@ function rvy_default_options_sitewide() {
 	$def = array(
 		'copy_posts_capability' => true,
 		'revision_statuses_noun_labels' => true,
+		'caption_copy_as_edit' => true,
 		'pending_revisions' => true,
 		'revise_posts_capability' => true,
 		'scheduled_revisions' => true,
@@ -63,6 +64,7 @@ function rvy_default_options() {
 	$def = array(
 		'copy_posts_capability' => 0,
 		'revision_statuses_noun_labels' => 0,
+		'caption_copy_as_edit' => 0,
 		'pending_revisions' => 1,
 		'revise_posts_capability' => 0,
 		'scheduled_revisions' => 1,
