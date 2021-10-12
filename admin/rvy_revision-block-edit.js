@@ -29,7 +29,7 @@ if(rvyObjEdit[rvyObjEdit.currentStatus+'ActionCaption']){$(refSelector).after('<
 +'<div class="revision-created" style="display: none">'
 +'<span class="revision-approve revision-created">'
 +rvyObjEdit[rvyObjEdit.currentStatus+'CompletedCaption']+'</span> '
-+'<a href="'+rvyObjEdit[rvyObjEdit.currentStatus+'CompletedURL']+'" class="revision-approve revision-edit components-button is-tertiary ppr-purple-button" target="pp_revisions_copy">'
++'<a href="'+rvyObjEdit[rvyObjEdit.currentStatus+'CompletedURL']+'" class="revision-approve revision-edit components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
 +rvyObjEdit[rvyObjEdit.currentStatus+'CompletedLinkCaption']+'</a></div>'
 +'</div>');}
 if(RvyApprovalLocked!=$('button.revision-approve').prop('disabled')){if(RvyApprovalLocked){$('button.revision-approve').html('Revision needs update.');}else{$('button.revision-approve').html(rvyObjEdit[rvyObjEdit.currentStatus+'ActionCaption']);}}

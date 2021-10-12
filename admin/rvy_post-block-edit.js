@@ -11,14 +11,14 @@ var rvyIsPublished=false;var RvySubmissionUI=function(){if(rvyObjEdit.ajaxurl&&!
 +'<button type="button" class="revision-approve revision-created ppr-clear-button" style="display: none">'
 +'<span class="revision-approve revision-created">'
 +rvyObjEdit.completedCaption+'</span> '
-+'<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-tertiary ppr-purple-button" target="pp_revisions_copy">'
++'<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
 +rvyObjEdit.completedLinkCaption+'</a></button>';if(rvyObjEdit.scheduleCaption){let postStatus=wp.data.select('core/editor').getCurrentPostAttribute('status');var publishedStatuses=Object.keys(rvyObjEdit.publishedStatuses).map(function(key){return rvyObjEdit.publishedStatuses[key];});rvyIsPublished=publishedStatuses.indexOf(postStatus)>=0;if(rvyIsPublished){html+='<a href="javascript:void(0)" style="display: none" class="revision-approve revision-schedule" title="'
 +rvyObjEdit.scheduleTitle+'"><button type="button" class="components-button revision-approve revision-schedule is-primary ppr-purple-button">'
 +rvyObjEdit.scheduleCaption+'</button></a>'
 +'<button type="button" class="revision-approve revision-scheduled ppr-clear-button" style="display: none">'
 +'<span class="revision-approve revision-scheduled">'
 +rvyObjEdit.scheduledCaption+'</span> '
-+'<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-tertiary ppr-purple-button" target="pp_revisions_copy">'
++'<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
 +rvyObjEdit.scheduledLinkCaption+'</a></button>';}}
 html+='</div>';$('div.edit-post-post-schedule').after(html);if(rvyCreationDisabled){$('button.revision-approve').prop('disabled','disabled');$('button.revision-schedule').prop('disabled','disabled');$('a.revision-approve').attr('title',rvyObjEdit.actionDisabledTitle);$('a.revision-schedule').attr('title',rvyObjEdit.scheduleDisabledTitle);}else{$('button.revision-approve').prop('disabled',false);$('button.revision-schedule').prop('disabled',false);$('a.revision-approve').attr('title',rvyObjEdit.actionTitle);$('a.revision-schedule').attr('title',rvyObjEdit.scheduleTitle);}
 RvyRefreshScheduleButton();}}

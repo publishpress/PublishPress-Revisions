@@ -159,7 +159,7 @@ jQuery(document).ready( function($) {
 					+ '<span class="revision-approve revision-created">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
 
-					+ '<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-approve revision-edit components-button is-tertiary ppr-purple-button" target="pp_revisions_copy">'
+					+ '<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-approve revision-edit components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a></div>'
 
 					+ '</div>'
@@ -313,7 +313,7 @@ jQuery(document).ready( function($) {
 	var RvyRecaptionSaveDraft = function() {
 		if ($('button.editor-post-save-draft:not(.rvy-recaption)').length) {
 			RvyRecaptionElement('button.editor-post-save-draft:not(.rvy-recaption)', rvyObjEdit.saveRevision);
-			$('button.editor-post-save-draft:not(.rvy-recaption)').addClass('rvy-recaption').removeClass('is-tertiary').addClass('is-primary').addClass('ppr-purple-button');
+			$('button.editor-post-save-draft:not(.rvy-recaption)').addClass('rvy-recaption').removeClass('is-tertiary').addClass('is-secondary').addClass('ppr-purple-button');
 		}
 
 		if (($('div.edit-post-header__settings a.editor-post-preview:visible').length || $('div.block-editor-post-preview__dropdown button.block-editor-post-preview__button-toggle:visible').length) && !$('a.rvy-post-preview').length) {
@@ -333,13 +333,13 @@ jQuery(document).ready( function($) {
 				if (rvyObjEdit.viewCaption) {
 					RvyRecaptionElement('.block-editor-post-preview__button-toggle', rvyObjEdit.viewCaption);
 					$('button.block-editor-post-preview__button-toggle:not(.ppr-purple-button)').removeClass('is-tertiary').addClass('is-secondary').addClass('ppr-purple-button');
-				}			
+				}
 			}
 
 			if (rvyObjEdit.viewTitle) {
 				$('div.edit-post-header__settings a.rvy-post-preview').attr('title', rvyObjEdit.viewTitle);
 			}
-			
+
 		} else {
 			if (!rvyObjEdit.multiPreviewActive) { // WP < 5.5
 				if (!$('a.editor-post-preview').next('a.rvy-post-preview').length) {
@@ -349,7 +349,7 @@ jQuery(document).ready( function($) {
 					if (rvyObjEdit.viewCaption) {
 						RvyRecaptionElement('div.edit-post-header__settings a.rvy-post-preview', rvyObjEdit.viewCaption);
 					}
-		
+
 					if (rvyObjEdit.viewTitle) {
 						$('div.edit-post-header__settings a.rvy-post-preview').attr('title', rvyObjEdit.viewTitle);
 					}

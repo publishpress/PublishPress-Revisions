@@ -79,7 +79,7 @@ class PostEditorWorkflowUI {
             $vars['draftActionURL'] = ''; // wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=submit$redirect_arg"), "submit-post_$published_post_id|{$post->ID}" );
             $vars['draftInProcessCaption'] = pp_revisions_status_label('pending-revision', 'submitting');
             $vars['draftCompletedCaption'] = pp_revisions_status_label('pending-revision', 'submitted');
-            $vars['draftCompletedLinkCaption'] = __('view', 'revisionary');
+            $vars['draftCompletedLinkCaption'] = __('Preview', 'revisionary');
             $vars['draftCompletedURL'] = rvy_preview_url($post);
         } else {
             $vars['draftActionCaption'] = '';
@@ -161,7 +161,7 @@ class PostEditorWorkflowUI {
                 'actionDisabledTitle' => esc_attr(sprintf(__('Update post before creating %s.', 'revisionary'), strtolower(pp_revisions_status_label('draft-revision', 'basic')))),
                 'creatingCaption' => pp_revisions_status_label('draft-revision', 'submitting'),
                 'completedCaption' => pp_revisions_status_label('draft-revision', 'submitted'),
-                'completedLinkCaption' => __('view', 'revisionary'),
+                'completedLinkCaption' => __('Preview', 'revisionary'),
                 'completedURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
                 'errorCaption' => __('Error Creating Revision', 'revisionary'),
                 'ajaxurl' => rvy_admin_url(''),
@@ -180,7 +180,7 @@ class PostEditorWorkflowUI {
                 'scheduleTitle' => '',
                 'scheduleDisabledTitle' => esc_attr(sprintf(__('For custom field changes, edit a scheduled %s.', 'revisionary'), strtolower(pp_revisions_status_label('draft-revision', 'basic')))),
                 'scheduledCaption' => pp_revisions_status_label('future-revision', 'submitted'),
-                'scheduledLinkCaption' => __('view', 'revisionary'),
+                'scheduledLinkCaption' => __('Preview', 'revisionary'),
                 'scheduledURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
             ));
         }
