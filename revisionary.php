@@ -80,7 +80,8 @@ if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1
 		add_action('all_admin_notices', function()
 		{
 			if (defined('REVISIONARY_FILE')) {
-				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: "%2$s")', 'revisionary' ), RVY_VERSION, dirname(plugin_basename(REVISIONARY_FILE)) );
+				$other_version = (defined('REVISIONARY_VERSION')) ? REVISIONARY_VERSION : PUBLISHPRESS_REVISIONS_VERSION;
+				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: "%2$s")', 'revisionary' ), $other_version, dirname(plugin_basename(REVISIONARY_FILE)) );
 			} else {
 				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)', 'revisionary' ), RVY_VERSION );
 			}
@@ -118,6 +119,8 @@ register_activation_hook(__FILE__, function()
 			require_once(dirname(__FILE__).'/activation_rvy.php');
 		}
 
+		require_once(dirname(__FILE__).'/functions.php');
+
 		// import from Revisionary 1.x
 		new RevisionaryActivation(['import_legacy' => true]);
 
@@ -135,6 +138,8 @@ register_activation_hook(__FILE__, function()
 register_deactivation_hook(__FILE__, function()
 	{
 		global $wpdb;
+
+		require_once(dirname(__FILE__).'/functions.php');
 
 		// convert pending / scheduled revisions to v2.x format, which also prevents them from being listed as regular drafts / pending posts
 		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
@@ -199,10 +204,6 @@ add_action(
 
 		define ('COLS_ALL_RVY', 0);
 		define ('COL_ID_RVY', 1);
-
-		if (!defined('AUTOSAVE_INTERVAL')) { // note: 
-			define('AUTOSAVE_INTERVAL', 3);
-		}
 
 		if ( defined('RS_DEBUG') ) {
 			include_once( dirname(__FILE__).'/lib/debug.php');

@@ -96,9 +96,10 @@ $this->tab_captions = array( 'features' => __( 'Settings', 'revisionary' ), 'opt
 $this->section_captions = array(
 	'features' => array(
 		'role_definition' 	  	=> __('Role Definition', 'revisionary'),
-		'working_copy'			=> __('Working Copies', 'revisionary'),
-		'scheduled_revisions' 	=> __('Scheduled Changes', 'revisionary'),
-		'pending_revisions'		=> __('Change Requests', 'revisionary'),
+		'revision_statuses'		=> __('Revision Statuses', 'revisionary'),
+		'working_copy'			=> pp_revisions_status_label('draft-revision', 'plural'),
+		'scheduled_revisions' 	=> pp_revisions_status_label('future-revision', 'plural'),
+		'pending_revisions'		=> pp_revisions_status_label('pending-revision', 'plural'),
 		'revision_queue'		=> __('Revision Queue', 'revisionary'),		
 		'preview'				=> __('Preview / Approval', 'revisionary'),
 		'revisions'				=> __('Revision Options', 'revisionary'),
@@ -107,12 +108,19 @@ $this->section_captions = array(
 );
 
 // TODO: replace individual _e calls with these (and section, tab captions)
+$pending_revision_singular = pp_revisions_status_label('pending-revision', 'name');
+$pending_revision_plural = pp_revisions_status_label('pending-revision', 'plural');
+$pending_revision_basic = pp_revisions_status_label('pending-revision', 'basic');
+$future_revision_singular = pp_revisions_status_label('future-revision', 'name');
+
 $this->option_captions = apply_filters('revisionary_option_captions', 
 	[
-	'copy_posts_capability' =>					__("Working Copies require role capability", 'revisionary'),
-	'pending_revisions' => 						__('Enable Change Requests', 'revisionary'),
-	'scheduled_revisions' => 					__('Enable Scheduled Changes', 'revisionary'),
-	'revise_posts_capability' =>				__("Change Requests require role capability", 'revisionary'),
+	'revision_statuses_noun_labels' =>			__('Use alternate labeling: "Working Copy" > "Change Request" > "Scheduled Change"', 'revisionary'),
+	'copy_posts_capability' =>					sprintf(__("%s require role capability", 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
+	'caption_copy_as_edit' =>					__("Posts / Pages admin listing: limited users get 'Edit' caption"),
+	'pending_revisions' => 						sprintf(__('Enable %s', 'revisionary'), $pending_revision_plural),
+	'scheduled_revisions' => 					sprintf(__('Enable %s', 'revisionary'), pp_revisions_status_label('future-revision', 'plural')),
+	'revise_posts_capability' =>				sprintf(__("%s require role capability", 'revisionary'), $pending_revision_plural),
 	'revisor_lock_others_revisions' =>			__("Editing others&apos; revisions requires role capability", 'revisionary'),
 	'revisor_hide_others_revisions' => 			__("Listing others&apos; revisions requires role capability", 'revisionary'),
 	'admin_revisions_to_own_posts' =>			__("Users can always administer revisions to their own editable posts", 'revisionary'),
@@ -125,11 +133,11 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'pending_revision_update_post_date' => 		__('Update Publish Date', 'revisionary'),
 	'scheduled_revision_update_modified_date' => __('Update Modified Date', 'revisionary'),
 	'pending_revision_update_modified_date' => 	__('Update Modified Date', 'revisionary'),
-	'pending_rev_notify_author' => 				__('Email original Author when a Change Request is submitted', 'revisionary'),
-	'rev_approval_notify_author' => 			__('Email the original Author when a Change Request is approved', 'revisionary'),
-	'rev_approval_notify_revisor' => 			__('Email the Revisor when a Change Request is approved', 'revisionary'),
-	'publish_scheduled_notify_author' => 		__('Email the original Author when a Scheduled Change is published', 'revisionary'),
-	'publish_scheduled_notify_revisor' => 		__('Email the Revisor when a Scheduled Change is published', 'revisionary'),
+	'pending_rev_notify_author' => 				sprintf(__('Email original Author when a %s is submitted', 'revisionary'), $pending_revision_basic),
+	'rev_approval_notify_author' => 			sprintf(__('Email the original Author when a %s is approved', 'revisionary'), $pending_revision_singular),
+	'rev_approval_notify_revisor' => 			sprintf(__('Email the Revisor when a %s is approved', 'revisionary'), $pending_revision_singular),
+	'publish_scheduled_notify_author' => 		sprintf(__('Email the original Author when a %s is published', 'revisionary'), $future_revision_singular),
+	'publish_scheduled_notify_revisor' => 		sprintf(__('Email the Revisor when a %s is published', 'revisionary'), $future_revision_singular),
 	'use_notification_buffer' => 				__('Enable notification buffer', 'revisionary'),
 	'revisor_role_add_custom_rolecaps' => 		__('All custom post types available to Revisors', 'revisionary' ),
 	'require_edit_others_drafts' => 			__('Prevent Revisors from editing other user&apos;s drafts', 'revisionary' ),
@@ -144,13 +152,13 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 
 
 if ( defined('RVY_CONTENT_ROLES') ) {
-	$this->option_captions['pending_rev_notify_admin'] = 		__('Email designated Publishers when a Change Request is submitted', 'revisionary');
-	$this->option_captions['publish_scheduled_notify_admin'] = 	__('Email designated Publishers when a Scheduled Change is published', 'revisionary');
-	$this->option_captions['rev_approval_notify_admin'] = 		__('Email designated Publishers when a Change Request is approved', 'revisionary');
+	$this->option_captions['pending_rev_notify_admin'] = 		sprintf(__('Email designated Publishers when a %s is submitted', 'revisionary'), $pending_revision_basic);
+	$this->option_captions['publish_scheduled_notify_admin'] = 	sprintf(__('Email designated Publishers when a %s is published', 'revisionary'), $future_revision_singular);
+	$this->option_captions['rev_approval_notify_admin'] = 		sprintf(__('Email designated Publishers when a %s is approved', 'revisionary'), $pending_revision_singular);
 } else {
-	$this->option_captions['pending_rev_notify_admin'] = 		__('Email Editors and Administrators when a Change Request is submitted', 'revisionary');
-	$this->option_captions['publish_scheduled_notify_admin'] = 	__('Email Editors and Administrators when a Scheduled Change is published', 'revisionary');
-	$this->option_captions['rev_approval_notify_admin'] = 		__('Email Editors and Administrators when a Change Request is approved', 'revisionary');
+	$this->option_captions['pending_rev_notify_admin'] = 		sprintf(__('Email Editors and Administrators when a %s is submitted', 'revisionary'), $pending_revision_basic);
+	$this->option_captions['publish_scheduled_notify_admin'] = 	sprintf(__('Email Editors and Administrators when a %s is published', 'revisionary'), $future_revision_singular);
+	$this->option_captions['rev_approval_notify_admin'] = 		sprintf(__('Email Editors and Administrators when a %s is approved', 'revisionary'), $pending_revision_singular);
 }
 	
 
@@ -158,7 +166,8 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 'features' => [
 	'license' =>			 ['edd_key'],
 	'role_definition' => 	 ['revisor_role_add_custom_rolecaps', 'require_edit_others_drafts'],
-	'working_copy' =>		 ['copy_posts_capability'],
+	'revision_statuses' =>	 ['revision_statuses_noun_labels'],
+	'working_copy' =>		 ['copy_posts_capability', 'caption_copy_as_edit'],
 	'scheduled_revisions' => ['scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date'],
 	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'queue_query_all_posts'],
@@ -335,6 +344,23 @@ $table_class = 'form-table rs-form-table';
 	<?php endif; // any options accessable in this section
 
 
+
+$section = 'revision_statuses';			// --- REVISION STATUSES SECTION ---
+
+if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
+	<tr valign="top"><th scope="row">
+	<?php echo $this->section_captions[$tab][$section]; ?>
+	</th><td>
+
+	<?php
+		$hint = __('Default labels are "Not Submitted for Approval", "Submitted for Approval", "Scheduled Revision"', 'revisionary');
+		$this->option_checkbox( 'revision_statuses_noun_labels', $tab, $section, $hint, '' );
+	?>
+
+	</td></tr>
+<?php endif; // any options accessable in this section
+
+
 $section = 'working_copy';			// --- WORKING COPIES SECTION ---
 
 if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
@@ -349,8 +375,11 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	if (defined('PRESSPERMIT_VERSION')) :?>
 		<div class="rs-subtext">
 		<?php _e('To expand the Posts / Pages listing for non-Editors, add capabilities: list_others_pages, list_published_posts, etc.', 'revisionary'); ?>
-		</div>
+		</div><br />
 	<?php endif;
+
+	$hint = sprintf(__('If the user does not have a regular Edit link, use the "Edit" caption for New %s operation', 'revisionary'), pp_revisions_status_label('draft-revision', 'name'));
+	$this->option_checkbox( 'caption_copy_as_edit', $tab, $section, $hint, '' );
 
 	//do_action('revisionary_option_ui_working_copies', $this);
 	?>
@@ -372,7 +401,7 @@ $pending_revisions_available ) :
 		
 		<?php 
 		$hint = sprintf(
-			__( 'Enable published content to be copied, edited and submitted as Change Requests, managed in %sRevision Queue%s.', 'revisionary' ),
+			__( 'Enable published content to be copied, edited, submitted for approval and managed in %sRevision Queue%s.', 'revisionary' ),
 			"<a href='" . rvy_admin_url('admin.php?page=revisionary-q') . "'>",
 			'</a>'	
 		);
@@ -381,10 +410,10 @@ $pending_revisions_available ) :
 		$hint = __('This restriction applies to users who are not full editors for the post type. To enable a role, add capabilities: revise_posts, revise_others_pages, etc.', 'revisionary');
 		$this->option_checkbox( 'revise_posts_capability', $tab, $section, $hint, '' );
 		
-		$hint = __( 'When a change request is published, update post publish date to current time.', 'revisionary' );
+		$hint = sprintf(__( 'When a %s is published, update post publish date to current time.', 'revisionary' ), pp_revisions_status_label('pending-revision', 'name'));
 		$this->option_checkbox( 'pending_revision_update_post_date', $tab, $section, $hint, '' );
 
-		$hint = __( 'When a change request is published, update post modified date to current time.', 'revisionary' );
+		$hint = sprintf(__( 'When a %s is published, update post modified date to current time.', 'revisionary' ), pp_revisions_status_label('pending-revision', 'name'));
 		$this->option_checkbox( 'pending_revision_update_modified_date', $tab, $section, $hint, '' );
 
 		do_action('revisionary_option_ui_pending_revisions', $this);
@@ -407,13 +436,13 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 		$hint = __( 'If a currently published post or page is edited and a future date set, the change will not be applied until the selected date.', 'revisionary' );
 		$this->option_checkbox( 'scheduled_revisions', $tab, $section, $hint, '' );
 		
-		$hint = __( 'When a scheduled change is published, update post publish date to current time.', 'revisionary' );
+		$hint = sprintf(__( 'When a %s is published, update post publish date to current time.', 'revisionary' ), pp_revisions_status_label('future-revision', 'name'));
 		$this->option_checkbox( 'scheduled_revision_update_post_date', $tab, $section, $hint, '' );
 
-		$hint = __( 'When a scheduled change is published, update post modified date to current time.', 'revisionary' );
+		$hint = sprintf(__( 'When a %s is published, update post modified date to current time.', 'revisionary' ), pp_revisions_status_label('future-revision', 'name'));
 		$this->option_checkbox( 'scheduled_revision_update_modified_date', $tab, $section, $hint, '' );
 
-		$hint = __( 'Publish scheduled changes asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
+		$hint = __( 'Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
 		$this->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
 		?>
 		</td></tr>

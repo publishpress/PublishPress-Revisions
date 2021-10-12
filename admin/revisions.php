@@ -215,13 +215,9 @@ foreach ( array_keys($revision_status_captions) as $_revision_status ) {
 			$status_caption = __( 'Past Revisions', 'revisionary' );
 			break;
 		case 'draft-revision':
-			$status_caption = __( 'Working Copies', 'revisionary' );
-			break;
 		case 'pending-revision':
-			$status_caption = __( 'Change Requests', 'revisionary' );
-			break;
 		case 'future-revision':
-			$status_caption = __( 'Scheduled Changes', 'revisionary' );
+			$status_caption = pp_revisions_status_label($_revision_status, 'plural');
 			break;
 	}
 	

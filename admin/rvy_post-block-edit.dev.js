@@ -34,6 +34,10 @@ jQuery(document).ready( function($) {
 			+ rvyObjEdit.actionTitle + '"><button type="button" class="components-button revision-approve revision-create is-primary ppr-purple-button">'
 			+ rvyObjEdit.actionCaption + '</button></a>'
 
+			+ '<div class="revision-creating" style="display: none;">'
+			+ '<span class="revision-approve revision-creating">'
+			+ rvyObjEdit.creatingCaption + '</span><span class="spinner ppr-submission-spinner" style=""></span></div>'
+
 			+ '<button type="button" class="revision-approve revision-created ppr-clear-button" style="display: none">'
 			+ '<span class="revision-approve revision-created">'
 			+ rvyObjEdit.completedCaption + '</span> '
@@ -75,6 +79,8 @@ jQuery(document).ready( function($) {
 				$('a.revision-approve').attr('title', rvyObjEdit.actionTitle);
 				$('a.revision-schedule').attr('title', rvyObjEdit.scheduleTitle);
 			}
+
+			RvyRefreshScheduleButton();
 		}
 	}
 	var RvyUIInterval = setInterval(RvySubmissionUI, 200);
@@ -101,14 +107,69 @@ jQuery(document).ready( function($) {
 		$('a.revision-schedule').attr('title', rvyObjEdit.scheduleTitle);
 	});
 
+	var rvyIsAutosaveStarted = false;
+	var rvyIsAutosaveDone = false;
+
 	$(document).on('click', 'button.revision-create', function() {
 		if ($('a.revision-create').attr('disabled')) {
 			return;
 		}
 
+		$('button.revision-create').hide();
+		$('div.revision-creating').show();
+		$('div.revision-creating span.ppr-submission-spinner').css('visibility', 'visible');
+
+		if (!wp.data.select('core/editor').isEditedPostDirty()) {
+			rvyCreateCopy();
+			return;
+		}
+
+		rvyIsAutosaveStarted = false;
+		rvyIsAutosaveDone = false;
+
+		wp.data.dispatch('core/editor').autosave();
+
+		var tmrNoAutosave = setTimeout(() => {
+			if (!rvyIsAutosaveStarted) {
+				clearInterval(intAutosaveWatch);
+				rvyCreateCopy();
+			}
+		}, 10000);
+
+		var intAutosaveDoneWatch;
+
+		var intAutosaveWatch = setInterval(() => {
+			if (wp.data.select('core/editor').isAutosavingPost()) {
+				rvyIsAutosaveStarted = true; 
+				clearInterval(intAutosaveWatch);
+				clearTimeout(tmrNoAutosave);
+
+				var tmrAutosaveTimeout = setTimeout(() => {
+					if (!rvyIsAutosaveDone) {
+						clearInterval(intAutosaveWatch);
+						rvyCreateCopy();
+					}
+				}, 10000);
+
+				intAutosaveDoneWatch = setInterval(() => {
+					if (!wp.data.select('core/editor').isAutosavingPost()) {
+						rvyIsAutosaveDone = true;
+						clearInterval(intAutosaveDoneWatch);
+						clearTimeout(tmrAutosaveTimeout);
+						rvyCreateCopy();
+					}
+				}, 100);
+			}
+		}, 100);
+	});
+
+	function rvyCreateCopy() {
 		var revisionaryCreateDone = function () {
 			$('.revision-create').hide();
+			$('.revision-creating').hide();
 			$('.revision-created').show();
+
+			$('a.revision-approve span.spinner').css('visibility', 'hidden');
 
 			$('button.revision-created a').attr('href', rvyObjEdit.completedURL);
 		}
@@ -126,12 +187,14 @@ jQuery(document).ready( function($) {
 			success: revisionaryCreateDone,
 			error: revisionaryCreateError
 		});
-	});
+	}
 
 	$(document).on('click', 'button.revision-schedule', function() {
 		if ($('a.revision-schedule').attr('disabled')) {
 			return;
 		}
+
+		$('button.revision-schedule').prop('disabled', true);
 
 		var revisionaryScheduleDone = function () {
 			$('.revision-schedule').hide();
@@ -171,6 +234,7 @@ jQuery(document).ready( function($) {
 			RvyTimeSelection = '';
 			$('.rvy-creation-ui .revision-schedule').hide();
 			$('.rvy-creation-ui .revision-scheduled').hide();
+			$('.rvy-creation-ui .revision-creating').hide();
 			$('.rvy-creation-ui .revision-created').hide();
 			$('.rvy-creation-ui .revision-create').show();
 			return;
@@ -188,6 +252,7 @@ jQuery(document).ready( function($) {
 			RvySelectedFutureDate = true;
 
 			$('.rvy-creation-ui .revision-create').hide();
+			$('.rvy-creation-ui .revision-creating').hide();
 			$('.rvy-creation-ui .revision-created').hide();
 			$('.rvy-creation-ui .revision-scheduled').hide();
 			$('.rvy-creation-ui .revision-schedule').show();
@@ -196,6 +261,7 @@ jQuery(document).ready( function($) {
 			$('.rvy-creation-ui .revision-schedule').hide();
 			$('.rvy-creation-ui .revision-scheduled').hide();
 			$('.rvy-creation-ui .revision-created').hide();
+			$('.rvy-creation-ui .revision-creating').hide();
 			$('.rvy-creation-ui .revision-create').show();
 
 			if ( tdiff <= 0 ) {

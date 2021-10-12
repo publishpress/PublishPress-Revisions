@@ -424,22 +424,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				break;
 
 			case 'post_status':
-	
-				switch ( $post->post_mime_type ) {
-					case 'draft-revision':
-						$label = __('Working Copy', 'revisionary');
-						break;
-					case 'pending-revision':
-						$label = __('Change Request', 'revisionary');
-						break;
-					case 'future-revision':
-						$label = __('Scheduled Change', 'revisionary');
-						break;
-					default:
-						if ( $status_obj = get_post_status_object( $post->post_mime_type) )
-							$label = $status_obj->label;
-						else
-							$label = ucwords($post->post_status);
+				if (rvy_is_revision_status($post->post_mime_type)) {
+					$label = pp_revisions_status_label($post->post_mime_type, 'short');
+				} else {
+					$label = ucwords($post->post_mime_type);
 				}
 
 				$link = add_query_arg('post_status', $post->post_mime_type, $request_url);
@@ -764,7 +752,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			}
 
 			$links['mine'] = sprintf(
-				apply_filters('revisionary_my_copies_label', __('%sMy Copies & Changes%s (%s)', 'revisionary')), 
+				apply_filters('revisionary_my_copies_label', (rvy_get_option('revision_statuses_noun_labels')) ? __('%sMy Copies & Changes%s (%s)', 'revisionary') : __('%sMy Revisions%s (%s)', 'revisionary') ), 
 				"<a href='admin.php?page=revisionary-q&author=$current_user->ID'{$link_class}>", '</a>', "<span class='count'>$my_count</span>"
 			);
 		}

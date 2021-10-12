@@ -247,10 +247,12 @@ class RevisionaryFront {
 					'</a></span>'
 					)
 				. sprintf(
+					str_replace(' ', '&nbsp;',
 					apply_filters(
 						'revisionary_preview_compare_view_caption', 
-						__("%sCompare%s%sView&nbsp;Published&nbsp;Post%s", 'revisionary'),
+							__("%sCompare%s%sView Published Post%s", 'revisionary'),
 						$post // revision
+						)
 					),
 					"<span><a href='$diff_url' class='rvy_preview_linkspan' target='_revision_diff'>",
 					'</a></span>',
@@ -261,10 +263,12 @@ class RevisionaryFront {
 			} else { // @todo
 				$view_published = ($published_url) 
 				? sprintf(
+					str_replace(' ', '&nbsp;',
 					apply_filters(
 						'revisionary_preview_view_caption',
-						__("%sView&nbsp;Published&nbsp;Post%s", 'revisionary'), 
+							__("%sView Published Post%s", 'revisionary'), 
 						$post // revision
+						)
 					),
 					"<span><a href='$published_url' class='rvy_preview_linkspan'>",
 					"</a></span>"
@@ -329,7 +333,7 @@ class RevisionaryFront {
 						$publish_button .= ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan rvy-approve-revision">' . $publish_caption . '</a></span>' : '';
 					}
 
-					$message = sprintf( __('This is a Working Copy. %s %s %s', 'revisionary'), $view_published, $edit_button, $publish_button );
+					$message = sprintf( __('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label('draft-revision', 'name'), $view_published, $edit_button, $publish_button );
 					
 					break;
 
@@ -341,13 +345,13 @@ class RevisionaryFront {
 					if ( strtotime( $post->post_date_gmt ) > agp_time_gmt() ) {
 						$class = 'pending_future';
 						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan rvy-approve-revision">' . $approve_caption . '</a></span>' : '';
-						$message = sprintf( __('This is a Change Request (requested publish date: %s). %s %s %s', 'revisionary'), $date, $view_published, $edit_button, $publish_button );
+						$message = sprintf( __('This is a %s (requested publish date: %s). %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $date, $view_published, $edit_button, $publish_button );
 					} else {
 						$class = 'pending';
 						$status_obj = get_post_status_object(get_post_field('post_status', rvy_post_id($revision_id)));
 						$publish_caption = (!empty($status_obj->public) || !empty($status_obj->private)) ? __('Publish now', 'revisionary') : $approve_caption;
 						$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan rvy-approve-revision">' . $publish_caption . '</a></span>' : '';
-						$message = sprintf( __('This is a Change Request. %s %s %s', 'revisionary'), $view_published, $edit_button, $publish_button );
+						$message = sprintf( __('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $view_published, $edit_button, $publish_button );
 					}
 					break;
 				
@@ -366,7 +370,7 @@ class RevisionaryFront {
 					$edit_url = rvy_admin_url("post.php?action=edit&amp;post=$revision_id");
 					$publish_button = ($can_publish) ? '<span><a href="' . $publish_url . '" class="rvy_preview_linkspan">' . __( 'Publish now', 'revisionary' ) . '</a></span>' : '';
 					$publish_button .= $reload_link;
-					$message = sprintf( __('This is a Scheduled Change (for publication on %s). %s %s %s', 'revisionary'), $date, $view_published, $edit_button, $publish_button );
+					$message = sprintf( __('This is a %s (for publication on %s). %s %s %s', 'revisionary'), pp_revisions_status_label('future-revision', 'name'), $date, $view_published, $edit_button, $publish_button );
 					break;
 
 				case '' :

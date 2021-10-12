@@ -110,7 +110,7 @@ class RevisionaryAdminPosts {
 			}
 
 			if (!isset($post_states['rvy_revision'])) {
-				$post_states['rvy_revision'] = __('Change Request', 'revisionary');
+				$post_states['rvy_revision'] = __('Revision', 'revisionary');
 			}
 		}
 
@@ -157,7 +157,16 @@ class RevisionaryAdminPosts {
 				$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
 				//$url = wp_nonce_url(rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg"), "submit-post_{$post->ID}" );
 				$url = rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg");
-				$actions['create_revision'] = "<a href='$url'>" . __('New&nbsp;Working&nbsp;Copy', 'revisionary') . '</a>';
+				
+				if (rvy_get_option('revision_statuses_noun_labels')) {
+					$caption = (isset($actions['edit']) || !rvy_get_option('caption_copy_as_edit')) ? __('New Working Copy', 'revisionary') : __('Edit');
+				} else {
+					$caption = (isset($actions['edit']) || !rvy_get_option('caption_copy_as_edit')) ? __('New Revision', 'revisionary') : __('Edit');
+				}
+
+				$caption = str_replace(' ', '&nbsp;', $caption);
+
+				$actions['create_revision'] = "<a href='$url'>" . $caption . '</a>';
 			}
 		}
 

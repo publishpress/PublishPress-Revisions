@@ -10,7 +10,11 @@ if ( ! $post_types = rvy_get_manageable_types() ) {
 }
 
 if (!rvy_get_option('pending_revisions') && !rvy_get_option('scheduled_revisions')) {
-	wp_die( __( 'Change Requests and Scheduled Changes are both disabled. See Revisions > Settings.', 'revisionary' ) );
+	wp_die( sprintf(__( 
+		'%s and %s are both disabled. See Revisions > Settings.', 'revisionary' ), 
+		pp_revisions_status_label('pending-revision', 'plural'),
+		pp_revisions_status_label('future-revision', 'plural')
+	));
 }
 
 set_current_screen( 'revisionary-q' );

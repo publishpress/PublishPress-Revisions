@@ -540,9 +540,23 @@ color: #2271B1;
 color: #655997 !important;
 }
 
+div.components-panel div.revision-submitting {
+  margin: 6px 0 6px 0;
+}
+
+div.components-panel div.revision-creating {
+  margin: 15px 0 15px 0;
+  padding: 6px 0 9px 2px; /*  @todo: review this spacing relative to button.revision-created */
+}
+
+div.components-panel span.ppr-submission-spinner, div.components-panel div.revision-submitting span.spinner {
+float: none;
+height: 25px !important;
+}
 
 div.components-panel button.revision-approve,
-div.components-panel div.revision-created {
+div.components-panel div.revision-created
+{
 	margin: 15px 0 15px 0;
 }
 
