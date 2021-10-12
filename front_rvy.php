@@ -247,10 +247,12 @@ class RevisionaryFront {
 					'</a></span>'
 					)
 				. sprintf(
+					str_replace(' ', '&nbsp;',
 					apply_filters(
 						'revisionary_preview_compare_view_caption', 
-						__("%sCompare%s%sView&nbsp;Published&nbsp;Post%s", 'revisionary'),
+							__("%sCompare%s%sView Published Post%s", 'revisionary'),
 						$post // revision
+						)
 					),
 					"<span><a href='$diff_url' class='rvy_preview_linkspan' target='_revision_diff'>",
 					'</a></span>',
@@ -261,10 +263,12 @@ class RevisionaryFront {
 			} else { // @todo
 				$view_published = ($published_url) 
 				? sprintf(
+					str_replace(' ', '&nbsp;',
 					apply_filters(
 						'revisionary_preview_view_caption',
-						__("%sView&nbsp;Published&nbsp;Post%s", 'revisionary'), 
+							__("%sView Published Post%s", 'revisionary'), 
 						$post // revision
+						)
 					),
 					"<span><a href='$published_url' class='rvy_preview_linkspan'>",
 					"</a></span>"
