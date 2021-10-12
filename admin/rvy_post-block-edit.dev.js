@@ -79,6 +79,8 @@ jQuery(document).ready( function($) {
 				$('a.revision-approve').attr('title', rvyObjEdit.actionTitle);
 				$('a.revision-schedule').attr('title', rvyObjEdit.scheduleTitle);
 			}
+
+			RvyRefreshScheduleButton();
 		}
 	}
 	var RvyUIInterval = setInterval(RvySubmissionUI, 200);
