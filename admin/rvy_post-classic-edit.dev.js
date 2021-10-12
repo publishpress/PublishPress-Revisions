@@ -60,13 +60,24 @@ jQuery(document).ready( function($) {
 
         $('a.revision-create').attr('disabled', 'disabled');
 
-        if (wp.autosave.server.postChanged()) {
+        if (wp.autosave && wp.autosave.server.postChanged()) {
+			var tmoRevisionSubmit = setTimeout(rvyCopyPost, 5000);  // @todo: review
+
+			var intRevisionSubmit = setInterval(function() {
+				if (!wp.autosave.server.postChanged()) {
+					clearTimeout(tmoRevisionSubmit);
+					clearInterval(intRevisionSubmit);
+					rvyCopyPost();
+				}
+			}, 250);
+
             wp.autosave.server.triggerSave();
-            var approvalDelay = 250;
         } else {
-            var approvalDelay = 1;
+			rvyCopyPost();
         }
+	});
         
+	function rvyCopyPost() {
         var revisionaryCreateDone = function () {
 			$('.revision-create').hide();
 			$('.revision-created-wrapper').show();
@@ -79,8 +90,6 @@ jQuery(document).ready( function($) {
 			$('div.rvy-creation-ui').html(rvyObjEdit.errorCaption);
 		}
 
-        var tmoSubmit = setInterval(function() {
-            if (!wp.autosave.server.postChanged()) {
                 var data = {'rvy_ajax_field': 'create_revision', 'rvy_ajax_value': rvyObjEdit.postID, 'rvy_date_selection': RvyTimeSelection, 'nc': RvyGetRandomInt(99999999)};
 
                 $.ajax({
@@ -90,12 +99,7 @@ jQuery(document).ready( function($) {
                     success: revisionaryCreateDone,
                     error: revisionaryCreateError
                 });
-
-                clearInterval(tmoSubmit);
             }
-        }, approvalDelay);
-
-	});
 
 	$(document).on('click', 'div.postbox-container', function() {
 		$('a.revision-create').attr('disabled', 'disabled');
@@ -179,7 +183,7 @@ jQuery(document).ready( function($) {
 
 		RvyTimeSelection = RvyTimeSelection / 1000; // pass seconds to server
 
-        console.log(tdiff);
+        //console.log(tdiff);
 
 		if ((tdiff > 1000)) {
 			RvySelectedFutureDate = true;

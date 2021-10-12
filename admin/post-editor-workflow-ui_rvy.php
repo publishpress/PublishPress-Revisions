@@ -77,6 +77,7 @@ class PostEditorWorkflowUI {
         if ($vars['draftAjaxField']) {
             $vars['draftActionCaption'] = __('Submit Change Request', 'revisionary');
             $vars['draftActionURL'] = ''; // wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=submit$redirect_arg"), "submit-post_$published_post_id|{$post->ID}" );
+            $vars['draftInProcessCaption'] = pp_revisions_status_label('pending-revision', 'submitting');
             $vars['draftCompletedCaption'] = __('Changes Submitted.', 'revisionary');
             $vars['draftCompletedLinkCaption'] = __('view', 'revisionary');
             $vars['draftCompletedURL'] = rvy_preview_url($post);
@@ -93,6 +94,8 @@ class PostEditorWorkflowUI {
         if ($can_publish) {
             $vars['pendingActionCaption'] = __('Approve Changes', 'revisionary');
             $vars['pendingActionURL'] = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=approve$redirect_arg&amp;editor=1"), "approve-post_$published_post_id|{$post->ID}" );
+
+			$vars['pendingInProcessCaption'] = pp_revisions_status_label('pending-revision', 'approving');
 
             $vars['futureActionCaption'] = __('Publish Changes', 'revisionary');
             $vars['futureActionURL'] = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=publish$redirect_arg&amp;editor=1"), "publish-post_$published_post_id|{$post->ID}" );
@@ -152,6 +155,7 @@ class PostEditorWorkflowUI {
                 'actionCaption' => __('Create Working Copy', 'revisionary'),
                 'actionTitle' => esc_attr(__('Create a working copy of this post', 'revisionary')),
                 'actionDisabledTitle' => esc_attr(__('Update post before creating copy.', 'revisionary')),
+                'creatingCaption' => pp_revisions_status_label('draft-revision', 'submitting'),
                 'completedCaption' => __('Working Copy Ready.', 'revisionary'),
                 'completedLinkCaption' => __('view', 'revisionary'),
                 'completedURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
