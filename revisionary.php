@@ -119,6 +119,8 @@ register_activation_hook(__FILE__, function()
 			require_once(dirname(__FILE__).'/activation_rvy.php');
 		}
 
+		require_once(dirname(__FILE__).'/functions.php');
+
 		// import from Revisionary 1.x
 		new RevisionaryActivation(['import_legacy' => true]);
 
@@ -136,6 +138,8 @@ register_activation_hook(__FILE__, function()
 register_deactivation_hook(__FILE__, function()
 	{
 		global $wpdb;
+
+		require_once(dirname(__FILE__).'/functions.php');
 
 		// convert pending / scheduled revisions to v2.x format, which also prevents them from being listed as regular drafts / pending posts
 		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
