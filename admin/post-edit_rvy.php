@@ -116,7 +116,7 @@ class RvyPostEdit {
 	            ?>
 	            <div class="misc-pub-section">
 	            <?php
-	            printf(__('%sScheduled Changes: %s', 'revisionary'), '<span class="dashicons dashicons-clock"></span>&nbsp;', '<b>' . count($_revisions) . '</b>');
+	            printf('%s' . pp_revisions_status_label('future-revision', 'plural') . ': %s', '<span class="dashicons dashicons-clock"></span>&nbsp;', '<b>' . count($_revisions) . '</b>');
 	            ?>
 	            <a class="hide-if-no-js"
                     href="<?php echo esc_url(admin_url("revision.php?post_id=$post->ID&revision=future-revision")); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions', 'revisionary'); ?></a>
@@ -130,7 +130,7 @@ class RvyPostEdit {
 	            ?>
 	            <div class="misc-pub-section">
 	            <?php
-	            printf(__('%sChange Requests: %s', 'revisionary'), '<span class="dashicons dashicons-edit"></span>&nbsp;', '<b>' . count($_revisions) . '</b>');
+	            printf('%s' . pp_revisions_status_label('pending-revision', 'plural') . ': %s', '<span class="dashicons dashicons-edit"></span>&nbsp;', '<b>' . count($_revisions) . '</b>');
 	            ?>
 	            <a class="hide-if-no-js"
                     href="<?php echo esc_url(admin_url("revision.php?post_id=$post->ID&revision=pending-revision")); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions', 'revisionary'); ?></a>

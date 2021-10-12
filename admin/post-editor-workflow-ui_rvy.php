@@ -44,10 +44,10 @@ class PostEditorWorkflowUI {
                     $vars['viewCaption'] = ('future-revision' == $post->post_mime_type) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
                 }
 
-                $vars['viewTitle'] =  __('View / Approve saved changes', 'revisionary');
+                $vars['viewTitle'] =  __('View / Approve saved revision', 'revisionary');
             } else {
                 $vars['viewCaption'] = version_compare($wp_version, '5.5-beta', '>=') ? __('Preview / Submit') :  __('View / Submit');
-                $vars['viewTitle'] =  __('View / Submit saved changes', 'revisionary');
+                $vars['viewTitle'] =  __('View / Submit saved revision', 'revisionary');
             }
         } else {
             $vars['viewURL']  = '';
@@ -59,7 +59,7 @@ class PostEditorWorkflowUI {
 
         $_revisions = wp_get_post_revisions($post->ID);
         if ($_revisions && count($_revisions) > 1) {
-            $vars['revisionEdits'] = sprintf(_n('<span class="dashicons dashicons-backup"></span>&nbsp;%s Revision Edit', '<span class="dashicons dashicons-backup"></span>&nbsp;%s Revision Edits', count($_revisions), 'revisionary'), count($_revisions));
+            $vars['revisionEdits'] = sprintf(_n('%s%s Revision Edit', '%s%s Revision Edits', '<span class="dashicons dashicons-backup"></span>&nbsp;', count($_revisions), 'revisionary'), count($_revisions));
         } else {
             $vars['revisionEdits'] = '';
         }
@@ -71,14 +71,14 @@ class PostEditorWorkflowUI {
         $vars['draftStatusCaption'] = $draft_obj->label;
 
         $vars['draftAjaxField'] = (current_user_can('set_revision_pending-revision', $post->ID)) ? 'submit_revision' : '';
-        $vars['draftErrorCaption'] = __('Error Submitting Changes', 'revisionary');
+        $vars['draftErrorCaption'] = __('Revision Submission Error', 'revisionary');
         $vars['draftDeletionURL'] = get_delete_post_link($post->ID, '', false);
 
         if ($vars['draftAjaxField']) {
-            $vars['draftActionCaption'] = __('Submit Change Request', 'revisionary');
+            $vars['draftActionCaption'] = pp_revisions_status_label('pending-revision', 'submit');
             $vars['draftActionURL'] = ''; // wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=submit$redirect_arg"), "submit-post_$published_post_id|{$post->ID}" );
             $vars['draftInProcessCaption'] = pp_revisions_status_label('pending-revision', 'submitting');
-            $vars['draftCompletedCaption'] = __('Changes Submitted.', 'revisionary');
+            $vars['draftCompletedCaption'] = pp_revisions_status_label('pending-revision', 'submitted');
             $vars['draftCompletedLinkCaption'] = __('view', 'revisionary');
             $vars['draftCompletedURL'] = rvy_preview_url($post);
         } else {
@@ -92,12 +92,12 @@ class PostEditorWorkflowUI {
         $vars['futureStatusCaption'] = $future_obj->label;
 
         if ($can_publish) {
-            $vars['pendingActionCaption'] = __('Approve Changes', 'revisionary');
+            $vars['pendingActionCaption'] = pp_revisions_status_label('pending-revision', 'approve');
             $vars['pendingActionURL'] = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=approve$redirect_arg&amp;editor=1"), "approve-post_$published_post_id|{$post->ID}" );
 
-			$vars['pendingInProcessCaption'] = pp_revisions_status_label('pending-revision', 'approving');
+            $vars['pendingInProcessCaption'] = pp_revisions_status_label('pending-revision', 'approving');
 
-            $vars['futureActionCaption'] = __('Publish Changes', 'revisionary');
+            $vars['futureActionCaption'] = pp_revisions_status_label('future-revision', 'publish');
             $vars['futureActionURL'] = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision={$post->ID}&amp;action=publish$redirect_arg&amp;editor=1"), "publish-post_$published_post_id|{$post->ID}" );
 
             $vars['pendingDeletionURL'] = get_delete_post_link($post->ID, '', false);
@@ -131,7 +131,9 @@ class PostEditorWorkflowUI {
 
         if ($do_pending_revisions && $_revisions = rvy_get_post_revisions($post->ID, 'pending-revision', ['orderby' => 'ID', 'order' => 'ASC'])) {
             $status_obj = get_post_status_object('pending-revision');
-            $vars['pendingRevisionsCaption'] = sprintf(_n('<span class="dashicons dashicons-edit"></span>&nbsp;%s Change Request', '<span class="dashicons dashicons-edit"></span>&nbsp;%s Change Requests', count($_revisions), 'revisionary'), count($_revisions));
+
+            $status_label = (count($_revisions) <= 1) ? pp_revisions_status_label('pending-revision', 'name') : pp_revisions_status_label('pending-revision', 'plural');
+            $vars['pendingRevisionsCaption'] = sprintf('<span class="dashicons dashicons-edit"></span>&nbsp;%s %s', count($_revisions), $status_label);
 
             $vars['pendingRevisionsURL'] = rvy_admin_url("revision.php?post_id=$post->ID&revision=pending-revision");   // @todo: fix i8n
         } else {
@@ -140,7 +142,9 @@ class PostEditorWorkflowUI {
 
         if ($do_scheduled_revisions && $_revisions = rvy_get_post_revisions($post->ID, 'future-revision', ['orderby' => 'ID', 'order' => 'ASC'])) {
             $status_obj = get_post_status_object('future-revision');
-            $vars['scheduledRevisionsCaption'] = sprintf(_n('<span class="dashicons dashicons-clock"></span>&nbsp;%s Scheduled Change', '<span class="dashicons dashicons-clock"></span>&nbsp;%s Scheduled Changes', count($_revisions), 'revisionary'), count($_revisions));
+
+            $status_label = (count($_revisions) <= 1) ? pp_revisions_status_label('future-revision', 'name') : pp_revisions_status_label('future-revision', 'plural');
+            $vars['scheduledRevisionsCaption'] = sprintf('<span class="dashicons dashicons-clock"></span>&nbsp;%s %s', count($_revisions), $status_label);
 
             $vars['scheduledRevisionsURL'] = rvy_admin_url("revision.php?post_id=$post->ID&revision=future-revision");
         } else {
@@ -152,14 +156,14 @@ class PostEditorWorkflowUI {
 
         if (current_user_can('copy_post', $post->ID)) {
             $vars = array_merge($vars, array(
-                'actionCaption' => __('Create Working Copy', 'revisionary'),
-                'actionTitle' => esc_attr(__('Create a working copy of this post', 'revisionary')),
-                'actionDisabledTitle' => esc_attr(__('Update post before creating copy.', 'revisionary')),
+                'actionCaption' => pp_revisions_status_label('draft-revision', 'submit'),
+                'actionTitle' => esc_attr(sprintf(__('Create a %s of this post', 'revisionary'), strtolower(pp_revisions_status_label('draft-revision', 'basic')))),
+                'actionDisabledTitle' => esc_attr(sprintf(__('Update post before creating %s.', 'revisionary'), strtolower(pp_revisions_status_label('draft-revision', 'basic')))),
                 'creatingCaption' => pp_revisions_status_label('draft-revision', 'submitting'),
-                'completedCaption' => __('Working Copy Ready.', 'revisionary'),
+                'completedCaption' => pp_revisions_status_label('draft-revision', 'submitted'),
                 'completedLinkCaption' => __('view', 'revisionary'),
                 'completedURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
-                'errorCaption' => __('Error Creating Copy', 'revisionary'),
+                'errorCaption' => __('Error Creating Revision', 'revisionary'),
                 'ajaxurl' => rvy_admin_url(''),
                 'postID' => $post->ID
             ));
@@ -172,10 +176,10 @@ class PostEditorWorkflowUI {
 
             $vars = array_merge($vars, array(
                 'publishedStatuses' => $published_statuses,
-                'scheduleCaption' => __('Schedule Changes', 'revisionary'),
+                'scheduleCaption' => pp_revisions_status_label('future-revision', 'submit'),
                 'scheduleTitle' => '',
-                'scheduleDisabledTitle' => esc_attr(__('For custom field changes, edit a scheduled copy.', 'revisionary')),
-                'scheduledCaption' => __('Changes are Scheduled.', 'revisionary'),
+                'scheduleDisabledTitle' => esc_attr(sprintf(__('For custom field changes, edit a scheduled %s.', 'revisionary'), strtolower(pp_revisions_status_label('draft-revision', 'basic')))),
+                'scheduledCaption' => pp_revisions_status_label('future-revision', 'submitted'),
                 'scheduledLinkCaption' => __('view', 'revisionary'),
                 'scheduledURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
             ));
