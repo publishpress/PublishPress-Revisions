@@ -555,7 +555,8 @@ height: 25px !important;
 }
 
 div.components-panel button.revision-approve,
-div.components-panel div.revision-created {
+div.components-panel div.revision-created
+{
 	margin: 15px 0 15px 0;
 }
 
