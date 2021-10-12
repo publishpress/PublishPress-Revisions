@@ -105,9 +105,9 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 == Changelog ==
 
 = 3.0 =
-* New revision submission mechanism: create a working copy first instead of editing existing post. Then submit as a Change Request before scheduling or publication
+* New revision submission mechanism: create an unsubmitted revision first instead of editing existing post. Edit revision directly, then submit for scheduling or publication.
 * Changes to plugin-related UI in Post / Revision editor
-* Admin Bar includes Create Working Copy button
+* Admin Bar includes "New Revision" button
 * Adjusted Revision Queue filter captions
 * Permissions integration: revise_others_posts, revise_others_pages, etc. capabilties are equivalent to list_others capabilities in allowing uneditable items to be listed
 
