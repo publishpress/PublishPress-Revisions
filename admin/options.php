@@ -167,7 +167,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'license' =>			 ['edd_key'],
 	'role_definition' => 	 ['revisor_role_add_custom_rolecaps', 'require_edit_others_drafts'],
 	'revision_statuses' =>	 ['revision_statuses_noun_labels'],
-	'working_copy' =>		 ['copy_posts_capability'],
+	'working_copy' =>		 ['copy_posts_capability', 'caption_copy_as_edit'],
 	'scheduled_revisions' => ['scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date'],
 	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'queue_query_all_posts'],
@@ -375,8 +375,11 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	if (defined('PRESSPERMIT_VERSION')) :?>
 		<div class="rs-subtext">
 		<?php _e('To expand the Posts / Pages listing for non-Editors, add capabilities: list_others_pages, list_published_posts, etc.', 'revisionary'); ?>
-		</div>
+		</div><br />
 	<?php endif;
+
+	$hint = sprintf(__('If the user does not have a regular Edit link, use the "Edit" caption for New %s operation', 'revisionary'), pp_revisions_status_label('draft-revision', 'name'));
+	$this->option_checkbox( 'caption_copy_as_edit', $tab, $section, $hint, '' );
 
 	//do_action('revisionary_option_ui_working_copies', $this);
 	?>
