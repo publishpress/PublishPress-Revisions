@@ -151,13 +151,13 @@ class Rvy_Revision_Workflow_UI {
             $blogname = wp_specialchars_decode( get_option('blogname'), ENT_QUOTES );
             
             if (!empty($args['update'])) {
-                $title = sprintf( __('[%s] Change Request Updated', 'revisionary'), $blogname );
+                $title = sprintf( __('[%s] %s Updated', 'revisionary'), $blogname, pp_revisions_status_label('pending-revision', 'name') );
                 
-                $message = sprintf( __('A change request to the %1$s "%2$s" has been updated.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
+                $message = sprintf( __('A %s to the %1$s "%2$s" has been updated.', 'revisionary'), strtolower(pp_revisions_status_label('pending-revision', 'name')), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
             } else {
-                $title = sprintf( __('[%s] Change Request Submission', 'revisionary'), $blogname );
+                $title = sprintf( __('[%s] %s Submission', 'revisionary'), $blogname, pp_revisions_status_label('pending-revision', 'name') );
                 
-                $message = sprintf( __('A change request to the %1$s "%2$s" has been submitted.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
+                $message = sprintf( __('A %s to the %1$s "%2$s" has been submitted.', 'revisionary'), strtolower(pp_revisions_status_label('pending-revision', 'name')), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
             }
 
             $message .= sprintf( __('This operation was performed by %1$s.', 'revisionary' ), $current_user->display_name ) . "\r\n\r\n";
@@ -172,7 +172,7 @@ class Rvy_Revision_Workflow_UI {
 
                 $message .= __( 'Revision Queue: ', 'revisionary' ) . rvy_admin_url("admin.php?page=revisionary-q&published_post={$published_post->ID}") . "\r\n\r\n";
                 
-                $message .= __( 'Edit Change Request: ', 'revisionary' ) . rvy_admin_url("post.php?action=edit&post={$revision_id}") . "\r\n";
+                $message .= sprintf(__( 'Edit %s: ', 'revisionary' ), pp_revisions_status_label('pending-revision', 'name')) . rvy_admin_url("post.php?action=edit&post={$revision_id}") . "\r\n";
             }
 
             if ( $admin_notify ) {

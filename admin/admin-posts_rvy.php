@@ -110,7 +110,7 @@ class RevisionaryAdminPosts {
 			}
 
 			if (!isset($post_states['rvy_revision'])) {
-				$post_states['rvy_revision'] = __('Change Request', 'revisionary');
+				$post_states['rvy_revision'] = __('Revision', 'revisionary');
 			}
 		}
 

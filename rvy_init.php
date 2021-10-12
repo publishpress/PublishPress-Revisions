@@ -45,6 +45,16 @@ if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview'])
 	_rvy_jreviews_preview_compat();
 }
 
+// Default early beta testers to same revision status labeling they are already using. They will be directly notified of the new setting.
+$last_ver = get_option('revisionary_last_version');
+
+if (version_compare($last_ver, '3.0-alpha', '>=') && version_compare($last_ver, '3.0-beta7', '<')) {
+	if (!get_option('pp_revisions_beta3_option_sync_done')) {
+		update_option('rvy_revision_statuses_noun_labels', 1);
+		update_option('pp_revisions_beta3_option_sync_done', 1);
+	}
+}
+
 function rvy_mail_check_buffer($new_msg = [], $args = []) {
 	if (empty($args['log_only'])) {
 		if (!$use_buffer = rvy_get_option('use_notification_buffer')) {
@@ -221,34 +231,142 @@ function rvy_delete_post_meta($post_id, $meta_key) {
 }
 
 function rvy_status_registrations() {
+
+	$labels = apply_filters('revisionary_status_labels',
+		rvy_get_option('revision_statuses_noun_labels') ?
+		[
+			'draft-revision' => [
+				'name' => __('Working Copy', 'revisionary'),
+				'submit' => __('Create Working Copy', 'revisionary'), 
+				'submit_short' => __('Create Copy', 'revisionary'), 
+				'submitting' => __('Creating Working Copy...', 'revisionary'),
+				'submitted' => __('Working Copy ready.', 'revisionary'),
+				'approve' => __('Approve Changes', 'revisionary'), 
+				'approving' => __('Approving Changes...', 'revisionary'),
+				'publish' => __('Publish Changes', 'revisionary'),
+				'save' => __('Save Revision', 'revisionary'), 
+				'update' => __('Update Revision', 'revisionary'), 
+				'plural' => __('Working Copies', 'revisionary'), 
+				'short' => __('Working Copy', 'revisionary'),
+				'count' => _n_noop('Working Copies <span class="count">(%d)</span>', 'Working Copies <span class="count">(%d)</span>'),  // @todo: confirm API will support a fixed string
+				'basic' => 'Copy',
+			],
+		
+			'pending-revision' => [
+				'name' => __('Change Request', 'revisionary'),
+				'submit' => __('Submit Change Request', 'revisionary'),
+				'submit_short' => __('Submit Changes', 'revisionary'),
+				'submitting' => __('Submitting Changes...', 'revisionary'),
+				'submitted' => __('Changes Submitted.', 'revisionary'),
+				'approve' => __('Approve Changes', 'revisionary'), 
+				'approving' => __('Approving Changes...', 'revisionary'),
+				'publish' => __('Publish Changes', 'revisionary'), 
+				'save' => __('Save Revision', 'revisionary'), 
+				'update' => __('Update Revision', 'revisionary'), 
+				'plural' => __('Change Requests', 'revisionary'), 
+				'short' => __('Change Request', 'revisionary'),
+				'count' => _n_noop('Change Requests <span class="count">(%d)</span>', 'Change Requests <span class="count">(%d)</span>'),
+				'enable' => __('Enable Change Requests', 'revisionary'),
+				'basic' => 'Change Request',
+			],
+
+			'future-revision' => [
+				'name' => __('Scheduled Change', 'revisionary'),
+				'submit' => __('Schedule Changes', 'revisionary'),
+				'submit_short' => __('Schedule Changes', 'revisionary'),
+				'submitting' => __('Scheduling Changes...', 'revisionary'),
+				'submitted' => __('Changes are Scheduled.', 'revisionary'),
+				'approve' => __('Schedule Changes', 'revisionary'), 
+				'publish' => __('Publish Changes', 'revisionary'), 
+				'save' => __('Save Revision', 'revisionary'), 
+				'update' => __('Update Revision', 'revisionary'), 
+				'plural' => __('Scheduled Changes', 'revisionary'), 
+				'short' => __('Scheduled Change', 'revisionary'),
+				'count' => _n_noop('Scheduled Changes <span class="count">(%d)</span>', 'Scheduled Changes <span class="count">(%d)</span>'),
+				'basic' => 'Scheduled Change',
+			],
+		]
+
+		:
+		[
+			'draft-revision' => [
+				'name' => __('Unsubmitted Revision', 'revisionary'),
+				'submit' => __('New Revision', 'revisionary'), 
+				'submit_short' => __('New Revision', 'revisionary'), 
+				'submitting' => __('Creating Revision...', 'revisionary'),
+				'submitted' => __('Revision ready to edit.', 'revisionary'),
+				'approve' => __('Approve Revision', 'revisionary'), 
+				'publish' => __('Publish Revision', 'revisionary'), 
+				'save' => __('Save Revision', 'revisionary'), 
+				'update' => __('Update Revision', 'revisionary'), 
+				'plural' => __('Unsubmitted Revisions', 'revisionary'), 
+				'short' => __('Not Submitted', 'revisionary'),
+				'count' => _n_noop('Not Submitted for Approval <span class="count">(%s)</span>', 'Not Submitted for Approval <span class="count">(%s)</span>'),   // @todo: confirm API will support a fixed string
+				'basic' => 'Revision',
+			],
+		
+			'pending-revision' => [
+				'name' => __('Submitted Revision', 'revisionary'),
+				'submit' => __('Submit Revision', 'revisionary'), 
+				'submitting' => __('Submitting Revision...', 'revisionary'),
+				'submitted' => __('Revision Submitted.', 'revisionary'),
+				'submit_short' => __('Submit Revision', 'revisionary'), 
+				'approve' => __('Approve Revision', 'revisionary'), 
+				'publish' => __('Publish Revision', 'revisionary'), 
+				'save' => __('Save Revision', 'revisionary'), 
+				'update' => __('Update Revision', 'revisionary'), 
+				'plural' => __('Submitted Revisions', 'revisionary'), 
+				'short' => __('Submitted', 'revisionary'),
+				'count' => _n_noop('Submitted for Approval <span class="count">(%s)</span>', 'Submitted for Approval <span class="count">(%s)</span>'),
+				'basic' => 'Revision',
+			],
+
+			'future-revision' => [
+				'name' => __('Scheduled Revision', 'revisionary'),
+				'submit' => __('Schedule Revision', 'revisionary'), 
+				'submit_short' => __('Schedule Revision', 'revisionary'), 
+				'submitting' => __('Scheduling Revision...', 'revisionary'),
+				'submitted' => __('Revision Scheduled.', 'revisionary'),
+				'approve' => __('Approve Revision', 'revisionary'), 
+				'publish' => __('Publish Revision', 'revisionary'), 
+				'save' => __('Save Revision', 'revisionary'), 
+				'update' => __('Update Revision', 'revisionary'), 
+				'plural' => __('Scheduled Revisions', 'revisionary'), 
+				'short' => __('Scheduled', 'revisionary'),
+				'count' => _n_noop('Scheduled Revision <span class="count">(%s)</span>', 'Scheduled Revisions <span class="count">(%s)</span>'),
+				'basic' => 'Scheduled Revision',
+			],
+		]
+	);
+
 	register_post_status('draft-revision', array(
-		'label' => __('Working Copy', 'revisionary'),
-		'labels' => (object)['publish' => __('Publish Changes', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Working Copies', 'revisionary'), 'short' => __('Draft', 'revisionary') ],
+		'label' => $labels['draft-revision']['name'],
+		'labels' => (object) $labels['draft-revision'],
 		'protected' => true,
 		'internal' => true,
-		'label_count' => _n_noop('Working Copies <span class="count">(%s)</span>', 'Working Copies <span class="count">(%s)</span>'),  // @todo: confirm API will support a fixed string
+		'label_count' => $labels['draft-revision']['count'],
 		'exclude_from_search' => false,
 		'show_in_admin_all_list' => false,
 		'show_in_admin_status_list' => false,
 	));
 	
 	register_post_status('pending-revision', array(
-		'label' => __('Change Request', 'revisionary'),
-		'labels' => (object)['publish' => __('Publish Changes', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Change Requests', 'revisionary'), 'short' => __('Entry', 'revisionary') ],
+		'label' => $labels['pending-revision']['name'],
+		'labels' => (object) $labels['pending-revision'],
 		'protected' => true,
 		'internal' => true,
-		'label_count' => _n_noop('Change Requests <span class="count">(%s)</span>', 'Change Requests <span class="count">(%s)</span>'),
+		'label_count' => $labels['pending-revision']['count'],
 		'exclude_from_search' => false,
 		'show_in_admin_all_list' => false,
 		'show_in_admin_status_list' => false,
 	));
 
 	register_post_status('future-revision', array(
-		'label' => __('Scheduled Change', 'revisionary'),
-		'labels' => (object)['publish' => __('Publish Changes', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Scheduled Changes', 'revisionary'), 'short' => __('Scheduled', 'revisionary')],
+		'label' => $labels['future-revision']['name'],
+		'labels' => (object) $labels['future-revision'],
 		'protected' => true,
 		'internal' => true,
-		'label_count' => _n_noop('Scheduled Changes <span class="count">(%s)</span>', 'Scheduled Changes <span class="count">(%s)</span>'),
+		'label_count' => $labels['future-revision']['count'],
 		'exclude_from_search' => false,
 		'show_in_admin_all_list' => false,
 		'show_in_admin_status_list' => false,
@@ -287,6 +405,16 @@ function rvy_status_registrations() {
 		}
 	}, 99
 );
+}
+
+function pp_revisions_status_label($status_name, $label_property) {
+	global $wp_post_statuses;
+
+	if (!empty($wp_post_statuses[$status_name]) && !empty($wp_post_statuses[$status_name]->labels->$label_property)) {
+		return $wp_post_statuses[$status_name]->labels->$label_property;
+	} else {
+		return '';
+	}
 }
 
 // WP function is_plugin_active_for_network() is defined in admin
