@@ -192,6 +192,8 @@ jQuery(document).ready( function($) {
 			return;
 		}
 
+		$('button.revision-schedule').prop('disabled', true);
+
 		var revisionaryScheduleDone = function () {
 			$('.revision-schedule').hide();
 			$('.revision-scheduled').show();
