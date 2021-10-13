@@ -9,7 +9,7 @@ if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 }
 
 if ( in_array( $pagenow, array( 'edit.php', 'post.php', 'post-new.php', 'plugins.php' ) ) ) { 
-	add_action( 'all_admin_notices', '_rvy_intro_notice' );
+	//add_action( 'all_admin_notices', '_rvy_intro_notice' ); // @todo: updated welcome message / screen
 
 	if (get_site_transient('_revisionary_1x_migration')) {
 		add_action( 'all_admin_notices', '_rvy_migration_notice' );
@@ -311,7 +311,7 @@ function rvy_admin_init() {
 }
 
 function rvy_intro_message($abbreviated = false) {
-	
+	/*
 	$guide_link = sprintf(
 		__('For more details on setting up PublishPress Revisions, %sread this guide%s.', 'revisionary'),
 		'<a href="https://publishpress.com/documentation/revisionary-start" target="_blank">',
@@ -325,6 +325,7 @@ function rvy_intro_message($abbreviated = false) {
 		$guide_link,
 		'</p>'
 	);
+	*/
 }
 
 function rvy_migration_message() {
@@ -337,9 +338,11 @@ function rvy_migration_message() {
 }
 
 function _rvy_intro_notice() {
+	/*
 	if ( current_user_can( 'edit_users') ) {
 		rvy_dismissable_notice( 'intro_revisor_role', rvy_intro_message());
 	}
+	*/
 }
 
 function _rvy_migration_notice() {
