@@ -240,7 +240,7 @@ class RevisionaryFront {
 				? sprintf(
 					apply_filters(
 						'revisionary_list_caption', 
-						__("%sList%s", 'revisionary'),
+						__("%sView Queue%s", 'revisionary'),
 						$post // revision
 					),
 					"<span><a href='$queue_url' class='rvy_preview_linkspan' target='_revision_list'>",
