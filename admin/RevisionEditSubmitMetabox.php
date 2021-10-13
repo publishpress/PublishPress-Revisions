@@ -111,10 +111,11 @@ class RvyRevisionEditSubmitMetabox
             if ($type_obj && empty($type_obj->public)) {
                 return;
             } elseif ($can_publish) {
-                $preview_button = ('future-revision' == $post->post_mime_type) ? __('View / Publish', 'revisionary') : __('View / Approve', 'revisionary');
+                //$preview_button = ('future-revision' == $post->post_mime_type) ? __('View / Publish', 'revisionary') : __('Preview / Approve', 'revisionary');
+                $preview_button = __('Preview', 'revisionary');
                 $preview_title = __('View / moderate saved revision', 'revisionary');
             } else {
-                $preview_button = __('View');
+                $preview_button = __('Preview', 'revisionary');
                 $preview_title = __('View saved revision', 'revisionary');
             }
             ?>

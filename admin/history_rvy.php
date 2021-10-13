@@ -1070,9 +1070,9 @@ class RevisionaryHistory
         }
 
         if (empty($type_obj) || $can_approve) {
-            $button_label = $direct_approval ? __('Approve', 'revisionary') : __('View / Approve', 'revisionary');
+            $button_label = $direct_approval ? __('Approve', 'revisionary') : __('Preview / Approve', 'revisionary');
         } else {
-            $button_label = __('View', 'revisionary');
+            $button_label = __('Preview', 'revisionary');
         }
         ?>
         <script type="text/javascript">
