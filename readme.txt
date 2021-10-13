@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.8
-Stable tag: 2.6.1
+Stable tag: 2.6.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -110,6 +110,13 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 * Admin Bar includes "New Revision" button
 * Adjusted Revision Queue filter captions
 * Permissions integration: revise_others_posts, revise_others_pages, etc. capabilties are equivalent to list_others capabilities in allowing uneditable items to be listed
+
+= 2.6.3 - 11 Oct 2021 =
+* Fixed : Classic Editor - Error submitting a pending or scheduled revision
+
+= 2.6.2 - 7 Oct 2021 =
+* Change : Maintenance queries run at plugin activation to convert version 3.0 revisions back to 2.6 encoding
+* API : Support for WPML Translation Management support in Pro version
 
 = 2.6.1 - 15 Jul 2021 =
 * Fixed : Pending / Scheduled Revisions could become disassociated from main post due to third party plugin interactions

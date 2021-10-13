@@ -126,6 +126,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'admin_revisions_to_own_posts' =>			__("Users can always administer revisions to their own editable posts", 'revisionary'),
 	'queue_query_all_posts' => 					__('Compatibility Mode', 'revisionary'),
 	'revision_update_notifications' =>			__('Also notify on Revision Update', 'revisionary'),
+	'revision_submit_trigger_post_actions' => 	__('Revision Submission: API actions for Post Creation', 'revisionary'),
 	'trigger_post_update_actions' => 			__('Revision Publication: API actions to mimic Post Update', 'revisionary'),
 	'diff_display_strip_tags' => 				__('Hide html tags on Compare Revisions screen', 'revisionary'),
 	'async_scheduled_publish' => 				__('Asynchronous Publishing', 'revisionary'),
@@ -552,6 +553,9 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		<?php endif;?>
 
 		<?php
+		$hint = __('Some plugins may need this disabled.', 'revisionary');
+		$this->option_checkbox( 'revision_submit_trigger_post_actions', $tab, $section, $hint, '' );
+
 		$hint = __('This may improve compatibility with some plugins.', 'revisionary');
 		$this->option_checkbox( 'trigger_post_update_actions', $tab, $section, $hint, '' );
 
@@ -804,6 +808,31 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		
 		?>
 		</td></tr>
+
+		<?php
+		if ((defined('REVISIONARY_PRO_VERSION') || defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) && defined('ICL_SITEPRESS_VERSION') && defined('WPML_TM_VERSION')) :?>
+
+		<tr valign="top"><th scope="row">
+		<?php _e('WPML Translation Management', 'revisionary') ?>
+		</th></td>
+		<td>
+		<p>
+		<?php
+		$url = admin_url('admin.php?page=revisionary-settings&rvy_wpml_sync_needs_update=1');
+		?>
+		<a href="<?php echo($url);?>"><?php _e('Sync "Needs Update" flags', 'revisionary');?></a>
+
+		<div class="rs-subtext">
+		<?php 
+		_e('Set "Needs Update" for any post with translations which was updated (possibly by revision approval) more recently than its translations.', 'revisionary');
+		?>
+		</div>
+
+		</p>
+		</td></tr>
+
+		<?php endif;?>
+
 		<!--
 		<tr valign="top"><th scope="row">
 		<?php _e('Documentation', 'revisionary') ?>
