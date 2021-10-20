@@ -542,6 +542,7 @@ function rvy_add_revisor_role( $requested_blog_id = '' ) {
 		'edit_pages' => true,
 		'delete_pages' => true,
 		'edit_others_pages' => true,
+		'upload_files' => true,
 		'level_3' => true,
 		'level_2' => true,
 		'level_1' => true,

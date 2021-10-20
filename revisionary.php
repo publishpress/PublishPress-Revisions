@@ -103,6 +103,12 @@ register_activation_hook(__FILE__, function()
 
 		require_once(dirname(__FILE__).'/functions.php');
 
+		if (version_compare($last_ver, '3.0-rc3', '<')) {
+			if ($role = @get_role('revisor')) {
+				$role->add_cap('upload_files');
+			}
+		}
+
 		if ($current_version != $last_ver) {
 			require_once( dirname(__FILE__).'/lib/agapetry_wp_core_lib.php');
 			require_once(dirname(__FILE__).'/rvy_init.php');
