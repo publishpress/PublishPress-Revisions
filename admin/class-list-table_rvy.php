@@ -887,6 +887,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 ?>
 		<div class="alignleft actions">
 <?php
+		/*
 		if ( 'top' === $which && !is_singular() ) {
 			ob_start();
 			
@@ -901,6 +902,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				submit_button( __( 'Filter' ), '', 'filter_action', false, array( 'id' => 'post-query-submit' ) );
 			}
 		}
+		*/
 ?>
 		</div>
 <?php
