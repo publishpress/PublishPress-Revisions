@@ -158,11 +158,7 @@ class RevisionaryAdminPosts {
 				//$url = wp_nonce_url(rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg"), "submit-post_{$post->ID}" );
 				$url = rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg");
 				
-				if (rvy_get_option('revision_statuses_noun_labels')) {
-					$caption = (isset($actions['edit']) || !rvy_get_option('caption_copy_as_edit')) ? __('New Working Copy', 'revisionary') : __('Edit');
-				} else {
-					$caption = (isset($actions['edit']) || !rvy_get_option('caption_copy_as_edit')) ? __('New Revision', 'revisionary') : __('Edit');
-				}
+				$caption = (isset($actions['edit']) || !rvy_get_option('caption_copy_as_edit')) ? pp_revisions_status_label('draft-revision', 'submit') : __('Edit');
 
 				$caption = str_replace(' ', '&nbsp;', $caption);
 

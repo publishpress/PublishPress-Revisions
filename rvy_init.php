@@ -417,6 +417,32 @@ function pp_revisions_status_label($status_name, $label_property) {
 	}
 }
 
+function pp_revisions_label($label_name) {
+	static $labels;
+
+	if (empty($labels)) {
+		$labels = apply_filters('revisionary_labels',
+		[
+			'my_revisions' => (rvy_get_option('revision_statuses_noun_labels')) 
+			? 							__('%sMy Copies & Changes%s (%s)', 'revisionary') 
+			: 							__('%sMy Revisions%s (%s)', 'revisionary'),
+			
+			'queue_col_revision' 		=> __('Revision', 'revisionary'),
+			'queue_col_revised_by' 		=> __('Revised By', 'revisionary'),
+			'queue_col_revision_date' 	=> __('Revision Date', 'revisionary'),
+			'queue_col_post_author' 	=> __('Post Author', 'revisionary'),
+			'queue_col_published_post' 	=> __('Published Post', 'revisionary'),
+			'update_revision' 			=> __('Update Revision', 'revisionary'),
+
+			'submit_revision' => (rvy_get_option('revision_statuses_noun_labels'))
+			?							__('Submit Revision', 'revisionary')
+			:							__('Submit Changes', 'revisionary')
+		]);
+	}
+
+	return (isset($labels[$label_name])) ? $labels[$label_name] : '';
+}
+
 // WP function is_plugin_active_for_network() is defined in admin
 function rvy_plugin_active_for_network( $plugin ) {
 	if ( ! is_multisite() ) {

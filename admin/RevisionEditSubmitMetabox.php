@@ -82,7 +82,7 @@ class RvyRevisionEditSubmitMetabox
      */
     public static function post_save_button($post, $args)
     {
-        $draft_label = __('Update Revision', 'revisionary');
+        $draft_label = pp_revisions_label('update_revision');
         ?>
         <input type="submit" name="save" id="save-post" value="<?php echo $draft_label ?>"
                 tabindex="4" class="button button-highlighted"/>

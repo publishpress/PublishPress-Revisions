@@ -19,7 +19,7 @@ class PostEditorWorkflowUI {
 
         $vars = [
             'postID' => $post->ID,
-            'saveRevision' => __('Update Revision'),
+            'saveRevision' => pp_revisions_label('update_revision'),
             'scheduledRevisionsEnabled' => $do_scheduled_revisions,
             'multiPreviewActive' => version_compare($wp_version, '5.5-beta', '>='),
             'statusLabel' => __('Status', 'revisionary'),

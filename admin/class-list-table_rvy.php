@@ -386,11 +386,11 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		
 		$arr = [
 			'cb' => '<input type="checkbox" />', 
-			'title' => __('Revision', 'revisionary'), 
+			'title' => pp_revisions_label('queue_col_revision'), 
 			'post_status' => __('Status', 'revisionary'), 
 			'post_type' => __('Post Type', 'revisionary'), 
-			'author' => __('Revised By', 'revisionary'), 
-			'date' => __('Submission', 'revisionary'),
+			'author' => pp_revisions_label('queue_col_revised_by'), 
+			'date' =>  pp_revisions_label('queue_col_revision_date'),
 		];
 
 		if (!empty($_REQUEST['cat'])) {
@@ -401,9 +401,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$arr['date_sched'] = __('Schedule');
 		}
 
-		$arr['published_post'] = apply_filters('revisionary_published_post_caption', __('Published Post', 'revisionary'));
+		$arr['published_post'] = pp_revisions_label('queue_col_published_post');
 
-		$arr['post_author'] = __('Post Author', 'revisionary');
+		$arr['post_author'] = pp_revisions_label('queue_col_post_author');
 
 		return $arr;
 	}
@@ -752,7 +752,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			}
 
 			$links['mine'] = sprintf(
-				apply_filters('revisionary_my_copies_label', (rvy_get_option('revision_statuses_noun_labels')) ? __('%sMy Copies & Changes%s (%s)', 'revisionary') : __('%sMy Revisions%s (%s)', 'revisionary') ), 
+				pp_revisions_label('my_revisions'), 
 				"<a href='admin.php?page=revisionary-q&author=$current_user->ID'{$link_class}>", '</a>', "<span class='count'>$my_count</span>"
 			);
 		}

@@ -146,7 +146,7 @@ class Revisionary
 					if (current_user_can('copy_post', $post->ID)) {
 						$admin_bar->add_menu([
 								'id'    => 'rvy-create-revision',
-								'title' => rvy_get_option('revision_statuses_noun_labels') ? __('New Working Copy', 'revisionary') : __('New Revision', 'revisionary'), // Your menu title
+								'title' => pp_revisions_status_label('draft-revision', 'submit_short'), // Your menu title
 								//'href'  => wp_nonce_url(rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise&amp;front=1"), "submit-post_{$post->ID}"), // URL
 								'href'  => rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise&amp;front=1"), // URL
 								'meta'  => [
