@@ -126,6 +126,9 @@ class RevisionCreation {
 		switch($revision_status) {
 			case 'draft-revision':
 				$data['post_status'] = 'draft';
+
+				$data['post_date'] = current_time( 'mysql' );
+				$data['post_date_gmt'] = current_time( 'mysql', 1 );
 				break;
 
 			case 'future-revision':
