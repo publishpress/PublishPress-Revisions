@@ -7,7 +7,6 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
  */
 class RevisionaryEditRevisionClassicUI {
 	function __construct () {
-		add_action('admin_head', [$this, 'add_js']);
 		add_action('admin_head', [$this, 'hide_admin_divs']);
 
 		add_filter('post_updated_messages', [$this, 'fltPostUpdatedMessage']);
@@ -17,121 +16,6 @@ class RevisionaryEditRevisionClassicUI {
 
 		add_filter('presspermit_editor_ui_status', [$this, 'fltEditorUIstatus'], 10, 3);
 		add_filter('presspermit_post_editor_immediate_caption', [$this, 'fltImmediateCaption'], 10, 2);
-	}
-
-	function add_js() {
-		global $post;
-
-		?>
-		<script type="text/javascript">
-		/* <![CDATA[ */
-		jQuery(document).ready( function($) {
-			if (typeof(postL10n) != 'undefined') {
-				postL10n.saveDraft = "<?php _e('Update Revision', 'revisionary' )?>";
-			}
-
-            var rvyNowCaption = "<?php _e( 'Current Time', 'revisionary' );?>";
-            $('#publishing-action #publish').show();
-        });
-        /* ]]> */
-        </script>
-
-		<?php if ('draft-revision' == $post->post_mime_type):?>
-			<script type="text/javascript">
-			/* <![CDATA[ */
-			jQuery(document).ready( function($) {
-				$('#publish').val("<?php _e('Submit Changes', 'revisionary' )?>");
-
-				if (typeof(postL10n) != 'undefined') {
-					postL10n.update = "<?php _e('Submit Changes', 'revisionary' )?>";
-					postL10n.schedule = "<?php _e('Submit Change Schedule', 'revisionary' )?>";
-				}
-
-				setInterval(
-					function() {
-						if ($('#publish').val() != "<?php _e('Submit Changes', 'revisionary' )?>") {
-							$('#publish').val("<?php _e('Submit Changes', 'revisionary' )?>");
-						}
-					}
-					, 200
-				);
-			});
-			/* ]]> */
-			</script>
-    	<?php else:?>
-			<script type="text/javascript">
-			/* <![CDATA[ */
-			jQuery(document).ready( function($) {
-				$('#publish').val("<?php _e('Update Revision', 'revisionary' )?>");
-
-				if (typeof(postL10n) != 'undefined') {
-					postL10n.update = "<?php _e('Update Revision', 'revisionary' )?>";
-
-				}
-
-				setInterval(
-					function() {
-						if ($('#publish').val() != "<?php _e('Update Revision', 'revisionary' )?>") {
-							$('#publish').val("<?php _e('Update Revision', 'revisionary' )?>");
-						}
-					}
-					, 200
-				);
-			});
-			/* ]]> */
-			</script>
-		<?php endif;
-
-		global $post, $current_user;
-
-		if (!empty($post)):
-			$type_obj = get_post_type_object($post->post_type);
-
-			$view_link = rvy_preview_url($post);
-
-			$can_publish = current_user_can('edit_post', rvy_post_id($post->ID));
-
-			if ($type_obj && empty($type_obj->public)) {
-				$view_link = '';
-				$view_caption = '';
-				$view_title = '';
-			} elseif ($can_publish) {
-				$view_caption = __('Preview');
-				$view_title = __('View / moderate saved revision', 'revisionary');
-			} else {
-				$view_caption = __('Preview');
-				$view_title = __('View saved revision', 'revisionary');
-			}
-
-			$preview_caption = __('View');
-			$preview_title = __('View unsaved changes', 'revisionary');
-			?>
-
-			<script type="text/javascript">
-			/* <![CDATA[ */
-			jQuery(document).ready( function($) {
-				$('h1.wp-heading-inline').html('<?php printf(__('Edit %s Revision', 'revisionary'), $type_obj->labels->singular_name);?>');
-
-				<?php if ($view_link) :?>
-					// remove preview event handlers
-					original = $('#minor-publishing-actions #post-preview');
-					$(original).after(original.clone().attr('href', '<?php echo $view_link;?>').attr('target', '_blank').attr('id', 'revision-preview'));
-					$(original).hide();
-				<?php endif;?>
-
-				<?php if ($view_caption) :?>
-					$('#minor-publishing-actions #revision-preview').html('<?php echo $view_caption;?>');
-				<?php endif;?>
-
-				<?php if ($preview_title) :?>
-					$('#minor-publishing-actions #post-preview').html('<?php echo $preview_caption;?>');
-					$('#minor-publishing-actions #post-preview').attr('title', '<?php echo $preview_title;?>');
-				<?php endif;?>
-
-			});
-			/* ]]> */
-			</script>
-		<?php endif;
 	}
 
 	function hide_admin_divs() {
