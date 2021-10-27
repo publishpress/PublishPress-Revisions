@@ -49,6 +49,10 @@ class RvyPostEdit {
             $args = \PublishPress\Revisions\PostEditorWorkflowUI::revisionLinkParams(compact('post', 'do_pending_revisions', 'do_scheduled_revisions'));
             wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
 
+            if (defined('PUBLISHPRESS_VERSION')) {
+                wp_dequeue_script('publishpress-custom_status');
+                wp_dequeue_style('publishpress-custom_status');
+            }
         } elseif (current_user_can('edit_post', $post->ID)) {
             $status_obj = get_post_status_object($post->post_status);
 
