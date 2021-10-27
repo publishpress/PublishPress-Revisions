@@ -286,7 +286,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$own_revision_clause = '';
 		}
 
-		$where_append = "($p.comment_count IN ($post_id_csv) $own_revision_clause)";
+		$revision_status_clause = (!empty($args['revision_query']) && empty($_REQUEST['all'])) ? "AND $p.post_mime_type != 'draft-revision' " : '';
+
+		$where_append = "($p.comment_count IN ($post_id_csv) {$revision_status_clause}$own_revision_clause)";
 
 		$status_csv = rvy_filtered_statuses(['return' => 'csv']);
 
@@ -355,7 +357,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	}
 
 	function revisions_filter($clauses, $_wp_query = false) {
-		$clauses['where'] = $this->revisions_where_filter($clauses['where']);
+		$clauses['where'] = $this->revisions_where_filter($clauses['where'], ['revision_query' => true]);
 		$this->posts_clauses_filtered = $clauses;
 		return $clauses;
 	}
@@ -633,6 +635,16 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			'total_items' => $total_items,
 			'per_page' => $per_page
 		]);
+
+		if (empty($_REQUEST['all']) && empty($_REQUEST['author']) && empty($_REQUEST['post_author']) && empty($_REQUEST['post_status'])) :?>
+		<script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready( function($) {
+            $('span.ppr-my-activity-count').html(' (<?php echo $total_items;?>)');
+        });
+        /* ]]> */
+		</script>
+		<?php endif;
 	}
 
 	public function no_items() {
@@ -726,6 +738,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$num_posts = $this->count_revisions($post_types, $revision_statuses);
 
 		$links = [];
+
+		$links[''] = '';
 		$links['all'] = '';
 
 		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
@@ -815,13 +829,21 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			}
 		}
 
-		if (empty($current_link_class) && empty($_REQUEST['post_type']) && empty($_REQUEST['author']) && empty($_REQUEST['post_author']) && empty($_REQUEST['published_post']) && empty($_REQUEST['post_status'])) {
+		if (empty($current_link_class) && empty($_REQUEST['post_type']) && empty($_REQUEST['author']) && empty($_REQUEST['post_author']) && empty($_REQUEST['published_post']) && empty($_REQUEST['post_status']) && empty($_REQUEST['all'])) {
 			$link_class = " class='current'";
 		} else {
 			$link_class = '';
 		}
 
-		$links['all'] = "<a href='admin.php?page=revisionary-q'{$link_class}>" . sprintf( __('All %s', 'revisionary'), "<span class='count'>($all_count)</span>" ) . '</a>';
+		$links[''] = "<a href='admin.php?page=revisionary-q'{$link_class}>" . sprintf( __('My Activity', 'revisionary'), "<span class='count'>($all_count)</span>" ) . '</a><span class="ppr-my-activity-count"></span>';
+
+		if (empty($current_link_class) && empty($_REQUEST['post_type']) && empty($_REQUEST['author']) && empty($_REQUEST['post_author']) && empty($_REQUEST['published_post']) && empty($_REQUEST['post_status']) && !empty($_REQUEST['all'])) {
+			$link_class = " class='current'";
+		} else {
+			$link_class = '';
+		}
+
+		$links['all'] = "<a href='admin.php?page=revisionary-q&all=1'{$link_class}>" . sprintf( __('All %s', 'revisionary'), "<span class='count'>($all_count)</span>" ) . '</a>';
 		
 		return $links;
 	}
