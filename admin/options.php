@@ -95,15 +95,15 @@ $this->tab_captions = array( 'features' => __( 'Settings', 'revisionary' ), 'opt
 
 $this->section_captions = array(
 	'features' => array(
-		'role_definition' 	  	=> __('Role Definition', 'revisionary'),
-		'revision_statuses'		=> __('Revision Statuses', 'revisionary'),
+		'role_definition' 	  	=> __('Revisors', 'revisionary'),
+		'revision_statuses'		=> __('Statuses', 'revisionary'),
 		'working_copy'			=> pp_revisions_status_label('draft-revision', 'plural'),
 		'scheduled_revisions' 	=> pp_revisions_status_label('future-revision', 'plural'),
 		'pending_revisions'		=> pp_revisions_status_label('pending-revision', 'plural'),
-		'revision_queue'		=> __('Revision Queue', 'revisionary'),
+		'revision_queue'		=> __('Queue', 'revisionary'),
 		'preview'				=> __('Preview / Approval', 'revisionary'),
-		'revisions'				=> __('Revision Options', 'revisionary'),
-		'notification'			=> __('Email Notification', 'revisionary')
+		'revisions'				=> __('Options', 'revisionary'),
+		'notification'			=> __('Notifications', 'revisionary')
 	)
 );
 
