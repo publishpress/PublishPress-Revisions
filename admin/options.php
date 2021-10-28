@@ -964,8 +964,8 @@ echo "<input type='hidden' name='all_options' value='$this->all_options' />";
 echo "<input type='hidden' name='rvy_submission_topic' value='options' />";
 ?>
 <p class="submit">
-<input type="submit" name="rvy_submit" class="button-primary" value="<?php _e('Save Changes', 'revisionary');?>" />
-<input type="submit" name="rvy_defaults" class="button-secondary" value="<?php _e('Revert to Defaults', 'revisionary') ?>" onclick="<?php echo $js_call;?>" style="float:right;" />
+<input type="submit" name="rvy_submit" class="button button-primary" value="<?php _e('Save Changes', 'revisionary');?>" />
+<input type="submit" name="rvy_defaults" class="button button-secondary" value="<?php _e('Revert to Defaults', 'revisionary') ?>" onclick="<?php echo $js_call;?>" style="float:right;" />
 </p>
 
 <?php
