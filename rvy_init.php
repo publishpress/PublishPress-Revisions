@@ -427,6 +427,8 @@ function pp_revisions_label($label_name) {
 			? 							__('%sMy Copies & Changes%s (%s)', 'revisionary') 
 			: 							__('%sMy Revisions%s (%s)', 'revisionary'),
 			
+			'my_published_posts'		=> __('%sMy Published Posts%s(%s)', 'revisionary'),
+
 			'queue_col_revision' 		=> __('Revision', 'revisionary'),
 			'queue_col_revised_by' 		=> __('Revised By', 'revisionary'),
 			'queue_col_revision_date' 	=> __('Revision Date', 'revisionary'),

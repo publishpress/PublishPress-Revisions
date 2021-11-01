@@ -745,25 +745,29 @@ class Revisionary
 		if (rvy_in_revision_workflow($post)) {
 			$object_type_obj = get_post_type_object($post->post_type);
 
-			// If edit_others capability is being required for this post type, apply edit_others_revisions capability
-			if (!empty($object_type_obj->cap) && in_array($object_type_obj->cap->edit_others_posts, $reqd_caps)) {
-				if (!empty($current_user->allcaps['edit_others_revisions']) || !rvy_get_option('revisor_lock_others_revisions')) {
-					$wp_blogcaps[$object_type_obj->cap->edit_others_posts] = true;
-				
-				} elseif (rvy_get_option('admin_revisions_to_own_posts') && current_user_can('edit_post', rvy_post_id($post_id))) {
-					$wp_blogcaps[$object_type_obj->cap->edit_others_posts] = true;
+			if (('draft-revision' == $post->post_mime_type) && !rvy_is_post_author($author) && empty($wp_blogcaps['manage_unsubmitted_revisions'])) {
+				unset($wp_blogcaps[$object_type_obj->cap->edit_others_posts]);
+			} else {
+				// If edit_others capability is being required for this post type, apply edit_others_revisions capability
+				if (!empty($object_type_obj->cap) && in_array($object_type_obj->cap->edit_others_posts, $reqd_caps)) {
+					if (!empty($current_user->allcaps['edit_others_revisions']) || !rvy_get_option('revisor_lock_others_revisions')) {
+						$wp_blogcaps[$object_type_obj->cap->edit_others_posts] = true;
+					
+					} elseif (rvy_get_option('admin_revisions_to_own_posts') && current_user_can('edit_post', rvy_post_id($post_id))) {
+						$wp_blogcaps[$object_type_obj->cap->edit_others_posts] = true;
+					}
 				}
-			}
-		
-			// Grant edit permission for revision if user can edit main post
-			if (!empty($args[0]) && ('edit_post' == $args[0]) && array_diff($reqd_caps, array_keys(array_filter($wp_blogcaps)))) {
-				$this->skip_filtering = true;
-
-				if (rvy_get_option('admin_revisions_to_own_posts') && current_user_can('edit_post', rvy_post_id($post_id))) {
-					$wp_blogcaps = array_merge($wp_blogcaps, array_fill_keys($reqd_caps, true));
+			
+				// Grant edit permission for revision if user can edit main post
+				if (!empty($args[0]) && ('edit_post' == $args[0]) && array_diff($reqd_caps, array_keys(array_filter($wp_blogcaps)))) {
+					$this->skip_filtering = true;
+	
+					if (rvy_get_option('admin_revisions_to_own_posts') && current_user_can('edit_post', rvy_post_id($post_id))) {
+						$wp_blogcaps = array_merge($wp_blogcaps, array_fill_keys($reqd_caps, true));
+					}
+	
+					$this->skip_filtering = false;
 				}
-
-				$this->skip_filtering = false;
 			}
 		}
 
