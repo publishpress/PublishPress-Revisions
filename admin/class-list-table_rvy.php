@@ -286,7 +286,11 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$own_revision_clause = '';
 		}
 
-		$revision_status_clause = (!empty($args['revision_query']) && empty($_REQUEST['all'])) ? "AND $p.post_mime_type != 'draft-revision' " : '';
+		if (!empty($args['revision_query']) && empty($_REQUEST['all'])) {
+			$revision_status_clause = "AND $p.post_mime_type != 'draft-revision' ";
+		} elseif (!current_user_can("manage_unsubmitted_revisions")) {
+			$revision_status_clause = "AND ($p.post_mime_type != 'draft-revision' OR $p.post_author = '$current_user->ID')";
+		}
 
 		$where_append = "($p.comment_count IN ($post_id_csv) {$revision_status_clause}$own_revision_clause)";
 

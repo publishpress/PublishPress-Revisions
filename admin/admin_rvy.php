@@ -226,7 +226,7 @@ class RevisionaryAdmin
 	}
 
 	public function fltPublishPressCapsSection($section_caps) {
-		$section_caps['PublishPress Revisions'] = ['edit_others_drafts', 'edit_others_revisions', 'list_others_revisions'];
+		$section_caps['PublishPress Revisions'] = ['edit_others_drafts', 'edit_others_revisions', 'list_others_revisions', 'manage_unsubmitted_revisions'];
 		return $section_caps;
 	}
 
