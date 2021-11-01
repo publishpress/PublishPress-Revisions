@@ -804,7 +804,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				$link_class = '';
 			}
 
-			$links['my_posts'] = sprintf(__('%sMy Published Posts%s(%s)', 'revisionary'), "<a href='admin.php?page=revisionary-q&post_author=$current_user->ID'{$link_class}>", '</a>', "<span class='count'>$my_post_count</span>");
+			$links['my_posts'] = sprintf(pp_revisions_label('my_published_posts'), "<a href='admin.php?page=revisionary-q&post_author=$current_user->ID'{$link_class}>", '</a>', "<span class='count'>$my_post_count</span>");
 		}
 
 		$all_count = 0;
