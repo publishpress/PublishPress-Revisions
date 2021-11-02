@@ -770,9 +770,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			}
 
 			$links['mine'] = sprintf(
-				pp_revisions_label('my_revisions'), 
+				translate_nooped_plural(pp_revisions_label('my_revisions'), $my_count), 
 				"<a href='admin.php?page=revisionary-q&author=$current_user->ID'{$link_class}>", '</a>', "<span class='count'>$my_count</span>"
-			);
+			) .'&nbsp;';
 		}
 
 		$where = $this->revisions_where_filter( 
@@ -804,7 +804,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				$link_class = '';
 			}
 
-			$links['my_posts'] = sprintf(pp_revisions_label('my_published_posts'), "<a href='admin.php?page=revisionary-q&post_author=$current_user->ID'{$link_class}>", '</a>', "<span class='count'>$my_post_count</span>");
+			$links['my_posts'] = sprintf(
+				translate_nooped_plural(pp_revisions_label('my_published_posts'), $my_post_count), 
+				"<a href='admin.php?page=revisionary-q&post_author=$current_user->ID'{$link_class}>", '</a>', "<span class='count'>$my_post_count</span>"
+			) . '&nbsp;';
 		}
 
 		$all_count = 0;

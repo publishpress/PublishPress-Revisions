@@ -424,10 +424,10 @@ function pp_revisions_label($label_name) {
 		$labels = apply_filters('revisionary_labels',
 		[
 			'my_revisions' => (rvy_get_option('revision_statuses_noun_labels')) 
-			? 							__('%sMy Copies & Changes%s (%s)', 'revisionary') 
-			: 							__('%sMy Revisions%s (%s)', 'revisionary'),
+			? 							_n_noop('%sMy Copies & Changes%s(%s)</span>', '%sMy Copies & Changes%s(%s)</span>', 'revisionary')
+			: 							_n_noop('%sMy Revisions%s(%s)</span>', '%sMy Revisions%s(%s)</span>', 'revisionary'),
 			
-			'my_published_posts'		=> __('%sMy Published Posts%s(%s)', 'revisionary'),
+			'my_published_posts'		=> _n_noop('%sMy Published Posts%s(%s)</span>', '%sMy Published Posts%s(%s)', 'revisionary'),
 
 			'queue_col_revision' 		=> __('Revision', 'revisionary'),
 			'queue_col_revised_by' 		=> __('Revised By', 'revisionary'),
