@@ -59,7 +59,7 @@ class PostEditorWorkflowUI {
 
         $_revisions = wp_get_post_revisions($post->ID);
         if ($_revisions && count($_revisions) > 1) {
-            $vars['revisionEdits'] = sprintf(_n('%s%s Revision Edit', '%s%s Revision Edits', '<span class="dashicons dashicons-backup"></span>&nbsp;', count($_revisions), 'revisionary'), count($_revisions));
+            $vars['revisionEdits'] = sprintf(_n('%s%s Revision Edit', '%s%s Revision Edits', count($_revisions), 'revisionary'), '<span class="dashicons dashicons-backup"></span>&nbsp;', count($_revisions));
         } else {
             $vars['revisionEdits'] = '';
         }
