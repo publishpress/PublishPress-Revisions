@@ -248,7 +248,7 @@ function rvy_status_registrations() {
 				'update' => __('Update Revision', 'revisionary'), 
 				'plural' => __('Working Copies', 'revisionary'), 
 				'short' => __('Working Copy', 'revisionary'),
-				'count' => _n_noop('Working Copies <span class="count">(%d)</span>', 'Working Copies <span class="count">(%d)</span>'),  // @todo: confirm API will support a fixed string
+				'count' => _n_noop('Working Copies <span class="count">(%d)</span>', 'Working Copies <span class="count">(%d)</span>', 'revisionary'),  // @todo: confirm API will support a fixed string
 				'basic' => 'Copy',
 			],
 		
@@ -265,7 +265,7 @@ function rvy_status_registrations() {
 				'update' => __('Update Revision', 'revisionary'), 
 				'plural' => __('Change Requests', 'revisionary'), 
 				'short' => __('Change Request', 'revisionary'),
-				'count' => _n_noop('Change Requests <span class="count">(%d)</span>', 'Change Requests <span class="count">(%d)</span>'),
+				'count' => _n_noop('Change Requests <span class="count">(%d)</span>', 'Change Requests <span class="count">(%d)</span>', 'revisionary'),
 				'enable' => __('Enable Change Requests', 'revisionary'),
 				'basic' => 'Change Request',
 			],
@@ -282,7 +282,7 @@ function rvy_status_registrations() {
 				'update' => __('Update Revision', 'revisionary'), 
 				'plural' => __('Scheduled Changes', 'revisionary'), 
 				'short' => __('Scheduled Change', 'revisionary'),
-				'count' => _n_noop('Scheduled Changes <span class="count">(%d)</span>', 'Scheduled Changes <span class="count">(%d)</span>'),
+				'count' => _n_noop('Scheduled Changes <span class="count">(%d)</span>', 'Scheduled Changes <span class="count">(%d)</span>', 'revisionary'),
 				'basic' => 'Scheduled Change',
 			],
 		]
@@ -301,7 +301,7 @@ function rvy_status_registrations() {
 				'update' => __('Update Revision', 'revisionary'), 
 				'plural' => __('Unsubmitted Revisions', 'revisionary'), 
 				'short' => __('Not Submitted', 'revisionary'),
-				'count' => _n_noop('Not Submitted for Approval <span class="count">(%s)</span>', 'Not Submitted for Approval <span class="count">(%s)</span>'),   // @todo: confirm API will support a fixed string
+				'count' => _n_noop('Not Submitted for Approval <span class="count">(%s)</span>', 'Not Submitted for Approval <span class="count">(%s)</span>', 'revisionary'),   // @todo: confirm API will support a fixed string
 				'basic' => 'Revision',
 			],
 		
@@ -317,7 +317,7 @@ function rvy_status_registrations() {
 				'update' => __('Update Revision', 'revisionary'), 
 				'plural' => __('Submitted Revisions', 'revisionary'), 
 				'short' => __('Submitted', 'revisionary'),
-				'count' => _n_noop('Submitted for Approval <span class="count">(%s)</span>', 'Submitted for Approval <span class="count">(%s)</span>'),
+				'count' => _n_noop('Submitted for Approval <span class="count">(%s)</span>', 'Submitted for Approval <span class="count">(%s)</span>', 'revisionary'),
 				'basic' => 'Revision',
 			],
 
@@ -333,7 +333,7 @@ function rvy_status_registrations() {
 				'update' => __('Update Revision', 'revisionary'), 
 				'plural' => __('Scheduled Revisions', 'revisionary'), 
 				'short' => __('Scheduled', 'revisionary'),
-				'count' => _n_noop('Scheduled Revision <span class="count">(%s)</span>', 'Scheduled Revisions <span class="count">(%s)</span>'),
+				'count' => _n_noop('Scheduled Revision <span class="count">(%s)</span>', 'Scheduled Revisions <span class="count">(%s)</span>', 'revisionary'),
 				'basic' => 'Scheduled Revision',
 			],
 		]
