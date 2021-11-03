@@ -34,6 +34,10 @@
  *
  **/
 
+// Temporary usage within this module only; avoids multiple instances of version string
+global $pp_revisions_version;
+$pp_revisions_version = '3.0-rc3';
+
 if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 	die( 'This page cannot be called directly.' );
 
@@ -94,29 +98,22 @@ if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1
 
 define('REVISIONARY_FILE', __FILE__);
 
+add_action(
+	'init', 
+	function() {
+		global $pp_revisions_version;
+		require_once(dirname(__FILE__).'/functions.php');
+		pp_revisions_plugin_updated($pp_revisions_version);
+	},
+	2
+);
+
 // register these functions before any early exits so normal activation/deactivation can still run with RS_DEBUG
 register_activation_hook(__FILE__, function() 
 	{
-		$current_version = '3.0-rc2';
-
-		$last_ver = get_option('revisionary_last_version');
-
+		global $pp_revisions_version;
 		require_once(dirname(__FILE__).'/functions.php');
-
-		if (version_compare($last_ver, '3.0-rc3', '<')) {
-			if ($role = @get_role('revisor')) {
-				$role->add_cap('upload_files');
-			}
-		}
-
-		if ($current_version != $last_ver) {
-			require_once( dirname(__FILE__).'/lib/agapetry_wp_core_lib.php');
-			require_once(dirname(__FILE__).'/rvy_init.php');
-			revisionary_refresh_revision_flags();
-
-			// mirror to PUBLISHPRESS_REVISIONS_VERSION
-			update_option('revisionary_last_version', $current_version);
-		}
+		pp_revisions_plugin_updated($pp_revisions_version);
 
 		// force this timestamp to be regenerated, in case something went wrong before
 		delete_option( 'rvy_next_rev_publish_gmt' );
@@ -202,7 +199,8 @@ add_action(
 			return;
 		}
 
-		define('PUBLISHPRESS_REVISIONS_VERSION', '3.0-rc2');
+		global $pp_revisions_version;
+		define('PUBLISHPRESS_REVISIONS_VERSION', $pp_revisions_version);
 
 		if ( ! defined( 'RVY_VERSION' ) ) {
 			define( 'RVY_VERSION', PUBLISHPRESS_REVISIONS_VERSION );  // back compat

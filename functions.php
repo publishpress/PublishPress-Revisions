@@ -241,3 +241,33 @@ function rvy_nc_url($url, $args = []) {
 function rvy_admin_url($partial_admin_url) {
     return rvy_nc_url( admin_url($partial_admin_url) );
 }
+
+function pp_revisions_plugin_updated($current_version) {
+    $last_ver = get_option('revisionary_last_version');
+
+    if (version_compare($last_ver, '3.0-rc7', '<')) {
+        if ($role = @get_role('administrator')) {
+            $role->add_cap('manage_unsubmitted_revisions');
+        }
+
+        if ($role = @get_role('revisor')) {
+            $role->add_cap('upload_files');
+        }
+
+    } elseif (version_compare($last_ver, '2.4.3-beta4', '<')) { // Empty Queue condition was reported with Elementor, so default this setting
+        if (defined('ELEMENTOR_VERSION') || defined('ELEMENTOR_PRO_VERSION')) {
+            update_option('rvy_queue_query_all_posts', 1);
+        }
+    }
+
+    if ($current_version != $last_ver) {
+        require_once( dirname(__FILE__).'/lib/agapetry_wp_core_lib.php');
+        require_once(dirname(__FILE__).'/rvy_init.php');
+        revisionary_refresh_revision_flags();
+
+        // mirror to REVISIONARY_VERSION
+        update_option('revisionary_last_version', $current_version);
+
+        delete_option('revisionary_sent_mail');
+    }
+}
