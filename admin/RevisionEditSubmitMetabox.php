@@ -82,7 +82,7 @@ class RvyRevisionEditSubmitMetabox
      */
     public static function post_save_button($post, $args)
     {
-        if (!$draft_label = pp_revisions_status_label($post->post_mime_type, 'update_revision')) {
+        if (!$draft_label = pp_revisions_status_label($post->post_mime_type, 'update')) {
         	$draft_label = pp_revisions_label('update_revision');
         }
         ?>
