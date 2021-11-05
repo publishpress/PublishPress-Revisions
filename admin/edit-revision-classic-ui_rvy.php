@@ -94,7 +94,7 @@ class RevisionaryEditRevisionClassicUI {
 		?>
 
 		<a id="rvy_compare_button" class="preview button" href="<?php echo $compare_link; ?>" target="_blank" id="revision-compare"
-		tabindex="4" title="<?php echo esc_attr($compare_title);?>"><?php echo $compare_button; ?></a>
+		tabindex="4" title="<?php echo esc_attr($compare_title);?>" style="float:right"><?php echo $compare_button; ?></a>
         <?php
     }
 
