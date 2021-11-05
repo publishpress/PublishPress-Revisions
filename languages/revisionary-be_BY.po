@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Revisionary\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-12 16:52-0400\n"
+"POT-Creation-Date: 2021-11-05 15:26-0400\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Kevin Behrens <kevin@publishpress.com>\n"
 "Language-Team: Marcis G. <by.marcis@gmail.com>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "X-Poedit-SearchPath-2: classes\n"
 "X-Poedit-SearchPath-3: includes\n"
 
-#: admin/RevisionEditSubmitMetabox.php:62 admin/class-list-table_rvy.php:860
+#: admin/RevisionEditSubmitMetabox.php:62 admin/class-list-table_rvy.php:889
 msgid "Delete Permanently"
 msgstr ""
 
@@ -27,123 +27,82 @@ msgstr ""
 msgid "Move to Trash"
 msgstr ""
 
-#: admin/RevisionEditSubmitMetabox.php:85
-#: admin/edit-revision-classic-ui_rvy.php:30
-#: admin/edit-revision-classic-ui_rvy.php:65
-#: admin/edit-revision-classic-ui_rvy.php:68
-#: admin/edit-revision-classic-ui_rvy.php:74
-#: admin/edit-revision-classic-ui_rvy.php:75
-#: admin/post-editor-workflow-ui_rvy.php:22 rvy_init.php:248 rvy_init.php:265
-#: rvy_init.php:282 rvy_init.php:301 rvy_init.php:317 rvy_init.php:333
-#, fuzzy
-#| msgid "Revisions"
-msgid "Update Revision"
-msgstr "Рэдакцыі"
-
-#: admin/RevisionEditSubmitMetabox.php:114
-#: admin/edit-revision-classic-ui_rvy.php:99 admin/post-edit_rvy.php:79
-#: admin/post-editor-workflow-ui_rvy.php:44
-msgid "View / Publish"
+#: admin/RevisionEditSubmitMetabox.php:117
+#: admin/RevisionEditSubmitMetabox.php:120 admin/class-list-table_rvy.php:576
+#: admin/class-list-table_rvy.php:1220 admin/history_rvy.php:1074
+#: admin/history_rvy.php:1169 admin/post-edit_rvy.php:86
+#: admin/post-editor-workflow-ui_rvy.php:42
+#: admin/post-editor-workflow-ui_rvy.php:82
+#: admin/post-editor-workflow-ui_rvy.php:164
+#: admin/post-editor-workflow-ui_rvy.php:183 admin/revision-ui_rvy.php:275
+msgid "Preview"
 msgstr ""
 
-#: admin/RevisionEditSubmitMetabox.php:114
-#: admin/edit-revision-classic-ui_rvy.php:99 admin/history_rvy.php:1072
-#: admin/post-edit_rvy.php:79 admin/post-editor-workflow-ui_rvy.php:44
-msgid "View / Approve"
-msgstr ""
-
-#: admin/RevisionEditSubmitMetabox.php:115
-#: admin/edit-revision-classic-ui_rvy.php:100 admin/post-edit_rvy.php:98
+#: admin/RevisionEditSubmitMetabox.php:118 admin/post-edit_rvy.php:102
 msgid "View / moderate saved revision"
 msgstr ""
 
-#: admin/RevisionEditSubmitMetabox.php:117 admin/class-list-table_rvy.php:562
-#: admin/edit-revision-classic-ui_rvy.php:102
-#: admin/edit-revision-classic-ui_rvy.php:106 admin/history_rvy.php:1074
-#: admin/post-edit_rvy.php:82
-#, fuzzy
-msgid "View"
-msgstr "Глядзець гэта ў мэнэджару версій"
-
-#: admin/RevisionEditSubmitMetabox.php:118
-#: admin/edit-revision-classic-ui_rvy.php:103 admin/post-edit_rvy.php:101
+#: admin/RevisionEditSubmitMetabox.php:121 admin/post-edit_rvy.php:105
 msgid "View saved revision"
 msgstr ""
 
-#: admin/RevisionEditSubmitMetabox.php:140
+#: admin/RevisionEditSubmitMetabox.php:143
 msgid "Status:"
 msgstr ""
 
-#: admin/RevisionEditSubmitMetabox.php:173
+#: admin/RevisionEditSubmitMetabox.php:176
 msgid "M j, Y @ G:i"
 msgstr ""
 
-#: admin/RevisionEditSubmitMetabox.php:178
+#: admin/RevisionEditSubmitMetabox.php:181
 #, fuzzy, php-format
 #| msgid "Schedule for:"
 msgid "Scheduled for: %s"
 msgstr "Запланавана для:"
 
-#: admin/RevisionEditSubmitMetabox.php:181
+#: admin/RevisionEditSubmitMetabox.php:184
 #, fuzzy, php-format
 #| msgid "Published on:"
 msgid "Publish on: %s"
 msgstr "Апублікавана:"
 
-#: admin/RevisionEditSubmitMetabox.php:184
-#: admin/edit-revision-classic-ui_rvy.php:179
+#: admin/RevisionEditSubmitMetabox.php:187
+#: admin/edit-revision-classic-ui_rvy.php:63
 msgid "Publish <b>on approval</b>"
 msgstr ""
 
-#: admin/RevisionEditSubmitMetabox.php:190 admin/admin-posts_rvy.php:163
-#: admin/admin-posts_rvy.php:165 admin/class-list-table_rvy.php:538
-#: admin/class-list-table_rvy.php:1163 admin/history_rvy.php:1116
-#: front_rvy.php:282
+#: admin/RevisionEditSubmitMetabox.php:193 admin/admin-posts_rvy.php:161
+#: admin/class-list-table_rvy.php:544 admin/class-list-table_rvy.php:1194
+#: admin/history_rvy.php:1116 front_rvy.php:282
 msgid "Edit"
 msgstr ""
 
-#: admin/admin-init_rvy.php:141 admin/admin-init_rvy.php:217
+#: admin/admin-init_rvy.php:126 admin/admin-init_rvy.php:202
 msgid "Sorry, you are not allowed to approve this revision."
 msgstr ""
 
-#: admin/admin-init_rvy.php:182
+#: admin/admin-init_rvy.php:167
 msgid "Sorry, you are not allowed to submit this revision."
 msgstr ""
 
-#: admin/admin-init_rvy.php:246
+#: admin/admin-init_rvy.php:231
 #, fuzzy
 #| msgid "You do not have permission to delete that revision."
 msgid "Sorry, you are not allowed to delete this revision."
 msgstr "У вас няма правоў для выдалення рэдакцыі."
 
-#: admin/admin-init_rvy.php:251
+#: admin/admin-init_rvy.php:236
 msgid "Error in deleting."
 msgstr ""
 
-#: admin/admin-init_rvy.php:331
-#, php-format
-msgid ""
-"For more details on setting up PublishPress Revisions, %sread this guide%s."
-msgstr ""
-
-#: admin/admin-init_rvy.php:337
-#, php-format
-msgid ""
-"<strong>Welcome to PublishPress Revisions!</strong> Here&apos;s how it works:"
-"%s<li>\"Contributors\" can submit revisions to their published posts.</"
-"li><li>\"Revisors\" can submit revisions to posts and pages published by "
-"others.</li><li>\"Authors\", \"Editors\" and \"Administrators\" can approve "
-"revisions or schedule their own revisions.</li>%s%s%s"
-msgstr ""
-
-#: admin/admin-init_rvy.php:347
+#: admin/admin-init_rvy.php:333
 #, php-format
 msgid ""
 "<strong>Revisionary is now PublishPress Revisions!</strong> Note the new "
 "Revisions menu and %sRevision Queue%s screen, where Revisions are listed. %s"
 msgstr ""
 
-#: admin/admin-init_rvy.php:373
+#: admin/admin-init_rvy.php:361
 msgid "Dismiss"
 msgstr ""
 
@@ -159,7 +118,7 @@ msgstr "Рэдакцыя была запланавана для публікац
 msgid "The revision was published."
 msgstr "Рэдакцыя была апублікавана."
 
-#: admin/admin-posts_rvy.php:113 admin/class-list-table_rvy.php:390
+#: admin/admin-posts_rvy.php:113 rvy_init.php:432
 #, fuzzy
 #| msgid "Revisions"
 msgid "Revision"
@@ -175,17 +134,6 @@ msgstr "%1$s рэдакцый"
 #, fuzzy
 #| msgid "Revisions"
 msgid "Revision Queue"
-msgstr "Рэдакцыі"
-
-#: admin/admin-posts_rvy.php:163 revisionary_main.php:148
-msgid "New Working Copy"
-msgstr ""
-
-#: admin/admin-posts_rvy.php:165 revisionary_main.php:148 rvy_init.php:294
-#: rvy_init.php:295
-#, fuzzy
-#| msgid "Revisions"
-msgid "New Revision"
 msgstr "Рэдакцыі"
 
 #: admin/admin_lib-mu_rvy.php:10 admin/options.php:221
@@ -282,191 +230,161 @@ msgstr "абраць"
 msgid "unselect"
 msgstr "не выбіраць"
 
-#: admin/class-list-table_rvy.php:391 admin/post-editor-workflow-ui_rvy.php:25
+#: admin/class-list-table_rvy.php:397 admin/post-editor-workflow-ui_rvy.php:25
 msgid "Status"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:392
+#: admin/class-list-table_rvy.php:398
 msgid "Post Type"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:393
-msgid "Revised By"
-msgstr ""
-
-#: admin/class-list-table_rvy.php:394
-msgid "Submission"
-msgstr ""
-
-#: admin/class-list-table_rvy.php:402
+#: admin/class-list-table_rvy.php:408
 #, fuzzy
 #| msgid "Schedule Now"
 msgid "Schedule"
 msgstr "Запланавана для:"
 
-#: admin/class-list-table_rvy.php:405
-#, fuzzy
-#| msgid "Published on:"
-msgid "Published Post"
-msgstr "Апублікавана:"
-
-#: admin/class-list-table_rvy.php:407
-msgid "Post Author"
-msgstr ""
-
-#: admin/class-list-table_rvy.php:441 admin/class-list-table_rvy.php:1091
+#: admin/class-list-table_rvy.php:447 admin/class-list-table_rvy.php:1122
 msgid "Y/m/d g:i:s a"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:449 admin/class-list-table_rvy.php:1096
+#: admin/class-list-table_rvy.php:455 admin/class-list-table_rvy.php:1127
 #: admin/history_rvy.php:987
 #, php-format
 msgid "%s ago"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:452 admin/class-list-table_rvy.php:1099
+#: admin/class-list-table_rvy.php:458 admin/class-list-table_rvy.php:1130
 msgid "Y/m/d g:i a"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:459
+#: admin/class-list-table_rvy.php:465
 #, fuzzy, php-format
 #| msgid "(already scheduled for publication on %s)"
 msgid "Scheduled publication: %s"
 msgstr "(ужо запланаваны да публікацыі на %s)"
 
-#: admin/class-list-table_rvy.php:462
+#: admin/class-list-table_rvy.php:468
 #, fuzzy, php-format
 #| msgid "(for publication on %s)"
 msgid "Requested publication: %s"
 msgstr "(lkz ge,kbrfwbb %s)"
 
-#: admin/class-list-table_rvy.php:466
+#: admin/class-list-table_rvy.php:472
 #, fuzzy
 #| msgid "Unschedule"
 msgid "Missed schedule"
 msgstr "Не планаваць"
 
-#: admin/class-list-table_rvy.php:509 admin/history_rvy.php:781
+#: admin/class-list-table_rvy.php:515 admin/history_rvy.php:781
 msgid "No author"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:549
+#: admin/class-list-table_rvy.php:555
 #, fuzzy, php-format
 #| msgid "View it in Revisions Manager"
 msgid "View only revisions of %s"
 msgstr "Глядзець гэта ў мэнэджару версій"
 
-#: admin/class-list-table_rvy.php:550 admin/class-list-table_rvy.php:902
+#: admin/class-list-table_rvy.php:556
 #, fuzzy
 #| msgid "filter:"
 msgid "Filter"
 msgstr "фільтр:"
 
-#: admin/class-list-table_rvy.php:561 admin/class-list-table_rvy.php:569
+#: admin/class-list-table_rvy.php:567 admin/class-list-table_rvy.php:575
 #, fuzzy
 #| msgid "It will be published on %s"
 msgid "View published post"
 msgstr "Гэта было апублікавана %s"
 
-#: admin/class-list-table_rvy.php:570 admin/class-list-table_rvy.php:1189
-#: admin/history_rvy.php:1169 admin/revision-ui_rvy.php:275
-msgid "Preview"
-msgstr ""
+#: admin/class-list-table_rvy.php:568
+#, fuzzy
+msgid "View"
+msgstr "Глядзець гэта ў мэнэджару версій"
 
-#: admin/class-list-table_rvy.php:593
+#: admin/class-list-table_rvy.php:599
 #, fuzzy
 #| msgid "Restore this Past Revision"
 msgid "Compare Past Revisions"
 msgstr "Воостановлено з прошл. рэдакцыі"
 
-#: admin/class-list-table_rvy.php:594
+#: admin/class-list-table_rvy.php:600
 msgid "History"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:756
-#, php-format
-msgid "%sMy Copies & Changes%s (%s)"
+#: admin/class-list-table_rvy.php:846
+msgid "My Activity"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:756
-#, fuzzy, php-format
-#| msgid "Revisions"
-msgid "%sMy Revisions%s (%s)"
-msgstr "Рэдакцыі"
-
-#: admin/class-list-table_rvy.php:790
-#, php-format
-msgid "%sMy Published Posts%s(%s)"
-msgstr ""
-
-#: admin/class-list-table_rvy.php:825
+#: admin/class-list-table_rvy.php:854
 #, php-format
 msgid "All %s"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:849 front_rvy.php:325
+#: admin/class-list-table_rvy.php:878 front_rvy.php:325
 #, fuzzy
 msgid "Submit"
 msgstr ""
 "%1$s Submit a case study%2$s, растлумачыўшы, якім чынам гэтыя ўбудовы "
 "дапамогуць вам зрабіць нешта выдатнае і пахвальна."
 
-#: admin/class-list-table_rvy.php:852 admin/history_rvy.php:1072
+#: admin/class-list-table_rvy.php:881 admin/history_rvy.php:1072
 #: front_rvy.php:344
 msgid "Approve"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:853
+#: admin/class-list-table_rvy.php:882
 #, fuzzy
 #| msgid "Published:"
 msgid "Publish"
 msgstr "Да публікацыі гэтага Рэдакцыя цяпер."
 
-#: admin/class-list-table_rvy.php:856 admin/revision-ui_rvy.php:280
+#: admin/class-list-table_rvy.php:885 admin/revision-ui_rvy.php:280
 msgid "Unschedule"
 msgstr "Не планаваць"
 
-#: admin/class-list-table_rvy.php:881
+#: admin/class-list-table_rvy.php:910
 msgid "Filter by category"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:946
+#: admin/class-list-table_rvy.php:977
 msgid "Filter by date"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:948
+#: admin/class-list-table_rvy.php:979
 msgid "All dates"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:1007
+#: admin/class-list-table_rvy.php:1038
 #, fuzzy
 #| msgid "select"
 msgid "Select All"
 msgstr "абраць"
 
-#: admin/class-list-table_rvy.php:1079
+#: admin/class-list-table_rvy.php:1110
 #, fuzzy, php-format
 #| msgid "&#8220;%1$s&#8221; (Current Revision)"
 msgid "&#8220;%s&#8221; (Edit)"
 msgstr "&#8220;%1$s&#8221; (Бягучая рэдакцыя)"
 
-#: admin/class-list-table_rvy.php:1172
+#: admin/class-list-table_rvy.php:1203
 #, fuzzy
 #| msgid "Current Revision"
 msgid "Delete Revision"
 msgstr "У вас няма правоў для выдалення рэдакцыі."
 
-#: admin/class-list-table_rvy.php:1173 admin/revision-ui_rvy.php:411
+#: admin/class-list-table_rvy.php:1204 admin/revision-ui_rvy.php:411
 msgid "Delete"
 msgstr "Выдаліць"
 
-#: admin/class-list-table_rvy.php:1188
+#: admin/class-list-table_rvy.php:1219
 #, fuzzy
 #| msgid "Pending Revisions"
 msgid "Preview Revision"
 msgstr "Pending Revisions"
 
-#: admin/class-list-table_rvy.php:1201
+#: admin/class-list-table_rvy.php:1232
 msgid "Compare Changes"
 msgstr ""
 
@@ -474,45 +392,16 @@ msgstr ""
 msgid "Enable public preview"
 msgstr ""
 
-#: admin/edit-revision-classic-ui_rvy.php:33 admin/post-edit_rvy.php:26
-#: admin/post-edit_rvy.php:64
-#, fuzzy
-#| msgid "Current Revision"
-msgid "Current Time"
-msgstr "Бягучая рэдакцыя"
-
-#: admin/edit-revision-classic-ui_rvy.php:43
-#: admin/edit-revision-classic-ui_rvy.php:46
-#: admin/edit-revision-classic-ui_rvy.php:52
-#: admin/edit-revision-classic-ui_rvy.php:53 rvy_init.php:258
-msgid "Submit Changes"
-msgstr ""
-
-#: admin/edit-revision-classic-ui_rvy.php:47
-msgid "Submit Change Schedule"
-msgstr ""
-
-#: admin/edit-revision-classic-ui_rvy.php:107
-#: admin/post-editor-workflow-ui_rvy.php:58
-msgid "View unsaved changes"
-msgstr ""
-
-#: admin/edit-revision-classic-ui_rvy.php:113
-#, fuzzy, php-format
-#| msgid "%1$s Revisions"
-msgid "Edit %s Revision"
-msgstr "%1$s рэдакцый"
-
-#: admin/edit-revision-classic-ui_rvy.php:209
+#: admin/edit-revision-classic-ui_rvy.php:93
 msgid "Compare this revision to published copy, or to other revisions"
 msgstr ""
 
-#: admin/edit-revision-classic-ui_rvy.php:222
+#: admin/edit-revision-classic-ui_rvy.php:106
 #, php-format
 msgid "Revision updated. %sView Preview%s"
 msgstr ""
 
-#: admin/edit-revision-classic-ui_rvy.php:224
+#: admin/edit-revision-classic-ui_rvy.php:108
 #, fuzzy
 #| msgid "The revision was updated."
 msgid "Revision updated."
@@ -606,6 +495,10 @@ msgstr ""
 
 #: admin/history_rvy.php:985
 msgid "M j, Y @ H:i"
+msgstr ""
+
+#: admin/history_rvy.php:1072
+msgid "Preview / Approve"
 msgstr ""
 
 #: admin/history_rvy.php:1168
@@ -1137,18 +1030,22 @@ msgstr ""
 msgid "Revert to Defaults"
 msgstr "Вярнуць да пачатковых"
 
+#: admin/post-edit_rvy.php:26 admin/post-edit_rvy.php:68
+#, fuzzy
+#| msgid "Current Revision"
+msgid "Current Time"
+msgstr "Бягучая рэдакцыя"
+
 #: admin/post-editor-workflow-ui_rvy.php:28
 msgid "(on approval)"
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:42
-#, fuzzy
-#| msgid "Privately Published:"
-msgid "Preview / Publish"
-msgstr "Прыватна апублікавана:"
+#: admin/post-editor-workflow-ui_rvy.php:44
+msgid "View / Publish"
+msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:42
-msgid "Preview / Approve"
+#: admin/post-editor-workflow-ui_rvy.php:44
+msgid "View / Approve"
 msgstr ""
 
 #: admin/post-editor-workflow-ui_rvy.php:47
@@ -1167,6 +1064,10 @@ msgstr ""
 msgid "View / Submit saved revision"
 msgstr ""
 
+#: admin/post-editor-workflow-ui_rvy.php:58
+msgid "View unsaved changes"
+msgstr ""
+
 #: admin/post-editor-workflow-ui_rvy.php:62
 #, fuzzy, php-format
 #| msgid "%1$s Revisions"
@@ -1176,13 +1077,6 @@ msgstr "%1$s рэдакцый"
 #: admin/post-editor-workflow-ui_rvy.php:74
 msgid "Revision Submission Error"
 msgstr ""
-
-#: admin/post-editor-workflow-ui_rvy.php:82
-#: admin/post-editor-workflow-ui_rvy.php:164
-#: admin/post-editor-workflow-ui_rvy.php:183
-#, fuzzy
-msgid "view"
-msgstr "Глядзець гэта ў мэнэджару версій"
 
 #: admin/post-editor-workflow-ui_rvy.php:160
 #, php-format
@@ -1445,9 +1339,10 @@ msgid "no %s revisions available."
 msgstr "не %s даступных рэдакцый."
 
 #: front_rvy.php:244
-#, php-format
-msgid "%sList%s"
-msgstr ""
+#, fuzzy, php-format
+#| msgid "Revisions"
+msgid "%sView Queue%s"
+msgstr "Рэдакцыі"
 
 #: front_rvy.php:254
 #, fuzzy, php-format
@@ -1514,7 +1409,7 @@ msgstr ""
 msgid "%1$s queries in %2$s seconds. %3$s MB used."
 msgstr "%1$s запытаў у %2$s секунд. %3$s MB выкарыстоўваецца."
 
-#: revision-creation_rvy.php:159
+#: revision-creation_rvy.php:162
 msgid "Could not insert revision into the database"
 msgstr ""
 
@@ -1561,11 +1456,11 @@ msgstr "Рэдакцыі"
 msgid "Edit %s: "
 msgstr "%1$s рэдакцый"
 
-#: revisionary.php:67
+#: revisionary.php:71
 msgid "<strong>This plugin can be deleted.</strong>"
 msgstr ""
 
-#: revisionary.php:84 revisionary.php:166
+#: revisionary.php:88 revisionary.php:169
 #, fuzzy, php-format
 #| msgid ""
 #| "Another copy of Revisionary is already activated (version %1$s in \"%2$s"
@@ -1575,7 +1470,7 @@ msgid ""
 "(version %1$s: \"%2$s\")"
 msgstr "Іншая копія Revisionary ужо актывавана (версія %1$s in \"%2$s\")"
 
-#: revisionary.php:86 revisionary.php:168
+#: revisionary.php:90 revisionary.php:171
 #, fuzzy, php-format
 #| msgid ""
 #| "Another copy of Revisionary is already activated (version %1$s in \"%2$s"
@@ -1585,12 +1480,12 @@ msgid ""
 "(version %1$s)"
 msgstr "Іншая копія Revisionary ужо актывавана (версія %1$s in \"%2$s\")"
 
-#: revisionary.php:187
+#: revisionary.php:190
 #, php-format
 msgid "PublishPress Revisions requires PHP version %s or higher."
 msgstr ""
 
-#: revisionary.php:194
+#: revisionary.php:197
 #, php-format
 msgid "PublishPress Revisions requires WordPress version %s or higher."
 msgstr ""
@@ -1636,6 +1531,13 @@ msgstr "Дата публікацыі"
 msgid "Save Revision"
 msgstr "Рэдакцыі"
 
+#: rvy_init.php:248 rvy_init.php:265 rvy_init.php:282 rvy_init.php:301
+#: rvy_init.php:317 rvy_init.php:333 rvy_init.php:437
+#, fuzzy
+#| msgid "Revisions"
+msgid "Update Revision"
+msgstr "Рэдакцыі"
+
 #: rvy_init.php:249
 msgid "Working Copies"
 msgstr ""
@@ -1646,6 +1548,10 @@ msgstr ""
 
 #: rvy_init.php:257
 msgid "Submit Change Request"
+msgstr ""
+
+#: rvy_init.php:258 rvy_init.php:441
+msgid "Submit Changes"
 msgstr ""
 
 #: rvy_init.php:259
@@ -1700,6 +1606,12 @@ msgstr "Запланаваныя рэдакцыі"
 msgid "Unsubmitted Revision"
 msgstr "Рэдакцыі"
 
+#: rvy_init.php:294 rvy_init.php:295
+#, fuzzy
+#| msgid "Revisions"
+msgid "New Revision"
+msgstr "Рэдакцыі"
+
 #: rvy_init.php:296
 #, fuzzy
 #| msgid "Restore this Past Revision"
@@ -1741,7 +1653,7 @@ msgstr "Пісаць аўтару, калі версія рэдакцыі адп
 msgid "Submitted Revision"
 msgstr "Рэдакцыі"
 
-#: rvy_init.php:310 rvy_init.php:313
+#: rvy_init.php:310 rvy_init.php:313 rvy_init.php:440
 #, fuzzy
 #| msgid "Revisions"
 msgid "Submit Revision"
@@ -1804,11 +1716,31 @@ msgstr "Запланаваныя рэдакцыі"
 msgid "Scheduled"
 msgstr "Рэдакцыя была запланавана для публікацыі."
 
-#: rvy_init.php:551
+#: rvy_init.php:433
+msgid "Revised By"
+msgstr ""
+
+#: rvy_init.php:434
+#, fuzzy
+#| msgid "The revision was updated."
+msgid "Revision Date"
+msgstr "Версія была обнавлена."
+
+#: rvy_init.php:435
+msgid "Post Author"
+msgstr ""
+
+#: rvy_init.php:436
+#, fuzzy
+#| msgid "Published on:"
+msgid "Published Post"
+msgstr "Апублікавана:"
+
+#: rvy_init.php:580
 msgid "Revisor"
 msgstr "Рэвізор"
 
-#: rvy_init.php:976
+#: rvy_init.php:1005
 #, fuzzy
 #| msgid "Revisionary"
 msgid "Revision Workflow"
@@ -1817,6 +1749,25 @@ msgstr "Revisionary"
 #: vendor/publishpress/wordpress-version-notices/src/Module/MenuLink/Module.php:129
 msgid "Amazing! We are redirecting you to our site..."
 msgstr ""
+
+#, fuzzy, php-format
+#~| msgid "Revisions"
+#~ msgid "%sMy Revisions%s (%s)"
+#~ msgstr "Рэдакцыі"
+
+#, fuzzy, php-format
+#~| msgid "%1$s Revisions"
+#~ msgid "Edit %s Revision"
+#~ msgstr "%1$s рэдакцый"
+
+#, fuzzy
+#~| msgid "Privately Published:"
+#~ msgid "Preview / Publish"
+#~ msgstr "Прыватна апублікавана:"
+
+#, fuzzy
+#~ msgid "view"
+#~ msgstr "Глядзець гэта ў мэнэджару версій"
 
 #, fuzzy, php-format
 #~| msgid "Scheduled Revisions"
