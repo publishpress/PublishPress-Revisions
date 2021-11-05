@@ -442,6 +442,8 @@ class RevisionaryHistory
 
         $return = array();
 
+        $acf_active = function_exists('acf_get_setting');
+
         foreach ( $all_meta_fields = _wp_post_revision_fields( $compare_to ) as $field => $name ) {
             /**
              * Contextually filter a post revision field.
@@ -461,6 +463,10 @@ class RevisionaryHistory
 
             /** This filter is documented in wp-admin/includes/revision.php */
             $content_to = apply_filters( "_wp_post_revision_field_{$field}", $compare_to->$field, $field, $compare_to, 'to' );
+
+            if ($acf_active && is_scalar($content_to) && (0 === strpos($content_to, 'field_'))) {
+                continue;
+            }
 
             $args = array(
                 'show_split_view' => true,
