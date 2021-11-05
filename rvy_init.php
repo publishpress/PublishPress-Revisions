@@ -427,7 +427,7 @@ function pp_revisions_label($label_name) {
 			? 							_n_noop('%sMy Copies & Changes%s(%s)</span>', '%sMy Copies & Changes%s(%s)</span>', 'revisionary')
 			: 							_n_noop('%sMy Revisions%s(%s)</span>', '%sMy Revisions%s(%s)</span>', 'revisionary'),
 			
-			'my_published_posts'		=> _n_noop('%sMy Published Posts%s(%s)</span>', '%sMy Published Posts%s(%s)', 'revisionary'),
+			'my_published_posts'		=> _n_noop('%sRevisions to My Posts%s(%s)</span>', '%sRevisions to My Posts%s(%s)', 'revisionary'),
 
 			'queue_col_revision' 		=> __('Revision', 'revisionary'),
 			'queue_col_revised_by' 		=> __('Revised By', 'revisionary'),
