@@ -654,7 +654,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		<script type="text/javascript">
         /* <![CDATA[ */
         jQuery(document).ready( function($) {
-            $('span.ppr-my-activity-count').html(' (<?php echo $total_items;?>)');
+            $('span.ppr-my-activity-count').html('(<?php echo $total_items;?>)&nbsp;');
         });
         /* ]]> */
 		</script>
