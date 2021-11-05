@@ -159,7 +159,7 @@ class RevisionCreation {
 		$revision_id = wp_insert_post(\wp_slash($data), true);
 
 		if (is_wp_error($revision_id)) {
-			return new WP_Error(__( 'Could not insert revision into the database', 'revisionary'));
+			return new \WP_Error(__( 'Could not insert revision into the database', 'revisionary'));
 		}
 
 		$wpdb->update($wpdb->posts, ['comment_count' => $base_post_id], ['ID' => $revision_id]);
