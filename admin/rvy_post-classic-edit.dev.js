@@ -9,7 +9,7 @@ jQuery(document).ready( function($) {
 	var RvySubmissionUI = function() {
 		if (rvyObjEdit.ajaxurl && !$('div.rvy-creation-ui').length) {
             
-            var html = '<div class="rvy-creation-ui"><a href="javascript:void(0)" class="button revision-approve revision-create" style="margin-bottom: 15px" title="' 
+            var html = '<div class="rvy-creation-ui"><a href="javascript:void(0)" class="button revision-approve revision-create" style="margin-top: 15px; margin-bottom: 15px" title="' 
 			+ rvyObjEdit.actionTitle + '">' 
 			+ rvyObjEdit.actionCaption + '</a>'
 			
@@ -24,11 +24,11 @@ jQuery(document).ready( function($) {
 				rvyIsPublished = publishedStatuses.indexOf(rvyObjEdit.currentStatus) >= 0;
 
 				if (rvyIsPublished) {
-					html += '<a href="javascript:void(0)" style="display: none; margin-bottom: 15px" class="button revision-approve revision-schedule" title="' 
+					html += '<a href="javascript:void(0)" style="display: none; margin-top: 15px; margin-bottom: 15px" class="button revision-approve revision-schedule" title="' 
 					+ rvyObjEdit.scheduleTitle + '">' 
 					+ rvyObjEdit.scheduleCaption + '</a>'
 					
-					+ '<div class="revision-scheduled-wrapper" style="display:none; margin-bottom: 15px; font-weight: bold"><span class="revision-approve revision-scheduled">'
+					+ '<div class="revision-scheduled-wrapper" style="display:none; margin-top: 15px; margin-bottom: 15px; font-weight: bold"><span class="revision-approve revision-scheduled">'
 					+ rvyObjEdit.scheduledCaption + '</span> '
 
 					+ '&nbsp;<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">' 
