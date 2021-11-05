@@ -19,7 +19,7 @@ jQuery(document).ready( function($) {
             }
             
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']) {
-				$(refSelector).before(
+				$(refSelector).after(
                     '<div class="rvy-creation-ui" style="float:left; padding-left:10px">'
 
                     + '<a href="' + url + '" class="button revision-approve">'
@@ -33,7 +33,7 @@ jQuery(document).ready( function($) {
                     + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a>'
                     + '</div>'
                     
-					+ '</div>'
+					+ '</div> <br /><br />'
 				);
 			}
 
