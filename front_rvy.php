@@ -277,7 +277,7 @@ class RevisionaryFront {
 			}
 
 			if (current_user_can('edit_post', $revision_id)) {
-				$edit_url = rvy_admin_url("post.php?action=edit&amp;post=$revision_id");
+				$edit_url = apply_filters('revisionary_preview_edit_url', rvy_admin_url("post.php?action=edit&amp;post=$revision_id"), $revision_id);
 				$edit_button = "<span><a href='$edit_url' class='rvy_preview_linkspan'>" . __('Edit', 'revisionary') . '</a></span>';
 			} else {
 				$edit_button = '';
