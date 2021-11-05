@@ -268,13 +268,17 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		
 		$p = (!empty($args['alias'])) ? $args['alias'] : $wpdb->posts;
 
+		$is_count_query = empty($args['revision_query']);
+
+		$is_my_activity = empty($_REQUEST['all']) && empty($_REQUEST['author']) && empty($_REQUEST['post_author']) && empty($_REQUEST['post_status']);
+
 		if (!empty($args['status_count'])) {
 			$post_id_csv = "'" . implode("','", $this->published_post_count_ids) . "'";
 		} else {
 			$post_id_csv = "'" . implode("','", $this->published_post_ids) . "'";
 		}
 
-		if ((empty($_REQUEST['post_author']) || !empty($args['status_count'])) && empty($_REQUEST['published_post'])) {
+		if ((empty($_REQUEST['post_author']) || !empty($args['status_count'])) && empty($_REQUEST['published_post']) && empty($args['my_published_count'])) {
 			$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
 
 			$own_revision_and = $this->append_revisions_where($where, $args);
@@ -283,10 +287,19 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$own_revision_clause = '';
 		}
 
-		if (!empty($args['revision_query']) && empty($_REQUEST['all'])) {
+		if (!$is_my_activity && !$is_count_query && (empty($args['revision_query']) || (!empty($_REQUEST['author']) && ($current_user->ID != $_REQUEST['author'])))) {
+			$revision_status_clause = '';
+		
+		} elseif ((!$is_my_activity && !$is_count_query
+		&& (empty($_REQUEST['all'])
+		&& (empty($_REQUEST['post_status']) || ('draft-revision' != $_REQUEST['post_status']))
+		)) || !empty($args['my_published_count'])) {
 			$revision_status_clause = "AND $p.post_mime_type != 'draft-revision' ";
-		} elseif (!current_user_can("manage_unsubmitted_revisions")) {
+
+		} elseif (($is_my_activity && !$is_count_query) || !current_user_can("manage_unsubmitted_revisions")) {
 			$revision_status_clause = "AND ($p.post_mime_type != 'draft-revision' OR $p.post_author = '$current_user->ID')";
+		} else {
+			$revision_status_clause = '';
 		}
 
 		$where_append = "($p.comment_count IN ($post_id_csv) {$revision_status_clause}$own_revision_clause)";
@@ -777,11 +790,11 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				"r.post_mime_type IN ($revision_status_csv) AND p.post_author = '%d'", 
 				$current_user->ID
 			),
-			['alias' => 'r', 'status_count' => true]
+			['alias' => 'r', 'status_count' => true, 'my_published_count' => true]
 		);
 
 		$count_query = apply_filters('presspermit_posts_request',
-			"SELECT COUNT(DISTINCT p.ID) FROM $wpdb->posts AS p INNER JOIN $wpdb->posts AS r ON r.comment_count = p.ID WHERE $where", 
+			"SELECT COUNT(r.ID) FROM $wpdb->posts AS p INNER JOIN $wpdb->posts AS r ON r.comment_count = p.ID WHERE $where", 
 			['has_cap_check' => true, 'source_alias' => 'p']
 		);
 
