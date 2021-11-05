@@ -69,13 +69,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		if (!empty($q['post_author'])) {
-			// @todo: confirm separate query for post counts with post_author view filter is no longer needed
-			/*
 			do_action('revisionary_queue_pre_query');
 			$_pre_query = new WP_Query( $qp );
 			$this->published_post_count_ids = $_pre_query->posts;
 			do_action('revisionary_queue_pre_query_done');
-			*/
 
 			$qp['author'] = $q['post_author'];
 		}
