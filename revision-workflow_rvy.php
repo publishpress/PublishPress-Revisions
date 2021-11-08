@@ -145,7 +145,7 @@ class Rvy_Revision_Workflow_UI {
 
         if ( ( $admin_notify || $author_notify ) && $revision_id ) {
             $type_obj = get_post_type_object( $object_type );
-            $type_caption = $type_obj->labels->singular_name;
+            $type_caption = strtolower($type_obj->labels->singular_name);
             $post_arr['post_type'] = $published_post->post_type;
             
             $blogname = wp_specialchars_decode( get_option('blogname'), ENT_QUOTES );
@@ -153,14 +153,12 @@ class Rvy_Revision_Workflow_UI {
             if (!empty($args['update'])) {
                 $title = sprintf( __('[%s] %s Updated', 'revisionary'), $blogname, pp_revisions_status_label('pending-revision', 'name') );
                 
-                $message = sprintf( __('A %s to the %1$s "%2$s" has been updated.', 'revisionary'), strtolower(pp_revisions_status_label('pending-revision', 'name')), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
+                $message = sprintf( __('%1$s updated a %2$s of the %3$s "%4$s".', 'revisionary'), $current_user->display_name, strtolower(pp_revisions_status_label('pending-revision', 'name')), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
             } else {
-                $title = sprintf( __('[%s] %s Submission', 'revisionary'), $blogname, pp_revisions_status_label('pending-revision', 'name') );
+                $title = sprintf( __('[%s] %s', 'revisionary'), $blogname, pp_revisions_status_label('pending-revision', 'name') );
                 
-                $message = sprintf( __('A %s to the %1$s "%2$s" has been submitted.', 'revisionary'), strtolower(pp_revisions_status_label('pending-revision', 'name')), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
+                $message = sprintf( __('%1$s submitted changes to the %2$s "%3$s". You can review the changes for possible publication:', 'revisionary'), $current_user->display_name, $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
             }
-
-            $message .= sprintf( __('This operation was performed by %1$s.', 'revisionary' ), $current_user->display_name ) . "\r\n\r\n";
 
             if ( $revision_id ) {
                 $revision = get_post($revision_id);
