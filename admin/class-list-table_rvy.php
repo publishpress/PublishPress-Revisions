@@ -64,9 +64,11 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$qp['posts_per_page'] = -1;
 		$qp['fields'] = 'ids';
 		
+		/*
 		if (empty($q['published_post']) && empty($q['post_author']) && !rvy_get_option('queue_query_all_posts')) { // support defeat of performance enhancement in case _has_revisions flag is not being stored reliably due to plugin integration issues
 			$qp['meta_key'] = '_rvy_has_revisions';
 		}
+		*/
 
 		if (!empty($q['post_author'])) {
 			do_action('revisionary_queue_pre_query');
@@ -640,10 +642,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$total_items = $wp_query->found_posts;
 		
 		// auto-flush revision flags 
+		/*
 		if (!$total_items && !rvy_get_option('queue_query_all_posts') && !get_transient('revisionary_flushed_has_revision_flag')) {
 			revisionary_refresh_revision_flags();
 			set_transient('revisionary_flushed_has_revision_flag', true, 60);
 		}
+		*/
 
 		$this->set_pagination_args( [
 			'total_items' => $total_items,
