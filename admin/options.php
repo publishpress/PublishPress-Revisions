@@ -314,7 +314,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 
 	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 		?>
-		<li class="nav-tab-license nav-tab-active">
+		<li class="nav-tab nav-tab-license nav-tab-active">
 			<a href="#ppr-tab-license">
 				<?php _e('License', 'revisionary') ?>
 			</a>
