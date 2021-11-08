@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.8
-Stable tag: 2.6.3
+Stable tag: 3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -104,7 +104,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
-= 3.0 =
+= 3.0 - 9 Nov 2021 =
 * New revision submission mechanism: create an unsubmitted revision first instead of editing existing post. Edit revision directly, then submit for scheduling or publication.
 * Changes to plugin-related UI in Post / Revision editor
 * Admin Bar includes "New Revision" button
