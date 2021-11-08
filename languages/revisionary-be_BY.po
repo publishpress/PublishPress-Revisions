@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Revisionary\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 15:26-0400\n"
+"POT-Creation-Date: 2021-11-08 17:50-0500\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Kevin Behrens <kevin@publishpress.com>\n"
 "Language-Team: Marcis G. <by.marcis@gmail.com>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "X-Poedit-SearchPath-2: classes\n"
 "X-Poedit-SearchPath-3: includes\n"
 
-#: admin/RevisionEditSubmitMetabox.php:62 admin/class-list-table_rvy.php:889
+#: admin/RevisionEditSubmitMetabox.php:62 admin/class-list-table_rvy.php:904
 msgid "Delete Permanently"
 msgstr ""
 
@@ -28,9 +28,9 @@ msgid "Move to Trash"
 msgstr ""
 
 #: admin/RevisionEditSubmitMetabox.php:117
-#: admin/RevisionEditSubmitMetabox.php:120 admin/class-list-table_rvy.php:576
-#: admin/class-list-table_rvy.php:1220 admin/history_rvy.php:1074
-#: admin/history_rvy.php:1169 admin/post-edit_rvy.php:86
+#: admin/RevisionEditSubmitMetabox.php:120 admin/class-list-table_rvy.php:589
+#: admin/class-list-table_rvy.php:1235 admin/history_rvy.php:1080
+#: admin/history_rvy.php:1175 admin/post-edit_rvy.php:86
 #: admin/post-editor-workflow-ui_rvy.php:42
 #: admin/post-editor-workflow-ui_rvy.php:82
 #: admin/post-editor-workflow-ui_rvy.php:164
@@ -72,8 +72,8 @@ msgid "Publish <b>on approval</b>"
 msgstr ""
 
 #: admin/RevisionEditSubmitMetabox.php:193 admin/admin-posts_rvy.php:161
-#: admin/class-list-table_rvy.php:544 admin/class-list-table_rvy.php:1194
-#: admin/history_rvy.php:1116 front_rvy.php:282
+#: admin/class-list-table_rvy.php:557 admin/class-list-table_rvy.php:1209
+#: admin/history_rvy.php:1122 front_rvy.php:282
 msgid "Edit"
 msgstr ""
 
@@ -136,7 +136,7 @@ msgstr "%1$s рэдакцый"
 msgid "Revision Queue"
 msgstr "Рэдакцыі"
 
-#: admin/admin_lib-mu_rvy.php:10 admin/options.php:221
+#: admin/admin_lib-mu_rvy.php:10 admin/options.php:222
 msgid "PublishPress Revisions Network Settings"
 msgstr ""
 
@@ -144,7 +144,7 @@ msgstr ""
 msgid "Network Settings"
 msgstr ""
 
-#: admin/admin_lib-mu_rvy.php:21 admin/options.php:223
+#: admin/admin_lib-mu_rvy.php:21 admin/options.php:224
 #, fuzzy
 #| msgid "Revisionary Defaults"
 msgid "PublishPress Revisions Network Defaults"
@@ -160,7 +160,7 @@ msgstr "Вярнуць да пачатковых"
 msgid "Revisions"
 msgstr "Рэдакцыі"
 
-#: admin/admin_rvy.php:185 admin/options.php:227
+#: admin/admin_rvy.php:185 admin/options.php:228
 #, fuzzy
 #| msgid "Publish this Pending Revision now."
 msgid "PublishPress Revisions Settings"
@@ -196,7 +196,7 @@ msgstr ""
 msgid "PublishPress Revisions Documentation"
 msgstr "Да публікацыі гэтага Рэдакцыя цяпер."
 
-#: admin/admin_rvy.php:275 admin/options.php:808
+#: admin/admin_rvy.php:275 admin/options.php:840
 msgid "Documentation"
 msgstr ""
 
@@ -230,161 +230,161 @@ msgstr "абраць"
 msgid "unselect"
 msgstr "не выбіраць"
 
-#: admin/class-list-table_rvy.php:397 admin/post-editor-workflow-ui_rvy.php:25
+#: admin/class-list-table_rvy.php:410 admin/post-editor-workflow-ui_rvy.php:25
 msgid "Status"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:398
+#: admin/class-list-table_rvy.php:411
 msgid "Post Type"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:408
+#: admin/class-list-table_rvy.php:421
 #, fuzzy
 #| msgid "Schedule Now"
 msgid "Schedule"
 msgstr "Запланавана для:"
 
-#: admin/class-list-table_rvy.php:447 admin/class-list-table_rvy.php:1122
+#: admin/class-list-table_rvy.php:460 admin/class-list-table_rvy.php:1137
 msgid "Y/m/d g:i:s a"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:455 admin/class-list-table_rvy.php:1127
-#: admin/history_rvy.php:987
+#: admin/class-list-table_rvy.php:468 admin/class-list-table_rvy.php:1142
+#: admin/history_rvy.php:993
 #, php-format
 msgid "%s ago"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:458 admin/class-list-table_rvy.php:1130
+#: admin/class-list-table_rvy.php:471 admin/class-list-table_rvy.php:1145
 msgid "Y/m/d g:i a"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:465
+#: admin/class-list-table_rvy.php:478
 #, fuzzy, php-format
 #| msgid "(already scheduled for publication on %s)"
 msgid "Scheduled publication: %s"
 msgstr "(ужо запланаваны да публікацыі на %s)"
 
-#: admin/class-list-table_rvy.php:468
+#: admin/class-list-table_rvy.php:481
 #, fuzzy, php-format
 #| msgid "(for publication on %s)"
 msgid "Requested publication: %s"
 msgstr "(lkz ge,kbrfwbb %s)"
 
-#: admin/class-list-table_rvy.php:472
+#: admin/class-list-table_rvy.php:485
 #, fuzzy
 #| msgid "Unschedule"
 msgid "Missed schedule"
 msgstr "Не планаваць"
 
-#: admin/class-list-table_rvy.php:515 admin/history_rvy.php:781
+#: admin/class-list-table_rvy.php:528 admin/history_rvy.php:787
 msgid "No author"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:555
+#: admin/class-list-table_rvy.php:568
 #, fuzzy, php-format
 #| msgid "View it in Revisions Manager"
 msgid "View only revisions of %s"
 msgstr "Глядзець гэта ў мэнэджару версій"
 
-#: admin/class-list-table_rvy.php:556
+#: admin/class-list-table_rvy.php:569
 #, fuzzy
 #| msgid "filter:"
 msgid "Filter"
 msgstr "фільтр:"
 
-#: admin/class-list-table_rvy.php:567 admin/class-list-table_rvy.php:575
+#: admin/class-list-table_rvy.php:580 admin/class-list-table_rvy.php:588
 #, fuzzy
 #| msgid "It will be published on %s"
 msgid "View published post"
 msgstr "Гэта было апублікавана %s"
 
-#: admin/class-list-table_rvy.php:568
+#: admin/class-list-table_rvy.php:581
 #, fuzzy
 msgid "View"
 msgstr "Глядзець гэта ў мэнэджару версій"
 
-#: admin/class-list-table_rvy.php:599
+#: admin/class-list-table_rvy.php:612
 #, fuzzy
 #| msgid "Restore this Past Revision"
 msgid "Compare Past Revisions"
 msgstr "Воостановлено з прошл. рэдакцыі"
 
-#: admin/class-list-table_rvy.php:600
+#: admin/class-list-table_rvy.php:613
 msgid "History"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:846
+#: admin/class-list-table_rvy.php:861
 msgid "My Activity"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:854
+#: admin/class-list-table_rvy.php:869
 #, php-format
 msgid "All %s"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:878 front_rvy.php:325
+#: admin/class-list-table_rvy.php:893 front_rvy.php:325
 #, fuzzy
 msgid "Submit"
 msgstr ""
 "%1$s Submit a case study%2$s, растлумачыўшы, якім чынам гэтыя ўбудовы "
 "дапамогуць вам зрабіць нешта выдатнае і пахвальна."
 
-#: admin/class-list-table_rvy.php:881 admin/history_rvy.php:1072
+#: admin/class-list-table_rvy.php:896 admin/history_rvy.php:1078
 #: front_rvy.php:344
 msgid "Approve"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:882
+#: admin/class-list-table_rvy.php:897
 #, fuzzy
 #| msgid "Published:"
 msgid "Publish"
 msgstr "Да публікацыі гэтага Рэдакцыя цяпер."
 
-#: admin/class-list-table_rvy.php:885 admin/revision-ui_rvy.php:280
+#: admin/class-list-table_rvy.php:900 admin/revision-ui_rvy.php:280
 msgid "Unschedule"
 msgstr "Не планаваць"
 
-#: admin/class-list-table_rvy.php:910
+#: admin/class-list-table_rvy.php:925
 msgid "Filter by category"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:977
+#: admin/class-list-table_rvy.php:992
 msgid "Filter by date"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:979
+#: admin/class-list-table_rvy.php:994
 msgid "All dates"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:1038
+#: admin/class-list-table_rvy.php:1053
 #, fuzzy
 #| msgid "select"
 msgid "Select All"
 msgstr "абраць"
 
-#: admin/class-list-table_rvy.php:1110
+#: admin/class-list-table_rvy.php:1125
 #, fuzzy, php-format
 #| msgid "&#8220;%1$s&#8221; (Current Revision)"
 msgid "&#8220;%s&#8221; (Edit)"
 msgstr "&#8220;%1$s&#8221; (Бягучая рэдакцыя)"
 
-#: admin/class-list-table_rvy.php:1203
+#: admin/class-list-table_rvy.php:1218
 #, fuzzy
 #| msgid "Current Revision"
 msgid "Delete Revision"
 msgstr "У вас няма правоў для выдалення рэдакцыі."
 
-#: admin/class-list-table_rvy.php:1204 admin/revision-ui_rvy.php:411
+#: admin/class-list-table_rvy.php:1219 admin/revision-ui_rvy.php:411
 msgid "Delete"
 msgstr "Выдаліць"
 
-#: admin/class-list-table_rvy.php:1219
+#: admin/class-list-table_rvy.php:1234
 #, fuzzy
 #| msgid "Pending Revisions"
 msgid "Preview Revision"
 msgstr "Pending Revisions"
 
-#: admin/class-list-table_rvy.php:1232
+#: admin/class-list-table_rvy.php:1247
 msgid "Compare Changes"
 msgstr ""
 
@@ -423,95 +423,95 @@ msgstr "Вярнуцца да рэдагавання пастоў"
 msgid "(no title)"
 msgstr ""
 
-#: admin/history_rvy.php:525 admin/options.php:573
+#: admin/history_rvy.php:531 admin/options.php:580
 #, fuzzy
 #| msgid "Publish Date"
 msgid "Post Date"
 msgstr "Дата публікацыі"
 
-#: admin/history_rvy.php:526
+#: admin/history_rvy.php:532
 msgid "Post Parent"
 msgstr ""
 
-#: admin/history_rvy.php:527
+#: admin/history_rvy.php:533
 msgid "Menu Order"
 msgstr ""
 
-#: admin/history_rvy.php:528
+#: admin/history_rvy.php:534
 msgid "Comment Status"
 msgstr ""
 
-#: admin/history_rvy.php:529
+#: admin/history_rvy.php:535
 msgid "Ping Status"
 msgstr ""
 
-#: admin/history_rvy.php:664
+#: admin/history_rvy.php:670
 msgid "Page Template"
 msgstr ""
 
-#: admin/history_rvy.php:667
+#: admin/history_rvy.php:673
 #, fuzzy
 #| msgid "Features"
 msgid "Featured Image"
 msgstr "Функцыі"
 
-#: admin/history_rvy.php:676
+#: admin/history_rvy.php:682
 msgid "Beaver Builder Data"
 msgstr ""
 
-#: admin/history_rvy.php:677
+#: admin/history_rvy.php:683
 msgid "Beaver Builder Settings"
 msgstr ""
 
-#: admin/history_rvy.php:914
+#: admin/history_rvy.php:920
 #, fuzzy
 #| msgid "Schedule for:"
 msgid "Scheduled for "
 msgstr "Рэдакцыя была запланавана для публікацыі."
 
-#: admin/history_rvy.php:919
+#: admin/history_rvy.php:925
 #, fuzzy
 msgid "Requested for "
 msgstr "Запытаная дата публікацыі: <strong>%1$s</strong>"
 
-#: admin/history_rvy.php:924
+#: admin/history_rvy.php:930
 #, fuzzy
 msgid "Modified "
 msgstr "Даце апошняй змены (націсніце, каб прагледзець / аднавіць)"
 
-#: admin/history_rvy.php:929
+#: admin/history_rvy.php:935
 #, php-format
 msgid "%s%s ago"
 msgstr ""
 
-#: admin/history_rvy.php:929
+#: admin/history_rvy.php:935
 #, php-format
 msgid "%s%s from now"
 msgstr ""
 
-#: admin/history_rvy.php:940
+#: admin/history_rvy.php:946
 msgid "M j, Y @ g:i a"
 msgstr ""
 
-#: admin/history_rvy.php:985
+#: admin/history_rvy.php:991
 msgid "M j, Y @ H:i"
 msgstr ""
 
-#: admin/history_rvy.php:1072
+#: admin/history_rvy.php:1078
 msgid "Preview / Approve"
 msgstr ""
 
-#: admin/history_rvy.php:1168
+#: admin/history_rvy.php:1174
 #, fuzzy
 #| msgid "Review it here: "
 msgid "Preview / Restore"
 msgstr "Глядзець гэта тут:"
 
-#: admin/history_rvy.php:1175
+#: admin/history_rvy.php:1181
 msgid "Manage"
 msgstr ""
 
-#: admin/history_rvy.php:1176
+#: admin/history_rvy.php:1182
 msgid "List"
 msgstr ""
 
@@ -575,10 +575,6 @@ msgstr ""
 
 #: admin/options.php:126
 msgid "Users can always administer revisions to their own editable posts"
-msgstr ""
-
-#: admin/options.php:127
-msgid "Compatibility Mode"
 msgstr ""
 
 #: admin/options.php:128
@@ -677,25 +673,30 @@ msgstr "Рэдакцыя была апублікавана."
 msgid "Compare Past Revisions ordering:"
 msgstr ""
 
-#: admin/options.php:155
+#: admin/options.php:150
+#, php-format
+msgid "Include %s in My Activity, Revisions to My Posts views"
+msgstr ""
+
+#: admin/options.php:156
 #, fuzzy, php-format
 #| msgid "Email designated Publishers when a Pending Revision is submitted"
 msgid "Email designated Publishers when a %s is submitted"
 msgstr "Email, прызначаны выдавецтву, калі рэдакцыя ўяўляецца"
 
-#: admin/options.php:156
+#: admin/options.php:157
 #, fuzzy, php-format
 #| msgid "Email designated Publishers when a Scheduled Revision is published"
 msgid "Email designated Publishers when a %s is published"
 msgstr "Email, прызначаны выдавецтву, калі запланаваная рэдакцыя публікуецца"
 
-#: admin/options.php:157
+#: admin/options.php:158
 #, fuzzy, php-format
 #| msgid "Email designated Publishers when a Scheduled Revision is published"
 msgid "Email designated Publishers when a %s is approved"
 msgstr "Email, прызначаны выдавецтву, калі запланаваная рэдакцыя публікуецца"
 
-#: admin/options.php:159
+#: admin/options.php:160
 #, fuzzy, php-format
 #| msgid ""
 #| "Email Editors and Administrators when a Pending Revision is submitted"
@@ -703,7 +704,7 @@ msgid "Email Editors and Administrators when a %s is submitted"
 msgstr ""
 "Адпраўляць email рэдактарам і адміністратарам, калі рэдакцыя адпраўляецца"
 
-#: admin/options.php:160
+#: admin/options.php:161
 #, fuzzy, php-format
 #| msgid ""
 #| "Email Editors and Administrators when a Scheduled Revision is published"
@@ -712,7 +713,7 @@ msgstr ""
 "Адпраўляць email рэдактарам і адміністратарам, калі запланаваная рэдакцыя "
 "публікуецца"
 
-#: admin/options.php:161
+#: admin/options.php:162
 #, fuzzy, php-format
 #| msgid ""
 #| "Email Editors and Administrators when a Scheduled Revision is published"
@@ -721,17 +722,17 @@ msgstr ""
 "Адпраўляць email рэдактарам і адміністратарам, калі запланаваная рэдакцыя "
 "публікуецца"
 
-#: admin/options.php:225
+#: admin/options.php:226
 #, fuzzy
 #| msgid "Revisionary Site Options"
 msgid "PublishPress Revisions Site Settings"
 msgstr "Revisionary налады сайта"
 
-#: admin/options.php:233 admin/options.php:926
+#: admin/options.php:234 admin/options.php:958
 msgid "Update &raquo;"
 msgstr "Абнавіць &raquo;"
 
-#: admin/options.php:247
+#: admin/options.php:248
 #, fuzzy
 #| msgid ""
 #| "These are the <strong>default</strong> settings for options which can be "
@@ -743,92 +744,92 @@ msgstr ""
 "Гэта <strong>default</strong>налады для опцый, якія могуць быць скарэктаваны "
 "за блог."
 
-#: admin/options.php:284
+#: admin/options.php:285
 #, php-format
 msgid "You can also specify %1$sdefaults for site-specific settings%2$s."
 msgstr ""
 
-#: admin/options.php:285
+#: admin/options.php:286
 #, php-format
 msgid ""
 "Use this tab to make <strong>NETWORK-WIDE</strong> changes to PublishPress "
 "Revisions settings. %s"
 msgstr ""
 
-#: admin/options.php:287
+#: admin/options.php:288
 msgid ""
 "Here you can change the default value for settings which are controlled "
 "separately on each site."
 msgstr ""
 
-#: admin/options.php:301
+#: admin/options.php:302
 #, fuzzy, php-format
 #| msgid "Note that %1$s site-wide options%2$s may also be available."
 msgid "Note that %1$s network-wide settings%2$s may also be available."
 msgstr "Запомніце, што %1$s налады %2$s таксама даступныя."
 
-#: admin/options.php:333
+#: admin/options.php:334
 msgid ""
 "The user role \"Revisor\" role is now available. Include capabilities for "
 "all custom post types in this role?"
 msgstr ""
 
-#: admin/options.php:338
+#: admin/options.php:339
 msgid ""
 "If checked, users lacking site-wide publishing capabilities will also be "
 "checked for the edit_others_drafts capability"
 msgstr ""
 
-#: admin/options.php:355
+#: admin/options.php:356
 msgid ""
 "Default labels are \"Not Submitted for Approval\", \"Submitted for Approval"
 "\", \"Scheduled Revision\""
 msgstr ""
 
-#: admin/options.php:371
+#: admin/options.php:372
 msgid ""
 "This restriction applies to users who are not full editors for the post "
 "type. To enable a role, add capabilities: copy_posts, copy_others_pages, etc."
 msgstr ""
 
-#: admin/options.php:376
+#: admin/options.php:377
 msgid ""
 "To expand the Posts / Pages listing for non-Editors, add capabilities: "
 "list_others_pages, list_published_posts, etc."
 msgstr ""
 
-#: admin/options.php:380
+#: admin/options.php:381
 #, php-format
 msgid ""
 "If the user does not have a regular Edit link, use the \"Edit\" caption for "
 "New %s operation"
 msgstr ""
 
-#: admin/options.php:403
+#: admin/options.php:404
 #, php-format
 msgid ""
 "Enable published content to be copied, edited, submitted for approval and "
 "managed in %sRevision Queue%s."
 msgstr ""
 
-#: admin/options.php:409
+#: admin/options.php:410
 msgid ""
 "This restriction applies to users who are not full editors for the post "
 "type. To enable a role, add capabilities: revise_posts, revise_others_pages, "
 "etc."
 msgstr ""
 
-#: admin/options.php:412 admin/options.php:438
+#: admin/options.php:413 admin/options.php:439
 #, php-format
 msgid "When a %s is published, update post publish date to current time."
 msgstr ""
 
-#: admin/options.php:415 admin/options.php:441
+#: admin/options.php:416 admin/options.php:442
 #, php-format
 msgid "When a %s is published, update post modified date to current time."
 msgstr ""
 
-#: admin/options.php:435
+#: admin/options.php:436
 msgid ""
 "If a currently published post or page is edited and a future date set, the "
 "change will not be applied until the selected date."
@@ -836,7 +837,7 @@ msgstr ""
 "Калі ў наш час публікуецца паведамленне ці старонка рэдагуецца і будучым "
 "усталяваць дату, змены не будуць ужывацца да абранай даты."
 
-#: admin/options.php:444
+#: admin/options.php:445
 #, fuzzy
 #| msgid ""
 #| "Publish scheduled revisions asynchronously, via a secondary http request "
@@ -851,174 +852,182 @@ msgstr ""
 "ад сервера. Гэта, як правіла, пераважней, бо ўхіляе затрымкі, але некаторыя "
 "серверы не падтрымліваюць яго."
 
-#: admin/options.php:462
+#: admin/options.php:463
 msgid ""
 "This restriction applies to users who are not full editors for the post "
 "type. To enable a role, give it the edit_others_revisions capability."
 msgstr ""
 
-#: admin/options.php:465
+#: admin/options.php:466
 msgid ""
 "This restriction applies to users who are not full editors for the post "
 "type. To enable a role, give it the list_others_revisions capability."
 msgstr ""
 
-#: admin/options.php:468
+#: admin/options.php:469
 msgid ""
 "Bypass the above restrictions for others' revisions to logged in user's own "
 "posts."
 msgstr ""
 
-#: admin/options.php:471
-msgid ""
-"If some revisions are missing from the queue, disable a performance "
-"enhancement for better compatibility with themes and plugins."
-msgstr ""
-
-#: admin/options.php:476
+#: admin/options.php:483
 msgid "Regenerate \"post has revision\" flags"
 msgstr ""
 
-#: admin/options.php:492
+#: admin/options.php:499
 msgid ""
 "For themes that block revision preview, hide preview links from non-"
 "Administrators"
 msgstr ""
 
-#: admin/options.php:504
+#: admin/options.php:511
 #, fuzzy
 #| msgid "Published on:"
 msgid "Published Post Slug"
 msgstr "Апублікавана:"
 
-#: admin/options.php:504
+#: admin/options.php:511
 #, fuzzy
 #| msgid "Revisions"
 msgid "Revision Slug"
 msgstr "Рэдакцыі"
 
-#: admin/options.php:504
+#: admin/options.php:511
 #, fuzzy
 #| msgid "Revisionary"
 msgid "Revision ID only"
 msgstr "Revisionary"
 
-#: admin/options.php:515
+#: admin/options.php:522
 msgid ""
 "Some themes or plugins may require Revision Slug or Revision ID link type "
 "for proper template loading and field display."
 msgstr ""
 
-#: admin/options.php:525
+#: admin/options.php:532
 msgid "If disabled, Compare screen links to Revision Preview for approval"
 msgstr ""
 
-#: admin/options.php:545
+#: admin/options.php:552
 #, php-format
 msgid ""
 "For compatibility with Advanced Custom Fields, Beaver Builder and WPML, "
 "upgrade to <a href=\"%s\" target=\"_blank\">PublishPress Revisions Pro</a>."
 msgstr ""
 
-#: admin/options.php:554
+#: admin/options.php:561
 msgid "This may improve compatibility with some plugins."
 msgstr ""
 
-#: admin/options.php:573
+#: admin/options.php:580
 msgid "Modification Date"
 msgstr ""
 
-#: admin/options.php:583
+#: admin/options.php:590
 msgid "Show descriptive captions for PublishPress Revisions settings"
 msgstr ""
 
-#: admin/options.php:603 admin/options.php:665
+#: admin/options.php:610 admin/options.php:672
 msgid "select recipients"
 msgstr "абраць атрымальнікаў"
 
-#: admin/options.php:612 admin/options.php:630
+#: admin/options.php:619 admin/options.php:637
 msgid "Never"
 msgstr "Ніколі"
 
-#: admin/options.php:612 admin/options.php:630
+#: admin/options.php:619 admin/options.php:637
 msgid "By default"
 msgstr "Па змаўчанні"
 
-#: admin/options.php:612 admin/options.php:630
+#: admin/options.php:619 admin/options.php:637
 msgid "Always"
 msgstr "Заўсёды"
 
-#: admin/options.php:694
+#: admin/options.php:701
 msgid ""
 "To avoid notification failures, buffer emails for delayed sending once "
 "minute, hour or day limits are exceeded"
 msgstr ""
 
-#: admin/options.php:711
+#: admin/options.php:718
 #, fuzzy
 #| msgid "Email Notification"
 msgid "Notification Buffer"
 msgstr "Email апавяшчэнне"
 
-#: admin/options.php:739
+#: admin/options.php:746
 #, fuzzy
 #| msgid "Email Notification"
 msgid "Notification Log"
 msgstr "Email апавяшчэнне"
 
-#: admin/options.php:768
+#: admin/options.php:775
 #, fuzzy
 #| msgid "Email Notification"
 msgid "Purge Notification Buffer"
 msgstr "Email апавяшчэнне"
 
-#: admin/options.php:774
+#: admin/options.php:781
 #, fuzzy
 #| msgid "Email Notification"
 msgid "Truncate Notification Log"
 msgstr "Email апавяшчэнне"
 
-#: admin/options.php:780
+#: admin/options.php:787
 #, php-format
 msgid "Sent in last minute: %d / %d"
 msgstr ""
 
-#: admin/options.php:781
+#: admin/options.php:788
 #, php-format
 msgid "Sent in last hour: %d / %d"
 msgstr ""
 
-#: admin/options.php:782
+#: admin/options.php:789
 #, php-format
 msgid "Sent in last day: %d / %d"
 msgstr ""
 
-#: admin/options.php:789
+#: admin/options.php:796
 #, php-format
 msgid "Seconds until next buffer processing time: %d"
 msgstr ""
 
-#: admin/options.php:798
+#: admin/options.php:805
 msgid "Show Notification Log / Buffer"
 msgstr ""
 
-#: admin/options.php:800
+#: admin/options.php:807
 msgid "Show with message content"
 msgstr ""
 
-#: admin/options.php:841
+#: admin/options.php:818
+msgid "WPML Translation Management"
+msgstr ""
+
+#: admin/options.php:825
+msgid "Sync \"Needs Update\" flags"
+msgstr ""
+
+#: admin/options.php:829
+msgid ""
+"Set \"Needs Update\" for any post with translations which was updated "
+"(possibly by revision approval) more recently than its translations."
+msgstr ""
+
+#: admin/options.php:873
 #, fuzzy, php-format
 #| msgid "sitewide control of \"%s\""
 msgid "network-wide control of \"%s\""
 msgstr "па ўсім сайце кантроль \"%s\""
 
-#: admin/options.php:848
+#: admin/options.php:880
 msgid ""
 "Specify which PublishPress Revisions Settings to control network-wide. "
 "Unselected settings are controlled separately on each site."
 msgstr ""
 
-#: admin/options.php:930
+#: admin/options.php:962
 msgid ""
 "All settings in this form (including those on unselected tabs) will be reset "
 "to DEFAULTS.  Are you sure?"
@@ -1026,7 +1035,7 @@ msgstr ""
 "Усе налады ў гэтай форме (у тым ліку па абраных укладках) будзе Аднавіць "
 "значэнні па змаўчанні. Вы ўпэўнены?"
 
-#: admin/options.php:935
+#: admin/options.php:967
 msgid "Revert to Defaults"
 msgstr "Вярнуць да пачатковых"
 
@@ -1419,38 +1428,34 @@ msgid "[%s] %s Updated"
 msgstr ""
 
 #: revision-workflow_rvy.php:156
-#, fuzzy, php-format
-#| msgid "A pending revision to the %1$s \"%2$s\" has been submitted."
-msgid "A %s to the %1$s \"%2$s\" has been updated."
-msgstr "Якая чакае версія на %1$s \"%2$s\" была адпраўлена."
+#, php-format
+msgid "%1$s updated a %2$s of the %3$s \"%4$s\"."
+msgstr ""
 
 #: revision-workflow_rvy.php:158
-#, php-format
-msgid "[%s] %s Submission"
+#, fuzzy, php-format
+msgid "[%s] %s"
 msgstr ""
+"Запланаваны перагляд вы, прадстаўленых на %1$s \"%2$s\" быў апублікаваны."
 
 #: revision-workflow_rvy.php:160
-#, fuzzy, php-format
-#| msgid "A pending revision to the %1$s \"%2$s\" has been submitted."
-msgid "A %s to the %1$s \"%2$s\" has been submitted."
-msgstr "Якая чакае версія на %1$s \"%2$s\" была адпраўлена."
-
-#: revision-workflow_rvy.php:163
 #, php-format
-msgid "This operation was performed by %1$s."
+msgid ""
+"%1$s submitted changes to the %2$s \"%3$s\". You can review the changes for "
+"possible publication:"
 msgstr ""
 
-#: revision-workflow_rvy.php:170
+#: revision-workflow_rvy.php:168
 msgid "Preview and Approval: "
 msgstr ""
 
-#: revision-workflow_rvy.php:173
+#: revision-workflow_rvy.php:171
 #, fuzzy
 #| msgid "Revisions"
 msgid "Revision Queue: "
 msgstr "Рэдакцыі"
 
-#: revision-workflow_rvy.php:175
+#: revision-workflow_rvy.php:173
 #, fuzzy, php-format
 #| msgid "%1$s Revisions"
 msgid "Edit %s: "
@@ -1749,6 +1754,16 @@ msgstr "Revisionary"
 #: vendor/publishpress/wordpress-version-notices/src/Module/MenuLink/Module.php:129
 msgid "Amazing! We are redirecting you to our site..."
 msgstr ""
+
+#, fuzzy, php-format
+#~| msgid "A pending revision to the %1$s \"%2$s\" has been submitted."
+#~ msgid "A %s to the %1$s \"%2$s\" has been updated."
+#~ msgstr "Якая чакае версія на %1$s \"%2$s\" была адпраўлена."
+
+#, fuzzy, php-format
+#~| msgid "A pending revision to the %1$s \"%2$s\" has been submitted."
+#~ msgid "A %s to the %1$s \"%2$s\" has been submitted."
+#~ msgstr "Якая чакае версія на %1$s \"%2$s\" была адпраўлена."
 
 #, fuzzy, php-format
 #~| msgid "Revisions"
