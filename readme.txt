@@ -105,11 +105,12 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 == Changelog ==
 
 = 3.0 - 9 Nov 2021 =
-* New revision submission mechanism: create an unsubmitted revision first instead of editing existing post. Edit revision directly, then submit for scheduling or publication.
-* Changes to plugin-related UI in Post / Revision editor
-* Admin Bar includes "New Revision" button
-* Adjusted Revision Queue filter captions
-* Permissions integration: revise_others_posts, revise_others_pages, etc. capabilties are equivalent to list_others capabilities in allowing uneditable items to be listed
+* Feature: New revision submission mechanism: create an unsubmitted revision first instead of editing existing post. Edit revision directly, then submit for scheduling or publication.
+* Change: Revisions UI in Post / Revision editor
+* Feature: Admin Bar includes "New Revision" button
+* Change: Revision Queue filter captions
+* Compat: Permissions - revise_others_posts, revise_others_pages, etc. capabilties are equivalent to list_others capabilities in allowing uneditable items to be listed
+* Change : Include upload_files capability in the Revisor role
 
 = 2.6.3 - 11 Oct 2021 =
 * Fixed : Classic Editor - Error submitting a pending or scheduled revision
