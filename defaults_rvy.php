@@ -50,6 +50,7 @@ function rvy_default_options_sitewide() {
 		'trigger_post_update_actions' => true,
 		'copy_revision_comments_to_post' => true,
 		'past_revisions_order_by' => true,
+		'list_unsubmitted_revisions' => true,
 	);
 
 	if ( $other_options = array_diff_key( rvy_default_options(), $def ) ) {
@@ -99,6 +100,7 @@ function rvy_default_options() {
 		'trigger_post_update_actions' => 0,
 		'copy_revision_comments_to_post' => 0,
 		'past_revisions_order_by' => '',
+		'list_unsubmitted_revisions' => 0,
 	);
 
 	return $def;

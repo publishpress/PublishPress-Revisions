@@ -287,7 +287,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$own_revision_clause = '';
 		}
 
-		if (!$is_my_activity && !$is_count_query && (empty($args['revision_query']) || (!empty($_REQUEST['author']) && ($current_user->ID != $_REQUEST['author'])))) {
+		if ((!$is_my_activity && !$is_count_query && (empty($args['revision_query']) || (!empty($_REQUEST['author']) && ($current_user->ID != $_REQUEST['author']))))
+		|| rvy_get_option('list_unsubmitted_revisions')
+		) {
 			$revision_status_clause = '';
 		
 		} elseif ((!$is_my_activity && !$is_count_query

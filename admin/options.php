@@ -146,7 +146,8 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'preview_link_type' => 						__('Preview Link Type', 'revisionary'),
 	'compare_revisions_direct_approval' => 		__('Approve Button on Compare Revisions screen', 'revisionary'),
 	'copy_revision_comments_to_post' => 		__('Copy revision comments to published post', 'revisionary'),
-	'past_revisions_order_by' =>				__('Compare Past Revisions ordering:')
+	'past_revisions_order_by' =>				__('Compare Past Revisions ordering:'), 
+	'list_unsubmitted_revisions' => 			sprintf(__('Include %s in My Activity, Revisions to My Posts views', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural'))
 	]
 );
 
@@ -469,6 +470,10 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 			$hint = __('Bypass the above restrictions for others\' revisions to logged in user\'s own posts.', 'revisionary');
 			$this->option_checkbox( 'admin_revisions_to_own_posts', $tab, $section, $hint, '' );
 
+			$hint = '';
+			$this->option_checkbox( 'list_unsubmitted_revisions', $tab, $section, $hint, '' );
+
+			/*
 			$hint = __('If some revisions are missing from the queue, disable a performance enhancement for better compatibility with themes and plugins.', 'revisionary');
 			$this->option_checkbox( 'queue_query_all_posts', $tab, $section, $hint, '' );
 		?>
