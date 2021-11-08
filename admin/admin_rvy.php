@@ -5,9 +5,9 @@
  * @copyright   Copyright (c) 2021 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
- * 
- * Scripts and filter / action handlers applicable for all wp-admin URLs 
- * 
+ *
+ * Scripts and filter / action handlers applicable for all wp-admin URLs
+ *
  * Selectively load other classes based on URL
  */
 
@@ -32,9 +32,9 @@ class RevisionaryAdmin
 				require_once( dirname(__FILE__).'/admin_lib-mu_rvy.php' );
 				add_action('admin_menu', 'rvy_mu_site_menu', 15 );
 			}
-			
+
 			add_action('admin_menu', [$this, 'build_menu']);
-			
+
 			if ( strpos($script_name, 'p-admin/plugins.php') ) {
 				add_filter( 'plugin_row_meta', [$this, 'flt_plugin_action_links'], 10, 2 );
 			}
@@ -47,7 +47,7 @@ class RevisionaryAdmin
 					echo '<style type="text/css">#plugin_update_from_iframe {display:none;}</style>';
 				});
 			}
-			
+
 			return; // no further filtering on WP plugin maintenance scripts
 		}
 
@@ -77,7 +77,7 @@ class RevisionaryAdmin
 					}
 				}
 			}
-		}	
+		}
 
 		if ( ! ( defined( 'SCOPER_VERSION' ) || defined( 'PP_VERSION' ) || defined( 'PPCE_VERSION' ) ) || defined( 'USE_RVY_RIGHTNOW' ) ) {
 			add_action('dashboard_glance_items', [$this, 'actDashboardGlanceItems']);
@@ -114,6 +114,10 @@ class RevisionaryAdmin
 			wp_enqueue_style('revisionary-admin-common', RVY_URLPATH . '/common/css/pressshack-admin.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
 
+		if ((!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings']))) {
+			wp_enqueue_script('revisionary-settings', RVY_URLPATH . '/admin/settings.js', [], PUBLISHPRESS_REVISIONS_VERSION);
+		}
+
 		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && ('admin.php' == $pagenow) && !empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options']) ) {
 			wp_enqueue_style('revisionary-settings', RVY_URLPATH . '/includes-pro/settings-pro.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
@@ -124,7 +128,7 @@ class RevisionaryAdmin
 			// legacy revision management UI for past revisions
 			require_once( dirname(__FILE__).'/revision-ui_rvy.php' );
 		}
-		
+
 		if ( ! defined('SCOPER_VERSION') ) {
 			// old js for notification recipient selection UI
 			wp_enqueue_script( 'rvy', RVY_URLPATH . "/admin/revisionary.js", array('jquery'), PUBLISHPRESS_REVISIONS_VERSION, true );
@@ -145,7 +149,7 @@ class RevisionaryAdmin
 
 		if ( strpos( $_SERVER['REQUEST_URI'], 'wp-admin/network/' ) )
 			return;
-	
+
 		$path = RVY_ABSPATH;
 
 		// For Revisions Manager access, satisfy WordPress' demand that all admin links be properly defined in menu
@@ -177,22 +181,22 @@ class RevisionaryAdmin
 			return;
 
 		global $rvy_default_options, $rvy_options_sitewide;
-		
+
 		if ( empty($rvy_default_options) )
 			rvy_refresh_default_options();
 
 		if ( ! RVY_NETWORK || ( count($rvy_options_sitewide) != count($rvy_default_options) ) ) {
 			add_submenu_page( 'revisionary-q', __('PublishPress Revisions Settings', 'revisionary'), __('Settings', 'revisionary'), 'read', 'revisionary-settings', 'rvy_omit_site_options');
-			add_action('revisionary_page_revisionary-settings', 'rvy_omit_site_options' );	
+			add_action('revisionary_page_revisionary-settings', 'rvy_omit_site_options' );
 		}
 
 		if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 			add_submenu_page(
-	            'revisionary-q', 
-	            __('Upgrade to Pro', 'revisionary'), 
-	            __('Upgrade to Pro', 'revisionary'), 
-	            'read', 
-	            'revisionary-pro', 
+	            'revisionary-q',
+	            __('Upgrade to Pro', 'revisionary'),
+	            __('Upgrade to Pro', 'revisionary'),
+	            'read',
+	            'revisionary-pro',
 	            'rvy_omit_site_options'
 	        );
     	}
@@ -200,7 +204,7 @@ class RevisionaryAdmin
 
 	function limitRevisionEditorUI() {
 		global $post;
-		
+
 		remove_post_type_support($post->post_type, 'author');
 		remove_post_type_support($post->post_type, 'custom-fields'); // todo: filter post_id in query
 	}
@@ -214,14 +218,14 @@ class RevisionaryAdmin
 
 		return $query_args;
 	}
-	
+
 	// adds a Settings link next to Deactivate, Edit in Plugins listing
 	function flt_plugin_action_links($links, $file) {
 		if ($file == plugin_basename(REVISIONARY_FILE)) {
 			$page = ( defined('RVY_NETWORK') && RVY_NETWORK ) ? 'rvy-net_options' : 'revisionary-settings';
 			$links[] = "<a href='admin.php?page=$page'>" . __awp('Settings') . "</a>";
 		}
-			
+
 		return $links;
 	}
 
@@ -238,7 +242,7 @@ class RevisionaryAdmin
 				}
 			}
 		}
-		
+
 		return $enable_scripts;
 	}
 
@@ -258,7 +262,7 @@ class RevisionaryAdmin
 
 		<div class="pp-rating">
 		<a href="https://wordpress.org/support/plugin/revisionary/reviews/#new-post" target="_blank" rel="noopener noreferrer">
-		<?php printf( 
+		<?php printf(
 			__('If you like %s, please leave us a %s rating. Thank you!', 'revisionary'),
 			'<strong>PublishPress Revisions</strong>',
 			'<span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span>'

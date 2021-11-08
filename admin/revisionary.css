@@ -51,10 +51,6 @@ color: blue;
 background-color: #FFFEEB;
 }
 
-.rs-settings {
-background-color: #FFFEEB;
-}
-
 .rs-backgray {
 background-color: #d8d8d8;
 }
@@ -239,24 +235,24 @@ color: #b00;
 width: 100%;
 }
 
-#rs-admin_table tr, #rs-realm_table tr, #realm_adjustments tr, #rs-advanced_table tr {
+#rs-realm_table tr, #realm_adjustments tr, #rs-advanced_table tr {
 background-color: #f1f1f1;
 border-bottom: 4px solid #FFFEEB;
 }
 
-.rs-backgreen #rs-admin_table tr, .rs-backgreen #rs-realm_table tr, .rs-backgreen #realm_adjustments tr, .rs-backgreen #rs-advanced_table tr {
+.rs-backgreen #rs-realm_table tr, .rs-backgreen #realm_adjustments tr, .rs-backgreen #rs-advanced_table tr {
 border-bottom: 4px solid #CDD7BA;
 }
 
-.rs-backgray #rs-admin_table tr, .rs-backgray #rs-realm_table tr, .rs-backgray #realm_adjustments tr, .rs-backgray #rs-advanced_table tr {
+.rs-backgray #rs-realm_table tr, .rs-backgray #realm_adjustments tr, .rs-backgray #rs-advanced_table tr {
 border-bottom: 4px solid #d8d8d8;
 }
 
-#rs-admin_table tr td, #rs-realm_table tr td, #realm_adjustments tr td, #rs-advanced_table tr td {
+#rs-realm_table tr td, #realm_adjustments tr td, #rs-advanced_table tr td {
 padding: 1em 0 1em 0;
 }
 
-#rs-admin_table th, #rs-realm_table th, #realm_adjustments th, #rs-advanced_table th {
+#rs-realm_table th, #realm_adjustments th, #rs-advanced_table th {
 font-weight: bold;
 }
 
