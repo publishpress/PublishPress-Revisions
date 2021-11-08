@@ -124,7 +124,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'revisor_lock_others_revisions' =>			__("Editing others&apos; revisions requires role capability", 'revisionary'),
 	'revisor_hide_others_revisions' => 			__("Listing others&apos; revisions requires role capability", 'revisionary'),
 	'admin_revisions_to_own_posts' =>			__("Users can always administer revisions to their own editable posts", 'revisionary'),
-	'queue_query_all_posts' => 					__('Compatibility Mode', 'revisionary'),
+	//'queue_query_all_posts' => 					__('Compatibility Mode', 'revisionary'),
 	'revision_update_notifications' =>			__('Also notify on Revision Update', 'revisionary'),
 	'trigger_post_update_actions' => 			__('Revision Publication: API actions to mimic Post Update', 'revisionary'),
 	'diff_display_strip_tags' => 				__('Hide html tags on Compare Revisions screen', 'revisionary'),
@@ -161,7 +161,6 @@ if ( defined('RVY_CONTENT_ROLES') ) {
 	$this->option_captions['publish_scheduled_notify_admin'] = 	sprintf(__('Email Editors and Administrators when a %s is published', 'revisionary'), $future_revision_singular);
 	$this->option_captions['rev_approval_notify_admin'] = 		sprintf(__('Email Editors and Administrators when a %s is approved', 'revisionary'), $pending_revision_singular);
 }
-	
 
 $this->form_options = apply_filters('revisionary_option_sections', [ 
 'features' => [
@@ -372,7 +371,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	<?php 
 	$hint = __('This restriction applies to users who are not full editors for the post type. To enable a role, add capabilities: copy_posts, copy_others_pages, etc.', 'revisionary');
 	$this->option_checkbox( 'copy_posts_capability', $tab, $section, $hint, '' );
-	
+
 	if (defined('PRESSPERMIT_VERSION')) :?>
 		<div class="rs-subtext">
 		<?php _e('To expand the Posts / Pages listing for non-Editors, add capabilities: list_others_pages, list_published_posts, etc.', 'revisionary'); ?>
@@ -476,9 +475,11 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 			/*
 			$hint = __('If some revisions are missing from the queue, disable a performance enhancement for better compatibility with themes and plugins.', 'revisionary');
 			$this->option_checkbox( 'queue_query_all_posts', $tab, $section, $hint, '' );
+			*/
+
 		?>
 
-		<p style="padding-left:22px">
+		<p style="padding-left:22px; margin-top:25px">
 		<a href="<?php echo add_query_arg('rvy_flush_flags', 1, esc_url($_SERVER['REQUEST_URI']))?>"><?php _e('Regenerate "post has revision" flags', 'revisionary');?></a>
 		</p>
 
