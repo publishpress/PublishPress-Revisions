@@ -21,7 +21,9 @@ Your users can update posts using the normal WordPress editor, but their changes
 
 The Free version of PublishPress Revisions supports the WordPress core. The Pro version of PublishPress Revisions supports ACF, Yoast SEO, PODS, WooCommerce, WPML, Elementor, Beaver Builder, and many more plugins and themes.
 
-> <strong>Revisions Pro</strong><br />
+## PublishPress Revisions Pro ##
+
+> <strong>Upgrade to Revisions Pro</strong><br />
 > This plugin is the free version of the Revisions Pro plugin that comes with all the features you need to manage changes for your WordPress content. With Revisions Pro you can manage changes to plugin content and page-builders. <a href="https://publishpress.com/revisions"  title="Revisions Pro">Click here to purchase the best premium WordPress content update plugin now!</a>
 
 = Submit Change Requests for Posts =
