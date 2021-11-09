@@ -34,13 +34,7 @@ if ( ! empty($_GET['right']) )
 	$right = absint($_GET['right']);
 else
 	$right = '';
-
-/*
-if ( ! empty($_GET['revision_status']) )
-	$revision_status = sanitize_key($_GET['revision_status']);
-else
-	$revision_status = '';
-*/	
+	
 $revision_status = 'inherit';
 
 if ( ! empty($_GET['action']) )
@@ -79,7 +73,7 @@ default :
 	
 	if ( ! $revision = wp_get_post_revision( $revision_id ) ) {
 		if ($revision = get_post($revision_id)) {
-			if (!rvy_is_revision_status($revision->post_status)) {
+			if (!rvy_in_revision_workflow($revision)) {
 				$revision = false;
 			}
 		}
@@ -107,7 +101,7 @@ default :
 			break;
 
 		// actual status of compared objects overrides any revision_Status arg passed in
-		$revision_status = $revision->post_status;
+		$revision_status = $revision->post_mime_type;
 
 		if (!current_user_can( 'edit_post', $rvy_post->ID ) && !rvy_is_post_author($revision)) {
 			wp_die();
@@ -160,15 +154,15 @@ if ( ! $revision_status )
 <div class="wrap">
 
 <?php
-if (!$can_fully_edit_post = agp_user_can( $edit_cap, $rvy_post->ID, '', ['skip_revision_allowance' => true])) {
+if (!$can_fully_edit_post = current_user_can( $edit_cap, $rvy_post->ID)) {
 	// post-assigned Revisor role is sufficient to edit others' revisions, but post-assigned Contributor role is not
-	$_can_edit_others = (!rvy_get_option('revisor_lock_others_revisions') || rvy_is_full_editor($rvy_post)) && agp_user_can( $edit_others_cap, $rvy_post->ID, 0, ['skip_revision_allowance' => true] );
+	$_can_edit_others = (!rvy_get_option('revisor_lock_others_revisions') || rvy_is_full_editor($rvy_post)) && current_user_can( $edit_others_cap, $rvy_post->ID);
 }
 
 if ( 'diff' != $action ) {
-	$can_edit = ( ( 'revision' == $revision->post_type ) || rvy_is_revision_status($revision->post_status) ) && (
+	$can_edit = ( ( 'revision' == $revision->post_type ) || rvy_in_revision_workflow($revision) ) && (
 		$can_fully_edit_post || 
-		( (rvy_is_post_author($revision) || $_can_edit_others) && ('pending-revision' == $revision->post_status) ) 
+		( (rvy_is_post_author($revision) || $_can_edit_others) && (in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) ))
 		);
 }
 ?>
@@ -177,23 +171,28 @@ if ( 'diff' != $action ) {
 if ( $is_administrator = is_content_administrator_rvy() ) {
 	global $wpdb;
 
-	$status_csv = implode("','", array_merge(rvy_revision_statuses(), ['inherit']));
+	$base_status_csv = implode("','", array_merge(rvy_revision_base_statuses(), ['inherit']));
+	$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
 
 	$results = $wpdb->get_results( 
 		$wpdb->prepare(
-			"SELECT post_status, COUNT( * ) AS num_posts FROM {$wpdb->posts}"
-			. " WHERE post_status IN ('$status_csv')"
-			. " AND ((post_type = 'revision' AND post_status = 'inherit' AND post_parent = %d) OR (post_type != 'revision' AND post_status != 'inherit' AND comment_count = %d))"
-			. " GROUP BY post_status",
+			"SELECT post_mime_type, COUNT( * ) AS num_posts FROM {$wpdb->posts}"
+			. " WHERE post_status IN ('$base_status_csv')"
+			. " AND ((post_type = 'revision' AND post_status = 'inherit' AND post_parent = %d) OR (post_type != 'revision' AND post_mime_type IN ($revision_status_csv) AND comment_count = %d))"
+			. " GROUP BY post_mime_type",
 			$rvy_post->ID,
 			$rvy_post->ID
 		)
 	);
 	
-	$num_revisions = array( 'inherit' => 0, 'pending-revision' => 0, 'future-revision' => 0 );
-	foreach( $results as $row )
-		$num_revisions[$row->post_status] = $row->num_posts;
-		
+	$num_revisions = array( '' => 0, 'pending-revision' => 0, 'future-revision' => 0 );
+	foreach( $results as $row ) {
+		$num_revisions[$row->post_mime_type] = $row->num_posts;
+	}
+
+	$num_revisions['inherit'] = $num_revisions[''];
+	unset($num_revisions['']);
+
 	$num_revisions = (object) $num_revisions;
 }
 
@@ -205,7 +204,7 @@ foreach ( array_keys($revision_status_captions) as $_revision_status ) {
 		$link = "admin.php?page=rvy-revisions&amp;revision={$post_id}&amp;revision_status=$_revision_status";
 		$target = '';
 	} else {
-		$link = admin_url("admin.php?page=revisionary-q&published_post={$rvy_post->ID}&post_status={$_revision_status}");
+		$link = rvy_admin_url("admin.php?page=revisionary-q&published_post={$rvy_post->ID}&post_status={$_revision_status}");
 		$target = "target='_blank'";
 	}
 
@@ -215,11 +214,10 @@ foreach ( array_keys($revision_status_captions) as $_revision_status ) {
 		case 'inherit':
 			$status_caption = __( 'Past Revisions', 'revisionary' );
 			break;
+		case 'draft-revision':
 		case 'pending-revision':
-			$status_caption = __( 'Pending Revisions', 'revisionary' );
-			break;
 		case 'future-revision':
-			$status_caption = __( 'Scheduled Revisions', 'revisionary' );
+			$status_caption = pp_revisions_status_label($_revision_status, 'plural');
 			break;
 	}
 	

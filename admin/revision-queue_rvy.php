@@ -10,7 +10,11 @@ if ( ! $post_types = rvy_get_manageable_types() ) {
 }
 
 if (!rvy_get_option('pending_revisions') && !rvy_get_option('scheduled_revisions')) {
-	wp_die( __( 'Pending Revisions and Scheduled Revisions are both disabled. See Revisions > Settings.', 'revisionary' ) );
+	wp_die( sprintf(__( 
+		'%s and %s are both disabled. See Revisions > Settings.', 'revisionary' ), 
+		pp_revisions_status_label('pending-revision', 'plural'),
+		pp_revisions_status_label('future-revision', 'plural')
+	));
 }
 
 set_current_screen( 'revisionary-q' );
@@ -28,6 +32,7 @@ $bulk_counts = array(
 	'deleted'   => isset( $_REQUEST['deleted'] )   ? absint( $_REQUEST['deleted'] )   : 0,
 	'updated' => 0,
 	'locked' => 0,
+	'submitted_count' => isset( $_REQUEST['submitted_count'] ) ? absint( $_REQUEST['submitted_count'] ) : 0,
 	'approved_count' => isset( $_REQUEST['approved_count'] ) ? absint( $_REQUEST['approved_count'] ) : 0,
 	'unscheduled_count' => isset( $_REQUEST['unscheduled_count'] ) ? absint( $_REQUEST['unscheduled_count'] ) : 0,
 	'published_count' => isset( $_REQUEST['published_count'] ) ? absint( $_REQUEST['published_count'] ) : 0,
@@ -37,6 +42,7 @@ $bulk_counts = array(
 
 $bulk_messages = [];
 $bulk_messages['post'] = array(
+	'submitted_count'   => sprintf(_n( '%s revision submitted.', '%s revisions submitted.', $bulk_counts['submitted_count'], 'revisionary' ), $bulk_counts['submitted_count']),
 	'approved_count'   => sprintf(_n( '%s revision approved.', '%s revisions approved.', $bulk_counts['approved_count'], 'revisionary' ), $bulk_counts['approved_count']),
 	'unscheduled_count' => sprintf(_n( '%s revision unscheduled.', '%s revisions unscheduled.', $bulk_counts['unscheduled_count'], 'revisionary' ), $bulk_counts['unscheduled_count']),
 	'published_count'   => sprintf(_n( '%s revision published.', '%s revisions published.', $bulk_counts['published_count'], 'revisionary' ), $bulk_counts['published_count']),
@@ -166,8 +172,7 @@ $_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated
 <br class="clear" />
 
 <?php
-global $revisionary;
-$revisionary->admin->publishpressFooter();
+do_action('revisionary_admin_footer');
 ?>
 
 </div>

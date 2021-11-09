@@ -23,10 +23,8 @@ class Rvy_Revision_Workflow_UI {
     
                 if ( $publisher_ids = $revisionary->content_roles->get_metagroup_members( 'Pending Revision Monitors' ) ) {
                     if ( $type_obj ) {
-                        $revisionary->skip_revision_allowance = true;
                         $cols = ( defined('COLS_ALL_RS') ) ? COLS_ALL_RS : 'all';
                         $post_publishers = $revisionary->content_roles->users_who_can( 'edit_post', $object_id, array( 'cols' => $cols, 'force_refresh' => true, 'user_ids' => $publisher_ids ) );
-                        $revisionary->skip_revision_allowance = false;
 
                         $can_publish_post = array();
                         foreach ( $post_publishers as $key => $user ) {
@@ -90,10 +88,8 @@ class Rvy_Revision_Workflow_UI {
             foreach($author_ids as $author_id) {
                 if ( empty( $default_ids[$author_id] ) ) {
                     if ( defined('RVY_CONTENT_ROLES') ) {
-                        $revisionary->skip_revision_allowance = true;
                         $cols = ( defined('COLS_ALL_RS') ) ? COLS_ALL_RS : 'all';
                         $author_notify = (bool) $revisionary->content_roles->users_who_can( 'edit_post', $object_id, array( 'cols' => $cols, 'force_refresh' => true, 'user_ids' => (array) $author_id ) );
-                        $revisionary->skip_revision_allowance = false;
                     } else {
                         $_user = new WP_User($author_id);
                         $reqd_caps = map_meta_cap( 'edit_post', $_user->ID, $object_id );
@@ -134,7 +130,7 @@ class Rvy_Revision_Workflow_UI {
         }
 
         // Support workaround to prevent notification when an Administrator or Editor voluntarily creates a pending revision
-        if (defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS') && agp_user_can('edit_post', $published_post->ID, 0, ['skip_revision_allowance' => true])) {
+        if (defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS') && current_user_can('edit_post', $published_post->ID)) {
             return;
         }
 
@@ -149,22 +145,20 @@ class Rvy_Revision_Workflow_UI {
 
         if ( ( $admin_notify || $author_notify ) && $revision_id ) {
             $type_obj = get_post_type_object( $object_type );
-            $type_caption = $type_obj->labels->singular_name;
+            $type_caption = strtolower($type_obj->labels->singular_name);
             $post_arr['post_type'] = $published_post->post_type;
             
             $blogname = wp_specialchars_decode( get_option('blogname'), ENT_QUOTES );
             
             if (!empty($args['update'])) {
-                $title = sprintf( __('[%s] Pending Revision Update', 'revisionary'), $blogname );
+                $title = sprintf( __('[%s] %s Updated', 'revisionary'), $blogname, pp_revisions_status_label('pending-revision', 'name') );
                 
-                $message = sprintf( __('A pending revision to the %1$s "%2$s" has been updated.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
+                $message = sprintf( __('%1$s updated a %2$s of the %3$s "%4$s".', 'revisionary'), $current_user->display_name, strtolower(pp_revisions_status_label('pending-revision', 'name')), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
             } else {
-                $title = sprintf( __('[%s] Pending Revision Notification', 'revisionary'), $blogname );
+                $title = sprintf( __('[%s] %s', 'revisionary'), $blogname, pp_revisions_status_label('pending-revision', 'name') );
                 
-                $message = sprintf( __('A pending revision to the %1$s "%2$s" has been submitted.', 'revisionary'), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
+                $message = sprintf( __('%1$s submitted changes to the %2$s "%3$s". You can review the changes for possible publication:', 'revisionary'), $current_user->display_name, $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
             }
-
-            $message .= sprintf( __('It was submitted by %1$s.', 'revisionary' ), $current_user->display_name ) . "\r\n\r\n";
 
             if ( $revision_id ) {
                 $revision = get_post($revision_id);
@@ -174,9 +168,9 @@ class Rvy_Revision_Workflow_UI {
                     $message .= __( 'Preview and Approval: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
                 }
 
-                $message .= __( 'Revision Queue: ', 'revisionary' ) . admin_url("admin.php?page=revisionary-q&published_post={$published_post->ID}") . "\r\n\r\n";
+                $message .= __( 'Revision Queue: ', 'revisionary' ) . rvy_admin_url("admin.php?page=revisionary-q&published_post={$published_post->ID}") . "\r\n\r\n";
                 
-                $message .= __( 'Edit Revision: ', 'revisionary' ) . admin_url("post.php?action=edit&post={$revision_id}") . "\r\n";
+                $message .= sprintf(__( 'Edit %s: ', 'revisionary' ), pp_revisions_status_label('pending-revision', 'name')) . rvy_admin_url("post.php?action=edit&post={$revision_id}") . "\r\n";
             }
 
             if ( $admin_notify ) {
@@ -255,175 +249,6 @@ class Rvy_Revision_Workflow_UI {
             }
         }
     }
-
-    function get_revision_msg( $revision, $args = array() ) {
-        global $current_user;
-
-        $defaults = array( 'post_id' => 0, 'post_arr' => array(), 'object_type' => '', 'future_date' => null );
-        $args = array_merge( $defaults, (array) $args );
-        foreach( array_keys($defaults) as $var ) { $$var = $args[$var]; }
-        
-        if ( ! $revision ) {
-            $msg = __('Sorry, an error occurred while attempting to save your revision.', 'revisionary'); 
-        } else {
-            if ( is_scalar ( $revision ) ) {
-                //$revision = wp_get_post_revision( $revision );
-                $revision = get_post($revision);
-            }
-
-            if ( ! $post_arr ) {
-                $post_arr = (array) $revision;
-            }
-
-            if ( ! $post_id ) {
-                $post_id = rvy_post_id($revision->ID);
-            }
-
-            if ( ! $object_type ) {
-                if ( $post = get_post( $post_id ) ) {
-                    $object_type = $post->post_type;
-                }
-            }
-
-            if ( null === $future_date ) {
-                $future_date = $post_arr && ! empty( $post_arr['post_date_gmt'] ) && strtotime($post_arr['post_date_gmt'] ) > agp_time_gmt();
-            }
-
-            $manage_link = $this->get_manage_link( $object_type );
-            
-            switch( $revision->post_status ) {
-            case 'future-revision':
-                rvy_delete_post_meta( $post_id, "_new_scheduled_revision_{$current_user->ID}" );  // clear the flag which triggered a redirect from Gutenberg editor
-
-                $msg = __('Your modification was saved as a Scheduled Revision.', 'revisionary') . ' ';
-            
-                $msg .= '<ul>';
-
-                $links = [
-                    'edit' => sprintf( '<a href="%s">' . __('Keep editing the revision', 'revisionary') . '</a>', "post.php?post={$revision->ID}&amp;action=edit" ),
-                    'back' => sprintf( '<a href="%s">' . __('Go back to schedule another revision', 'revisionary') . '</a>', admin_url("post.php?post=$post_id&action=edit")),
-                    'queue' => sprintf( '<a href="%s">' . __('View Revision Queue', 'revisionary') . '</a>', "admin.php?page=revisionary-q&published_post=$post_id" ),
-                    'manage' => sprintf( '<a href="%s">' . $manage_link->caption . '</a>', admin_url($manage_link->uri) )
-                ];
-
-                if ($show_preview_link = rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
-                    $preview_link = rvy_preview_url($revision);
-
-                    $links = array_merge(
-                        ['preview' => sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link )],
-                        $links
-                    );
-                }
-
-                $links = apply_filters('revisionary_schedule_message_links', $links, $revision, $args);
-
-                foreach($links as $link_id => $link) {
-                    $msg .= "<li>{$links[$link_id]}<br /><br /></li>";                    
-                }
-
-                $msg .= '</ul>';
-
-                $msg = apply_filters('revisionary_schedule_message', $msg, $revision, $args);
-
-                break;
-
-            case 'pending-revision':
-            default:
-                // support alternate message if revision was submitted by an Editor or Administrator
-                if (defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATION')) {
-                    $editor_roles = [];
-                    
-                    foreach (['REVISIONARY_ALTERNATE_SUBMISSION_CAPTION_ROLES', 'RVY_MONITOR_ROLES', 'SCOPER_MONITOR_ROLES'] as $const) {
-                        if (defined($const)) {
-                            $editor_roles = array_map('trim', explode(',', constant($const)));
-                            break;
-                        }
-                    }
-
-                    if (empty($editor_roles)) {
-                        $editor_roles = ['editor', 'administrator'];
-                    }
-
-					// Administrator role might be excluded from revision notification, but as a self-approving revisor should still get the abbreviated submission caption. 
-                    if (!defined('REVISIONARY_ALTERNATE_SUBMISSION_CAPTION_ROLES')) {
-                        $editor_roles []= 'administrator';
-                    }
-
-                    if ($user = new WP_User($revision->post_author)) {
-                        if (array_intersect($user->roles, $editor_roles)) {
-                            $use_editor_message = true;
-                        }
-                    }
-                }
-
-                if (!empty($use_editor_message)) {
-                    $msg = __('Your modification has been saved.', 'revisionary') . ' <br />';
-                } else {
-	                $msg = __('Your modification has been saved for editorial review.', 'revisionary') . ' <br /><br />';
-	                
-	                if ( $future_date ) {
-	                    $msg .= __('If approved by an editor, it will be published on the date you specified.', 'revisionary') . ' ';
-	                } else {
-	                    $msg .= __('It will be published when an editor approves it.', 'revisionary') . ' ';
-	                }
-                }
-
-                clean_post_cache($revision->ID);
-                
-                $msg .= '<ul>';
-
-                $type_obj = get_post_type_object($revision->post_type);
-
-                $links = [
-                    'edit' => sprintf( '<a href="%s">' . __('Keep editing the revision', 'revisionary') . '</a>', "post.php?post={$revision->ID}&amp;action=edit" ),
-                    'back' => sprintf( '<a href="%s">' . __('Go back to submit another revision', 'revisionary') . '</a>', admin_url("post.php?post=$post_id&action=edit")),
-                    'queue' => sprintf( '<a href="%s">' . __('View Revision Queue', 'revisionary') . '</a>', "admin.php?page=revisionary-q&published_post=$post_id" ),
-                    'manage' => sprintf( '<a href="%s">' . $manage_link->caption . '</a>', admin_url($manage_link->uri) )
-                ];
-
-                if ($show_preview_link = $type_obj && !empty($type_obj->public) && rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
-                    $preview_link = rvy_preview_url($revision);
-                    $preview_link = remove_query_arg('preview_id', $preview_link);
-
-                    $links = array_merge(
-                        ['preview' => sprintf( '<a href="%s">' . __( 'Preview it', 'revisionary' ) . '</a>', $preview_link )],
-                        $links
-                    );
-                }
-
-                $links = apply_filters('revisionary_submit_message_links', $links, $revision, $args);
-
-                foreach($links as $link_id => $link) {
-                    $msg .= "<li>{$links[$link_id]}<br /><br /></li>";                    
-                }
-
-                $msg .= '</ul>';
-
-                $msg = apply_filters('revisionary_submit_message', $msg, $revision, $args);
-            }
-        }
-
-        return $msg;
-    }
-
-    function get_manage_link( $post_type ) {
-		$arr = (object) array();
-		
-		// maintaining these for back compat with existing translations
-		if ( 'post' == $post_type ) {
-			$arr->uri = 'edit.php';
-			$arr->caption = __( 'Return to Edit Posts', 'revisionary' );
-		} elseif ( 'page' == $post_type ) {
-			$arr->uri = "edit.php?post_type=$post_type";
-			$arr->caption = __( 'Return to Edit Pages', 'revisionary' );
-		} else {
-			$wp_post_type = get_post_type_object( $post_type );
-			$arr->uri = "edit.php?post_type=$post_type";
-			$arr->caption = sprintf( __( 'Return to Edit %s', 'revisionary' ), $wp_post_type->labels->name );
-		}
-		
-		return $arr;
-	}
     
     static function getRecipients($notification_class, $args) {
         $defaults = ['type_obj' => false, 'published_post' => false];
@@ -452,9 +277,7 @@ class Rvy_Revision_Workflow_UI {
                     $recipient_ids = $revisionary->content_roles->get_metagroup_members( 'Pending Revision Monitors' );
                     
                     if ( $type_obj ) {
-                        $revisionary->skip_revision_allowance = true;
                         $post_publisher_ids = $revisionary->content_roles->users_who_can( 'edit_post', $published_post->ID, array( 'cols' => 'id', 'user_ids' => $recipient_ids ) );
-                        $revisionary->skip_revision_allowance = false;
                         $recipient_ids = array_intersect( $recipient_ids, $post_publisher_ids );
                     }
 

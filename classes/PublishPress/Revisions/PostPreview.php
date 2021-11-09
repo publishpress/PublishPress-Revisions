@@ -9,7 +9,7 @@ class PostPreview {
     // If this preview of unsaved changes is for a revision, show published post author
 	public function fltAuthor($display_name) {
 		if ($_post = get_post(rvy_detect_post_id())) {           
-            if (rvy_is_revision_status($_post->post_status)) {
+            if (rvy_in_revision_workflow($_post)) {
                 remove_filter('the_author', [$this, 'fltAuthor'], 15);
 
                 if ($published_author = get_post_field('post_author', rvy_post_id($_post->ID))) {

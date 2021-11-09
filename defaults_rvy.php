@@ -5,7 +5,7 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 /**
  * @package     PublishPress\Revisions\RevisionaryOptions
  * @author      PublishPress <help@publishpress.com>
- * @copyright   Copyright (c) 2019 PublishPress. All rights reserved.
+ * @copyright   Copyright (c) 2021 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
  */
@@ -13,7 +13,11 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 // Setting scope: For Network installations, which Revisionary options should default to site-wide control?
 function rvy_default_options_sitewide() {
 	$def = array(
+		'copy_posts_capability' => true,
+		'revision_statuses_noun_labels' => true,
+		'caption_copy_as_edit' => true,
 		'pending_revisions' => true,
+		'revise_posts_capability' => true,
 		'scheduled_revisions' => true,
 		'async_scheduled_publish' => true,
 		'pending_rev_notify_admin' => true,
@@ -29,7 +33,8 @@ function rvy_default_options_sitewide() {
 		'revisor_role_add_custom_rolecaps' => true,
 		'revisor_lock_others_revisions' => true,
 		'revisor_hide_others_revisions' => true,
-		'queue_query_all_posts' => true,
+		'admin_revisions_to_own_posts' => true,
+		//'queue_query_all_posts' => true,
 		'require_edit_others_drafts' => true,
 		'diff_display_strip_tags' => false,
 		'scheduled_revision_update_post_date' => true,
@@ -41,12 +46,11 @@ function rvy_default_options_sitewide() {
 		'preview_link_type' => true,
 		'compare_revisions_direct_approval' => true,
 		'display_pp_branding' => true,
-		'revision_update_redirect' => true,
 		'revision_update_notifications' => true,
-		'revision_submit_trigger_post_actions' => true,
 		'trigger_post_update_actions' => true,
 		'copy_revision_comments_to_post' => true,
 		'past_revisions_order_by' => true,
+		'list_unsubmitted_revisions' => true,
 	);
 
 	if ( $other_options = array_diff_key( rvy_default_options(), $def ) ) {
@@ -59,7 +63,11 @@ function rvy_default_options_sitewide() {
 // Default values for Revisionary settings
 function rvy_default_options() {
 	$def = array(
+		'copy_posts_capability' => 0,
+		'revision_statuses_noun_labels' => 0,
+		'caption_copy_as_edit' => 0,
 		'pending_revisions' => 1,
+		'revise_posts_capability' => 0,
 		'scheduled_revisions' => 1,
 		'async_scheduled_publish' => 1,
 		'pending_rev_notify_admin' => 1,
@@ -75,7 +83,8 @@ function rvy_default_options() {
 		'revisor_role_add_custom_rolecaps' => 1,
 		'revisor_lock_others_revisions' => 1,
 		'revisor_hide_others_revisions' => 1,
-		'queue_query_all_posts' => 0,
+		'admin_revisions_to_own_posts' => 1,
+		//'queue_query_all_posts' => 0,
 		'require_edit_others_drafts' => 1,
 		'diff_display_strip_tags' => 0,
 		'scheduled_revision_update_post_date' => 1,
@@ -87,12 +96,11 @@ function rvy_default_options() {
 		'preview_link_type' => 'published_slug',
 		'compare_revisions_direct_approval' => 0,
 		'display_pp_branding' => 1,
-		'revision_update_redirect' => 0,
 		'revision_update_notifications' => 0,
-		'revision_submit_trigger_post_actions' => 1,
 		'trigger_post_update_actions' => 0,
 		'copy_revision_comments_to_post' => 0,
 		'past_revisions_order_by' => '',
+		'list_unsubmitted_revisions' => 0,
 	);
 
 	return $def;

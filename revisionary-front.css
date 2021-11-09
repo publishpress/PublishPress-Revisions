@@ -65,6 +65,17 @@
     background-color: #FFECEF;
 }
 
+.rvy_view_draft {
+    background-color: #b5b32f;
+}
+.rvy_view_draft .rvy_preview_linkspan {
+    background-color: #cde0d2;
+    border-color: #a6b5a9;
+}
+.rvy_view_draft .rvy_preview_linkspan:hover {
+    background-color: #E4F5E8;
+}
+
 .rvy_view_pending {
     background-color: #35b194;
 }

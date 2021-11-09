@@ -3,13 +3,13 @@ global $pagenow, $revisionary;
 
 add_action( 'init', '_rvy_post_edit_ui' );
 
-if (defined('REVISIONARY_PRO_VERSION')) {
+if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 	require_once(RVY_ABSPATH . '/includes-pro/admin-load.php');
 	new RevisionaryProAdmin();
 }
 
 if ( in_array( $pagenow, array( 'edit.php', 'post.php', 'post-new.php', 'plugins.php' ) ) ) { 
-	add_action( 'all_admin_notices', '_rvy_intro_notice' );
+	//add_action( 'all_admin_notices', '_rvy_intro_notice' ); // @todo: updated welcome message / screen
 
 	if (get_site_transient('_revisionary_1x_migration')) {
 		add_action( 'all_admin_notices', '_rvy_migration_notice' );
@@ -19,15 +19,20 @@ if ( in_array( $pagenow, array( 'edit.php', 'post.php', 'post-new.php', 'plugins
 function _rvy_post_edit_ui() {
 	global $pagenow, $revisionary;
 
-	if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ) ) ) {
-		if ( $pagenow == 'post.php' ) {
-			require_once( dirname(__FILE__).'/post-edit_rvy.php' );
-			$revisionary->post_edit_ui = new RvyPostEdit();
-		}
+	if (in_array($pagenow, ['post.php', 'post-new.php'])) {
+		if ($pagenow == 'post.php') {
+			require_once( dirname(__FILE__).'/post-editor-workflow-ui_rvy.php' );
 
-		if ($revisionary->isBlockEditorActive()) {
-			require_once( dirname(__FILE__).'/post-edit-block-ui_rvy.php' );
+			if (\PublishPress\Revisions\Utils::isBlockEditorActive()) {
+				require_once( dirname(__FILE__).'/post-edit-block-ui_rvy.php' );
+			} else {
+				require_once( dirname(__FILE__).'/post-edit_rvy.php' );
+				$revisionary->post_edit_ui = new RvyPostEdit();
+			}
 		}
+	} elseif ('edit.php' == $pagenow) {
+		require_once( dirname(__FILE__).'/admin-posts_rvy.php' );
+		new RevisionaryAdminPosts();
 	}
 }
 
@@ -41,6 +46,8 @@ function rvy_load_textdomain() {
 }
 
 function rvy_admin_init() {
+	rvy_load_textdomain();
+
 	// @todo: clean up "Restore Revision" URL on Diff screen
 	if (!empty($_GET['amp;revision']) && !empty($_GET['amp;action']) && !empty($_GET['amp;_wpnonce'])) {
 		$_GET['revision'] = $_GET['amp;revision'];
@@ -71,14 +78,18 @@ function rvy_admin_init() {
 
 		check_admin_referer('bulk-revision-queue');
 
-		$sendback = remove_query_arg( array('trashed', 'untrashed', 'approved_count', 'published_count', 'deleted', 'locked', 'ids', 'posts', '_wp_nonce', '_wp_http_referer'), wp_get_referer() );
+		if (!$url = str_replace('#038;', '&', wp_get_referer())) {
+			$url = admin_url("admin.php?page=revisionary-q");
+		}
+
+		$sendback = remove_query_arg( array('trashed', 'untrashed', 'submitted_count', 'approved_count', 'published_count', 'deleted', 'locked', 'ids', 'posts', '_wp_nonce', '_wp_http_referer'), $url);
 	
 		if ( 'delete_all' == $doaction ) {
 			// Prepare for deletion of all posts with a specified post status (i.e. Empty trash).
 			$post_status = preg_replace('/[^a-z0-9_-]+/i', '', sanitize_key($_REQUEST['post_status']));
 			// Verify the post status exists.
 			if ( get_post_status_object( $post_status ) ) {
-				$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_type=%s AND post_status = %s", $post_type, $post_status ) );
+				$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_type=%s AND post_mime_type = %s", $post_type, $post_status ) );
 			}
 			$doaction = 'delete';
 		} elseif ( isset( $_REQUEST['media'] ) ) {
@@ -106,13 +117,11 @@ function rvy_admin_init() {
 						continue;
 					}
 					
-					if (!rvy_is_revision_status($revision->post_status)) {
+					if (!rvy_in_revision_workflow($revision)) {
 						continue;
 					}
 					
-					if ( !$is_administrator 
-					&& !agp_user_can('edit_post', rvy_post_id($revision->ID), '', ['skip_revision_allowance' => true])
-					) {
+					if (!$is_administrator && !current_user_can('edit_post', rvy_post_id($revision->ID))) {
 						if (count($post_ids) == 1) {
 							wp_die( __('Sorry, you are not allowed to approve this revision.', 'revisionary') );
 						} else {
@@ -120,7 +129,7 @@ function rvy_admin_init() {
 						}
 					}
 	
-					if (('future-revision' == $revision->post_status) && ('publish_revision' == $doaction)) {
+					if (('future-revision' == $revision->post_mime_type) && ('publish_revision' == $doaction)) {
 						if (rvy_revision_publish($revision->ID)) {
 							$approved++;
 						}
@@ -138,6 +147,41 @@ function rvy_admin_init() {
 	
 				break;
 	
+			case 'submit_revision' :
+				$submitted = 0;
+				$is_administrator = current_user_can('administrator');
+
+				require_once( dirname(__FILE__).'/revision-action_rvy.php');
+	
+				foreach ((array) $post_ids as $post_id) {
+					if (!$revision = get_post($post_id)) {
+						continue;
+					}
+					
+					if ('draft' != $revision->post_status) {
+						continue;
+					}
+					
+					if (!$is_administrator && !current_user_can('set_revision_pending-revision', $revision->ID)) {
+						if (count($post_ids) == 1) {
+							wp_die( __('Sorry, you are not allowed to submit this revision.', 'revisionary') );
+						} else {
+							continue;
+						}
+					}	
+
+					if (rvy_revision_submit($revision->ID)) {
+						$submitted++;
+					}
+				}
+	
+				if ($submitted) {
+					$arg = 'submitted_count';
+					$sendback = add_query_arg($arg, $submitted, $sendback);
+				}
+
+				break;
+
 			case 'unschedule_revision' :
 				$unscheduled = 0;
 				$is_administrator = current_user_can('administrator');
@@ -149,13 +193,11 @@ function rvy_admin_init() {
 						continue;
 					}
 					
-					if ('future-revision' != $revision->post_status) {
+					if ('future-revision' != $revision->post_mime_type) {
 						continue;
 					}
 					
-					if ( !$is_administrator 
-					&& !agp_user_can('edit_post', rvy_post_id($revision->ID), '', ['skip_revision_allowance' => true])
-					) {
+					if (!$is_administrator && !current_user_can('edit_post', rvy_post_id($revision->ID))) {
 						if (count($post_ids) == 1) {
 							wp_die( __('Sorry, you are not allowed to approve this revision.', 'revisionary') );
 						} else {
@@ -181,11 +223,11 @@ function rvy_admin_init() {
 					if ( ! $revision = get_post($post_id) )
 						continue;
 					
-					if ( ! rvy_is_revision_status($revision->post_status) )
+					if ( ! rvy_in_revision_workflow($revision) )
 						continue;
 					
 					if ( ! current_user_can('administrator') && ! current_user_can( 'delete_post', rvy_post_id($revision->ID) ) ) {  // @todo: review Administrator cap check
-						if (('pending-revision' != $revision->post_status) || !rvy_is_post_author($revision)) {	// allow submitters to delete their own still-pending revisions
+						if (!in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) || !rvy_is_post_author($revision)) {	// allow submitters to delete their own still-pending revisions
 							wp_die( __('Sorry, you are not allowed to delete this revision.', 'revisionary') );
 						}
 					} 
@@ -204,7 +246,7 @@ function rvy_admin_init() {
 		}
 	
 		if ($sendback) {
-			$sendback = remove_query_arg( array('action', 'action2', '_wp_http_referer', '_wpnonce', 'tags_input', 'post_author', 'comment_status', 'ping_status', '_status', 'post', 'bulk_edit', 'post_view'), $sendback );
+			$sendback = remove_query_arg( array('action', 'action2', '_wp_http_referer', '_wpnonce', 'deleted', 'tags_input', 'post_author', 'comment_status', 'ping_status', '_status', 'post', 'bulk_edit', 'post_view'), $sendback );
 			$sendback = str_replace('#038;', '&', $sendback);	// @todo Proper decode
 			wp_redirect($sendback);
 		}
@@ -220,6 +262,14 @@ function rvy_admin_init() {
 				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
 				add_action( 'wp_loaded', 'rvy_revision_delete' );
 				
+			} elseif ( ! empty($_GET['action']) && ('revise' == $_GET['action']) ) {
+				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
+				add_action( 'wp_loaded', 'rvy_revision_create' );
+
+			} elseif ( ! empty($_GET['action']) && ('submit' == $_GET['action']) ) {
+				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
+				add_action( 'wp_loaded', 'rvy_revision_submit' );
+
 			} elseif ( ! empty($_GET['action']) && ('approve' == $_GET['action']) ) {
 				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
 				add_action( 'wp_loaded', 'rvy_revision_approve' );
@@ -238,17 +288,17 @@ function rvy_admin_init() {
 
 		$revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : $_REQUEST['to'];
 
-		if (('modified' == rvy_get_option('past_revisions_order_by')) && !rvy_is_revision_status(get_post_field('post_status', $revision_id))) {
+		if (('modified' == rvy_get_option('past_revisions_order_by')) && !rvy_in_revision_workflow($revision_id)) {
 			require_once(dirname(__FILE__).'/history_rvy.php');
 			add_filter('query', ['RevisionaryHistory', 'fltOrderRevisionsByModified']);
 		}
 	}
 
-	if (defined('REVISIONARY_PRO_VERSION') && !empty($_REQUEST['rvy_ajax_settings'])) {
+	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !empty($_REQUEST['rvy_ajax_settings'])) {
 		include_once(RVY_ABSPATH . '/includes-pro/pro-activation-ajax.php');
 	}
 
-	if (defined('REVISIONARY_PRO_VERSION') && !empty($_REQUEST['rvy_refresh_updates'])) {
+	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !empty($_REQUEST['rvy_refresh_updates'])) {
 		do_action('revisionary_refresh_updates');
 	}
 
@@ -261,7 +311,7 @@ function rvy_admin_init() {
 }
 
 function rvy_intro_message($abbreviated = false) {
-	
+	/*
 	$guide_link = sprintf(
 		__('For more details on setting up PublishPress Revisions, %sread this guide%s.', 'revisionary'),
 		'<a href="https://publishpress.com/documentation/revisionary-start" target="_blank">',
@@ -275,11 +325,12 @@ function rvy_intro_message($abbreviated = false) {
 		$guide_link,
 		'</p>'
 	);
+	*/
 }
 
 function rvy_migration_message() {
 	return sprintf(
-		__('<strong>Revisionary is now PublishPress Revisions!</strong> Note the new Revisions menu and %sRevision Queue%s screen, where Pending and Scheduled Revisions are listed. %s', 'revisionary'),
+		__('<strong>Revisionary is now PublishPress Revisions!</strong> Note the new Revisions menu and %sRevision Queue%s screen, where Revisions are listed. %s', 'revisionary'),
 		'<a href="' . admin_url('admin.php?page=revisionary-q') . '">',
 		'</a>',
 		'<div style="margin-top:10px">' . rvy_intro_message(true) . '</div>'
@@ -287,9 +338,11 @@ function rvy_migration_message() {
 }
 
 function _rvy_intro_notice() {
+	/*
 	if ( current_user_can( 'edit_users') ) {
 		rvy_dismissable_notice( 'intro_revisor_role', rvy_intro_message());
 	}
+	*/
 }
 
 function _rvy_migration_notice() {
@@ -317,7 +370,7 @@ function rvy_dismissable_notice( $msg_id, $message ) {
 	endif;
 }
 
-function rvy_get_post_revisions($post_id, $status = 'inherit', $args = '' ) {
+function rvy_get_post_revisions($post_id, $status = '', $args = '' ) {
 	global $wpdb;
 	
 	$defaults = array( 'order' => 'DESC', 'orderby' => 'post_modified_gmt', 'use_memcache' => true, 'fields' => COLS_ALL_RVY, 'return_flipped' => false );
@@ -327,11 +380,15 @@ function rvy_get_post_revisions($post_id, $status = 'inherit', $args = '' ) {
 		$$var = ( isset( $args[$var] ) ) ? $args[$var] : $defaults[$var];
 	}
 	
-	if (!in_array( 
-		$status, 
-		array_merge(rvy_revision_statuses(), array('inherit')) 
-	) ) {
-		return [];
+	if (!$status) {
+		$all_rev_statuses_clause = " AND (post_mime_type = 'draft-revision' OR post_mime_type = 'pending-revision' OR post_mime_type = 'future-revision')";
+	} else {
+		if (!in_array( 
+			$status, 
+			array_merge(rvy_revision_statuses(), array('inherit')) 
+		) ) {
+			return [];
+		}
 	}
 
 	if ( COL_ID_RVY == $fields ) {
@@ -355,15 +412,26 @@ function rvy_get_post_revisions($post_id, $status = 'inherit', $args = '' ) {
 				)
 			);
 		} else {
-			$revisions = $wpdb->get_col(
-				$wpdb->prepare(
-				"SELECT ID FROM $wpdb->posts "
-				. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
-					. " WHERE pm_published.meta_value = %s AND post_status = %s",
-					$post_id,
-					$status
-				)
-			);
+			if (!empty($all_rev_statuses_clause)) { 
+				$revisions = $wpdb->get_col(
+					$wpdb->prepare(
+					"SELECT ID FROM $wpdb->posts "
+					. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
+						. " WHERE pm_published.meta_value = %s $all_rev_statuses_clause",
+						$post_id
+					)
+				);
+			} else {
+				$revisions = $wpdb->get_col(
+					$wpdb->prepare(
+					"SELECT ID FROM $wpdb->posts "
+					. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
+						. " WHERE pm_published.meta_value = %s AND post_mime_type = %s",
+						$post_id,
+						$status
+					)
+				);
+			}
 		}
 
 		if ( $return_flipped )
@@ -388,15 +456,34 @@ function rvy_get_post_revisions($post_id, $status = 'inherit', $args = '' ) {
 				)
 			);
 		} else {
-			$revisions = $wpdb->get_results(
-				$wpdb->prepare(
-				"SELECT * FROM $wpdb->posts "
-				. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
-					. " WHERE pm_published.meta_value = %d AND post_status = %s $order_clause",
-					$post_id,
-					$status
-				)
-			);
+			if (!empty($all_rev_statuses_clause)) { 
+
+				$test = $wpdb->prepare(
+					"SELECT * FROM $wpdb->posts "
+					. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
+						. " WHERE pm_published.meta_value = %d $all_rev_statuses_clause $order_clause",
+						$post_id
+				);
+
+				$revisions = $wpdb->get_results(
+					$wpdb->prepare(
+					"SELECT * FROM $wpdb->posts "
+					. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
+						. " WHERE pm_published.meta_value = %d $all_rev_statuses_clause $order_clause",
+						$post_id
+					)
+				);
+			} else {
+				$revisions = $wpdb->get_results(
+					$wpdb->prepare(
+					"SELECT * FROM $wpdb->posts "
+					. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
+						. " WHERE pm_published.meta_value = %d AND post_mime_type = %s $order_clause",
+						$post_id,
+						$status
+					)
+				);
+			}
 		}
 	}
 

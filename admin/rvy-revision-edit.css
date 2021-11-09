@@ -1,3 +1,7 @@
+.components-dropdown-menu__popover .components-popover__content{
+min-width: 260px;
+}
+
 div.publishpress-extended-post-privacy, div.publishpress-extended-post-status {
 display: none;
 }
@@ -7,7 +11,7 @@ display:inline-flex;
 }
 
 /* Gutenberg */
-a.rvy-post-preview, a.rvy-post-preview.components-button.is-large {
+a.rvy-post-preview.components-button.is-large {
 margin-right:5px;
 text-decoration: none;
 height: inherit;
@@ -16,32 +20,7 @@ height: inherit;
 a.editor-post-preview, a.editor-post-preview.components-button.is-large {
 margin-right: 5px;
 }
-div.components-panel button.revision-approve {
-width: 100%;
-margin: 15px 0 15px 0;
-justify-content: center;
-color: #070;
-border-color: #070;
-font-weight: bold;
-}
 
-div.components-panel a.revision-approve{
-text-decoration: none;
-}
-
-/* Classic */
-#submitpost #revision-compare {
-margin: 5px 10px 10px 5px;
-}
-
-#submitpost div.rvy-revision-approve {
-line-height: 2.1;
-}
-
-#submitpost div.rvy-revision-approve a, #submitpost div.rvy-revision-approve a:link, #submitpost div.rvy-revision-approve a:visited {
-color: #070;
-font-weight: bold;
-}
 
 #rvy_compare_button {
 margin: 0 10px 10px 10px;

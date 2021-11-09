@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, permissions, moderate, 
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.8
-Stable tag: 2.6.3
+Stable tag: 3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -103,6 +103,14 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 12. Scheduled Revisions in Publishing Soon list
 
 == Changelog ==
+
+= 3.0 - 9 Nov 2021 =
+* Feature: New revision submission mechanism: create an unsubmitted revision first instead of editing existing post. Edit revision directly, then submit for scheduling or publication.
+* Change: Revisions UI in Post / Revision editor
+* Feature: Admin Bar includes "New Revision" button
+* Change: Revision Queue filter captions
+* Compat: Permissions - revise_others_posts, revise_others_pages, etc. capabilties are equivalent to list_others capabilities in allowing uneditable items to be listed
+* Change : Include upload_files capability in the Revisor role
 
 = 2.6.3 - 11 Oct 2021 =
 * Fixed : Classic Editor - Error submitting a pending or scheduled revision

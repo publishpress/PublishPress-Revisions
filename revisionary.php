@@ -5,7 +5,7 @@
  * Description: Maintain published content with teamwork and precision using the Revisions model to submit, approve and schedule changes.
  * Author: PublishPress
  * Author URI: https://publishpress.com
- * Version: 2.6.3
+ * Version: 3.0
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 4.9.7
@@ -33,6 +33,10 @@
  * @copyright   Copyright (C) 2021 PublishPress. All rights reserved.
  *
  **/
+
+// Temporary usage within this module only; avoids multiple instances of version string
+global $pp_revisions_version;
+$pp_revisions_version = '3.0';
 
 if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 	die( 'This page cannot be called directly.' );
@@ -80,7 +84,8 @@ if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1
 		add_action('all_admin_notices', function()
 		{
 			if (defined('REVISIONARY_FILE')) {
-				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: "%2$s")', 'revisionary' ), RVY_VERSION, dirname(plugin_basename(REVISIONARY_FILE)) );
+				$other_version = (defined('REVISIONARY_VERSION')) ? REVISIONARY_VERSION : PUBLISHPRESS_REVISIONS_VERSION;
+				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: "%2$s")', 'revisionary' ), $other_version, dirname(plugin_basename(REVISIONARY_FILE)) );
 			} else {
 				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)', 'revisionary' ), RVY_VERSION );
 			}
@@ -93,21 +98,22 @@ if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1
 
 define('REVISIONARY_FILE', __FILE__);
 
+add_action(
+	'init', 
+	function() {
+		global $pp_revisions_version;
+		require_once(dirname(__FILE__).'/functions.php');
+		pp_revisions_plugin_updated($pp_revisions_version);
+	},
+	2
+);
+
 // register these functions before any early exits so normal activation/deactivation can still run with RS_DEBUG
 register_activation_hook(__FILE__, function() 
 	{
-		$current_version = '2.6.3';
-
-		$last_ver = get_option('revisionary_last_version');
-
-		if ($current_version != $last_ver) {
-			require_once( dirname(__FILE__).'/lib/agapetry_wp_core_lib.php');
-			require_once(dirname(__FILE__).'/rvy_init.php');
-			revisionary_refresh_revision_flags();
-
-			// mirror to REVISIONARY_VERSION
-			update_option('revisionary_last_version', $current_version);
-		}
+		global $pp_revisions_version;
+		require_once(dirname(__FILE__).'/functions.php');
+		pp_revisions_plugin_updated($pp_revisions_version);
 
 		// force this timestamp to be regenerated, in case something went wrong before
 		delete_option( 'rvy_next_rev_publish_gmt' );
@@ -116,21 +122,33 @@ register_activation_hook(__FILE__, function()
 			require_once(dirname(__FILE__).'/activation_rvy.php');
 		}
 
+		require_once(dirname(__FILE__).'/functions.php');
+
+		// import from Revisionary 1.x
 		new RevisionaryActivation(['import_legacy' => true]);
 
-		// convert pending / scheduled revisions from v3.0 format
-		if (!defined('PUBLISHPRESS_REVISIONS_SKIP_V2_CONVERSION')) {
-			global $wpdb;
-			$wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft-revision' WHERE post_status IN ('draft') AND post_mime_type IN ('draft-revision')");
-			$wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending-revision' WHERE post_status IN ('pending') AND post_mime_type IN ('pending-revision')");
-			$wpdb->query("UPDATE $wpdb->posts SET post_status = 'future-revision' WHERE post_status IN ('future') AND post_mime_type IN ('future-revision')");
-			//$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = '' WHERE post_status IN ('draft-revision', 'pending-revision', 'future-revision')");
-		}
+		// convert pending / scheduled revisions to v3.0 format
+		global $wpdb;
+		
+		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+		$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = post_status WHERE post_status IN ($revision_status_csv)");
+		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft' WHERE post_status IN ('draft-revision')");
+		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending' WHERE post_status IN ('pending-revision')");
+		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'future' WHERE post_status IN ('future-revision')");
 	}
 );
 
 register_deactivation_hook(__FILE__, function()
 	{
+		global $wpdb;
+
+		require_once(dirname(__FILE__).'/functions.php');
+
+		// convert pending / scheduled revisions to v2.x format, which also prevents them from being listed as regular drafts / pending posts
+		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+		$wpdb->query("UPDATE $wpdb->posts SET post_status = post_mime_type WHERE post_mime_type IN ($revision_status_csv)");
+		$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = '' WHERE post_mime_type IN ($revision_status_csv)");
+		
 		if ($timestamp = wp_next_scheduled('rvy_mail_buffer_hook')) {
 		   wp_unschedule_event( $timestamp,'rvy_mail_buffer_hook');
 		}
@@ -181,10 +199,11 @@ add_action(
 			return;
 		}
 
-		define('REVISIONARY_VERSION', '2.6.3');
+		global $pp_revisions_version;
+		define('PUBLISHPRESS_REVISIONS_VERSION', $pp_revisions_version);
 
 		if ( ! defined( 'RVY_VERSION' ) ) {
-			define( 'RVY_VERSION', REVISIONARY_VERSION );  // back compat
+			define( 'RVY_VERSION', PUBLISHPRESS_REVISIONS_VERSION );  // back compat
 		}
 
 		define ('COLS_ALL_RVY', 0);
@@ -223,7 +242,7 @@ add_action(
 
 		define('RVY_ABSPATH', __DIR__);
 
-		if (is_admin() && !defined('REVISIONARY_PRO_VERSION')) {
+		if (is_admin() && !defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 			require_once(__DIR__ . '/includes/CoreAdmin.php');
 			new \PublishPress\Revisions\CoreAdmin();
 		}
