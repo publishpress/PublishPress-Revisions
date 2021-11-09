@@ -1,9 +1,9 @@
-=== PublishPress Revisions: Submit, Moderate, Schedule and Approve Revisions ===
+=== PublishPress Revisions: Submit, Moderate, and Schedule Changes to Posts ===
 
 Contributors: publishpress, kevinB, stevejburge, andergmartins
 Author: PublishPress
 Author URI: https://publishpress.com
-Tags: revision, submit changes, workflow, collaboration, permissions, moderate, posts, schedule revisions
+Tags: revision, submit changes, workflow, collaboration, schedule revisions
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.8
@@ -21,28 +21,37 @@ Your users can update posts using the normal WordPress editor, but their changes
 
 The Free version of PublishPress Revisions supports the WordPress core. The Pro version of PublishPress Revisions supports ACF, Yoast SEO, PODS, WooCommerce, WPML, Elementor, Beaver Builder, and many more plugins and themes.
 
+> <strong>Revisions Pro</strong><br />
+> This plugin is the free version of the Revisions Pro plugin that comes with all the features you need to manage changes for your WordPress content. With Revisions Pro you can manage changes to plugin content and page-builders. <a href="https://publishpress.com/revisions"  title="Revisions Pro">Click here to purchase the best premium WordPress content update plugin now!</a>
+
 = Submit Change Requests for Posts =
 PublishPress Revisions allows your users to submit change requests for published posts. Your users can update posts using the normal WordPress editor, but their changes will not be published automatically. Instead, the changes are stored as a "pending revision" that can be approved or rejected.
+
 [Click here to see how to submit revisions](https://publishpress.com/knowledge-base/revisions-start/).
 
 = Schedule Future Updates to Posts =
 PublishPress Revisions allows you to schedule WordPress revisions to be published in the future. When you're editing a published post, all you need to do is select a future date and click "Schedule Revision". Your changes will be published at the specified time.
+
 [Click here to see how to schedule revisions](https://publishpress.com/knowledge-base/schedule-revisions-future/).
 
 = Manage and Moderate Changes to Content =
 After you create a revision with PublishPress Revisions, you can find that revision on the Revision Queue screen. This screen shows you all the revisions that have been submitted for approval. Underneath each revision you can choose from several moderation tools: Edit, Delete, Preview and Compare.
+
 [Click here to see how to manage and moderate revisions](https://publishpress.com/knowledge-base/schedule-or-publish-revisions/).
 
 = Compare Current and Former Versions =
 Pending and Scheduled Revisions can include changes to post content, categories, tags, featured image, page parent and other options. Each of these changes can be reviewed in the familiar Compare Revisions interface.
+
 [Click here to see how to compare revisions](https://publishpress.com/knowledge-base/compare-revisions/).
 
 = Frontend Moderation of Changes =
 It is possible to preview and moderate revisions via the frontend of your WordPress site. If you click Preview for a pending revision, you'll see a toolbar across the frontend of the site. This toolbar will change color so you can easily know the status of the revision. For example, if you're looking at a pending revision, the toolbar will be green. For scheduled revisions, the toolbar will be grey.
+
 [Click here to see how to manage from the frontend of your site](https://publishpress.com/knowledge-base/publishing-revisions-frontend/).
 
 = Email Notifications for Revisions =
 PublishPress Revisions will notify Administrators and Editors when a new revision is submitted. They can log in to preview, compare and approve the changes. PublishPress Revisions can also send emails for revision approval and publication. The Settings screen lets you disable unwanted notifications.
+
 [Click here for more on revision notifications](https://publishpress.com/knowledge-base/emails-revisionary/).
 
 = Additional Supported Plugins in the Pro Version =
@@ -66,20 +75,26 @@ PublishPress Revisions works with the default WordPress user roles, and also int
 To schedule changes to a published post, just set the desired future date before hitting Update.
 
 By upgrading to Revisions Pro, you also gain advanced permissions control through the PublishPress Permissions Pro plugin. You can customize permissions by role or per-user, granting full editing or revision submission rights to specific posts, categories, or taxonomy terms.
+
 [Click here for more on revision permissions](https://publishpress.com/knowledge-base/permissions-revisions).
 
 = Join PublishPress and get the Pro plugins =
+
+The Pro versions of the PublishPress plugins are well worth your investment. The Pro versions have extra features and faster support. [Click here to join PublishPress](https://publishpress.com/pricing/).
+
+Join PublishPress and you'll get access to these Pro plugins:
+
 * [PublishPress Authors Pro](https://publishpress.com/authors) allows you to add multiple authors and guest authors to WordPress posts.
+* [PublishPress Blocks Pro](https://publishpress.com/blocks) has everything you need to build professional websites with the WordPress block editor.
 * [PublishPress Capabilities Pro](https://publishpress.com/capabilities) is the plugin to manage your WordPress user roles, permissions, and capabilities.
 * [PublishPress Checklists Pro](https://publishpress.com/checklists) enables you to define tasks that must be completed before content is published.
-* [PublishPress Permissions Pro](https://publishpress.com/permissions) is the plugin for advanced WordPress permissions.
+* [PublishPress Permissions Pro](https://publishpress.com/permissions)  is the plugin for advanced WordPress permissions.
 * [PublishPress Pro](https://publishpress.com/publishpress) is the plugin for managing and scheduling WordPress content.
 * [PublishPress Revisions Pro](https://publishpress.com/revisions) allows you to update your published pages with teamwork and precision.
+* [PublishPress Series Pro](https://publishpress.com/series) enables you to group content together into a series 
 
-The Pro versions of the PublishPress plugins are well worth your investment. The Pro versions have extra features and faster support. 
-[Click here to join PublishPress](https://publishpress.com/pricing/).
+Together, these plugins are a suite of powerful publishing tools for WordPress. If you need to create a professional workflow in WordPress, with moderation, revisions, permissions and more... then you should try PublishPress.
 
-Together, these plugins are a suite of powerful publishing tools for WordPress. If you need to create a professional workflow in WordPress, with moderation, revisions, permissions and more then you should try PublishPress.
 
 = Bug Reports =
 Bug reports for PublishPress Revisions are welcomed in our [repository on GitHub](https://github.com/publishpress/publishpress-revisions). Please note that GitHub is not a support forum, and that issues that aren't properly qualified as bugs will be closed.
@@ -89,18 +104,16 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Screenshots ==
 
-1. Low-level user submits a "Pending Revision" to a Published Page 
-2. Email Notification Recipients (optionally adjustable)
-3. Pending Revision Confirmation
-4. Pending Revisions in Dashboard Right Now Count
-5. Revision Queue: filterable list of Pending, Scheduled Revisions
-6. Revision Queue actions
-7. Pending Revision Revision Preview / Approval
-8. Compare Pending and Scheduled Revisions using the familiar UI
-9. Scheduled Revision Creation (unrestricted editor)
-10. Scheduled Revision Confirmation
-11. Scheduled Revision Preview
-12. Scheduled Revisions in Publishing Soon list
+1. Schedule Revisions: PublishPress Revisions allows you to schedule WordPress revisions to be published in the future. 
+2. Control Revision Permissions: PublishPress Revisions allows you to control which users are able to submit revisions to published posts. 
+3. Submit Revisions: PublishPress Revisions enables you to submit change requests for published posts. 
+4. Preview and Compare Revisions: Every requested change can be reviewed in the normal “Compare Revisions” interface in WordPress.
+5. Manage and Moderate Revisions: PublishPress Revisions has a Revision Queue screen where you can search, approve, or deny changes to a published post's content.
+6. Email Notifications for Revisions: Administrators and Editors are notified by email when a new revision is submitted. PublishPress Revisions can also send emails for revision approval and publication.
+7. Support for Plugins: Revisions Pro adds support for the plugins such as Yoast SEO, WooCommrce and Advanced Custom Fields.
+8. Divi, Beaver Builder Integration: With Revisions Pro, your Contributors and Revisors will be able to submit revisions to published content using the front end editor of the Divi theme or Beaver Builder plugin.
+9. WPML Integration: With Revisions Pro, pending and scheduled revisions work in multi-language sites controlled by the WPML plugin. 
+10. Advanced Permissions: By upgrading to Revisions Pro, you also gain advanced permissions control through Permissions Pro. Customize permissions by role or per-user.
 
 == Changelog ==
 
