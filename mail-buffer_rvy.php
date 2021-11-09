@@ -23,7 +23,10 @@ function _rvy_mail_check_buffer($new_msg = [], $args = []) {
 	if (!$log_only) {
 		wp_cache_delete('revisionary_mail_buffer', 'options');
 		
-		if (!$buffer = get_option('revisionary_mail_buffer')) {
+		// @todo: re-enable buffer after troubleshooting for working copy redirect error
+
+		//if (!$buffer = get_option('revisionary_mail_buffer')) {
+		if (true) {
 			$buffer = [];
 			$first_buffer = true;
 		}
@@ -80,6 +83,8 @@ function _rvy_mail_check_buffer($new_msg = [], $args = []) {
 	if (!$log_only && $new_msg_buffered) {
 		$buffer = array_merge([$new_msg], $buffer);
 		update_option('revisionary_mail_buffer', $buffer);
+	} else {
+		$buffer = [];
 	}
 
 	if (!empty($purged)) {

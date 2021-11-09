@@ -1,4 +1,9 @@
 <?php
+
+/*
+ * Legacy functions for listing Past Revisions, with bulk deletion
+ */
+
 /**
  * @package     PublishPress\Revisions\RevisionManagerUI
  * @author      PublishPress <help@publishpress.com>
@@ -38,28 +43,6 @@ function rvy_metabox_notification_list() {
 		}
 		
 		echo('</div>');
-}
-
-
-function rvy_metabox_revisions( $status ) {
-	global $revisionary;
-
-	$property_name = $status . '_revisions';
-	if ( ! empty( $revisionary->filters_admin_item_ui->$property_name ) )
-		echo $revisionary->filters_admin_item_ui->$property_name;
-	
-	elseif ( ! empty( $_GET['post'] ) ) {
-		$args = array( 'format' => 'list', 'parent' => false );
-		rvy_list_post_revisions( (int) $_GET['post'], $status, $args );
-	}
-}
-
-function rvy_metabox_revisions_pending() {
-	rvy_metabox_revisions( 'pending-revision' );
-}
-
-function rvy_metabox_revisions_future() {
-	rvy_metabox_revisions( 'future-revision' );
 }
 
 /**
@@ -161,7 +144,7 @@ function rvy_post_revision_title( $revision, $link = true, $date_field = 'post_d
 function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 	if ( !$post = get_post( $post_id ) )
 		return;
-	
+
 	$defaults = array( 'parent' => false, 'right' => false, 'left' => false, 'format' => 'list', 'type' => 'all', 'echo' => true, 'date_field' => '', 'current_id' => 0 );
 	$args = wp_parse_args( $args, $defaults );
 
@@ -211,7 +194,7 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 	$rows = '';
 	$class = false;
 	
-	$can_edit_post = agp_user_can('edit_post', $post->ID, '', ['skip_revision_allowance' => true]);
+	$can_edit_post = current_user_can('edit_post', $post->ID);
 	
 	$hide_others_revisions = ! $can_edit_post && empty($current_user->allcaps['list_others_revisions']) && rvy_get_option('revisor_hide_others_revisions');
 	
@@ -230,13 +213,13 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 	
 	foreach ( $revisions as $revision ) {
 		if ( $status && ( $status != $revision->post_status ) ) 		 // support arg to display only past / pending / future revisions
-			if ( ('revision' == $revision->post_type) || rvy_is_revision_status($revision->post_status) )  // but always display current rev
+			if ( ('revision' == $revision->post_type) || rvy_in_revision_workflow($revision) )  // but always display current rev
 				continue;
 		
 		if ( 'revision' === $type && wp_is_post_autosave( $revision ) )
 			continue;
 			
-		if ( $hide_others_revisions && ( ( 'revision' == $revision->post_type ) || rvy_is_revision_status($revision->post_status) ) && !rvy_is_post_author($revision) )
+		if ( $hide_others_revisions && ( ( 'revision' == $revision->post_type ) || rvy_in_revision_workflow($revision) ) && !rvy_is_post_author($revision) )
 			continue;
 		
 		// todo: set up buffering to restore this in case we (or some other plugin) impose revision-specific read capability
@@ -369,6 +352,19 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 <?php
 wp_nonce_field( 'rvy-revisions' ); 
 ?>
+
+<?php
+// add Ajax goodies we need for fancy publish date editing in Revisions Manager and role duration/content date limit editing Bulk Role Admin
+?>
+<script type="text/javascript">
+/* <![CDATA[ */
+jQuery(document).ready( function($) {
+	$('#rvy-rev-checkall').on('click', function() {
+		$('.rvy-rev-chk').attr( 'checked', this.checked );
+	});
+});
+/* ]]> */
+</script>
 
 <table class="widefat post-revisions" cellspacing="0">
 	<col class="rvy-col1" />

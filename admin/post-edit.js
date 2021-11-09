@@ -2,11 +2,8 @@ jQuery(document).ready( function($) {
 	$('#publish').show();
 	
 	$('#misc-publishing-actions div.num-revisions').contents().filter(function() {
-		//if ( typeof(this.nodeValue) != 'undefined' ){ console.debug(this.nodeValue);} 
 		return ( this.nodeType == 3 && ( typeof(this.nodeValue) != 'undefined' ) && this.nodeValue.indexOf("Revisions") != -1 ); 
 	}).wrap('<span class="rev-caption"></span>');
-	
-	//$('#misc-publishing-actions span.rev-caption').html( rvyPostEdit.pubHistoryCaption + '&nbsp;' );
 	
 	if ( ! $('#timestampdiv a.now-timestamp').length ) {
 	 	$('#timestampdiv a.cancel-timestamp').after('<a href="#timestamp_now" class="now-timestamp hide-if-no-js button-now">' + rvyPostEdit.nowCaption + '</a>');

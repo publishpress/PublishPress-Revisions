@@ -7,17 +7,6 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
  
  // TODO: scale this down more, as it's overkill for Revisionary's usage
  class RevisionaryAgentsChecklist {
-	public static function all_agents_checklist( $role_bases, $agents, $args, $class = 'rs-agents' ) {
-		$div_style = "class='$class rvy-agents-checklist'";
-		
-		foreach ( $role_bases as $role_basis ) {
-			echo "<div $div_style>";
-			self::agents_checklist($role_basis, $agents[$role_basis], $role_basis, array(), $args);
-			
-			echo "</div>";
-		}
-	}
-	
 	public static function agents_checklist( $role_basis, $all_agents, $id_prefix = '', $stored_assignments = '', $args = '') {
 		if ( empty($all_agents) )
 			return;
@@ -38,22 +27,11 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 		}
 	}
 	
-	public static function eligible_agents_input_box( $role_basis, $id_prefix, $propagation ) {
-		$id = "{$id_prefix}_csv";
-		$msg = __( "Enter additional User Names or IDs (comma-separate)", 'revisionary');
-		echo '<br /><div class="rs-agents_caption"><strong>' . $msg . ':</strong></div>';
-		echo "<input name='$id' type='text' class='rvy-agents-filter' id='$id' />";
-	}
-	
 	// stored_assignments[agent_id][inherited_from] = progenitor_assignment_id (note: this function treats progenitor_assignment_id as a boolean)
 	static function _agents_checklist_display( $agents_subset, $role_basis, $all_agents, $id_prefix, $stored_assignments, $args, &$key) {
 		$defaults = array( 
-		'eligible_ids' => '', 			'locked_ids' => '',
-		'suppress_extra_prefix' => false, 					 				'check_for_incomplete_submission' => false,
-		'checkall_threshold' => 6,		'filter_threshold' => 10, 			'default_hide_threshold' => 20,
-		'caption_length_limit' => 20, 	'emsize_threshold' => 4, 
-		'objtype_display_name' => '', 	'objtype_display_name_plural' => '',
-		'for_entity_ids' => '');
+		'filter_threshold' => 10, 			'default_hide_threshold' => 20,		'caption_length_limit' => 20, 		'emsize_threshold' => 4
+		);
 
 		$args = (array) $args;
 		foreach( array_keys( $defaults ) as $var ) {
@@ -63,28 +41,15 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 		global $is_IE;
 		$ie_checkbox_style = ( $is_IE ) ? "style='height:1em'" : '';
 		
-		if ( is_array($eligible_ids) && empty($eligible_ids) )
-			$eligible_ids = array(-1);
-		else
-			if ( ! is_array($eligible_ids) ) $eligible_ids = array(); else $eligible_ids = array_flip($eligible_ids);
-
 		if ( ! is_array($stored_assignments) ) $stored_assignments = array();
-		if ( ! is_array($locked_ids) ) $locked_ids = array(); else $locked_ids = array_flip($locked_ids);
-		if ( is_array($for_entity_ids) && ! empty($for_entity_ids) ) $for_entity_ids = array_flip($for_entity_ids);
-		
-		if ( ! $suppress_extra_prefix )
-			$id_prefix .= "_{$role_basis}";
+
+		$id_prefix .= "_{$role_basis}";
 		
 		$agent_count = array();
 		
 		$agent_count[CURRENT_ITEMS_RVY] = count($stored_assignments);
 		
-		if ( empty($eligible_ids) )
-			$agent_count[ELIGIBLE_ITEMS_RVY] = count($all_agents) - count( $stored_assignments );
-		elseif ( $eligible_ids != array(-1) )
-			$agent_count[ELIGIBLE_ITEMS_RVY] = count( array_diff_key($eligible_ids, $stored_assignments) );
-		else
-			$agent_count[ELIGIBLE_ITEMS_RVY] = 0;
+		$agent_count[ELIGIBLE_ITEMS_RVY] = count($all_agents) - count( $stored_assignments );
 					
 		$default_hide_filtered_list = ( $default_hide_threshold && ( $agent_count[$agents_subset] > $default_hide_threshold ) );
 			
@@ -151,10 +116,7 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 			foreach( $all_agents as $agent ) {
 				$id = $agent->ID;
 				
-				if ( is_array($for_entity_ids) )
-					$role_assigned = isset($for_entity_ids[$id]) || isset($for_children_ids[$id]) ;
-				else
-					$role_assigned = isset($stored_assignments[$id]);
+				$role_assigned = isset($stored_assignments[$id]);
 				
 				switch ( $agents_subset ) {
 					case CURRENT_ITEMS_RVY:
@@ -162,7 +124,6 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 						break;
 					default: //ELIGIBLE_ITEMS_RVY
 						if ( $role_assigned ) continue 2;
-						if ( $eligible_ids && ! isset($eligible_ids[$id] ) ) continue 2;
 				}
 				
 				$caption = $agent->display_name;
@@ -208,10 +169,7 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 			$id = $agent->ID;
 			$agent_display_name = $agent->display_name;
 			
-			if ( is_array($for_entity_ids) )
-				$role_assigned = isset($for_entity_ids[$id]) || isset($for_children_ids[$id]) ;
-			else
-				$role_assigned = isset($stored_assignments[$id]);
+			$role_assigned = isset($stored_assignments[$id]);
 			
 			switch ( $agents_subset ) {
 				case CURRENT_ITEMS_RVY:
@@ -219,7 +177,6 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 					break;
 				default: //ELIGIBLE_ITEMS_RVY
 					if ( $role_assigned ) continue 2;
-					if ( $eligible_ids && ! isset($eligible_ids[$id] ) ) continue 2;
 			}
 			
 			// markup for role duration / content date limits
@@ -228,14 +185,9 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 			$link_class = '';
 			$limit_style = '';
 	
-			$disabled = ( $locked_ids && isset($locked_ids[$id]) ) ? " disabled='disabled'" : '';
-			
 			$li_title = "title=' " . strtolower($agent_display_name) . " '";
 			
-			if ( $role_assigned && ( ! is_array($for_entity_ids) || isset($for_entity_ids[$id]) ) )
-				$this_checked = ' checked="checked"';
-			else
-				$this_checked = '';
+			$this_checked = ( $role_assigned ) ? ' checked="checked"' : '';
 
 			if ( $this_checked )
 				$last_agents[] = $id;
@@ -243,7 +195,7 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 			$label_class = '';
 				
 			echo "\r\n<li $li_title>"
-				. "<input type='checkbox' name='{$id_prefix}[]'{$disabled}{$this_checked} value='$id' id='{$id_prefix}{$id}' $ie_checkbox_style />";
+				. "<input type='checkbox' name='{$id_prefix}[]'{$this_checked} value='$id' id='{$id_prefix}{$id}' $ie_checkbox_style />";
 			
 			echo "<label $title $limit_style for='{$id_prefix}{$id}'{$label_class}>";
 			
