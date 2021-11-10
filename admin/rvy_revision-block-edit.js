@@ -1,4 +1,5 @@
-jQuery(document).ready(function($){function RvyRecaptionElement(btnSelector,btnCaption,btnIcon=''){let node=document.querySelector(btnSelector);if(node){document.querySelector(btnSelector).innerText=`${btnCaption}`;if(btnIcon){document.querySelector(btnSelector).innerHTML=`<span class="dashicons dashicons-${btnIcon}"></span>${btnCaption}`;}}}
+jQuery(document).ready(function($){function RvyRecaptionElement(btnSelector,btnCaption,btnIcon=''){if(rvyObjEdit.disableRecaption){return;}
+let node=document.querySelector(btnSelector);if(node){document.querySelector(btnSelector).innerText=`${btnCaption}`;if(btnIcon){document.querySelector(btnSelector).innerHTML=`<span class="dashicons dashicons-${btnIcon}"></span>${btnCaption}`;}}}
 function RvySetPublishButtonCaption(caption,waitForSaveDraftButton,forceRegen,timeout){if(caption==''&&(typeof rvyObjEdit['publishCaptionCurrent']!='undefined')){caption=rvyObjEdit.publishCaptionCurrent;}else{rvyObjEdit.publishCaptionCurrent=caption;}
 if(typeof waitForSaveDraftButton=='undefined'){waitForSaveDraftButton=false;}
 if((!waitForSaveDraftButton||$('button.editor-post-switch-to-draft').filter(':visible').length||$('button.editor-post-save-draft').filter(':visible').length)&&$('button.editor-post-publish-button').length){RvyRecaptionElement('button.editor-post-publish-button',caption);}}
