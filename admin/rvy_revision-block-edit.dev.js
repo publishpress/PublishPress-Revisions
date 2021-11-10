@@ -7,6 +7,10 @@
 */
 jQuery(document).ready( function($) {
 	function RvyRecaptionElement(btnSelector, btnCaption, btnIcon = '') {
+		if (rvyObjEdit.disableRecaption) {
+			return;
+		}
+		
 		let node = document.querySelector(btnSelector);
 
 		if (node) {
