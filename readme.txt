@@ -104,6 +104,15 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 3.0.1 - 10 Nov 2021 =
+* Fixed : Revisions created using Revisions 2.x were not listed in Revision Queue until plugin de/re-activation
+* Fixed : Front Page setting was cleared at revision submission on some sites
+* Fixed : Front Page setting dropdown in Settings > Reading included revisions
+* Fixed : Classic Editor : Schedule Revisions could not be submitted
+* Fixed : Classic Editor : Schedule button was displayed incorrectly while selecting a future date for scheduled revision
+* Compat : Gutenberg plugin - Edit Revision screen crashed on update attempt
+* API: Allow redirect to be disabled on revision creation
+
 = 3.0 - 9 Nov 2021 =
 * Feature: New revision submission mechanism: create an unsubmitted revision first instead of editing existing post. Edit revision directly, then submit for scheduling or publication.
 * Change: Revisions UI in Post / Revision editor
