@@ -123,7 +123,10 @@ class Revisionary
 		add_action('post_updated', [$this, 'actUpdateRevision'], 10, 2);
 		add_action('post_updated', [$this, 'actUpdateRevisionFixCommentCount'], 999, 2);
 
-		add_filter("option_page_on_front", [$this, 'fltOptionPageOnFront']);
+		// This filter may be required in some configurations, but problematic in others
+		if (defined('PP_REVISIONS_PAGE_ON_FRONT_FILTER')) {
+			add_filter("option_page_on_front", [$this, 'fltOptionPageOnFront']);
+		}
 
 		add_filter('posts_clauses', [$this, 'fltPostsClauses'], 10, 2);
 
