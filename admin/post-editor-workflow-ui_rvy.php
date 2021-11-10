@@ -167,6 +167,7 @@ class PostEditorWorkflowUI {
                 'completedURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
                 'errorCaption' => __('Error Creating Revision', 'revisionary'),
                 'ajaxurl' => rvy_admin_url(''),
+                'update' => __('Update', 'revisionary'),
                 'postID' => $post->ID
             ));
         } else {
@@ -184,6 +185,7 @@ class PostEditorWorkflowUI {
                 'scheduledCaption' => pp_revisions_status_label('future-revision', 'submitted'),
                 'scheduledLinkCaption' => __('Preview', 'revisionary'),
                 'scheduledURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
+                'update' => __('Update', 'revisionary'),
             ));
         }
 
