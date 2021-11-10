@@ -244,7 +244,16 @@ function rvy_admin_url($partial_admin_url) {
 function pp_revisions_plugin_updated($current_version) {
     $last_ver = get_option('revisionary_last_version');
 
-    if (version_compare($last_ver, '3.0-rc7', '<')) {
+    if (version_compare($last_ver, '3.0.1', '<')) {
+        // convert pending / scheduled revisions to v3.0 format
+		global $wpdb;
+		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+		$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = post_status WHERE post_status IN ($revision_status_csv)");
+		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft' WHERE post_status IN ('draft-revision')");
+		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending' WHERE post_status IN ('pending-revision')");
+		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'future' WHERE post_status IN ('future-revision')");
+
+    } elseif (version_compare($last_ver, '3.0-rc7', '<')) {
         if ($role = @get_role('administrator')) {
             $role->add_cap('manage_unsubmitted_revisions');
         }
@@ -252,8 +261,8 @@ function pp_revisions_plugin_updated($current_version) {
         if ($role = @get_role('revisor')) {
             $role->add_cap('upload_files');
         }
-
     } 
+
     /*
     elseif (version_compare($last_ver, '2.4.3-beta4', '<')) { // Empty Queue condition was reported with Elementor, so default this setting
         if (defined('ELEMENTOR_VERSION') || defined('ELEMENTOR_PRO_VERSION')) {
