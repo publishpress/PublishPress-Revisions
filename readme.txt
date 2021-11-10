@@ -7,7 +7,7 @@ Tags: revision, submit changes, workflow, collaboration, schedule revisions
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.8
-Stable tag: 3.0
+Stable tag: 3.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -117,6 +117,15 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 10. Advanced Permissions: By upgrading to Revisions Pro, you also gain advanced permissions control through Permissions Pro. Customize permissions by role or per-user.
 
 == Changelog ==
+
+= 3.0.1 - 10 Nov 2021 =
+* Fixed : Revisions created using Revisions 2.x were not listed in Revision Queue until plugin de/re-activation
+* Fixed : Front Page setting was cleared at revision submission on some sites
+* Fixed : Front Page setting dropdown in Settings > Reading included revisions
+* Fixed : Classic Editor : Schedule Revisions could not be submitted
+* Fixed : Classic Editor : Schedule button was displayed incorrectly while selecting a future date for scheduled revision
+* Compat : Gutenberg plugin - Edit Revision screen crashed on update attempt
+* API: Allow redirect to be disabled on revision creation
 
 = 3.0 - 9 Nov 2021 =
 * Feature: New revision submission mechanism: create an unsubmitted revision first instead of editing existing post. Edit revision directly, then submit for scheduling or publication.

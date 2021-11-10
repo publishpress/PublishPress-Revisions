@@ -28,6 +28,8 @@ class PostEditorWorkflowUI {
             'onApprovalCaption' => __('(on approval)', 'revisionary'),
         ];
 
+        $vars['disableRecaption'] = is_plugin_active('gutenberg/gutenberg.php');
+
         if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
             $vars['viewURL'] = rvy_preview_url($post);
             $can_publish = current_user_can('edit_post', rvy_post_id($post->ID));
@@ -165,6 +167,7 @@ class PostEditorWorkflowUI {
                 'completedURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
                 'errorCaption' => __('Error Creating Revision', 'revisionary'),
                 'ajaxurl' => rvy_admin_url(''),
+                'update' => __('Update', 'revisionary'),
                 'postID' => $post->ID
             ));
         } else {
@@ -182,6 +185,7 @@ class PostEditorWorkflowUI {
                 'scheduledCaption' => pp_revisions_status_label('future-revision', 'submitted'),
                 'scheduledLinkCaption' => __('Preview', 'revisionary'),
                 'scheduledURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
+                'update' => __('Update', 'revisionary'),
             ));
         }
 

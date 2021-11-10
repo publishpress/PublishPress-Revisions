@@ -101,7 +101,7 @@ jQuery(document).ready( function($) {
                 });
             }
 
-	$(document).on('click', 'div.postbox-container', function() {
+	$(document).on('click', '#normal-sortables input, #normal-sortables select', function() {
 		$('a.revision-create').attr('disabled', 'disabled');
 		$('a.revision-schedule').attr('disabled', 'disabled');
 	});
@@ -207,6 +207,7 @@ jQuery(document).ready( function($) {
 				}
             }
             
+			$('#publish').val(rvyObjEdit.update);
             $('#publish').show();
 		}
 	}
