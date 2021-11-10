@@ -207,6 +207,7 @@ jQuery(document).ready( function($) {
 				}
             }
             
+			$('#publish').val(rvyObjEdit.update);
             $('#publish').show();
 		}
 	}
