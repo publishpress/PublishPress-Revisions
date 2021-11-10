@@ -131,7 +131,70 @@ class Revisionary
 			add_action('admin_bar_menu', [$this, 'adminToolbarItem'], 100);
 		}
 
+		add_filter('wp_dropdown_pages', [$this, 'fltDropdownPages'], 10, 3);
+
 		do_action( 'rvy_init', $this );
+	}
+
+	// Work around unfilterable get_pages() query by replacing the wp_dropdown_pages() return array
+	function fltDropdownPages($output, $parsed_args, $pages) {
+		// ---- Begin PublishPress Modification ---
+		global $wpdb;
+
+		// don't recursively execute this filter
+		remove_filter('wp_dropdown_pages', [$this, 'fltDropdownPages'], 10, 3);
+
+		$parse_args['echo'] = 0;
+
+		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+		$parsed_args['exclude'] = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ($revision_status_csv)");
+		// ---- End PublishPress Modification ---
+
+		$pages  = get_pages( $parsed_args );
+		$output = '';
+		// Back-compat with old system where both id and name were based on $name argument.
+		if ( empty( $parsed_args['id'] ) ) {
+			$parsed_args['id'] = $parsed_args['name'];
+		}
+	
+		if ( ! empty( $pages ) ) {
+			$class = '';
+			if ( ! empty( $parsed_args['class'] ) ) {
+				$class = " class='" . esc_attr( $parsed_args['class'] ) . "'";
+			}
+	
+			$output = "<select name='" . esc_attr( $parsed_args['name'] ) . "'" . $class . " id='" . esc_attr( $parsed_args['id'] ) . "'>\n";
+			if ( $parsed_args['show_option_no_change'] ) {
+				$output .= "\t<option value=\"-1\">" . $parsed_args['show_option_no_change'] . "</option>\n";
+			}
+			if ( $parsed_args['show_option_none'] ) {
+				$output .= "\t<option value=\"" . esc_attr( $parsed_args['option_none_value'] ) . '">' . $parsed_args['show_option_none'] . "</option>\n";
+			}
+			$output .= walk_page_dropdown_tree( $pages, $parsed_args['depth'], $parsed_args );
+			$output .= "</select>\n";
+		}
+	
+		/**
+		 * Filters the HTML output of a list of pages as a drop down.
+		 *
+		 * @since 2.1.0
+		 * @since 4.4.0 `$parsed_args` and `$pages` added as arguments.
+		 *
+		 * @param string    $output      HTML output for drop down list of pages.
+		 * @param array     $parsed_args The parsed arguments array. See wp_dropdown_pages()
+		 *                               for information on accepted arguments.
+		 * @param WP_Post[] $pages       Array of the page objects.
+		 */
+		$html = apply_filters( 'wp_dropdown_pages', $output, $parsed_args, $pages );
+	
+		if ( $parsed_args['echo'] ) {
+			echo $html;
+		}
+	
+		// PublishPress: restore this filter hook
+		add_filter('wp_dropdown_pages', [$this, 'fltDropdownPages'], 10, 3);
+
+		return $html;
 	}
 
 	function adminToolbarItem($admin_bar) {
