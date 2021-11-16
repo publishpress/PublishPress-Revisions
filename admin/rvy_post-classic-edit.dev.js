@@ -153,6 +153,10 @@ jQuery(document).ready( function($) {
         RvyRefreshScheduleButton();
     });
 
+	var $timestampdiv = $('#timestampdiv');
+	$timestampdiv.find('.save-timestamp').on( 'click', function( event ) { 
+		RvyRefreshScheduleButton();
+	});
 
     /**
 	 *  If date is set to future, change Publish button caption to "Schedule Revision",
