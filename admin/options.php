@@ -97,9 +97,9 @@ $this->section_captions = array(
 	'features' => array(
 		'role_definition' 	  	=> __('Revisors', 'revisionary'),
 		'revision_statuses'		=> __('Statuses', 'revisionary'),
-		'working_copy'			=> pp_revisions_status_label('draft-revision', 'plural'),
+		'working_copy'			=> rvy_get_option('revision_statuses_noun_labels') ? pp_revisions_status_label('draft-revision', 'plural') : __('Revision Creation', 'revisionary'),
+		'pending_revisions'		=> rvy_get_option('revision_statuses_noun_labels') ? pp_revisions_status_label('pending-revision', 'plural') : __('Revision Submission', 'revisionary'),
 		'scheduled_revisions' 	=> pp_revisions_status_label('future-revision', 'plural'),
-		'pending_revisions'		=> pp_revisions_status_label('pending-revision', 'plural'),
 		'revision_queue'		=> __('Queue', 'revisionary'),
 		'preview'				=> __('Preview / Approval', 'revisionary'),
 		'revisions'				=> __('Options', 'revisionary'),
@@ -109,18 +109,18 @@ $this->section_captions = array(
 
 // TODO: replace individual _e calls with these (and section, tab captions)
 $pending_revision_singular = pp_revisions_status_label('pending-revision', 'name');
-$pending_revision_plural = pp_revisions_status_label('pending-revision', 'plural');
+$pending_revision_plural = rvy_get_option('revision_statuses_noun_labels') ? pp_revisions_status_label('pending-revision', 'plural') : __('Revision Submission', 'revisionary');
 $pending_revision_basic = pp_revisions_status_label('pending-revision', 'basic');
 $future_revision_singular = pp_revisions_status_label('future-revision', 'name');
 
 $this->option_captions = apply_filters('revisionary_option_captions',
 	[
 	'revision_statuses_noun_labels' =>			__('Use alternate labeling: "Working Copy" > "Change Request" > "Scheduled Change"', 'revisionary'),
-	'copy_posts_capability' =>					sprintf(__("%s require role capability", 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
-	'caption_copy_as_edit' =>					__("Posts / Pages admin listing: limited users get 'Edit' caption"),
+	'copy_posts_capability' =>					rvy_get_option('revision_statuses_noun_labels') ? __("Additional role capability required to create a Working Copy", 'revisionary') : __("Additional role capability required to create a new revision", 'revisionary'),
+	'caption_copy_as_edit' =>					sprintf(__('Posts / Pages list: Use "Edit" caption for %s link'), pp_revisions_status_label('draft-revision', 'submit_short')),
 	'pending_revisions' => 						sprintf(__('Enable %s', 'revisionary'), $pending_revision_plural),
 	'scheduled_revisions' => 					sprintf(__('Enable %s', 'revisionary'), pp_revisions_status_label('future-revision', 'plural')),
-	'revise_posts_capability' =>				sprintf(__("%s require role capability", 'revisionary'), $pending_revision_plural),
+	'revise_posts_capability' =>				rvy_get_option('revision_statuses_noun_labels') ? __("Additional role capability required to submit a Change Request", 'revisionary') : __("Additional role capability required to submit a revision", 'revisionary'),
 	'revisor_lock_others_revisions' =>			__("Editing others&apos; revisions requires role capability", 'revisionary'),
 	'revisor_hide_others_revisions' => 			__("Listing others&apos; revisions requires role capability", 'revisionary'),
 	'admin_revisions_to_own_posts' =>			__("Users can always administer revisions to their own editable posts", 'revisionary'),
@@ -401,7 +401,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		</div><br />
 	<?php endif;
 
-	$hint = sprintf(__('If the user does not have a regular Edit link, use the "Edit" caption for New %s operation', 'revisionary'), pp_revisions_status_label('draft-revision', 'name'));
+	$hint = sprintf(__('If the user does not have a regular Edit link, recaption the %s link as "Edit"', 'revisionary'), pp_revisions_status_label('draft-revision', 'submit_short'));
 	$this->option_checkbox( 'caption_copy_as_edit', $tab, $section, $hint, '' );
 
 	//do_action('revisionary_option_ui_working_copies', $this);
