@@ -111,6 +111,14 @@ class PostEditorWorkflowUI {
             $vars['futureDeletionURL'] = '';
         }
 
+        if (\PublishPress\Revisions\Utils::isBlockEditorActive()) {
+            $vars['updateCaption'] =  __('Update Revision', 'revisionary');
+        } else {
+            if (!$vars['updateCaption'] = pp_revisions_status_label($post->post_mime_type, 'update')) {
+                $vars['updateCaption'] = pp_revisions_label('update_revision');
+            }
+        }
+
         return $vars;
     }
 
