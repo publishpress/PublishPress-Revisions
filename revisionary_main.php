@@ -203,7 +203,7 @@ class Revisionary
 	function adminToolbarItem($admin_bar) {
 		global $post;
 
-		if (!empty($post) && !rvy_in_revision_workflow($post) && ('revision' != $post->post_type) && rvy_is_supported_post_type($post->post_type)) {
+		if (!empty($post) && get_option('pending_revisions') && !rvy_in_revision_workflow($post) && ('revision' != $post->post_type) && rvy_is_supported_post_type($post->post_type)) {
 			$status_obj = get_post_status_object($post->post_status);
 
 			if (!empty($status_obj->public) || !empty($status_obj->private) || rvy_get_option('pending_revision_unpublished')) {
@@ -574,6 +574,10 @@ class Revisionary
 		global $current_user;
 		
 		if ('copy_post' == $cap) {
+			if (!rvy_get_option('pending_revisions')) {
+				return array_diff_key($caps, [$cap => true]);
+			}
+
 			if (!empty($args[0])) {
 				$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
 			} else {
@@ -610,6 +614,10 @@ class Revisionary
 			}
 		
 		} elseif ('set_revision_pending-revision' == $cap) {
+			if (!rvy_get_option('pending_revisions')) {
+				return array_diff_key($caps, [$cap => true]);
+			}
+			
 			if (!empty($args[0])) {
 				$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
 			} else {
