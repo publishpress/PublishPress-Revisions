@@ -9,6 +9,10 @@ jQuery(document).ready( function($) {
 	var RvySubmissionUI = function() {
 		var refSelector = '#rvy_compare_button';
 
+        if (!$(refSelector).length) {
+            var refSelector = 'div.misc-pub-section-last';
+        }
+
 		if (rvyObjEdit.ajaxurl && !$('div.rvy-creation-ui').length && $(refSelector).length) {
             $('#post-status-display').html(rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']);
 			
@@ -35,13 +39,16 @@ jQuery(document).ready( function($) {
                     
 					+ '</div> <br /><br />'
 				);
-			}
-
+            }
+            
 			$('.edit-post-post-schedule__toggle').after('<button class="components-button is-tertiary post-schedule-footnote" disabled>' + rvyObjEdit.onApprovalCaption + '</button>');
 
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'DeletionURL']) {
 				$('a.submitdelete').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'DeletionURL']);
-			}
+            }
+            
+            $('#publish').hide();
+            $('#save-post').val(rvyObjEdit.updateCaption);
 		}
 	}
 	var RvyUIInterval = setInterval(RvySubmissionUI, 100);
