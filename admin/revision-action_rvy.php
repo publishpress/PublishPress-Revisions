@@ -943,7 +943,7 @@ function rvy_revision_bulk_delete() {
 	
 			// before deleting the revision, note its status for redirect
 			$revision_status = $revision->post_mime_type;
-			wp_delete_post( $revision_id );
+			wp_delete_post($revision_id, true);
 			$delete_count++;
 
 			rvy_delete_past_revisions($revision_id);
