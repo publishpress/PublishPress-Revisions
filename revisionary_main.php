@@ -609,7 +609,9 @@ class Revisionary
 			}
 
 			// allow PublishPress Permissions to apply 'copy' exceptions
-			if ($can_copy = apply_filters('revisionary_can_copy', $can_copy, $post_id, 'draft', 'draft-revision', $filter_args)) {
+			if ($can_copy = apply_filters('revisionary_can_copy', $can_copy, $post_id, 'draft', 'draft-revision', $filter_args)
+			|| apply_filters('revisionary_can_submit', $can_copy, $post_id, 'pending', 'pending-revision', $filter_args)
+			) {
 				$caps = ['read'];
 			}
 		
