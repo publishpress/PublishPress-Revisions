@@ -272,7 +272,7 @@ class Revisionary
 			array_fill_keys(
 				get_post_types(['public' => true]), true
 			),
-			['product' => true, 'order' => true, 'swfd-courses' => true]
+			['product' => true, 'order' => true, 'swfd-courses' => true, 'tribe_events' => true]
 		);
 
 		if (!defined('REVISIONARY_NO_PRIVATE_TYPES')) {
