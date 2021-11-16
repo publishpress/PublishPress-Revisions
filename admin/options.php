@@ -203,7 +203,7 @@ do_action('revisionary_settings_ui', $this, $sitewide, $customize_defaults);
 <header>
 <!-- <div class='wrap'> -->
 <?php
-echo '<form action="" method="post">';
+echo '<form action="" method="post" autocomplete="off">';
 wp_nonce_field( 'rvy-update-options' );
 
 if ( $sitewide )
