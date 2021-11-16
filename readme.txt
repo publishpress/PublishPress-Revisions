@@ -118,6 +118,18 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Changelog ==
 
+= 3.0.2 - 15 Nov 2021 =
+* Compat : PublishPress Permissions - Revisions Submission permissions did not correctly adjust Edit Posts / Pages listing in some configurations (also requires Permissions 3.6.3)
+* Compat : The Events Calendar - Revisions could not be submitted in Classic Editor
+* Fixed : Classic Editor - Schedule button was incorrectly displayed (leading to failed scheduling attempt) if a single time element is changed followed by OK button
+* Fixed : Scheduled Revisions could not be updated in Gutenberg editor
+* Fixed : Admin Bar button "New Revision" was displayed even if Submitted Revisions are disabled
+* Fixed : Revision Queue: bulk deletion did not reduce revision counts
+* Fixed : Duplicate page selection dropdown in Quick Edit and other instances of wp_dropdown_pages()
+* Fixed : Invalid page hierarchy and broken Pages admin if a past revision that was originally submitted through the Revisions plugin is restored 
+* Fixed : Revision Preview was missing "Approve" button caption if revision is of an unpublished post
+* Change : Revisions Settings - clarify some captions
+
 = 3.0.1 - 10 Nov 2021 =
 * Fixed : Revisions created using Revisions 2.x were not listed in Revision Queue until plugin de/re-activation
 * Fixed : Front Page setting was cleared at revision submission on some sites
