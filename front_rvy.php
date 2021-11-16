@@ -320,6 +320,8 @@ class RevisionaryFront {
 					$class = 'draft';
 					$status_obj = get_post_status_object(get_post_field('post_status', rvy_post_id($revision_id)));
 
+					$approve_caption = __( 'Approve', 'revisionary' );
+
 					if (!empty($submit_url) && current_user_can("set_revision_pending-revision", $revision_id)) {
 						$submit_caption = __( 'Submit', 'revisionary' );
 						$publish_button = '<span><a href="' . $submit_url . '" class="rvy_preview_linkspan rvy-submit-revision">' . $submit_caption . '</a></span>';
