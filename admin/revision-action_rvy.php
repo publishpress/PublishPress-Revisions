@@ -675,6 +675,11 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		$update_fields['post_date_gmt'] = $update['post_date_gmt'];
 	}
 
+	// Safeguard: prevent invalid hierarchy and broken Pages admin
+	if (!empty($update_fields['post_parent']) && ($post_id == $update_fields['post_parent'])) {
+		$update_fields['post_parent'] = 0;
+	}
+
 	$wpdb->update($wpdb->posts, $update_fields, ['ID' => $post_id]);
 
 	// also copy all stored postmeta from revision
