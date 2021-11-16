@@ -147,7 +147,7 @@ class Revisionary
 		// don't recursively execute this filter
 		remove_filter('wp_dropdown_pages', [$this, 'fltDropdownPages'], 10, 3);
 
-		$parse_args['echo'] = 0;
+		$parsed_args['echo'] = 0;
 
 		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
 		$parsed_args['exclude'] = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ($revision_status_csv)");
