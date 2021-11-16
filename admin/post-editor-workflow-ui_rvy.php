@@ -164,7 +164,7 @@ class PostEditorWorkflowUI {
         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
         $published_post_id = rvy_post_id($post->ID);
 
-        if (current_user_can('copy_post', $post->ID)) {
+        if (rvy_get_option('pending_revisions') && current_user_can('copy_post', $post->ID)) {
             $vars = array_merge($vars, array(
                 'actionCaption' => pp_revisions_status_label('draft-revision', 'submit'),
                 'actionTitle' => esc_attr(sprintf(__('Create a %s of this post', 'revisionary'), strtolower(pp_revisions_status_label('draft-revision', 'basic')))),
@@ -182,7 +182,7 @@ class PostEditorWorkflowUI {
             $vars['actionCaption'] = '';
         }
 
-        if (current_user_can($type_obj->cap->publish_posts)) {
+        if (rvy_get_option('scheduled_revisions') && current_user_can($type_obj->cap->publish_posts)) {
             $published_statuses = array_merge(get_post_stati(['public' => true]), get_post_stati(['private' => true]));
 
             $vars = array_merge($vars, array(
