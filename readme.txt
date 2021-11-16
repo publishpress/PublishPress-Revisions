@@ -57,9 +57,9 @@ PublishPress Revisions will notify Administrators and Editors when a new revisio
 
 Page builder / front end editing integrations:
 
-* BeaverBuilder integration
+* BeaverBuilder integration 
 * Divi Theme, Divi Builder integration
-* Elementor integration
+* Elementor integration 
 
 Major plugins we maintain compatibility with:
 
@@ -113,7 +113,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 1. Schedule Revisions: PublishPress Revisions allows you to schedule WordPress revisions to be published in the future. 
 2. Control Revision Permissions: PublishPress Revisions allows you to control which users are able to submit revisions to published posts. 
 3. Submit Revisions: PublishPress Revisions enables you to submit change requests for published posts. 
-4. Preview and Compare Revisions: Every requested change can be reviewed in the normal “Compare Revisions” interface in WordPress.
+4. Preview and Compare Revisions: Every requested change can be reviewed in the normal �Compare Revisions� interface in WordPress.
 5. Manage and Moderate Revisions: PublishPress Revisions has a Revision Queue screen where you can search, approve, or deny changes to a published post's content.
 6. Email Notifications for Revisions: Administrators and Editors are notified by email when a new revision is submitted. PublishPress Revisions can also send emails for revision approval and publication.
 7. Support for Plugins: Revisions Pro adds support for the plugins such as Yoast SEO, WooCommrce and Advanced Custom Fields.
@@ -131,7 +131,7 @@ PublishPress Revisions can duplicate pages and any other post types. For example
 
 WooCommerce is the most popular way to build a WordPress eCommerce site. With PublishPress Revisions Pro you can submit, moderate, approve and schedule revisions to your WooCommerce products.
 
-When you are on the “Products” screen, click the “New Revision” link. Inside the product revision, the PublishPress buttons will appear in the top-right corner. When you save the product, it will appear on the main “Revision Queue” screen. 
+When you are on the �Products� screen, click the �New Revision� link. Inside the product revision, the PublishPress buttons will appear in the top-right corner. When you save the product, it will appear on the main �Revision Queue� screen. 
 
 It is possible to schedule updates to WooCommerce products.
 
@@ -150,10 +150,10 @@ PublishPress Revisions Pro has support for the Elementor plugin.
 Here's how to use PublishPress Revisions and Elementor together:
 
 - Find and a published post or page that was created with Elementor.
-- You will see a “New revision” link.
-- On the next screen, you can click “Edit with Elementor” to make changes.
-- You can use “Submit Revision” in the right sidebar to submit your changes. 
-- In the WordPress admin area, you can go to visit the “Revision Queue” screen and you will see the submitted revision of your Elementor page. It will be waiting for your approval.
+- You will see a �New revision� link.
+- On the next screen, you can click �Edit with Elementor� to make changes.
+- You can use �Submit Revision� in the right sidebar to submit your changes. 
+- In the WordPress admin area, you can go to visit the �Revision Queue� screen and you will see the submitted revision of your Elementor page. It will be waiting for your approval.
 
 It is possible to schedule content updates to Elementor posts.
 
@@ -168,10 +168,10 @@ It is possible to schedule content updates to Elementor posts.
 The Events Calendar plugin is one the most popular ways to create and list events in WordPress. PublishPress Revisions Pro and The Events Calendar work together successfully.
 
 - Make sure you are using the Gutenberg option for creating events.
-- After installing PublishPress Revisions Pro, you will be able to submit revisions to events using the “New Revision” option on the main “Events” screen.
+- After installing PublishPress Revisions Pro, you will be able to submit revisions to events using the �New Revision� option on the main �Events� screen.
 - You will see the normal Event screen, but with additional PublishPress Revisions button in the top-right corner.
-- Your event revisions will appear in the “Revision Queue”.
-- You will not be able to use the “Compare” link because The Events Calendar does not support that WordPress feature yet. However, all the other key features of PublishPress Revisions Pro will work. For example, PublishPress Revisions Pro will record changes to all your event fields and settings.
+- Your event revisions will appear in the �Revision Queue�.
+- You will not be able to use the �Compare� link because The Events Calendar does not support that WordPress feature yet. However, all the other key features of PublishPress Revisions Pro will work. For example, PublishPress Revisions Pro will record changes to all your event fields and settings.
 
 [Click here for more on duplicate The Events Calendar events (https://publishpress.com/knowledge-base/revisions-events-calendar/).
 
@@ -179,10 +179,10 @@ The Events Calendar plugin is one the most popular ways to create and list event
 
 PublishPress Revisions Pro has support for the Advanced Custom Fields (ACF) plugin. You can schedule, moderate and approve revisions for content that uses ACF.
 
-- To create a revision for post that use ACF, click on the “New Revision” link.
-- Go to the “Revision Queue”.
-- Click “Edit” and you can update the revision, including the ACF fields.
-- Click “Compare” and you can see what's changed in this revision. The “Compare” screen will show you any changes that have happened with ACF Fields.
+- To create a revision for post that use ACF, click on the �New Revision� link.
+- Go to the �Revision Queue�.
+- Click �Edit� and you can update the revision, including the ACF fields.
+- Click �Compare� and you can see what's changed in this revision. The �Compare� screen will show you any changes that have happened with ACF Fields.
 
 [Click here for more on duplicate posts with Advanced Custom Fields (https://publishpress.com/knowledge-base/revisionary-acf/).
 
@@ -190,8 +190,8 @@ PublishPress Revisions Pro has support for the Advanced Custom Fields (ACF) plug
 
 PublishPress Revisions Pro has support for the WPML plugin. For example, you can create revisions for a post in English and create separate revisions for the Spanish translation of that post.
 
-- Go to your “Posts” screen.
-- Click “New Revisions” and you can create a translated version of your content in any language. 
+- Go to your �Posts� screen.
+- Click �New Revisions� and you can create a translated version of your content in any language. 
 
 [Click here for more on duplicate posts with WPML (https://publishpress.com/knowledge-base/revisionary-wpml/).
     
@@ -207,16 +207,16 @@ In the image below, you can Yoast SEO data. With PublishPress Revisions Pro you 
 
 PublishPress Revisions Pro has support for the Beaver Builder plugin. Here's how to use PublishPress Revisions Pro and Beaver Builder together:
 
-- In your WordPress admin area, click “New Revision” for a post or page that uses Beaver Builder.
-- On the next screen, you will be able to click “Launch Beaver Builder” and create a new version of this post.
-- Click “Submit Revision” to submit your updates.
-- In the WordPress admin area, you can visit the “Revision Queue” screen and you will see the submitted revision of your Beaver Builder page. It will be waiting for your approval.
+- In your WordPress admin area, click �New Revision� for a post or page that uses Beaver Builder.
+- On the next screen, you will be able to click �Launch Beaver Builder� and create a new version of this post.
+- Click �Submit Revision� to submit your updates.
+- In the WordPress admin area, you can visit the �Revision Queue� screen and you will see the submitted revision of your Beaver Builder page. It will be waiting for your approval.
 
 It is also possible to schedule revisions to Beaver Builder content.
 
-- When you're editing a revision, click “Immediately”.
+- When you're editing a revision, click �Immediately�.
 - Choose the date you want your post changes to go live.
-- Click the “Submit Revision” button.
+- Click the �Submit Revision� button.
 
 [Click here for more on duplicate posts with Beaver Builder (https://publishpress.com/knowledge-base/revisionary-beaver-builder/).
 
@@ -224,7 +224,7 @@ It is also possible to schedule revisions to Beaver Builder content.
 
 Divi is one of the most popular page-builders in WordPress, and it does integrate with PublishPress Revisions Pro. It is possible for lower-level users to edit a page with Divi and submit an update for approval. This workflow will apply to anyone with the correct permissions to submit revisions.
 
-- In your WordPress admin area, click “New Revision” for a post or page that uses Divi.
+- In your WordPress admin area, click �New Revision� for a post or page that uses Divi.
 - You will see the normal editing layout in Divi, with the PublishPress Revisions buttons in the top toolbar and right sidebar. Click "Edit With The Divi Builder" to make content changes.
 
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
