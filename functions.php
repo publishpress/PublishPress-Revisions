@@ -252,8 +252,15 @@ function pp_revisions_plugin_updated($current_version) {
 		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft' WHERE post_status IN ('draft-revision')");
 		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending' WHERE post_status IN ('pending-revision')");
 		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'future' WHERE post_status IN ('future-revision')");
+    } 
 
-    } elseif (version_compare($last_ver, '3.0-rc7', '<')) {
+    if (version_compare($last_ver, '3.0.2', '<')) {
+        // delete revisions that were erroneously trashed instead of deleted
+		global $wpdb;
+        $wpdb->query("DELETE FROM $wpdb->posts WHERE post_mime_type IN ('draft-revision', 'pending-revision', 'future-revision') AND post_status = 'trash'");
+    }
+
+    if (version_compare($last_ver, '3.0-rc7', '<')) {
         if ($role = @get_role('administrator')) {
             $role->add_cap('manage_unsubmitted_revisions');
         }

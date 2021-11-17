@@ -24,6 +24,10 @@ jQuery(document).ready( function($) {
 
 	// Update main publish ("Publish" / "Submit Pending") button width and span caption
 	function RvySetPublishButtonCaption(caption,waitForSaveDraftButton,forceRegen,timeout) {
+		if ('future' == rvyObjEdit.currentStatus) {
+			caption = rvyObjEdit.updateCaption;
+		}
+		
 		if ( caption == '' && ( typeof rvyObjEdit['publishCaptionCurrent'] != 'undefined' )  ) {
 			caption = rvyObjEdit.publishCaptionCurrent;
 		} else {
@@ -118,8 +122,13 @@ jQuery(document).ready( function($) {
 			$('#icl_div').closest('div.edit-post-meta-boxes-area').hide();
 		}
 
+		if ('future' == rvyObjEdit.currentStatus) {
+			$('button.editor-post-publish-button').show();
+		
+		} else {
 		if ( $('button.editor-post-publish-button').length ) {
 			$('button.editor-post-publish-button').hide();
+			}
 		}
 	}
 	var RvyHideInterval = setInterval(RvyHideElements, 50);
@@ -287,32 +296,32 @@ jQuery(document).ready( function($) {
 	});
 
 	function rvySubmitCopy() {
-			var revisionaryCreateDone = function () {
-				$('.revision-approve').hide();
+		var revisionaryCreateDone = function () {
+			$('.revision-approve').hide();
 			$('div.revision-submitting').hide();
-				$('.revision-created').show();
+			$('.revision-created').show();
 
-				// @todo: abstract this for other workflows
-				rvyObjEdit.currentStatus = 'pending';
+			// @todo: abstract this for other workflows
+			rvyObjEdit.currentStatus = 'pending';
 
-				$('.rvy-current-status').html(rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']);
-				$('a.revision-edit').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL']).show();
-			}
-
-			var revisionaryCreateError = function (data, txtStatus) {
-				$('div.rvy-creation-ui').html(rvyObjEdit[rvyObjEdit.currentStatus + 'ErrorCaption']);
-			}
-
-			var data = {'rvy_ajax_field': rvyObjEdit[rvyObjEdit.currentStatus + 'AjaxField'], 'rvy_ajax_value': wp.data.select('core/editor').getCurrentPostId(), 'nc': RvyGetRandomInt(99999999)};
-
-			$.ajax({
-				url: rvyObjEdit.ajaxurl,
-				data: data,
-				dataType: "html",
-				success: revisionaryCreateDone,
-				error: revisionaryCreateError
-			});
+			$('.rvy-current-status').html(rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']);
+			$('a.revision-edit').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL']).show();
 		}
+
+		var revisionaryCreateError = function (data, txtStatus) {
+			$('div.rvy-creation-ui').html(rvyObjEdit[rvyObjEdit.currentStatus + 'ErrorCaption']);
+		}
+
+		var data = {'rvy_ajax_field': rvyObjEdit[rvyObjEdit.currentStatus + 'AjaxField'], 'rvy_ajax_value': wp.data.select('core/editor').getCurrentPostId(), 'nc': RvyGetRandomInt(99999999)};
+
+		$.ajax({
+			url: rvyObjEdit.ajaxurl,
+			data: data,
+			dataType: "html",
+			success: revisionaryCreateDone,
+			error: revisionaryCreateError
+		});
+	}
 
 	var RvyRecaptionSaveDraft = function() {
 		if ($('button.editor-post-save-draft:not(.rvy-recaption)').length) {
@@ -338,13 +347,13 @@ jQuery(document).ready( function($) {
 				if (rvyObjEdit.viewCaption) {
 					RvyRecaptionElement('.block-editor-post-preview__button-toggle', rvyObjEdit.viewCaption);
 					$('button.block-editor-post-preview__button-toggle:not(.ppr-purple-button)').removeClass('is-tertiary').addClass('is-secondary').addClass('ppr-purple-button');
-				}
+				}			
 			}
 
 			if (rvyObjEdit.viewTitle) {
 				$('div.edit-post-header__settings a.rvy-post-preview').attr('title', rvyObjEdit.viewTitle);
 			}
-
+			
 		} else {
 			if (!rvyObjEdit.multiPreviewActive) { // WP < 5.5
 				if (!$('a.editor-post-preview').next('a.rvy-post-preview').length) {
@@ -354,7 +363,7 @@ jQuery(document).ready( function($) {
 					if (rvyObjEdit.viewCaption) {
 						RvyRecaptionElement('div.edit-post-header__settings a.rvy-post-preview', rvyObjEdit.viewCaption);
 					}
-
+		
 					if (rvyObjEdit.viewTitle) {
 						$('div.edit-post-header__settings a.rvy-post-preview').attr('title', rvyObjEdit.viewTitle);
 					}

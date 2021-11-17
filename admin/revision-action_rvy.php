@@ -675,6 +675,11 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		$update_fields['post_date_gmt'] = $update['post_date_gmt'];
 	}
 
+	// Safeguard: prevent invalid hierarchy and broken Pages admin
+	if (!empty($update_fields['post_parent']) && ($post_id == $update_fields['post_parent'])) {
+		$update_fields['post_parent'] = 0;
+	}
+
 	$wpdb->update($wpdb->posts, $update_fields, ['ID' => $post_id]);
 
 	// also copy all stored postmeta from revision
@@ -938,7 +943,7 @@ function rvy_revision_bulk_delete() {
 	
 			// before deleting the revision, note its status for redirect
 			$revision_status = $revision->post_mime_type;
-			wp_delete_post( $revision_id );
+			wp_delete_post($revision_id, true);
 			$delete_count++;
 
 			rvy_delete_past_revisions($revision_id);

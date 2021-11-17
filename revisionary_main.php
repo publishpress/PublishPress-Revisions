@@ -147,7 +147,7 @@ class Revisionary
 		// don't recursively execute this filter
 		remove_filter('wp_dropdown_pages', [$this, 'fltDropdownPages'], 10, 3);
 
-		$parse_args['echo'] = 0;
+		$parsed_args['echo'] = 0;
 
 		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
 		$parsed_args['exclude'] = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ($revision_status_csv)");
@@ -203,7 +203,7 @@ class Revisionary
 	function adminToolbarItem($admin_bar) {
 		global $post;
 
-		if (!empty($post) && !rvy_in_revision_workflow($post) && ('revision' != $post->post_type) && rvy_is_supported_post_type($post->post_type)) {
+		if (!empty($post) && get_option('pending_revisions') && !rvy_in_revision_workflow($post) && ('revision' != $post->post_type) && rvy_is_supported_post_type($post->post_type)) {
 			$status_obj = get_post_status_object($post->post_status);
 
 			if (!empty($status_obj->public) || !empty($status_obj->private) || rvy_get_option('pending_revision_unpublished')) {
@@ -272,7 +272,7 @@ class Revisionary
 			array_fill_keys(
 				get_post_types(['public' => true]), true
 			),
-			['product' => true, 'order' => true, 'swfd-courses' => true]
+			['product' => true, 'order' => true, 'swfd-courses' => true, 'tribe_events' => true]
 		);
 
 		if (!defined('REVISIONARY_NO_PRIVATE_TYPES')) {
@@ -574,6 +574,10 @@ class Revisionary
 		global $current_user;
 		
 		if ('copy_post' == $cap) {
+			if (!rvy_get_option('pending_revisions')) {
+				return array_diff_key($caps, [$cap => true]);
+			}
+
 			if (!empty($args[0])) {
 				$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
 			} else {
@@ -605,11 +609,17 @@ class Revisionary
 			}
 
 			// allow PublishPress Permissions to apply 'copy' exceptions
-			if ($can_copy = apply_filters('revisionary_can_copy', $can_copy, $post_id, 'draft', 'draft-revision', $filter_args)) {
+			if ($can_copy = apply_filters('revisionary_can_copy', $can_copy, $post_id, 'draft', 'draft-revision', $filter_args)
+			|| apply_filters('revisionary_can_submit', $can_copy, $post_id, 'pending', 'pending-revision', $filter_args)
+			) {
 				$caps = ['read'];
 			}
 		
 		} elseif ('set_revision_pending-revision' == $cap) {
+			if (!rvy_get_option('pending_revisions')) {
+				return array_diff_key($caps, [$cap => true]);
+			}
+			
 			if (!empty($args[0])) {
 				$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
 			} else {
