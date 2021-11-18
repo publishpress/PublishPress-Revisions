@@ -741,16 +741,6 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$post_types = rvy_get_manageable_types();
 		$revision_statuses = rvy_revision_statuses();
 
-		$q = ['post_type' => $post_types, 'fields' => 'ids', 'post_parent' => $this->published_post_ids];
-		
-		if ( ! empty($_REQUEST['s']) ) {
-			$q['s'] = $_REQUEST['s'];
-		}
-
-		if ( ! empty($_REQUEST['m']) ) {
-			$q['m'] = (int) $_REQUEST['m'];
-		}
-		
 		$num_posts = $this->count_revisions($post_types, $revision_statuses);
 
 		$links = [];
