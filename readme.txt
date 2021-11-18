@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.8
-Stable tag: 3.0.2
+Stable tag: 3.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -237,6 +237,10 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 
 == Changelog ==
+
+= 3.0.3 - 18 Nov 2021 =
+* Fixed : Revisions Queue empty on sites with a large number of published posts
+* Compat : WooCommerce - Hide Product Variations, Linked Products tabs when editing a Product Revision
 
 = 3.0.2 - 15 Nov 2021 =
 * Compat : PublishPress Permissions - Revisions Submission permissions did not correctly adjust Edit Posts / Pages listing in some configurations (also requires Permissions 3.6.3)

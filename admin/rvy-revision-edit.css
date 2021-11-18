@@ -25,3 +25,9 @@ margin-right: 5px;
 #rvy_compare_button {
 margin: 0 10px 10px 10px;
 }
+
+#woocommerce-product-data ul.product_data_tabs li.variations_options,
+#woocommerce-product-data ul.product_data_tabs li.linked_product_options
+{
+display: none !important;
+}

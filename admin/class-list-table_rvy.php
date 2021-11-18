@@ -2,8 +2,8 @@
 require_once( ABSPATH . 'wp-admin/includes/class-wp-posts-list-table.php' );
 
 class Revisionary_List_Table extends WP_Posts_List_Table {
-	private $published_post_ids = [];
-	private $published_post_count_ids = [];
+	private $published_post_ids_query = '';
+	private $published_post_count_ids_query = '';
 	private $post_types = [];
 	private $posts_clauses_filtered; 
 
@@ -73,7 +73,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if (!empty($q['post_author'])) {
 			do_action('revisionary_queue_pre_query');
 			$_pre_query = new WP_Query( $qp );
-			$this->published_post_count_ids = $_pre_query->posts;
+			$this->published_post_count_ids_query = $_pre_query->request;
 			do_action('revisionary_queue_pre_query_done');
 
 			$qp['author'] = $q['post_author'];
@@ -89,11 +89,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		remove_filter($filter_name, [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
 		do_action('revisionary_queue_pre_query_done');
 
-		$this->published_post_ids = $pre_query->posts;
-
-		if (empty($this->published_post_count_ids)) {
-			$this->published_post_count_ids = $this->published_post_ids;
-		}
+		$this->published_post_ids_query = $pre_query->request;
 
 		// === now query the revisions ===
 		$qr = $q; 
@@ -275,9 +271,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$is_my_activity = empty($_REQUEST['all']) && empty($_REQUEST['author']) && empty($_REQUEST['post_author']) && empty($_REQUEST['post_status']);
 
 		if (!empty($args['status_count'])) {
-			$post_id_csv = "'" . implode("','", $this->published_post_count_ids) . "'";
+			$id_subquery = (!empty($this->published_post_count_ids_query)) ? $this->published_post_count_ids_query : $this->published_post_ids_query;
 		} else {
-			$post_id_csv = "'" . implode("','", $this->published_post_ids) . "'";
+			$id_subquery = $this->published_post_ids_query;
 		}
 
 		if ((empty($_REQUEST['post_author']) || !empty($args['status_count'])) && empty($_REQUEST['published_post']) && empty($args['my_published_count'])) {
@@ -306,7 +302,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$revision_status_clause = '';
 		}
 
-		$where_append = "($p.comment_count IN ($post_id_csv) {$revision_status_clause}$own_revision_clause)";
+		$where_append = "($p.comment_count IN ($id_subquery) {$revision_status_clause}$own_revision_clause)";
 
 		$status_csv = rvy_filtered_statuses(['return' => 'csv']);
 
@@ -745,16 +741,6 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$post_types = rvy_get_manageable_types();
 		$revision_statuses = rvy_revision_statuses();
 
-		$q = ['post_type' => $post_types, 'fields' => 'ids', 'post_parent' => $this->published_post_ids];
-		
-		if ( ! empty($_REQUEST['s']) ) {
-			$q['s'] = $_REQUEST['s'];
-		}
-
-		if ( ! empty($_REQUEST['m']) ) {
-			$q['m'] = (int) $_REQUEST['m'];
-		}
-		
 		$num_posts = $this->count_revisions($post_types, $revision_statuses);
 
 		$links = [];
@@ -970,14 +956,14 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$date_col = ( ! empty($_REQUEST['post_status']) && 'future-revision' == $_REQUEST['post_status'] ) ? 'post_date' : 'post_modified';
 
-		$ids = implode("','", array_map('intval', $this->published_post_ids));
+		$id_subquery = $this->published_post_ids_query;
 		
 		$type_csv = implode("','", array_map('sanitize_key', rvy_get_manageable_types()));
 
 		$months = $wpdb->get_results(
 			"SELECT DISTINCT YEAR( $date_col ) AS year, MONTH( $date_col ) AS month
 			FROM $wpdb->posts
-			WHERE post_type IN ('$type_csv') AND comment_count IN ('$ids')
+			WHERE post_type IN ('$type_csv') AND comment_count IN ($id_subquery)
 			$extra_checks
 			ORDER BY $date_col DESC" 
 		);
