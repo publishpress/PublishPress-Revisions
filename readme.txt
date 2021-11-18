@@ -232,6 +232,10 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.0.3 - 18 Nov 2021 =
+* Fixed : Revisions Queue empty on sites with a large number of published posts
+* Compat : WooCommerce - Hide Product Variations, Linked Products tabs when editing a Product Revision
+
 = 3.0.2 - 15 Nov 2021 =
 * Compat : PublishPress Permissions - Revisions Submission permissions did not correctly adjust Edit Posts / Pages listing in some configurations (also requires Permissions 3.6.3)
 * Compat : The Events Calendar - Revisions could not be submitted in Classic Editor
