@@ -280,7 +280,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
 
 			$own_revision_and = $this->append_revisions_where($where, $args);
-			$own_revision_clause = "OR ($p.post_status IN ('draft', 'pending') AND $p.post_mime_type IN ($revision_status_csv) AND $p.post_author = '$current_user->ID'{$own_revision_and})";
+			$own_revision_clause = " OR ($p.post_status IN ('draft', 'pending') AND $p.post_mime_type IN ($revision_status_csv) AND $p.post_author = '$current_user->ID'{$own_revision_and})";
 		} else {
 			$own_revision_clause = '';
 		}
