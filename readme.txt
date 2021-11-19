@@ -234,6 +234,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 = 3.0.4 - 19 Nov 2021 =
 * Fixed : New Revision button not displayed in Admin Bar
+* Fixed : Revision Queue: revisions not listed in My Activity view
 
 = 3.0.3 - 18 Nov 2021 =
 * Fixed : Revisions Queue empty on sites with a large number of published posts
