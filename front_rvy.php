@@ -248,10 +248,10 @@ class RevisionaryFront {
 					)
 				. sprintf(
 					str_replace(' ', '&nbsp;',
-					apply_filters(
-						'revisionary_preview_compare_view_caption', 
+						apply_filters(
+							'revisionary_preview_compare_view_caption', 
 							__("%sCompare%s%sView Published Post%s", 'revisionary'),
-						$post // revision
+							$post // revision
 						)
 					),
 					"<span><a href='$diff_url' class='rvy_preview_linkspan' target='_revision_diff'>",
