@@ -97,7 +97,6 @@ class Revisionary
 		
 		add_action( 'deleted_post', [$this, 'actDeletedPost']);
 
-
 		if ( rvy_get_option('scheduled_revisions') ) {
 			// users who have edit_published capability for post/page can create a scheduled revision by modifying post date to a future date (without setting "future" status explicitly)
 			add_filter( 'wp_insert_post_data', array($this, 'flt_insert_post_data'), 99, 2 );
@@ -596,7 +595,7 @@ class Revisionary
 				}
 
 				if (!empty($type_obj)) {
-					if (rvy_get_option("copy_posts_capability")) {					
+					if (rvy_get_option("copy_posts_capability")) {		
 						$base_prop = (rvy_is_post_author($post_id)) ? 'edit_posts' : 'edit_others_posts';
 						$copy_cap_name = str_replace('edit_', 'copy_', $type_obj->cap->$base_prop);
 						$can_copy = current_user_can($copy_cap_name);
@@ -837,11 +836,11 @@ class Revisionary
 				// Grant edit permission for revision if user can edit main post
 				if (!empty($args[0]) && ('edit_post' == $args[0]) && array_diff($reqd_caps, array_keys(array_filter($wp_blogcaps)))) {
 					$this->skip_filtering = true;
-	
+
 					if (rvy_get_option('admin_revisions_to_own_posts') && current_user_can('edit_post', rvy_post_id($post_id))) {
 						$wp_blogcaps = array_merge($wp_blogcaps, array_fill_keys($reqd_caps, true));
 					}
-	
+
 					$this->skip_filtering = false;
 				}
 			}
@@ -888,6 +887,7 @@ class Revisionary
 
 			if (!rvy_is_revision_status($postarr['post_mime_type']) || !in_array($postarr['post_status'], rvy_revision_base_statuses())) {
 				$revert_status = true;
+
 			} elseif ($revision) {
 				if (($data['post_mime_type'] != $revision->post_mime_type) || ($data['post_status'] != $revision->post_status)
 				&& (('future-revision' == $revision->post_mime_type) || ('future-revision' == $postarr['post_mime_type']))
