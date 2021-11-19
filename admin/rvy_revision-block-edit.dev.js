@@ -126,8 +126,8 @@ jQuery(document).ready( function($) {
 			$('button.editor-post-publish-button').show();
 		
 		} else {
-			if ( $('button.editor-post-publish-button').length ) {
-				$('button.editor-post-publish-button').hide();
+		if ( $('button.editor-post-publish-button').length ) {
+			$('button.editor-post-publish-button').hide();
 			}
 		}
 	}

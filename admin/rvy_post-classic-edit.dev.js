@@ -76,7 +76,7 @@ jQuery(document).ready( function($) {
 			rvyCopyPost();
         }
 	});
-
+        
 	function rvyCopyPost() {
         var revisionaryCreateDone = function () {
 			$('.revision-create').hide();
@@ -90,16 +90,16 @@ jQuery(document).ready( function($) {
 			$('div.rvy-creation-ui').html(rvyObjEdit.errorCaption);
 		}
 
-		var data = {'rvy_ajax_field': 'create_revision', 'rvy_ajax_value': rvyObjEdit.postID, 'rvy_date_selection': RvyTimeSelection, 'nc': RvyGetRandomInt(99999999)};
+                var data = {'rvy_ajax_field': 'create_revision', 'rvy_ajax_value': rvyObjEdit.postID, 'rvy_date_selection': RvyTimeSelection, 'nc': RvyGetRandomInt(99999999)};
 
-		$.ajax({
-			url: rvyObjEdit.ajaxurl,
-			data: data,
-			dataType: "html",
-			success: revisionaryCreateDone,
-			error: revisionaryCreateError
-		});
-	}
+                $.ajax({
+                    url: rvyObjEdit.ajaxurl,
+                    data: data,
+                    dataType: "html",
+                    success: revisionaryCreateDone,
+                    error: revisionaryCreateError
+                });
+            }
 
 	$(document).on('click', '#normal-sortables input, #normal-sortables select', function() {
 		$('a.revision-create').attr('disabled', 'disabled');
@@ -210,7 +210,7 @@ jQuery(document).ready( function($) {
 					RvyTimeSelection = '';
 				}
             }
-
+            
 			$('#publish').val(rvyObjEdit.update);
             $('#publish').show();
 		}

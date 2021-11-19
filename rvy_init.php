@@ -741,10 +741,10 @@ function rvy_update_option( $option_basename, $option_val, $sitewide = -1 ) {
 		$sitewide = isset( $rvy_options_sitewide ) && ! empty( $rvy_options_sitewide[$option_basename] );
 	}
 		
-	if ($sitewide) {
-		update_site_option("rvy_$option_basename", $option_val);
+	if ( $sitewide ) {
+		update_site_option( "rvy_$option_basename", $option_val );
 	} else { 
-		update_option("rvy_$option_basename", $option_val);
+		update_option( "rvy_$option_basename", $option_val );
 	}
 }
 
