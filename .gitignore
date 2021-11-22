@@ -19,3 +19,5 @@ wp-content/plugins/hello.php
 
 .idea/*.*
 .vscode/*.*
+
+vendor
