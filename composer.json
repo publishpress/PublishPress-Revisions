@@ -15,6 +15,7 @@
     "minimum-stability": "stable",
     "require": {
       "php": ">=5.6.20",
-      "publishpress/wordpress-version-notices": "dev-master"
+      "publishpress/wordpress-version-notices": "dev-master",
+        "publishpress/wordpress-banners": "^1.2"
     }
   }
