@@ -528,7 +528,7 @@ margin-right: 6px;
 margin-top: 2px;
 }
 
-.toplevel_page_revisionary-q .pressshack-admin-wrapper a {
+.toplevel_page_revisionary-q .pressshack-admin-wrapper a:not(.button) {
 color: #2271B1;
 }
 
