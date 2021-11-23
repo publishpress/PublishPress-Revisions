@@ -986,7 +986,7 @@ $js_call = "javascript:if (confirm('$msg')) {return true;} else {return false;}"
 		<?php
 		$banners = new PublishPress\WordPressBanners\BannersMain;
 		$banners->pp_display_banner(
-		    __( 'Recommendations for you', 'capsman-enhanced' ),
+		    __( 'Recommendations for you', 'revisionary' ),
 		    __( 'Control who can create Revisions', 'revisionary' ),
 		    array(
 		        __( 'Choose who can Publish, Read, Edit and Delete content.', 'revisionary' ),
