@@ -10,7 +10,7 @@
  * Domain Path: /languages/
  * Min WP Version: 4.9.7
  * Requires PHP: 5.6.20
- * 
+ *
  * Copyright (c) 2021 PublishPress
  *
  * GNU General Public License, Free Software Foundation <https://www.gnu.org/licenses/gpl-3.0.html>
@@ -64,7 +64,7 @@ if (!$pro_active && is_multisite()) {
 
 if ($pro_active) {
 	add_filter(
-        'plugin_row_meta', 
+        'plugin_row_meta',
         function($links, $file)
         {
             if ($file == plugin_basename(__FILE__)) {
@@ -89,7 +89,7 @@ if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1
 			} else {
 				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)', 'revisionary' ), RVY_VERSION );
 			}
-			
+
 			echo "<div id='message' class='notice error' style='color:black'>" . $message . '</div>';
 		}, 5);
 	}
@@ -99,7 +99,7 @@ if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1
 define('REVISIONARY_FILE', __FILE__);
 
 add_action(
-	'init', 
+	'init',
 	function() {
 		global $pp_revisions_version;
 		require_once(dirname(__FILE__).'/functions.php');
@@ -109,7 +109,7 @@ add_action(
 );
 
 // register these functions before any early exits so normal activation/deactivation can still run with RS_DEBUG
-register_activation_hook(__FILE__, function() 
+register_activation_hook(__FILE__, function()
 	{
 		global $pp_revisions_version;
 		require_once(dirname(__FILE__).'/functions.php');
@@ -129,7 +129,7 @@ register_activation_hook(__FILE__, function()
 
 		// convert pending / scheduled revisions to v3.0 format
 		global $wpdb;
-		
+
 		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
 		$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = post_status WHERE post_status IN ($revision_status_csv)");
 		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft' WHERE post_status IN ('draft-revision')");
@@ -148,7 +148,7 @@ register_deactivation_hook(__FILE__, function()
 		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
 		$wpdb->query("UPDATE $wpdb->posts SET post_status = post_mime_type WHERE post_mime_type IN ($revision_status_csv)");
 		$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = '' WHERE post_mime_type IN ($revision_status_csv)");
-		
+
 		if ($timestamp = wp_next_scheduled('rvy_mail_buffer_hook')) {
 		   wp_unschedule_event( $timestamp,'rvy_mail_buffer_hook');
 		}
@@ -157,7 +157,7 @@ register_deactivation_hook(__FILE__, function()
 
 // negative priority to precede any default WP action handlers
 add_action(
-	'plugins_loaded', 
+	'plugins_loaded',
 	function()
 	{
 		if ( defined('RVY_VERSION') ) {  // Revisionary 1.x defines RVY_VERSION on load, but does not define REVISIONARY_FILE
@@ -226,7 +226,7 @@ add_action(
 
 		if ( is_admin() || defined('XMLRPC_REQUEST') ) {
 			require_once( dirname(__FILE__).'/lib/agapetry_wp_admin_lib.php');
-				
+
 			// skip WP version check and init operations when a WP plugin auto-update is in progress
 			if ( false !== strpos($_SERVER['SCRIPT_NAME'], 'update.php') )
 				return;
@@ -248,6 +248,17 @@ add_action(
 		}
 
 		rvy_refresh_options_sitewide();
+
+		// Sidebar Banner for Settings page
+		if (!rvy_is_plugin_active('capsman-enhanced.php') && !rvy_is_plugin_active('capabilities-pro.php')) {
+			define('PUBLISHPRESS_REVISIONS_CAPABILITIES_INSTALLED', false);
+
+			if (!defined('PP_WP_BANNERS_VERSION')) {
+			    require_once __DIR__ . '/vendor/publishpress/wordpress-banners/BannersMain.php';
+			}
+		} else {
+			define('PUBLISHPRESS_REVISIONS_CAPABILITIES_INSTALLED', true);
+		}
 
 		// since sequence of set_current_user and init actions seems unreliable, make sure our current_user is loaded first
 		add_action('init', 'rvy_init', 1);

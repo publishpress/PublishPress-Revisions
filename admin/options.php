@@ -82,6 +82,8 @@ if ( ! current_user_can( 'manage_options' ) || ( $sitewide && ! is_super_admin()
 
 ?>
 <div class="wrap pressshack-admin-wrapper">
+<div class="pp-columns-wrapper<?php echo !PUBLISHPRESS_REVISIONS_CAPABILITIES_INSTALLED ? ' pp-enable-sidebar' : '' ?>">
+<div class="pp-column-left">
 <?php
 
 if ( $sitewide )
@@ -146,7 +148,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'preview_link_type' => 						__('Preview Link Type', 'revisionary'),
 	'compare_revisions_direct_approval' => 		__('Approve Button on Compare Revisions screen', 'revisionary'),
 	'copy_revision_comments_to_post' => 		__('Copy revision comments to published post', 'revisionary'),
-	'past_revisions_order_by' =>				__('Compare Past Revisions ordering:'), 
+	'past_revisions_order_by' =>				__('Compare Past Revisions ordering:'),
 	'list_unsubmitted_revisions' => 			sprintf(__('Include %s in My Activity, Revisions to My Posts views', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural'))
 	]
 );
@@ -977,6 +979,28 @@ $js_call = "javascript:if (confirm('$msg')) {return true;} else {return false;}"
 ?>
 </form>
 <p style='clear:both'></p>
+
+</div><!-- .pp-column-left -->
+<?php if( !PUBLISHPRESS_REVISIONS_CAPABILITIES_INSTALLED ) { ?>
+	<div class="pp-column-right">
+		<?php
+		$banners = new PublishPress\WordPressBanners\BannersMain;
+		$banners->pp_display_banner(
+		    __( 'Recommendations for you', 'capsman-enhanced' ),
+		    __( 'Control who can create Revisions', 'revisionary' ),
+		    array(
+		        __( 'Choose who can Publish, Read, Edit and Delete content.', 'revisionary' ),
+				__( 'Set permissions for posts, pages, custom content types, categories, tags, and more.', 'revisionary' ),
+				__( 'Create and copy user roles.', 'revisionary' )
+		    ),
+		    admin_url( 'plugin-install.php?s=publishpress-ppcore-install&tab=search&type=term' ),
+		    __( 'Click here to install PublishPress Capabilities for free', 'revisionary' ),
+		    'install-capabilities.jpg'
+		);
+		?>
+	</div><!-- .pp-column-right -->
+<?php } ?>
+</div><!-- .pp-columns-wrapper -->
 
 <?php
 do_action('revisionary_admin_footer');
