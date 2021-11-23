@@ -232,6 +232,10 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.0.5 - 23 Nov 2021 =
+* Fixed : Published custom post types not listed to Revisors under some configurations (Permissions integration requires Permissions 3.6.4)
+* Fixed : Multisite - network-wide settings screens were non-functional
+
 = 3.0.4 - 19 Nov 2021 =
 * Fixed : New Revision button not displayed in Admin Bar
 * Fixed : Revision Queue: revisions not listed in My Activity view
