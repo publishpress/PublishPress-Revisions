@@ -180,14 +180,13 @@ $_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated
 		$banners = new PublishPress\WordPressBanners\BannersMain;
 		$banners->pp_display_banner(
 		    __( 'Recommendations for you', 'revisionary' ),
-		    __( 'Control who can create Revisions', 'revisionary' ),
+		    __( 'Install PublishPress Capabilities', 'revisionary' ),
 		    array(
-		        __( 'Choose who can Publish, Read, Edit and Delete content.', 'revisionary' ),
-				__( 'Set permissions for posts, pages, custom content types, categories, tags, and more.', 'revisionary' ),
-				__( 'Create and copy user roles.', 'revisionary' )
+		        __( 'PublishPress Capabilities is a free plugin with full support for PublishPress Revisions.', 'revisionary' ),
+				__( 'Install this plugin to control which user roles can create revisions.', 'revisionary' )
 		    ),
 		    admin_url( 'plugin-install.php?s=publishpress-capman-install&tab=search&type=term' ),
-		    __( 'Click here to install PublishPress Capabilities for free', 'revisionary' ),
+		    __( 'Click here to install PublishPress Capabilities', 'revisionary' ),
 		    'install-capabilities.jpg'
 		);
 		?>
