@@ -10,8 +10,8 @@ if ( ! $post_types = rvy_get_manageable_types() ) {
 }
 
 if (!rvy_get_option('pending_revisions') && !rvy_get_option('scheduled_revisions')) {
-	wp_die( sprintf(__( 
-		'%s and %s are both disabled. See Revisions > Settings.', 'revisionary' ), 
+	wp_die( sprintf(__(
+		'%s and %s are both disabled. See Revisions > Settings.', 'revisionary' ),
 		pp_revisions_status_label('pending-revision', 'plural'),
 		pp_revisions_status_label('future-revision', 'plural')
 	));
@@ -68,6 +68,8 @@ $bulk_counts = array_filter( $bulk_counts );
 require_once( ABSPATH . 'wp-admin/admin-header.php' );
 ?>
 <div class="wrap pressshack-admin-wrapper revision-q">
+<div class="pp-columns-wrapper<?php echo !PUBLISHPRESS_REVISIONS_CAPABILITIES_INSTALLED ? ' pp-enable-sidebar' : '' ?>">
+<div class="pp-column-left">
 <header>
 <h1 class="wp-heading-inline"><?php
 
@@ -87,7 +89,7 @@ $filters = [];
 
 if (!empty($_REQUEST['author'])) {
 	if ($_user = new WP_User((int) $_REQUEST['author'])) {
-		$filters['author'] = (!empty($_REQUEST['post_status']) || !empty($_REQUEST['post_status'])) 
+		$filters['author'] = (!empty($_REQUEST['post_status']) || !empty($_REQUEST['post_status']))
 		? sprintf(_x('%s: ', 'Author Name', 'revisionary'), $_user->display_name)
 		: $_user->display_name;
 	}
@@ -100,15 +102,15 @@ if (!empty($_REQUEST['post_status'])) {
 }
 
 if (!empty($_REQUEST['post_type']) && empty($published_title)) {
-	$filters['post_type'] = (!empty($_REQUEST['post_status'])) 
-	? sprintf(_x('of %s', 'Posts / Pages / etc.', 'revisionary'), $type_obj->labels->name) 
+	$filters['post_type'] = (!empty($_REQUEST['post_status']))
+	? sprintf(_x('of %s', 'Posts / Pages / etc.', 'revisionary'), $type_obj->labels->name)
 	: $type_obj->labels->name;
 }
 
 if (!empty($_REQUEST['post_author']) && empty($published_title)) {
 	if ($_user = new WP_User((int) $_REQUEST['post_author'])) {
-		$filters['post_author'] = $filters 
-		? sprintf(__('%sPost Author: %s', 'revisionary'), ' - ', $_user->display_name) 
+		$filters['post_author'] = $filters
+		? sprintf(__('%sPost Author: %s', 'revisionary'), ' - ', $_user->display_name)
 		: sprintf(__('%sPost Author: %s', 'revisionary'), '', $_user->display_name);
 	}
 }
@@ -170,6 +172,28 @@ $_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated
 
 <div id="ajax-response"></div>
 <br class="clear" />
+
+</div><!-- .pp-column-left -->
+<?php if( !PUBLISHPRESS_REVISIONS_CAPABILITIES_INSTALLED ) { ?>
+	<div class="pp-column-right">
+		<?php
+		$banners = new PublishPress\WordPressBanners\BannersMain;
+		$banners->pp_display_banner(
+		    __( 'Recommendations for you', 'revisionary' ),
+		    __( 'Control who can create Revisions', 'revisionary' ),
+		    array(
+		        __( 'Choose who can Publish, Read, Edit and Delete content.', 'revisionary' ),
+				__( 'Set permissions for posts, pages, custom content types, categories, tags, and more.', 'revisionary' ),
+				__( 'Create and copy user roles.', 'revisionary' )
+		    ),
+		    admin_url( 'plugin-install.php?s=publishpress-ppcore-install&tab=search&type=term' ),
+		    __( 'Click here to install PublishPress Capabilities for free', 'revisionary' ),
+		    'install-capabilities.jpg'
+		);
+		?>
+	</div><!-- .pp-column-right -->
+<?php } ?>
+</div><!-- .pp-columns-wrapper -->
 
 <?php
 do_action('revisionary_admin_footer');
