@@ -186,7 +186,7 @@ $_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated
 				__( 'Set permissions for posts, pages, custom content types, categories, tags, and more.', 'revisionary' ),
 				__( 'Create and copy user roles.', 'revisionary' )
 		    ),
-		    admin_url( 'plugin-install.php?s=publishpress-ppcore-install&tab=search&type=term' ),
+		    admin_url( 'plugin-install.php?s=publishpress-capman-install&tab=search&type=term' ),
 		    __( 'Click here to install PublishPress Capabilities for free', 'revisionary' ),
 		    'install-capabilities.jpg'
 		);
