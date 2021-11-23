@@ -36,6 +36,7 @@
 
 // Temporary usage within this module only; avoids multiple instances of version string
 global $pp_revisions_version;
+
 $pp_revisions_version = '3.0.5';
 
 if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
