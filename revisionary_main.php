@@ -275,7 +275,10 @@ class Revisionary
 		);
 
 		if (!defined('REVISIONARY_NO_PRIVATE_TYPES')) {
-			$private_types = get_post_types(['public' => false], 'object');
+			$private_types = array_merge(
+				get_post_types(['public' => false], 'object'), 
+				get_post_types(['public' => null], 'object')
+			);
 			
 			// by default, enable non-public post types that have type-specific capabilities defined
 			foreach($private_types as $post_type => $type_obj) {

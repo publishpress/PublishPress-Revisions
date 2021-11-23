@@ -492,18 +492,81 @@ function rvy_add_revisor_custom_caps() {
 	if ( ! rvy_get_option( 'revisor_role_add_custom_rolecaps' ) )
 		return;
 
-	global $wp_roles;
+	global $wp_roles, $revisionary;
+
+	$custom_types = get_post_types(['public' => true, '_builtin' => false], 'object');
+
+	if (!defined('REVISIONARY_NO_PRIVATE_TYPES')) {
+		$private_types = array_merge(
+			get_post_types(['public' => false], 'object'), 
+			get_post_types(['public' => null], 'object')
+		);
+		
+		// by default, enable non-public post types that have type-specific capabilities defined
+		foreach($private_types as $post_type => $type_obj) {
+			if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages']))
+			|| defined('REVISIONARY_ENABLE_' . strtoupper($post_type) . '_TYPE')
+			) {
+				$custom_types[$post_type] = $type_obj;
+			}
+		}
+	}
 
 	if ( isset( $wp_roles->roles['revisor'] ) ) {
-		if ( $custom_types = get_post_types( array( 'public' => true, '_builtin' => false ), 'object' ) ) {
+		if ($custom_types) {
 			foreach( $custom_types as $post_type => $type_obj ) {
 				$cap = $type_obj->cap;	
 				$custom_caps = array_fill_keys( array( $cap->read_private_posts, $cap->edit_posts, $cap->edit_others_posts, "delete_{$post_type}s" ), true );
+
+				if (!empty($type_obj->cap->edit_published_posts)) {
+					$list_published_cap = str_replace('edit_', 'list_', $type_obj->cap->edit_published_posts);
+					$custom_caps[$list_published_cap] = true;
+				}
+
+				if (!empty($type_obj->cap->edit_private_posts)) {
+					$list_private_cap = str_replace('edit_', 'list_', $type_obj->cap->edit_private_posts);
+					$custom_caps[$list_private_cap] = true;
+				}
 
 				$wp_roles->roles['revisor']['capabilities'] = array_merge( $wp_roles->roles['revisor']['capabilities'], $custom_caps );
 				$wp_roles->role_objects['revisor']->capabilities = array_merge( $wp_roles->role_objects['revisor']->capabilities, $custom_caps );
 			}
 		}
+	}
+
+	if ( isset( $wp_roles->roles['contributor'] ) ) {
+		if ($custom_types) {
+			foreach( $custom_types as $post_type => $type_obj ) {
+				$cap = $type_obj->cap;	
+				$custom_caps = [];
+				
+				if (!empty($type_obj->cap->edit_published_posts)) {
+					$list_published_cap = str_replace('edit_', 'list_', $type_obj->cap->edit_published_posts);
+					$custom_caps[$list_published_cap] = true;
+				}
+
+				if (!empty($type_obj->cap->edit_private_posts)) {
+					$list_private_cap = str_replace('edit_', 'list_', $type_obj->cap->edit_private_posts);
+					$custom_caps[$list_private_cap] = true;
+				}
+
+				$wp_roles->roles['contributor']['capabilities'] = array_merge( $wp_roles->roles['contributor']['capabilities'], $custom_caps );
+				$wp_roles->role_objects['contributor']->capabilities = array_merge( $wp_roles->role_objects['contributor']->capabilities, $custom_caps );
+			}
+		}
+	}
+
+	global $current_user;
+
+	foreach(['contributor', 'revisor'] as $role_name) {
+		if (in_array($role_name, $current_user->roles)) {
+			$current_user->allcaps = array_merge($current_user->allcaps, $wp_roles->role_objects[$role_name]->capabilities);
+		}
+	}
+
+	if (function_exists('presspermit')) {
+		$user = presspermit()->getUser();
+		$user->allcaps = $current_user->allcaps;
 	}
 }
 
@@ -570,6 +633,10 @@ function rvy_add_revisor_role( $requested_blog_id = '' ) {
 		'edit_pages' => true,
 		'delete_pages' => true,
 		'edit_others_pages' => true,
+		'list_published_posts' => true,
+		'list_published_pages' => true,
+		'list_private_posts' => true,
+		'list_private_pages' => true,
 		'upload_files' => true,
 		'level_3' => true,
 		'level_2' => true,

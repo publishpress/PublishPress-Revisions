@@ -115,7 +115,7 @@ class RevisionCreation {
 		$url = apply_filters('revisionary_create_revision_redirect', rvy_admin_url("post.php?post=$revision_id&action=edit"), $revision_id);
 
 		if (!empty($args['suppress_redirect'])) {
-			return $post_id;
+			return $revision_id;
 		}
 
 		wp_redirect($url);

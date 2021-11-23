@@ -244,6 +244,17 @@ function rvy_admin_url($partial_admin_url) {
 function pp_revisions_plugin_updated($current_version) {
     $last_ver = get_option('revisionary_last_version');
 
+    if (version_compare($last_ver, '3.0.5-beta', '<')) {
+        if ($role = @get_role('revisor')) {
+            $role->add_cap('list_others_posts');
+            $role->add_cap('list_others_pages');
+            $role->add_cap('list_published_posts');
+            $role->add_cap('list_published_pages');
+            $role->add_cap('list_private_posts');
+            $role->add_cap('list_private_pages');
+        }
+    }
+
     if (version_compare($last_ver, '3.0.1', '<')) {
         // convert pending / scheduled revisions to v3.0 format
 		global $wpdb;
