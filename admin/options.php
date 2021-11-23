@@ -184,18 +184,24 @@ if ( RVY_NETWORK ) {
 
 	global $rvy_options_sitewide;
 
-	foreach ( $this->form_options as $tab_name => $sections )
+	foreach ( $this->form_options as $tab_name => $sections ) {
 		foreach ( $sections as $section_name => $option_names ) {
-			if ( $sitewide )
+			if ($sitewide) {
 				$this->form_options[$tab_name][$section_name] = array_intersect( $this->form_options[$tab_name][$section_name], array_keys($rvy_options_sitewide) );
-			else
+			} elseif ('license' != $section_name) {
 				$this->form_options[$tab_name][$section_name] = array_diff( $this->form_options[$tab_name][$section_name], array_keys($rvy_options_sitewide) );
 		}
+		}
+	}
 
 	foreach ( $this->form_options as $tab_name => $sections )
 		foreach ( array_keys($sections) as $section_name )
 			if ( empty( $this->form_options[$tab_name][$section_name] ) )
 				unset( $this->form_options[$tab_name][$section_name] );
+
+	if (!$sitewide) {
+		unset($this->form_options['features']['license']);
+	}
 }
 
 do_action('revisionary_settings_ui', $this, $sitewide, $customize_defaults);
@@ -309,10 +315,9 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 <ul id="publishpress-revisions-settings-tabs" class="nav-tab-wrapper">
 	<?php
 	// Set first tab and content as active
-	$activeTab 		= true;
-	$activeContent 	= true;
+	$setActiveTab = '';
 
-	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
+	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !empty($this->form_options['features']['license'])) {
 		?>
 		<li class="nav-tab nav-tab-license nav-tab-active">
 			<a href="#ppr-tab-license">
@@ -320,18 +325,22 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 			</a>
 		</li>
 		<?php
-		$activeTab = false;
+		$setActiveTab = 'license';
 	}
 
-	foreach($this->section_captions['features'] as $link => $label) {
+	foreach($this->section_captions['features'] as $section_name => $label) {
+		if (!empty($this->form_options[$tab][$section_name])) {
 		?>
-		<li class="nav-tab<?php echo $activeTab == true ? ' nav-tab-active' : '' ?>">
-			<a href="#ppr-tab-<?php echo $link ?>">
+		<li class="nav-tab<?php echo (empty($setActiveTab)) ? ' nav-tab-active' : '' ?>">
+			<a href="#ppr-tab-<?php echo $section_name ?>">
 				<?php echo $label ?>
 			</a>
 		</li>
 		<?php
-		$activeTab = false;
+			if (empty($setActiveTab)) {
+				$setActiveTab = $section_name;
+			}
+		}
 	}
 	?>
 </ul>
@@ -341,7 +350,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 <?php
 // possible TODO: replace redundant hardcoded IDs with $id
 
-	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
+	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !empty($this->form_options['features']['license'])) {
 		require_once(RVY_ABSPATH . '/includes-pro/SettingsLicense.php');
 		$license_ui = new RevisionaryLicenseSettings();
 		?>
@@ -349,13 +358,12 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 			<?php $license_ui->display($sitewide, $customize_defaults); ?>
 		</table>
 		<?php
-		$activeContent = false;
 	}
 
 	$section = 'role_definition';			// --- ROLE DEFINITION SECTION ---
 
 	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-		<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>"<?php echo $activeContent == false ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
+		<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
 
 		<?php
 		$hint = __('The user role "Revisor" role is now available. Include capabilities for all custom post types in this role?', 'revisionary');
@@ -375,7 +383,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 $section = 'revision_statuses';			// --- REVISION STATUSES SECTION ---
 
 if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-	<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>" style="display:none;"><tr valign="top"><td>
+	<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
 
 	<?php
 		$hint = __('Default labels are "Not Submitted for Approval", "Submitted for Approval", "Scheduled Revision"', 'revisionary');
@@ -389,7 +397,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 $section = 'working_copy';			// --- WORKING COPIES SECTION ---
 
 if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-	<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>" style="display:none;"><tr valign="top"><td>
+	<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
 
 	<?php
 	$hint = __('This restriction applies to users who are not full editors for the post type. To enable a role, add capabilities: copy_posts, copy_others_pages, etc.', 'revisionary');
@@ -418,7 +426,7 @@ $pending_revisions_available ) :
 	$section = 'pending_revisions';			// --- PENDING REVISIONS SECTION ---
 
 	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-		<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>" style="display:none;"><tr valign="top"><td>
+		<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
 
 		<?php
 		$hint = sprintf(
@@ -449,7 +457,7 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 	$section = 'scheduled_revisions';			// --- SCHEDULED REVISIONS SECTION ---
 
 	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-		<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>" style="display:none;"><tr valign="top"><td>
+		<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
 
 		<?php
 		$hint = __( 'If a currently published post or page is edited and a future date set, the change will not be applied until the selected date.', 'revisionary' );
@@ -474,7 +482,7 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 		$section = 'revision_queue';			// --- REVISION QUEUE SECTION ---
 
 		if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-			<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>" style="display:none;"><tr valign="top"><td>
+			<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
 
 			<?php
 			$hint = __('This restriction applies to users who are not full editors for the post type. To enable a role, give it the edit_others_revisions capability.', 'revisionary');
@@ -508,7 +516,7 @@ endif;
 $section = 'preview';			// --- PREVIEW SECTION ---
 
 if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-	<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>" style="display:none;"><tr valign="top"><td>
+	<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
 
 	<?php
 	$hint = __('For themes that block revision preview, hide preview links from non-Administrators', 'revisionary');
@@ -557,7 +565,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 	$section = 'revisions';			// --- REVISIONS SECTION ---
 
 	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-		<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>" style="display:none;"><tr valign="top"><td>
+		<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
 
 		<?php
 		if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) :
@@ -613,7 +621,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 	$section = 'notification';			// --- NOTIFICATION SECTION ---
 
 	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-		<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>" style="display:none;"><tr valign="top"><td>
+		<table class="form-table rs-form-table" id="ppr-tab-<?php echo $section ?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
 
 		<?php
 		if( $pending_revisions_available ) {
@@ -968,7 +976,7 @@ echo "<input type='hidden' name='rvy_submission_topic' value='options' />";
 ?>
 <p class="submit">
 <input type="submit" name="rvy_submit" class="button button-primary" value="<?php _e('Save Changes', 'revisionary');?>" />
-<input type="submit" name="rvy_defaults" class="button button-secondary" value="<?php _e('Revert to Defaults', 'revisionary') ?>" onclick="<?php echo $js_call;?>" style="float:right;" />
+<input type="submit" name="rvy_defaults" class="button button-secondary" value="<?php _e('Revert to Defaults', 'revisionary') ?>" onclick="<?php if (!empty($js_call)) echo $js_call;?>" style="float:right;" />
 </p>
 
 <?php
