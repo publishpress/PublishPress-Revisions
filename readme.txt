@@ -238,6 +238,10 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.0.6 - 29 Nov 2021 =
+* Fixed : Edit Revision - revisions could not be updated unless SCRIPT_DEBUG is enabled on the site
+* Fixed : Revisions could not be scheduled if Settings > Revisions > Revision Submission is disabled
+
 = 3.0.5 - 23 Nov 2021 =
 * Fixed : Published custom post types not listed to Revisors under some configurations (Permissions integration requires Permissions 3.6.4)
 * Fixed : Multisite - network-wide settings screens were non-functional
