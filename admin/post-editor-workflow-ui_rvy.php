@@ -195,6 +195,13 @@ class PostEditorWorkflowUI {
                 'scheduledURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
                 'update' => __('Update', 'revisionary'),
             ));
+
+            if (empty($var['actionCaption'])) {
+                $vars = array_merge($vars, array(
+                    'actionCaption' => '',
+                    'ajaxurl' => rvy_admin_url(''),
+                ));
+            }
         }
 
         return $vars;
