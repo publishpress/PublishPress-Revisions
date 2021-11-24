@@ -2,8 +2,8 @@ jQuery(document).ready(function($){if(rvyObjEdit.scheduledRevisionsURL||rvyObjEd
 if(rvyObjEdit.pendingRevisionsURL&&!$(ediv+'div.edit-post-last-revision__panel a.rvy-pending-revisions').length){var pclone=$('div.edit-post-last-revision__panel a:first').clone().addClass('rvy-pending-revisions').attr('href',rvyObjEdit.pendingRevisionsURL).html(rvyObjEdit.pendingRevisionsCaption);$(ediv+'div.edit-post-last-revision__panel a:last').after(pclone);}
 $('div.edit-post-last-revision__panel').css('height','inherit');}
 setInterval(RvyPendingRevPanel,200);}
-var rvyIsPublished=false;var RvySubmissionUI=function(){if(rvyObjEdit.ajaxurl&&!$('button.revision-approve').length){var html='<div class="rvy-creation-ui"><a href="javascript:void(0)" class="revision-approve" title="'
-+rvyObjEdit.actionTitle+'"><button type="button" class="components-button revision-approve revision-create is-primary ppr-purple-button">'
+var rvyIsPublished=false;var RvySubmissionUI=function(){if(rvyObjEdit.ajaxurl&&!$('button.revision-approve').length){var style=(rvyObjEdit.actionCaption=='')?' style="display:none"':'';var html='<div class="rvy-creation-ui"><a href="javascript:void(0)" class="revision-approve" title="'
++rvyObjEdit.actionTitle+'"'+style+'><button type="button" class="components-button revision-approve revision-create is-primary ppr-purple-button"'+style+'>'
 +rvyObjEdit.actionCaption+'</button></a>'
 +'<div class="revision-creating" style="display: none;">'
 +'<span class="revision-approve revision-creating">'

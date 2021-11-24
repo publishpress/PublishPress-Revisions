@@ -8,8 +8,9 @@
 jQuery(document).ready( function($) {
 	var RvySubmissionUI = function() {
 		if (rvyObjEdit.ajaxurl && !$('div.rvy-creation-ui').length) {
-            
-            var html = '<div class="rvy-creation-ui"><a href="javascript:void(0)" class="button revision-approve revision-create" style="margin-top: 15px; margin-bottom: 15px" title="' 
+			var hideStyle = (rvyObjEdit.actionCaption == '') ? ' style="display:none"' : '';
+
+            var html = '<div class="rvy-creation-ui"' + hideStyle + '><a href="javascript:void(0)" class="button revision-approve revision-create" style="margin-top: 15px; margin-bottom: 15px" title="' 
 			+ rvyObjEdit.actionTitle + '">' 
 			+ rvyObjEdit.actionCaption + '</a>'
 			
@@ -192,14 +193,19 @@ jQuery(document).ready( function($) {
 		if ((tdiff > 1000)) {
 			RvySelectedFutureDate = true;
 
+			$('.rvy-creation-ui').show();
 			$('.rvy-creation-ui .revision-create').hide();
 			$('.rvy-creation-ui .revision-created-wrapper').hide();
 			$('.rvy-creation-ui .revision-scheduled-wrapper').hide();
             $('.rvy-creation-ui .revision-schedule').show();
 
             $('#publish').hide();
-
 		} else {
+
+			if ('' == rvyObjEdit.actionCaption) {
+				$('.rvy-creation-ui').hide();
+			}
+
 			$('.rvy-creation-ui .revision-schedule').hide();
 			$('.rvy-creation-ui .revision-scheduled-wrapper').hide();
 			$('.rvy-creation-ui .revision-created-wrapper').hide();
