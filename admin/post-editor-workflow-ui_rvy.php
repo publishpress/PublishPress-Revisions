@@ -196,7 +196,7 @@ class PostEditorWorkflowUI {
                 'update' => __('Update', 'revisionary'),
             ));
 
-            if (empty($var['actionCaption'])) {
+            if (empty($vars['actionCaption'])) {
                 $vars = array_merge($vars, array(
                     'actionCaption' => '',
                     'ajaxurl' => rvy_admin_url(''),
