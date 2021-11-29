@@ -29,9 +29,10 @@ jQuery(document).ready( function($) {
 
 	var RvySubmissionUI = function() {
 		if (rvyObjEdit.ajaxurl && !$('button.revision-approve').length) {
+			var style = (rvyObjEdit.actionCaption == '') ? ' style="display:none"' : '';
 
 			var html = '<div class="rvy-creation-ui"><a href="javascript:void(0)" class="revision-approve" title="'
-			+ rvyObjEdit.actionTitle + '"><button type="button" class="components-button revision-approve revision-create is-primary ppr-purple-button">'
+			+ rvyObjEdit.actionTitle + '"' + style + '><button type="button" class="components-button revision-approve revision-create is-primary ppr-purple-button"' + style + '>'
 			+ rvyObjEdit.actionCaption + '</button></a>'
 
 			+ '<div class="revision-creating" style="display: none;">'

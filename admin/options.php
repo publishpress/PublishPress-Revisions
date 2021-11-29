@@ -190,7 +190,7 @@ if ( RVY_NETWORK ) {
 				$this->form_options[$tab_name][$section_name] = array_intersect( $this->form_options[$tab_name][$section_name], array_keys($rvy_options_sitewide) );
 			} elseif ('license' != $section_name) {
 				$this->form_options[$tab_name][$section_name] = array_diff( $this->form_options[$tab_name][$section_name], array_keys($rvy_options_sitewide) );
-		}
+			}
 		}
 	}
 
