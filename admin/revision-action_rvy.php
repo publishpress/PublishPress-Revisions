@@ -1077,8 +1077,9 @@ function rvy_publish_scheduled_revisions($args = array()) {
 
 	$revised_uris = array();
 
-	if ( ! empty( $_GET['rs_debug'] ) )
+	if (defined('WP_DEBUG') && WP_DEBUG && !empty($_GET['rs_debug'])) {
 		echo "current time: $time_gmt";
+	}
 
 	if (!empty($args['force_revision_id']) && is_scalar($args['force_revision_id'])) {
 		$results = $wpdb->get_results( 
@@ -1112,8 +1113,9 @@ function rvy_publish_scheduled_revisions($args = array()) {
 					continue;
 				}
 
-				if ( ! empty( $_GET['rs_debug'] ) )
+				if (defined('WP_DEBUG') && WP_DEBUG && ! empty( $_GET['rs_debug'] ) ) {
 					echo '<br />' . "publishing revision $row->ID";
+				}
 
 				$restored_post_ids[$published_id] = true;
 				
