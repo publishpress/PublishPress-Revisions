@@ -57,12 +57,12 @@ class RevisionaryAdminPosts {
 		}
 
 		if ($listed_ids) {
-			$id_csv = "'" . implode("','", array_map('intval', $listed_ids)) . "'";
-			$revision_base_status_csv = rvy_revision_base_statuses(['return' => 'csv']);
-			$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+			$id_csv = implode("','", array_map('intval', $listed_ids));
+			$revision_base_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_base_statuses()));
+			$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
 
 			$results = $wpdb->get_results(
-				"SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN ($id_csv) AND post_status IN ($revision_base_status_csv) AND post_mime_type IN ($revision_status_csv) GROUP BY comment_count"
+				"SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN ('$id_csv') AND post_status IN ('$revision_base_status_csv') AND post_mime_type IN ('$revision_status_csv') GROUP BY comment_count"
 			);
 			
 			foreach($results as $row) {
@@ -199,20 +199,22 @@ class RevisionaryAdminPosts {
             $_post_type = (!empty($matches[1])) ? $matches[1] : PWP::findPostType();
 
             if ($_post_type) {
-				$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+				$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
 				
 				if (!function_exists('presspermit')) {
 					// avoid counting posts stored with a status that's no longer registered
 					$statuses = get_post_stati();
-					$statuses_clause = " AND post_status IN ('" . implode("','", $statuses) . "')";
+					$statuses_clause = " AND post_status IN ('" 
+											. implode("','", array_map('pp_revisions_sanitize_key', $statuses)) 
+										. "')";
 				} else {
 					$statuses_clause = '';
 				}
 
-				if (!strpos($query, "AND post_mime_type NOT IN ($revision_status_csv)")) {
+				if (!strpos($query, "AND post_mime_type NOT IN ('$revision_status_csv')")) {
 					$query = str_replace(
 						" post_type = '{$matches[1]}'", 
-						"( post_type = '{$matches[1]}' AND post_mime_type NOT IN ($revision_status_csv){$statuses_clause} )", 
+						"( post_type = '{$matches[1]}' AND post_mime_type NOT IN ('$revision_status_csv'){$statuses_clause} )", 
 						$query
 					);
 				}
