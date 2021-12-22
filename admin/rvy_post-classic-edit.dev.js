@@ -6,6 +6,8 @@
 * Copyright 2021, PublishPress
 */
 jQuery(document).ready( function($) {
+	var rvyIsPublished = false;
+
 	var RvySubmissionUI = function() {
 		if (rvyObjEdit.ajaxurl && !$('div.rvy-creation-ui').length) {
 			var hideStyle = (rvyObjEdit.actionCaption == '') ? ' style="display:none"' : '';
