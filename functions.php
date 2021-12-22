@@ -9,6 +9,20 @@ function revisionary_unrevisioned_postmeta() {
 }
 
 /**
+ * Sanitizes a string entry
+ *
+ * Keys are used as internal identifiers. Uppercase or lowercase alphanumeric characters,
+ * spaces, periods, commas, plusses, asterisks, colons, pipes, parentheses, dashes and underscores are allowed.
+ *
+ * @param string $entry String entry
+ * @return string Sanitized entry
+ */
+function pp_revisions_sanitize_entry( $entry ) {
+    $entry = preg_replace( '/[^a-zA-Z0-9 \.\,\+\*\:\|\(\)_\-]/', '', $entry );
+    return $entry;
+}
+
+/**
  * Copies the taxonomies of a post to another post.
  * Based on Yoast Duplicate Post
  *
