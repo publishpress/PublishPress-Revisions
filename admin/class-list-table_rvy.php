@@ -456,9 +456,13 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		switch ($column_name) {
 			case 'post_type':
-				if ( $type_obj = get_post_type_object( get_post_field( 'post_type', $post->post_parent ) ) ) {
+				$post_type = get_post_field('post_type', $post_id);
+
+				if ( $type_obj = get_post_type_object( $post_type ) ) {
 					$link = add_query_arg('post_type', $type_obj->name, $request_url);
 					echo "<a href='$link'>{$type_obj->labels->singular_name}</a>";
+				} else {
+					echo "($post_type)";
 				}
 
 				break;
@@ -569,13 +573,15 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		if ( $can_edit_post && 'trash' != $post->post_status ) {
-			$actions['edit'] = sprintf(
-				'<a href="%1$s" title="%2$s" aria-label="%2$s">%3$s</a>',
-				get_edit_post_link( $post->ID ),
-				/* translators: %s: post title */
-				esc_attr('Edit published post'),
-				__( 'Edit' )
-			);
+			if ($edit_link = get_edit_post_link( $post->ID )) {
+				$actions['edit'] = sprintf(
+					'<a href="%1$s" title="%2$s" aria-label="%2$s">%3$s</a>',
+					$edit_link,
+					/* translators: %s: post title */
+					esc_attr('Edit published post'),
+					__( 'Edit' )
+				);
+			}
 		}
 
 		$request_url = add_query_arg($_REQUEST, rvy_admin_url('admin.php?page=revisionary-q'));
@@ -1127,10 +1133,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$title = _draft_or_post_title($post);
 
-		if ( $can_edit_post && $post->post_status != 'trash' ) {
+		if ( $can_edit_post && $post->post_status != 'trash' && $edit_link = get_edit_post_link( $post->ID )) {
 			printf(
 				'<a class="row-title" href="%s" aria-label="%s">%s%s</a>',
-				get_edit_post_link( $post->ID ),
+				$edit_link,
 				/* translators: %s: post title */
 				esc_attr( sprintf( __( '&#8220;%s&#8221; (Edit)' ), $title ) ),
 				'',
@@ -1211,23 +1217,27 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$title            = _draft_or_post_title();
 
 		if ( $can_edit_post && 'trash' != $post->post_status ) {
-			$actions['edit'] = sprintf(
-				'<a href="%1$s" title="%2$s" aria-label="%2$s">%3$s</a>',
-				get_edit_post_link( $post->ID ),
-				/* translators: %s: post title */
-				esc_attr('Edit Revision'),
-				__( 'Edit' )
-			);
+			if ($edit_link = get_edit_post_link( $post->ID )) {
+				$actions['edit'] = sprintf(
+					'<a href="%1$s" title="%2$s" aria-label="%2$s">%3$s</a>',
+					get_edit_post_link( $post->ID ),
+					/* translators: %s: post title */
+					esc_attr('Edit Revision'),
+					__( 'Edit' )
+				);
+			}
 		}
 
 		if ( current_user_can( 'delete_post', $post->ID ) ) {
-			$actions['delete'] = sprintf(
-				'<a href="%1$s" class="submitdelete" title="%2$s" aria-label="%2$s">%3$s</a>',
-				get_delete_post_link( $post->ID, '', true ),
-				/* translators: %s: post title */
-				esc_attr( sprintf( __( 'Delete Revision', 'revisionary' ), $title ) ),
-				__( 'Delete' )
-			);
+			if ($delete_link = get_delete_post_link( $post->ID, '', true )) {
+				$actions['delete'] = sprintf(
+					'<a href="%1$s" class="submitdelete" title="%2$s" aria-label="%2$s">%3$s</a>',
+					$delete_link,
+					/* translators: %s: post title */
+					esc_attr( sprintf( __( 'Delete Revision', 'revisionary' ), $title ) ),
+					__( 'Delete' )
+				);
+			}
 		}
 
 		if ( is_post_type_viewable( $post_type_object ) ) {
