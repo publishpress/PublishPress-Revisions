@@ -53,7 +53,7 @@ class Revisionary_Submittee {
 	
 		$default_prefix = ( $customize_defaults ) ? 'default_' : '';
 
-		$reviewed_options = array_map('sanitize_key', explode(',', $_POST['all_options']));
+		$reviewed_options = array_map('pp_revisions_sanitize_key', explode(',', $_POST['all_options']));
 		foreach ( $reviewed_options as $option_name )
 			rvy_delete_option($default_prefix . $option_name, $sitewide );
 	}
@@ -61,9 +61,9 @@ class Revisionary_Submittee {
 	function update_sitewide() {
 		check_admin_referer( 'rvy-update-options' );
 		
-		$reviewed_options = isset($_POST['rvy_all_movable_options']) ? explode(',', $_POST['rvy_all_movable_options']) : array();
+		$reviewed_options = isset($_POST['rvy_all_movable_options']) ? array_map('pp_revisions_sanitize_key', explode(',', $_POST['rvy_all_movable_options'])) : array();
 		
-		$options_sitewide = isset($_POST['rvy_options_sitewide']) ? (array) $_POST['rvy_options_sitewide'] : array();
+		$options_sitewide = isset($_POST['rvy_options_sitewide']) ? array_map('pp_revisions_sanitize_key', (array) $_POST['rvy_options_sitewide']) : array();
 
 		update_site_option( "rvy_options_sitewide_reviewed", $reviewed_options );
 		update_site_option( "rvy_options_sitewide", $options_sitewide );
@@ -79,7 +79,7 @@ class Revisionary_Submittee {
 	function update_page_options( $sitewide = false, $customize_defaults = false ) {
 		$default_prefix = ( $customize_defaults ) ? 'default_' : '';
 		
-		$reviewed_options = array_map('sanitize_key', explode(',', $_POST['all_options']));
+		$reviewed_options = array_map('pp_revisions_sanitize_key', explode(',', $_POST['all_options']));
 
 		foreach ( $reviewed_options as $option_basename ) {
 			$value = isset($_POST[$option_basename]) ? $_POST[$option_basename] : '';
