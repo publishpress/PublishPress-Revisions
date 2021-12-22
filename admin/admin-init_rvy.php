@@ -49,7 +49,8 @@ function rvy_admin_init() {
 	rvy_load_textdomain();
 
 	// @todo: clean up "Restore Revision" URL on Diff screen
-	if (!empty($_GET['amp;revision']) && !empty($_GET['amp;action']) && !empty($_GET['amp;_wpnonce'])) {
+	// Until the integration with WP revisions.php is resolved, limit the scope of this workaround to relevant actions
+	if (!empty($_GET['amp;revision']) && !empty($_GET['amp;action']) && !empty($_GET['amp;_wpnonce']) && in_array($_GET['amp;action'], ['approve', 'publish'])) {
 		$_GET['revision'] = $_GET['amp;revision'];
 		$_GET['action'] = $_GET['amp;action'];
 		$_GET['_wpnonce'] = $_GET['amp;_wpnonce'];
