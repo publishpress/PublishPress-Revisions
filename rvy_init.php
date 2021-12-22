@@ -1301,7 +1301,7 @@ function rvy_preview_url($revision, $args = []) {
 	$post_type = pp_revisions_sanitize_key($post_type);
 
 	if ($post_type_obj = get_post_type_object($revision->post_type)) {
-		if (empty($post_type_obj->public)) { // For non-public types, preview is not available so default to Compare Revisions screen
+		if (empty($post_type_obj->public) && !defined('FL_BUILDER_VERSION') && !apply_filters('revisionary_private_type_alternate_preview_url', true, $revision)) { // For non-public types, preview is not available so default to Compare Revisions screen
 			return apply_filters('revisionary_preview_url', rvy_admin_url("revision.php?revision=$revision->ID"), $revision, $args);
 		}
 	}
