@@ -9,6 +9,31 @@ function revisionary_unrevisioned_postmeta() {
 }
 
 /**
+ * Sanitizes a string entry
+ *
+ * Keys are used as internal identifiers. Uppercase or lowercase alphanumeric characters,
+ * spaces, periods, commas, plusses, asterisks, colons, pipes, parentheses, dashes and underscores are allowed.
+ *
+ * @param string $entry String entry
+ * @return string Sanitized entry
+ */
+function pp_revisions_sanitize_entry( $entry ) {
+    $entry = preg_replace( '/[^a-zA-Z0-9 \.\,\+\*\:\|\(\)_\-]/', '', $entry );
+    return $entry;
+}
+
+/*
+ * Same as sanitize_key(), but without applying filters
+ */
+function pp_revisions_sanitize_key( $key ) {
+    $raw_key = $key;
+    $key     = strtolower( $key );
+    $key     = preg_replace( '/[^a-z0-9_\-]/', '', $key );
+    
+    return $key;
+}
+
+/**
  * Copies the taxonomies of a post to another post.
  * Based on Yoast Duplicate Post
  *
@@ -143,7 +168,7 @@ function rvy_revision_base_statuses($args = []) {
 		$$var = $args[$var];
 	}
 
-	$arr = array_map('sanitize_key', (array) apply_filters('rvy_revision_base_statuses', ['draft', 'pending', 'future']));
+	$arr = array_map('pp_revisions_sanitize_key', (array) apply_filters('rvy_revision_base_statuses', ['draft', 'pending', 'future']));
 
 	if ('object' == $output) {
 		$status_keys = array_value($arr);
@@ -164,7 +189,7 @@ function rvy_revision_statuses($args = []) {
 		$$var = $args[$var];
 	}
 	
-	$arr = array_map('sanitize_key', (array) apply_filters('rvy_revision_statuses', ['draft-revision', 'pending-revision', 'future-revision']));
+	$arr = array_map('pp_revisions_sanitize_key', (array) apply_filters('rvy_revision_statuses', ['draft-revision', 'pending-revision', 'future-revision']));
 
 	if ('object' == $output) {
 		$status_keys = array_value($arr);
@@ -258,8 +283,8 @@ function pp_revisions_plugin_updated($current_version) {
     if (version_compare($last_ver, '3.0.1', '<')) {
         // convert pending / scheduled revisions to v3.0 format
 		global $wpdb;
-		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
-		$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = post_status WHERE post_status IN ($revision_status_csv)");
+		$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
+		$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = post_status WHERE post_status IN ('$revision_status_csv')");
 		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft' WHERE post_status IN ('draft-revision')");
 		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending' WHERE post_status IN ('pending-revision')");
 		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'future' WHERE post_status IN ('future-revision')");

@@ -74,7 +74,7 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 echo '<span class="dashicons dashicons-backup"></span>&nbsp;';
 
 if ( ! empty( $_REQUEST['post_type'] ) ) {
-	$type_obj = get_post_type_object( sanitize_key($_REQUEST['post_type']) );
+	$type_obj = get_post_type_object( pp_revisions_sanitize_key($_REQUEST['post_type']) );
 }
 
 if (!empty($_REQUEST['published_post'])) {
@@ -94,7 +94,7 @@ if (!empty($_REQUEST['author'])) {
 }
 
 if (!empty($_REQUEST['post_status'])) {
-	if ($status_obj = get_post_status_object(sanitize_key($_REQUEST['post_status']))) {
+	if ($status_obj = get_post_status_object(pp_revisions_sanitize_key($_REQUEST['post_status']))) {
 		$filters['post_status'] = $status_obj->labels->plural;
 	}
 }

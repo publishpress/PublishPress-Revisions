@@ -1308,7 +1308,12 @@ function rvy_publish_scheduled_revisions($args = array()) {
 		
 		if ( $skip_revision_ids ) {
 			// if more than one scheduled revision was not yet published, convert the older ones to regular revisions
-			$id_clause = "AND ID IN ('" . implode( "','", array_keys($skip_revision_ids) ) . "')";
+			$id_clause = "AND ID IN ('" 
+							. implode("','", 
+								array_map('intval', array_keys($skip_revision_ids))
+								) 
+						. "')";
+
 			$wpdb->query( "UPDATE $wpdb->posts SET post_type = 'revision', post_status = 'inherit' WHERE post_mime_type = 'future-revision' $id_clause" );
 		}
 	}

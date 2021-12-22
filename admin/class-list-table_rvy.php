@@ -34,8 +34,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			remove_action('the_post', [$multiple_authors_addon, 'fix_post'], 10);
 		}
 
-		if (!empty($_REQUEST['published_post']) && !rvy_get_post_meta($_REQUEST['published_post'], '_rvy_has_revisions', true)) {
-			revisionary_refresh_postmeta($_REQUEST['published_post']);
+		if (!empty($_REQUEST['published_post']) && !rvy_get_post_meta((int) $_REQUEST['published_post'], '_rvy_has_revisions', true)) {
+			revisionary_refresh_postmeta((int) $_REQUEST['published_post']);
 		}
 
 		$this->correctCommentCounts();
@@ -211,7 +211,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					}
 				}
 
-				$can_edit_others_types = apply_filters('revisionary_queue_edit_others_types', $can_edit_others_types);
+				$can_edit_others_types = array_map('pp_revisions_sanitize_key', apply_filters('revisionary_queue_edit_others_types', $can_edit_others_types));
 
 				$type_clause = ($can_edit_others_types) ? "OR $p.post_type IN ('" . implode("','", $can_edit_others_types) . "')" : '';
 
@@ -264,7 +264,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	function revisions_where_filter($where, $args = []) {
 		global $wpdb, $current_user, $revisionary;
 		
-		$p = (!empty($args['alias'])) ? $args['alias'] : $wpdb->posts;
+		$p = (!empty($args['alias'])) ? pp_revisions_sanitize_entry($args['alias']) : $wpdb->posts;
 
 		$is_count_query = empty($args['revision_query']);
 
@@ -304,7 +304,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$where_append = "($p.comment_count IN ($id_subquery) {$revision_status_clause}$own_revision_clause)";
 
-		$status_csv = rvy_filtered_statuses(['return' => 'csv']);
+		$status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_filtered_statuses()));
 
 		$own_posts = $wpdb->get_col(
 			$wpdb->prepare(
@@ -319,7 +319,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$own_posts = [];
 		}
 
-		$own_posts_csv = "'" . implode("','", $own_posts) . "'";
+		$own_posts_csv = implode("','", array_map('intval', $own_posts));
 
 		if (rvy_get_option('revisor_hide_others_revisions') && !current_user_can('administrator') 
 			&& !current_user_can('list_others_revisions') && empty($args['suppress_author_clause']) 
@@ -347,7 +347,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$can_publish_types = array_intersect($can_publish_types, apply_filters('revisionary_manageable_types', $can_publish_types));
 
 			if ($can_publish_types){
-				$type_clause = "OR $p.post_type IN ('" . implode("','", $can_publish_types) . "')";
+				$type_clause = "OR $p.post_type IN ('" . implode("','", array_map('pp_revisions_sanitize_key', $can_publish_types)) . "')";
 			} else {
 				$type_clause = '';
 			}
@@ -356,13 +356,23 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		} elseif ($revisionary->config_loaded) {
 			$where_append .= (array_filter($revisionary->enabled_post_types)) 
-			? " AND ($p.post_type IN ('" . implode("','", array_keys(array_filter($revisionary->enabled_post_types))) . "'))" 
+			? " AND ($p.post_type IN ('" 
+				. implode("','", 
+					array_map(
+						'pp_revisions_sanitize_key', 
+						array_keys(
+							array_filter($revisionary->enabled_post_types)
+						)
+					)
+				) . "'))" 
+			
 			: " AND 1=2";
 		}
 
 		if (empty($args['suppress_author_clause'])) {
-			$status_csv = rvy_filtered_statuses(['return' => 'csv']);
-			$where_append .= " AND $p.comment_count IN (SELECT ID FROM $wpdb->posts WHERE post_status IN ($status_csv))";
+			$status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_filtered_statuses()));
+
+			$where_append .= " AND $p.comment_count IN (SELECT ID FROM $wpdb->posts WHERE post_status IN ('$status_csv'))";
 		}
 
 		$where .= " AND $where_append";
@@ -379,10 +389,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	function correctCommentCounts() {
 		global $wpdb;
 
-		$revision_base_status_csv = rvy_revision_base_statuses(['return' => 'csv']);
-		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+		$revision_base_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_base_statuses()));
+		$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
 
-		if ($revision_ids = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_status IN ($revision_base_status_csv) AND post_mime_type IN ($revision_status_csv) AND comment_count = 0")) {
+		if ($revision_ids = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_status IN ('$revision_base_status_csv') AND post_mime_type IN ('$revision_status_csv') AND comment_count = 0")) {
 			foreach($revision_ids as $revision_id) {
 				if ($main_post_id = get_post_meta($revision_id, '_rvy_base_post_id', true)) {
 					$wpdb->update($wpdb->posts, ['comment_count' => $main_post_id], ['ID' => $revision_id]);
@@ -693,11 +703,11 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	private function count_revisions($post_type = '', $statuses = '' ) {
 		global $wpdb;
 
-		$status_csv = implode("','", array_map('sanitize_key', (array) $statuses));
+		$status_csv = implode("','", array_map('pp_revisions_sanitize_key', (array) $statuses));
 
 		if ($post_type) {
 			$type_clause = "AND post_type IN ('" 
-			. implode("','", array_map('sanitize_key', (array) $post_type)) 
+			. implode("','", array_map('pp_revisions_sanitize_key', (array) $post_type)) 
 			. "')";
 		}
 
@@ -748,11 +758,11 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$links[''] = '';
 		$links['all'] = '';
 
-		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+		$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
 
 		$where = $this->revisions_where_filter( 
 			$wpdb->prepare(
-				"$wpdb->posts.post_mime_type IN ($revision_status_csv) AND $wpdb->posts.post_author = '%d'", 
+				"$wpdb->posts.post_mime_type IN ('$revision_status_csv') AND $wpdb->posts.post_author = '%d'", 
 				$current_user->ID
 			),
 			['status_count' => true]
@@ -779,7 +789,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$where = $this->revisions_where_filter( 
 			$wpdb->prepare(
-				"r.post_mime_type IN ($revision_status_csv) AND p.post_author = '%d'", 
+				"r.post_mime_type IN ('$revision_status_csv') AND p.post_author = '%d'", 
 				$current_user->ID
 			),
 			['alias' => 'r', 'status_count' => true, 'my_published_count' => true]
@@ -944,21 +954,21 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	protected function rvy_months_dropdown() {
 		global $wpdb, $wp_locale;
 
-		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+		$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
 
 		$extra_checks = "AND post_status != 'auto-draft'";
 		
 		if (isset($_GET['post_status']) && ('all' != $_GET['post_status'])) {
-			$extra_checks = $wpdb->prepare( ' AND post_status = %s', sanitize_key($_GET['post_status']) );
+			$extra_checks = $wpdb->prepare( ' AND post_status = %s', pp_revisions_sanitize_key($_GET['post_status']) );
 		} else {
-			$extra_checks = " AND post_mime_type IN ($revision_status_csv)";
+			$extra_checks = " AND post_mime_type IN ('$revision_status_csv')";
 		}
 
 		$date_col = ( ! empty($_REQUEST['post_status']) && 'future-revision' == $_REQUEST['post_status'] ) ? 'post_date' : 'post_modified';
 
 		$id_subquery = $this->published_post_ids_query;
 		
-		$type_csv = implode("','", array_map('sanitize_key', rvy_get_manageable_types()));
+		$type_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_get_manageable_types()));
 
 		$months = $wpdb->get_results(
 			"SELECT DISTINCT YEAR( $date_col ) AS year, MONTH( $date_col ) AS month
@@ -1023,7 +1033,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$current_url = remove_query_arg( 'paged', $current_url );
 
 		if ( isset( $_GET['orderby'] ) ) {
-			$current_orderby = sanitize_key($_GET['orderby']);
+			$current_orderby = pp_revisions_sanitize_key($_GET['orderby']);
 		} else {
 			$current_orderby = '';
 		}

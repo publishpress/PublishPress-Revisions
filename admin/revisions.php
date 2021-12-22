@@ -38,7 +38,7 @@ else
 $revision_status = 'inherit';
 
 if ( ! empty($_GET['action']) )
-	$action = sanitize_key($_GET['action']);
+	$action = pp_revisions_sanitize_key($_GET['action']);
 else
 	$action = '';
 
@@ -172,13 +172,13 @@ if ( $is_administrator = is_content_administrator_rvy() ) {
 	global $wpdb;
 
 	$base_status_csv = implode("','", array_merge(rvy_revision_base_statuses(), ['inherit']));
-	$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+	$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
 
 	$results = $wpdb->get_results( 
 		$wpdb->prepare(
 			"SELECT post_mime_type, COUNT( * ) AS num_posts FROM {$wpdb->posts}"
 			. " WHERE post_status IN ('$base_status_csv')"
-			. " AND ((post_type = 'revision' AND post_status = 'inherit' AND post_parent = %d) OR (post_type != 'revision' AND post_mime_type IN ($revision_status_csv) AND comment_count = %d))"
+			. " AND ((post_type = 'revision' AND post_status = 'inherit' AND post_parent = %d) OR (post_type != 'revision' AND post_mime_type IN ('$revision_status_csv') AND comment_count = %d))"
 			. " GROUP BY post_mime_type",
 			$rvy_post->ID,
 			$rvy_post->ID
