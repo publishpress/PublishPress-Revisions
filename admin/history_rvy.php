@@ -38,7 +38,7 @@ class RevisionaryHistory
     function actCompareRevisionsTweakUI() {
         global $revisionary;
 
-        $revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : $_REQUEST['to'];
+        $revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : (int) $_REQUEST['to'];
 
         // Hide Restore button if user does not have permission
         if ($_post = get_post($revision_id)) {
@@ -64,8 +64,8 @@ class RevisionaryHistory
     public function actLoadRevision() {
         global $wpdb, $post;
 
-        if (!empty($_REQUEST['revision']) && is_scalar($_REQUEST['revision']) && !empty($_REQUEST['post_id']) && !is_numeric($_REQUEST['revision']) && rvy_is_revision_status(sanitize_key($_REQUEST['revision']))) {
-            $revision_status = sanitize_key($_REQUEST['revision']);
+        if (!empty($_REQUEST['revision']) && is_scalar($_REQUEST['revision']) && !empty($_REQUEST['post_id']) && !is_numeric($_REQUEST['revision']) && rvy_is_revision_status(pp_revisions_sanitize_key($_REQUEST['revision']))) {
+            $revision_status = pp_revisions_sanitize_key($_REQUEST['revision']);
 
             $orderby = ('future-revision' == $revision_status) ? 'post_date' : 'ID';
             $order =   ('future-revision' == $revision_status) ? 'DESC' : 'ASC';
@@ -272,11 +272,11 @@ class RevisionaryHistory
     public function fltRevisionQueryWhere($where, $args = []) {
         global $wpdb;
 
-        $p = (!empty($args['alias'])) ? $args['alias'] : $wpdb->posts;
+        $p = (!empty($args['alias'])) ? sanitize_text_field($args['alias']) : $wpdb->posts;
 
-		$post_id_csv = "'" . implode("','", $this->published_post_ids) . "'";
+		$post_id_csv = implode("','", array_map('intval', $this->published_post_ids));
 
-		$where .= " AND $p.comment_count IN ($post_id_csv)";
+		$where .= " AND $p.comment_count IN ('$post_id_csv')";
 
         return $where;
     }
