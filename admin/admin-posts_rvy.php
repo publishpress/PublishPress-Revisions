@@ -19,6 +19,33 @@ class RevisionaryAdminPosts {
 			add_filter('get_comments_number', [$this, 'fltCommentsNumber'], 20, 2);
 		}
 
+		// If a revision was just deleted from within post editor, redirect to Revision Queue
+		if (!empty($_REQUEST['trashed']) && !empty($_REQUEST['post_type']) && !empty($_REQUEST['ids']) && is_scalar($_REQUEST['ids'])) {
+			$post_type = pp_revisions_sanitize_key($_REQUEST['post_type']);
+
+			if (in_array($post_type, rvy_get_manageable_types())) {
+				$deleted_id = (int) $_REQUEST['ids'];
+
+				if (!empty($_SERVER['HTTP_REFERER']) && (
+					(false !== strpos($_SERVER['HTTP_REFERER'], admin_url("post.php?post={$deleted_id}&action=edit")))
+					|| (false !== strpos($_SERVER['HTTP_REFERER'], admin_url("post-new.php")))
+				)) {
+					$_post = get_post($deleted_id);
+
+					if (!$_post || (('trash' == $_post->post_status) && in_array($_post->post_mime_type, rvy_revision_statuses()))) {
+						if (apply_filters('revisionary_deletion_redirect_to_queue', true, $deleted_id, $post_type)) {
+							$url = admin_url("admin.php?page=revisionary-q&pp_revisions_deleted={$deleted_id}");
+							
+							if (false === strpos($_SERVER['REQUEST_URI'], $url)) {
+								wp_redirect($url);
+								exit;
+							}
+						}
+					}
+				}
+			}
+		}
+
 		add_filter('query', [$this, 'fltPostCountQuery']);
     }
     
