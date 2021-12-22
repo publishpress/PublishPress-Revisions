@@ -310,7 +310,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		)) || !empty($args['my_published_count'])) {
 			$revision_status_clause = "AND $p.post_mime_type != 'draft-revision' ";
 
-		} elseif (($is_my_activity && !$is_count_query) || !current_user_can("manage_unsubmitted_revisions")) {
+		} elseif (($is_my_activity && !$is_count_query) || (rvy_get_option('manage_unsubmitted_capability') && !current_user_can("manage_unsubmitted_revisions"))) {
 			$revision_status_clause = "AND ($p.post_mime_type != 'draft-revision' OR $p.post_author = '$current_user->ID')";
 		} else {
 			$revision_status_clause = '';
