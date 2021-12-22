@@ -11,7 +11,7 @@ class RevisionaryDashboard {
 		global $wpdb, $revisionary;
 
 		$types = array_keys($revisionary->enabled_post_types);
-		$post_types_csv = implode( "','", $types );
+		$post_types_csv = implode( "','", array_map('pp_revisions_sanitize_key', $types));
 		$clauses['where'] = str_replace( "$wpdb->posts.post_type = 'post'", "$wpdb->posts.post_type IN ('$post_types_csv')", $clauses['where'] );
 
 		remove_filter('posts_clauses_request', [&$this, 'fltDashboardQueryClauses']);
