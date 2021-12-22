@@ -238,27 +238,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	}
 
 	function append_revisions_where($where, $args=[]) {
-		global $wpdb;
-		
-		$where_append = '';
-		
-		if (defined('ICL_SITEPRESS_VERSION')) {
-			if (!empty($_REQUEST['lang'])) {
-				$lang = $_REQUEST['lang'];
-			} else {
-				global $sitepress;
-				if (!empty($sitepress) && method_exists($sitepress, 'get_admin_language_cookie')) {
-					$lang = $sitepress->get_admin_language_cookie();
-				}
-			}
-
-			if ($lang) {
-				$p = (!empty($args['alias'])) ? $args['alias'] : $wpdb->posts;
-				$where_append = " AND $p.comment_count IN (SELECT element_id FROM {$wpdb->prefix}icl_translations WHERE element_type LIKE 'post_%' AND language_code = '$lang')";
-			}
-		}
-
-		return $where_append;
+		// relocated to calling function for clarity
+		return '';
 	}
 
 	function revisions_where_filter($where, $args = []) {
@@ -277,10 +258,32 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		if ((empty($_REQUEST['post_author']) || !empty($args['status_count'])) && empty($_REQUEST['published_post']) && empty($args['my_published_count'])) {
-			$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+			$revision_status_csv =  implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
 
-			$own_revision_and = $this->append_revisions_where($where, $args);
-			$own_revision_clause = " OR ($p.post_status IN ('draft', 'pending') AND $p.post_mime_type IN ($revision_status_csv) AND $p.post_author = '$current_user->ID'{$own_revision_and})";
+			$own_revision_and = '';
+
+			if (defined('ICL_SITEPRESS_VERSION')) {
+				if (!empty($_REQUEST['lang'])) {
+					$lang = sanitize_text_field($_REQUEST['lang']);
+				} else {
+					global $sitepress;
+					if (!empty($sitepress) && method_exists($sitepress, 'get_admin_language_cookie')) {
+						$lang = sanitize_text_field($sitepress->get_admin_language_cookie());
+					}
+				}
+
+				if (!empty($lang)) {
+					$own_revision_and = $wpdb->prepare(
+						" AND $p.comment_count IN (SELECT element_id FROM {$wpdb->prefix}icl_translations WHERE element_type LIKE 'post_%' AND language_code = %s)",
+						$lang
+					);
+				}
+			}
+
+			$own_revision_clause = $wpdb->prepare(
+				" OR ($p.post_status IN ('draft', 'pending') AND $p.post_mime_type IN ('$revision_status_csv') AND $p.post_author = %d {$own_revision_and})",
+				$current_user->ID
+			);
 		} else {
 			$own_revision_clause = '';
 		}
