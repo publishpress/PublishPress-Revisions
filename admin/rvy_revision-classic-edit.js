@@ -11,7 +11,7 @@ if(rvyObjEdit[rvyObjEdit.currentStatus+'ActionCaption']){$(refSelector).after('<
 +'</div>'
 +'</div> <br /><br />');}
 $('.edit-post-post-schedule__toggle').after('<button class="components-button is-tertiary post-schedule-footnote" disabled>'+rvyObjEdit.onApprovalCaption+'</button>');if(rvyObjEdit[rvyObjEdit.currentStatus+'DeletionURL']){$('a.submitdelete').attr('href',rvyObjEdit[rvyObjEdit.currentStatus+'DeletionURL']);}
-$('#publish').hide();$('#save-post').val(rvyObjEdit.updateCaption);}}
+$('#publish').hide();$('#save-post').val(rvyObjEdit.updateCaption);if(rvyObjEdit.deleteCaption){$('#submitdiv #submitpost #delete-action a.submitdelete').html(rvyObjEdit.deleteCaption).show();}}}
 var RvyUIInterval=setInterval(RvySubmissionUI,100);$(document).on('click','a.save-timestamp, a.cancel-timestamp',function(){wp.autosave.server.triggerSave();});function RvyGetRandomInt(max){return Math.floor(Math.random()*max);}
 $(document).on('click','div.postbox-container',function(){$('a.revision-approve').attr('disabled','disabled');});$(document).on('click','a.revision-approve',function(){if($('a.revision-approve').attr('disabled')){return;}
 $('a.revision-approve').attr('disabled','disabled');if(wp.autosave.server.postChanged()){wp.autosave.server.triggerSave();var approvalDelay=250;}else{var approvalDelay=1;}

@@ -38,6 +38,17 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			revisionary_refresh_postmeta((int) $_REQUEST['published_post']);
 		}
 
+		// Gutenberg will not allow immediate deletion of revisions from within editor
+		if (!empty($_REQUEST['pp_revisions_deleted'])) {
+			global $current_user;
+			
+			$delete_id = (int) $_REQUEST['pp_revisions_deleted'];
+
+			if (('trash' == get_post_field('post_status', $delete_id)) && (get_post_field('post_author', $delete_id) == $current_user->ID)) {
+				wp_delete_post($delete_id, true);
+			}
+		}
+
 		$this->correctCommentCounts();
 	}
 

@@ -192,13 +192,20 @@ jQuery(document).ready( function($) {
 			$('.edit-post-post-schedule__toggle').after('<button class="components-button is-tertiary post-schedule-footnote" disabled>' + rvyObjEdit.onApprovalCaption + '</button>');
 
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'DeletionURL']) {
-				$('button.editor-post-trash').wrap('<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'DeletionURL'] + '"></a>');
+				$('button.editor-post-trash').wrap('<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'DeletionURL'] + '" style="text-decoration:none"></a>');
 			}
 		}
 
 		$('button.post-schedule-footnote').toggle(!/\d/.test($('button.edit-post-post-schedule__toggle').html()));
 	}
 	var RvyUIInterval = setInterval(RvySubmissionUI, 100);
+
+
+	setInterval(function() {
+		if (rvyObjEdit.deleteCaption && $('button.editor-post-trash').length && ($('button.editor-post-trash').html() != rvyObjEdit.deleteCaption)) {
+			$('button.editor-post-trash').html(rvyObjEdit.deleteCaption).closest('div').show();
+		}
+	}, 100);
 
 	var RvyApprovalLocked = false;
 

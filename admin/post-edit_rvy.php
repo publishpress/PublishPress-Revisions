@@ -47,6 +47,9 @@ class RvyPostEdit {
             wp_enqueue_script('rvy_object_edit', RVY_URLPATH . "/admin/rvy_revision-classic-edit{$suffix}.js", ['jquery', 'jquery-form'], PUBLISHPRESS_REVISIONS_VERSION, true);
 
             $args = \PublishPress\Revisions\PostEditorWorkflowUI::revisionLinkParams(compact('post', 'do_pending_revisions', 'do_scheduled_revisions'));
+
+            $args['deleteCaption'] = __('Delete Permanently', 'revisionary');
+
             wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
 
             if (defined('PUBLISHPRESS_VERSION')) {

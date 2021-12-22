@@ -49,10 +49,13 @@ jQuery(document).ready( function($) {
             
             $('#publish').hide();
             $('#save-post').val(rvyObjEdit.updateCaption);
-		}
+
+            if (rvyObjEdit.deleteCaption) {
+                $('#submitdiv #submitpost #delete-action a.submitdelete').html(rvyObjEdit.deleteCaption).show();
+            }
+        }
 	}
 	var RvyUIInterval = setInterval(RvySubmissionUI, 100);
-
 	
 	$(document).on('click', 'a.save-timestamp, a.cancel-timestamp', function() {
         wp.autosave.server.triggerSave();
