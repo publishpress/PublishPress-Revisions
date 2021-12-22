@@ -146,7 +146,7 @@ class RvyPostEdit {
 
     function fltAllowBrowseRevisionsLink($wp_blogcaps, $reqd_caps, $args) {
         if (!empty($args[0]) && ('edit_post' == $args[0]) && !empty($args[2])) {
-            if ($_post = get_post($args[2])) {
+            if ($_post = get_post((int) $args[2])) {
                 if ('revision' == $_post->post_type && current_user_can('edit_post', $_post->post_parent)) {
                     if (did_action('post_submitbox_minor_actions')) {
                         if (!did_action('post_submitbox_misc_actions')) {
