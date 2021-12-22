@@ -13,6 +13,7 @@ if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
 // Setting scope: For Network installations, which Revisionary options should default to site-wide control?
 function rvy_default_options_sitewide() {
 	$def = array(
+		'manage_unsubmitted_capability' => true,
 		'copy_posts_capability' => true,
 		'revision_statuses_noun_labels' => true,
 		'caption_copy_as_edit' => true,
@@ -63,6 +64,7 @@ function rvy_default_options_sitewide() {
 // Default values for Revisionary settings
 function rvy_default_options() {
 	$def = array(
+		'manage_unsubmitted_capability' => 0,
 		'copy_posts_capability' => 0,
 		'revision_statuses_noun_labels' => 0,
 		'caption_copy_as_edit' => 0,
