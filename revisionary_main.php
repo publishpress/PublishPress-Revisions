@@ -42,7 +42,7 @@ class Revisionary
 		//
 		// Note: some filtering is needed to allow users with full editing permissions on the published post to access a Compare Revisions screen with Preview and Manage buttons
 		if (is_admin() && (false !== strpos($_SERVER['REQUEST_URI'], 'revision.php')) && (!empty($_REQUEST['revision'])) && !is_content_administrator_rvy()) {
-			$revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : $_REQUEST['to'];
+			$revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : (int) $_REQUEST['to'];
 			
 			if ($revision_id) {
 				if ($_post = get_post($revision_id)) {
@@ -148,8 +148,8 @@ class Revisionary
 
 		$parsed_args['echo'] = 0;
 
-		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
-		$parsed_args['exclude'] = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ($revision_status_csv)");
+		$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
+		$parsed_args['exclude'] = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ('$revision_status_csv')");
 		// ---- End PublishPress Modification ---
 
 		$pages  = get_pages( $parsed_args );
@@ -259,8 +259,8 @@ class Revisionary
 		$src_table = ($source_alias) ? $source_alias : $wpdb->posts;
         $args['src_table'] = $src_table;
 
-		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
-		$clauses['where'] .= " AND $src_table.post_mime_type NOT IN ($revision_status_csv)";
+		$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
+		$clauses['where'] .= " AND $src_table.post_mime_type NOT IN ('$revision_status_csv')";
 
 		return $clauses;
 	}
@@ -381,9 +381,9 @@ class Revisionary
 			return;
 		}
 
-		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+		$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
 
-		$any_trashed_posts = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_status = 'trash' AND comment_count > 0 AND post_mime_type IN ($revision_status_csv) LIMIT 1");
+		$any_trashed_posts = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_status = 'trash' AND comment_count > 0 AND post_mime_type IN ('$revision_status_csv') LIMIT 1");
 
 		$trashed_clause = ($any_trashed_posts) 
 		? $wpdb->prepare( 
@@ -393,7 +393,7 @@ class Revisionary
 
 		$post_ids = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT ID FROM $wpdb->posts WHERE (post_mime_type IN ($revision_status_csv) AND comment_count = %d) $trashed_clause", 
+				"SELECT ID FROM $wpdb->posts WHERE (post_mime_type IN ('$revision_status_csv') AND comment_count = %d) $trashed_clause", 
 				$post_id
 			)
 		);
@@ -496,8 +496,8 @@ class Revisionary
 
 		if ($revision) {
 			$args = [];
-			if (!empty($_REQUEST['nc'])) { // with a specified link target, avoid multiple browser tabs the same editor instance
-				$args['nc'] = $_REQUEST['nc'];
+			if (!empty($_REQUEST['nc'])) { // with a specified link target, avoid multiple browser tabs in the same editor instance
+				$args['nc'] = pp_revisions_sanitize_key($_REQUEST['nc']);
 			}
 
 			$preview_link = rvy_preview_url($revision, $args);
@@ -528,7 +528,7 @@ class Revisionary
 		if ( ! in_array( $meta_cap, array( 'edit_post', 'edit_page' ) ) )
 			return $caps;
 		
-		$object_id = ( is_array($args) && ! empty($args[0]) ) ? $args[0] : $args;
+		$object_id = ( is_array($args) && ! empty($args[0]) ) ? (int) $args[0] : $args;
 		
 		if ( ! $object_id || ! is_scalar($object_id) || ( $object_id < 0 ) || ! rvy_get_option('require_edit_others_drafts') ) {
 			return $caps;
@@ -581,7 +581,7 @@ class Revisionary
 			}
 
 			if (!empty($args[0])) {
-				$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
+				$post_id = (is_object($args[0])) ? $args[0]->ID : (int) $args[0];
 			} else {
 				$post_id = 0;
 			}
@@ -623,7 +623,7 @@ class Revisionary
 			}
 			
 			if (!empty($args[0])) {
-				$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
+				$post_id = (is_object($args[0])) ? $args[0]->ID : (int) $args[0];
 			} else {
 				$post_id = 0;
 			}
@@ -686,7 +686,7 @@ class Revisionary
 		}
 
 		if (!empty($args[0])) {
-			$post_id = (is_object($args[0])) ? $args[0]->ID : $args[0];
+			$post_id = (is_object($args[0])) ? $args[0]->ID : (int) $args[0];
 		} else {
 			$post_id = 0;
 		}
