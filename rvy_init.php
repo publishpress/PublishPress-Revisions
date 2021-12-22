@@ -927,6 +927,8 @@ function rvy_confirm_async_execution($action) {
 	if ( is_array($requested_actions) && isset($requested_actions[$action]) ) {
 		unset( $requested_actions[$action] );
 		update_option( 'requested_remote_actions_rvy', $requested_actions );
+	} else {
+		exit;
 	}
 }
 
