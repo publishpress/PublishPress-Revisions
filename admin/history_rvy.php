@@ -780,7 +780,7 @@ class RevisionaryHistory
             $author_captions = [];
             $avatars = '';
             foreach($authors as $_author) {
-                $author_captions []= ($use_multiple_authors) ? esc_html($_author->display_name) : get_the_author_meta('display_name', $_author->ID);
+                $author_captions []= ($use_multiple_authors) ? esc_html($_author->display_name) : htmlspecialchars_decode(get_the_author_meta('display_name', $_author->ID));
                 $avatars .= $show_avatars ? get_avatar( $_author->ID, 32 ) : '';
             }
 
