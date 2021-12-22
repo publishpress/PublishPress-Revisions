@@ -1,4 +1,4 @@
-jQuery(document).ready(function($){var RvySubmissionUI=function(){if(rvyObjEdit.ajaxurl&&!$('div.rvy-creation-ui').length){var hideStyle=(rvyObjEdit.actionCaption=='')?' style="display:none"':'';var html='<div class="rvy-creation-ui"'+hideStyle+'><a href="javascript:void(0)" class="button revision-approve revision-create" style="margin-top: 15px; margin-bottom: 15px" title="'
+jQuery(document).ready(function($){var rvyIsPublished=false;var RvySubmissionUI=function(){if(rvyObjEdit.ajaxurl&&!$('div.rvy-creation-ui').length){var hideStyle=(rvyObjEdit.actionCaption=='')?' style="display:none"':'';var html='<div class="rvy-creation-ui"'+hideStyle+'><a href="javascript:void(0)" class="button revision-approve revision-create" style="margin-top: 15px; margin-bottom: 15px" title="'
 +rvyObjEdit.actionTitle+'">'
 +rvyObjEdit.actionCaption+'</a>'
 +'<div class="revision-created-wrapper" style="display:none; margin: 10px 0 10px 5px; font-weight: bold"><span class="revision-approve revision-created">'
