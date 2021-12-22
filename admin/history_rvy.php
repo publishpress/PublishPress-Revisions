@@ -899,17 +899,17 @@ class RevisionaryHistory
                         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
 
                         //if (in_array($revision->post_mime_type, ['draft-revision'])) {
-                        //    $restore_link = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=submit$redirect_arg"), "submit-post_$published_post_id|{$revision->ID}" );
+                        //    $restore_link = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision={$revision->ID}&action=submit$redirect_arg"), "submit-post_$published_post_id|{$revision->ID}" );
 
                         if (in_array($revision->post_mime_type, ['draft-revision', 'pending-revision'])) {
-                            $restore_link = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|{$revision->ID}" );
+                            $restore_link = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision={$revision->ID}&action=approve$redirect_arg"), "approve-post_$published_post_id|{$revision->ID}" );
 
                         } elseif (in_array($revision->post_mime_type, ['future-revision'])) {
-                            $restore_link = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|{$revision->ID}" );
+                            $restore_link = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision={$revision->ID}&action=publish$redirect_arg"), "publish-post_$published_post_id|{$revision->ID}" );
                         }
 
                         if (current_user_can('edit_post', $revision->ID)) {
-                            $edit_url = rvy_admin_url("post.php?action=edit&amp;post=$revision->ID");
+                            $edit_url = rvy_admin_url("post.php?action=edit&post=$revision->ID");
                         }
 	                }
                 }
