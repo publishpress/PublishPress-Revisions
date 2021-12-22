@@ -290,7 +290,7 @@ function pp_revisions_plugin_updated($current_version) {
 		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'future' WHERE post_status IN ('future-revision')");
     } 
 
-    if (version_compare($last_ver, '3.0.2', '<')) {
+    if (version_compare($last_ver, '3.0.7-rc4', '<') && !defined('PRESSPERMIT_DEBUG')) {
         // delete revisions that were erroneously trashed instead of deleted
 		global $wpdb;
         $wpdb->query("DELETE FROM $wpdb->posts WHERE post_mime_type IN ('draft-revision', 'pending-revision', 'future-revision') AND post_status = 'trash'");
