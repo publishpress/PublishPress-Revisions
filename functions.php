@@ -22,6 +22,17 @@ function pp_revisions_sanitize_entry( $entry ) {
     return $entry;
 }
 
+/*
+ * Same as sanitize_key(), but without applying filters
+ */
+function pp_revisions_sanitize_key( $key ) {
+    $raw_key = $key;
+    $key     = strtolower( $key );
+    $key     = preg_replace( '/[^a-z0-9_\-]/', '', $key );
+    
+    return $key;
+}
+
 /**
  * Copies the taxonomies of a post to another post.
  * Based on Yoast Duplicate Post
