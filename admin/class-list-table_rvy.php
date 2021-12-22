@@ -308,7 +308,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$own_posts = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT ID FROM $wpdb->posts WHERE post_status IN ($status_csv) AND post_author = %d",
+				"SELECT ID FROM $wpdb->posts WHERE post_status IN ('$status_csv') AND post_author = %d",
 				$current_user->ID
 			)
 		);
@@ -352,7 +352,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				$type_clause = '';
 			}
 
-			$where_append .= $wpdb->prepare(" AND (($p.post_author = %d $type_clause) OR ($p.comment_count IN ($own_posts_csv) $type_clause))", $current_user->ID );
+			$where_append .= $wpdb->prepare(" AND (($p.post_author = %d $type_clause) OR ($p.comment_count IN ('$own_posts_csv') $type_clause))", $current_user->ID );
 
 		} elseif ($revisionary->config_loaded) {
 			$where_append .= (array_filter($revisionary->enabled_post_types)) 
@@ -800,8 +800,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			['has_cap_check' => true, 'source_alias' => 'p']
 		);
 
-		$status_csv = rvy_filtered_statuses(['return' => 'csv']);
-		$count_query .= " AND p.post_status IN ($status_csv)";
+		$status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_filtered_statuses()));
+		$count_query .= " AND p.post_status IN ('$status_csv')";
 
 		// work around some versions of PressPermit inserting non-aliased post_type reference into where clause under some configurations
 		$count_query = str_replace("$wpdb->posts.post_type", "p.post_type", $count_query);
