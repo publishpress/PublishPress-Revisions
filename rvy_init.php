@@ -196,6 +196,8 @@ function rvy_ajax_handler() {
 					}
 				}
 			}
+
+			exit;
 		}
 
 	}
