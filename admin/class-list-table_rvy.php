@@ -824,7 +824,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$count_query .= " AND p.post_status IN ('$status_csv')";
 
 		// work around some versions of PressPermit inserting non-aliased post_type reference into where clause under some configurations
-		$count_query = str_replace("$wpdb->posts.post_type", "p.post_type", $count_query);
+		$count_query = str_replace("$wpdb->posts.post_type ", "p.post_type ", $count_query);
 
 		if ($my_post_count = $wpdb->get_var( 
 			$count_query
