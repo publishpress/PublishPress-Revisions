@@ -242,7 +242,10 @@ function rvy_admin_init() {
 				break;
 	
 			default:
-				$sendback = apply_filters( 'handle_bulk_actions-' . get_current_screen()->id, $sendback, $doaction, $post_ids );
+				if (function_exists('get_current_screen')) {
+					$sendback = apply_filters( 'handle_bulk_actions-' . get_current_screen()->id, $sendback, $doaction, $post_ids );
+				}
+				
 				break;
 		}
 	
