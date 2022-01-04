@@ -77,6 +77,8 @@ function rvy_revision_submit($revision_id = 0) {
 		if ( empty($status_obj->public) && empty($status_obj->private) ) {
 			$wpdb->update($wpdb->posts, ['post_status' => 'pending', 'post_mime_type' => 'pending-revision'], ['ID' => $revision_id]);
 
+			clean_post_cache($revision_id);
+
 			require_once( dirname(REVISIONARY_FILE).'/revision-workflow_rvy.php' );
 			$rvy_workflow_ui = new Rvy_Revision_Workflow_UI();
 
@@ -270,6 +272,8 @@ function rvy_revision_approve($revision_id = 0) {
 			$last_arg = array( "revision_action" => 1, 'scheduled' => $revision->ID );
 			$scheduled = $revision->post_date;
 		}
+
+		clean_post_cache($revision->ID);
 
 		// Support workaround to prevent notification when an Administrator or Editor created the revision
         if (defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS')) {
@@ -496,6 +500,9 @@ function rvy_revision_restore() {
 		revisionary_copy_postmeta($revision, $post->ID);
 
 		revisionary_copy_terms($revision, $post->ID);
+
+		clean_post_cache($revision->ID);
+		clean_post_cache($post->ID);
 
 		rvy_format_content( $revision->post_content, $revision->post_content_filtered, $post->ID );
 
@@ -794,6 +801,9 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	rvy_delete_redundant_revisions($revision);
 
+	clean_post_cache($revision_id);
+	clean_post_cache($published->ID);
+
 	/**
 	 * Trigger after a revision has been applied.
 	 *
@@ -874,6 +884,8 @@ function rvy_revision_delete() {
 		
 		check_admin_referer('delete-revision_' .  $revision_id);
 		
+		clean_post_cache(rvy_post_id($revision_id));
+
 		// before deleting the revision, note its status for redirect
 		wp_delete_post_revision( $revision_id );
 		$redirect = "admin.php?page=rvy-revisions&revision={$revision->post_parent}&action=view&revision_status={$revision->post_mime_type}&deleted=1";
@@ -941,6 +953,8 @@ function rvy_revision_bulk_delete() {
 				}
 			}
 	
+			clean_post_cache(rvy_post_id($revision_id));
+
 			// before deleting the revision, note its status for redirect
 			$revision_status = $revision->post_mime_type;
 			wp_delete_post($revision_id, true);
@@ -986,6 +1000,8 @@ function rvy_revision_unschedule($revision_id) {
 
 		$wpdb->update( $wpdb->posts, array( 'post_status' => 'draft-revision' ), array( 'ID' => $revision->ID ) );
 		
+		clean_post_cache($revision->ID);
+
 		rvy_update_next_publish_date();
 	} while (0);
 
@@ -1032,6 +1048,8 @@ function rvy_revision_publish($revision_id = false) {
 	
 	if (!empty($do_publish)) {
 		rvy_publish_scheduled_revisions(array('force_revision_id' => $revision->ID));
+
+		clean_post_cache($revision->ID);
 
 		if ($post) {
 			clean_post_cache($post->ID);
