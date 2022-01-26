@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.8
-Stable tag: 3.0.7
+Stable tag: 3.0.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -237,6 +237,9 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 
 == Changelog ==
+
+= 3.0.8 - 26 Jan 2022
+* Compat : WordPress 5.9 - Fatal error adding / editing posts (work around WP hooking late-defined function _disable_block_editor_for_navigation_post_type)
 
 = 3.0.7 - 5 Jan 2022 =
 * Fixed : Revision status changes not updated on sites running an object cache
