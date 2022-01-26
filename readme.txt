@@ -238,6 +238,9 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.0.8 - 26 Jan 2022
+* Compat : WordPress 5.9 - Fatal error adding / editing posts (work around WP hooking late-defined function _disable_block_editor_for_navigation_post_type)
+
 = 3.0.7 - 5 Jan 2022 =
 * Fixed : Revision status changes not updated on sites running an object cache
 * Fixed : Revision deletion from within editor left an inaccessible trashed revision and redirected to Edit Posts. Now deletes revision and redirects to Revision Queue.

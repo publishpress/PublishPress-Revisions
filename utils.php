@@ -42,6 +42,8 @@ class Utils {
 	 * @return bool
 	 */
 	public static function isBlockEditorActive() {
+		global $wp_version;
+
 		// Check if PP Custom Post Statuses lower than v2.4 is installed. It disables Gutenberg.
 		if ( defined('PPS_VERSION') && version_compare(PPS_VERSION, '2.4-beta', '<') ) {
 			return false;
@@ -89,6 +91,12 @@ class Utils {
 		 * Classic editor either disabled or enabled (either via an option or with GET argument).
 		 * It's a hairy conditional :(
 		 */
+
+		if (version_compare($wp_version, '5.9-beta', '>=')) {
+            remove_action('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type', 10, 2);
+            remove_filter('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type', 10, 2);
+        }
+
 		// phpcs:ignore WordPress.VIP.SuperGlobalInputUsage.AccessDetected, WordPress.Security.NonceVerification.NoNonceVerification
 		$conditions[] = (self::isWp5() || $pluginsState['gutenberg'])
 						&& ! $pluginsState['classic-editor']
@@ -107,6 +115,10 @@ class Utils {
 
 		$conditions[] = $pluginsState['gutenberg-ramp'] 
 						&& apply_filters('use_block_editor_for_post', true, get_post(rvy_detect_post_id()), PHP_INT_MAX);
+
+		if (defined('PP_CAPABILITIES_RESTORE_NAV_TYPE_BLOCK_EDITOR_DISABLE') && version_compare($wp_version, '5.9-beta', '>=')) {
+			add_filter('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type', 10, 2 );
+		}
 
 		// Returns true if at least one condition is true.
 		return count(
