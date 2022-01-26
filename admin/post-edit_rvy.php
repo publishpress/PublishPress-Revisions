@@ -47,6 +47,9 @@ class RvyPostEdit {
             wp_enqueue_script('rvy_object_edit', RVY_URLPATH . "/admin/rvy_revision-classic-edit{$suffix}.js", ['jquery', 'jquery-form'], PUBLISHPRESS_REVISIONS_VERSION, true);
 
             $args = \PublishPress\Revisions\PostEditorWorkflowUI::revisionLinkParams(compact('post', 'do_pending_revisions', 'do_scheduled_revisions'));
+
+            $args['deleteCaption'] = __('Delete Permanently', 'revisionary');
+
             wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
 
             if (defined('PUBLISHPRESS_VERSION')) {
@@ -146,7 +149,7 @@ class RvyPostEdit {
 
     function fltAllowBrowseRevisionsLink($wp_blogcaps, $reqd_caps, $args) {
         if (!empty($args[0]) && ('edit_post' == $args[0]) && !empty($args[2])) {
-            if ($_post = get_post($args[2])) {
+            if ($_post = get_post((int) $args[2])) {
                 if ('revision' == $_post->post_type && current_user_can('edit_post', $_post->post_parent)) {
                     if (did_action('post_submitbox_minor_actions')) {
                         if (!did_action('post_submitbox_misc_actions')) {

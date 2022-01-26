@@ -196,6 +196,8 @@ function rvy_ajax_handler() {
 					}
 				}
 			}
+
+			exit;
 		}
 
 	}
@@ -673,12 +675,12 @@ function revisionary_refresh_postmeta($post_id, $args = []) {
 
 	$ignore_clause = ($ignore_revisions) ? " AND ID NOT IN (" . implode(",", array_map('intval', $ignore_revisions)) . ")" : '';
 
-	$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+	$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
 
 	$has_revisions = $wpdb->get_var(
 		// account for post deletion
 		$wpdb->prepare(
-			"SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ($revision_status_csv) $ignore_clause AND comment_count = %d LIMIT 1",
+			"SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ('$revision_status_csv') $ignore_clause AND comment_count = %d LIMIT 1",
 			$post_id
 		)
 	);
@@ -699,13 +701,13 @@ if (!empty($_REQUEST['rvy_flush_flags'])) {
 function revisionary_refresh_revision_flags() {
 	global $wpdb;
 
-	$status_csv = rvy_filtered_statuses(['return' => 'csv']);
-	$revision_base_status_csv = rvy_revision_base_statuses(['return' => 'csv']);
-	$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+	$status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_filtered_statuses()));
+	$revision_base_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_base_statuses()));
+	$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
 
 	$arr_have_revisions = $wpdb->get_col(
 		"SELECT r.comment_count FROM $wpdb->posts r INNER JOIN $wpdb->posts p ON r.comment_count = p.ID"
-		. " WHERE p.post_status IN ($status_csv) AND r.post_status IN ($revision_base_status_csv) AND r.post_mime_type IN ($revision_status_csv)"
+		. " WHERE p.post_status IN ('$status_csv') AND r.post_status IN ('$revision_base_status_csv') AND r.post_mime_type IN ('$revision_status_csv')"
 	);
 	
 	$have_revisions = implode("','", array_map('intval', array_unique($arr_have_revisions)));
@@ -927,6 +929,8 @@ function rvy_confirm_async_execution($action) {
 	if ( is_array($requested_actions) && isset($requested_actions[$action]) ) {
 		unset( $requested_actions[$action] );
 		update_option( 'requested_remote_actions_rvy', $requested_actions );
+	} else {
+		exit;
 	}
 }
 
@@ -1079,7 +1083,7 @@ function _revisionary_dashboard_dismiss_msg() {
 	if ( ! is_array( $dismissals ) )
 		$dismissals = array();
 
-	$msg_id = ( isset( $_REQUEST['msg_id'] ) ) ? sanitize_key($_REQUEST['msg_id']) : 'intro_revisor_role';
+	$msg_id = ( isset( $_REQUEST['msg_id'] ) ) ? pp_revisions_sanitize_key($_REQUEST['msg_id']) : 'intro_revisor_role';
 	$dismissals[$msg_id] = true;
 	update_option( 'rvy_dismissals', $dismissals );
 }
@@ -1298,8 +1302,14 @@ function rvy_preview_url($revision, $args = []) {
 		$$var = (!empty($args[$var])) ? $args[$var] : $defaults[$var]; 
 	}
 
+	if ('revision' == $post_type) {
+		$post_type = get_post_field('post_type', $revision->post_parent);
+	}
+
+	$post_type = pp_revisions_sanitize_key($post_type);
+
 	if ($post_type_obj = get_post_type_object($revision->post_type)) {
-		if (empty($post_type_obj->public)) { // For non-public types, preview is not available so default to Compare Revisions screen
+		if (empty($post_type_obj->public) && !defined('FL_BUILDER_VERSION') && !apply_filters('revisionary_private_type_use_preview_url', false, $revision)) { // For non-public types, preview is not available so default to Compare Revisions screen
 			return apply_filters('revisionary_preview_url', rvy_admin_url("revision.php?revision=$revision->ID"), $revision, $args);
 		}
 	}

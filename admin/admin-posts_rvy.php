@@ -19,6 +19,33 @@ class RevisionaryAdminPosts {
 			add_filter('get_comments_number', [$this, 'fltCommentsNumber'], 20, 2);
 		}
 
+		// If a revision was just deleted from within post editor, redirect to Revision Queue
+		if (!empty($_REQUEST['trashed']) && !empty($_REQUEST['post_type']) && !empty($_REQUEST['ids']) && is_scalar($_REQUEST['ids'])) {
+			$post_type = pp_revisions_sanitize_key($_REQUEST['post_type']);
+
+			if (in_array($post_type, rvy_get_manageable_types())) {
+				$deleted_id = (int) $_REQUEST['ids'];
+
+				if (!empty($_SERVER['HTTP_REFERER']) && (
+					(false !== strpos($_SERVER['HTTP_REFERER'], admin_url("post.php?post={$deleted_id}&action=edit")))
+					|| (false !== strpos($_SERVER['HTTP_REFERER'], admin_url("post-new.php")))
+				)) {
+					$_post = get_post($deleted_id);
+
+					if (!$_post || (('trash' == $_post->post_status) && in_array($_post->post_mime_type, rvy_revision_statuses()))) {
+						if (apply_filters('revisionary_deletion_redirect_to_queue', true, $deleted_id, $post_type)) {
+							$url = admin_url("admin.php?page=revisionary-q&pp_revisions_deleted={$deleted_id}");
+							
+							if (false === strpos($_SERVER['REQUEST_URI'], $url)) {
+								wp_redirect($url);
+								exit;
+							}
+						}
+					}
+				}
+			}
+		}
+
 		add_filter('query', [$this, 'fltPostCountQuery']);
     }
     
@@ -57,12 +84,12 @@ class RevisionaryAdminPosts {
 		}
 
 		if ($listed_ids) {
-			$id_csv = "'" . implode("','", array_map('intval', $listed_ids)) . "'";
-			$revision_base_status_csv = rvy_revision_base_statuses(['return' => 'csv']);
-			$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+			$id_csv = implode("','", array_map('intval', $listed_ids));
+			$revision_base_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_base_statuses()));
+			$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
 
 			$results = $wpdb->get_results(
-				"SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN ($id_csv) AND post_status IN ($revision_base_status_csv) AND post_mime_type IN ($revision_status_csv) GROUP BY comment_count"
+				"SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN ('$id_csv') AND post_status IN ('$revision_base_status_csv') AND post_mime_type IN ('$revision_status_csv') GROUP BY comment_count"
 			);
 			
 			foreach($results as $row) {
@@ -199,20 +226,22 @@ class RevisionaryAdminPosts {
             $_post_type = (!empty($matches[1])) ? $matches[1] : PWP::findPostType();
 
             if ($_post_type) {
-				$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+				$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
 				
 				if (!function_exists('presspermit')) {
 					// avoid counting posts stored with a status that's no longer registered
 					$statuses = get_post_stati();
-					$statuses_clause = " AND post_status IN ('" . implode("','", $statuses) . "')";
+					$statuses_clause = " AND post_status IN ('" 
+											. implode("','", array_map('pp_revisions_sanitize_key', $statuses)) 
+										. "')";
 				} else {
 					$statuses_clause = '';
 				}
 
-				if (!strpos($query, "AND post_mime_type NOT IN ($revision_status_csv)")) {
+				if (!strpos($query, "AND post_mime_type NOT IN ('$revision_status_csv')")) {
 					$query = str_replace(
 						" post_type = '{$matches[1]}'", 
-						"( post_type = '{$matches[1]}' AND post_mime_type NOT IN ($revision_status_csv){$statuses_clause} )", 
+						"( post_type = '{$matches[1]}' AND post_mime_type NOT IN ('$revision_status_csv'){$statuses_clause} )", 
 						$query
 					);
 				}

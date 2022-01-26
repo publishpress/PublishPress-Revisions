@@ -10,6 +10,11 @@ div.edit-post-post-status div.edit-post-post-schedule, div.edit-post-post-status
 display:inline-flex;
 }
 
+/* Classic Editor Trash button: Initial hide before js show with recaption */
+#submitdiv #submitpost a.submitdelete {
+display: none;
+}
+
 /* Gutenberg */
 a.rvy-post-preview.components-button.is-large {
 margin-right:5px;
