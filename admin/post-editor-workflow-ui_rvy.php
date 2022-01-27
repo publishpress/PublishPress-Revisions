@@ -28,7 +28,7 @@ class PostEditorWorkflowUI {
             'onApprovalCaption' => __('(on approval)', 'revisionary'),
         ];
 
-        $vars['disableRecaption'] = is_plugin_active('gutenberg/gutenberg.php');
+        $vars['disableRecaption'] = version_compare($wp_version, '5.9-beta', '>=') || is_plugin_active('gutenberg/gutenberg.php');
 
         if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
             $vars['viewURL'] = rvy_preview_url($post);
