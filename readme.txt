@@ -238,6 +238,9 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.0.9 - 27 Jan 2022
+* Compat : WordPress 5.9 - Revisions could not be updated using Gutenberg editor
+
 = 3.0.8 - 26 Jan 2022
 * Compat : WordPress 5.9 - Fatal error adding / editing posts (work around WP hooking late-defined function _disable_block_editor_for_navigation_post_type)
 
