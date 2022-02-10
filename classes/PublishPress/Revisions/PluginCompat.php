@@ -67,8 +67,8 @@ class PluginCompat {
 				}
 			}
 
-			$revision_base_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_base_statuses()));
-			$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
+			$revision_base_status_csv = implode("','", array_map('sanitize_key', rvy_revision_base_statuses()));
+			$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 			if ('include' == $mod) {
 				$clause = "(($clause) OR ($src_table.post_status IN ('$revision_base_status_csv') AND $src_table.post_mime_type IN ('$revision_status_csv') AND $src_table.comment_count IN ('" . implode("','", array_map('intval', $ids)) . "')))";
@@ -155,7 +155,7 @@ class PluginCompat {
     function flt_custom_permalinks_query($query) {
 		global $wpdb;
 
-		$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
+		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 		if (strpos($query, " WHERE pm.meta_key = 'custom_permalink' ") && strpos($query, "$wpdb->posts AS p")) {
 			$query = str_replace(

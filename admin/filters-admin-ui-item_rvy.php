@@ -1,5 +1,5 @@
 <?php
-if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
+if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die();
 
 /*

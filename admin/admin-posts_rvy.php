@@ -14,21 +14,21 @@ class RevisionaryAdminPosts {
 		add_filter('page_row_actions', [$this, 'revisions_row_action_link']);
 		add_filter('post_row_actions', [$this, 'revisions_row_action_link']);
 
-		if (!empty($_REQUEST['post_status']) && ('trash' == $_REQUEST['post_status'])) {
+		if (!empty($_REQUEST['post_status']) && ('trash' == sanitize_key($_REQUEST['post_status']))) {
 			add_filter('display_post_states', [$this, 'fltTrashedPostState'], 20, 2 );
 			add_filter('get_comments_number', [$this, 'fltCommentsNumber'], 20, 2);
 		}
 
 		// If a revision was just deleted from within post editor, redirect to Revision Queue
 		if (!empty($_REQUEST['trashed']) && !empty($_REQUEST['post_type']) && !empty($_REQUEST['ids']) && is_scalar($_REQUEST['ids'])) {
-			$post_type = pp_revisions_sanitize_key($_REQUEST['post_type']);
+			$post_type = sanitize_key($_REQUEST['post_type']);
 
 			if (in_array($post_type, rvy_get_manageable_types())) {
 				$deleted_id = (int) $_REQUEST['ids'];
 
 				if (!empty($_SERVER['HTTP_REFERER']) && (
-					(false !== strpos($_SERVER['HTTP_REFERER'], admin_url("post.php?post={$deleted_id}&action=edit")))
-					|| (false !== strpos($_SERVER['HTTP_REFERER'], admin_url("post-new.php")))
+					(false !== strpos(esc_url_raw($_SERVER['HTTP_REFERER']), admin_url("post.php?post={$deleted_id}&action=edit")))
+					|| (false !== strpos(esc_url_raw($_SERVER['HTTP_REFERER']), admin_url("post-new.php")))
 				)) {
 					$_post = get_post($deleted_id);
 
@@ -36,7 +36,7 @@ class RevisionaryAdminPosts {
 						if (apply_filters('revisionary_deletion_redirect_to_queue', true, $deleted_id, $post_type)) {
 							$url = admin_url("admin.php?page=revisionary-q&pp_revisions_deleted={$deleted_id}");
 							
-							if (false === strpos($_SERVER['REQUEST_URI'], $url)) {
+							if (false === strpos(esc_url_raw($_SERVER['REQUEST_URI']), $url)) {
 								wp_redirect($url);
 								exit;
 							}
@@ -85,8 +85,8 @@ class RevisionaryAdminPosts {
 
 		if ($listed_ids) {
 			$id_csv = implode("','", array_map('intval', $listed_ids));
-			$revision_base_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_base_statuses()));
-			$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
+			$revision_base_status_csv = implode("','", array_map('sanitize_key', rvy_revision_base_statuses()));
+			$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 			$results = $wpdb->get_results(
 				"SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN ('$id_csv') AND post_status IN ('$revision_base_status_csv') AND post_mime_type IN ('$revision_status_csv') GROUP BY comment_count"
@@ -181,7 +181,7 @@ class RevisionaryAdminPosts {
 
 		if (!empty($status_obj->public) || !empty($status_obj->private) || rvy_get_option('pending_revision_unpublished')) {
 			if (rvy_get_option('pending_revisions') && current_user_can('copy_post', $post->ID)) {
-				$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
+				$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
 				//$url = wp_nonce_url(rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg"), "submit-post_{$post->ID}" );
 				$url = rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg");
 				
@@ -226,13 +226,13 @@ class RevisionaryAdminPosts {
             $_post_type = (!empty($matches[1])) ? $matches[1] : PWP::findPostType();
 
             if ($_post_type) {
-				$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
+				$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 				
 				if (!function_exists('presspermit')) {
 					// avoid counting posts stored with a status that's no longer registered
 					$statuses = get_post_stati();
 					$statuses_clause = " AND post_status IN ('" 
-											. implode("','", array_map('pp_revisions_sanitize_key', $statuses)) 
+											. implode("','", array_map('sanitize_key', $statuses)) 
 										. "')";
 				} else {
 					$statuses_clause = '';

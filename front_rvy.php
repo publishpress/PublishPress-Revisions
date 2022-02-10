@@ -227,7 +227,7 @@ class RevisionaryFront {
 
 			$can_publish = current_user_can('edit_post', $published_post_id);
 
-			$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
+			$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
 
 			load_plugin_textdomain('revisionary', false, dirname(plugin_basename(REVISIONARY_FILE)) . '/languages');
 
@@ -357,7 +357,7 @@ class RevisionaryFront {
 
 					// work around quirk of new scheduled revision preview not displaying page template and post thumbnail when accessed immediately after creation
 					if (time() < strtotime($post->post_modified_gmt) + 15) {
-						$current_url = set_url_scheme( esc_url('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']) );
+						$current_url = set_url_scheme( esc_url('https://' . esc_url_raw($_SERVER['HTTP_HOST']). esc_url_raw($_SERVER['REQUEST_URI'])) );
 						$title = esc_attr(__('This revision is very new, preview may not be synchronized with theme.', 'revisionary'));
 						$reload_link = " <a href='$current_url' title='$title'>" . __('Reload', 'revisionary') . '</a>';
 					} else {

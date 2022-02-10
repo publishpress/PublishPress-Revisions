@@ -1,5 +1,5 @@
 <?php
-if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
+if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die( 'This page cannot be called directly.' );
 
 add_action( '_wp_put_post_revision', 'rvy_review_revision' );
@@ -426,7 +426,8 @@ function rvy_revision_approve($revision_id = 0) {
 
 		if ( empty( $_REQUEST['rvy_redirect'] ) && ! $scheduled && is_post_type_viewable($type_obj) ) {
 			$redirect = $published_url;
-		} elseif ( !empty($_REQUEST['rvy_redirect']) && 'edit' == $_REQUEST['rvy_redirect'] ) {
+
+		} elseif ( !empty($_REQUEST['rvy_redirect']) && 'edit' == esc_url_raw($_REQUEST['rvy_redirect']) ) {
 			$redirect = add_query_arg( $last_arg, "post.php?post=$revision_id&action=edit" );
 
 		} elseif (is_post_type_viewable($type_obj)) {
@@ -518,7 +519,7 @@ function rvy_revision_restore() {
 		} elseif ( 'edit' == $_REQUEST['rvy_redirect'] ) {
 			$redirect = add_query_arg( $last_arg, "post.php?post={$post->ID}&action=edit" );
 		} else {
-			$redirect = add_query_arg( $last_arg, esc_url($_REQUEST['rvy_redirect']) );
+			$redirect = add_query_arg( $last_arg, esc_url_raw($_REQUEST['rvy_redirect']) );
 		}
 
 	} while (0);
@@ -896,7 +897,7 @@ function rvy_revision_delete() {
 	} while (0);
 	
 	if ( ! empty( $_GET['return'] ) && ! empty( $_SERVER['HTTP_REFERER'] ) ) {
-		$redirect = str_replace( 'trashed=', 'deleted=', $_SERVER['HTTP_REFERER'] );
+		$redirect = str_replace( 'trashed=', 'deleted=', esc_url_raw($_SERVER['HTTP_REFERER']) );
 
 	} elseif ( ! $redirect ) {
 		if ( ! empty($post) && is_object($post) && ( 'post' != $post->post_type ) ) {
@@ -1343,8 +1344,8 @@ function rvy_publish_scheduled_revisions($args = array()) {
 	// if this was initiated by an asynchronous remote call, we're done.
 	if ( ! empty( $_GET['action']) && ( 'publish_scheduled_revisions' == $_GET['action'] ) ) {
 		exit( 0 );
-	} elseif ( in_array( $_SERVER['REQUEST_URI'], $revised_uris ) ) {
-		wp_redirect( esc_url($_SERVER['REQUEST_URI']) );  // if one of the revised pages is being accessed now, redirect back so revision is published on first access
+	} elseif ( in_array( esc_url_raw($_SERVER['REQUEST_URI']), $revised_uris ) ) {
+		wp_redirect( esc_url(esc_url_raw($_SERVER['REQUEST_URI'])) );  // if one of the revised pages is being accessed now, redirect back so revision is published on first access
 	}
 }
 
