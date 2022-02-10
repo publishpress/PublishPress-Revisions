@@ -220,39 +220,36 @@ function rvy_in_revision_workflow($post) {
 }
 
 function rvy_post_id($revision_id) {
-	static $busy;
+	if ($_post = get_post($revision_id)) {
+		// if ID passed in is not a revision, return it as is
+		if (('revision' != $_post->post_type) && !rvy_in_revision_workflow($_post)) {
+			return $revision_id;
 
-	if (!empty($busy)) {
-		return;
-	}
-
-	$busy = true;
-	$published_id = rvy_get_post_meta( $revision_id, '_rvy_base_post_id', true );
-	$busy = false;
-
-	if (empty($published_id)) {
-		if ($_post = get_post($revision_id)) {
-			// if ID passed in is not a revision, return it as is
-			if (('revision' != $_post->post_type) && !rvy_in_revision_workflow($_post)) {
-				return $revision_id;
-
-			} elseif ('revision' == $_post->post_type) {
-				return $_post->post_parent;
-
-			} else {
-				// Restore missing postmeta field
-				/*
-				if ($_post->comment_count) {
-					rvy_update_post_meta( $revision_id, '_rvy_base_post_id', $_post->comment_count );
+		} elseif ('revision' == $_post->post_type) {
+			return $_post->post_parent;
+		} else {
+            if (!$_post->comment_count) {
+				static $busy;
+			
+				if (!empty($busy)) {
+					return;
 				}
-				*/
+			
+				$busy = true;
+				$published_id = rvy_get_post_meta( $revision_id, '_rvy_base_post_id', true );
+				$busy = false;
 
-				return $_post->comment_count;
+                if ($published_id) {
+                    global $wpdb;
+                    $wpdb->update($wpdb->posts, ['comment_count' => $published_id], ['ID' => $revision_id]);
+                }
+			} else {
+                $published_id = $_post->comment_count;
 			}
 		}
 	}
 
-	return ($published_id) ? $published_id : 0;
+	return (!empty($published_id)) ? $published_id : 0;
 }
 
 // Append a random argument for cache busting
