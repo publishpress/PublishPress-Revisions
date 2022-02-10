@@ -168,7 +168,7 @@ function rvy_revision_base_statuses($args = []) {
 		$$var = $args[$var];
 	}
 
-	$arr = array_map('pp_revisions_sanitize_key', (array) apply_filters('rvy_revision_base_statuses', ['draft', 'pending', 'future']));
+	$arr = array_map('sanitize_key', (array) apply_filters('rvy_revision_base_statuses', ['draft', 'pending', 'future']));
 
 	if ('object' == $output) {
 		$status_keys = array_value($arr);
@@ -189,7 +189,7 @@ function rvy_revision_statuses($args = []) {
 		$$var = $args[$var];
 	}
 	
-	$arr = array_map('pp_revisions_sanitize_key', (array) apply_filters('rvy_revision_statuses', ['draft-revision', 'pending-revision', 'future-revision']));
+	$arr = array_map('sanitize_key', (array) apply_filters('rvy_revision_statuses', ['draft-revision', 'pending-revision', 'future-revision']));
 
 	if ('object' == $output) {
 		$status_keys = array_value($arr);
@@ -220,39 +220,37 @@ function rvy_in_revision_workflow($post) {
 }
 
 function rvy_post_id($revision_id) {
-	static $busy;
+    if ($_post = get_post($revision_id)) {
+        // if ID passed in is not a revision, return it as is
+        if (('revision' != $_post->post_type) && !rvy_in_revision_workflow($_post)) {
+            return $revision_id;
 
-	if (!empty($busy)) {
-		return;
-	}
+        } elseif ('revision' == $_post->post_type) {
+            return $_post->post_parent;
 
-	$busy = true;
-	$published_id = rvy_get_post_meta( $revision_id, '_rvy_base_post_id', true );
-	$busy = false;
+        } else {
+            if (!$_post->comment_count) {
+                static $busy;
 
-	if (empty($published_id)) {
-		if ($_post = get_post($revision_id)) {
-			// if ID passed in is not a revision, return it as is
-			if (('revision' != $_post->post_type) && !rvy_in_revision_workflow($_post)) {
-				return $revision_id;
+                if (!empty($busy)) {
+                    return;
+                }
+                
+                $busy = true;
+                $published_id = rvy_get_post_meta( $revision_id, '_rvy_base_post_id', true );
+                $busy = false;
 
-			} elseif ('revision' == $_post->post_type) {
-				return $_post->post_parent;
+                if ($published_id) {
+                    global $wpdb;
+                    $wpdb->update($wpdb->posts, ['comment_count' => $published_id], ['ID' => $revision_id]);
+                }
+            } else {
+                $published_id = $_post->comment_count;
+            }
+        }
+    }
 
-			} else {
-				// Restore missing postmeta field
-				/*
-				if ($_post->comment_count) {
-					rvy_update_post_meta( $revision_id, '_rvy_base_post_id', $_post->comment_count );
-				}
-				*/
-
-				return $_post->comment_count;
-			}
-		}
-	}
-
-	return ($published_id) ? $published_id : 0;
+	return (!empty($published_id)) ? $published_id : 0;
 }
 
 // Append a random argument for cache busting
@@ -283,7 +281,7 @@ function pp_revisions_plugin_updated($current_version) {
     if (version_compare($last_ver, '3.0.1', '<')) {
         // convert pending / scheduled revisions to v3.0 format
 		global $wpdb;
-		$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
+		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 		$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = post_status WHERE post_status IN ('$revision_status_csv')");
 		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft' WHERE post_status IN ('draft-revision')");
 		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending' WHERE post_status IN ('pending-revision')");

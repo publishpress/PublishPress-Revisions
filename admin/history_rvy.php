@@ -64,8 +64,8 @@ class RevisionaryHistory
     public function actLoadRevision() {
         global $wpdb, $post;
 
-        if (!empty($_REQUEST['revision']) && is_scalar($_REQUEST['revision']) && !empty($_REQUEST['post_id']) && !is_numeric($_REQUEST['revision']) && rvy_is_revision_status(pp_revisions_sanitize_key($_REQUEST['revision']))) {
-            $revision_status = pp_revisions_sanitize_key($_REQUEST['revision']);
+        if (!empty($_REQUEST['revision']) && is_scalar($_REQUEST['revision']) && !empty($_REQUEST['post_id']) && !is_numeric($_REQUEST['revision']) && rvy_is_revision_status(sanitize_key($_REQUEST['revision']))) {
+            $revision_status = sanitize_key($_REQUEST['revision']);
 
             $orderby = ('future-revision' == $revision_status) ? 'post_date' : 'ID';
             $order =   ('future-revision' == $revision_status) ? 'DESC' : 'ASC';
@@ -300,7 +300,6 @@ class RevisionaryHistory
 
     // port wp_ajax_get_revision_diffs() to support pending, scheduled revisions
     public function actAjaxRevisionDiffs() {
-
         if ( ! $post = get_post( (int) $_REQUEST['post_id'] ) ) {
             //wp_send_json_error();
             return;
@@ -315,7 +314,7 @@ class RevisionaryHistory
         $to = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : '';
 
         if (!$revision_id && !$to && !empty($_REQUEST['compare'])) {
-            $compare = (array) $_REQUEST['compare'];
+            $compare = array_map('intval', (array) sanitize_text_field($_REQUEST['compare']));
             list( $from, $to ) = explode( ':', reset($compare)); // from:to
         }
 
@@ -896,7 +895,7 @@ class RevisionaryHistory
 
                     // For non-public types, force direct approval because preview is not available
 	                if ((($type_obj && !is_post_type_viewable($type_obj)) || rvy_get_option('compare_revisions_direct_approval')) && current_user_can( 'edit_post', $published_post_id) ) {
-                        $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
+                        $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
 
                         //if (in_array($revision->post_mime_type, ['draft-revision'])) {
                         //    $restore_link = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision={$revision->ID}&action=submit$redirect_arg"), "submit-post_$published_post_id|{$revision->ID}" );

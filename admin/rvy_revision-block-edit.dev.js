@@ -29,9 +29,9 @@ jQuery(document).ready( function($) {
 		}
 		
 		if ( caption == '' && ( typeof rvyObjEdit['publishCaptionCurrent'] != 'undefined' )  ) {
-			caption = rvyObjEdit.publishCaptionCurrent;
+			console.log('caption 1: ' + caption);
 		} else {
-			rvyObjEdit.publishCaptionCurrent = caption;
+			console.log('caption 2: ' + caption);
 		}
 
 		if ( typeof waitForSaveDraftButton == 'undefined' ) {
@@ -69,7 +69,11 @@ jQuery(document).ready( function($) {
 
 
 	/************* RECAPTION PRE-PUBLISH AND PUBLISH BUTTONS ****************/
-	rvyObjEdit.publishCaptionCurrent = rvyObjEdit.publish;
+	if (typeof rvyObjEdit.publish == 'undefined') {
+		rvyObjEdit.publishCaptionCurrent = rvyObjEdit.updateCaption;
+	} else {
+		rvyObjEdit.publishCaptionCurrent = rvyObjEdit.publish;
+	}
 
 	// Initialization operations to perform once React loads the relevant elements
 	var RvyInitializeBlockEditorModifications = function() {
@@ -86,7 +90,11 @@ jQuery(document).ready( function($) {
 					RvySetPublishButtonCaption('', false, true); // nullstring: set caption to value queued in rvyObjEdit.publishCaptionCurrent
 				});
 			} else {
-				RvySetPublishButtonCaption(rvyObjEdit.publish, false, true);
+				if (typeof rvyObjEdit.publish == 'undefined') {
+					RvySetPublishButtonCaption(rvyObjEdit.updateCaption, false, true);
+				} else {
+					RvySetPublishButtonCaption(rvyObjEdit.publish, false, true);
+				}
 			}
 
 			$('select.editor-post-author__select').parent().hide();
@@ -94,11 +102,6 @@ jQuery(document).ready( function($) {
 			$('button.editor-post-switch-to-draft').hide();
 
 			$('div.components-notice-list').hide();	// autosave notice
-		}
-
-		if ( ( $('button.editor-post-publish-button').length || $('button.editor-post-publish-panel__toggle').length ) ) {
-			$('button.editor-post-publish-button').hide();
-			$('button.editor-post-publish-panel__toggle').hide();
 		}
 	}
 	var RvyInitInterval = setInterval(RvyInitializeBlockEditorModifications, 50);
@@ -126,8 +129,21 @@ jQuery(document).ready( function($) {
 			$('button.editor-post-publish-button').show();
 		
 		} else {
-			if ( $('button.editor-post-publish-button').length ) {
+			if ( $('button.editor-post-publish-button').length && ($('button.editor-post-save-draft:visible').length || $('button.editor-post-saved-stated:visible').length) ) {
 				$('button.editor-post-publish-button').hide();
+			}
+		}
+
+		if ( ( $('button.editor-post-publish-button').length || $('button.editor-post-publish-panel__toggle').length ) 
+		&& ($('button.editor-post-save-draft').filter(':visible').length || $('.is-saved').filter(':visible').length) 
+		) {
+			$('button.editor-post-publish-button').hide();
+			$('button.editor-post-publish-panel__toggle').hide();
+		} else {
+			if ($('button.editor-post-publish-button').length) {
+				$('button.editor-post-publish-button').show();
+			} else {
+				$('button.editor-post-publish-panel__toggle').show();
 			}
 		}
 	}

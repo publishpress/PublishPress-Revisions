@@ -12,11 +12,11 @@ class Utils {
 		if ($arr_url) {
 			$path = isset($arr_url['path']) ? $arr_url['path'] : '';
 	
-			if (0 === strpos($_SERVER['REQUEST_URI'], $path . '/wp-json/oembed/')) {
+			if (0 === strpos(esc_url_raw($_SERVER['REQUEST_URI']), $path . '/wp-json/oembed/')) {
 				return false;	
 			}
 	
-			if (0 === strpos($_SERVER['REQUEST_URI'], $path . '/wp-json/')) {
+			if (0 === strpos(esc_url_raw($_SERVER['REQUEST_URI']), $path . '/wp-json/')) {
 				return true;
 			}
 		}

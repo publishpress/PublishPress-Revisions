@@ -126,7 +126,7 @@ class Rvy_Revision_Workflow_UI {
         foreach( array_keys($defaults) as $var ) { $$var = $args[$var]; }
 
         $revision_id = (int) $revision_id;
-        $object_type = pp_revisions_sanitize_key($object_type);
+        $object_type = sanitize_key($object_type);
 
         if ( ! $published_post ) {
             return;

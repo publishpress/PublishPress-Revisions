@@ -1,5 +1,5 @@
 <?php
-if ( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
+if ( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die();
 
 if (defined('REVISIONARY_FILE')) {
@@ -135,6 +135,7 @@ function rvy_ajax_handler() {
 						rvy_revision_submit($post_id);
 						$check_autosave = true;
 					//}
+
 					break;
 
 				case 'create_scheduled_revision':
@@ -233,7 +234,6 @@ function rvy_delete_post_meta($post_id, $meta_key) {
 }
 
 function rvy_status_registrations() {
-
 	$labels = apply_filters('revisionary_status_labels',
 		rvy_get_option('revision_statuses_noun_labels') ?
 		[
@@ -608,9 +608,9 @@ function rvy_detect_post_id() {
 	} elseif ( ! empty( $_GET['page_id'] ) ) {
 		$post_id = (int) $_GET['page_id'];
 
-	} elseif (defined('REST_REQUEST') && REST_REQUEST && strpos($_SERVER['REQUEST_URI'], 'autosaves')) {
+	} elseif (defined('REST_REQUEST') && REST_REQUEST && strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'autosaves')) {
 		require_once( dirname(__FILE__).'/rest_rvy.php' );
-		$post_id = Revisionary_REST::get_id_element($_SERVER['REQUEST_URI'], 1);
+		$post_id = Revisionary_REST::get_id_element(esc_url_raw($_SERVER['REQUEST_URI']), 1);
 
 	} elseif (defined('DOING_AJAX') && DOING_AJAX) {
 		$post_id = apply_filters('revisionary_detect_id', 0, ['is_ajax' => true]);
@@ -675,7 +675,7 @@ function revisionary_refresh_postmeta($post_id, $args = []) {
 
 	$ignore_clause = ($ignore_revisions) ? " AND ID NOT IN (" . implode(",", array_map('intval', $ignore_revisions)) . ")" : '';
 
-	$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
+	$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 	$has_revisions = $wpdb->get_var(
 		// account for post deletion
@@ -701,9 +701,9 @@ if (!empty($_REQUEST['rvy_flush_flags'])) {
 function revisionary_refresh_revision_flags() {
 	global $wpdb;
 
-	$status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_filtered_statuses()));
-	$revision_base_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_base_statuses()));
-	$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
+	$status_csv = implode("','", array_map('sanitize_key', rvy_filtered_statuses()));
+	$revision_base_status_csv = implode("','", array_map('sanitize_key', rvy_revision_base_statuses()));
+	$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 	$arr_have_revisions = $wpdb->get_col(
 		"SELECT r.comment_count FROM $wpdb->posts r INNER JOIN $wpdb->posts p ON r.comment_count = p.ID"
@@ -1083,7 +1083,7 @@ function _revisionary_dashboard_dismiss_msg() {
 	if ( ! is_array( $dismissals ) )
 		$dismissals = array();
 
-	$msg_id = ( isset( $_REQUEST['msg_id'] ) ) ? pp_revisions_sanitize_key($_REQUEST['msg_id']) : 'intro_revisor_role';
+	$msg_id = ( isset( $_REQUEST['msg_id'] ) ) ? sanitize_key($_REQUEST['msg_id']) : 'intro_revisor_role';
 	$dismissals[$msg_id] = true;
 	update_option( 'rvy_dismissals', $dismissals );
 }
@@ -1165,12 +1165,12 @@ function rvy_init() {
 	} else {		// @todo: fix links instead
 		// fill in the missing args for Pending / Scheduled revision preview link from Edit Posts / Pages
 		if ( isset($_SERVER['HTTP_REFERER']) 
-		&& ( false !== strpos( urldecode($_SERVER['HTTP_REFERER']),'p-admin/edit-pages.php') 
-		|| false !== strpos( urldecode($_SERVER['HTTP_REFERER']),'p-admin/edit.php') ) ) {
+		&& ( false !== strpos( urldecode(esc_url_raw($_SERVER['HTTP_REFERER'])),'p-admin/edit-pages.php') 
+		|| false !== strpos( urldecode(esc_url_raw($_SERVER['HTTP_REFERER'])),'p-admin/edit.php') ) ) {
 
 			if ( ! empty($_GET['p']) ) {
 				if ( rvy_get_option( 'scheduled_revisions' ) || rvy_get_option( 'pending_revisions' ) ) {
-					if ( $post = get_post( $_GET['p'] ) ) {
+					if ( $post = get_post( sanitize_text_field($_GET['p']) ) ) {
 						if (rvy_in_revision_workflow($post)) {
 							$_GET['preview'] = 1;
 						}
@@ -1185,7 +1185,7 @@ function rvy_init() {
 	}
 	
 	if ( empty( $_GET['action'] ) || ( 'publish_scheduled_revisions' != $_GET['action'] ) ) {
-		if ( ! strpos( $_SERVER['REQUEST_URI'], 'login.php' ) && rvy_get_option( 'scheduled_revisions' ) ) {
+		if ( ! strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'login.php' ) && rvy_get_option( 'scheduled_revisions' ) ) {
 		
 			// If a previously requested asynchronous request was ineffective, perform the actions now
 			// (this is not executed if the current URI is from a manual publication request with action=publish_scheduled_revisions)
@@ -1306,7 +1306,7 @@ function rvy_preview_url($revision, $args = []) {
 		$post_type = get_post_field('post_type', $revision->post_parent);
 	}
 
-	$post_type = pp_revisions_sanitize_key($post_type);
+	$post_type = sanitize_key($post_type);
 
 	if ($post_type_obj = get_post_type_object($revision->post_type)) {
 		if (empty($post_type_obj->public) && !defined('FL_BUILDER_VERSION') && !apply_filters('revisionary_private_type_use_preview_url', false, $revision)) { // For non-public types, preview is not available so default to Compare Revisions screen
@@ -1391,7 +1391,7 @@ add_action('init', 'rvy_rest_cache_compat', 9999);
 function rvy_rest_cache_compat() {
 	global $wp_post_types;
 
-	$uri = $_SERVER['REQUEST_URI'];
+	$uri = esc_url_raw($_SERVER['REQUEST_URI']);
 
 	$rest_cache_active = false;
 	foreach(['rvy_ajax_field', 'rvy_ajax_value'] as $param) {
@@ -1418,7 +1418,7 @@ function rvy_rest_cache_compat() {
 add_filter('wp_rest_cache/skip_caching', 'rvy_rest_cache_skip');
 
 function rvy_rest_cache_skip($skip) {
-	$uri = $_SERVER['REQUEST_URI'];
+	$uri = esc_url_raw($_SERVER['REQUEST_URI']);
 	$uncached_params = array_merge($uncached_params, ['rvy_ajax_field', 'rvy_ajax_value']);
 
 	foreach($uncached_params as $param) {

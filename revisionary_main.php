@@ -1,5 +1,5 @@
 <?php
-if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
+if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die( 'This page cannot be called directly.' );
 	
 /**
@@ -25,7 +25,7 @@ class Revisionary
 	}
 
 	function init() {
-		if (is_admin() && (false !== strpos($_SERVER['REQUEST_URI'], 'revision.php')) && (!empty($_REQUEST['revision']))) {
+		if (is_admin() && (false !== strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'revision.php')) && (!empty($_REQUEST['revision']))) {
 			add_action('init', [$this, 'addFilters'], PHP_INT_MAX);
 		} else {
 			$this->addFilters();
@@ -41,7 +41,7 @@ class Revisionary
 		// @todo: Correct selective application of filtering downstream so Revisors can use a read-only Compare [Past] Revisions screen
 		//
 		// Note: some filtering is needed to allow users with full editing permissions on the published post to access a Compare Revisions screen with Preview and Manage buttons
-		if (is_admin() && (false !== strpos($_SERVER['REQUEST_URI'], 'revision.php')) && (!empty($_REQUEST['revision'])) && !is_content_administrator_rvy()) {
+		if (is_admin() && (false !== strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'revision.php')) && (!empty($_REQUEST['revision'])) && !is_content_administrator_rvy()) {
 			$revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : (int) $_REQUEST['to'];
 			
 			if ($revision_id) {
@@ -148,7 +148,7 @@ class Revisionary
 
 		$parsed_args['echo'] = 0;
 
-		$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
+		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 		$parsed_args['exclude'] = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ('$revision_status_csv')");
 		// ---- End PublishPress Modification ---
 
@@ -259,7 +259,7 @@ class Revisionary
 		$src_table = ($source_alias) ? $source_alias : $wpdb->posts;
         $args['src_table'] = $src_table;
 
-		$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
+		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 		$clauses['where'] .= " AND $src_table.post_mime_type NOT IN ('$revision_status_csv')";
 
 		return $clauses;
@@ -381,7 +381,7 @@ class Revisionary
 			return;
 		}
 
-		$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
+		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 		$any_trashed_posts = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_status = 'trash' AND comment_count > 0 AND post_mime_type IN ('$revision_status_csv') LIMIT 1");
 
@@ -497,7 +497,7 @@ class Revisionary
 		if ($revision) {
 			$args = [];
 			if (!empty($_REQUEST['nc'])) { // with a specified link target, avoid multiple browser tabs in the same editor instance
-				$args['nc'] = pp_revisions_sanitize_key($_REQUEST['nc']);
+				$args['nc'] = sanitize_key($_REQUEST['nc']);
 			}
 
 			$preview_link = rvy_preview_url($revision, $args);
@@ -521,6 +521,8 @@ class Revisionary
 
 	// prevent revisors from editing other users' regular drafts and pending posts
 	function flt_limit_others_drafts( $caps, $meta_cap, $user_id, $args ) {
+		global $current_user;
+		
 		if (!empty($this->skip_filtering)) {
 			return $caps;
 		}
@@ -536,6 +538,7 @@ class Revisionary
 
 		if ( $post = get_post( $object_id ) ) {
 			if ( ('revision' != $post->post_type) && ! rvy_in_revision_workflow($post) ) {
+
 				if (empty($this->enabled_post_types[$post->post_type])
 				|| !apply_filters('revisionary_require_edit_others_drafts', true, $post->post_type, $post->post_status, $args)) {
 					return $caps;
@@ -544,11 +547,12 @@ class Revisionary
 				$status_obj = get_post_status_object( $post->post_status );
 
 				if (!rvy_is_post_author($post) && $status_obj && ! $status_obj->public && ! $status_obj->private) {
+
 					$post_type_obj = get_post_type_object( $post->post_type );
 					if (isset($post_type_obj->cap->edit_published_posts) && current_user_can( $post_type_obj->cap->edit_published_posts)) {	// don't require any additional caps for sitewide Editors
 						return $caps;
 					}
-			
+
 					static $stati;
 
 					if ( ! isset($stati) ) {
@@ -557,18 +561,20 @@ class Revisionary
 					}
 
 					if ( in_array( $post->post_status, $stati ) ) {	// isset check because doing_cap_check property was undefined prior to Permissions 3.3.8
-						if ((!function_exists('presspermit') || (isset(presspermit()->doing_cap_check) && !presspermit()->doing_cap_check)) && empty($current_user->allcaps['edit_others_drafts']) && $post_type_obj) {
+						if ((!function_exists('presspermit') || (isset(presspermit()->doing_cap_check) && !presspermit()->doing_cap_check)) && $post_type_obj) {
 							if (!empty($post_type_obj->cap->edit_others_posts)) {
 								$caps[] = str_replace('edit_', 'list_', $post_type_obj->cap->edit_others_posts);
 							}
-						} else {
+						}
+						
+						if (empty($current_user->allcaps['edit_others_drafts'])) {
 							$caps[] = "edit_others_drafts";
 						}
 					}
 				}
 			}
 		}
-		
+
 		return $caps;
 	}
 
@@ -751,14 +757,14 @@ class Revisionary
 				return $caps;
 			}
 		} elseif (($post_id > 0) && $post && rvy_in_revision_workflow($post) 
-			&& rvy_get_option('revisor_lock_others_revisions') && !rvy_is_post_author($post) && !rvy_is_full_editor($post)
+			&& rvy_get_option('revisor_lock_others_revisions') && !rvy_is_post_author($post) && !rvy_is_full_editor(rvy_post_id($post->ID))
 		) {
 			if ($type_obj = get_post_type_object( $post->post_type )) {
-				if (in_array($type_obj->cap->edit_others_posts, $caps)) {					
+				if (in_array($type_obj->cap->edit_others_posts, $caps)) {	
 					if ((!empty($type_obj->cap->edit_others_posts) && empty($current_user->allcaps[$type_obj->cap->edit_others_posts])) 
 					|| (!empty($type_obj->cap->edit_published_posts) && empty($current_user->allcaps[$type_obj->cap->edit_published_posts]))
 					) {
-						if (!rvy_get_option('admin_revisions_to_own_posts') || !current_user_can('edit_post', rvy_post_id($post_id))) {
+						if (!current_user_can('edit_post', rvy_post_id($post_id))) {
 							if (!empty($current_user->allcaps['edit_others_revisions'])) {
 								$caps[] = 'edit_others_revisions';
 							} else {
