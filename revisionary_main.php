@@ -521,6 +521,8 @@ class Revisionary
 
 	// prevent revisors from editing other users' regular drafts and pending posts
 	function flt_limit_others_drafts( $caps, $meta_cap, $user_id, $args ) {
+		global $current_user;
+		
 		if (!empty($this->skip_filtering)) {
 			return $caps;
 		}
