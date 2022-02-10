@@ -235,8 +235,12 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
-
 == Changelog ==
+
+= 3.0.10 - 10 Feb 2022 =
+* Fixed : WordPress 5.9 - When editing a submitted revision, Save button was hidden
+* Fixed : Revision Compare did not load on some sites
+* Fixed : Option "Editing others' revisions requires role capability" was not applied
 
 = 3.0.9 - 27 Jan 2022
 * Compat : WordPress 5.9 - Revisions could not be updated using Gutenberg editor
