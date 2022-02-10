@@ -1,5 +1,5 @@
 <?php // avoid bombing out if the actual debug file is not loaded
-if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
+if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die();
 
 if ( ! function_exists('d_echo') ) {

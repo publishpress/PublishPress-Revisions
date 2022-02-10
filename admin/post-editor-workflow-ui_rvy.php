@@ -66,7 +66,7 @@ class PostEditorWorkflowUI {
             $vars['revisionEdits'] = '';
         }
 
-        $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
+        $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
         $published_post_id = rvy_post_id($post->ID);
 
         $draft_obj = get_post_status_object('draft-revision');
@@ -161,7 +161,7 @@ class PostEditorWorkflowUI {
             $vars['scheduledRevisionsURL'] = '';
         }
 
-        $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
+        $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
         $published_post_id = rvy_post_id($post->ID);
 
         if (rvy_get_option('pending_revisions') && current_user_can('copy_post', $post->ID)) {

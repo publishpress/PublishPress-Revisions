@@ -1,6 +1,6 @@
 <?php
 
-if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
+if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die( 'This page cannot be called directly.' );
 	
 /**
@@ -38,7 +38,7 @@ else
 $revision_status = 'inherit';
 
 if ( ! empty($_GET['action']) )
-	$action = pp_revisions_sanitize_key($_GET['action']);
+	$action = sanitize_key($_GET['action']);
 else
 	$action = '';
 
@@ -172,7 +172,7 @@ if ( $is_administrator = is_content_administrator_rvy() ) {
 	global $wpdb;
 
 	$base_status_csv = implode("','", array_merge(rvy_revision_base_statuses(), ['inherit']));
-	$revision_status_csv = implode("','", array_map('pp_revisions_sanitize_key', rvy_revision_statuses()));
+	$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 	$results = $wpdb->get_results( 
 		$wpdb->prepare(

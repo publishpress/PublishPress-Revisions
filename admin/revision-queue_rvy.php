@@ -74,7 +74,7 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 echo '<span class="dashicons dashicons-backup"></span>&nbsp;';
 
 if ( ! empty( $_REQUEST['post_type'] ) ) {
-	$type_obj = get_post_type_object( pp_revisions_sanitize_key($_REQUEST['post_type']) );
+	$type_obj = get_post_type_object(sanitize_key($_REQUEST['post_type']));
 }
 
 if (!empty($_REQUEST['published_post'])) {
@@ -94,7 +94,7 @@ if (!empty($_REQUEST['author'])) {
 }
 
 if (!empty($_REQUEST['post_status'])) {
-	if ($status_obj = get_post_status_object(pp_revisions_sanitize_key($_REQUEST['post_status']))) {
+	if ($status_obj = get_post_status_object(sanitize_key($_REQUEST['post_status']))) {
 		$filters['post_status'] = $status_obj->labels->plural;
 	}
 }
@@ -122,9 +122,9 @@ if (!empty($published_title)) {
 ?></h1>
 
 <?php
-if ( isset( $_REQUEST['s'] ) && strlen( $_REQUEST['s'] ) ) {
+if ( isset( $_REQUEST['s'] ) && strlen( sanitize_text_field($_REQUEST['s']) ) ) {
 	/* translators: %s: search keywords */
-	printf( ' <span class="subtitle">' . __( 'Search results for &#8220;%s&#8221;' ) . '</span>', strip_tags($_REQUEST['s']) );
+	printf( ' <span class="subtitle">' . __( 'Search results for &#8220;%s&#8221;' ) . '</span>', strip_tags(sanitize_text_field($_REQUEST['s'])) );
 }
 ?>
 
@@ -136,7 +136,7 @@ if ( isset( $_REQUEST['s'] ) && strlen( $_REQUEST['s'] ) ) {
 $messages = array();
 foreach ( $bulk_counts as $message => $count ) {
 	if ( $message == 'trashed' && isset( $_REQUEST['ids'] ) ) {
-		$ids = preg_replace( '/[^0-9,]/', '', $_REQUEST['ids'] );
+		$ids = preg_replace( '/[^0-9,]/', '', sanitize_text_field($_REQUEST['ids']));
 		$messages[] = '<a href="' . esc_url( wp_nonce_url( "edit.php?post_type=$post_type&doaction=undo&action=untrash&ids=$ids", "bulk-revision-queue" ) ) . '">' . __('Undo') . '</a>';
 	} elseif (!empty($bulk_messages['post'][$message])) {
 		$messages []= $bulk_messages['post'][$message];
@@ -148,7 +148,7 @@ if ( $messages ) {
 }
 unset( $messages );
 
-$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated', 'approved_count', 'published_count', 'deleted', 'trashed', 'untrashed' ), esc_url($_SERVER['REQUEST_URI']) );
+$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated', 'approved_count', 'published_count', 'deleted', 'trashed', 'untrashed' ), esc_url(esc_url_raw($_SERVER['REQUEST_URI'])) );
 ?>
 
 <?php $wp_list_table->views(); ?>
@@ -158,7 +158,7 @@ $_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated
 <?php $wp_list_table->search_box( 'Search', 'post' ); ?>
 
 <input type="hidden" name="page" class="post_status_page" value="revisionary-q" />
-<input type="hidden" name="post_status" class="post_status_page" value="<?php echo !empty($_REQUEST['post_status']) ? esc_attr($_REQUEST['post_status']) : 'all'; ?>" />
+<input type="hidden" name="post_status" class="post_status_page" value="<?php echo !empty($_REQUEST['post_status']) ? esc_attr(sanitize_key($_REQUEST['post_status'])) : 'all'; ?>" />
 
 <?php if ( ! empty( $_REQUEST['show_sticky'] ) ) { ?>
 <input type="hidden" name="show_sticky" value="1" />

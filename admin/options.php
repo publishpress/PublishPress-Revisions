@@ -1,5 +1,5 @@
 <?php
-if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
+if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die( 'This page cannot be called directly.' );
 
 do_action('revisionary_load_options_ui');
@@ -233,7 +233,6 @@ else
 	_e('PublishPress Revisions Settings', 'revisionary');
 ?>
 </h1>
-
 </td>
 <td>
 </td>
@@ -509,11 +508,10 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 			$hint = __('If some revisions are missing from the queue, disable a performance enhancement for better compatibility with themes and plugins.', 'revisionary');
 			$this->option_checkbox( 'queue_query_all_posts', $tab, $section, $hint, '' );
 			*/
-
 		?>
 
 		<p style="padding-left:22px; margin-top:25px">
-		<a href="<?php echo add_query_arg('rvy_flush_flags', 1, esc_url($_SERVER['REQUEST_URI']))?>"><?php _e('Regenerate "post has revision" flags', 'revisionary');?></a>
+		<a href="<?php echo add_query_arg('rvy_flush_flags', 1, esc_url(esc_url_raw($_SERVER['REQUEST_URI'])))?>"><?php _e('Regenerate "post has revision" flags', 'revisionary');?></a>
 		</p>
 
 		</td></tr></table>
@@ -736,7 +734,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			delete_option('revisionary_mail_buffer');
 		}
 
-		$uri = esc_url($_SERVER['REQUEST_URI']);
+		$uri = esc_url(esc_url_raw($_SERVER['REQUEST_URI']));
 
 		if (!empty($_REQUEST['mailinfo'])) {
 			$verbose = !empty($_REQUEST['verbose']);
