@@ -751,14 +751,14 @@ class Revisionary
 				return $caps;
 			}
 		} elseif (($post_id > 0) && $post && rvy_in_revision_workflow($post) 
-			&& rvy_get_option('revisor_lock_others_revisions') && !rvy_is_post_author($post) && !rvy_is_full_editor($post)
+			&& rvy_get_option('revisor_lock_others_revisions') && !rvy_is_post_author($post) && !rvy_is_full_editor(rvy_post_id($post->ID))
 		) {
 			if ($type_obj = get_post_type_object( $post->post_type )) {
 				if (in_array($type_obj->cap->edit_others_posts, $caps)) {					
 					if ((!empty($type_obj->cap->edit_others_posts) && empty($current_user->allcaps[$type_obj->cap->edit_others_posts])) 
 					|| (!empty($type_obj->cap->edit_published_posts) && empty($current_user->allcaps[$type_obj->cap->edit_published_posts]))
 					) {
-						if (!rvy_get_option('admin_revisions_to_own_posts') || !current_user_can('edit_post', rvy_post_id($post_id))) {
+						if (!current_user_can('edit_post', rvy_post_id($post_id))) {
 							if (!empty($current_user->allcaps['edit_others_revisions'])) {
 								$caps[] = 'edit_others_revisions';
 							} else {
