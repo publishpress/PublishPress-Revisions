@@ -1186,6 +1186,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if ( is_post_type_viewable( $post_type_object ) ) {
 			if ($can_read_post && $post_type_object && !empty($post_type_object->public)) {
 				if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
+					do_action('pp_revisions_get_post_link', $post->ID);
+
 					$preview_link = rvy_preview_url($post);
 
 					//$preview_link = remove_query_arg( 'post_type', $preview_link );
@@ -1197,6 +1199,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 						esc_attr( __( 'Preview Revision', 'revisionary' ) ),
 						__( 'Preview' )
 					);
+
+					do_action('pp_revisions_post_link_done', $post->ID);
 				}
 			}
 		}
