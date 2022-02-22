@@ -136,12 +136,13 @@ function revisionary_copy_postmeta($from_post, $to_post_id, $args = []) {
         $meta_keys = array_diff( $source_meta_keys, $meta_excludelist );
     }
 
+    $target_meta_keys = \get_post_custom_keys( $to_post_id );
+
     $meta_keys = apply_filters('revisionary_create_revision_meta_keys', $meta_keys);
 
     foreach ( $meta_keys as $meta_key ) {
         if ($empty_target_only) {
-            $target_values = \get_post_custom_values( $meta_key, $to_post_id );
-            if (!empty($target_values)) {
+            if (in_array($meta_key, $target_meta_keys)) {
                 continue;
             }
         }
@@ -150,6 +151,18 @@ function revisionary_copy_postmeta($from_post, $to_post_id, $args = []) {
         foreach ( $meta_values as $meta_value ) {
             $meta_value = maybe_unserialize( $meta_value );
             update_post_meta( $to_post_id, $meta_key, \PublishPress\Revisions\Utils::recursively_slash_strings( $meta_value ) );
+        }
+    }
+
+    if (!$empty_target_only) {
+        if ($delete_meta_keys = array_diff($target_meta_keys, $meta_keys, revisionary_unrevisioned_postmeta())) {
+            $deletable_keys = apply_filters('revisionary_deletable_postmeta_keys', ['_links_to', '_links_to_target']);
+        }
+        
+        foreach($delete_meta_keys as $meta_key) {
+            if (in_array($meta_key, $deletable_keys) || defined('PP_REVISIONS_APPLY_POSTMETA_DELETION')) {
+                delete_post_meta($to_post_id, $meta_key);
+            }
         }
     }
 
