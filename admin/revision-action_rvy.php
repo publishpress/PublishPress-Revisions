@@ -351,7 +351,7 @@ function rvy_revision_approve($revision_id = 0) {
 			
 			if ( $db_action && rvy_get_option( 'rev_approval_notify_admin' ) ) {
 				require_once(dirname(REVISIONARY_FILE).'/revision-workflow_rvy.php');
-				$admin_ids = apply_filters('revisionary_approval_notify_admin', Rvy_Revision_Workflow_UI::getRecipients('rev_approval_notify_admin', ['type_obj' => $type_obj, 'published_post' => $post]));
+				$admin_ids = apply_filters('revisionary_approval_notify_admin', Rvy_Revision_Workflow_UI::getRecipients('rev_approval_notify_admin', ['type_obj' => $type_obj, 'published_post' => $post]), ['post_type' => $type_obj->name, 'post_id' => $post->ID, 'revision_id' => $revision->ID]);
 
 				foreach($admin_ids as $user_id) {
 					if ($user = new WP_User($user_id)) {
