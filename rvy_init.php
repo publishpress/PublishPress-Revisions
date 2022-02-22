@@ -203,7 +203,7 @@ function rvy_ajax_handler() {
 
 	}
 
-	if (defined('DOING_AJAX') && DOING_AJAX && ('get-revision-diffs' == $_REQUEST['action'])) {
+	if (defined('DOING_AJAX') && DOING_AJAX && isset($_REQUEST['action']) && ('get-revision-diffs' == $_REQUEST['action'])) {
 		require_once( dirname(__FILE__).'/admin/history_rvy.php' );
 		new RevisionaryHistory();
 	}
