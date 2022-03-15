@@ -439,7 +439,7 @@ function rvy_revision_approve($revision_id = 0) {
 	} while (0);
 	
 	if (!empty($update_next_publish_date)) {
-		rvy_update_next_publish_date();
+		rvy_update_next_publish_date(['revision_id' => $revision_id]);
 	}
 
 	if (!$batch_process) {	
@@ -1072,21 +1072,23 @@ function rvy_revision_publish($revision_id = false) {
 }
 
 // rvy_init action passes Revisionary object
-function _rvy_publish_scheduled_revisions() {
-	rvy_publish_scheduled_revisions();
+function _rvy_publish_scheduled_revisions($args = []) {
+	rvy_publish_scheduled_revisions($args);
 }
 
-function rvy_publish_scheduled_revisions($args = array()) {
+function rvy_publish_scheduled_revisions($args = []) {
 	global $wpdb;
 	
 	if (function_exists('relevanssi_query')) {
 		remove_action( 'wp_insert_post', 'relevanssi_insert_edit', 99, 1 );
 	}
 
-	rvy_confirm_async_execution( 'publish_scheduled_revisions' );
-
-	// Prevent this function from being triggered simultaneously by another site request
-	update_option( 'rvy_next_rev_publish_gmt', '2035-01-01 00:00:00' );
+	if (!rvy_get_option('scheduled_publish_cron')) {
+		rvy_confirm_async_execution( 'publish_scheduled_revisions' );
+	
+		// Prevent this function from being triggered simultaneously by another site request
+		update_option( 'rvy_next_rev_publish_gmt', '2035-01-01 00:00:00' );
+	}
 	
 	$time_gmt = current_time('mysql', 1);
 	
@@ -1103,14 +1105,14 @@ function rvy_publish_scheduled_revisions($args = array()) {
 	if (!empty($args['force_revision_id']) && is_scalar($args['force_revision_id'])) {
 		$results = $wpdb->get_results( 
 			$wpdb->prepare( 
-				"SELECT * FROM $wpdb->posts WHERE post_mime_type = 'future-revision' AND ID = %d",
+				"SELECT * FROM $wpdb->posts WHERE post_type != 'revision' AND post_status != 'inherit' AND post_mime_type = 'future-revision' AND ID = %d",
 				(int) $args['force_revision_id']
 			)
 		);
 	} else {
 		$results = $wpdb->get_results( 
 			$wpdb->prepare(
-				"SELECT * FROM $wpdb->posts WHERE post_mime_type = 'future-revision' AND post_date_gmt <= %s ORDER BY post_date_gmt DESC",
+				"SELECT * FROM $wpdb->posts WHERE post_type != 'revision' AND post_status != 'inherit' AND post_mime_type = 'future-revision' AND post_date_gmt <= %s ORDER BY post_date_gmt DESC",
 				$time_gmt
 			)
 		);
@@ -1339,7 +1341,9 @@ function rvy_publish_scheduled_revisions($args = array()) {
 		}
 	}
 
-	rvy_update_next_publish_date();
+	if (!rvy_get_option('scheduled_publish_cron')) {
+		rvy_update_next_publish_date();
+	}
 
 	// if this was initiated by an asynchronous remote call, we're done.
 	if ( ! empty( $_GET['action']) && ( 'publish_scheduled_revisions' == $_GET['action'] ) ) {
@@ -1349,11 +1353,17 @@ function rvy_publish_scheduled_revisions($args = array()) {
 	}
 }
 
-function rvy_update_next_publish_date() {
+function rvy_update_next_publish_date($args = []) {
 	global $wpdb;
 	
+	if ($args && !empty($args['revision_id']) && rvy_get_option('scheduled_publish_cron')) {
+		if ($revision = get_post($args['revision_id'])) {
+			wp_schedule_single_event(strtotime( $revision->post_date_gmt ), 'publish_revision_rvy', $args);
+		}
+	}
+
 	if ( $next_publish_date_gmt = $wpdb->get_var( "SELECT post_date_gmt FROM $wpdb->posts WHERE post_mime_type = 'future-revision' ORDER BY post_date_gmt ASC LIMIT 1" ) ) {
-		// wp_schedule_single_event( strtotime( $next_publish_date_gmt ), 'publish_revision_rvy' );  // @todo: wp_cron testing
+
 	} else {
 		$next_publish_date_gmt = '2035-01-01 00:00:00';
 	}

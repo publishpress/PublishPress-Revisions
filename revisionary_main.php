@@ -369,7 +369,14 @@ class Revisionary
 	function actSavePost($post_id, $post) {
 		if (strtotime($post->post_date_gmt) > agp_time_gmt()) {
 			require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
-			rvy_update_next_publish_date();
+			
+			if (rvy_get_option('revision_publish_cron')) {
+				if (rvy_in_revision_workflow($post_id) && ('future-revision' == $post->post_mime_type)) {
+					rvy_update_next_publish_date(['revision_id' => $post_id]);
+				}
+			} else {
+				rvy_update_next_publish_date();
+			}
 		}
 	}
 

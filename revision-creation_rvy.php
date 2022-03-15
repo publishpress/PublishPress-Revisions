@@ -16,7 +16,7 @@ class RevisionCreation {
 	function flt_future_revision_status_change($revision_status, $old_status, $revision_id) {
 		if ('future-revision' == $revision_status) {
 			require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
-			rvy_update_next_publish_date();
+			rvy_update_next_publish_date(['revision_id' => $revision_id]);
 		}
 
 		if ('pending-revision' == $revision_status) {
@@ -104,6 +104,11 @@ class RevisionCreation {
 
 		if (!empty($use_autosave)) {
 			$wpdb->delete($wpdb->posts, ['ID' => $autosave_post->ID]);
+		}
+
+		if ('future-revision' == $revision_status) {
+			require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
+			rvy_update_next_publish_date(['revision_id' => $revision_id]);
 		}
 
 		if (!$revision_id || !is_scalar($revision_id)) { // update_post_data() returns array or object on update abandon / failure
