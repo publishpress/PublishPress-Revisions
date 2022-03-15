@@ -419,7 +419,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	function rvy_pending_list_register_columns( $columns ) {
 		global $wp_query;
 		foreach( $wp_query->posts as $post ) {
-			if ( !empty($post) && is_object($post) && (('future-revision' == $post->post_mime_type && 'future' == $post->post_status) || (strtotime($post->post_date_gmt) > agp_time_gmt())) ) {
+			if ( !empty($post) && is_object($post) && (('future-revision' == $post->post_mime_type && 'inherit' != $post->post_status) || (strtotime($post->post_date_gmt) > agp_time_gmt())) ) {
 				$have_scheduled = true;
 				break;
 			}

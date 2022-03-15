@@ -141,7 +141,7 @@ class RevisionCreation {
 				break;
 
 			case 'future-revision':
-				$data['post_status'] = 'future';
+				$data['post_status'] = 'pending';
 				break;
 
 			default:
