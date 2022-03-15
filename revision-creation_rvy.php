@@ -173,9 +173,6 @@ class RevisionCreation {
 
 		$wpdb->update($wpdb->posts, ['comment_count' => $base_post_id], ['ID' => $revision_id]);
 
-		rvy_update_post_meta($revision_id, '_rvy_base_post_id', $base_post_id);
-		rvy_update_post_meta($base_post_id, '_rvy_has_revisions', true);
-
 		// Use the newly generated $post_ID.
 		$where = array( 'ID' => $revision_id );
 		
@@ -206,6 +203,9 @@ class RevisionCreation {
 			revisionary_copy_terms($base_post_id, $revision_id);
 			revisionary_copy_postmeta($base_post_id, $revision_id);
 		}
+
+		rvy_update_post_meta($revision_id, '_rvy_base_post_id', $base_post_id);
+		rvy_update_post_meta($base_post_id, '_rvy_has_revisions', true);
 	
 		// Set GUID.  @todo: still needed?
 		if ( '' == get_post_field( 'guid', $revision_id ) ) {
