@@ -28,12 +28,6 @@ jQuery(document).ready( function($) {
 			caption = rvyObjEdit.updateCaption;
 		}
 		
-		if ( caption == '' && ( typeof rvyObjEdit['publishCaptionCurrent'] != 'undefined' )  ) {
-			console.log('caption 1: ' + caption);
-		} else {
-			console.log('caption 2: ' + caption);
-		}
-
 		if ( typeof waitForSaveDraftButton == 'undefined' ) {
 			waitForSaveDraftButton = false;
 		}
