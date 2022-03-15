@@ -130,6 +130,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'revision_update_notifications' =>			__('Also notify on Revision Update', 'revisionary'),
 	'trigger_post_update_actions' => 			__('Revision Publication: API actions to mimic Post Update', 'revisionary'),
 	'diff_display_strip_tags' => 				__('Hide html tags on Compare Revisions screen', 'revisionary'),
+	'scheduled_publish_cron' =>					__('Use WP-Cron scheduling', 'revisionary'),
 	'async_scheduled_publish' => 				__('Asynchronous Publishing', 'revisionary'),
 	'scheduled_revision_update_post_date' => 	__('Update Publish Date', 'revisionary'),
 	'pending_revision_update_post_date' => 		__('Update Publish Date', 'revisionary'),
@@ -171,7 +172,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'role_definition' => 	 ['revisor_role_add_custom_rolecaps', 'require_edit_others_drafts'],
 	'revision_statuses' =>	 ['revision_statuses_noun_labels'],
 	'working_copy' =>		 ['manage_unsubmitted_capability', 'copy_posts_capability', 'auto_submit_revisions', 'caption_copy_as_edit'],
-	'scheduled_revisions' => ['scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date'],
+	'scheduled_revisions' => ['scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date'],
 	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'],
@@ -480,8 +481,13 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 		$hint = sprintf(__( 'When a %s is published, update post modified date to current time.', 'revisionary' ), pp_revisions_status_label('future-revision', 'name'));
 		$this->option_checkbox( 'scheduled_revision_update_modified_date', $tab, $section, $hint, '' );
 
-		$hint = __( 'Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
-		$this->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
+		$hint = __( 'Publish scheduled revisions using the WP-Cron mechanism.', 'revisionary' );
+		$this->option_checkbox( 'scheduled_publish_cron', $tab, $section, $hint, '' );
+
+		if (!rvy_get_option('scheduled_publish_cron')) {
+			$hint = __( 'Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
+			$this->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
+		}
 		?>
 		</td></tr></table>
 	<?php endif; // any options accessable in this section
