@@ -43,8 +43,13 @@ jQuery(document).ready( function($) {
 			+ '<span class="revision-approve revision-created">'
 			+ rvyObjEdit.completedCaption + '</span> '
 
+			+ '<a href="javascript:void(0)" class="revision-approve revision-preview components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
+			+ rvyObjEdit.completedLinkCaption + '</a>'
+			
 			+ '<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
-			+ rvyObjEdit.completedLinkCaption + '</a></button>';
+			+ rvyObjEdit.completedEditLinkCaption + '</a>'
+			
+			'</button>';
 
 			if (rvyObjEdit.scheduleCaption) {
 				let postStatus = wp.data.select('core/editor').getCurrentPostAttribute('status');
@@ -60,8 +65,13 @@ jQuery(document).ready( function($) {
 					+ '<span class="revision-approve revision-scheduled">'
 					+ rvyObjEdit.scheduledCaption + '</span> '
 
+					+ '<a href="javascript:void(0)" class="revision-approve revision-preview components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
+					+ rvyObjEdit.scheduledLinkCaption + '</a>'
+
 					+ '<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
-					+ rvyObjEdit.scheduledLinkCaption + '</a></button>';
+					+ rvyObjEdit.scheduledEditLinkCaption + '</a>'
+					
+					+ '</button>';
 				}
 			}
 
@@ -172,7 +182,8 @@ jQuery(document).ready( function($) {
 
 			$('a.revision-approve span.spinner').css('visibility', 'hidden');
 
-			$('button.revision-created a').attr('href', rvyObjEdit.completedURL);
+			$('button.revision-created a.revision-preview').attr('href', rvyObjEdit.completedURL);
+			$('button.revision-created a.revision-edit').attr('href', rvyObjEdit.completedEditURL);
 		}
 
 		var revisionaryCreateError = function (data, txtStatus) {
@@ -201,7 +212,8 @@ jQuery(document).ready( function($) {
 			$('.revision-schedule').hide();
 			$('.revision-scheduled').show();
 
-			$('button.revision-scheduled a').attr('href', rvyObjEdit.scheduledURL);
+			$('button.revision-scheduled a.revision-preview').attr('href', rvyObjEdit.scheduledURL);
+			$('button.revision-scheduled a.revision-edit').attr('href', rvyObjEdit.scheduledEditURL);
 		}
 
 		var revisionaryScheduleError = function (data, txtStatus) {

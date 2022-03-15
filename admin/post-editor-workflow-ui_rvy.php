@@ -83,6 +83,8 @@ class PostEditorWorkflowUI {
             $vars['draftCompletedCaption'] = pp_revisions_status_label('pending-revision', 'submitted');
             $vars['draftCompletedLinkCaption'] = __('Preview', 'revisionary');
             $vars['draftCompletedURL'] = rvy_preview_url($post);
+            $vars['draftCompletedEditCaption'] = __('Edit', 'revisionary');
+            $vars['draftCompletedEditURL'] = admin_url("post.php?post={$post->ID}&action=edit");
         } else {
             $vars['draftActionCaption'] = '';
         }
@@ -167,12 +169,14 @@ class PostEditorWorkflowUI {
         if (rvy_get_option('pending_revisions') && current_user_can('copy_post', $post->ID)) {
             $vars = array_merge($vars, array(
                 'actionCaption' => pp_revisions_status_label('draft-revision', 'submit'),
-                'actionTitle' => esc_attr(sprintf(__('Create a %s of this post', 'revisionary'), strtolower(pp_revisions_status_label('draft-revision', 'basic')))),
+                'actionTitle' => '', //esc_attr(sprintf(__('Create a %s of this post', 'revisionary'), strtolower(pp_revisions_status_label('draft-revision', 'basic')))),
                 'actionDisabledTitle' => esc_attr(sprintf(__('Update post before creating %s.', 'revisionary'), strtolower(pp_revisions_status_label('draft-revision', 'basic')))),
                 'creatingCaption' => pp_revisions_status_label('draft-revision', 'submitting'),
                 'completedCaption' => pp_revisions_status_label('draft-revision', 'submitted'),
                 'completedLinkCaption' => __('Preview', 'revisionary'),
                 'completedURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
+                'completedEditLinkCaption' => __('Edit', 'revisionary'),
+                'completedEditURL' => rvy_nc_url( add_query_arg('edit_new_revision', $post->ID, get_permalink($post->ID))),
                 'errorCaption' => __('Error Creating Revision', 'revisionary'),
                 'ajaxurl' => rvy_admin_url(''),
                 'update' => __('Update', 'revisionary'),
@@ -193,6 +197,8 @@ class PostEditorWorkflowUI {
                 'scheduledCaption' => pp_revisions_status_label('future-revision', 'submitted'),
                 'scheduledLinkCaption' => __('Preview', 'revisionary'),
                 'scheduledURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
+                'scheduledEditLinkCaption' => __('Edit', 'revisionary'),
+                'scheduledEditURL' => rvy_nc_url( add_query_arg('edit_new_revision', $post->ID, get_permalink($post->ID))),
                 'update' => __('Update', 'revisionary'),
             ));
 
