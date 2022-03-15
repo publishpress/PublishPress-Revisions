@@ -1122,7 +1122,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 
 	if ( $results ) {
 		foreach ( $results as $row ) {
-			$published_id = rvy_post_id($row->ID);
+			$published_id = (!empty($row->comment_count)) ? $row->comment_count : rvy_post_id($row->ID);
 
 			if ( ! isset($restored_post_ids[$published_id]) ) {
 				$revised_uris []= get_permalink( $row->ID );
