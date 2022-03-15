@@ -203,8 +203,6 @@ jQuery(document).ready( function($) {
 
 		RvyTimeSelection = RvyTimeSelection / 1000; // pass seconds to server
 
-        //console.log(tdiff);
-
 		if ((tdiff > 1000)) {
 			RvySelectedFutureDate = true;
 
