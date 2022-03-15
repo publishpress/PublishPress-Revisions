@@ -1147,12 +1147,6 @@ function rvy_init() {
 
 	rvy_role_translation_support();
 
-	/*  // wp_cron hook @todo
-	if ( rvy_get_option( 'scheduled_revisions' ) ) {
-		add_action( 'publish_revision_rvy', 'revisionary_publish_scheduled' ); //wp-cron hook
-	}
-	*/
-
 	if ( is_admin() ) {
 		require_once(dirname(__FILE__).'/admin/admin-init_rvy.php');
 
