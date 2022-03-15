@@ -1,7 +1,6 @@
 <?php
 class RevisionaryDashboard {
 	public function recentPostsQueryArgs($query_args) {
-		//$query_args['post_status'] = array('future', 'future-revision');
 		add_filter('posts_clauses_request', [&$this, 'fltDashboardQueryClauses']);
 
 		return $query_args;
