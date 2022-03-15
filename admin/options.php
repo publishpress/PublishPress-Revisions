@@ -120,6 +120,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'copy_posts_capability' =>					rvy_get_option('revision_statuses_noun_labels') ? __("Additional role capability required to create a Working Copy", 'revisionary') : __("Additional role capability required to create a new revision", 'revisionary'),
 	'caption_copy_as_edit' =>					sprintf(__('Posts / Pages list: Use "Edit" caption for %s link'), pp_revisions_status_label('draft-revision', 'submit_short')),
 	'pending_revisions' => 						sprintf(__('Enable %s', 'revisionary'), $pending_revision_plural),
+	'auto_submit_revisions' =>					__("Auto-submit revisions created by a user with publishing capability", 'revisionary'),
 	'scheduled_revisions' => 					sprintf(__('Enable %s', 'revisionary'), pp_revisions_status_label('future-revision', 'plural')),
 	'revise_posts_capability' =>				rvy_get_option('revision_statuses_noun_labels') ? __("Additional role capability required to submit a Change Request", 'revisionary') : __("Additional role capability required to submit a revision", 'revisionary'),
 	'revisor_lock_others_revisions' =>			__("Editing others&apos; revisions requires role capability", 'revisionary'),
@@ -169,7 +170,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'license' =>			 ['edd_key'],
 	'role_definition' => 	 ['revisor_role_add_custom_rolecaps', 'require_edit_others_drafts'],
 	'revision_statuses' =>	 ['revision_statuses_noun_labels'],
-	'working_copy' =>		 ['manage_unsubmitted_capability', 'copy_posts_capability', 'caption_copy_as_edit'],
+	'working_copy' =>		 ['manage_unsubmitted_capability', 'copy_posts_capability', 'auto_submit_revisions', 'caption_copy_as_edit'],
 	'scheduled_revisions' => ['scheduled_revisions', 'async_scheduled_publish', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date'],
 	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions'],
@@ -415,7 +416,10 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	?>
 	<br />
 	<?php
-
+	$this->option_checkbox( 'auto_submit_revisions', $tab, $section, '', '' );
+	?>
+	<br />
+	<?php
 	$hint = sprintf(__('If the user does not have a regular Edit link, recaption the %s link as "Edit"', 'revisionary'), pp_revisions_status_label('draft-revision', 'submit_short'));
 	$this->option_checkbox( 'caption_copy_as_edit', $tab, $section, $hint, '' );
 

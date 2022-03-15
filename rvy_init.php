@@ -124,7 +124,9 @@ function rvy_ajax_handler() {
 
 						require_once( dirname(REVISIONARY_FILE).'/revision-creation_rvy.php' );
 						$rvy_creation = new PublishPress\Revisions\RevisionCreation();
-						$rvy_creation->createRevision($post_id, 'draft-revision', compact('time_gmt'));
+
+						$revision_status = (rvy_get_option('auto_submit_revisions') && current_user_can('edit_post', $post_id)) ? 'pending-revision' : 'draft-revision';
+						$rvy_creation->createRevision($post_id, $revision_status, compact('time_gmt'));
 					}
 					exit;
 
