@@ -1,4 +1,5 @@
 jQuery(document).ready(function($){var RvySubmissionUI=function(){var refSelector='#rvy_compare_button';if(!$(refSelector).length){var refSelector='div.misc-pub-section-last';}
+if(!$(refSelector).length){var refSelector='div.misc-pub-curtime';}
 if(rvyObjEdit.ajaxurl&&!$('div.rvy-creation-ui').length&&$(refSelector).length){$('#post-status-display').html(rvyObjEdit[rvyObjEdit.currentStatus+'StatusCaption']);if(rvyObjEdit[rvyObjEdit.currentStatus+'ActionURL']){var url=rvyObjEdit[rvyObjEdit.currentStatus+'ActionURL'];}else{var url='javascript:void(0)';}
 if(rvyObjEdit[rvyObjEdit.currentStatus+'ActionCaption']){$(refSelector).after('<div class="rvy-creation-ui" style="float:left; padding-left:10px">'
 +'<a href="'+url+'" class="button revision-approve">'

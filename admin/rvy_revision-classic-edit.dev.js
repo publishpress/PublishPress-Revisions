@@ -13,6 +13,10 @@ jQuery(document).ready( function($) {
             var refSelector = 'div.misc-pub-section-last';
         }
 
+        if (!$(refSelector).length) {
+            var refSelector = 'div.misc-pub-curtime';
+        }
+
 		if (rvyObjEdit.ajaxurl && !$('div.rvy-creation-ui').length && $(refSelector).length) {
             $('#post-status-display').html(rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']);
 			
