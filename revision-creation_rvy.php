@@ -171,7 +171,11 @@ class RevisionCreation {
 			return new \WP_Error(__( 'Could not insert revision into the database', 'revisionary'));
 		}
 
-		$wpdb->update($wpdb->posts, ['comment_count' => $base_post_id], ['ID' => $revision_id]);
+		$update_data = ('pending-revision' == $data['post_mime_type'])  // 
+		? ['comment_count' => $base_post_id, 'post_modified_gmt' => $data['post_modified_gmt'], 'post_modified' => $data['post_modified']]
+		: ['comment_count' => $base_post_id];
+
+		$wpdb->update($wpdb->posts, $update_data, ['ID' => $revision_id]);
 
 		// Use the newly generated $post_ID.
 		$where = array( 'ID' => $revision_id );
