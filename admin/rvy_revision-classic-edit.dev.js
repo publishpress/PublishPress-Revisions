@@ -33,12 +33,8 @@ jQuery(document).ready( function($) {
 					+ '<span class="revision-approve revision-created" style="color:green">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
 
-					+ '&nbsp;<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-preview" target="_blank">' 
+					+ '&nbsp;<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-edit" target="_blank">' 
                     + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a>'
-
-                    + '&nbsp;<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedEditURL'] + '" class="revision-edit" target="_blank">' 
-                    + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedEditLinkCaption'] + '</a>'
-
                     + '</div>'
                     
 					+ '</div> <br /><br />'
@@ -96,8 +92,7 @@ jQuery(document).ready( function($) {
 				rvyObjEdit.currentStatus = 'pending';
 
 				$('#post-status-display').html(rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']);
-                $('a.revision-preview').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL']).show();
-                $('a.revision-edit').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedEditURL']).show();
+                $('a.revision-edit').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL']).show();
 			}
 
 			var revisionaryCreateError = function (data, txtStatus) {
