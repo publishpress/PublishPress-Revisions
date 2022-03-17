@@ -136,12 +136,13 @@ function revisionary_copy_postmeta($from_post, $to_post_id, $args = []) {
         $meta_keys = array_diff( $source_meta_keys, $meta_excludelist );
     }
 
+    $target_meta_keys = \get_post_custom_keys( $to_post_id );
+
     $meta_keys = apply_filters('revisionary_create_revision_meta_keys', $meta_keys);
 
     foreach ( $meta_keys as $meta_key ) {
         if ($empty_target_only) {
-            $target_values = \get_post_custom_values( $meta_key, $to_post_id );
-            if (!empty($target_values)) {
+            if (in_array($meta_key, $target_meta_keys)) {
                 continue;
             }
         }
@@ -150,6 +151,18 @@ function revisionary_copy_postmeta($from_post, $to_post_id, $args = []) {
         foreach ( $meta_values as $meta_value ) {
             $meta_value = maybe_unserialize( $meta_value );
             update_post_meta( $to_post_id, $meta_key, \PublishPress\Revisions\Utils::recursively_slash_strings( $meta_value ) );
+        }
+    }
+
+    if (!$empty_target_only && !empty($target_meta_keys) && is_array($target_meta_keys)) {
+        if ($delete_meta_keys = array_diff($target_meta_keys, $meta_keys, revisionary_unrevisioned_postmeta())) {
+            $deletable_keys = apply_filters('revisionary_deletable_postmeta_keys', ['_links_to', '_links_to_target']);
+        }
+        
+        foreach($delete_meta_keys as $meta_key) {
+            if (in_array($meta_key, $deletable_keys) || defined('PP_REVISIONS_APPLY_POSTMETA_DELETION')) {
+                delete_post_meta($to_post_id, $meta_key);
+            }
         }
     }
 
@@ -267,6 +280,14 @@ function rvy_admin_url($partial_admin_url) {
 function pp_revisions_plugin_updated($current_version) {
     $last_ver = get_option('revisionary_last_version');
 
+    if (version_compare($last_ver, '3.0.12-rc4', '<')) {
+        global $wp_version;
+
+        if (class_exists('WpeCommon') || version_compare($wp_version, '5.9', '>=')) {
+            update_option('rvy_scheduled_publish_cron', 1);  // trigger generation of cron schedules for existing scheduled revisions
+        }
+    }
+
     if (version_compare($last_ver, '3.0.5-beta', '<')) {
         if ($role = @get_role('revisor')) {
             $role->add_cap('list_others_posts');
@@ -283,9 +304,9 @@ function pp_revisions_plugin_updated($current_version) {
 		global $wpdb;
 		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 		$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = post_status WHERE post_status IN ('$revision_status_csv')");
-		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft' WHERE post_status IN ('draft-revision')");
-		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending' WHERE post_status IN ('pending-revision')");
-		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'future' WHERE post_status IN ('future-revision')");
+		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft', post_mime_type = 'draft-revision' WHERE post_status IN ('draft-revision')");
+		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending', post_mime_type = 'pending-revision' WHERE post_status IN ('pending-revision')");
+		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending', post_mime_type = 'future-revision' WHERE post_status IN ('future-revision')");
     } 
 
     if (version_compare($last_ver, '3.0.7-rc4', '<') && !defined('PRESSPERMIT_DEBUG')) {

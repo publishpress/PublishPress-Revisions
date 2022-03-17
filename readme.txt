@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.9
-Stable tag: 3.0.10
+Stable tag: 3.0.12
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -236,6 +236,16 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
 == Changelog ==
+
+= 3.0.12 - 3 Mar 2022 =
+* Feature : Edit link in post editor after revision creation / scheduling
+* Change : Option to auto-submit revisions created by users who can publish the main post
+* Change : Option to publish scheduled revisions using WP-Cron
+* Fixed : Scheduled publication of revisions fails on WP Engine if caching enabled (fix by enabling WP Cron scheduling)
+* Fixed : WP 5.9 - After editing a revision, approval button remained disabled after revision update
+* Fixed : New revisions were not listed in Revision Queue or linked to Preview button under some conditions
+* Fixed : Compare Revisions: error if ACF is active on a PHP 8 installation
+* Fixed : Revision Queue - column headers (to set sort field) had a bad link
 
 = 3.0.10 - 10 Feb 2022 =
 * Fixed : WordPress 5.9 - When editing a submitted revision, Save button was hidden

@@ -114,6 +114,10 @@ class Revisionary
 			add_action('template_redirect', array($this, 'act_new_revision_redirect'));
 		}
 
+		if (!empty($_REQUEST['edit_new_revision'])) {
+			add_action('template_redirect', array($this, 'act_edit_revision_redirect'));
+		}
+
 		add_filter('get_comments_number', array($this, 'flt_get_comments_number'), 10, 2);
 
 		add_action('save_post', array($this, 'actSavePost'), 20, 2);
@@ -369,7 +373,14 @@ class Revisionary
 	function actSavePost($post_id, $post) {
 		if (strtotime($post->post_date_gmt) > agp_time_gmt()) {
 			require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
-			rvy_update_next_publish_date();
+			
+			if (rvy_get_option('revision_publish_cron')) {
+				if (rvy_in_revision_workflow($post_id) && ('future-revision' == $post->post_mime_type)) {
+					rvy_update_next_publish_date(['revision_id' => $post_id]);
+				}
+			} else {
+				rvy_update_next_publish_date();
+			}
 		}
 	}
 
@@ -502,6 +513,35 @@ class Revisionary
 
 			$preview_link = rvy_preview_url($revision, $args);
 			wp_redirect($preview_link);
+			exit;
+		}
+
+		// If logged user does not have a pending revision of this post, redirect to published permalink
+		wp_redirect($published_url);
+	}
+
+	function act_edit_revision_redirect() {
+		global $current_user, $post;
+
+		if (is_admin() || empty($post) || empty($_REQUEST['edit_new_revision'])) {
+			return;
+		}
+
+		$last_user_revision_id = (int) $_REQUEST['edit_new_revision'];
+
+		$published_post_id = rvy_post_id($post->ID);
+		$published_url = get_permalink($published_post_id);
+
+		$revision = $this->get_last_revision($published_post_id, $current_user->ID);
+
+		if ($revision) {
+			$args = [];
+			if (!empty($_REQUEST['nc'])) { // with a specified link target, avoid multiple browser tabs in the same editor instance
+				$args['nc'] = sanitize_key($_REQUEST['nc']);
+			}
+
+			$edit_link = admin_url("post.php?post={$revision->ID}&action=edit&nc={$args['nc']}");
+			wp_redirect($edit_link);
 			exit;
 		}
 

@@ -419,7 +419,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	function rvy_pending_list_register_columns( $columns ) {
 		global $wp_query;
 		foreach( $wp_query->posts as $post ) {
-			if ( !empty($post) && is_object($post) && (('future-revision' == $post->post_mime_type && 'future' == $post->post_status) || (strtotime($post->post_date_gmt) > agp_time_gmt())) ) {
+			if ( !empty($post) && is_object($post) && (('future-revision' == $post->post_mime_type && 'inherit' != $post->post_status) || (strtotime($post->post_date_gmt) > agp_time_gmt())) ) {
 				$have_scheduled = true;
 				break;
 			}
@@ -992,7 +992,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	public function print_column_headers( $with_id = true ) {		
 		list( $columns, $hidden, $sortable, $primary ) = $this->get_column_info();
 
-		$current_url = set_url_scheme( esc_url('http://' . esc_url_raw($_SERVER['HTTP_HOST']). esc_url_raw($_SERVER['REQUEST_URI']) ));
+		$current_url = set_url_scheme( esc_url(esc_url_raw($_SERVER['HTTP_HOST']). esc_url_raw($_SERVER['REQUEST_URI']) ));
 		$current_url = remove_query_arg( 'paged', $current_url );
 
 		if ( isset( $_GET['orderby'] ) ) {
@@ -1186,6 +1186,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if ( is_post_type_viewable( $post_type_object ) ) {
 			if ($can_read_post && $post_type_object && !empty($post_type_object->public)) {
 				if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
+					do_action('pp_revisions_get_post_link', $post->ID);
+
 					$preview_link = rvy_preview_url($post);
 
 					//$preview_link = remove_query_arg( 'post_type', $preview_link );
@@ -1197,6 +1199,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 						esc_attr( __( 'Preview Revision', 'revisionary' ) ),
 						__( 'Preview' )
 					);
+
+					do_action('pp_revisions_post_link_done', $post->ID);
 				}
 			}
 		}

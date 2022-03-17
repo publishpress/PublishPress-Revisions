@@ -19,8 +19,13 @@ jQuery(document).ready( function($) {
 			+ '<div class="revision-created-wrapper" style="display:none; margin: 10px 0 10px 5px; font-weight: bold"><span class="revision-approve revision-created">' 
 			+ rvyObjEdit.completedCaption + '</span> '
 
+			+ '&nbsp;<a href="javascript:void(0)" class="revision-approve revision-preview" target="_blank">' 
+			+ rvyObjEdit.completedLinkCaption + '</a>'
+			
 			+ '&nbsp;<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">' 
-			+ rvyObjEdit.completedLinkCaption + '</a></div>';
+			+ rvyObjEdit.completedEditLinkCaption + '</a>'
+			
+			+ '</div>';
 			
 			if (rvyObjEdit.scheduleCaption) {
 				var publishedStatuses = Object.keys(rvyObjEdit.publishedStatuses).map(function (key) { return rvyObjEdit.publishedStatuses[key]; });
@@ -34,8 +39,13 @@ jQuery(document).ready( function($) {
 					+ '<div class="revision-scheduled-wrapper" style="display:none; margin-top: 15px; margin-bottom: 15px; font-weight: bold"><span class="revision-approve revision-scheduled">'
 					+ rvyObjEdit.scheduledCaption + '</span> '
 
+					+ '&nbsp;<a href="javascript:void(0)" class="revision-approve revision-preview" target="_blank">' 
+					+ rvyObjEdit.scheduledLinkCaption + '</a>'
+					
 					+ '&nbsp;<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">' 
-					+ rvyObjEdit.scheduledLinkCaption + '</a></div>';
+					+ rvyObjEdit.scheduledEditLinkCaption + '</a>'
+
+					+ '</div>';
 				}
 			}
 
@@ -85,7 +95,8 @@ jQuery(document).ready( function($) {
 			$('.revision-create').hide();
 			$('.revision-created-wrapper').show();
 
-            $('div.revision-created-wrapper a.revision-edit').attr('href', rvyObjEdit.completedURL);
+			$('div.revision-created-wrapper a.revision-preview').attr('href', rvyObjEdit.completedURL);
+			$('div.revision-created-wrapper a.revision-edit').attr('href', rvyObjEdit.completedEditURL);
             $('a.revision-create').removeAttr('disabled');
 		}
 
@@ -127,7 +138,9 @@ jQuery(document).ready( function($) {
 			$('.revision-schedule').hide();
 			$('.revision-scheduled-wrapper').show();
 
-            $('div.revision-scheduled-wrapper a.revision-edit').attr('href', rvyObjEdit.scheduledURL);
+			$('div.revision-scheduled-wrapper a.revision-preview').attr('href', rvyObjEdit.scheduledURL);
+			$('div.revision-scheduled-wrapper a.revision-edit').attr('href', rvyObjEdit.scheduledEditURL);
+
             $('a.revision-schedule').removeAttr('disabled');
 		}
 
@@ -189,8 +202,6 @@ jQuery(document).ready( function($) {
 		var tdiff = RvyTimeSelection - Date.now();
 
 		RvyTimeSelection = RvyTimeSelection / 1000; // pass seconds to server
-
-        //console.log(tdiff);
 
 		if ((tdiff > 1000)) {
 			RvySelectedFutureDate = true;

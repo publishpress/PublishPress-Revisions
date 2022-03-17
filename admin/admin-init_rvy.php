@@ -461,14 +461,6 @@ function rvy_get_post_revisions($post_id, $status = '', $args = '' ) {
 			);
 		} else {
 			if (!empty($all_rev_statuses_clause)) { 
-
-				$test = $wpdb->prepare(
-					"SELECT * FROM $wpdb->posts "
-					. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
-						. " WHERE pm_published.meta_value = %d $all_rev_statuses_clause $order_clause",
-						$post_id
-				);
-
 				$revisions = $wpdb->get_results(
 					$wpdb->prepare(
 					"SELECT * FROM $wpdb->posts "

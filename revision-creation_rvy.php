@@ -16,7 +16,7 @@ class RevisionCreation {
 	function flt_future_revision_status_change($revision_status, $old_status, $revision_id) {
 		if ('future-revision' == $revision_status) {
 			require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
-			rvy_update_next_publish_date();
+			rvy_update_next_publish_date(['revision_id' => $revision_id]);
 		}
 
 		if ('pending-revision' == $revision_status) {
@@ -106,6 +106,11 @@ class RevisionCreation {
 			$wpdb->delete($wpdb->posts, ['ID' => $autosave_post->ID]);
 		}
 
+		if ('future-revision' == $revision_status) {
+			require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
+			rvy_update_next_publish_date(['revision_id' => $revision_id]);
+		}
+
 		if (!$revision_id || !is_scalar($revision_id)) { // update_post_data() returns array or object on update abandon / failure
 			return;
 		}
@@ -136,7 +141,7 @@ class RevisionCreation {
 				break;
 
 			case 'future-revision':
-				$data['post_status'] = 'future';
+				$data['post_status'] = 'pending';
 				break;
 
 			default:
@@ -168,9 +173,6 @@ class RevisionCreation {
 
 		$wpdb->update($wpdb->posts, ['comment_count' => $base_post_id], ['ID' => $revision_id]);
 
-		rvy_update_post_meta($revision_id, '_rvy_base_post_id', $base_post_id);
-		rvy_update_post_meta($base_post_id, '_rvy_has_revisions', true);
-
 		// Use the newly generated $post_ID.
 		$where = array( 'ID' => $revision_id );
 		
@@ -201,6 +203,9 @@ class RevisionCreation {
 			revisionary_copy_terms($base_post_id, $revision_id);
 			revisionary_copy_postmeta($base_post_id, $revision_id);
 		}
+
+		rvy_update_post_meta($revision_id, '_rvy_base_post_id', $base_post_id);
+		rvy_update_post_meta($base_post_id, '_rvy_has_revisions', true);
 	
 		// Set GUID.  @todo: still needed?
 		if ( '' == get_post_field( 'guid', $revision_id ) ) {

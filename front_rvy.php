@@ -181,7 +181,7 @@ class RevisionaryFront {
 
 			do_action('revisionary_preview_load', $revision_id, $published_post_id);
 
-			if (!defined('REVISIONARY_PREVIEW_NO_META_MIRROR')) {
+			if (!defined('REVISIONARY_PREVIEW_NO_META_MIRROR') && !class_exists('CWS_PageLinksTo')) {
 				// For display integrity, copy any missing keys from published post. Note: Any fields missing from revision are left unmodified at revision approval.
 				revisionary_copy_postmeta($published_post_id, $revision_id, ['empty_target_only' => true]);
 			}

@@ -28,12 +28,6 @@ jQuery(document).ready( function($) {
 			caption = rvyObjEdit.updateCaption;
 		}
 		
-		if ( caption == '' && ( typeof rvyObjEdit['publishCaptionCurrent'] != 'undefined' )  ) {
-			console.log('caption 1: ' + caption);
-		} else {
-			console.log('caption 2: ' + caption);
-		}
-
 		if ( typeof waitForSaveDraftButton == 'undefined' ) {
 			waitForSaveDraftButton = false;
 		}
@@ -188,13 +182,16 @@ jQuery(document).ready( function($) {
 					+ '<span class="revision-approve revision-created">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
 
-					+ '<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-approve revision-edit components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
-					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a></div>'
+					+ '<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-approve revision-preview components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
+					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a>'
+					
+					+ '</div>'
 
 					+ '</div>'
 				);
 			}
 
+			/*
 			if (RvyApprovalLocked != $('button.revision-approve').prop('disabled')) {
 				if (RvyApprovalLocked) {
 					$('button.revision-approve').html('Revision needs update.');
@@ -202,6 +199,7 @@ jQuery(document).ready( function($) {
 					$('button.revision-approve').html(rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']);
 				}
 			}
+			*/
 
 			$('button.revision-approve').prop('disabled', RvyApprovalLocked && ('pending' == rvyObjEdit.currentStatus));
 
@@ -229,17 +227,19 @@ jQuery(document).ready( function($) {
 		if ('pending' == rvyObjEdit.currentStatus) {
 			RvyApprovalLocked = true;
 			$('button.revision-approve').prop('disabled', true);
+			rvySaveMonitor();
 		}
 	});
 
 	$(document).on('click', 'button.edit-post-post-schedule__toggle', function() {
 		RvyApprovalLocked = true;
 		$('button.revision-approve').prop('disabled', true);
+		rvySaveMonitor();
 	});
 
 	$(document).on('click', 'button.editor-post-save-draft', function() {
 		RvyApprovalLocked = false;
-		$('button.revision-approve').prop('disabled', false);
+		$('button.revision-approve').removeAttr('disabled');
 		$('button.revision-approve').html(rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']);
 	});
 
@@ -249,7 +249,35 @@ jQuery(document).ready( function($) {
 
 	$(document).on('click', 'div.postbox-container', function() {
 		$('button.revision-approve').prop('disabled', 'disabled');
+		rvySaveMonitor();
 	});
+
+	var redirectCheckSaveInterval = false;
+
+	function rvySaveMonitor() {
+		if (redirectCheckSaveInterval) {
+			return;
+		}
+
+		redirectCheckSaveInterval = setInterval(function () {
+			let saving = wp.data.select('core/editor').isSavingPost();
+
+			if (saving || $('div.edit-post-header button.is-saved').length) {
+				clearInterval(redirectCheckSaveInterval);
+
+				var redirectCheckSaveDoneInterval = setInterval(function () {
+					let saving = wp.data.select('core/editor').isSavingPost();
+
+					if (!saving || $('div.edit-post-header button.is-saved').length) {
+						RvyApprovalLocked = false;
+						$('button.revision-approve').removeAttr('disabled');
+						clearInterval(redirectCheckSaveDoneInterval);
+						redirectCheckSaveInterval = false;
+					}
+				}, 100);
+			}
+		}, 100);
+	}
 
 	var rvyIsAutosaveStarted = false;
 	var rvyIsAutosaveDone = false;
@@ -328,7 +356,8 @@ jQuery(document).ready( function($) {
 			rvyObjEdit.currentStatus = 'pending';
 
 			$('.rvy-current-status').html(rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']);
-			$('a.revision-edit').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL']).show();
+			$('a.revision-preview').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL']).show();
+			$('a.revision-edit').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedEditURL']).show();
 		}
 
 		var revisionaryCreateError = function (data, txtStatus) {
