@@ -136,12 +136,12 @@ function revisionary_copy_postmeta($from_post, $to_post_id, $args = []) {
         $meta_keys = array_diff( $source_meta_keys, $meta_excludelist );
     }
 
-    $target_meta_keys = \get_post_custom_keys( $to_post_id );
+    $target_meta_keys = (array) \get_post_custom_keys( $to_post_id );
 
     $meta_keys = apply_filters('revisionary_create_revision_meta_keys', $meta_keys);
 
     foreach ( $meta_keys as $meta_key ) {
-        if ($empty_target_only) {
+        if ($empty_target_only && !empty($target_meta_keys) && is_array($target_meta_keys)) {
             if (in_array($meta_key, $target_meta_keys)) {
                 continue;
             }
