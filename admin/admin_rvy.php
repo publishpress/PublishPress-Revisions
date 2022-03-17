@@ -211,6 +211,9 @@ class RevisionaryAdmin
 
 	function flt_dashboard_recent_posts_query_args($query_args) {
 		if ('future' == $query_args['post_status']) {
+			global $revisionary;
+			$revisionary->is_revisions_query = true;
+
 			require_once(dirname(__FILE__).'/admin-dashboard_rvy.php');
 			$rvy_dash = new RevisionaryDashboard();
 			$query_args = $rvy_dash->recentPostsQueryArgs($query_args);
