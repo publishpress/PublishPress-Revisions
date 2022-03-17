@@ -97,6 +97,11 @@ class Utils {
             remove_filter('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type', 10, 2);
         }
 
+		// Divi: Classic Editor option
+		if (function_exists('et_get_option') && ( 'on' == et_get_option( 'et_enable_classic_editor', 'off' ))) {
+			return false;
+		}
+
 		// phpcs:ignore WordPress.VIP.SuperGlobalInputUsage.AccessDetected, WordPress.Security.NonceVerification.NoNonceVerification
 		$conditions[] = (self::isWp5() || $pluginsState['gutenberg'])
 						&& ! $pluginsState['classic-editor']
