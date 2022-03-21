@@ -231,11 +231,12 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.0.13 - 17 Mar 2022 =
+= 3.0.13 - 21 Mar 2022 =
 * Fixed : Revision submission in Classic Editor caused "Undefined" link next to "Preview" link
 * Fixed : New revisions created with "Auto-submit" option had wrong date (and listing order) in Revision Queue
 * Fixed : PHP error on revision approval under some configurations
 * Fixed : Dashboard Activity widget: Scheduled revisions were not included in Publishing Soon list
+* Fixed : API: wp_after_insert_post action was not applied at revision publication
 * Compat : Divi - Revision preview bar not visible on front end
 * Compat : Divi - Classic Editor setting did not trigger correct Revisions UI
 * Compat : Custom post types - revision submission button not displayed in some configurations
