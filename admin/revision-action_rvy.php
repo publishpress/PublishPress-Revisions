@@ -798,6 +798,10 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 				unset(presspermit()->flags['ignore_save_post']);
 			}
 		}
+
+		if (!defined('RVY_NO_AFTER_INSERT_ACTION') && !empty($_published)) {
+			do_action('wp_after_insert_post', $_published->ID, $_published, true, $published);
+		}
 	}
 
 	rvy_delete_past_revisions($revision_id);
