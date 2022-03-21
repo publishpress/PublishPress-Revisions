@@ -586,8 +586,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	);
 
 	if (
-		(in_array($revision->post_mime_type, ['pending-revision', 'draft-revision']) && !rvy_get_option('pending_revision_update_post_date'))
-		|| (('future-revision' == $revision->post_mime_type) && !rvy_get_option('scheduled_revision_update_post_date'))
+		(in_array($revision->post_mime_type, ['pending-revision', 'draft-revision']) && !rvy_filter_option('pending_revision_update_post_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
+		|| (('future-revision' == $revision->post_mime_type) && !rvy_filter_option('scheduled_revision_update_post_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
 	) {
 		// @todo: how was post_date_gmt of published post previously set to zero?
 		if (('0000-00-00 00:00:00' == $published->post_date_gmt) && ('0000-00-00 00:00:00' != $published->post_date)) {
@@ -660,8 +660,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	}
 
 	if (
-		(in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && rvy_get_option('pending_revision_update_modified_date'))
-		|| (('future-revision' == $revision->post_mime_type) && rvy_get_option('scheduled_revision_update_modified_date'))
+		(in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && rvy_filter_option('pending_revision_update_modified_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
+		|| (('future-revision' == $revision->post_mime_type) && rvy_filter_option('scheduled_revision_update_modified_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
 	) {
 		$post_modified = current_time('mysql');
 		$post_modified_gmt = current_time('mysql', 1);
@@ -674,8 +674,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	$update_fields['post_modified_gmt'] = $post_modified_gmt;
 
 	if (
-		(in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && rvy_get_option('pending_revision_update_post_date'))
-		|| (('future-revision' == $revision->post_mime_type) && rvy_get_option('scheduled_revision_update_post_date'))
+		(in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && rvy_filter_option('pending_revision_update_post_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
+		|| (('future-revision' == $revision->post_mime_type) && rvy_filter_option('scheduled_revision_update_post_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
 	) {
 		$update_fields['post_date'] = $post_modified;
 		$update_fields['post_date_gmt'] = $post_modified_gmt;
@@ -797,6 +797,10 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 			if (function_exists('presspermit')) {
 				unset(presspermit()->flags['ignore_save_post']);
 			}
+		}
+
+		if (!defined('RVY_NO_AFTER_INSERT_ACTION') && !empty($_published)) {
+			do_action('wp_after_insert_post', $_published->ID, $_published, true, $published);
 		}
 	}
 

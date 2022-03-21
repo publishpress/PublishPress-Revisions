@@ -16,6 +16,7 @@ class Revisionary
 	var $rest = '';				// object ref - Revisionary_REST
 	var $internal_meta_update = false;
 	var $skip_filtering = false;
+	var $is_revisions_query = false;
 
 	var $config_loaded = false;		// configuration related to post types and statuses must be loaded late on the init action
 	var $enabled_post_types = [];	// enabled_post_types property is set (keyed by post type slug) late on the init action. 
@@ -235,7 +236,7 @@ class Revisionary
 	}
 
 	public function fltPostsClauses($clauses, $_wp_query, $args = []) {
-		global $wpdb;
+		global $wpdb, $revisionary;
 
 		$defaults = [
 			'is_revisions_query' => false,
@@ -247,7 +248,7 @@ class Revisionary
             $$var = $args[$var];
         }
 
-		if ($is_revisions_query || !empty($_wp_query->is_revisions_query) || !empty($_wp_query->query['is_revisions_query']) || $_wp_query->is_preview) {
+		if ($is_revisions_query || !empty($_wp_query->is_revisions_query) || !empty($_wp_query->query['is_revisions_query']) || (!empty($revisionary) && !empty($revisionary->is_revisions_query)) || $_wp_query->is_preview) {
 			return $clauses;
 		}
 

@@ -897,6 +897,10 @@ function rvy_retrieve_options( $sitewide = false ) {
 	}
 }
 
+function rvy_filter_option($option_basename, $args) {
+	return apply_filters("pp_revisions_option_{$option_basename}", rvy_get_option($option_basename), $args);
+}
+
 function rvy_get_option($option_basename, $sitewide = -1, $get_default = false) {
 	if (('async_scheduled_publish' == $option_basename) && function_exists('relevanssi_query')) {
 		return false;

@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.9
-Stable tag: 3.0.12
+Stable tag: 3.0.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,13 +26,11 @@ Your users can update posts using the normal WordPress editor, but their changes
 
 ## Submit Change Requests for Posts ####
 PublishPress Revisions allows your users to submit change requests for published posts. Your users can update posts using the normal WordPress editor, but their changes will not be published automatically. Instead, the changes are stored as a "pending revision" that can be approved or rejected.
-
 [Click here to see how to submit revisions](https://publishpress.com/knowledge-base/revisions-start/).
 
 ## Schedule Future Updates to Posts ##
 
 PublishPress Revisions allows you to schedule WordPress revisions to be published in the future. When you're editing a published post, all you need to do is select a future date and click "Schedule Revision". Your changes will be published at the specified time.
-
 [Click here to see how to schedule revisions](https://publishpress.com/knowledge-base/schedule-revisions-future/).
 
 ## Manage and Moderate Changes to Content ##
@@ -43,19 +41,16 @@ After you create a revision with PublishPress Revisions, you can find that revis
 
 ## Compare Current and Former Versions ##
 Pending and Scheduled Revisions can include changes to post content, categories, tags, featured image, page parent and other options. Each of these changes can be reviewed in the familiar Compare Revisions interface.
-
 [Click here to see how to compare revisions](https://publishpress.com/knowledge-base/compare-revisions/).
 
 ## Frontend Moderation of Content Changes ##
 
 It is possible to preview and moderate revisions via the frontend of your WordPress site. If you click Preview for a pending revision, you'll see a toolbar across the frontend of the site. This toolbar will change color so you can easily know the status of the revision. For example, if you're looking at a pending revision, the toolbar will be green. For scheduled revisions, the toolbar will be grey.
-
 [Click here to see how to manage from the frontend of your site](https://publishpress.com/knowledge-base/publishing-revisions-frontend/).
 
 ## Email Notifications for Revisions ##
 
 PublishPress Revisions will notify Administrators and Editors when a new revision is submitted. They can log in to preview, compare and approve the changes. PublishPress Revisions can also send emails for revision approval and publication. The Settings screen lets you disable unwanted notifications.
-
 [Click here for more on revision notifications](https://publishpress.com/knowledge-base/emails-revisionary/).
 
 ## Additional Plugins Supported in the Pro Version ##
@@ -88,7 +83,6 @@ PublishPress Revisions works with the default WordPress user roles, and also int
 To schedule changes to a published post, just set the desired future date before hitting Update.
 
 By upgrading to Revisions Pro, you also gain advanced permissions control through the PublishPress Permissions Pro plugin. You can customize permissions by role or per-user, granting full editing or revision submission rights to specific posts, categories, or taxonomy terms.
-
 [Click here for more on revision permissions](https://publishpress.com/knowledge-base/permissions-revisions).
 
 ## Join PublishPress and get the Pro plugins ##
@@ -237,6 +231,17 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.0.13 - 21 Mar 2022 =
+* Fixed : Revision submission in Classic Editor caused "Undefined" link next to "Preview" link
+* Fixed : New revisions created with "Auto-submit" option had wrong date (and listing order) in Revision Queue
+* Fixed : PHP error on revision approval under some configurations
+* Fixed : Dashboard Activity widget: Scheduled revisions were not included in Publishing Soon list
+* Fixed : API: wp_after_insert_post action was not applied at revision publication
+* Compat : Divi - Revision preview bar not visible on front end
+* Compat : Divi - Classic Editor setting did not trigger correct Revisions UI
+* Compat : Custom post types - revision submission button not displayed in some configurations
+* API: New filters pp_revisions_option_pending_revision_update_post_date, ​pp_revisions_option_pending_revision_update_modified_date, ​pp_revisions_option_scheduled_revision_update_post_date​, ​pp_revisions_option_scheduled_revision_update_modified_date
+
 = 3.0.12 - 3 Mar 2022 =
 * Feature : Edit link in post editor after revision creation / scheduling
 * Change : Option to auto-submit revisions created by users who can publish the main post
@@ -312,11 +317,11 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 * API: Allow redirect to be disabled on revision creation
 
 = 3.0 - 9 Nov 2021 =
-* Feature: New revision submission mechanism: create an unsubmitted revision first instead of editing existing post. Edit revision directly, then submit for scheduling or publication.
-* Change: Revisions UI in Post / Revision editor
-* Feature: Admin Bar includes "New Revision" button
-* Change: Revision Queue filter captions
-* Compat: Permissions - revise_others_posts, revise_others_pages, etc. capabilties are equivalent to list_others capabilities in allowing uneditable items to be listed
+* Feature : New revision submission mechanism: create an unsubmitted revision first instead of editing existing post. Edit revision directly, then submit for scheduling or publication.
+* Change : Revisions UI in Post / Revision editor
+* Feature : Admin Bar includes "New Revision" button
+* Change : Revision Queue filter captions
+* Compat : Permissions - revise_others_posts, revise_others_pages, etc. capabilties are equivalent to list_others capabilities in allowing uneditable items to be listed
 * Change : Include upload_files capability in the Revisor role
 
 = 2.6.3 - 11 Oct 2021 =
@@ -575,7 +580,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 * Lang : Correct textdomain on numerous translation calls
 * Lang : Improve translation string construction
 * Lang : Support translation of Revisor role name
-* Lang: Updated language files
+* Lang : Updated language files
 
 = 2.1.7 - 13 Jan 2020 =
 * Fixed : Excessive resource usage with some caching solutions
@@ -644,7 +649,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 * Fixed : Classic Editor - Invalid Revisions > Browse link displayed to Revisors
 * Compat : Classic Editor plugin - with "Allow users to switch editors" enabled, non-default editor did not have correct javascript loaded for Revisions
 * Compat : On themes that use a fixed position header, display preview top bar above header
-* Compat : PressPermit Pro - revision preview could not be viewed by Contributors under some configurations 
+* Compat : PressPermit Pro - revision preview could not be viewed by Contributors under some configurations
 * Fixed : On standard Compare Revisions screen (for past revisions), Preview and Manage button links did not update with slider selection change
 * Fixed : Pending, Schedule Revision notification - invalid preview link in some emails
 * Fixed : Trashed revisions were not identified as revisions in Edit Posts listing

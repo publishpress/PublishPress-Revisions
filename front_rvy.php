@@ -428,7 +428,11 @@ class RevisionaryFront {
 					rvyAdminBarMenuZindex = barZ;
 				}
 			} else {
+				if (!empty($_REQUEST['et_fb']) && !defined('PP_REVISIONS_DIVI_NO_ADMIN_BAR') && function_exists('et_divi_replace_parent_stylesheet') && (!defined('ET_BUILDER_PRODUCT_VERSION') || version_compare(ET_BUILDER_PRODUCT_VERSION, '4.14.8', '<='))) {
+					var rvyAdminBarHeight = '32px';
+				} else {
 				var rvyAdminBarHeight = 0;
+				}
 			}
 
 			$('div.rvy_view_revision').css('position', 'fixed').css('top', '32px');
