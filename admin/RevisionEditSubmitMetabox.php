@@ -44,8 +44,6 @@ class RvyRevisionEditSubmitMetabox
                         </div>
                     <?php endif; ?>
 
-                    <?php /* see RvyPostEdit::actSubmitMetaboxActions() */  ?>
-
                     <?php do_action('post_submitbox_misc_actions', $post); ?>
                 </div> <?php // misc-publishing-actions ?>
 
@@ -74,7 +72,7 @@ class RvyRevisionEditSubmitMetabox
         </div> <?php // submitpost ?>
 
         <?php
-    } // end function post_submit_meta_box()
+    }
 
 
     /*

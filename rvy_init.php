@@ -1,5 +1,5 @@
 <?php
-if ( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
+if (isset($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die();
 
 if (defined('REVISIONARY_FILE')) {
@@ -81,8 +81,6 @@ function rvy_send_buffered_mail() {
 function rvy_set_notification_buffer_cron() {
 	$cron_timestamp = wp_next_scheduled( 'rvy_mail_buffer_hook' );
 
-	//$wait_sec = time() - $cron_timestamp;
-
 	if (rvy_get_option('use_notification_buffer')) {
 		if (!$cron_timestamp) {
 			wp_schedule_event(time(), 'two_minutes', 'rvy_mail_buffer_hook');
@@ -151,7 +149,7 @@ function _rvy_no_redirect_filter($redirect, $orig) {
 function rvy_ajax_handler() {
 	global $current_user, $wpdb;
 
-	if (!empty($_REQUEST['rvy_ajax_field'])) {
+	if (!empty($_REQUEST['rvy_ajax_field'] && !empty($_REQUEST['rvy_ajax_value']))) {
 		if ($post_id = intval($_REQUEST['rvy_ajax_value'])) {
 
 			switch ($_REQUEST['rvy_ajax_field']) {
@@ -169,11 +167,9 @@ function rvy_ajax_handler() {
 
 				case 'submit_revision':
 					// capability check is applied within function to support batch execution without redundant checks
-					//if (current_user_can('set_revision_pending-revision', $post_id)) {
-						require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');	
-						rvy_revision_submit($post_id);
-						$check_autosave = true;
-					//}
+					require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');	
+					rvy_revision_submit($post_id);
+					$check_autosave = true;
 
 					break;
 
@@ -189,20 +185,6 @@ function rvy_ajax_handler() {
 					}
 
 					break;
-
-				/*
-				case 'approve_revision':
-					require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');	
-					rvy_revision_approve($post_id);
-					$check_autosave = true;
-					break;
-
-				case 'publish_revision':
-					require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');	
-					rvy_revision_publish($post_id);
-					$check_autosave = true;
-					break;
-				*/
 
 				default:
 			}
@@ -229,10 +211,6 @@ function rvy_ajax_handler() {
 						$wpdb->update($wpdb->posts, $update_data, ['ID' => $post_id]);
 
 						$wpdb->delete($wpdb->posts, ['ID' => $autosave_post->ID]);
-
-						// For taxonomies and meta keys not stored for the autosave, use published copies
-						//revisionary_copy_terms($autosave_post->ID, $post_id, ['empty_target_only' => true]);
-						//revisionary_copy_postmeta($autosave_post->ID, $post_id, ['empty_target_only' => true]);
 					}
 				}
 			}
@@ -268,8 +246,6 @@ function rvy_update_post_meta($post_id, $meta_key, $meta_value) {
 
 function rvy_delete_post_meta($post_id, $meta_key) {
 	delete_post_meta($post_id, $meta_key);
-
-	//wp_cache_delete($post_id, 'post_meta');
 }
 
 function rvy_status_registrations() {
@@ -647,7 +623,7 @@ function rvy_detect_post_id() {
 	} elseif ( ! empty( $_GET['page_id'] ) ) {
 		$post_id = (int) $_GET['page_id'];
 
-	} elseif (defined('REST_REQUEST') && REST_REQUEST && strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'autosaves')) {
+	} elseif (defined('REST_REQUEST') && REST_REQUEST && isset($_SERVER['REQUEST_URI']) && strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'autosaves')) {
 		require_once( dirname(__FILE__).'/rest_rvy.php' );
 		$post_id = Revisionary_REST::get_id_element(esc_url_raw($_SERVER['REQUEST_URI']), 1);
 
@@ -995,8 +971,6 @@ function rvy_error( $err_slug, $arg2 = '' ) {
 }
 
 function rvy_check_duplicate_mail($new_msg, $sent_mail, $buffer) {
-	// $new_msg = array_merge(compact('address', 'title', 'message'), ['time' => strtotime(current_time( 'mysql' )), 'time_gmt' => time()], $args);
-
 	foreach([$sent_mail, $buffer] as $compare_set) {
 		foreach($compare_set as $sent) {
 			foreach(['address', 'title', 'message'] as $field) {
@@ -1019,8 +993,6 @@ function rvy_check_duplicate_mail($new_msg, $sent_mail, $buffer) {
 }
 
 function rvy_mail( $address, $title, $message, $args ) {
-	// args: ['revision_id' => $revision_id, 'post_id' => $published_post->ID, 'notification_type' => $notification_type, 'notification_class' => $notification_class]
-
 	/*
 	 * [wp-cron action checks wp_option revisionary_mail_buffer. If wait time has elapsed, send buffered emails (up to limit per minute)]
 	 * 
@@ -1152,11 +1124,7 @@ function rvy_get_manageable_types() {
 	}
 
 	foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
-		//if ( ! empty( $current_user->allcaps[$type_obj->cap->publish_posts] ) 
-		//&& ! empty( $current_user->allcaps[$type_obj->cap->edit_published_posts] ) 
-		//&& ! empty( $current_user->allcaps[$type_obj->cap->edit_others_posts] ) ) {
-			$types[$post_type]= $post_type;
-		//}
+		$types[$post_type]= $post_type;
 	}
 	
 	$types = array_diff_key($types, array('acf-field-group' => true));
@@ -1164,7 +1132,7 @@ function rvy_get_manageable_types() {
 }
 
 // thanks to GravityForms for the nifty dismissal script
-if ( in_array( basename($_SERVER['PHP_SELF']), array('admin.php', 'admin-ajax.php') ) ) {
+if (isset($_SERVER['PHP_SELF']) && in_array( basename($_SERVER['PHP_SELF']), array('admin.php', 'admin-ajax.php') ) ) {
 	add_action( 'wp_ajax_rvy_dismiss_msg', '_revisionary_dashboard_dismiss_msg' );
 }
 
@@ -1221,8 +1189,8 @@ function rvy_init() {
 		}
 	}
 	
-	if ( empty( $_GET['action'] ) || ( 'publish_scheduled_revisions' != $_GET['action'] ) ) {
-		if ( ! strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'login.php' ) && rvy_get_option( 'scheduled_revisions' ) && !rvy_get_option('scheduled_publish_cron') ) {
+	if (empty($_GET['action']) || (isset($_GET['action']) && ('publish_scheduled_revisions' != $_GET['action']))) {
+		if (isset($_SERVER['REQUEST_URI']) && ! strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'login.php' ) && rvy_get_option( 'scheduled_revisions' ) && !rvy_get_option('scheduled_publish_cron') ) {
 		
 			// If a previously requested asynchronous request was ineffective, perform the actions now
 			// (this is not executed if the current URI is from a manual publication request with action=publish_scheduled_revisions)
@@ -1428,6 +1396,10 @@ add_action('init', 'rvy_rest_cache_compat', 9999);
 function rvy_rest_cache_compat() {
 	global $wp_post_types;
 
+	if (!isset($_SERVER['REQUEST_URI'])) {
+		return;
+	}
+
 	$uri = esc_url_raw($_SERVER['REQUEST_URI']);
 
 	$rest_cache_active = false;
@@ -1440,7 +1412,6 @@ function rvy_rest_cache_compat() {
 
 	$rest_cache_active = $rest_cache_active 
 	|| (strpos($uri, '_locale=user') && strpos($uri, 'wp-json') && strpos($uri, '/posts/') && rvy_is_plugin_active('wp-rest-cache/wp-rest-cache.php'));
-	//|| ((!empty($_REQUEST['wp-remove-post-lock']) || strpos($uri, '_locale=user')) && rvy_is_plugin_active('wp-rest-cache/wp-rest-cache.php'));
 
 	if ($rest_cache_active) {
 		foreach(array_keys($wp_post_types) as $key) {
@@ -1455,6 +1426,10 @@ function rvy_rest_cache_compat() {
 add_filter('wp_rest_cache/skip_caching', 'rvy_rest_cache_skip');
 
 function rvy_rest_cache_skip($skip) {
+	if (!isset($_SERVER['REQUEST_URI'])) {
+		return;
+	}
+
 	$uri = esc_url_raw($_SERVER['REQUEST_URI']);
 	$uncached_params = array_merge($uncached_params, ['rvy_ajax_field', 'rvy_ajax_value']);
 

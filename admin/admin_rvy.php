@@ -11,7 +11,7 @@
  * Selectively load other classes based on URL
  */
 
-if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
+if( isset($_SERVER['SCRIPT_FILENAME']) && (basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME']))) )
 	die();
 
 define ('RVY_URLPATH', plugins_url('', REVISIONARY_FILE));
@@ -21,7 +21,7 @@ class RevisionaryAdmin
 	function __construct() {
 		global $pagenow, $post;
 
-		$script_name = esc_url_raw($_SERVER['SCRIPT_NAME']);
+		$script_name = (isset($_SERVER['SCRIPT_NAME'])) ? esc_url_raw($_SERVER['SCRIPT_NAME']) : '';
 
 		add_action('admin_head', [$this, 'admin_head']);
 		add_action('admin_enqueue_scripts', [$this, 'admin_scripts']);
@@ -124,7 +124,7 @@ class RevisionaryAdmin
  	}
 
 	function admin_head() {
-		if( false !== strpos( urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'admin.php?page=rvy-revisions' ) ) {
+		if ( isset($_SERVER['REQUEST_URI']) && (false !== strpos( urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'admin.php?page=rvy-revisions' ))) {
 			// legacy revision management UI for past revisions
 			require_once( dirname(__FILE__).'/revision-ui_rvy.php' );
 		}
@@ -147,13 +147,13 @@ class RevisionaryAdmin
 	function build_menu() {
 		global $current_user;
 
-		if ( strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'wp-admin/network/' ) )
+		if ( isset($_SERVER['REQUEST_URI']) && (strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'wp-admin/network/' )) )
 			return;
 
 		$path = RVY_ABSPATH;
 
 		// For Revisions Manager access, satisfy WordPress' demand that all admin links be properly defined in menu
-		if ( false !== strpos( urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'admin.php?page=rvy-revisions' ) ) {
+		if (isset($_SERVER['REQUEST_URI']) && (false !== strpos( urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'admin.php?page=rvy-revisions' )) ) {
 			add_submenu_page( 'none', esc_html__('Revisions', 'revisionary'), esc_html__('Revisions', 'revisionary'), 'read', 'rvy-revisions', 'rvy_include_admin_revisions' );
 		}
 

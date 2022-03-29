@@ -61,12 +61,6 @@ class RevisionCreation {
 			return;
 		}
 
-		/*
-        if (!empty($_POST)) {
-            $_POST['skip_sitepress_actions'] = true;
-		}
-		*/
-
 		$set_post_properties = [       
 			'post_content',          
 			'post_content_filtered', 
@@ -179,12 +173,6 @@ class RevisionCreation {
 
 		// Use the newly generated $post_ID.
 		$where = array( 'ID' => $revision_id );
-		
-		// @todo: confirm never needed
-		/*
-		$data['post_name'] = wp_unique_post_slug( sanitize_title( $data['post_title'], $post_ID ), $post_ID, $data['post_status'], $data['post_type'], $data['post_parent'] );
-		$wpdb->update( $wpdb->posts, array( 'post_name' => $data['post_name'] ), $where );
-		*/
 
 		// make sure autosave still exists
 		if (!empty($args['meta_post_id'])) {

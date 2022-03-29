@@ -36,7 +36,7 @@ class RevisionaryAdminPosts {
 						if (apply_filters('revisionary_deletion_redirect_to_queue', true, $deleted_id, $post_type)) {
 							$url = admin_url("admin.php?page=revisionary-q&pp_revisions_deleted={$deleted_id}");
 							
-							if (false === strpos(esc_url_raw($_SERVER['REQUEST_URI']), $url)) {
+							if (!empty($_SERVER['REQUEST_URI']) && false === strpos(esc_url_raw($_SERVER['REQUEST_URI']), $url)) {
 								wp_redirect($url);
 								exit;
 							}
@@ -182,7 +182,6 @@ class RevisionaryAdminPosts {
 		if (!empty($status_obj->public) || !empty($status_obj->private) || rvy_get_option('pending_revision_unpublished')) {
 			if (rvy_get_option('pending_revisions') && current_user_can('copy_post', $post->ID)) {
 				$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
-				//$url = wp_nonce_url(rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg"), "submit-post_{$post->ID}" );
 				$url = rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg");
 				
 				$caption = (isset($actions['edit']) || !rvy_get_option('caption_copy_as_edit')) ? pp_revisions_status_label('draft-revision', 'submit') : esc_html__('Edit');

@@ -12,6 +12,10 @@ class Utils {
 		if ($arr_url) {
 			$path = isset($arr_url['path']) ? $arr_url['path'] : '';
 	
+			if (!isset($_SERVER['REQUEST_URI'])) {
+				return false;
+			}
+
 			if (0 === strpos(esc_url_raw($_SERVER['REQUEST_URI']), $path . '/wp-json/oembed/')) {
 				return false;	
 			}
@@ -68,8 +72,8 @@ class Utils {
 		}
 
 		$pluginsState = array(
-			'classic-editor' => class_exists( 'Classic_Editor' ), // is_plugin_active('classic-editor/classic-editor.php'),
-			'gutenberg'      => function_exists( 'the_gutenberg_project' ), //is_plugin_active('gutenberg/gutenberg.php'),
+			'classic-editor' => class_exists( 'Classic_Editor' ),
+			'gutenberg'      => function_exists( 'the_gutenberg_project' ),
 			'gutenberg-ramp' => class_exists('Gutenberg_Ramp'),
 		);
 
@@ -162,8 +166,6 @@ class Utils {
 	public static function get_post_autosave($post_id, $user_id) {
 		global $wpdb;
 	
-		//$autosave_name = $post_id . '-autosave-v1';
-
 		$autosave_query = "
 			SELECT *
 			FROM $wpdb->posts

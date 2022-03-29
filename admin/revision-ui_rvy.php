@@ -157,7 +157,6 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 	// link to publish date in Edit Form metaboxes, but modification date in Revisions Manager table
 	if ( ! $date_field  ) {
 		if ( 'list' == $format ) {
-			//$date_field = ( in_array( $status, array( 'inherit', 'pending-revision' ) ) ) ? 'post_modified' : 'post_date';
 			$date_field = 'post_modified';
 			$sort_field = $date_field;
 		} else {
@@ -216,22 +215,9 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 		if ( $hide_others_revisions && ( ( 'revision' == $revision->post_type ) || rvy_in_revision_workflow($revision) ) && !rvy_is_post_author($revision) )
 			continue;
 		
-		// todo: set up buffering to restore this in case we (or some other plugin) impose revision-specific read capability
-		//if ( ! current_user_can( "read_{$post->post_type}", $revision->ID ) )
-		//	continue;
-
 		$date = rvy_post_revision_title( $revision, true, $date_field, compact( 'post', 'format' ) );
 
-		// Just track single post_author for revision. Changes to Authors taxonomy will be applied to published post.
-		//
-		//if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
-		//	ob_start();
-		//	do_action("manage_{$revision->post_type}_posts_custom_column", 'authors', $revision->ID);
-		//	$name = ob_get_contents();
-		//	ob_end_clean();
-		//} else {
-			$name = get_the_author_meta( 'display_name', $revision->post_author );
-		//}
+		$name = get_the_author_meta( 'display_name', $revision->post_author );
 
 		if ( 'form-table' == $format ) {
 			if ( ! $left_checked_done ) {

@@ -65,12 +65,7 @@ function _rvy_jreviews_preview_compat() {
 
     remove_filter('template_include',              [$JReviews, 'template_include']);
 
-    // remove_filter('the_content',                    array(& $JReviews, 'the_content'));
-
     // SEO functions
-
-    // New hook for WP 4.4
-
     remove_filter('document_title_parts',          [$JReviews, 'page_title_parts'], 20);
 
     remove_filter('pre_get_document_title',        [$JReviews, 'page_title_override'], 20);

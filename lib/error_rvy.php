@@ -3,16 +3,6 @@ class RvyError {
 	private $notices = array();
 
 	function error_notice( $err ) {
-		/*
-		switch( $err ) {
-			case 'old_php' :
-				$this->add_notice('Sorry, PublishPress Revisions requires PHP 5.4 or higher. Please upgrade your server or deactivate PublishPress Revisions.');
-				break;
-			
-			default :
-		}
-		*/
-		
 		return true;
 	}
 
