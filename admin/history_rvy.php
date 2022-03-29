@@ -1031,7 +1031,7 @@ class RevisionaryHistory
             'to'             => $selected_revision_id,
             'from'           => $from,
             'diffData'       => $diffs,
-            'baseUrl'        => parse_url( rvy_admin_url( 'revision.php' ), PHP_URL_PATH ),
+            'baseUrl'        => wp_parse_url( rvy_admin_url( 'revision.php' ), PHP_URL_PATH ),
             'compareTwoMode' => absint( $compare_two_mode ), // Apparently booleans are not allowed
             'revisionIds'    => array_keys( $revisions ),
         ];

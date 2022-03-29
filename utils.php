@@ -6,7 +6,7 @@ class Utils {
 		static $arr_url;
 	
 		if (!isset($arr_url)) {
-			$arr_url = parse_url(get_option('siteurl'));
+			$arr_url = wp_parse_url(get_option('siteurl'));
 		}
 	
 		if ($arr_url) {
