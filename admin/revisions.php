@@ -37,9 +37,9 @@ else
 $revision_status = 'inherit';
 
 if ( ! empty($_GET['action']) )
-	$action = sanitize_key($_GET['action']);
+	$_action = sanitize_key($_GET['action']);
 else
-	$action = '';
+	$_action = '';
 
 if ( ! empty($_GET['restored_post'] ) ) {
 	$revision_id = (int) $_GET['restored_post'];
@@ -58,10 +58,10 @@ $revision_status_captions = array(
 	'future-revision' => __awp( 'Scheduled', 'revisionary' ) 
 );
 
-if( 'edit' == $action )
-	$action = 'view';
+if( 'edit' == $_action )
+	$_action = 'view';
 
-switch ( $action ) :
+switch ( $_action ) :
 case 'diff' :
 	break;
 case 'view' :
@@ -158,7 +158,7 @@ if (!$can_fully_edit_post = current_user_can( $edit_cap, $rvy_post->ID)) {
 	$_can_edit_others = (!rvy_get_option('revisor_lock_others_revisions') || rvy_is_full_editor($rvy_post)) && current_user_can( $edit_others_cap, $rvy_post->ID);
 }
 
-if ( 'diff' != $action ) {
+if ( 'diff' != $_action ) {
 	$can_edit = ( ( 'revision' == $revision->post_type ) || rvy_in_revision_workflow($revision) ) && (
 		$can_fully_edit_post || 
 		( (rvy_is_post_author($revision) || $_can_edit_others) && (in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) ))
@@ -197,13 +197,13 @@ if ( $is_administrator = is_content_administrator_rvy() ) {
 
 echo '<ul class="subsubsub">';
 foreach ( array_keys($revision_status_captions) as $_revision_status ) {
-	$post_id = ( ! empty($rvy_post->ID) ) ? $rvy_post->ID : $revision_id;
+	$_post_id = ( ! empty($rvy_post->ID) ) ? $rvy_post->ID : $revision_id;
 	
 	if ('inherit' == $_revision_status) {
-		$link = "admin.php?page=rvy-revisions&amp;revision={$post_id}&amp;revision_status=$_revision_status";
+		$_link = "admin.php?page=rvy-revisions&amp;revision={$_post_id}&amp;revision_status=$_revision_status";
 		$target = '';
 	} else {
-		$link = rvy_admin_url("admin.php?page=revisionary-q&published_post={$rvy_post->ID}&post_status={$_revision_status}");
+		$_link = rvy_admin_url("admin.php?page=revisionary-q&published_post={$rvy_post->ID}&post_status={$_revision_status}");
 		$target = "_blank";
 	}
 
