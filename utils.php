@@ -12,6 +12,10 @@ class Utils {
 		if ($arr_url) {
 			$path = isset($arr_url['path']) ? $arr_url['path'] : '';
 	
+			if (!isset($_SERVER['REQUEST_URI'])) {
+				return false;
+			}
+
 			if (0 === strpos(esc_url_raw($_SERVER['REQUEST_URI']), $path . '/wp-json/oembed/')) {
 				return false;	
 			}

@@ -164,7 +164,9 @@ if (!empty($any_messages)) {
 }
 unset( $messages );
 
-$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated', 'approved_count', 'published_count', 'deleted', 'trashed', 'untrashed' ), esc_url(esc_url_raw($_SERVER['REQUEST_URI'])) );
+if (!empty($_SERVER['REQUEST_URI'])) {
+	$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated', 'approved_count', 'published_count', 'deleted', 'trashed', 'untrashed' ), esc_url(esc_url_raw($_SERVER['REQUEST_URI'])) );
+}
 ?>
 
 <?php $wp_list_table->views(); ?>
