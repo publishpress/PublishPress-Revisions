@@ -992,6 +992,11 @@ function rvy_check_duplicate_mail($new_msg, $sent_mail, $buffer) {
 	}
 }
 
+/*
+ * wp_mail() wrapper, also implements mail buffer
+ * 
+ * args: ['revision_id' => $revision_id, 'post_id' => $published_post->ID, 'notification_type' => $notification_type, 'notification_class' => $notification_class]
+ */
 function rvy_mail( $address, $title, $message, $args ) {
 	/*
 	 * [wp-cron action checks wp_option revisionary_mail_buffer. If wait time has elapsed, send buffered emails (up to limit per minute)]
