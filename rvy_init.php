@@ -1,5 +1,5 @@
 <?php
-if ( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
+if (isset($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die();
 
 if (defined('REVISIONARY_FILE')) {
@@ -149,7 +149,7 @@ function _rvy_no_redirect_filter($redirect, $orig) {
 function rvy_ajax_handler() {
 	global $current_user, $wpdb;
 
-	if (!empty($_REQUEST['rvy_ajax_field'])) {
+	if (!empty($_REQUEST['rvy_ajax_field'] && !empty($_REQUEST['rvy_ajax_value']))) {
 		if ($post_id = intval($_REQUEST['rvy_ajax_value'])) {
 
 			switch ($_REQUEST['rvy_ajax_field']) {
@@ -623,7 +623,7 @@ function rvy_detect_post_id() {
 	} elseif ( ! empty( $_GET['page_id'] ) ) {
 		$post_id = (int) $_GET['page_id'];
 
-	} elseif (defined('REST_REQUEST') && REST_REQUEST && strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'autosaves')) {
+	} elseif (defined('REST_REQUEST') && REST_REQUEST && isset($_SERVER['REQUEST_URI']) && strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'autosaves')) {
 		require_once( dirname(__FILE__).'/rest_rvy.php' );
 		$post_id = Revisionary_REST::get_id_element(esc_url_raw($_SERVER['REQUEST_URI']), 1);
 
@@ -1132,7 +1132,7 @@ function rvy_get_manageable_types() {
 }
 
 // thanks to GravityForms for the nifty dismissal script
-if ( in_array( basename($_SERVER['PHP_SELF']), array('admin.php', 'admin-ajax.php') ) ) {
+if (isset($_SERVER['PHP_SELF']) && in_array( basename($_SERVER['PHP_SELF']), array('admin.php', 'admin-ajax.php') ) ) {
 	add_action( 'wp_ajax_rvy_dismiss_msg', '_revisionary_dashboard_dismiss_msg' );
 }
 
@@ -1189,8 +1189,8 @@ function rvy_init() {
 		}
 	}
 	
-	if ( empty( $_GET['action'] ) || ( 'publish_scheduled_revisions' != $_GET['action'] ) ) {
-		if ( ! strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'login.php' ) && rvy_get_option( 'scheduled_revisions' ) && !rvy_get_option('scheduled_publish_cron') ) {
+	if (empty($_GET['action']) || (isset($_GET['action']) && ('publish_scheduled_revisions' != $_GET['action']))) {
+		if (isset($_SERVER['REQUEST_URI']) && ! strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'login.php' ) && rvy_get_option( 'scheduled_revisions' ) && !rvy_get_option('scheduled_publish_cron') ) {
 		
 			// If a previously requested asynchronous request was ineffective, perform the actions now
 			// (this is not executed if the current URI is from a manual publication request with action=publish_scheduled_revisions)
@@ -1396,6 +1396,10 @@ add_action('init', 'rvy_rest_cache_compat', 9999);
 function rvy_rest_cache_compat() {
 	global $wp_post_types;
 
+	if (!isset($_SERVER['REQUEST_URI'])) {
+		return;
+	}
+
 	$uri = esc_url_raw($_SERVER['REQUEST_URI']);
 
 	$rest_cache_active = false;
@@ -1422,6 +1426,10 @@ function rvy_rest_cache_compat() {
 add_filter('wp_rest_cache/skip_caching', 'rvy_rest_cache_skip');
 
 function rvy_rest_cache_skip($skip) {
+	if (!isset($_SERVER['REQUEST_URI'])) {
+		return;
+	}
+
 	$uri = esc_url_raw($_SERVER['REQUEST_URI']);
 	$uncached_params = array_merge($uncached_params, ['rvy_ajax_field', 'rvy_ajax_value']);
 

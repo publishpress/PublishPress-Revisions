@@ -1,5 +1,5 @@
 <?php
-if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
+if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die( 'This page cannot be called directly.' );
 	
 /**
@@ -26,7 +26,7 @@ class Revisionary
 	}
 
 	function init() {
-		if (is_admin() && (false !== strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'revision.php')) && (!empty($_REQUEST['revision']))) {
+		if (isset($_SERVER['REQUEST_URI']) && is_admin() && (false !== strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'revision.php')) && (!empty($_REQUEST['revision']))) {
 			add_action('init', [$this, 'addFilters'], PHP_INT_MAX);
 		} else {
 			$this->addFilters();
@@ -42,8 +42,14 @@ class Revisionary
 		// @todo: Correct selective application of filtering downstream so Revisors can use a read-only Compare [Past] Revisions screen
 		//
 		// Note: some filtering is needed to allow users with full editing permissions on the published post to access a Compare Revisions screen with Preview and Manage buttons
-		if (is_admin() && (false !== strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'revision.php')) && (!empty($_REQUEST['revision'])) && !is_content_administrator_rvy()) {
-			$revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : (int) $_REQUEST['to'];
+		if (is_admin() && isset($_SERVER['REQUEST_URI']) && (false !== strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'revision.php')) && (!empty($_REQUEST['revision'])) && !is_content_administrator_rvy()) {
+			if (!empty($_REQUEST['revision'])) {
+				$revision_id = (int) $_REQUEST['revision'];
+			} elseif (isset($_REQUEST['to'])) {
+				$revision_id = (int) $_REQUEST['to'];
+			} else {
+				$revision_id = 0;
+			}
 			
 			if ($revision_id) {
 				if ($_post = get_post($revision_id)) {

@@ -54,9 +54,17 @@ function rvy_admin_init() {
 		$_GET['revision'] = (int) $_GET['amp;revision'];
 		$_GET['action'] = sanitize_key($_GET['amp;action']);
 		$_GET['_wpnonce'] = sanitize_key($_GET['amp;_wpnonce']);
-		$_REQUEST['revision'] = (int) $_REQUEST['amp;revision'];
-		$_REQUEST['action'] = sanitize_key($_REQUEST['amp;action']);
-		$_REQUEST['_wpnonce'] = sanitize_key($_REQUEST['amp;_wpnonce']);
+		if (!empty($_REQUEST['amp;revision'])) {
+			$_REQUEST['revision'] = (int) $_REQUEST['amp;revision'];
+		}
+
+		if (!empty($_REQUEST['amp;action'])) {
+			$_REQUEST['action'] = sanitize_key($_REQUEST['amp;action']);
+		}
+
+		if (!empty($_REQUEST['amp;_wpnonce'])) {
+			$_REQUEST['_wpnonce'] = sanitize_key($_REQUEST['amp;_wpnonce']);
+		}
 	}
 
 	if ( ! empty($_POST['rvy_submit']) || ! empty($_POST['rvy_defaults']) ) {
@@ -87,7 +95,12 @@ function rvy_admin_init() {
 	
 		if ( 'delete_all' == $doaction ) {
 			// Prepare for deletion of all posts with a specified post status (i.e. Empty trash).
-			$post_status = sanitize_key($_REQUEST['post_status']);
+			
+			if (isset($_REQUEST['post_status'])) {
+				$post_status = sanitize_key($_REQUEST['post_status']);
+			} else {
+				$post_status = '';
+			}
 			// Verify the post status exists.
 			if ( get_post_status_object( $post_status ) ) {
 				$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_type=%s AND post_mime_type = %s", $post_type, $post_status ) );
@@ -257,7 +270,7 @@ function rvy_admin_init() {
 
 	// don't bother with the checks in this block unless action arg was passed
 	} elseif ( ! empty($_GET['action']) || ! empty($_POST['action']) ) {
-		if (false !== strpos(urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'admin.php') && !empty($_REQUEST['page']) && ('rvy-revisions' == $_REQUEST['page'])) {
+		if (isset($_SERVER['REQUEST_URI']) && false !== strpos(urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'admin.php') && !empty($_REQUEST['page']) && ('rvy-revisions' == $_REQUEST['page'])) {
 			if ( ! empty($_GET['action']) && ('restore' == $_GET['action']) ) {
 				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
 				add_action( 'wp_loaded', 'rvy_revision_restore' );
@@ -290,7 +303,13 @@ function rvy_admin_init() {
 		
 	} elseif (is_admin() && (false !== strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'revision.php'))) { // endif action arg passed
 
-		$revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : (int) $_REQUEST['to'];
+		if (!empty($_REQUEST['revision'])) {
+			$revision_id = (int) $_REQUEST['revision'];
+		} elseif (isset($_REQUEST['to'])) {
+			$revision_id = (int) $_REQUEST['to'];
+		} else {
+			return;
+		}
 
 		if (('modified' == rvy_get_option('past_revisions_order_by')) && !rvy_in_revision_workflow($revision_id)) {
 			require_once(dirname(__FILE__).'/history_rvy.php');

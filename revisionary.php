@@ -38,10 +38,10 @@
 global $pp_revisions_version;
 $pp_revisions_version = '3.0.13';
 
-if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
+if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die( 'This page cannot be called directly.' );
 
-if ( strpos( $_SERVER['SCRIPT_NAME'], 'p-admin/index-extra.php' ) || strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/update.php' ) )
+if (isset($_SERVER['SCRIPT_NAME']) && strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/index-extra.php' ) || strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/update.php' ) )
 	return;
 
 $pro_active = false;
@@ -80,7 +80,8 @@ if ($pro_active) {
 
 if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1.x defines RVY_VERSION on load, but does not define REVISIONARY_FILE
 	// don't allow two copies to run simultaneously
-	if ( is_admin() && strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/plugins.php' ) && ! strpos( urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'deactivate' ) ) {
+	if ( is_admin() && isset($_SERVER['SCRIPT_NAME']) && isset($_SERVER['REQUEST_URI']) 
+	&& strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/plugins.php' ) && ! strpos( urldecode(esc_url_raw(esc_url_raw($_SERVER['REQUEST_URI']))), 'deactivate' ) ) {
 		add_action('all_admin_notices', function()
 		{
 			if (defined('REVISIONARY_FILE')) {
@@ -165,7 +166,9 @@ add_action(
 	{
 		if ( defined('RVY_VERSION') ) {  // Revisionary 1.x defines RVY_VERSION on load, but does not define REVISIONARY_FILE
 			// don't allow two copies to run simultaneously
-			if ( is_admin() && strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/plugins.php' ) && ! strpos( urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'deactivate' ) ) {
+			if ( is_admin() && isset($_SERVER['REQUEST_URI']) && isset($_SERVER['SCRIPT_NAME'])
+			&& strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/plugins.php' ) && ! strpos( urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'deactivate' ) 
+			) {
 				add_action('all_admin_notices', function()
 				{
 					if (defined('REVISIONARY_FILE')) {
@@ -231,7 +234,7 @@ add_action(
 			require_once( dirname(__FILE__).'/lib/agapetry_wp_admin_lib.php');
 				
 			// skip WP version check and init operations when a WP plugin auto-update is in progress
-			if ( false !== strpos(esc_url_raw($_SERVER['SCRIPT_NAME']), 'update.php') )
+			if (isset($_SERVER['SCRIPT_NAME']) && false !== strpos(esc_url_raw($_SERVER['SCRIPT_NAME']), 'update.php') )
 				return;
 		}
 
@@ -240,7 +243,7 @@ add_action(
 		require_once( dirname(__FILE__).'/functions.php');
 
 		// avoid lockout in case of editing plugin via wp-admin
-		if ( defined('RS_DEBUG') && is_admin() && ( strpos( urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'p-admin/plugin-editor.php' ) || strpos( urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'p-admin/plugins.php' ) ) && false === strpos( $_SERVER['REQUEST_URI'], 'activate' ) )
+		if ( defined('RS_DEBUG') && is_admin() && isset($_SERVER['REQUEST_URI']) && ( strpos( urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'p-admin/plugin-editor.php' ) || strpos( urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'p-admin/plugins.php' ) ) && false === strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'activate' ) )
 			return;
 
 		define('RVY_ABSPATH', __DIR__);

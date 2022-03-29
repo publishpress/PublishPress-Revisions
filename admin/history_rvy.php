@@ -38,7 +38,13 @@ class RevisionaryHistory
     function actCompareRevisionsTweakUI() {
         global $revisionary;
 
-        $revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : (int) $_REQUEST['to'];
+        if (!empty($_REQUEST['revision'])) {
+            $revision_id = (int) $_REQUEST['revision'];
+        } elseif (isset($_REQUEST['to'])) {
+            $revision_id = (int) $_REQUEST['to'];
+        } else {
+            return;
+        }
 
         // Hide Restore button if user does not have permission
         if ($_post = get_post($revision_id)) {
@@ -302,6 +308,10 @@ class RevisionaryHistory
 
     // port wp_ajax_get_revision_diffs() to support pending, scheduled revisions
     public function actAjaxRevisionDiffs() {
+        if (!isset($_REQUEST['post_id'])) {
+            return; 
+        }
+
         if ( ! $post = get_post( (int) $_REQUEST['post_id'] ) ) {
             return;
         }
