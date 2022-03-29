@@ -231,6 +231,10 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.0.14 - 29 Mar 2022 =
+* Fixed : Output variable escaping, other coding standard improvements
+* Compat : NitroPack caching plugin
+
 = 3.0.13 - 21 Mar 2022 =
 * Fixed : Revision submission in Classic Editor caused "Undefined" link next to "Preview" link
 * Fixed : New revisions created with "Auto-submit" option had wrong date (and listing order) in Revision Queue
