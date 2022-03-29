@@ -76,7 +76,7 @@ function rvy_post_revision_title( $revision, $link = true, $date_field = 'post_d
 	
 	// note: RS filter (un-requiring edit_published/private cap) will be applied to this cap check
 	
-	if ( $link ) { //&& current_user_can( 'edit_post', $revision->ID ) ) {    // revisions are listed in the Editor even if not editable / restorable / approvable
+	if ( $link ) {
 		if ('inherit' == $revision->post_status) {
 			$link = "revision.php?revision=$revision->ID";
 		} else {

@@ -34,8 +34,6 @@ function rvy_revision_create($post_id = 0) {
 function rvy_revision_submit($revision_id = 0) {
 	global $wpdb, $revisionary;
 
-	//require_once( ABSPATH . 'wp-admin/admin.php');
-
 	if (!$revision_id) {
 		$batch_process = false;
 
@@ -483,7 +481,6 @@ function rvy_revision_restore() {
 		}
 
 		check_admin_referer( "restore-post_{$post->ID}|$revision->ID" );
-		//wp_restore_post_revision( $revision_id );
 
 		$published_url = get_permalink($post->ID);
 
