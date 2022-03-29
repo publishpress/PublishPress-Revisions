@@ -484,11 +484,11 @@ class RevisionaryHistory
 
             if ($strip_tags) {
                 if (is_string($content_from)) {
-                	$content_from = strip_tags($content_from);
+                    $content_from = wp_strip_all_tags($content_from);
                 }
 
                 if (is_string($content_to)) {
-                	$content_to = strip_tags($content_to);
+                    $content_to = wp_strip_all_tags($content_to);
                 }
             }
 
@@ -574,8 +574,8 @@ class RevisionaryHistory
             $args = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
 
             if ($strip_tags) {
-                $content_from = strip_tags($content_from);
-                $content_to = strip_tags($content_to);
+                $content_from = wp_strip_all_tags($content_from);
+                $content_to = wp_strip_all_tags($content_to);
             }
 
             if ($diff = wp_text_diff( $content_from, $content_to, $args )) {
@@ -726,8 +726,8 @@ class RevisionaryHistory
             $args = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
 
             if ($strip_tags) {
-                $content_from = strip_tags($content_from);
-                $content_to = strip_tags($content_to);
+                $content_from = wp_strip_all_tags($content_from);
+                $content_to = wp_strip_all_tags($content_to);
             }
 
             if ($diff = wp_text_diff( $content_from, $content_to, $args )) {
