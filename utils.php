@@ -166,8 +166,9 @@ class Utils {
 	public static function get_post_autosave($post_id, $user_id) {
 		global $wpdb;
 	
-		$autosave_query = "
-			SELECT *
+		$autosave = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT *
 			FROM $wpdb->posts
 			WHERE post_parent = %d
 			AND post_type = 'revision'
@@ -175,11 +176,7 @@ class Utils {
 			AND post_name LIKE '%" . intval($post_id) . "-autosave%'
 			AND post_author = %d
 			ORDER BY post_date DESC
-			LIMIT 1";
-	
-		$autosave = $wpdb->get_row(
-			$wpdb->prepare(
-				$autosave_query,
+				LIMIT 1",
 				$post_id,
 				$user_id
 			)
