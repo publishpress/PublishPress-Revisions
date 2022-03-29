@@ -8,14 +8,6 @@ if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 	new RevisionaryProAdmin();
 }
 
-if ( in_array( $pagenow, array( 'edit.php', 'post.php', 'post-new.php', 'plugins.php' ) ) ) { 
-	//add_action( 'all_admin_notices', '_rvy_intro_notice' ); // @todo: updated welcome message / screen
-
-	if (get_site_transient('_revisionary_1x_migration')) {
-		add_action( 'all_admin_notices', '_rvy_migration_notice' );
-	}
-}
-
 function _rvy_post_edit_ui() {
 	global $pagenow, $revisionary;
 
@@ -335,64 +327,8 @@ function rvy_admin_init() {
 	}
 }
 
-function rvy_intro_message($abbreviated = false) {
-	/*
-	$guide_link = sprintf(
-		__('For more details on setting up PublishPress Revisions, %sread this guide%s.', 'revisionary'),
-		'<a href="https://publishpress.com/documentation/revisionary-start" target="_blank">',
-		'</a>'
-	);
-
-	return ($abbreviated) ? $guide_link : sprintf(
-		__('<strong>Welcome to PublishPress Revisions!</strong> Here&apos;s how it works:%s<li>"Contributors" can submit revisions to their published posts.</li><li>"Revisors" can submit revisions to posts and pages published by others.</li><li>"Authors", "Editors" and "Administrators" can approve revisions or schedule their own revisions.</li>%s%s%s', 'revisionary'),
-		'<ul style="list-style-type:disc; padding-left:10px;margin-bottom:0">',
-		'</ul><p>',
-		$guide_link,
-		'</p>'
-	);
-	*/
-}
-
-function rvy_migration_message() {
-	return sprintf(
-		__('<strong>Revisionary is now PublishPress Revisions!</strong> Note the new Revisions menu and %sRevision Queue%s screen, where Revisions are listed. %s', 'revisionary'),
-		'<a href="' . admin_url('admin.php?page=revisionary-q') . '">',
-		'</a>',
-		'<div style="margin-top:10px">' . rvy_intro_message(true) . '</div>'
-	);
-}
-
-function _rvy_intro_notice() {
-	/*
-	if ( current_user_can( 'edit_users') ) {
-		rvy_dismissable_notice( 'intro_revisor_role', rvy_intro_message());
-	}
-	*/
-}
-
-function _rvy_migration_notice() {
-	if ( current_user_can( 'edit_users') ) {
-		rvy_dismissable_notice( 'revisionary_migration', rvy_migration_message());
-	}
-}
-
 function rvy_dismissable_notice( $msg_id, $message ) {
-	$dismissals = (array) rvy_get_option( 'dismissals' );
-
-	if ( ! isset( $dismissals[$msg_id] ) ) :
-		$class = 'rvy-admin-notice rvy-admin-notice-plugin';
-		?>
-		<div class='updated rvy-notice' class='<?php echo $class;?>' id='rvy_dashboard_message'>
-		<span style="float:right"><a href="javascript:void(0);" onclick="RvyDismissNotice();"><?php _e("Dismiss", "revisionary") ?></a></span>
-		<?php echo $message ?></div>
-		<script type="text/javascript">
-			function RvyDismissNotice(){
-				jQuery("#rvy_dashboard_message").slideUp();
-				jQuery.post(ajaxurl, {action:"rvy_dismiss_msg", msg_id:"<?php echo $msg_id ?>", cookie: encodeURIComponent(document.cookie)});
-			}
-		</script>
-	<?php 
-	endif;
+	return;
 }
 
 function rvy_get_post_revisions($post_id, $status = '', $args = '' ) {
