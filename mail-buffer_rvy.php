@@ -18,6 +18,8 @@ function _rvy_mail_send_limits() {
 }
 
 function _rvy_mail_check_buffer($new_msg = [], $args = []) {
+	global $wpdb;
+	
 	$log_only = !empty($args['log_only']);
 	
 	if (!$log_only) {
@@ -91,12 +93,10 @@ function _rvy_mail_check_buffer($new_msg = [], $args = []) {
 	}
 
 	if (!empty($first_mail_log) && $sent_mail) {
-		global $wpdb;
 		$wpdb->query("UPDATE $wpdb->options SET autoload = 'no' WHERE option_name = 'revisionary_sent_mail'");
 	}
 
 	if (!empty($first_buffer) && $buffer) {
-		global $wpdb;
 		$wpdb->query("UPDATE $wpdb->options SET autoload = 'no' WHERE option_name = 'revisionary_mail_buffer'");
 	}
 

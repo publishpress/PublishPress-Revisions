@@ -207,8 +207,6 @@ function rvy_revision_approve($revision_id = 0) {
 		if ( strtotime( $revision->post_date_gmt ) <= agp_time_gmt() ) {
 			$status_obj = get_post_status_object( $revision->post_mime_type );
 
-			global $wpdb;
-
 			if ( empty($status_obj->public) && empty($status_obj->private) ) {
 				$db_action = true;
 				
@@ -251,7 +249,6 @@ function rvy_revision_approve($revision_id = 0) {
 		// If requested publish date is in the future, schedule the revision
 		} else {
 			if ( 'future-revision' != $revision->post_mime_type ) {
-				global $wpdb;
 				$wpdb->update( $wpdb->posts, array( 'post_mime_type' => 'future-revision' ), array( 'ID' => $revision->ID ) );
 				
 				$update_next_publish_date = true;

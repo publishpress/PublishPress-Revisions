@@ -136,7 +136,7 @@ class RevisionaryFront {
 			return;
 		}
 
-		global $wp_query, $revisionary;
+		global $wp_query, $revisionary, $post;
 		if ($wp_query->is_404) {
 			if (!empty($_REQUEST['base_post'])) {
 				if ($post = get_post(intval($_REQUEST['base_post']))) {
@@ -154,7 +154,6 @@ class RevisionaryFront {
 		} elseif (!empty($_REQUEST['p'])) {
 			$revision_id = (int) $_REQUEST['p'];
 		} else {
-			global $post;
 			if ($post) {
 				$revision_id = $post->ID;
 			}
