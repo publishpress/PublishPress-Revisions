@@ -586,7 +586,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		(in_array($revision->post_mime_type, ['pending-revision', 'draft-revision']) && !rvy_filter_option('pending_revision_update_post_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
 		|| (('future-revision' == $revision->post_mime_type) && !rvy_filter_option('scheduled_revision_update_post_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
 	) {
-		// @todo: how was post_date_gmt of published post previously set to zero?
+		// todo: how was post_date_gmt of published post previously set to zero?
 		if (('0000-00-00 00:00:00' == $published->post_date_gmt) && ('0000-00-00 00:00:00' != $published->post_date)) {
 			// reconstruct post_date_gmt from stored post_date
 			$timestamp = strtotime($published->post_date);
@@ -728,7 +728,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 			['ID' => $revision_id]
 		);
 
-		// @todo save change as past revision?
+		// todo: save change as past revision?
 		$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
 	}
 	

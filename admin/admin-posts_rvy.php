@@ -217,7 +217,7 @@ class RevisionaryAdminPosts {
         $pos_from = strpos($query, "FROM $posts");
 		$pos_where = strpos($query, "WHERE ");
         
-        // @todo: use 'wp_count_posts' filter instead?
+        // todo: use 'wp_count_posts' filter instead?
 
         if ((strpos($query, "ELECT post_status, COUNT( * ) AS num_posts ") || (strpos($query, "ELECT COUNT( 1 )") && $pos_from && (!$pos_where || ($pos_from < $pos_where)))) 
         && preg_match("/FROM\s*{$posts}\s*WHERE post_type\s*=\s*'([^ ]+)'/", $query, $matches)
