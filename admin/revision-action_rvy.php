@@ -251,7 +251,7 @@ function rvy_revision_approve($revision_id = 0) {
 			if ( 'future-revision' != $revision->post_mime_type ) {
 				$wpdb->update( $wpdb->posts, array( 'post_mime_type' => 'future-revision' ), array( 'ID' => $revision->ID ) );
 				
-				$update_next_publish_date = true;
+				rvy_update_next_publish_date(['revision_id' => $revision_id]);
 				
 				$db_action = true;
 				
