@@ -8,10 +8,10 @@ class Revisionary_Submittee {
 	function handle_submission($action, $sitewide = false, $customize_defaults = false) {
 		if ( ( $sitewide || $customize_defaults ) ) {
 			if ( ! is_super_admin() )
-				wp_die(__awp('Cheatin&#8217; uh?'));
+				wp_die('');
 		
 		} elseif ( ! current_user_can( 'manage_options' ) )
-			 wp_die(__awp('Cheatin&#8217; uh?'));
+			 wp_die('');
 
 		if ( $customize_defaults )
 			$sitewide = true;		// default customization is only for per-site options, but is network-wide in terms of DB storage in sitemeta table
