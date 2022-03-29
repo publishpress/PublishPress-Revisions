@@ -277,52 +277,52 @@ function rvy_status_registrations() {
 		rvy_get_option('revision_statuses_noun_labels') ?
 		[
 			'draft-revision' => [
-				'name' => __('Working Copy', 'revisionary'),
-				'submit' => __('Create Working Copy', 'revisionary'), 
-				'submit_short' => __('Create Copy', 'revisionary'), 
-				'submitting' => __('Creating Working Copy...', 'revisionary'),
-				'submitted' => __('Working Copy ready.', 'revisionary'),
-				'approve' => __('Approve Changes', 'revisionary'), 
-				'approving' => __('Approving Changes...', 'revisionary'),
-				'publish' => __('Publish Changes', 'revisionary'),
-				'save' => __('Save Revision', 'revisionary'), 
-				'update' => __('Update Revision', 'revisionary'), 
-				'plural' => __('Working Copies', 'revisionary'), 
-				'short' => __('Working Copy', 'revisionary'),
+				'name' => esc_html__('Working Copy', 'revisionary'),
+				'submit' => esc_html__('Create Working Copy', 'revisionary'), 
+				'submit_short' => esc_html__('Create Copy', 'revisionary'), 
+				'submitting' => esc_html__('Creating Working Copy...', 'revisionary'),
+				'submitted' => esc_html__('Working Copy ready.', 'revisionary'),
+				'approve' => esc_html__('Approve Changes', 'revisionary'), 
+				'approving' => esc_html__('Approving Changes...', 'revisionary'),
+				'publish' => esc_html__('Publish Changes', 'revisionary'),
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Working Copies', 'revisionary'), 
+				'short' => esc_html__('Working Copy', 'revisionary'),
 				'count' => _n_noop('Working Copies <span class="count">(%d)</span>', 'Working Copies <span class="count">(%d)</span>', 'revisionary'),  // @todo: confirm API will support a fixed string
 				'basic' => 'Copy',
 			],
 		
 			'pending-revision' => [
-				'name' => __('Change Request', 'revisionary'),
-				'submit' => __('Submit Change Request', 'revisionary'),
-				'submit_short' => __('Submit Changes', 'revisionary'),
-				'submitting' => __('Submitting Changes...', 'revisionary'),
-				'submitted' => __('Changes Submitted.', 'revisionary'),
-				'approve' => __('Approve Changes', 'revisionary'), 
-				'approving' => __('Approving Changes...', 'revisionary'),
-				'publish' => __('Publish Changes', 'revisionary'), 
-				'save' => __('Save Revision', 'revisionary'), 
-				'update' => __('Update Revision', 'revisionary'), 
-				'plural' => __('Change Requests', 'revisionary'), 
-				'short' => __('Change Request', 'revisionary'),
+				'name' => esc_html__('Change Request', 'revisionary'),
+				'submit' => esc_html__('Submit Change Request', 'revisionary'),
+				'submit_short' => esc_html__('Submit Changes', 'revisionary'),
+				'submitting' => esc_html__('Submitting Changes...', 'revisionary'),
+				'submitted' => esc_html__('Changes Submitted.', 'revisionary'),
+				'approve' => esc_html__('Approve Changes', 'revisionary'), 
+				'approving' => esc_html__('Approving Changes...', 'revisionary'),
+				'publish' => esc_html__('Publish Changes', 'revisionary'), 
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Change Requests', 'revisionary'), 
+				'short' => esc_html__('Change Request', 'revisionary'),
 				'count' => _n_noop('Change Requests <span class="count">(%d)</span>', 'Change Requests <span class="count">(%d)</span>', 'revisionary'),
-				'enable' => __('Enable Change Requests', 'revisionary'),
+				'enable' => esc_html__('Enable Change Requests', 'revisionary'),
 				'basic' => 'Change Request',
 			],
 
 			'future-revision' => [
-				'name' => __('Scheduled Change', 'revisionary'),
-				'submit' => __('Schedule Changes', 'revisionary'),
-				'submit_short' => __('Schedule Changes', 'revisionary'),
-				'submitting' => __('Scheduling Changes...', 'revisionary'),
-				'submitted' => __('Changes are Scheduled.', 'revisionary'),
-				'approve' => __('Schedule Changes', 'revisionary'), 
-				'publish' => __('Publish Changes', 'revisionary'), 
-				'save' => __('Save Revision', 'revisionary'), 
-				'update' => __('Update Revision', 'revisionary'), 
-				'plural' => __('Scheduled Changes', 'revisionary'), 
-				'short' => __('Scheduled Change', 'revisionary'),
+				'name' => esc_html__('Scheduled Change', 'revisionary'),
+				'submit' => esc_html__('Schedule Changes', 'revisionary'),
+				'submit_short' => esc_html__('Schedule Changes', 'revisionary'),
+				'submitting' => esc_html__('Scheduling Changes...', 'revisionary'),
+				'submitted' => esc_html__('Changes are Scheduled.', 'revisionary'),
+				'approve' => esc_html__('Schedule Changes', 'revisionary'), 
+				'publish' => esc_html__('Publish Changes', 'revisionary'), 
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Scheduled Changes', 'revisionary'), 
+				'short' => esc_html__('Scheduled Change', 'revisionary'),
 				'count' => _n_noop('Scheduled Changes <span class="count">(%d)</span>', 'Scheduled Changes <span class="count">(%d)</span>', 'revisionary'),
 				'basic' => 'Scheduled Change',
 			],
@@ -331,49 +331,49 @@ function rvy_status_registrations() {
 		:
 		[
 			'draft-revision' => [
-				'name' => __('Unsubmitted Revision', 'revisionary'),
-				'submit' => __('New Revision', 'revisionary'), 
-				'submit_short' => __('New Revision', 'revisionary'), 
-				'submitting' => __('Creating Revision...', 'revisionary'),
-				'submitted' => __('Revision ready to edit.', 'revisionary'),
-				'approve' => __('Approve Revision', 'revisionary'), 
-				'publish' => __('Publish Revision', 'revisionary'), 
-				'save' => __('Save Revision', 'revisionary'), 
-				'update' => __('Update Revision', 'revisionary'), 
-				'plural' => __('Unsubmitted Revisions', 'revisionary'), 
-				'short' => __('Not Submitted', 'revisionary'),
+				'name' => esc_html__('Unsubmitted Revision', 'revisionary'),
+				'submit' => esc_html__('New Revision', 'revisionary'), 
+				'submit_short' => esc_html__('New Revision', 'revisionary'), 
+				'submitting' => esc_html__('Creating Revision...', 'revisionary'),
+				'submitted' => esc_html__('Revision ready to edit.', 'revisionary'),
+				'approve' => esc_html__('Approve Revision', 'revisionary'), 
+				'publish' => esc_html__('Publish Revision', 'revisionary'), 
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Unsubmitted Revisions', 'revisionary'), 
+				'short' => esc_html__('Not Submitted', 'revisionary'),
 				'count' => _n_noop('Not Submitted for Approval <span class="count">(%s)</span>', 'Not Submitted for Approval <span class="count">(%s)</span>', 'revisionary'),   // @todo: confirm API will support a fixed string
 				'basic' => 'Revision',
 			],
 		
 			'pending-revision' => [
-				'name' => __('Submitted Revision', 'revisionary'),
-				'submit' => __('Submit Revision', 'revisionary'), 
-				'submitting' => __('Submitting Revision...', 'revisionary'),
-				'submitted' => __('Revision Submitted.', 'revisionary'),
-				'submit_short' => __('Submit Revision', 'revisionary'), 
-				'approve' => __('Approve Revision', 'revisionary'), 
-				'publish' => __('Publish Revision', 'revisionary'), 
-				'save' => __('Save Revision', 'revisionary'), 
-				'update' => __('Update Revision', 'revisionary'), 
-				'plural' => __('Submitted Revisions', 'revisionary'), 
-				'short' => __('Submitted', 'revisionary'),
+				'name' => esc_html__('Submitted Revision', 'revisionary'),
+				'submit' => esc_html__('Submit Revision', 'revisionary'), 
+				'submitting' => esc_html__('Submitting Revision...', 'revisionary'),
+				'submitted' => esc_html__('Revision Submitted.', 'revisionary'),
+				'submit_short' => esc_html__('Submit Revision', 'revisionary'), 
+				'approve' => esc_html__('Approve Revision', 'revisionary'), 
+				'publish' => esc_html__('Publish Revision', 'revisionary'), 
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Submitted Revisions', 'revisionary'), 
+				'short' => esc_html__('Submitted', 'revisionary'),
 				'count' => _n_noop('Submitted for Approval <span class="count">(%s)</span>', 'Submitted for Approval <span class="count">(%s)</span>', 'revisionary'),
 				'basic' => 'Revision',
 			],
 
 			'future-revision' => [
-				'name' => __('Scheduled Revision', 'revisionary'),
-				'submit' => __('Schedule Revision', 'revisionary'), 
-				'submit_short' => __('Schedule Revision', 'revisionary'), 
-				'submitting' => __('Scheduling Revision...', 'revisionary'),
-				'submitted' => __('Revision Scheduled.', 'revisionary'),
-				'approve' => __('Approve Revision', 'revisionary'), 
-				'publish' => __('Publish Revision', 'revisionary'), 
-				'save' => __('Save Revision', 'revisionary'), 
-				'update' => __('Update Revision', 'revisionary'), 
-				'plural' => __('Scheduled Revisions', 'revisionary'), 
-				'short' => __('Scheduled', 'revisionary'),
+				'name' => esc_html__('Scheduled Revision', 'revisionary'),
+				'submit' => esc_html__('Schedule Revision', 'revisionary'), 
+				'submit_short' => esc_html__('Schedule Revision', 'revisionary'), 
+				'submitting' => esc_html__('Scheduling Revision...', 'revisionary'),
+				'submitted' => esc_html__('Revision Scheduled.', 'revisionary'),
+				'approve' => esc_html__('Approve Revision', 'revisionary'), 
+				'publish' => esc_html__('Publish Revision', 'revisionary'), 
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Scheduled Revisions', 'revisionary'), 
+				'short' => esc_html__('Scheduled', 'revisionary'),
 				'count' => _n_noop('Scheduled Revision <span class="count">(%s)</span>', 'Scheduled Revisions <span class="count">(%s)</span>', 'revisionary'),
 				'basic' => 'Scheduled Revision',
 			],
@@ -470,16 +470,16 @@ function pp_revisions_label($label_name) {
 			
 			'my_published_posts'		=> _n_noop('%sRevisions to My Posts%s(%s)</span>', '%sRevisions to My Posts%s(%s)', 'revisionary'),
 
-			'queue_col_revision' 		=> __('Revision', 'revisionary'),
-			'queue_col_revised_by' 		=> __('Revised By', 'revisionary'),
-			'queue_col_revision_date' 	=> __('Revision Date', 'revisionary'),
-			'queue_col_post_author' 	=> __('Post Author', 'revisionary'),
-			'queue_col_published_post' 	=> __('Published Post', 'revisionary'),
-			'update_revision' 			=> __('Update Revision', 'revisionary'),
+			'queue_col_revision' 		=> esc_html__('Revision', 'revisionary'),
+			'queue_col_revised_by' 		=> esc_html__('Revised By', 'revisionary'),
+			'queue_col_revision_date' 	=> esc_html__('Revision Date', 'revisionary'),
+			'queue_col_post_author' 	=> esc_html__('Post Author', 'revisionary'),
+			'queue_col_published_post' 	=> esc_html__('Published Post', 'revisionary'),
+			'update_revision' 			=> esc_html__('Update Revision', 'revisionary'),
 
 			'submit_revision' => (rvy_get_option('revision_statuses_noun_labels'))
-			?							__('Submit Revision', 'revisionary')
-			:							__('Submit Changes', 'revisionary')
+			?							esc_html__('Submit Revision', 'revisionary')
+			:							esc_html__('Submit Changes', 'revisionary')
 		]);
 	}
 
@@ -685,7 +685,7 @@ function rvy_add_revisor_role( $requested_blog_id = '' ) {
 		'level_0' => true
 	);
 
-	$wp_roles->add_role( 'revisor', __( 'Revisor', 'revisionary' ), $wp_role_caps );
+	$wp_roles->add_role( 'revisor', esc_html__( 'Revisor', 'revisionary' ), $wp_role_caps );
 }
 
 function rvy_apply_role_translation($translations, $text, $context, $domain) {
@@ -1116,9 +1116,9 @@ function rvy_is_status_published( $status ) {
 
 function rvy_halt( $msg, $title = '' ) {
 	if ( ! $title ) {
-		$title = __( 'Revision Workflow', 'revisionary' );
+		$title = esc_html__( 'Revision Workflow', 'revisionary' );
 	}
-	wp_die( $msg, $title, array( 'response' => 200 ) );
+	wp_die( esc_html($msg), esc_html($title), array( 'response' => 200 ) );
 }
 
 function _revisionary_dashboard_dismiss_msg() {

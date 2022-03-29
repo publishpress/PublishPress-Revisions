@@ -90,7 +90,7 @@ if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1
 				$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)', 'revisionary' ), RVY_VERSION );
 			}
 			
-			echo "<div id='message' class='notice error' style='color:black'>" . $message . '</div>';
+			echo "<div id='message' class='notice error' style='color:black'>" . esc_html($message) . '</div>';
 		}, 5);
 	}
 	return;
@@ -174,7 +174,7 @@ add_action(
 						$message = sprintf( __( 'Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)', 'revisionary' ), RVY_VERSION );
 					}
 
-					echo "<div id='message' class='notice error' style='color:black'>" . $message . '</div>';
+					echo "<div id='message' class='notice error' style='color:black'>" . esc_html($message) . '</div>';
 				}, 5);
 			}
 			return;
@@ -190,14 +190,14 @@ add_action(
 		// Critical errors that prevent initialization
 		if (version_compare($min_php_version, $php_version, '>')) {
 			if (is_admin() && current_user_can('activate_plugins')) {
-				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(__('PublishPress Revisions requires PHP version %s or higher.', 'revisionary'), '5.6.20') . "</div>"; });
+				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(esc_html__('PublishPress Revisions requires PHP version %s or higher.', 'revisionary'), '5.6.20') . "</div>"; });
 			}
 			return;
 		}
 
 		if (version_compare($wp_version, $min_wp_version, '<')) {
 			if (is_admin() && current_user_can('activate_plugins')) {
-				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(__('PublishPress Revisions requires WordPress version %s or higher.', 'revisionary'), '4.9.7') . "</div>"; });
+				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(esc_html__('PublishPress Revisions requires WordPress version %s or higher.', 'revisionary'), '4.9.7') . "</div>"; });
 			}
 			return;
 		}

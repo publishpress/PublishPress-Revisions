@@ -154,13 +154,13 @@ class Rvy_Revision_Workflow_UI {
             $blogname = wp_specialchars_decode( get_option('blogname'), ENT_QUOTES );
             
             if (!empty($args['update'])) {
-                $title = sprintf( __('[%s] %s Updated', 'revisionary'), $blogname, pp_revisions_status_label('pending-revision', 'name') );
+                $title = sprintf( esc_html__('[%s] %s Updated', 'revisionary'), $blogname, pp_revisions_status_label('pending-revision', 'name') );
                 
-                $message = sprintf( __('%1$s updated a %2$s of the %3$s "%4$s".', 'revisionary'), $current_user->display_name, strtolower(pp_revisions_status_label('pending-revision', 'name')), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
+                $message = sprintf( esc_html__('%1$s updated a %2$s of the %3$s "%4$s".', 'revisionary'), $current_user->display_name, strtolower(pp_revisions_status_label('pending-revision', 'name')), $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
             } else {
-                $title = sprintf( __('[%s] %s', 'revisionary'), $blogname, pp_revisions_status_label('pending-revision', 'name') );
+                $title = sprintf( esc_html__('[%s] %s', 'revisionary'), $blogname, pp_revisions_status_label('pending-revision', 'name') );
                 
-                $message = sprintf( __('%1$s submitted changes to the %2$s "%3$s". You can review the changes for possible publication:', 'revisionary'), $current_user->display_name, $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
+                $message = sprintf( esc_html__('%1$s submitted changes to the %2$s "%3$s". You can review the changes for possible publication:', 'revisionary'), $current_user->display_name, $type_caption, $post_arr['post_title'] ) . "\r\n\r\n";
             }
 
             if ( $revision_id ) {
@@ -168,12 +168,12 @@ class Rvy_Revision_Workflow_UI {
 
                 if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
                     $preview_link = rvy_preview_url($revision);
-                    $message .= __( 'Preview and Approval: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
+                    $message .= esc_html__( 'Preview and Approval: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
                 }
 
-                $message .= __( 'Revision Queue: ', 'revisionary' ) . rvy_admin_url("admin.php?page=revisionary-q&published_post={$published_post->ID}") . "\r\n\r\n";
+                $message .= esc_html__( 'Revision Queue: ', 'revisionary' ) . rvy_admin_url("admin.php?page=revisionary-q&published_post={$published_post->ID}") . "\r\n\r\n";
                 
-                $message .= sprintf(__( 'Edit %s: ', 'revisionary' ), pp_revisions_status_label('pending-revision', 'name')) . rvy_admin_url("post.php?action=edit&post={$revision_id}") . "\r\n";
+                $message .= sprintf(esc_html__( 'Edit %s: ', 'revisionary' ), pp_revisions_status_label('pending-revision', 'name')) . rvy_admin_url("post.php?action=edit&post={$revision_id}") . "\r\n";
             }
 
             if ( $admin_notify ) {
@@ -214,10 +214,11 @@ class Rvy_Revision_Workflow_UI {
 
             if ( $recipient_ids ) {
                 global $wpdb;
+
+                $id_csv = implode("','", array_map('intval', $recipient_ids));
+
                 $results = $wpdb->get_results( 
-                    "SELECT ID, user_email FROM $wpdb->users WHERE ID IN ('" 
-                    . implode("','", array_map('intval', $recipient_ids)) 
-                    . "')" 
+                    "SELECT ID, user_email FROM $wpdb->users WHERE ID IN ('$id_csv')" 
                 );
                 
                 foreach($results as $row) {

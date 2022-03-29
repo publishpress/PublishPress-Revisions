@@ -124,7 +124,7 @@ function rvy_admin_init() {
 					
 					if (!$is_administrator && !current_user_can('edit_post', rvy_post_id($revision->ID))) {
 						if (count($post_ids) == 1) {
-							wp_die( __('Sorry, you are not allowed to approve this revision.', 'revisionary') );
+							wp_die( esc_html__('Sorry, you are not allowed to approve this revision.', 'revisionary') );
 						} else {
 							continue;
 						}
@@ -165,7 +165,7 @@ function rvy_admin_init() {
 					
 					if (!$is_administrator && !current_user_can('set_revision_pending-revision', $revision->ID)) {
 						if (count($post_ids) == 1) {
-							wp_die( __('Sorry, you are not allowed to submit this revision.', 'revisionary') );
+							wp_die( esc_html__('Sorry, you are not allowed to submit this revision.', 'revisionary') );
 						} else {
 							continue;
 						}
@@ -200,7 +200,7 @@ function rvy_admin_init() {
 					
 					if (!$is_administrator && !current_user_can('edit_post', rvy_post_id($revision->ID))) {
 						if (count($post_ids) == 1) {
-							wp_die( __('Sorry, you are not allowed to approve this revision.', 'revisionary') );
+							wp_die( esc_html__('Sorry, you are not allowed to approve this revision.', 'revisionary') );
 						} else {
 							continue;
 						}
@@ -229,12 +229,12 @@ function rvy_admin_init() {
 					
 					if ( ! current_user_can('administrator') && ! current_user_can( 'delete_post', rvy_post_id($revision->ID) ) ) {  // @todo: review Administrator cap check
 						if (!in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) || !rvy_is_post_author($revision)) {	// allow submitters to delete their own still-pending revisions
-							wp_die( __('Sorry, you are not allowed to delete this revision.', 'revisionary') );
+							wp_die( esc_html__('Sorry, you are not allowed to delete this revision.', 'revisionary') );
 						}
 					} 
 	
 					if ( !wp_delete_post($post_id) )
-						wp_die( __('Error in deleting.') );
+						wp_die( esc_html__('Error in deleting.') );
 	
 					$deleted++;
 				}
