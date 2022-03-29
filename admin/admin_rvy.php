@@ -154,7 +154,7 @@ class RevisionaryAdmin
 
 		// For Revisions Manager access, satisfy WordPress' demand that all admin links be properly defined in menu
 		if ( false !== strpos( urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'admin.php?page=rvy-revisions' ) ) {
-			add_submenu_page( 'none', __('Revisions', 'revisionary'), __('Revisions', 'revisionary'), 'read', 'rvy-revisions', 'rvy_include_admin_revisions' );
+			add_submenu_page( 'none', esc_html__('Revisions', 'revisionary'), esc_html__('Revisions', 'revisionary'), 'read', 'rvy-revisions', 'rvy_include_admin_revisions' );
 		}
 
 		if ($types = rvy_get_manageable_types()) {
@@ -170,10 +170,10 @@ class RevisionaryAdmin
 			}
 
 			if (apply_filters('revisionary_add_menu', $can_edit_any)) {
-				$_menu_caption = ( defined( 'RVY_MODERATION_MENU_CAPTION' ) ) ? RVY_MODERATION_MENU_CAPTION : __('Revisions');
-				add_menu_page( __($_menu_caption, 'pp'), __($_menu_caption, 'pp'), 'read', 'revisionary-q', array(&$this, 'moderation_queue'), 'dashicons-backup', 29 );
+				$_menu_caption = ( defined( 'RVY_MODERATION_MENU_CAPTION' ) ) ? RVY_MODERATION_MENU_CAPTION : esc_html__('Revisions');
+				add_menu_page( esc_html__($_menu_caption, 'pp'), esc_html__($_menu_caption, 'pp'), 'read', 'revisionary-q', array(&$this, 'moderation_queue'), 'dashicons-backup', 29 );
 
-				add_submenu_page('revisionary-q', __('Revision Queue', 'revisionary'), __('Revision Queue', 'revisionary'), 'read', 'revisionary-q', [$this, 'moderation_queue']);
+				add_submenu_page('revisionary-q', esc_html__('Revision Queue', 'revisionary'), esc_html__('Revision Queue', 'revisionary'), 'read', 'revisionary-q', [$this, 'moderation_queue']);
 			}
 		}
 
@@ -186,15 +186,15 @@ class RevisionaryAdmin
 			rvy_refresh_default_options();
 
 		if ( ! RVY_NETWORK || ( count($rvy_options_sitewide) != count($rvy_default_options) ) ) {
-			add_submenu_page( 'revisionary-q', __('PublishPress Revisions Settings', 'revisionary'), __('Settings', 'revisionary'), 'read', 'revisionary-settings', 'rvy_omit_site_options');
+			add_submenu_page( 'revisionary-q', esc_html__('PublishPress Revisions Settings', 'revisionary'), esc_html__('Settings', 'revisionary'), 'read', 'revisionary-settings', 'rvy_omit_site_options');
 			add_action('revisionary_page_revisionary-settings', 'rvy_omit_site_options' );
 		}
 
 		if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 			add_submenu_page(
 	            'revisionary-q',
-	            __('Upgrade to Pro', 'revisionary'),
-	            __('Upgrade to Pro', 'revisionary'),
+	            esc_html__('Upgrade to Pro', 'revisionary'),
+	            esc_html__('Upgrade to Pro', 'revisionary'),
 	            'read',
 	            'revisionary-pro',
 	            'rvy_omit_site_options'
@@ -266,7 +266,7 @@ class RevisionaryAdmin
 		<div class="pp-rating">
 		<a href="https://wordpress.org/support/plugin/revisionary/reviews/#new-post" target="_blank" rel="noopener noreferrer">
 		<?php printf(
-			__('If you like %s, please leave us a %s rating. Thank you!', 'revisionary'),
+			esc_html__('If you like %s, please leave us a %s rating. Thank you!', 'revisionary'),
 			'<strong>PublishPress Revisions</strong>',
 			'<span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span>'
 			);
@@ -277,11 +277,11 @@ class RevisionaryAdmin
 		<hr>
 		<nav>
 		<ul>
-		<li><a href="https://publishpress.com/revisionary" target="_blank" rel="noopener noreferrer" title="<?php _e('About PublishPress Revisions', 'revisionary');?>"><?php _e('About', 'revisionary');?>
+		<li><a href="https://publishpress.com/revisionary" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr('About PublishPress Revisions', 'revisionary');?>"><?php esc_html_e('About', 'revisionary');?>
 		</a></li>
-		<li><a href="https://publishpress.com/documentation/revisions-start" target="_blank" rel="noopener noreferrer" title="<?php _e('PublishPress Revisions Documentation', 'revisionary');?>"><?php _e('Documentation', 'revisionary');?>
+		<li><a href="https://publishpress.com/documentation/revisions-start" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr('PublishPress Revisions Documentation', 'revisionary');?>"><?php esc_html_e('Documentation', 'revisionary');?>
 		</a></li>
-		<li><a href="https://publishpress.com/contact" target="_blank" rel="noopener noreferrer" title="<?php _e('Contact the PublishPress team', 'revisionary');?>"><?php _e('Contact', 'revisionary');?>
+		<li><a href="https://publishpress.com/contact" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr('Contact the PublishPress team', 'revisionary');?>"><?php esc_html_e('Contact', 'revisionary');?>
 		</a></li>
 		<li><a href="https://twitter.com/publishpresscom" target="_blank" rel="noopener noreferrer"><span class="dashicons dashicons-twitter"></span>
 		</a></li>
@@ -293,7 +293,7 @@ class RevisionaryAdmin
 		<div class="pp-pressshack-logo">
 		<a href="https://publishpress.com" target="_blank" rel="noopener noreferrer">
 
-		<img src="<?php echo plugins_url('', REVISIONARY_FILE) . '/common/img/publishpress-logo.png';?>" />
+		<img src="<?php echo esc_url(plugins_url('', REVISIONARY_FILE) . '/common/img/publishpress-logo.png');?>" />
 		</a>
 		</div>
 

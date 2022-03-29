@@ -304,24 +304,24 @@ function rvy_revision_approve($revision_id = 0) {
 			$type_obj = get_post_type_object( $post->post_type );
 			$type_caption = $type_obj->labels->singular_name;
 
-			$title = sprintf(__('[%s] Revision Approval Notice', 'revisionary' ), $blogname );
-			$message = sprintf( __('A revision to the %1$s "%2$s" has been approved.', 'revisionary' ), $type_caption, $post->post_title ) . "\r\n\r\n";
+			$title = sprintf(esc_html__('[%s] Revision Approval Notice', 'revisionary' ), $blogname );
+			$message = sprintf( esc_html__('A revision to the %1$s "%2$s" has been approved.', 'revisionary' ), $type_caption, $post->post_title ) . "\r\n\r\n";
 
 			if ( $revisor = new WP_User( $revision->post_author ) )
-				$message .= sprintf( __('The submitter was %1$s.', 'revisionary'), $revisor->display_name ) . "\r\n\r\n";
+				$message .= sprintf( esc_html__('The submitter was %1$s.', 'revisionary'), $revisor->display_name ) . "\r\n\r\n";
 
 			if ( $scheduled ) {
 				$datef = __awp( 'M j, Y @ g:i a' );
-				$message .= sprintf( __('It will be published on %s', 'revisionary' ), agp_date_i18n( $datef, strtotime($revision->post_date) ) ) . "\r\n\r\n";
+				$message .= sprintf( esc_html__('It will be published on %s', 'revisionary' ), agp_date_i18n( $datef, strtotime($revision->post_date) ) ) . "\r\n\r\n";
 				
 				if (rvy_get_option('revision_preview_links')) {
 					$preview_link = rvy_preview_url($revision);
-					$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
+					$message .= esc_html__( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
 				}
 
-				$message .= __( 'Editor: ', 'revisionary' ) . rvy_admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
+				$message .= esc_html__( 'Editor: ', 'revisionary' ) . rvy_admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
 			} else {
-				$message .= __( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";	
+				$message .= esc_html__( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";	
 			}
 			
 			if ( $db_action && rvy_get_option( 'rev_approval_notify_author' ) ) {
@@ -389,21 +389,21 @@ function rvy_revision_approve($revision_id = 0) {
 			}
 			
 			if ( $db_action && rvy_get_option( 'rev_approval_notify_revisor' ) ) {
-				$title = sprintf(__('[%s] Revision Approval Notice', 'revisionary' ), $blogname );
-				$message = sprintf( __('The revision you submitted for the %1$s "%2$s" has been approved.', 'revisionary' ), $type_caption, $revision->post_title ) . "\r\n\r\n";
+				$title = sprintf(esc_html__('[%s] Revision Approval Notice', 'revisionary' ), $blogname );
+				$message = sprintf( esc_html__('The revision you submitted for the %1$s "%2$s" has been approved.', 'revisionary' ), $type_caption, $revision->post_title ) . "\r\n\r\n";
 
 				if ( $scheduled ) {
 					$datef = __awp( 'M j, Y @ g:i a' );
-					$message .= sprintf( __('It will be published on %s', 'revisionary' ), agp_date_i18n( $datef, strtotime($revision->post_date) ) ) . "\r\n\r\n";
+					$message .= sprintf( esc_html__('It will be published on %s', 'revisionary' ), agp_date_i18n( $datef, strtotime($revision->post_date) ) ) . "\r\n\r\n";
 					
 					if (rvy_get_option('revision_preview_links')) {
 						$preview_link = rvy_preview_url($revision);
-						$message .= __( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
+						$message .= esc_html__( 'Preview it here: ', 'revisionary' ) . $preview_link . "\r\n\r\n";
 					}
 
-					$message .= __( 'Editor: ', 'revisionary' ) . rvy_admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
+					$message .= esc_html__( 'Editor: ', 'revisionary' ) . rvy_admin_url("post.php?post={$revision->ID}&action=edit") . "\r\n";
 				} else {
-					$message .= __( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";	
+					$message .= esc_html__( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";	
 				}
 
 				if ( $author = new WP_User( $revision->post_author, '' ) ) {
@@ -1105,7 +1105,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 	$revised_uris = array();
 
 	if (defined('WP_DEBUG') && WP_DEBUG && !empty($_GET['rs_debug'])) {
-		echo "current time: $time_gmt";
+		echo "current time: " . esc_html($time_gmt);
 	}
 
 	if (!empty($args['force_revision_id']) && is_scalar($args['force_revision_id'])) {
@@ -1141,7 +1141,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 				}
 
 				if (defined('WP_DEBUG') && WP_DEBUG && ! empty( $_GET['rs_debug'] ) ) {
-					echo '<br />' . "publishing revision $row->ID";
+					echo '<br />' . "publishing revision " . esc_html($row->ID);
 				}
 
 				$restored_post_ids[$published_id] = true;
@@ -1152,11 +1152,11 @@ function rvy_publish_scheduled_revisions($args = []) {
 				$type_caption = $type_obj->labels->singular_name;
 				
 				if ( rvy_get_option( 'publish_scheduled_notify_revisor' ) ) {
-					$title = sprintf( __('[%s] %s Publication Notice', 'revisionary' ), $blogname, pp_revisions_status_label('future-revision', 'name') );
-					$message = sprintf( __('The scheduled revision you submitted for the %1$s "%2$s" has been published.', 'revisionary' ), $type_caption, $row->post_title ) . "\r\n\r\n";
+					$title = sprintf( esc_html__('[%s] %s Publication Notice', 'revisionary' ), $blogname, pp_revisions_status_label('future-revision', 'name') );
+					$message = sprintf( esc_html__('The scheduled revision you submitted for the %1$s "%2$s" has been published.', 'revisionary' ), $type_caption, $row->post_title ) . "\r\n\r\n";
 
 					if ( ! empty($post->ID) )
-						$message .= __( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";
+						$message .= esc_html__( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";
 
 					if ( $author = new WP_User( $row->post_author ) )
 						rvy_mail( 
@@ -1174,14 +1174,14 @@ function rvy_publish_scheduled_revisions($args = []) {
 
 				// Prior to 1.3, notification was sent to author even if also revision submitter
 				if ( ( ( $post->post_author != $row->post_author ) || defined( 'RVY_LEGACY_SCHEDULED_REV_POST_AUTHOR_NOTIFY' ) ) && rvy_get_option( 'publish_scheduled_notify_author' ) ) {
-					$title = sprintf( __('[%s] %s Publication Notice', 'revisionary' ), $blogname, pp_revisions_status_label('future-revision', 'name') );
-					$message = sprintf( __('A scheduled revision to your %1$s "%2$s" has been published.', 'revisionary' ), $type_caption, $post->post_title ) . "\r\n\r\n";
+					$title = sprintf( esc_html__('[%s] %s Publication Notice', 'revisionary' ), $blogname, pp_revisions_status_label('future-revision', 'name') );
+					$message = sprintf( esc_html__('A scheduled revision to your %1$s "%2$s" has been published.', 'revisionary' ), $type_caption, $post->post_title ) . "\r\n\r\n";
 
 					if ( $revisor = new WP_User( $row->post_author ) )
-						$message .= sprintf( __('It was submitted by %1$s.'), $revisor->display_name ) . "\r\n\r\n";
+						$message .= sprintf( esc_html__('It was submitted by %1$s.'), $revisor->display_name ) . "\r\n\r\n";
 
 					if ( ! empty($post->ID) )
-						$message .= __( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";
+						$message .= esc_html__( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";
 				
 					if (function_exists('get_multiple_authors')) {
 						$authors = get_multiple_authors($post);
@@ -1242,15 +1242,15 @@ function rvy_publish_scheduled_revisions($args = []) {
 					}
 					
 					if (empty($skip_notification)) {
-						$title = sprintf(__('[%s] %s Publication'), $blogname, pp_revisions_status_label('future-revision', 'name') );
+						$title = sprintf(esc_html__('[%s] %s Publication'), $blogname, pp_revisions_status_label('future-revision', 'name') );
 						
-						$message = sprintf( __('A scheduled revision to the %1$s "%2$s" has been published.'), $type_caption, $row->post_title ) . "\r\n\r\n";
+						$message = sprintf( esc_html__('A scheduled revision to the %1$s "%2$s" has been published.'), $type_caption, $row->post_title ) . "\r\n\r\n";
 	
 						if ( $author = new WP_User( $row->post_author ) )
-							$message .= sprintf( __('It was submitted by %1$s.'), $author->display_name ) . "\r\n\r\n";
+							$message .= sprintf( esc_html__('It was submitted by %1$s.'), $author->display_name ) . "\r\n\r\n";
 	
 						if ( ! empty($post->ID) )
-							$message .= __( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";
+							$message .= esc_html__( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";
 	
 						$object_id = ( isset($post) && isset($post->ID) ) ? $post->ID : $row->ID;
 						$object_type = ( isset($post) && isset($post->post_type) ) ? $post->post_type : 'post';

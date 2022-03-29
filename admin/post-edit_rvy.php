@@ -23,7 +23,7 @@ class RvyPostEdit {
         <script type="text/javascript">
         /* <![CDATA[ */
         jQuery(document).ready( function($) {
-            var rvyNowCaption = "<?php _e( 'Current Time', 'revisionary' );?>";
+            var rvyNowCaption = "<?php esc_html_e( 'Current Time', 'revisionary' );?>";
             $('#publishing-action #publish').show();
         });
         /* ]]> */
@@ -48,7 +48,7 @@ class RvyPostEdit {
 
             $args = \PublishPress\Revisions\PostEditorWorkflowUI::revisionLinkParams(compact('post', 'do_pending_revisions', 'do_scheduled_revisions'));
 
-            $args['deleteCaption'] = __('Delete Permanently', 'revisionary');
+            $args['deleteCaption'] = esc_html__('Delete Permanently', 'revisionary');
 
             wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
 
@@ -68,7 +68,7 @@ class RvyPostEdit {
         }
 
         $args = array(
-            'nowCaption' => __( 'Current Time', 'revisionary' ),
+            'nowCaption' => esc_html__( 'Current Time', 'revisionary' ),
         );
         wp_localize_script( 'rvy_post', 'rvyPostEdit', $args );
 	}
@@ -82,12 +82,7 @@ class RvyPostEdit {
             return $preview_caption;
         }
 
-        //if (current_user_can('edit_post', rvy_post_id($post->ID))) {
-        //    $preview_caption = ('future-revision' == $post->post_status) ? __('Preview / Publish', 'revisionary') : __('Preview / Approve', 'revisionary');
-
-        //} elseif ($type_obj && !empty($type_obj->public)) {
-            $preview_caption = __('Preview');
-        //}
+        $preview_caption = esc_html__('Preview');
 
         return $preview_caption;
     }
@@ -102,9 +97,10 @@ class RvyPostEdit {
         }
 
         if (current_user_can('edit_post', rvy_post_id($post->ID))) {
-            $preview_title = __('View / moderate saved revision', 'revisionary');
+            $preview_title = esc_html__('View / moderate saved revision', 'revisionary');
+
         } elseif ($type_obj && !empty($type_obj->public)) {
-            $preview_title = __('View saved revision', 'revisionary');
+            $preview_title = esc_html__('View saved revision', 'revisionary');
         }
 
         return $preview_title;
@@ -123,7 +119,7 @@ class RvyPostEdit {
 	            ?>
 	            <div class="misc-pub-section">
 	            <?php
-	            printf('%s' . pp_revisions_status_label('future-revision', 'plural') . ': %s', '<span class="dashicons dashicons-clock"></span>&nbsp;', '<b>' . count($_revisions) . '</b>');
+	            printf('%s' . esc_html(pp_revisions_status_label('future-revision', 'plural')) . ': %s', '<span class="dashicons dashicons-clock"></span>&nbsp;', '<b>' . esc_html(count($_revisions)) . '</b>');
 	            ?>
 	            <a class="hide-if-no-js"
                     href="<?php echo esc_url(admin_url("revision.php?post_id=$post->ID&revision=future-revision")); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions', 'revisionary'); ?></a>
@@ -137,7 +133,7 @@ class RvyPostEdit {
 	            ?>
 	            <div class="misc-pub-section">
 	            <?php
-	            printf('%s' . pp_revisions_status_label('pending-revision', 'plural') . ': %s', '<span class="dashicons dashicons-edit"></span>&nbsp;', '<b>' . count($_revisions) . '</b>');
+	            printf('%s' . esc_html(pp_revisions_status_label('pending-revision', 'plural')) . ': %s', '<span class="dashicons dashicons-edit"></span>&nbsp;', '<b>' . esc_html(count($_revisions)) . '</b>');
 	            ?>
 	            <a class="hide-if-no-js"
                     href="<?php echo esc_url(admin_url("revision.php?post_id=$post->ID&revision=pending-revision")); ?>" target="_revision_diff"><?php _ex('Compare', 'revisions', 'revisionary'); ?></a>

@@ -17,7 +17,7 @@ global $revisionary;
 
 if ( defined( 'FV_FCK_NAME' ) && current_user_can('activate_plugins') ) {
 	echo( '<div class="error">' );
-	_e( "<strong>Note:</strong> For visual display of revisions, add the following code to foliopress-wysiwyg.php:<br />&nbsp;&nbsp;if ( strpos( $" . "_SERVER['REQUEST_URI'], 'admin.php?page=rvy-revisions' ) ) return;", 'revisionary');
+	esc_html_e( "<strong>Note:</strong> For visual display of revisions, add the following code to foliopress-wysiwyg.php:<br />&nbsp;&nbsp;if ( strpos( $" . "_SERVER['REQUEST_URI'], 'admin.php?page=rvy-revisions' ) ) return;", 'revisionary');
 	echo( '</div><br />' );
 }
 //wp_reset_vars( array('revision', 'left', 'right', 'action', 'revision_status') );
@@ -48,13 +48,13 @@ if ( ! empty($_GET['restored_post'] ) ) {
 
 if ( empty($revision_id) && ! $left && ! $right ) {
 	echo( '<div><br />' );
-	_e( 'No revision specified.', 'revisionary');
+	esc_html_e( 'No revision specified.', 'revisionary');
 	echo( '</div>' );
 	return;
 }
 
 $revision_status_captions = array( 
-	'inherit' => __( 'Past', 'revisionary' ), 
+	'inherit' => esc_html__( 'Past', 'revisionary' ), 
 	'pending-revision' => __awp('Pending', 'revisionary'), 
 	'future-revision' => __awp( 'Scheduled', 'revisionary' ) 
 );
@@ -116,7 +116,7 @@ default :
 
 	$published_title = "<a href='post.php?action=edit&post=$rvy_post->ID'>$rvy_post->post_title</a>";
 	?>
-	<h1><?php printf(__('Revisions of %s', 'revisionary'), $published_title);?></h1>
+	<h1><?php printf(esc_html__('Revisions of %s', 'revisionary'), esc_html($published_title));?></h1>
 	<?php
 
 	// Sets up the diff radio buttons
@@ -142,7 +142,7 @@ endswitch;
 
 if ( empty($revision) && empty($right_revision) && empty($left_revision) ) {
 	echo( '<div><br />' );
-	_e( 'The requested revision does not exist.', 'revisionary');
+	esc_html_e( 'The requested revision does not exist.', 'revisionary');
 	echo( '</div>' );
 	return;
 }
@@ -196,7 +196,7 @@ if ( $is_administrator = is_content_administrator_rvy() ) {
 	$num_revisions = (object) $num_revisions;
 }
 
-$status_links = '<ul class="subsubsub">';
+echo '<ul class="subsubsub">';
 foreach ( array_keys($revision_status_captions) as $_revision_status ) {
 	$post_id = ( ! empty($rvy_post->ID) ) ? $rvy_post->ID : $revision_id;
 	
@@ -205,14 +205,14 @@ foreach ( array_keys($revision_status_captions) as $_revision_status ) {
 		$target = '';
 	} else {
 		$link = rvy_admin_url("admin.php?page=revisionary-q&published_post={$rvy_post->ID}&post_status={$_revision_status}");
-		$target = "target='_blank'";
+		$target = "_blank";
 	}
 
-	$class = ( $revision_status == $_revision_status ) ? ' class="rvy_current_status rvy_select_status"' : 'class="rvy_select_status"';
+	$class = ( $revision_status == $_revision_status ) ? ' rvy_current_status rvy_select_status' : 'rvy_select_status';
 
 	switch( $_revision_status ) {
 		case 'inherit':
-			$status_caption = __( 'Past Revisions', 'revisionary' );
+			$status_caption = esc_html__( 'Past Revisions', 'revisionary' );
 			break;
 		case 'draft-revision':
 		case 'pending-revision':
@@ -223,22 +223,29 @@ foreach ( array_keys($revision_status_captions) as $_revision_status ) {
 	
 	if ( $is_administrator ) {
 		if ($num_revisions->$_revision_status) {
-			$label = __( '%1$s <span class="count"> (%2$s)</span>', 'revisionary' );
-			$status_links .= "<li $class><a href='$link' $target>" . sprintf( _nx( $label, $label, $num_revisions->$_revision_status, $label ), $status_caption, number_format_i18n( $num_revisions->$_revision_status ) ) . '</a></li>';
+			echo "<li class='" . esc_attr($class) . "'><a href='" . esc_url($_link) . "' target='" . esc_attr($target) . "'>" 
+			. sprintf( 
+				esc_html__( '%1$s %2$s (%3$s)%4$s', 'revisionary' ), 
+				'<span class="count">',
+				esc_html($status_caption), 
+				esc_html(number_format_i18n( $num_revisions->$_revision_status )),
+				'</span>'
+			) 
+			. '</a></li>';
 		}
-	} else
-		$status_links .= "<li $class><a href='$link' $target>" . $status_caption . '</a></li>';
+	} else {
+		echo "<li class='" . esc_attr($class) . "'><a href='" . esc_url($_link) . "' target='" . esc_attr($target) . "'>" . esc_html($status_caption) . '</a></li>';
+		}
 }
-$status_links .= '</ul>';
 
-echo $status_links;
+echo '</ul>';
 
 $args = array( 'format' => 'form-table', 'parent' => true, 'right' => $right, 'left' => $left, 'current_id' => isset($revision_id) ? $revision_id : 0 );
 
 $count = rvy_list_post_revisions( $rvy_post, $revision_status, $args );
 if ( $count < 2 ) {
 	echo( '<br class="clear" /><p>' );
-	printf( __( 'no %s revisions available.', 'revisionary'), strtolower($revision_status_captions[$revision_status]) );
+	printf( esc_html__( 'no %s revisions available.', 'revisionary'), esc_html(strtolower($revision_status_captions[$revision_status])) );
 	echo( '</p>' );
 }
 

@@ -51,21 +51,21 @@ class RevisionaryAdminPosts {
     
     function revision_action_notice() {
 		if ( ! empty($_GET['restored_post'] ) ) {
-			$msg = __('The revision was restored.', 'revisionary');
-			
+			?>
+			<div class='updated'><?php esc_html_e('The revision was restored.', 'revisionary');?>
+			</div>
+			<?php
 		} elseif ( ! empty($_GET['scheduled'] ) ) {
-			$msg = __('The revision was scheduled for publication.', 'revisionary');
-	
+			?>
+			<div class='updated'><?php esc_html_e('The revision was scheduled for publication.', 'revisionary');?>
+			</div>
+			<?php
 		} elseif ( ! empty($_GET['published_post'] ) ) {
-			$msg = __('The revision was published.', 'revisionary');
-		} else {
-			return;
-		}
-
-		?>
-		<div class='updated'><?php echo $msg ?>
-		</div>
-		<?php	
+			?>
+			<div class='updated'><?php esc_html_e('The revision was published.', 'revisionary');?>
+			</div>
+			<?php	
+    	}
     }
     
     public function fltAdminPostsListing() {
@@ -137,7 +137,7 @@ class RevisionaryAdminPosts {
 			}
 
 			if (!isset($post_states['rvy_revision'])) {
-				$post_states['rvy_revision'] = __('Revision', 'revisionary');
+				$post_states['rvy_revision'] = esc_html__('Revision', 'revisionary');
 			}
 		}
 
@@ -154,7 +154,7 @@ class RevisionaryAdminPosts {
 
 	function flt_display_post_states($post_states, $post) {
 		if (!empty($this->post_revision_count[$post->ID]) && !defined('REVISIONARY_SUPPRESS_POST_STATE_DISPLAY')) {
-			$post_states []= __('Has Revision', 'revisionary');
+			$post_states []= esc_html__('Has Revision', 'revisionary');
 		}
 
 		return $post_states;
@@ -169,7 +169,7 @@ class RevisionaryAdminPosts {
 
 		if (!empty($this->post_revision_count[$post->ID])) {
 			if ( 'trash' != $post->post_status && wp_check_post_lock( $post->ID ) === false ) {
-				$actions['revision_queue'] = "<a href='admin.php?page=revisionary-q&published_post=$post->ID'>" . __('Revision Queue', 'revisionary') . '</a>';
+				$actions['revision_queue'] = "<a href='admin.php?page=revisionary-q&published_post=$post->ID'>" . esc_html__('Revision Queue', 'revisionary') . '</a>';
 			}
 		}
 		
@@ -185,7 +185,7 @@ class RevisionaryAdminPosts {
 				//$url = wp_nonce_url(rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg"), "submit-post_{$post->ID}" );
 				$url = rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg");
 				
-				$caption = (isset($actions['edit']) || !rvy_get_option('caption_copy_as_edit')) ? pp_revisions_status_label('draft-revision', 'submit') : __('Edit');
+				$caption = (isset($actions['edit']) || !rvy_get_option('caption_copy_as_edit')) ? pp_revisions_status_label('draft-revision', 'submit') : esc_html__('Edit');
 
 				$caption = str_replace(' ', '&nbsp;', $caption);
 

@@ -155,8 +155,7 @@ class RevisionaryHistory
                 $post_edit_link = get_edit_post_link($published_post);
                 $post_title     = '<a href="' . $post_edit_link . '">' . _draft_or_post_title($published_post) . '</a>';
                 /* translators: %s: post title */
-                $h1             = sprintf( __( 'Compare %s of &#8220;%s&#8221;', 'revisionary' ), $status_obj->labels->plural, $post_title );
-                $return_to_post = '<a href="' . $post_edit_link . '">' . __( '&larr; Return to editor' ) . '</a>';
+                $do_h1 = true;
                 $title          = $status_obj->labels->plural;
 
                 $redirect = false;
@@ -183,8 +182,17 @@ class RevisionaryHistory
         ?>
 
         <div class="wrap">
-            <h1 class="long-header"><?php echo $h1; ?></h1>
-            <?php echo $return_to_post; ?>
+            <h1 class="long-header"><?php 
+            if (!empty($do_h1)) {
+                printf( esc_html__( 'Compare %s of "%s"', 'revisionary' ), $status_obj->labels->plural, $post_title );
+            }
+            ?>
+            </h1>
+            <?php
+            if (!empty($post_edit_link)) {
+                echo '<a href="' . esc_url($post_edit_link) . '">' . esc_html__( 'Return to editor' ) . '</a>';
+            }
+            ?>
         </div>
         <?php
         wp_print_revision_templates();
@@ -433,10 +441,10 @@ class RevisionaryHistory
 
         // Add default title if title field is empty
         if ( $compare_from && empty( $compare_from->post_title ) ) {
-            $compare_from->post_title = __( '(no title)' );
+            $compare_from->post_title = esc_html__( '(no title)' );
         }
         if ( empty( $compare_to->post_title ) ) {
-            $compare_to->post_title = __( '(no title)' );
+            $compare_to->post_title = esc_html__( '(no title)' );
         }
 
         $return = array();
@@ -533,11 +541,11 @@ class RevisionaryHistory
         }
 
         $compare_fields = [
-            'post_date' =>      __('Post Date', 'revisionary'),
-            'post_parent' =>    __('Post Parent', 'revisionary'),
-            'menu_order' =>     __('Menu Order', 'revisionary'),
-            'comment_status' => __('Comment Status', 'revisionary'),
-            'ping_status' =>    __('Ping Status', 'revisionary'),
+            'post_date' =>      esc_html__('Post Date', 'revisionary'),
+            'post_parent' =>    esc_html__('Post Parent', 'revisionary'),
+            'menu_order' =>     esc_html__('Menu Order', 'revisionary'),
+            'comment_status' => esc_html__('Comment Status', 'revisionary'),
+            'ping_status' =>    esc_html__('Ping Status', 'revisionary'),
         ];
 
         if (
@@ -672,10 +680,10 @@ class RevisionaryHistory
 
         $meta_fields = [];
 
-        $meta_fields['_wp_page_template'] = __('Page Template', 'revisionary');
+        $meta_fields['_wp_page_template'] = esc_html__('Page Template', 'revisionary');
 
         if (post_type_supports($compare_to->post_type, 'thumbnail')) {
-            $meta_fields ['_thumbnail_id'] = __('Featured Image', 'revisionary');
+            $meta_fields ['_thumbnail_id'] = esc_html__('Featured Image', 'revisionary');
         }
 
         /*
@@ -684,8 +692,8 @@ class RevisionaryHistory
         */
 
         if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && defined('FL_BUILDER_VERSION') && defined('REVISIONARY_BEAVER_BUILDER_DIFF')) {  // todo: move to filter
-            $meta_fields['_fl_builder_data'] = __('Beaver Builder Data', 'revisionary');
-            $meta_fields['_fl_builder_data_settings'] = __('Beaver Builder Settings', 'revisionary');
+            $meta_fields['_fl_builder_data'] = esc_html__('Beaver Builder Data', 'revisionary');
+            $meta_fields['_fl_builder_data_settings'] = esc_html__('Beaver Builder Settings', 'revisionary');
         }
 
         $native_fields = _wp_post_revision_fields( $to_meta, $compare_to );
@@ -789,7 +797,7 @@ class RevisionaryHistory
             }
 
             if (empty($author_captions)) {
-                $author_captions[] =  __('No author', 'revisionary');
+                $author_captions[] =  esc_html__('No author', 'revisionary');
             }
 
             $this->authors[ $author_key ] = array(
@@ -922,22 +930,22 @@ class RevisionaryHistory
             }
 
             if ('future-revision' == $revision->post_mime_type) {
-                $date_prefix = __('Scheduled for ', 'revisionary');
+                $date_prefix = esc_html__('Scheduled for ', 'revisionary');
                 $modified     = strtotime( $revision->post_date );
 		        $modified_gmt = strtotime( $revision->post_date_gmt . ' +0000' );
 
             } elseif (in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && (strtotime($revision->post_date_gmt) > $now_gmt ) ) {
-                $date_prefix = __('Requested for ', 'revisionary');
+                $date_prefix = esc_html__('Requested for ', 'revisionary');
                 $modified     = strtotime( $revision->post_date );
 		        $modified_gmt = strtotime( $revision->post_date_gmt . ' +0000' );
 
             } else {
-                $date_prefix = __('Modified ', 'revisionary');
+                $date_prefix = esc_html__('Modified ', 'revisionary');
                 $modified     = strtotime( $revision->post_modified );
 		        $modified_gmt = strtotime( $revision->post_modified_gmt . ' +0000' );
             }
 
-            $time_diff_label = ($now_gmt > $modified_gmt) ? __( '%s%s ago' ) : __( '%s%s from now', 'revisionary');
+            $time_diff_label = ($now_gmt > $modified_gmt) ? esc_html__( '%s%s ago' ) : esc_html__( '%s%s from now', 'revisionary');
 
             $use_multiple_authors = function_exists('get_multiple_authors') && !rvy_in_revision_workflow($revision);
 
@@ -948,7 +956,7 @@ class RevisionaryHistory
                 'id'         => $revision->ID,
                 'title'      => get_the_title( $revision->ID ),
                 'author'     => $this->authors[ $author_key ],
-                'date'       => sprintf('%s%s', $date_prefix, date_i18n( __( 'M j, Y @ g:i a', 'revisionary' ), $modified )),
+                'date'       => sprintf('%s%s', $date_prefix, date_i18n( esc_html__( 'M j, Y @ g:i a', 'revisionary' ), $modified )),
                 'dateShort'  => date_i18n( _x( 'j M @ g:i a', 'revision date short format' ), $modified ),
                 'timeAgo'    => sprintf( $time_diff_label, $date_prefix, human_time_diff( $modified_gmt, $now_gmt ) ),
                 'autosave'   => false,
@@ -993,9 +1001,9 @@ class RevisionaryHistory
                 'id'         => $post->ID,
                 'title'      => get_the_title( $post->ID ),
                 'author'     => $this->authors[ $author_key ],
-                'date'       => date_i18n( __( 'M j, Y @ H:i', 'revisionary' ), strtotime( $post->post_modified ) ),
+                'date'       => date_i18n( esc_html__( 'M j, Y @ H:i', 'revisionary' ), strtotime( $post->post_modified ) ),
                 'dateShort'  => date_i18n( _x( 'j M @ H:i', 'revision date short format', 'revisionary' ), strtotime( $post->post_modified ) ),
-                'timeAgo'    => sprintf( __( '%s ago' ), human_time_diff( strtotime( $post->post_modified_gmt ), $now_gmt ) ),
+                'timeAgo'    => sprintf( esc_html__( '%s ago' ), human_time_diff( strtotime( $post->post_modified_gmt ), $now_gmt ) ),
                 'autosave'   => false,
                 'current'    => true,
                 'restoreUrl' => false,
@@ -1080,9 +1088,9 @@ class RevisionaryHistory
         }
 
         if (empty($type_obj) || $can_approve) {
-            $button_label = $direct_approval ? __('Approve', 'revisionary') : __('Preview / Approve', 'revisionary');
+            $button_label = $direct_approval ? esc_html__('Approve', 'revisionary') : esc_html__('Preview / Approve', 'revisionary');
         } else {
-            $button_label = __('Preview', 'revisionary');
+            $button_label = esc_html__('Preview', 'revisionary');
         }
         ?>
         <script type="text/javascript">
@@ -1096,7 +1104,7 @@ class RevisionaryHistory
 
             var RvyDiffUI = function() {
                 if( $('input.restore-revision:not(.rvy-recaption)').length) {
-                    $('input.restore-revision').attr('value', '<?php echo $button_label;?>').addClass('rvy-recaption');
+                    $('input.restore-revision').attr('value', '<?php echo esc_html($button_label);?>').addClass('rvy-recaption');
 
                     $('h1').next('a').hide();
                 }
@@ -1115,7 +1123,7 @@ class RevisionaryHistory
                         }
 
                         if (!Number(rvyRevisionID)) {
-                            rvyRevisionID = <?php echo $this->revision_id;?>;
+                            rvyRevisionID = <?php echo esc_attr($this->revision_id);?>;
                         }
 
                         if (rvyRevisionID != rvyLastID) {
@@ -1124,7 +1132,7 @@ class RevisionaryHistory
                             for (rkey = 0; rkey < _wpRevisionsSettings.revisionData.length; rkey++) {
                                 if (_wpRevisionsSettings.revisionData[rkey].id == rselected) {
                                     if (_wpRevisionsSettings.revisionData[rkey].editUrl) {
-                                        $('input.restore-revision').after('<a href="' + _wpRevisionsSettings.revisionData[rkey].editUrl + '"><input type="button" class="edit-revision button button-primary" style="float:right" value="<?php _e('Edit');?>"></a>');
+                                        $('input.restore-revision').after('<a href="' + _wpRevisionsSettings.revisionData[rkey].editUrl + '"><input type="button" class="edit-revision button button-primary" style="float:right" value="<?php echo esc_attr('Edit');?>"></a>');
                                     }
                                 }
                             }
@@ -1176,15 +1184,15 @@ class RevisionaryHistory
 
         if ($show_preview_link) {
             $preview_label = (empty($type_obj) || $can_edit)
-            ?  __('Preview / Restore', 'revisionary')
-            : __('Preview');
+            ?  esc_html__('Preview / Restore', 'revisionary')
+            : esc_html__('Preview');
 
             $preview_url = rvy_preview_url($post);
         }
 
         $manage_label = (empty($type_obj) || $can_edit)
-        ?  __('Manage', 'revisionary')
-        : __('List', 'revisionary');
+        ?  esc_html__('Manage', 'revisionary')
+        : esc_html__('List', 'revisionary');
 
         $manage_url = rvy_admin_url("admin.php?page=rvy-revisions&revision=$post_id&action=view");
         ?>
@@ -1203,25 +1211,25 @@ class RevisionaryHistory
                 }
 
                 if (!Number(rvyRevisionID)) {
-                    rvyRevisionID = <?php echo $this->revision_id;?>;
+                    rvyRevisionID = <?php echo esc_attr($this->revision_id);?>;
                 }
 
                 if (rvyRevisionID != rvyLastID) {
                     <?php if($show_preview_link):?>
-                    var rvyPreviewURL = '<?php echo $preview_url;?>';
-                    rvyPreviewURL = rvyPreviewURL.replace("page_id=" + <?php echo $post_id;?>, "page_id=" + rvyRevisionID);
-                    rvyPreviewURL = rvyPreviewURL.replace("p=" + <?php echo $post_id;?>, "p=" + rvyRevisionID);
+                    var rvyPreviewURL = '<?php echo esc_url($preview_url);?>';
+                    rvyPreviewURL = rvyPreviewURL.replace("page_id=" + <?php echo esc_attr($post_id);?>, "page_id=" + rvyRevisionID);
+                    rvyPreviewURL = rvyPreviewURL.replace("p=" + <?php echo esc_attr($post_id);?>, "p=" + rvyRevisionID);
                     <?php endif;?>
 
-                    var rvyManageURL = '<?php echo $manage_url;?>';
-                    rvyManageURL = rvyManageURL.replace("revision=" + <?php echo $post_id;?>, "revision=" + rvyRevisionID);
+                    var rvyManageURL = '<?php echo esc_url($manage_url);?>';
+                    rvyManageURL = rvyManageURL.replace("revision=" + <?php echo esc_attr($post_id);?>, "revision=" + rvyRevisionID);
 
                     if(!$('span.rvy-compare-preview').length) {
                         <?php if($show_preview_link):?>
-                        $('h1').append('<span class="rvy-compare-preview" style="margin-left:20px"><a class="rvy_preview_linkspan" href="<?php echo $preview_url;?>" target="_revision_preview"><input class="button" type="button" value="<?php echo $preview_label;?>"></a></span>');
+                        $('h1').append('<span class="rvy-compare-preview" style="margin-left:20px"><a class="rvy_preview_linkspan" href="<?php echo esc_url($preview_url);?>" target="_revision_preview"><input class="button" type="button" value="<?php echo esc_attr($preview_label);?>"></a></span>');
                         <?php endif;?>
 
-                        $('h1').append('<span class="rvy-compare-list" style="margin-left:10px"><a class="rvy_preview_linkspan" href="<?php echo $manage_url;?>" target="_revision_list"><input class="button" type="button" value="<?php echo $manage_label;?>"></a></span>');
+                        $('h1').append('<span class="rvy-compare-list" style="margin-left:10px"><a class="rvy_preview_linkspan" href="<?php echo esc_url($manage_url);?>" target="_revision_list"><input class="button" type="button" value="<?php echo esc_attr($manage_label);?>"></a></span>');
                     } else {
                         <?php if($show_preview_link):?>
                         $('span.rvy-compare-preview a').attr('href', rvyPreviewURL);
