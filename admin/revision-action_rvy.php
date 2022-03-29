@@ -270,8 +270,6 @@ function rvy_revision_approve($revision_id = 0) {
 
 		// Support workaround to prevent notification when an Administrator or Editor created the revision
         if (defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS')) {
-			global $current_user;
-
 			$user = ($current_user->ID != $revision->post_author) ? new WP_User($revision->post_author) : $current_user;
 
 			if ($user && !empty($user->ID)) {
