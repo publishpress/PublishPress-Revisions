@@ -124,8 +124,6 @@ function rvy_revision_submit($revision_id = 0) {
 function rvy_revision_approve($revision_id = 0) {
 	global $current_user, $wpdb;
 
-	//require_once( ABSPATH . 'wp-admin/admin.php');
-
 	if (!$revision_id) {
 		$batch_process = false;
 
@@ -193,10 +191,6 @@ function rvy_revision_approve($revision_id = 0) {
 						$wpdb->update($wpdb->posts, $update_data, ['ID' => $revision_id]);
 					}
 
-					// For taxonomies and meta keys not stored for the autosave, use published copies
-					//revisionary_copy_terms($autosave_post->ID, $revision_id, ['empty_target_only' => true]);
-					//revisionary_copy_postmeta($autosave_post->ID, $revision_id, ['empty_target_only' => true]);
-					
 					$wpdb->delete($wpdb->posts, ['ID' => $autosave_post->ID]);
 				}
 			}
@@ -466,7 +460,6 @@ function rvy_revision_approve($revision_id = 0) {
 }
 
 function rvy_revision_restore() {
-	//require_once( ABSPATH . 'wp-admin/admin.php');
 	$revision_id = (int) $_GET['revision'];
 	$redirect = '';
 	
@@ -554,9 +547,6 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	$update = (array) $revision;
 
-	//$update = wp_slash( $update ); //since data is from db
-
-	//$published = get_post($published_id);
 	$published = $wpdb->get_row(
 		$wpdb->prepare("SELECT * FROM $wpdb->posts WHERE ID = %d", $published_id)
 	);
@@ -570,7 +560,6 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	}
 
 	// published post columns which should not be overwritten by revision values
-	//$update = array_diff_key($update, array_fill_keys(array('post_status', 'comment_count', 'post_name', 'guid', 'post_date', 'post_date_gmt' ), true));
 	$update = array_merge(
 		$update, 
 		array(
@@ -708,7 +697,6 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	revisionary_copy_postmeta($revision, $published->ID, ['apply_empty' => !$is_imported]);
 
 	// Allow Multiple Authors revisions to be applied to published post. Revision post_author is forced to actual submitting user.
-	//$skip_taxonomies = (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) ? ['author'] : [];
 	revisionary_copy_terms($revision_id, $post_id, ['apply_empty' => !$is_imported]);
 
 	if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && $published_authors) {
@@ -850,8 +838,6 @@ function rvy_do_revision_restore( $revision_id, $actual_revision_status = '' ) {
 		$revision_date = $revision->post_date;
 		$revision_date_gmt = $revision->post_date_gmt;
 
-		//$fields = array( 'post_content', 'post_title', 'post_modified', 'post_modified_gmt' );
-		
 		wp_restore_post_revision( $revision_id );
 
 		// @todo: why do revision post_date, post_date_gmt get changed?
@@ -871,7 +857,6 @@ function rvy_do_revision_restore( $revision_id, $actual_revision_status = '' ) {
 }
 
 function rvy_revision_delete() {
-	//require_once( ABSPATH . 'wp-admin/admin.php');
 	$revision_id = (int) $_GET['revision'];
 	$redirect = '';
 	
@@ -917,8 +902,6 @@ function rvy_revision_delete() {
 }
 
 function rvy_revision_bulk_delete() {
-	//require_once( ABSPATH . 'wp-admin/admin.php');
-
 	check_admin_referer( 'rvy-revisions' );
 	
 	$redirect = '';
@@ -1231,13 +1214,6 @@ function rvy_publish_scheduled_revisions($args = []) {
 			
 						if (array_intersect($user->roles, $skip_notification_revisor_roles)) {
 							$skip_notification = true;
-
-							/*
-							// If notification is being limited due to the role of the revision submitter, for which roles should notification be suppressed?
-							$skip_notification_admin_recipient_roles = (defined('REVISIONARY_LIMIT_NOTIFICATION_RECIPIENT_ROLES')) 
-							? array_map('trim', explode(',', constant('REVISIONARY_LIMIT_NOTIFICATION_RECIPIENT_ROLES')))
-							: [];
-							*/
 						}
 					}
 					

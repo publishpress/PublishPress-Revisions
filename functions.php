@@ -325,14 +325,6 @@ function pp_revisions_plugin_updated($current_version) {
         }
     } 
 
-    /*
-    elseif (version_compare($last_ver, '2.4.3-beta4', '<')) { // Empty Queue condition was reported with Elementor, so default this setting
-        if (defined('ELEMENTOR_VERSION') || defined('ELEMENTOR_PRO_VERSION')) {
-            update_option('rvy_queue_query_all_posts', 1);
-        }
-    }
-    */
-
     if ($current_version != $last_ver) {
         require_once( dirname(__FILE__).'/lib/agapetry_wp_core_lib.php');
         require_once(dirname(__FILE__).'/rvy_init.php');

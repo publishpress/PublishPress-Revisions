@@ -51,8 +51,6 @@ class PluginCompat {
     function fltPressPermitExceptionClause($clause, $required_operation, $post_type, $args) {
 		global $revisionary;
 		
-		//"$src_table.ID $logic ('" . implode("','", $ids) . "')",
-
 		if (empty($revisionary->enabled_post_types[$post_type]) && $revisionary->config_loaded) {
 			return $clause;
 		}

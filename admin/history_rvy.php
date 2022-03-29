@@ -144,11 +144,7 @@ class RevisionaryHistory
                     return;
                 }
 
-                //if ('future-revision' == $revision->post_mime_type) {
-                    $this->revision_status = $revision->post_mime_type;
-                //} else {
-                //    $this->post_status = 'pending-revision';
-                //}
+                $this->revision_status = $revision->post_mime_type;
 
                 $status_obj = get_post_status_object($revision->post_mime_type);
 
@@ -218,7 +214,6 @@ class RevisionaryHistory
 
         $q = apply_filters('revisionary_compare_vars', $q);
 
-        //do_action('revisionary_history_query', $post);
         add_filter('posts_clauses', [$this, 'fltRevisionClauses'], 5, 2);
 
         add_filter('posts_where', [$this, 'fltFixMimeTypeClause']);
@@ -226,7 +221,6 @@ class RevisionaryHistory
 		remove_filter('posts_where', [$this, 'fltFixMimeTypeClause']);
 
         remove_filter('posts_clauses', [$this, 'fltRevisionClauses'], 5, 2);
-        //do_action('revisionary_history_query_done', $post);
 
         $posts = [];
 
@@ -309,7 +303,6 @@ class RevisionaryHistory
     // port wp_ajax_get_revision_diffs() to support pending, scheduled revisions
     public function actAjaxRevisionDiffs() {
         if ( ! $post = get_post( (int) $_REQUEST['post_id'] ) ) {
-            //wp_send_json_error();
             return;
         }
 
@@ -419,25 +412,6 @@ class RevisionaryHistory
         }
 
         $strip_tags = rvy_get_option('diff_display_strip_tags');
-
-        // If comparing revisions, make sure we're dealing with the right post parent.
-        // The parent post may be a 'revision' when revisions are disabled and we're looking at autosaves.
-        /*
-        if ( $compare_from && (rvy_post_id($compare_from->ID) != $post->ID) && ($compare_from->ID != $post->ID) ) {
-            return false;
-        }
-        if ( (rvy_post_id($compare_to->ID) != $post->ID) && ($compare_to->ID != $post->ID) ) {
-            return false;
-        }
-        */
-
-        /*
-        if ( $compare_from && strtotime( $compare_from->post_date_gmt ) > strtotime( $compare_to->post_date_gmt ) ) {
-            $temp         = $compare_from;
-            $compare_from = $compare_to;
-            $compare_to   = $temp;
-        }
-        */
 
         // Add default title if title field is empty
         if ( $compare_from && empty( $compare_from->post_title ) ) {
@@ -686,11 +660,6 @@ class RevisionaryHistory
             $meta_fields ['_thumbnail_id'] = esc_html__('Featured Image', 'revisionary');
         }
 
-        /*
-        $meta_fields['_wp_attached_file'] = __('Attached Files', 'revisionary');
-        $meta_fields['_wp_attachment_metadata'] = __('Attachment Meta', 'revisionary');
-        */
-
         if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && defined('FL_BUILDER_VERSION') && defined('REVISIONARY_BEAVER_BUILDER_DIFF')) {  // todo: move to filter
             $meta_fields['_fl_builder_data'] = esc_html__('Beaver Builder Data', 'revisionary');
             $meta_fields['_fl_builder_data_settings'] = esc_html__('Beaver Builder Settings', 'revisionary');
@@ -862,8 +831,6 @@ class RevisionaryHistory
             $modified     = strtotime( $revision->post_modified );
             $modified_gmt = strtotime( $revision->post_modified_gmt . ' +0000' );
 
-            //$autosave = (bool) wp_is_post_autosave( $revision );
-            //$current  = ! $autosave && $revision->post_modified_gmt === $post->post_modified_gmt;
             $current = ($revision->ID == $post->ID);
 
             if ( $current && ! empty( $current_id ) ) {
@@ -909,9 +876,6 @@ class RevisionaryHistory
                     // For non-public types, force direct approval because preview is not available
 	                if ((($type_obj && !is_post_type_viewable($type_obj)) || rvy_get_option('compare_revisions_direct_approval')) && current_user_can( 'edit_post', $published_post_id) ) {
                         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
-
-                        //if (in_array($revision->post_mime_type, ['draft-revision'])) {
-                        //    $restore_link = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision={$revision->ID}&action=submit$redirect_arg"), "submit-post_$published_post_id|{$revision->ID}" );
 
                         if (in_array($revision->post_mime_type, ['draft-revision', 'pending-revision'])) {
                             $restore_link = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision={$revision->ID}&action=approve$redirect_arg"), "approve-post_$published_post_id|{$revision->ID}" );

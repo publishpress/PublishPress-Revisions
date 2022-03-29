@@ -20,7 +20,6 @@ if ( defined( 'FV_FCK_NAME' ) && current_user_can('activate_plugins') ) {
 	esc_html_e( "<strong>Note:</strong> For visual display of revisions, add the following code to foliopress-wysiwyg.php:<br />&nbsp;&nbsp;if ( strpos( $" . "_SERVER['REQUEST_URI'], 'admin.php?page=rvy-revisions' ) ) return;", 'revisionary');
 	echo( '</div><br />' );
 }
-//wp_reset_vars( array('revision', 'left', 'right', 'action', 'revision_status') );
 
 if ( ! empty($_GET['revision']) )
 	$revision_id = absint($_GET['revision']);
