@@ -266,6 +266,7 @@ function rvy_admin_init() {
 			$sendback = remove_query_arg( array('action', 'action2', '_wp_http_referer', '_wpnonce', 'deleted', 'tags_input', 'post_author', 'comment_status', 'ping_status', '_status', 'post', 'bulk_edit', 'post_view'), $sendback );
 			$sendback = str_replace('#038;', '&', $sendback);	// @todo Proper decode
 			wp_redirect($sendback);
+			exit;
 		}
 
 	// don't bother with the checks in this block unless action arg was passed
@@ -329,6 +330,7 @@ function rvy_admin_init() {
 		if (current_user_can('activate_plugins')) {
 			$url = admin_url('update-core.php');
 			wp_redirect($url);
+			exit;
 		}
 	}
 }
