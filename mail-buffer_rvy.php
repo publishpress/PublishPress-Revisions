@@ -25,7 +25,6 @@ function _rvy_mail_check_buffer($new_msg = [], $args = []) {
 		
 		// @todo: re-enable buffer after troubleshooting for working copy redirect error
 
-		//if (!$buffer = get_option('revisionary_mail_buffer')) {
 		if (true) {
 			$buffer = [];
 			$first_buffer = true;
