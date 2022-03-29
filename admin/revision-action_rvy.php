@@ -209,7 +209,7 @@ function rvy_revision_approve($revision_id = 0) {
 
 			global $wpdb;
 
-			if ( empty($status_obj->public) && empty($status_obj->private) ) { // && ( 'future-revision' != $revision->post_mime_type ) ) {
+			if ( empty($status_obj->public) && empty($status_obj->private) ) {
 				$db_action = true;
 				
 				if ('revision' == $revision->post_type) {
