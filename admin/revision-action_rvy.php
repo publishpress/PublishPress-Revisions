@@ -1346,6 +1346,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 	} elseif (!empty($_SERVER['REQUEST_URI'])) {
 		if ( in_array( esc_url_raw($_SERVER['REQUEST_URI']), $revised_uris ) ) {
 			wp_redirect( esc_url(esc_url_raw($_SERVER['REQUEST_URI'])) );  // if one of the revised pages is being accessed now, redirect back so revision is published on first access
+			exit;
 		}
 	}
 }
