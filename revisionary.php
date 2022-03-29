@@ -130,8 +130,7 @@ register_activation_hook(__FILE__, function()
 
 		// convert pending / scheduled revisions to v3.0 format
 		global $wpdb;
-		
-		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 		$wpdb->query("DELETE FROM $wpdb->posts WHERE post_mime_type IN ('draft-revision', 'pending-revision', 'future-revision') AND post_status = 'trash'");
 
@@ -149,9 +148,9 @@ register_deactivation_hook(__FILE__, function()
 		require_once(dirname(__FILE__).'/functions.php');
 
 		// convert pending / scheduled revisions to v2.x format, which also prevents them from being listed as regular drafts / pending posts
-		$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
-		$wpdb->query("UPDATE $wpdb->posts SET post_status = post_mime_type WHERE post_mime_type IN ($revision_status_csv)");
-		$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = '' WHERE post_mime_type IN ($revision_status_csv)");
+		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
+		$wpdb->query("UPDATE $wpdb->posts SET post_status = post_mime_type WHERE post_mime_type IN ('$revision_status_csv')");
+		$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = '' WHERE post_mime_type IN ('$revision_status_csv')");
 		
 		if ($timestamp = wp_next_scheduled('rvy_mail_buffer_hook')) {
 		   wp_unschedule_event( $timestamp,'rvy_mail_buffer_hook');
