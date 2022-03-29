@@ -523,6 +523,7 @@ class Revisionary
 
 		// If logged user does not have a pending revision of this post, redirect to published permalink
 		wp_redirect($published_url);
+		exit;
 	}
 
 	function act_edit_revision_redirect() {
@@ -552,6 +553,7 @@ class Revisionary
 
 		// If logged user does not have a pending revision of this post, redirect to published permalink
 		wp_redirect($published_url);
+		exit;
 	}
 
 	// log post type and ID from REST handler for reference by subsequent PP filters 

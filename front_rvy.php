@@ -32,6 +32,7 @@ class RevisionaryFront {
 			if (('revision' == $_post->post_type) && ('inherit' == $_post->post_status)) {
 				if ($url = get_permalink(rvy_post_id($_post->ID))) {
 					wp_redirect($url);
+					exit;
 				}
 			}
 		}
