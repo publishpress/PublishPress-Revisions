@@ -525,7 +525,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					}
 				}
 
-				echo $this->handle_published_row_actions( $parent_post, 'published_post' );
+				$this->handle_published_row_actions( $parent_post, 'published_post' );
 
 				break;
 
@@ -550,7 +550,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					echo implode(', ', $authors_str);  // output variables escaped above
 				} else {
 					$author_caption = get_the_author_meta('display_name', $parent_post->post_author);
-					echo $this->apply_edit_link(add_query_arg('post_author', $parent_post->post_author, $request_url), $author_caption);
+					$this->apply_edit_link(add_query_arg('post_author', $parent_post->post_author, $request_url), $author_caption);
 				}
 		} // end switch
 	}
@@ -708,7 +708,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if (isset($_REQUEST['post_status']) && 'trash' === sanitize_key($_REQUEST['post_status']))
 			echo esc_html(get_post_type_object( $post_type )->labels->not_found_in_trash);
 		else
-			echo get_post_type_object( $post_type )->labels->not_found;
+			echo esc_html(get_post_type_object( $post_type )->labels->not_found);
 	}
 
 	/**
