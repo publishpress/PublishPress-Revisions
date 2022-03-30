@@ -49,7 +49,7 @@ class RvyOptionUI {
 			$return['val'] = rvy_get_option($option_name, $this->sitewide, $this->customize_defaults);
 
 			echo "<div class='agp-vspaced_input'";
-			echo ($args['style']) ? " style='" . esc_attr($args['style']) . "'" : '';
+			echo (isset($args['style']) && $args['style']) ? " style='" . esc_attr($args['style']) . "'" : '';
 			echo ">";
 
 			echo "<label for='" . esc_attr($option_name) . "'><input name='" . esc_attr($option_name) . "' type='checkbox' id='" . esc_attr($option_name) . "' value='1' " . checked('1', $return['val'], false) . " /> "
