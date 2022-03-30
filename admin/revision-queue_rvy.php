@@ -6,14 +6,14 @@
 global $post_type, $post_type_object, $wpdb;
 
 if ( ! $post_types = rvy_get_manageable_types() ) {
-	wp_die( __( 'You are not allowed to manage revisions.', 'revisionary' ) );
+	wp_die( esc_html__( 'You are not allowed to manage revisions.', 'revisionary' ) );
 }
 
 if (!rvy_get_option('pending_revisions') && !rvy_get_option('scheduled_revisions')) {
-	wp_die( sprintf(__( 
+	wp_die( sprintf(esc_html__( 
 		'%s and %s are both disabled. See Revisions > Settings.', 'revisionary' ), 
-		pp_revisions_status_label('pending-revision', 'plural'),
-		pp_revisions_status_label('future-revision', 'plural')
+		esc_html(pp_revisions_status_label('pending-revision', 'plural')),
+		esc_html(pp_revisions_status_label('future-revision', 'plural'))
 	));
 }
 
@@ -42,11 +42,11 @@ $bulk_counts = array(
 
 $bulk_messages = [];
 $bulk_messages['post'] = array(
-	'submitted_count'   => sprintf(_n( '%s revision submitted.', '%s revisions submitted.', $bulk_counts['submitted_count'], 'revisionary' ), $bulk_counts['submitted_count']),
-	'approved_count'   => sprintf(_n( '%s revision approved.', '%s revisions approved.', $bulk_counts['approved_count'], 'revisionary' ), $bulk_counts['approved_count']),
-	'unscheduled_count' => sprintf(_n( '%s revision unscheduled.', '%s revisions unscheduled.', $bulk_counts['unscheduled_count'], 'revisionary' ), $bulk_counts['unscheduled_count']),
-	'published_count'   => sprintf(_n( '%s revision published.', '%s revisions published.', $bulk_counts['published_count'], 'revisionary' ), $bulk_counts['published_count']),
-	'deleted'   => sprintf(_n( '%s revision permanently deleted.', '%s revisions permanently deleted.', $bulk_counts['deleted'] ), $bulk_counts['deleted']),
+	'submitted_count'   => sprintf(esc_html(_n( '%s revision submitted.', '%s revisions submitted.', $bulk_counts['submitted_count'], 'revisionary' )), $bulk_counts['submitted_count']),
+	'approved_count'   => sprintf(esc_html(_n( '%s revision approved.', '%s revisions approved.', $bulk_counts['approved_count'], 'revisionary' )), $bulk_counts['approved_count']),
+	'unscheduled_count' => sprintf(esc_html(_n( '%s revision unscheduled.', '%s revisions unscheduled.', $bulk_counts['unscheduled_count'], 'revisionary' )), $bulk_counts['unscheduled_count']),
+	'published_count'   => sprintf(esc_html(_n( '%s revision published.', '%s revisions published.', $bulk_counts['published_count'], 'revisionary' )), $bulk_counts['published_count']),
+	'deleted'   => sprintf(esc_html(_n( '%s revision permanently deleted.', '%s revisions permanently deleted.', $bulk_counts['deleted'] )), $bulk_counts['deleted']),
 );
 
 $bulk_messages['page'] = $bulk_messages['post'];
@@ -108,23 +108,23 @@ if (!empty($_REQUEST['post_type']) && empty($published_title)) {
 if (!empty($_REQUEST['post_author']) && empty($published_title)) {
 	if ($_user = new WP_User((int) $_REQUEST['post_author'])) {
 		$filters['post_author'] = $filters 
-		? sprintf(__('%sPost Author: %s', 'revisionary'), ' - ', $_user->display_name) 
-		: sprintf(__('%sPost Author: %s', 'revisionary'), '', $_user->display_name);
+		? sprintf(esc_html__('%sPost Author: %s', 'revisionary'), ' - ', $_user->display_name) 
+		: sprintf(esc_html__('%sPost Author: %s', 'revisionary'), '', $_user->display_name);
 	}
 }
 
 $filter_csv = ($filters) ? ' (' . implode(" ", $filters) . ')' : '';
 
 if (!empty($published_title)) {
-	printf( _x('Revision Queue for "%s"%s', 'PublishedPostName (other filter captions)', 'revisionary'), $published_title, $filter_csv );
+	printf( esc_html(_x('Revision Queue for "%s"%s', 'PublishedPostName (other filter captions)', 'revisionary')), esc_html($published_title), esc_html($filter_csv) );
 } else
-	printf( __('Revision Queue %s', 'revisionary' ), $filter_csv);
+	printf( esc_html__('Revision Queue %s', 'revisionary' ), esc_html($filter_csv));
 ?></h1>
 
 <?php
 if ( isset( $_REQUEST['s'] ) && strlen( sanitize_text_field($_REQUEST['s']) ) ) {
 	/* translators: %s: search keywords */
-	printf( ' <span class="subtitle">' . __( 'Search results for &#8220;%s&#8221;' ) . '</span>', strip_tags(sanitize_text_field($_REQUEST['s'])) );
+	printf( ' <span class="subtitle">' . esc_html__( 'Search results for "%s"' ) . '</span>', esc_html(wp_strip_all_tags(sanitize_text_field($_REQUEST['s']))) );
 }
 ?>
 
@@ -134,21 +134,39 @@ if ( isset( $_REQUEST['s'] ) && strlen( sanitize_text_field($_REQUEST['s']) ) ) 
 <?php
 // If we have a bulk message to issue:
 $messages = array();
+
 foreach ( $bulk_counts as $message => $count ) {
 	if ( $message == 'trashed' && isset( $_REQUEST['ids'] ) ) {
-		$ids = preg_replace( '/[^0-9,]/', '', sanitize_text_field($_REQUEST['ids']));
-		$messages[] = '<a href="' . esc_url( wp_nonce_url( "edit.php?post_type=$post_type&doaction=undo&action=untrash&ids=$ids", "bulk-revision-queue" ) ) . '">' . __('Undo') . '</a>';
+		$any_messages = true;
+		break;
 	} elseif (!empty($bulk_messages['post'][$message])) {
-		$messages []= $bulk_messages['post'][$message];
+		$any_messages = true;
+		break;
 	}
 }
 
-if ( $messages ) {
-	echo '<div id="message" class="updated notice is-dismissible"><p>' . join( ' ', $messages ) . '</p></div>';
+if (!empty($any_messages)) {
+	echo '<div id="message" class="updated notice is-dismissible"><p>';
+}
+
+foreach ( $bulk_counts as $message => $count ) {
+	if ( $message == 'trashed' && isset( $_REQUEST['ids'] ) ) {
+		$ids = preg_replace( '/[^0-9,]/', '', sanitize_text_field($_REQUEST['ids']));
+		echo '<a href="' . esc_url( wp_nonce_url( "edit.php?post_type=$post_type&doaction=undo&action=untrash&ids=$ids", "bulk-revision-queue" ) ) . '">' . esc_html__('Undo') . '</a> ';
+	
+	} elseif (!empty($bulk_messages['post'][$message])) {
+		echo esc_html($bulk_messages['post'][$message]) . ' ';
+	}
+}
+
+if (!empty($any_messages)) {
+	echo '</p></div>';
 }
 unset( $messages );
 
-$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated', 'approved_count', 'published_count', 'deleted', 'trashed', 'untrashed' ), esc_url(esc_url_raw($_SERVER['REQUEST_URI'])) );
+if (!empty($_SERVER['REQUEST_URI'])) {
+	$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated', 'approved_count', 'published_count', 'deleted', 'trashed', 'untrashed' ), esc_url(esc_url_raw($_SERVER['REQUEST_URI'])) );
+}
 ?>
 
 <?php $wp_list_table->views(); ?>

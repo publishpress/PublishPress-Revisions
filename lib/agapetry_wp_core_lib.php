@@ -1,5 +1,5 @@
 <?php
-if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
+if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die();
 
 // separated these functions into separate module for use by RS extension plugins
@@ -40,7 +40,11 @@ function agp_user_can($reqd_caps, $object_id = 0, $user_id = 0, $args = array() 
 
 if ( ! function_exists('awp_post_type_from_uri') ) {
 function awp_post_type_from_uri() {
-	$script_name = esc_url_raw($_SERVER['SCRIPT_NAME']);
+	if (!empty($_SERVER['SCRIPT_NAME'])) {
+		$script_name = esc_url_raw($_SERVER['SCRIPT_NAME']);
+	} else {
+		$script_name = '';
+	}
 	
 	if ( strpos( $script_name, 'post-new.php' ) || strpos( $script_name, 'edit.php' ) ) {
 		$object_type = ! empty( $_GET['post_type'] ) ? sanitize_key($_GET['post_type']) : 'post';
@@ -65,6 +69,6 @@ function awp_post_type_from_uri() {
 // wrapper for __(), prevents WP strings from being forced into plugin .po
 if ( ! function_exists( '__awp' ) ) {
 function __awp( $string, $unused = '' ) {
-	return __( $string );		
+	return esc_html__( $string );		
 }
 }

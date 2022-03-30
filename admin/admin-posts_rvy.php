@@ -36,7 +36,7 @@ class RevisionaryAdminPosts {
 						if (apply_filters('revisionary_deletion_redirect_to_queue', true, $deleted_id, $post_type)) {
 							$url = admin_url("admin.php?page=revisionary-q&pp_revisions_deleted={$deleted_id}");
 							
-							if (false === strpos(esc_url_raw($_SERVER['REQUEST_URI']), $url)) {
+							if (!empty($_SERVER['REQUEST_URI']) && false === strpos(esc_url_raw($_SERVER['REQUEST_URI']), $url)) {
 								wp_redirect($url);
 								exit;
 							}
@@ -51,21 +51,21 @@ class RevisionaryAdminPosts {
     
     function revision_action_notice() {
 		if ( ! empty($_GET['restored_post'] ) ) {
-			$msg = __('The revision was restored.', 'revisionary');
-			
+			?>
+			<div class='updated'><?php esc_html_e('The revision was restored.', 'revisionary');?>
+			</div>
+			<?php
 		} elseif ( ! empty($_GET['scheduled'] ) ) {
-			$msg = __('The revision was scheduled for publication.', 'revisionary');
-	
+			?>
+			<div class='updated'><?php esc_html_e('The revision was scheduled for publication.', 'revisionary');?>
+			</div>
+			<?php
 		} elseif ( ! empty($_GET['published_post'] ) ) {
-			$msg = __('The revision was published.', 'revisionary');
-		} else {
-			return;
-		}
-
-		?>
-		<div class='updated'><?php echo $msg ?>
-		</div>
-		<?php	
+			?>
+			<div class='updated'><?php esc_html_e('The revision was published.', 'revisionary');?>
+			</div>
+			<?php	
+    	}
     }
     
     public function fltAdminPostsListing() {
@@ -137,7 +137,7 @@ class RevisionaryAdminPosts {
 			}
 
 			if (!isset($post_states['rvy_revision'])) {
-				$post_states['rvy_revision'] = __('Revision', 'revisionary');
+				$post_states['rvy_revision'] = esc_html__('Revision', 'revisionary');
 			}
 		}
 
@@ -154,7 +154,7 @@ class RevisionaryAdminPosts {
 
 	function flt_display_post_states($post_states, $post) {
 		if (!empty($this->post_revision_count[$post->ID]) && !defined('REVISIONARY_SUPPRESS_POST_STATE_DISPLAY')) {
-			$post_states []= __('Has Revision', 'revisionary');
+			$post_states []= esc_html__('Has Revision', 'revisionary');
 		}
 
 		return $post_states;
@@ -169,7 +169,7 @@ class RevisionaryAdminPosts {
 
 		if (!empty($this->post_revision_count[$post->ID])) {
 			if ( 'trash' != $post->post_status && wp_check_post_lock( $post->ID ) === false ) {
-				$actions['revision_queue'] = "<a href='admin.php?page=revisionary-q&published_post=$post->ID'>" . __('Revision Queue', 'revisionary') . '</a>';
+				$actions['revision_queue'] = "<a href='admin.php?page=revisionary-q&published_post=$post->ID'>" . esc_html__('Revision Queue', 'revisionary') . '</a>';
 			}
 		}
 		
@@ -182,10 +182,9 @@ class RevisionaryAdminPosts {
 		if (!empty($status_obj->public) || !empty($status_obj->private) || rvy_get_option('pending_revision_unpublished')) {
 			if (rvy_get_option('pending_revisions') && current_user_can('copy_post', $post->ID)) {
 				$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
-				//$url = wp_nonce_url(rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg"), "submit-post_{$post->ID}" );
 				$url = rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg");
 				
-				$caption = (isset($actions['edit']) || !rvy_get_option('caption_copy_as_edit')) ? pp_revisions_status_label('draft-revision', 'submit') : __('Edit');
+				$caption = (isset($actions['edit']) || !rvy_get_option('caption_copy_as_edit')) ? pp_revisions_status_label('draft-revision', 'submit') : esc_html__('Edit');
 
 				$caption = str_replace(' ', '&nbsp;', $caption);
 
@@ -218,7 +217,7 @@ class RevisionaryAdminPosts {
         $pos_from = strpos($query, "FROM $posts");
 		$pos_where = strpos($query, "WHERE ");
         
-        // @todo: use 'wp_count_posts' filter instead?
+        // todo: use 'wp_count_posts' filter instead?
 
         if ((strpos($query, "ELECT post_status, COUNT( * ) AS num_posts ") || (strpos($query, "ELECT COUNT( 1 )") && $pos_from && (!$pos_where || ($pos_from < $pos_where)))) 
         && preg_match("/FROM\s*{$posts}\s*WHERE post_type\s*=\s*'([^ ]+)'/", $query, $matches)

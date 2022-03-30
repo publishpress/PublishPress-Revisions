@@ -7,7 +7,7 @@ function rvy_mu_site_menu() {
 	// WP MU site options
 	if ( awp_is_mu() ) {
 		// Network-Wide Settings
-		add_submenu_page( 'revisionary-q', __('PublishPress Revisions Network Settings', 'revisionary'), __('Network Settings', 'revisionary'), 'read', 'rvy-net_options', 'rvy_mu_include_options_sitewide');
+		add_submenu_page( 'revisionary-q', esc_html__('PublishPress Revisions Network Settings', 'revisionary'), esc_html__('Network Settings', 'revisionary'), 'read', 'rvy-net_options', 'rvy_mu_include_options_sitewide');
 		add_action( 'revisionary_page_rvy-net_options', 'rvy_mu_include_options_sitewide' );	
 
 		global $rvy_default_options, $rvy_options_sitewide;
@@ -18,7 +18,7 @@ function rvy_mu_site_menu() {
 		
 		if ( count($rvy_options_sitewide) != count($rvy_default_options) ) {
 			// Default Options (for per-site settings)
-			add_submenu_page( 'revisionary-q', __('PublishPress Revisions Network Defaults', 'revisionary'), __('Network Defaults', 'revisionary'), 'read', 'rvy-default_options', 'rvy_mu_include_options');
+			add_submenu_page( 'revisionary-q', esc_html__('PublishPress Revisions Network Defaults', 'revisionary'), esc_html__('Network Defaults', 'revisionary'), 'read', 'rvy-default_options', 'rvy_mu_include_options');
 			add_action( 'revisionary_page_rvy-default_options', 'rvy_mu_include_options' );	
 		}
 	}

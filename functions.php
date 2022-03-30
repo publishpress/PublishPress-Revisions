@@ -268,7 +268,7 @@ function rvy_post_id($revision_id) {
 
 // Append a random argument for cache busting
 function rvy_nc_url($url, $args = []) {
-    $nc = (!empty($args['nc'])) ? $args['nc'] : substr(md5(rand()), 1, 8);
+    $nc = (!empty($args['nc'])) ? $args['nc'] : substr(md5(wp_rand(1, 99999999)), 1, 8);
     return add_query_arg('nc', $nc, $url);
 }
 
@@ -278,6 +278,8 @@ function rvy_admin_url($partial_admin_url) {
 }
 
 function pp_revisions_plugin_updated($current_version) {
+    global $wpdb;
+    
     $last_ver = get_option('revisionary_last_version');
 
     if (version_compare($last_ver, '3.0.12-rc4', '<')) {
@@ -301,7 +303,6 @@ function pp_revisions_plugin_updated($current_version) {
 
     if (version_compare($last_ver, '3.0.1', '<')) {
         // convert pending / scheduled revisions to v3.0 format
-		global $wpdb;
 		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 		$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = post_status WHERE post_status IN ('$revision_status_csv')");
 		$wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft', post_mime_type = 'draft-revision' WHERE post_status IN ('draft-revision')");
@@ -311,7 +312,6 @@ function pp_revisions_plugin_updated($current_version) {
 
     if (version_compare($last_ver, '3.0.7-rc4', '<') && !defined('PRESSPERMIT_DEBUG')) {
         // delete revisions that were erroneously trashed instead of deleted
-		global $wpdb;
         $wpdb->query("DELETE FROM $wpdb->posts WHERE post_mime_type IN ('draft-revision', 'pending-revision', 'future-revision') AND post_status = 'trash'");
     }
 
@@ -324,14 +324,6 @@ function pp_revisions_plugin_updated($current_version) {
             $role->add_cap('upload_files');
         }
     } 
-
-    /*
-    elseif (version_compare($last_ver, '2.4.3-beta4', '<')) { // Empty Queue condition was reported with Elementor, so default this setting
-        if (defined('ELEMENTOR_VERSION') || defined('ELEMENTOR_PRO_VERSION')) {
-            update_option('rvy_queue_query_all_posts', 1);
-        }
-    }
-    */
 
     if ($current_version != $last_ver) {
         require_once( dirname(__FILE__).'/lib/agapetry_wp_core_lib.php');

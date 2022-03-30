@@ -1,5 +1,5 @@
 <?php
-if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
+if (isset($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die();
 
 /*
@@ -17,7 +17,7 @@ class RevisionaryEditRevisionBlockUI {
 				/* <![CDATA[ */
 				jQuery(document).ready( function($) {
 					setInterval(function() {
-						$("div.edit-post-post-status label:not(:contains('<?php _e('Enable public preview');?>')):not('[for=public-post-preview-url]')").closest('div').closest('div.components-panel__row').hide();
+						$("div.edit-post-post-status label:not(:contains('<?php esc_html_e('Enable public preview');?>')):not('[for=public-post-preview-url]')").closest('div').closest('div.components-panel__row').hide();
 					}, 100);
 				});
 				/* ]]> */

@@ -1,5 +1,5 @@
 <?php
-if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
+if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die();
  
 define ('CURRENT_ITEMS_RVY', 'current');
@@ -39,7 +39,7 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 		}
 
 		global $is_IE;
-		$ie_checkbox_style = ( $is_IE ) ? "style='height:1em'" : '';
+		$ie_checkbox_style = ( $is_IE ) ? "height:1em" : '';
 		
 		if ( ! is_array($stored_assignments) ) $stored_assignments = array();
 
@@ -53,52 +53,65 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 					
 		$default_hide_filtered_list = ( $default_hide_threshold && ( $agent_count[$agents_subset] > $default_hide_threshold ) );
 			
-		$checked = ( $agents_subset == CURRENT_ITEMS_RVY ) ? $checked = "checked='checked'" : '';
-
 		// determine whether to show caption, show/hide checkbox and filter textbox
 		$any_display_filtering = ($agent_count[CURRENT_ITEMS_RVY] > $filter_threshold) || ($agent_count[ELIGIBLE_ITEMS_RVY] > $filter_threshold);
 		
 		if ( $agent_count[$agents_subset] > $filter_threshold ) {
+			$flt_checked = ( ! $default_hide_filtered_list ) ? " checked" : '';
 
-			$caption = ( CURRENT_ITEMS_RVY == $agents_subset ) ? __('show current users (%d)', 'revisionary') : __('show eligible users (%d)', 'revisionary');
-
-			$js_call = "agp_display_if('div_{$agents_subset}_{$id_prefix}', this.id);"
-					. "agp_display_if('chk-links_{$agents_subset}_{$id_prefix}', this.id);";
-	
-			$flt_checked = ( ! $default_hide_filtered_list ) ? "checked='checked'" : '';
-	
 			echo "<ul class='rs-list_horiz rvy-list-horiz'><li>"; // IE6 (at least) does not render label reliably without this
-			echo "<input type='checkbox' name='rs-jscheck[]' value='validate_me_{$agents_subset}_{$id_prefix}' id='chk_{$agents_subset}_{$id_prefix}' $flt_checked onclick=\"$js_call\" /> ";
+
+			echo "<input type='checkbox' name='rs-jscheck[]' value='" . esc_attr("validate_me_{$agents_subset}_{$id_prefix}") . "' " 
+			. "id='" . esc_attr("chk_{$agents_subset}_{$id_prefix}") . "' " 
+			. esc_attr($flt_checked) 
+			. " onclick=\""
+			. "agp_display_if('" . esc_attr("div_{$agents_subset}_{$id_prefix}") . "', this.id);"
+			. "agp_display_if('" . esc_attr("chk-links_{$agents_subset}_{$id_prefix}") . "', this.id);"
+			. "\" /> ";
+	
+			echo "<strong><label for='" . esc_attr("chk_{$agents_subset}_{$id_prefix}") . "'>";
+	
+			if (CURRENT_ITEMS_RVY == $agents_subset) {
+				printf(esc_html_e('show current users (%d)', 'revisionary'), esc_html($agent_count[$agents_subset]));
+			} else {
+				printf(esc_html__('show eligible users (%d)', 'revisionary'), esc_html($agent_count[$agents_subset]));
+			}
 			
-			echo "<strong><label for='chk_{$agents_subset}_{$id_prefix}'>";
-			printf ($caption, $agent_count[$agents_subset]);
 			echo '</label></strong>';
 			echo '</li>';
 			
-			$class = ( $default_hide_filtered_list ) ? '' : 'class="agp_js_show"';
+			$class = ($default_hide_filtered_list) ? '' : 'agp_js_show';
 			
-			echo "\r\n" . "<li class='rvy-available-agents'>&nbsp;&nbsp;<label for='flt_{$agents_subset}_{$id_prefix}' id='lbl_flt_{$id_prefix}'>";
+			echo "\r\n" . "<li class='rvy-available-agents'>&nbsp;&nbsp;<label for='" . esc_attr("flt_{$agents_subset}_{$id_prefix}") . "' id='" . esc_attr("lbl_flt_{$id_prefix}") . "'>";
 			_e ( 'filter:', 'revisionary');
-			$js_call = "agp_filter_ul('list_{$agents_subset}_{$id_prefix}', this.value, 'chk_{$agents_subset}_{$id_prefix}', 'chk-links_{$agents_subset}_{$id_prefix}');";
-			echo " <input type='text' id='flt_{$agents_subset}_{$id_prefix}' size='10' onkeyup=\"$js_call\" />";
+
+			echo " <input type='text' id='" . esc_attr("flt_{$agents_subset}_{$id_prefix}") . "' size='10' " 
+			. "onkeyup=\""
+			. "agp_filter_ul('" . esc_attr("list_{$agents_subset}_{$id_prefix}") . "', this.value, '" . esc_attr("chk_{$agents_subset}_{$id_prefix}") . "', '" . esc_attr("chk-links_{$agents_subset}_{$id_prefix}") . "');"
+			. "\" />";
+
 			echo "</label></li>";
 			
-			echo "<li $class style='display:none' id='chk-links_{$agents_subset}_{$id_prefix}'>";
+			echo "<li class='" . esc_attr($class) . "' style='display:none' id='" . esc_attr("chk-links_{$agents_subset}_{$id_prefix}") . "'>";
 		
-			$js_call = "agp_check_by_name('{$id_prefix}[]', true, true, false, 'list_{$agents_subset}_{$id_prefix}', 1);";
-			echo "\r\n" . "&nbsp;&nbsp;" . "<a href='javascript:void(0)' onclick=\"$js_call\">";
+			echo "\r\n" . "&nbsp;&nbsp;" . "<a href='javascript:void(0)' "
+			. "onclick=\""
+			. "agp_check_by_name('" . esc_attr($id_prefix) . "[]', true, true, false, '" . esc_attr("list_{$agents_subset}_{$id_prefix}") . "', 1);"
+			. "\">";
+		
 			_e ('select', 'revisionary');
 			echo '</a>&nbsp;&nbsp;';
 			
-			$js_call = "agp_check_by_name('{$id_prefix}[]', '', true, false, 'list_{$agents_subset}_{$id_prefix}', 1);";
-			echo "\r\n" . "<a href='javascript:void(0)' onclick=\"$js_call\">";
-			_e( 'unselect', 'revisionary');
+			echo "\r\n" . "<a href='javascript:void(0)' "
+			. "onclick=\""
+			. "agp_check_by_name('" . esc_attr($id_prefix) . "[]', '', true, false, '" . esc_attr("list_{$agents_subset}_{$id_prefix}") . "', 1);"
+			. "\">";
+
+			esc_html_e( 'unselect', 'revisionary');
 			echo "</a>";
 			
 			echo '</li></ul>';
 		}
-		
-		$title = '';
 		
 		if ( $any_display_filtering || $agent_count[$agents_subset] > $emsize_threshold ) {
 			global $wp_locale;
@@ -139,7 +152,6 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 			if ( $longest_caption_length < 10 )
 				$longest_caption_length = 10;
 			
-			//if ( ! $ems_per_character = rvy_get_option('ems_per_character') )
 			if ( defined( 'UI_EMS_PER_CHARACTER') )
 				$ems_per_character = UI_EMS_PER_CHARACTER;
 			else
@@ -151,14 +163,14 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 			$ems_half = ( ($list_width_ems - $ems_integer) >= 0.5 ) ? '_5' : '';
 			
 			$ul_class = "rs-agents_list_{$ems_integer}{$ems_half}";
-			$hide_class = ( $default_hide_filtered_list && $agent_count[$agents_subset] > $filter_threshold ) ? 'class="agp_js_hide"' : '';
+			$hide_class = ( $default_hide_filtered_list && $agent_count[$agents_subset] > $filter_threshold ) ? 'agp_js_hide' : '';
 
-			echo "\r\n" . "<div id='div_{$agents_subset}_{$id_prefix}' $hide_class>"
+			echo "\r\n" . "<div id='" . esc_attr("div_{$agents_subset}_{$id_prefix}") . "' class='" . esc_attr($hide_class) . "'>"
 				. "<div class='rs-agents_emsized'>"
-				. "<ul class='$ul_class' id='list_{$agents_subset}_{$id_prefix}'>";	
+				. "<ul class='" . esc_attr($ul_class) . "' id='" . esc_attr("list_{$agents_subset}_{$id_prefix}") . "'>";	
 		} else {
 			$ul_class = "rs-agents_list_auto";
-			echo "\r\n<ul class='$ul_class' id='list_{$agents_subset}_{$id_prefix}'>";
+			echo "\r\n<ul class='" . esc_attr($ul_class) . "' id='" . esc_attr("list_{$agents_subset}_{$id_prefix}") . "'>";
 			$rtl = false;
 		}
 		//-------- end list item width determination --------------
@@ -179,25 +191,17 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 					if ( $role_assigned ) continue 2;
 			}
 			
-			// markup for role duration / content date limits
-			$title = '';
-			$limit_class = '';
-			$link_class = '';
-			$limit_style = '';
-	
-			$li_title = "title=' " . strtolower($agent_display_name) . " '";
+			$li_title = strtolower($agent_display_name);
 			
-			$this_checked = ( $role_assigned ) ? ' checked="checked"' : '';
+			$this_checked = ( $role_assigned ) ? ' checked' : '';
 
 			if ( $this_checked )
 				$last_agents[] = $id;
 
-			$label_class = '';
-				
-			echo "\r\n<li $li_title>"
-				. "<input type='checkbox' name='{$id_prefix}[]'{$this_checked} value='$id' id='{$id_prefix}{$id}' $ie_checkbox_style />";
+			echo "\r\n<li title='" . esc_attr($li_title) . "'>"
+				. "<input type='checkbox' name='" . esc_attr($id_prefix) . "[]'" . esc_attr($this_checked) . " value='" . esc_attr($id) . "' id='" . esc_attr("{$id_prefix}{$id}") . "' style='" . esc_attr($ie_checkbox_style) . "' />";
 			
-			echo "<label $title $limit_style for='{$id_prefix}{$id}'{$label_class}>";
+			echo "<label for='" . esc_attr("{$id_prefix}{$id}") . "'>";
 			
 			$caption = $agent_display_name;
 			
@@ -210,7 +214,7 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 			
 			$caption = ' ' . $caption;
 				
-			echo $caption; // str_replace(' ', '&nbsp;', $caption);
+			echo esc_html($caption);
 			echo '</label></li>';
 			
 		} //foreach agent
@@ -219,7 +223,7 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 		
 		if ( CURRENT_ITEMS_RVY == $agents_subset ) {
 			$last_agents = implode("~", $last_agents);
-			echo "<input type=\"hidden\" id=\"last_{$id_prefix}\" name=\"last_{$id_prefix}\" value=\"$last_agents\" />";
+			echo "<input type='hidden' id='" . esc_attr("last_{$id_prefix}") . "' name='" . esc_attr("last_{$id_prefix}") . "' value='" . esc_attr($last_agents) . "' />";
 		}
 		
 		if ( $any_display_filtering || $agent_count[$agents_subset] > $emsize_threshold ) 

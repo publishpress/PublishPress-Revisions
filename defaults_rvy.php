@@ -1,5 +1,5 @@
 <?php
-if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
+if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die();
 
 /**
@@ -37,7 +37,6 @@ function rvy_default_options_sitewide() {
 		'revisor_lock_others_revisions' => true,
 		'revisor_hide_others_revisions' => true,
 		'admin_revisions_to_own_posts' => true,
-		//'queue_query_all_posts' => true,
 		'require_edit_others_drafts' => true,
 		'diff_display_strip_tags' => false,
 		'scheduled_revision_update_post_date' => true,
@@ -90,7 +89,6 @@ function rvy_default_options() {
 		'revisor_lock_others_revisions' => 1,
 		'revisor_hide_others_revisions' => 1,
 		'admin_revisions_to_own_posts' => 1,
-		//'queue_query_all_posts' => 0,
 		'require_edit_others_drafts' => 1,
 		'diff_display_strip_tags' => 0,
 		'scheduled_revision_update_post_date' => 1,

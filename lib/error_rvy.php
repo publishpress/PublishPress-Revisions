@@ -3,16 +3,6 @@ class RvyError {
 	private $notices = array();
 
 	function error_notice( $err ) {
-		/*
-		switch( $err ) {
-			case 'old_php' :
-				$this->add_notice('Sorry, PublishPress Revisions requires PHP 5.4 or higher. Please upgrade your server or deactivate PublishPress Revisions.');
-				break;
-			
-			default :
-		}
-		*/
-		
 		return true;
 	}
 
@@ -34,9 +24,9 @@ class RvyError {
 
 	function do_notices() {
 		foreach( $this->notices as $msg ) {
-			$style = ( ! empty( $msg->style ) ) ? "style='$msg->style'" : "style='color:black'";
-			$class = ( ! empty( $msg->class ) ) ? "class='$msg->class'" : '';
-			echo "<div id='message' class='error fade' $style $class>" . $msg->body . '</div>';
+			$style = ( ! empty( $msg->style ) ) ? $msg->style : "color:black";
+			$class = ( ! empty( $msg->class ) ) ? $msg->class : '';
+			echo "<div id='message' class='error fade' style='" . esc_attr($style) . "' class='" . esc_attr($class) . "'>" . esc_html($msg->body) . '</div>';
 		}
 	}
 } // end class

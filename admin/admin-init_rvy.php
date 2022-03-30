@@ -8,14 +8,6 @@ if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 	new RevisionaryProAdmin();
 }
 
-if ( in_array( $pagenow, array( 'edit.php', 'post.php', 'post-new.php', 'plugins.php' ) ) ) { 
-	//add_action( 'all_admin_notices', '_rvy_intro_notice' ); // @todo: updated welcome message / screen
-
-	if (get_site_transient('_revisionary_1x_migration')) {
-		add_action( 'all_admin_notices', '_rvy_migration_notice' );
-	}
-}
-
 function _rvy_post_edit_ui() {
 	global $pagenow, $revisionary;
 
@@ -54,9 +46,17 @@ function rvy_admin_init() {
 		$_GET['revision'] = (int) $_GET['amp;revision'];
 		$_GET['action'] = sanitize_key($_GET['amp;action']);
 		$_GET['_wpnonce'] = sanitize_key($_GET['amp;_wpnonce']);
-		$_REQUEST['revision'] = (int) $_REQUEST['amp;revision'];
-		$_REQUEST['action'] = sanitize_key($_REQUEST['amp;action']);
-		$_REQUEST['_wpnonce'] = sanitize_key($_REQUEST['amp;_wpnonce']);
+		if (!empty($_REQUEST['amp;revision'])) {
+			$_REQUEST['revision'] = (int) $_REQUEST['amp;revision'];
+		}
+
+		if (!empty($_REQUEST['amp;action'])) {
+			$_REQUEST['action'] = sanitize_key($_REQUEST['amp;action']);
+		}
+
+		if (!empty($_REQUEST['amp;_wpnonce'])) {
+			$_REQUEST['_wpnonce'] = sanitize_key($_REQUEST['amp;_wpnonce']);
+		}
 	}
 
 	if ( ! empty($_POST['rvy_submit']) || ! empty($_POST['rvy_defaults']) ) {
@@ -87,7 +87,12 @@ function rvy_admin_init() {
 	
 		if ( 'delete_all' == $doaction ) {
 			// Prepare for deletion of all posts with a specified post status (i.e. Empty trash).
-			$post_status = sanitize_key($_REQUEST['post_status']);
+			
+			if (isset($_REQUEST['post_status'])) {
+				$post_status = sanitize_key($_REQUEST['post_status']);
+			} else {
+				$post_status = '';
+			}
 			// Verify the post status exists.
 			if ( get_post_status_object( $post_status ) ) {
 				$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_type=%s AND post_mime_type = %s", $post_type, $post_status ) );
@@ -124,7 +129,7 @@ function rvy_admin_init() {
 					
 					if (!$is_administrator && !current_user_can('edit_post', rvy_post_id($revision->ID))) {
 						if (count($post_ids) == 1) {
-							wp_die( __('Sorry, you are not allowed to approve this revision.', 'revisionary') );
+							wp_die( esc_html__('Sorry, you are not allowed to approve this revision.', 'revisionary') );
 						} else {
 							continue;
 						}
@@ -165,7 +170,7 @@ function rvy_admin_init() {
 					
 					if (!$is_administrator && !current_user_can('set_revision_pending-revision', $revision->ID)) {
 						if (count($post_ids) == 1) {
-							wp_die( __('Sorry, you are not allowed to submit this revision.', 'revisionary') );
+							wp_die( esc_html__('Sorry, you are not allowed to submit this revision.', 'revisionary') );
 						} else {
 							continue;
 						}
@@ -200,7 +205,7 @@ function rvy_admin_init() {
 					
 					if (!$is_administrator && !current_user_can('edit_post', rvy_post_id($revision->ID))) {
 						if (count($post_ids) == 1) {
-							wp_die( __('Sorry, you are not allowed to approve this revision.', 'revisionary') );
+							wp_die( esc_html__('Sorry, you are not allowed to approve this revision.', 'revisionary') );
 						} else {
 							continue;
 						}
@@ -229,12 +234,12 @@ function rvy_admin_init() {
 					
 					if ( ! current_user_can('administrator') && ! current_user_can( 'delete_post', rvy_post_id($revision->ID) ) ) {  // @todo: review Administrator cap check
 						if (!in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) || !rvy_is_post_author($revision)) {	// allow submitters to delete their own still-pending revisions
-							wp_die( __('Sorry, you are not allowed to delete this revision.', 'revisionary') );
+							wp_die( esc_html__('Sorry, you are not allowed to delete this revision.', 'revisionary') );
 						}
 					} 
 	
 					if ( !wp_delete_post($post_id) )
-						wp_die( __('Error in deleting.') );
+						wp_die( esc_html__('Error in deleting.') );
 	
 					$deleted++;
 				}
@@ -253,11 +258,12 @@ function rvy_admin_init() {
 			$sendback = remove_query_arg( array('action', 'action2', '_wp_http_referer', '_wpnonce', 'deleted', 'tags_input', 'post_author', 'comment_status', 'ping_status', '_status', 'post', 'bulk_edit', 'post_view'), $sendback );
 			$sendback = str_replace('#038;', '&', $sendback);	// @todo Proper decode
 			wp_redirect($sendback);
+			exit;
 		}
 
 	// don't bother with the checks in this block unless action arg was passed
 	} elseif ( ! empty($_GET['action']) || ! empty($_POST['action']) ) {
-		if (false !== strpos(urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'admin.php') && !empty($_REQUEST['page']) && ('rvy-revisions' == $_REQUEST['page'])) {
+		if (isset($_SERVER['REQUEST_URI']) && false !== strpos(urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'admin.php') && !empty($_REQUEST['page']) && ('rvy-revisions' == $_REQUEST['page'])) {
 			if ( ! empty($_GET['action']) && ('restore' == $_GET['action']) ) {
 				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
 				add_action( 'wp_loaded', 'rvy_revision_restore' );
@@ -290,7 +296,13 @@ function rvy_admin_init() {
 		
 	} elseif (is_admin() && (false !== strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'revision.php'))) { // endif action arg passed
 
-		$revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : (int) $_REQUEST['to'];
+		if (!empty($_REQUEST['revision'])) {
+			$revision_id = (int) $_REQUEST['revision'];
+		} elseif (isset($_REQUEST['to'])) {
+			$revision_id = (int) $_REQUEST['to'];
+		} else {
+			return;
+		}
 
 		if (('modified' == rvy_get_option('past_revisions_order_by')) && !rvy_in_revision_workflow($revision_id)) {
 			require_once(dirname(__FILE__).'/history_rvy.php');
@@ -310,68 +322,13 @@ function rvy_admin_init() {
 		if (current_user_can('activate_plugins')) {
 			$url = admin_url('update-core.php');
 			wp_redirect($url);
+			exit;
 		}
 	}
 }
 
-function rvy_intro_message($abbreviated = false) {
-	/*
-	$guide_link = sprintf(
-		__('For more details on setting up PublishPress Revisions, %sread this guide%s.', 'revisionary'),
-		'<a href="https://publishpress.com/documentation/revisionary-start" target="_blank">',
-		'</a>'
-	);
-
-	return ($abbreviated) ? $guide_link : sprintf(
-		__('<strong>Welcome to PublishPress Revisions!</strong> Here&apos;s how it works:%s<li>"Contributors" can submit revisions to their published posts.</li><li>"Revisors" can submit revisions to posts and pages published by others.</li><li>"Authors", "Editors" and "Administrators" can approve revisions or schedule their own revisions.</li>%s%s%s', 'revisionary'),
-		'<ul style="list-style-type:disc; padding-left:10px;margin-bottom:0">',
-		'</ul><p>',
-		$guide_link,
-		'</p>'
-	);
-	*/
-}
-
-function rvy_migration_message() {
-	return sprintf(
-		__('<strong>Revisionary is now PublishPress Revisions!</strong> Note the new Revisions menu and %sRevision Queue%s screen, where Revisions are listed. %s', 'revisionary'),
-		'<a href="' . admin_url('admin.php?page=revisionary-q') . '">',
-		'</a>',
-		'<div style="margin-top:10px">' . rvy_intro_message(true) . '</div>'
-	);
-}
-
-function _rvy_intro_notice() {
-	/*
-	if ( current_user_can( 'edit_users') ) {
-		rvy_dismissable_notice( 'intro_revisor_role', rvy_intro_message());
-	}
-	*/
-}
-
-function _rvy_migration_notice() {
-	if ( current_user_can( 'edit_users') ) {
-		rvy_dismissable_notice( 'revisionary_migration', rvy_migration_message());
-	}
-}
-
 function rvy_dismissable_notice( $msg_id, $message ) {
-	$dismissals = (array) rvy_get_option( 'dismissals' );
-
-	if ( ! isset( $dismissals[$msg_id] ) ) :
-		$class = 'rvy-admin-notice rvy-admin-notice-plugin';
-		?>
-		<div class='updated rvy-notice' class='<?php echo $class;?>' id='rvy_dashboard_message'>
-		<span style="float:right"><a href="javascript:void(0);" onclick="RvyDismissNotice();"><?php _e("Dismiss", "revisionary") ?></a></span>
-		<?php echo $message ?></div>
-		<script type="text/javascript">
-			function RvyDismissNotice(){
-				jQuery("#rvy_dashboard_message").slideUp();
-				jQuery.post(ajaxurl, {action:"rvy_dismiss_msg", msg_id:"<?php echo $msg_id ?>", cookie: encodeURIComponent(document.cookie)});
-			}
-		</script>
-	<?php 
-	endif;
+	return;
 }
 
 function rvy_get_post_revisions($post_id, $status = '', $args = '' ) {

@@ -1,5 +1,5 @@
 <?php
-if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
+if (isset($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
     die();
 
 /*
@@ -40,7 +40,7 @@ class RevisionaryEditRevisionClassicUI {
 				remove_meta_box($id, $object_type, 'advanced');
 
 				// also hide via CSS in case the element is not a metabox
-				echo "#$id { display: none !important; }\n";  // this line adapted from Clutter Free plugin by Mark Jaquith
+				echo "#" . esc_attr($id) . "{ display: none !important; }\n";  // this line adapted from Clutter Free plugin by Mark Jaquith
 			}
 
 			echo "-->\n</style>\n";
@@ -60,7 +60,7 @@ class RevisionaryEditRevisionClassicUI {
 
 	public function fltImmediateCaption($caption, $post) {
 		if (rvy_in_revision_workflow($post)) {
-			$caption = __('Publish <b>on approval</b>', 'revisionary');
+			$caption = esc_html__('Publish <b>on approval</b>', 'revisionary');
 		}
 
 		return $caption;
@@ -90,11 +90,11 @@ class RevisionaryEditRevisionClassicUI {
 
 		$compare_link = rvy_admin_url("revision.php?revision=$post->ID");
 		$compare_button = _x('Compare', 'revisions', 'revisionary');
-		$compare_title = __('Compare this revision to published copy, or to other revisions', 'revisionary');
+		$compare_title = esc_html__('Compare this revision to published copy, or to other revisions', 'revisionary');
 		?>
 
-		<a id="rvy_compare_button" class="preview button" href="<?php echo $compare_link; ?>" target="_blank" id="revision-compare"
-		tabindex="4" title="<?php echo esc_attr($compare_title);?>" style="float:right"><?php echo $compare_button; ?></a>
+		<a id="rvy_compare_button" class="preview button" href="<?php echo esc_url($compare_link); ?>" target="_blank" id="revision-compare"
+		tabindex="4" title="<?php echo esc_attr($compare_title);?>" style="float:right"><?php echo esc_html($compare_button); ?></a>
         <?php
     }
 
@@ -103,9 +103,9 @@ class RevisionaryEditRevisionClassicUI {
 
 		if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
 			$preview_url = rvy_preview_url($post);
-			$preview_msg = sprintf(__('Revision updated. %sView Preview%s', 'revisionary'), "<a href='$preview_url'>", '</a>');
+			$preview_msg = sprintf(esc_html__('Revision updated. %sView Preview%s', 'revisionary'), "<a href='$preview_url'>", '</a>');
 		} else {
-			$preview_msg = __('Revision updated.', 'revisionary');
+			$preview_msg = esc_html__('Revision updated.', 'revisionary');
 		}
 
 		$messages['post'][1] = $preview_msg;

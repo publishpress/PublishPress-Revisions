@@ -1,5 +1,5 @@
 <?php
-if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
+if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die();
 	
 
@@ -8,15 +8,15 @@ class Revisionary_Submittee {
 	function handle_submission($action, $sitewide = false, $customize_defaults = false) {
 		if ( ( $sitewide || $customize_defaults ) ) {
 			if ( ! is_super_admin() )
-				wp_die(__awp('Cheatin&#8217; uh?'));
+				wp_die('');
 		
 		} elseif ( ! current_user_can( 'manage_options' ) )
-			 wp_die(__awp('Cheatin&#8217; uh?'));
+			 wp_die('');
 
 		if ( $customize_defaults )
 			$sitewide = true;		// default customization is only for per-site options, but is network-wide in terms of DB storage in sitemeta table
 		
-		if ( false === strpos( sanitize_key($_GET["page"]), 'revisionary-' ) && false === strpos( sanitize_key($_GET["page"]), 'rvy-' ) )
+		if (isset($_GET["page"]) && false === strpos( sanitize_key($_GET["page"]), 'revisionary-' ) && false === strpos( sanitize_key($_GET["page"]), 'rvy-' ) )
 			return;
 		
 		if ( empty($_POST['rvy_submission_topic']) )
@@ -53,9 +53,12 @@ class Revisionary_Submittee {
 	
 		$default_prefix = ( $customize_defaults ) ? 'default_' : '';
 
-		$reviewed_options = array_map('sanitize_key', explode(',', sanitize_text_field($_POST['all_options'])));
-		foreach ( $reviewed_options as $option_name )
-			rvy_delete_option($default_prefix . $option_name, $sitewide );
+		if (!empty($_POST['all_options'])) {
+			$reviewed_options = array_map('sanitize_key', explode(',', sanitize_text_field($_POST['all_options'])));
+			foreach ( $reviewed_options as $option_name ) {
+				rvy_delete_option($default_prefix . $option_name, $sitewide );
+			}
+		}
 	}
 	
 	function update_sitewide() {
@@ -79,16 +82,22 @@ class Revisionary_Submittee {
 	function update_page_options( $sitewide = false, $customize_defaults = false ) {
 		$default_prefix = ( $customize_defaults ) ? 'default_' : '';
 		
-		$reviewed_options = array_map('sanitize_key', explode(',', sanitize_text_field($_POST['all_options'])));
+		if (!empty($_POST['all_options'])) {
+			$reviewed_options = array_map('sanitize_key', explode(',', sanitize_text_field($_POST['all_options'])));
 
-		foreach ( $reviewed_options as $option_basename ) {
-			$value = isset($_POST[$option_basename]) ? $_POST[$option_basename] : '';
+			foreach ( $reviewed_options as $option_basename ) {
+				if (isset($_POST[$option_basename])) {
+					if (is_array($_POST[$option_basename])) {
+						$value = array_map('sanitize_key', $_POST[$option_basename]);
+					} else {
+						$value = sanitize_key($_POST[$option_basename]);
+					}
+				} else {
+					$value = '';
+				}
 
-			if ( ! is_array($value) )
-				$value = trim($value);
-			$value = stripslashes_deep($value);
-
-			rvy_update_option( $default_prefix . $option_basename, $value, $sitewide );
+				rvy_update_option( $default_prefix . $option_basename, $value, $sitewide );
+			}
 		}
 	}
 }

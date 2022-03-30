@@ -32,6 +32,7 @@ class RevisionaryFront {
 			if (('revision' == $_post->post_type) && ('inherit' == $_post->post_status)) {
 				if ($url = get_permalink(rvy_post_id($_post->ID))) {
 					wp_redirect($url);
+					exit;
 				}
 			}
 		}
@@ -135,7 +136,7 @@ class RevisionaryFront {
 			return;
 		}
 
-		global $wp_query, $revisionary;
+		global $wp_query, $revisionary, $post;
 		if ($wp_query->is_404) {
 			if (!empty($_REQUEST['base_post'])) {
 				if ($post = get_post(intval($_REQUEST['base_post']))) {
@@ -153,7 +154,6 @@ class RevisionaryFront {
 		} elseif (!empty($_REQUEST['p'])) {
 			$revision_id = (int) $_REQUEST['p'];
 		} else {
-			global $post;
 			if ($post) {
 				$revision_id = $post->ID;
 			}
@@ -240,7 +240,7 @@ class RevisionaryFront {
 				? sprintf(
 					apply_filters(
 						'revisionary_list_caption',
-						__("%sView Queue%s", 'revisionary'),
+						esc_html__("%sView Queue%s", 'revisionary'),
 						$post // revision
 					),
 					"<a href='$queue_url' class='button button-secondary' target='_revision_list'>",
@@ -249,7 +249,7 @@ class RevisionaryFront {
 				. sprintf(
 					apply_filters(
 						'revisionary_preview_compare_view_caption',
-						__("%sCompare%s%sView Published Post%s", 'revisionary'),
+						esc_html__("%sCompare%s%sView Published Post%s", 'revisionary'),
 						$post // revision
 					),
 					"<a href='$diff_url' class='button button-secondary' target='_revision_diff'>",
@@ -263,7 +263,7 @@ class RevisionaryFront {
 				? sprintf(
 					apply_filters(
 						'revisionary_preview_view_caption',
-						__("%sView Published Post%s", 'revisionary'),
+						esc_html__("%sView Published Post%s", 'revisionary'),
 						$post // revision
 					),
 					"<a href='$published_url' class='button button-secondary'>",
@@ -274,7 +274,7 @@ class RevisionaryFront {
 
 			if (current_user_can('edit_post', $revision_id)) {
 				$edit_url = apply_filters('revisionary_preview_edit_url', rvy_admin_url("post.php?action=edit&amp;post=$revision_id"), $revision_id);
-				$edit_button = "<a href='$edit_url' class='button button-secondary rvy_has_empty_spacing'>" . __('Edit', 'revisionary') . '</a>';
+				$edit_button = "<a href='$edit_url' class='button button-secondary rvy_has_empty_spacing'>" . esc_html__('Edit', 'revisionary') . '</a>';
 			} else {
 				$edit_button = '';
 			}
@@ -316,39 +316,39 @@ class RevisionaryFront {
 					$class = 'draft';
 					$status_obj = get_post_status_object(get_post_field('post_status', rvy_post_id($revision_id)));
 
-					$approve_caption = __( 'Approve', 'revisionary' );
+					$approve_caption = esc_html__( 'Approve', 'revisionary' );
 
 					if (!empty($submit_url) && current_user_can("set_revision_pending-revision", $revision_id)) {
-						$submit_caption = __( 'Submit', 'revisionary' );
+						$submit_caption = esc_html__( 'Submit', 'revisionary' );
 						$publish_button = '<a href="' . $submit_url . '" class="button button-secondary rvy-submit-revision">' . $submit_caption . '</a>';
 					} else {
 						$publish_button = '';
 					}
 
 					if ($can_publish) {
-						$publish_caption = (!empty($status_obj->public) || !empty($status_obj->private)) ? __('Publish now', 'revisionary') : $approve_caption;
+						$publish_caption = (!empty($status_obj->public) || !empty($status_obj->private)) ? esc_html__('Publish now', 'revisionary') : $approve_caption;
 						$publish_button .= ($can_publish) ? '<a href="' . $publish_url . '" class="button button-primary rvy-approve-revision">' . $publish_caption . '</a>' : '';
 					}
 
-					$message = sprintf( __('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label('draft-revision', 'name'), $view_published, $edit_button, $publish_button );
+					$message = sprintf( esc_html__('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label('draft-revision', 'name'), $view_published, $edit_button, $publish_button );
 
 					break;
 
 					// alternate: no break here; output hidden pending-revision top bar
 
 				case 'pending-revision' :
-					$approve_caption = __( 'Approve', 'revisionary' );
+					$approve_caption = esc_html__( 'Approve', 'revisionary' );
 
 					if ( strtotime( $post->post_date_gmt ) > agp_time_gmt() ) {
 						$class = 'pending_future';
 						$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-primary rvy-approve-revision">' . $approve_caption . '</a>' : '';
-						$message = sprintf( __('This is a %s (requested publish date: %s). %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $date, $view_published, $edit_button, $publish_button );
+						$message = sprintf( esc_html__('This is a %s (requested publish date: %s). %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $date, $view_published, $edit_button, $publish_button );
 					} else {
 						$class = 'pending';
 						$status_obj = get_post_status_object(get_post_field('post_status', rvy_post_id($revision_id)));
-						$publish_caption = (!empty($status_obj->public) || !empty($status_obj->private)) ? __('Publish now', 'revisionary') : $approve_caption;
+						$publish_caption = (!empty($status_obj->public) || !empty($status_obj->private)) ? esc_html__('Publish now', 'revisionary') : $approve_caption;
 						$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-primary rvy-approve-revision">' . $publish_caption . '</a>' : '';
-						$message = sprintf( __('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $view_published, $edit_button, $publish_button );
+						$message = sprintf( esc_html__('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $view_published, $edit_button, $publish_button );
 					}
 					break;
 
@@ -356,18 +356,18 @@ class RevisionaryFront {
 					$class = 'future';
 
 					// work around quirk of new scheduled revision preview not displaying page template and post thumbnail when accessed immediately after creation
-					if (time() < strtotime($post->post_modified_gmt) + 15) {
+					if (time() < strtotime($post->post_modified_gmt) + 15 && !empty($_SERVER['HTTP_HOST']) && !empty($_SERVER['REQUEST_URI'])) {
 						$current_url = set_url_scheme( esc_url('https://' . esc_url_raw($_SERVER['HTTP_HOST']). esc_url_raw($_SERVER['REQUEST_URI'])) );
-						$title = esc_attr(__('This revision is very new, preview may not be synchronized with theme.', 'revisionary'));
-						$reload_link = " <a href='$current_url' title='$title'>" . __('Reload', 'revisionary') . '</a>';
+						$title = esc_attr(esc_html__('This revision is very new, preview may not be synchronized with theme.', 'revisionary'));
+						$reload_link = " <a href='$current_url' title='$title'>" . esc_html__('Reload', 'revisionary') . '</a>';
 					} else {
 						$reload_link = '';
 					}
 
 					$edit_url = rvy_admin_url("post.php?action=edit&amp;post=$revision_id");
-					$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-primary">' . __( 'Publish now', 'revisionary' ) . '</a>' : '';
+					$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-primary">' . esc_html__( 'Publish now', 'revisionary' ) . '</a>' : '';
 					$publish_button .= $reload_link;
-					$message = sprintf( __('This is a %s (for publication on %s). %s %s %s', 'revisionary'), pp_revisions_status_label('future-revision', 'name'), $date, $view_published, $edit_button, $publish_button );
+					$message = sprintf( esc_html__('This is a %s (for publication on %s). %s %s %s', 'revisionary'), pp_revisions_status_label('future-revision', 'name'), $date, $view_published, $edit_button, $publish_button );
 					break;
 
 				case '' :
@@ -379,13 +379,14 @@ class RevisionaryFront {
 							$edit_button = '';
 						}
 
-						$message = sprintf( __('This is the Current Revision. %s', 'revisionary'), $edit_button );
+						$message = sprintf( esc_html__('This is the Current Revision. %s', 'revisionary'), $edit_button );
+
 					} elseif ('inherit' == $post->post_status) {
 						if ( current_user_can('edit_post', $revision_id ) ) {
 							$class = 'past';
 							$date = agp_date_i18n( $datef, strtotime( $post->post_modified ) );
-							$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-secondary">' . __( 'Restore', 'revisionary' ) . '</a>' : '';
-							$message = sprintf( __('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, $view_published, $publish_button );
+							$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-secondary">' . esc_html__( 'Restore', 'revisionary' ) . '</a>' : '';
+							$message = sprintf( esc_html__('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, $view_published, $publish_button );
 						}
 					}
 				}
@@ -398,7 +399,7 @@ class RevisionaryFront {
 					add_action('wp_print_footer_scripts', [$this, 'rvyPreviewJS'], 50);
 				}
 
-				$html = '<div id="pp_revisions_top_bar" class="rvy_view_revision rvy_view_' . $class . '">' .
+				$html = '<div id="pp_revisions_top_bar" class="' . esc_attr("rvy_view_revision rvy_view_" . $class) . '">' .
 						'<div class="rvy_preview_msgspan">' . $message . '</div></div>';
 
 				new RvyScheduledHtml( $html, 'wp_head', 99 );  // this should be inserted at the top of <body> instead, but currently no way to do it
@@ -407,7 +408,7 @@ class RevisionaryFront {
 	}
 
 	function rvyFrontCSS() {
-		echo '<link rel="stylesheet" href="' . plugins_url('', REVISIONARY_FILE) . '/revisionary-front.css" type="text/css" />'."\n";
+		echo '<link rel="stylesheet" href="' . esc_url(plugins_url('', REVISIONARY_FILE)) . '/revisionary-front.css" type="text/css" />'."\n";
 	}
 
 	function rvyEnqueuePreviewJS() {

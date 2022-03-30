@@ -1,5 +1,5 @@
 <?php
-if( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
+if (isset($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die();
 
 /*
@@ -36,7 +36,7 @@ class RevisionaryPostEditorMetaboxes {
 	function rvy_metabox_revisions( $status ) {
 		$property_name = $status . '_revisions';
 		if ( ! empty( $this->$property_name ) ) {
-			echo $this->$property_name;
+			echo esc_html($this->$property_name);
 		
 		} elseif ( ! empty( $_GET['post'] ) ) {
 			$args = array( 'format' => 'list', 'parent' => false );

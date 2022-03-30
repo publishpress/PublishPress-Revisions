@@ -1,5 +1,5 @@
 <?php
-if ( basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
+if (isset($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die();
 
 if (defined('REVISIONARY_FILE')) {
@@ -81,8 +81,6 @@ function rvy_send_buffered_mail() {
 function rvy_set_notification_buffer_cron() {
 	$cron_timestamp = wp_next_scheduled( 'rvy_mail_buffer_hook' );
 
-	//$wait_sec = time() - $cron_timestamp;
-
 	if (rvy_get_option('use_notification_buffer')) {
 		if (!$cron_timestamp) {
 			wp_schedule_event(time(), 'two_minutes', 'rvy_mail_buffer_hook');
@@ -151,7 +149,7 @@ function _rvy_no_redirect_filter($redirect, $orig) {
 function rvy_ajax_handler() {
 	global $current_user, $wpdb;
 
-	if (!empty($_REQUEST['rvy_ajax_field'])) {
+	if (!empty($_REQUEST['rvy_ajax_field'] && !empty($_REQUEST['rvy_ajax_value']))) {
 		if ($post_id = intval($_REQUEST['rvy_ajax_value'])) {
 
 			switch ($_REQUEST['rvy_ajax_field']) {
@@ -169,11 +167,9 @@ function rvy_ajax_handler() {
 
 				case 'submit_revision':
 					// capability check is applied within function to support batch execution without redundant checks
-					//if (current_user_can('set_revision_pending-revision', $post_id)) {
-						require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');	
-						rvy_revision_submit($post_id);
-						$check_autosave = true;
-					//}
+					require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');	
+					rvy_revision_submit($post_id);
+					$check_autosave = true;
 
 					break;
 
@@ -189,20 +185,6 @@ function rvy_ajax_handler() {
 					}
 
 					break;
-
-				/*
-				case 'approve_revision':
-					require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');	
-					rvy_revision_approve($post_id);
-					$check_autosave = true;
-					break;
-
-				case 'publish_revision':
-					require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');	
-					rvy_revision_publish($post_id);
-					$check_autosave = true;
-					break;
-				*/
 
 				default:
 			}
@@ -229,10 +211,6 @@ function rvy_ajax_handler() {
 						$wpdb->update($wpdb->posts, $update_data, ['ID' => $post_id]);
 
 						$wpdb->delete($wpdb->posts, ['ID' => $autosave_post->ID]);
-
-						// For taxonomies and meta keys not stored for the autosave, use published copies
-						//revisionary_copy_terms($autosave_post->ID, $post_id, ['empty_target_only' => true]);
-						//revisionary_copy_postmeta($autosave_post->ID, $post_id, ['empty_target_only' => true]);
 					}
 				}
 			}
@@ -268,8 +246,6 @@ function rvy_update_post_meta($post_id, $meta_key, $meta_value) {
 
 function rvy_delete_post_meta($post_id, $meta_key) {
 	delete_post_meta($post_id, $meta_key);
-
-	//wp_cache_delete($post_id, 'post_meta');
 }
 
 function rvy_status_registrations() {
@@ -277,52 +253,52 @@ function rvy_status_registrations() {
 		rvy_get_option('revision_statuses_noun_labels') ?
 		[
 			'draft-revision' => [
-				'name' => __('Working Copy', 'revisionary'),
-				'submit' => __('Create Working Copy', 'revisionary'), 
-				'submit_short' => __('Create Copy', 'revisionary'), 
-				'submitting' => __('Creating Working Copy...', 'revisionary'),
-				'submitted' => __('Working Copy ready.', 'revisionary'),
-				'approve' => __('Approve Changes', 'revisionary'), 
-				'approving' => __('Approving Changes...', 'revisionary'),
-				'publish' => __('Publish Changes', 'revisionary'),
-				'save' => __('Save Revision', 'revisionary'), 
-				'update' => __('Update Revision', 'revisionary'), 
-				'plural' => __('Working Copies', 'revisionary'), 
-				'short' => __('Working Copy', 'revisionary'),
+				'name' => esc_html__('Working Copy', 'revisionary'),
+				'submit' => esc_html__('Create Working Copy', 'revisionary'), 
+				'submit_short' => esc_html__('Create Copy', 'revisionary'), 
+				'submitting' => esc_html__('Creating Working Copy...', 'revisionary'),
+				'submitted' => esc_html__('Working Copy ready.', 'revisionary'),
+				'approve' => esc_html__('Approve Changes', 'revisionary'), 
+				'approving' => esc_html__('Approving Changes...', 'revisionary'),
+				'publish' => esc_html__('Publish Changes', 'revisionary'),
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Working Copies', 'revisionary'), 
+				'short' => esc_html__('Working Copy', 'revisionary'),
 				'count' => _n_noop('Working Copies <span class="count">(%d)</span>', 'Working Copies <span class="count">(%d)</span>', 'revisionary'),  // @todo: confirm API will support a fixed string
 				'basic' => 'Copy',
 			],
 		
 			'pending-revision' => [
-				'name' => __('Change Request', 'revisionary'),
-				'submit' => __('Submit Change Request', 'revisionary'),
-				'submit_short' => __('Submit Changes', 'revisionary'),
-				'submitting' => __('Submitting Changes...', 'revisionary'),
-				'submitted' => __('Changes Submitted.', 'revisionary'),
-				'approve' => __('Approve Changes', 'revisionary'), 
-				'approving' => __('Approving Changes...', 'revisionary'),
-				'publish' => __('Publish Changes', 'revisionary'), 
-				'save' => __('Save Revision', 'revisionary'), 
-				'update' => __('Update Revision', 'revisionary'), 
-				'plural' => __('Change Requests', 'revisionary'), 
-				'short' => __('Change Request', 'revisionary'),
+				'name' => esc_html__('Change Request', 'revisionary'),
+				'submit' => esc_html__('Submit Change Request', 'revisionary'),
+				'submit_short' => esc_html__('Submit Changes', 'revisionary'),
+				'submitting' => esc_html__('Submitting Changes...', 'revisionary'),
+				'submitted' => esc_html__('Changes Submitted.', 'revisionary'),
+				'approve' => esc_html__('Approve Changes', 'revisionary'), 
+				'approving' => esc_html__('Approving Changes...', 'revisionary'),
+				'publish' => esc_html__('Publish Changes', 'revisionary'), 
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Change Requests', 'revisionary'), 
+				'short' => esc_html__('Change Request', 'revisionary'),
 				'count' => _n_noop('Change Requests <span class="count">(%d)</span>', 'Change Requests <span class="count">(%d)</span>', 'revisionary'),
-				'enable' => __('Enable Change Requests', 'revisionary'),
+				'enable' => esc_html__('Enable Change Requests', 'revisionary'),
 				'basic' => 'Change Request',
 			],
 
 			'future-revision' => [
-				'name' => __('Scheduled Change', 'revisionary'),
-				'submit' => __('Schedule Changes', 'revisionary'),
-				'submit_short' => __('Schedule Changes', 'revisionary'),
-				'submitting' => __('Scheduling Changes...', 'revisionary'),
-				'submitted' => __('Changes are Scheduled.', 'revisionary'),
-				'approve' => __('Schedule Changes', 'revisionary'), 
-				'publish' => __('Publish Changes', 'revisionary'), 
-				'save' => __('Save Revision', 'revisionary'), 
-				'update' => __('Update Revision', 'revisionary'), 
-				'plural' => __('Scheduled Changes', 'revisionary'), 
-				'short' => __('Scheduled Change', 'revisionary'),
+				'name' => esc_html__('Scheduled Change', 'revisionary'),
+				'submit' => esc_html__('Schedule Changes', 'revisionary'),
+				'submit_short' => esc_html__('Schedule Changes', 'revisionary'),
+				'submitting' => esc_html__('Scheduling Changes...', 'revisionary'),
+				'submitted' => esc_html__('Changes are Scheduled.', 'revisionary'),
+				'approve' => esc_html__('Schedule Changes', 'revisionary'), 
+				'publish' => esc_html__('Publish Changes', 'revisionary'), 
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Scheduled Changes', 'revisionary'), 
+				'short' => esc_html__('Scheduled Change', 'revisionary'),
 				'count' => _n_noop('Scheduled Changes <span class="count">(%d)</span>', 'Scheduled Changes <span class="count">(%d)</span>', 'revisionary'),
 				'basic' => 'Scheduled Change',
 			],
@@ -331,49 +307,49 @@ function rvy_status_registrations() {
 		:
 		[
 			'draft-revision' => [
-				'name' => __('Unsubmitted Revision', 'revisionary'),
-				'submit' => __('New Revision', 'revisionary'), 
-				'submit_short' => __('New Revision', 'revisionary'), 
-				'submitting' => __('Creating Revision...', 'revisionary'),
-				'submitted' => __('Revision ready to edit.', 'revisionary'),
-				'approve' => __('Approve Revision', 'revisionary'), 
-				'publish' => __('Publish Revision', 'revisionary'), 
-				'save' => __('Save Revision', 'revisionary'), 
-				'update' => __('Update Revision', 'revisionary'), 
-				'plural' => __('Unsubmitted Revisions', 'revisionary'), 
-				'short' => __('Not Submitted', 'revisionary'),
+				'name' => esc_html__('Unsubmitted Revision', 'revisionary'),
+				'submit' => esc_html__('New Revision', 'revisionary'), 
+				'submit_short' => esc_html__('New Revision', 'revisionary'), 
+				'submitting' => esc_html__('Creating Revision...', 'revisionary'),
+				'submitted' => esc_html__('Revision ready to edit.', 'revisionary'),
+				'approve' => esc_html__('Approve Revision', 'revisionary'), 
+				'publish' => esc_html__('Publish Revision', 'revisionary'), 
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Unsubmitted Revisions', 'revisionary'), 
+				'short' => esc_html__('Not Submitted', 'revisionary'),
 				'count' => _n_noop('Not Submitted for Approval <span class="count">(%s)</span>', 'Not Submitted for Approval <span class="count">(%s)</span>', 'revisionary'),   // @todo: confirm API will support a fixed string
 				'basic' => 'Revision',
 			],
 		
 			'pending-revision' => [
-				'name' => __('Submitted Revision', 'revisionary'),
-				'submit' => __('Submit Revision', 'revisionary'), 
-				'submitting' => __('Submitting Revision...', 'revisionary'),
-				'submitted' => __('Revision Submitted.', 'revisionary'),
-				'submit_short' => __('Submit Revision', 'revisionary'), 
-				'approve' => __('Approve Revision', 'revisionary'), 
-				'publish' => __('Publish Revision', 'revisionary'), 
-				'save' => __('Save Revision', 'revisionary'), 
-				'update' => __('Update Revision', 'revisionary'), 
-				'plural' => __('Submitted Revisions', 'revisionary'), 
-				'short' => __('Submitted', 'revisionary'),
+				'name' => esc_html__('Submitted Revision', 'revisionary'),
+				'submit' => esc_html__('Submit Revision', 'revisionary'), 
+				'submitting' => esc_html__('Submitting Revision...', 'revisionary'),
+				'submitted' => esc_html__('Revision Submitted.', 'revisionary'),
+				'submit_short' => esc_html__('Submit Revision', 'revisionary'), 
+				'approve' => esc_html__('Approve Revision', 'revisionary'), 
+				'publish' => esc_html__('Publish Revision', 'revisionary'), 
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Submitted Revisions', 'revisionary'), 
+				'short' => esc_html__('Submitted', 'revisionary'),
 				'count' => _n_noop('Submitted for Approval <span class="count">(%s)</span>', 'Submitted for Approval <span class="count">(%s)</span>', 'revisionary'),
 				'basic' => 'Revision',
 			],
 
 			'future-revision' => [
-				'name' => __('Scheduled Revision', 'revisionary'),
-				'submit' => __('Schedule Revision', 'revisionary'), 
-				'submit_short' => __('Schedule Revision', 'revisionary'), 
-				'submitting' => __('Scheduling Revision...', 'revisionary'),
-				'submitted' => __('Revision Scheduled.', 'revisionary'),
-				'approve' => __('Approve Revision', 'revisionary'), 
-				'publish' => __('Publish Revision', 'revisionary'), 
-				'save' => __('Save Revision', 'revisionary'), 
-				'update' => __('Update Revision', 'revisionary'), 
-				'plural' => __('Scheduled Revisions', 'revisionary'), 
-				'short' => __('Scheduled', 'revisionary'),
+				'name' => esc_html__('Scheduled Revision', 'revisionary'),
+				'submit' => esc_html__('Schedule Revision', 'revisionary'), 
+				'submit_short' => esc_html__('Schedule Revision', 'revisionary'), 
+				'submitting' => esc_html__('Scheduling Revision...', 'revisionary'),
+				'submitted' => esc_html__('Revision Scheduled.', 'revisionary'),
+				'approve' => esc_html__('Approve Revision', 'revisionary'), 
+				'publish' => esc_html__('Publish Revision', 'revisionary'), 
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Scheduled Revisions', 'revisionary'), 
+				'short' => esc_html__('Scheduled', 'revisionary'),
 				'count' => _n_noop('Scheduled Revision <span class="count">(%s)</span>', 'Scheduled Revisions <span class="count">(%s)</span>', 'revisionary'),
 				'basic' => 'Scheduled Revision',
 			],
@@ -470,16 +446,16 @@ function pp_revisions_label($label_name) {
 			
 			'my_published_posts'		=> _n_noop('%sRevisions to My Posts%s(%s)</span>', '%sRevisions to My Posts%s(%s)', 'revisionary'),
 
-			'queue_col_revision' 		=> __('Revision', 'revisionary'),
-			'queue_col_revised_by' 		=> __('Revised By', 'revisionary'),
-			'queue_col_revision_date' 	=> __('Revision Date', 'revisionary'),
-			'queue_col_post_author' 	=> __('Post Author', 'revisionary'),
-			'queue_col_published_post' 	=> __('Published Post', 'revisionary'),
-			'update_revision' 			=> __('Update Revision', 'revisionary'),
+			'queue_col_revision' 		=> esc_html__('Revision', 'revisionary'),
+			'queue_col_revised_by' 		=> esc_html__('Revised By', 'revisionary'),
+			'queue_col_revision_date' 	=> esc_html__('Revision Date', 'revisionary'),
+			'queue_col_post_author' 	=> esc_html__('Post Author', 'revisionary'),
+			'queue_col_published_post' 	=> esc_html__('Published Post', 'revisionary'),
+			'update_revision' 			=> esc_html__('Update Revision', 'revisionary'),
 
 			'submit_revision' => (rvy_get_option('revision_statuses_noun_labels'))
-			?							__('Submit Revision', 'revisionary')
-			:							__('Submit Changes', 'revisionary')
+			?							esc_html__('Submit Revision', 'revisionary')
+			:							esc_html__('Submit Changes', 'revisionary')
 		]);
 	}
 
@@ -647,7 +623,7 @@ function rvy_detect_post_id() {
 	} elseif ( ! empty( $_GET['page_id'] ) ) {
 		$post_id = (int) $_GET['page_id'];
 
-	} elseif (defined('REST_REQUEST') && REST_REQUEST && strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'autosaves')) {
+	} elseif (defined('REST_REQUEST') && REST_REQUEST && isset($_SERVER['REQUEST_URI']) && strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'autosaves')) {
 		require_once( dirname(__FILE__).'/rest_rvy.php' );
 		$post_id = Revisionary_REST::get_id_element(esc_url_raw($_SERVER['REQUEST_URI']), 1);
 
@@ -685,7 +661,7 @@ function rvy_add_revisor_role( $requested_blog_id = '' ) {
 		'level_0' => true
 	);
 
-	$wp_roles->add_role( 'revisor', __( 'Revisor', 'revisionary' ), $wp_role_caps );
+	$wp_roles->add_role( 'revisor', esc_html__( 'Revisor', 'revisionary' ), $wp_role_caps );
 }
 
 function rvy_apply_role_translation($translations, $text, $context, $domain) {
@@ -752,7 +728,8 @@ function revisionary_refresh_revision_flags() {
 	$have_revisions = implode("','", array_map('intval', array_unique($arr_have_revisions)));
 
 	if ($ids = $wpdb->get_col("SELECT meta_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_has_revisions' AND post_id NOT IN ('$have_revisions')")) {
-		$wpdb->query("DELETE FROM $wpdb->postmeta WHERE meta_id IN (" . implode(",", array_map('intval', $ids)) . ")");
+		$id_csv = implode("','", array_map('intval', $ids));
+		$wpdb->query("DELETE FROM $wpdb->postmeta WHERE meta_id IN ('$id_csv')");
 	}
 
 	$have_flag_ids = $wpdb->get_col("SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_has_revisions'");
@@ -995,8 +972,6 @@ function rvy_error( $err_slug, $arg2 = '' ) {
 }
 
 function rvy_check_duplicate_mail($new_msg, $sent_mail, $buffer) {
-	// $new_msg = array_merge(compact('address', 'title', 'message'), ['time' => strtotime(current_time( 'mysql' )), 'time_gmt' => time()], $args);
-
 	foreach([$sent_mail, $buffer] as $compare_set) {
 		foreach($compare_set as $sent) {
 			foreach(['address', 'title', 'message'] as $field) {
@@ -1018,9 +993,12 @@ function rvy_check_duplicate_mail($new_msg, $sent_mail, $buffer) {
 	}
 }
 
+/*
+ * wp_mail() wrapper, also implements mail buffer
+ * 
+ * args: ['revision_id' => $revision_id, 'post_id' => $published_post->ID, 'notification_type' => $notification_type, 'notification_class' => $notification_class]
+ */
 function rvy_mail( $address, $title, $message, $args ) {
-	// args: ['revision_id' => $revision_id, 'post_id' => $published_post->ID, 'notification_type' => $notification_type, 'notification_class' => $notification_class]
-
 	/*
 	 * [wp-cron action checks wp_option revisionary_mail_buffer. If wait time has elapsed, send buffered emails (up to limit per minute)]
 	 * 
@@ -1116,9 +1094,9 @@ function rvy_is_status_published( $status ) {
 
 function rvy_halt( $msg, $title = '' ) {
 	if ( ! $title ) {
-		$title = __( 'Revision Workflow', 'revisionary' );
+		$title = esc_html__( 'Revision Workflow', 'revisionary' );
 	}
-	wp_die( $msg, $title, array( 'response' => 200 ) );
+	wp_die( esc_html($msg), esc_html($title), array( 'response' => 200 ) );
 }
 
 function _revisionary_dashboard_dismiss_msg() {
@@ -1152,11 +1130,7 @@ function rvy_get_manageable_types() {
 	}
 
 	foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
-		//if ( ! empty( $current_user->allcaps[$type_obj->cap->publish_posts] ) 
-		//&& ! empty( $current_user->allcaps[$type_obj->cap->edit_published_posts] ) 
-		//&& ! empty( $current_user->allcaps[$type_obj->cap->edit_others_posts] ) ) {
-			$types[$post_type]= $post_type;
-		//}
+		$types[$post_type]= $post_type;
 	}
 	
 	$types = array_diff_key($types, array('acf-field-group' => true));
@@ -1164,7 +1138,7 @@ function rvy_get_manageable_types() {
 }
 
 // thanks to GravityForms for the nifty dismissal script
-if ( in_array( basename($_SERVER['PHP_SELF']), array('admin.php', 'admin-ajax.php') ) ) {
+if (isset($_SERVER['PHP_SELF']) && in_array( basename($_SERVER['PHP_SELF']), array('admin.php', 'admin-ajax.php') ) ) {
 	add_action( 'wp_ajax_rvy_dismiss_msg', '_revisionary_dashboard_dismiss_msg' );
 }
 
@@ -1221,8 +1195,8 @@ function rvy_init() {
 		}
 	}
 	
-	if ( empty( $_GET['action'] ) || ( 'publish_scheduled_revisions' != $_GET['action'] ) ) {
-		if ( ! strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'login.php' ) && rvy_get_option( 'scheduled_revisions' ) && !rvy_get_option('scheduled_publish_cron') ) {
+	if (empty($_GET['action']) || (isset($_GET['action']) && ('publish_scheduled_revisions' != $_GET['action']))) {
+		if (isset($_SERVER['REQUEST_URI']) && ! strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'login.php' ) && rvy_get_option( 'scheduled_revisions' ) && !rvy_get_option('scheduled_publish_cron') ) {
 		
 			// If a previously requested asynchronous request was ineffective, perform the actions now
 			// (this is not executed if the current URI is from a manual publication request with action=publish_scheduled_revisions)
@@ -1428,6 +1402,10 @@ add_action('init', 'rvy_rest_cache_compat', 9999);
 function rvy_rest_cache_compat() {
 	global $wp_post_types;
 
+	if (!isset($_SERVER['REQUEST_URI'])) {
+		return;
+	}
+
 	$uri = esc_url_raw($_SERVER['REQUEST_URI']);
 
 	$rest_cache_active = false;
@@ -1440,7 +1418,6 @@ function rvy_rest_cache_compat() {
 
 	$rest_cache_active = $rest_cache_active 
 	|| (strpos($uri, '_locale=user') && strpos($uri, 'wp-json') && strpos($uri, '/posts/') && rvy_is_plugin_active('wp-rest-cache/wp-rest-cache.php'));
-	//|| ((!empty($_REQUEST['wp-remove-post-lock']) || strpos($uri, '_locale=user')) && rvy_is_plugin_active('wp-rest-cache/wp-rest-cache.php'));
 
 	if ($rest_cache_active) {
 		foreach(array_keys($wp_post_types) as $key) {
@@ -1455,6 +1432,10 @@ function rvy_rest_cache_compat() {
 add_filter('wp_rest_cache/skip_caching', 'rvy_rest_cache_skip');
 
 function rvy_rest_cache_skip($skip) {
+	if (!isset($_SERVER['REQUEST_URI'])) {
+		return;
+	}
+
 	$uri = esc_url_raw($_SERVER['REQUEST_URI']);
 	$uncached_params = array_merge($uncached_params, ['rvy_ajax_field', 'rvy_ajax_value']);
 
@@ -1467,39 +1448,3 @@ function rvy_rest_cache_skip($skip) {
 
 	return $skip;
 }
-
-/**
- * Full WP Engine cache flush (Hold for possible future use as needed)
- *
- * Based on WP Engine Cache Flush by Aaron Holbrook
- * https://github.org/a7/wpe-cache-flush/
- * http://github.org/a7/
- */
-/*
-function rvy_wpe_cache_flush() {
-    // Don't cause a fatal if there is no WpeCommon class
-    if ( ! class_exists( 'WpeCommon' ) ) {
-        return false;
-    }
-
-    if ( function_exists( 'WpeCommon::purge_memcached' ) ) {
-        \WpeCommon::purge_memcached();
-    }
-
-    if ( function_exists( 'WpeCommon::clear_maxcdn_cache' ) ) {
-        \WpeCommon::clear_maxcdn_cache();
-    }
-
-    if ( function_exists( 'WpeCommon::purge_varnish_cache' ) ) {
-        \WpeCommon::purge_varnish_cache();
-    }
-
-    global $wp_object_cache;
-    // Check for valid cache. Sometimes this is broken -- we don't know why! -- and it crashes when we flush.
-    // If there's no cache, we don't need to flush anyway.
-
-    if ( $wp_object_cache && is_object( $wp_object_cache ) ) {
-        @wp_cache_flush();
-    }
-}
-*/

@@ -6,9 +6,9 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 // This script executes on the 'init' action if is_admin() and $pagenow is 'post-new.php' or 'post.php' and the block editor is active.
 //
 
-if ($post_id = rvy_detect_post_id()) {
+if ($_post_id = rvy_detect_post_id()) {
     // PublishPress Custom Status module is not relevant to Edit Revision screen, conflicts with Revisions scripts
-    if (rvy_in_revision_workflow($post_id)) {
+    if (rvy_in_revision_workflow($_post_id)) {
         add_filter(
             'pp_module_dirs', 
             function($pp_modules) {
@@ -64,7 +64,7 @@ class RVY_PostBlockEditUI {
 
             $args = \PublishPress\Revisions\PostEditorWorkflowUI::revisionLinkParams(compact('post', 'do_pending_revisions', 'do_scheduled_revisions'));
 
-            $args['deleteCaption'] = __('Delete Permanently', 'revisionary');
+            $args['deleteCaption'] = esc_html__('Delete Permanently', 'revisionary');
 
         } elseif (current_user_can('edit_post', $post->ID)) {
             $status_obj = get_post_status_object($post->post_status);
