@@ -149,7 +149,7 @@ function _rvy_no_redirect_filter($redirect, $orig) {
 function rvy_ajax_handler() {
 	global $current_user, $wpdb;
 
-	if (!empty($_REQUEST['rvy_ajax_field'] && !empty($_REQUEST['rvy_ajax_value']))) {
+	if (!empty($_REQUEST['rvy_ajax_field']) && !empty($_REQUEST['rvy_ajax_value'])) {
 		if ($post_id = intval($_REQUEST['rvy_ajax_value'])) {
 
 			switch ($_REQUEST['rvy_ajax_field']) {
