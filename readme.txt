@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.9
-Stable tag: 3.0.13
+Stable tag: 3.0.14
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -231,7 +231,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.0.14 - 29 Mar 2022 =
+= 3.0.14 - 30 Mar 2022 =
 * Fixed : Output variable escaping, other coding standard improvements
 * Compat : NitroPack caching plugin
 
