@@ -477,10 +477,14 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 		$hint = sprintf(esc_html__( 'When a %s is published, update post modified date to current time.', 'revisionary' ), pp_revisions_status_label('future-revision', 'name'));
 		$this->option_checkbox( 'scheduled_revision_update_modified_date', $tab, $section, $hint, '' );
 
-		$hint = esc_html__( 'Publish scheduled revisions using the WP-Cron mechanism.', 'revisionary' );
-		$this->option_checkbox( 'scheduled_publish_cron', $tab, $section, $hint, '' );
+		global $wp_version;
 
-		if (!rvy_get_option('scheduled_publish_cron')) {
+		if (version_compare($wp_version, '5.9', '<')) {
+			$hint = esc_html__( 'Publish scheduled revisions using the WP-Cron mechanism.', 'revisionary' );
+			$this->option_checkbox( 'scheduled_publish_cron', $tab, $section, $hint, '' );
+		}
+
+		if (!rvy_get_option('scheduled_publish_cron') && version_compare($wp_version, '5.9', '<')) {
 			$hint = esc_html__( 'Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
 			$this->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
 		}
