@@ -49,7 +49,7 @@ class RvyOptionUI {
 			$return['val'] = rvy_get_option($option_name, $this->sitewide, $this->customize_defaults);
 
 			echo "<div class='agp-vspaced_input'";
-			echo ($args['style']) ? " style='" . esc_attr($args['style']) . "'" : '';
+			echo (isset($args['style']) && $args['style']) ? " style='" . esc_attr($args['style']) . "'" : '';
 			echo ">";
 
 			echo "<label for='" . esc_attr($option_name) . "'><input name='" . esc_attr($option_name) . "' type='checkbox' id='" . esc_attr($option_name) . "' value='1' " . checked('1', $return['val'], false) . " /> "
@@ -60,7 +60,7 @@ class RvyOptionUI {
 				echo "<div class='rs-subtext'>" . esc_html($hint_text) . "</div>";
 
 			if ( ! empty($args['subcaption']) )
-				echo esc_html($args['subcaption']);
+				echo $args['subcaption'];
 
 			echo "</div>";
 
@@ -477,10 +477,14 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 		$hint = sprintf(esc_html__( 'When a %s is published, update post modified date to current time.', 'revisionary' ), pp_revisions_status_label('future-revision', 'name'));
 		$this->option_checkbox( 'scheduled_revision_update_modified_date', $tab, $section, $hint, '' );
 
-		$hint = esc_html__( 'Publish scheduled revisions using the WP-Cron mechanism.', 'revisionary' );
-		$this->option_checkbox( 'scheduled_publish_cron', $tab, $section, $hint, '' );
+		global $wp_version;
 
-		if (!rvy_get_option('scheduled_publish_cron')) {
+		if (version_compare($wp_version, '5.9', '<')) {
+			$hint = esc_html__( 'Publish scheduled revisions using the WP-Cron mechanism.', 'revisionary' );
+			$this->option_checkbox( 'scheduled_publish_cron', $tab, $section, $hint, '' );
+		}
+
+		if (!rvy_get_option('scheduled_publish_cron') && version_compare($wp_version, '5.9', '<')) {
 			$hint = esc_html__( 'Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
 			$this->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
 		}
@@ -639,9 +643,6 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 
 		<?php
 		if( $pending_revisions_available ) {
-			$subcaption = ( defined('RVY_CONTENT_ROLES') && $group_link = $revisionary->content_roles->get_metagroup_edit_link( 'Pending Revision Monitors' ) ) ?
-				sprintf( " &bull;&nbsp;<a href='%s'>" . esc_html__('select recipients', 'revisionary') . "</a>", $group_link ) : '';
-
 			$id = 'pending_rev_notify_admin';
 			if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
 				$this->all_options []= $id;
@@ -656,7 +657,10 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 				echo '</select>&nbsp;';
 
 				echo esc_html($this->option_captions[$id]);
-				echo esc_html($subcaption);
+
+				echo ( defined('RVY_CONTENT_ROLES') && $group_link = $revisionary->content_roles->get_metagroup_edit_link( 'Pending Revision Monitors' ) ) ?
+				sprintf( " &bull;&nbsp;<a href='%s'>" . esc_html__('select recipients', 'revisionary') . "</a>", $group_link ) : '';
+
 				echo "<br />";
 			}
 
