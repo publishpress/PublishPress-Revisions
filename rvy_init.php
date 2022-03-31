@@ -100,7 +100,9 @@ function rvy_mail_buffer_cron_interval( $schedules ) {
 }
 
 function _revisionary_publish_scheduled_cron($args = []) {
-	if (get_option('rvy_scheduled_revisions') && get_option('rvy_scheduled_publish_cron')) {
+	global $wp_version;
+
+	if (get_option('rvy_scheduled_revisions') && (get_option('rvy_scheduled_publish_cron') || version_compare($wp_version, '5.9', '>='))) {
 		revisionary_publish_scheduled($args);
 	}
 }
@@ -149,7 +151,7 @@ function _rvy_no_redirect_filter($redirect, $orig) {
 function rvy_ajax_handler() {
 	global $current_user, $wpdb;
 
-	if (!empty($_REQUEST['rvy_ajax_field'] && !empty($_REQUEST['rvy_ajax_value']))) {
+	if (!empty($_REQUEST['rvy_ajax_field']) && !empty($_REQUEST['rvy_ajax_value'])) {
 		if ($post_id = intval($_REQUEST['rvy_ajax_value'])) {
 
 			switch ($_REQUEST['rvy_ajax_field']) {
@@ -1152,7 +1154,7 @@ function rvy_is_network_activated($plugin_file = '')
 }
 
 function rvy_init() {
-	global $wp_roles;
+	global $wp_roles, $wp_version;
 
 	if ( ! isset( $wp_roles->roles['revisor'] ) ) {
 		rvy_add_revisor_role();
@@ -1189,14 +1191,16 @@ function rvy_init() {
 				}
 			}
 		// Is this an asynchronous request to publish scheduled revisions?
-		} elseif (!empty($_GET['action']) && ('publish_scheduled_revisions' == $_GET['action']) && rvy_get_option('scheduled_revisions') && !rvy_get_option('scheduled_publish_cron')) {
+		} elseif (!empty($_GET['action']) && ('publish_scheduled_revisions' == $_GET['action']) && rvy_get_option('scheduled_revisions') 
+		&& (!rvy_get_option('scheduled_publish_cron') && version_compare($wp_version, '5.9', '<'))) {
 				require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
 				add_action( 'rvy_init', '_rvy_publish_scheduled_revisions' );
 		}
 	}
 	
 	if (empty($_GET['action']) || (isset($_GET['action']) && ('publish_scheduled_revisions' != $_GET['action']))) {
-		if (isset($_SERVER['REQUEST_URI']) && ! strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'login.php' ) && rvy_get_option( 'scheduled_revisions' ) && !rvy_get_option('scheduled_publish_cron') ) {
+		if (isset($_SERVER['REQUEST_URI']) && ! strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'login.php' ) && rvy_get_option( 'scheduled_revisions' ) 
+		&& (!rvy_get_option('scheduled_publish_cron') && version_compare($wp_version, '5.9', '<'))) {
 		
 			// If a previously requested asynchronous request was ineffective, perform the actions now
 			// (this is not executed if the current URI is from a manual publication request with action=publish_scheduled_revisions)
