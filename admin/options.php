@@ -643,9 +643,6 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 
 		<?php
 		if( $pending_revisions_available ) {
-			$subcaption = ( defined('RVY_CONTENT_ROLES') && $group_link = $revisionary->content_roles->get_metagroup_edit_link( 'Pending Revision Monitors' ) ) ?
-				sprintf( " &bull;&nbsp;<a href='%s'>" . esc_html__('select recipients', 'revisionary') . "</a>", $group_link ) : '';
-
 			$id = 'pending_rev_notify_admin';
 			if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
 				$this->all_options []= $id;
@@ -660,7 +657,10 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 				echo '</select>&nbsp;';
 
 				echo esc_html($this->option_captions[$id]);
-				echo esc_html($subcaption);
+
+				echo ( defined('RVY_CONTENT_ROLES') && $group_link = $revisionary->content_roles->get_metagroup_edit_link( 'Pending Revision Monitors' ) ) ?
+				sprintf( " &bull;&nbsp;<a href='%s'>" . esc_html__('select recipients', 'revisionary') . "</a>", $group_link ) : '';
+
 				echo "<br />";
 			}
 
