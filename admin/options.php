@@ -60,7 +60,7 @@ class RvyOptionUI {
 				echo "<div class='rs-subtext'>" . esc_html($hint_text) . "</div>";
 
 			if ( ! empty($args['subcaption']) )
-				echo esc_html($args['subcaption']);
+				echo $args['subcaption'];
 
 			echo "</div>";
 
