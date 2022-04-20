@@ -49,7 +49,7 @@ jQuery(document).ready( function($) {
 			+ '<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
 			+ rvyObjEdit.completedEditLinkCaption + '</a>'
 			
-			'</button>';
+			+ '</button>';
 
 			if (rvyObjEdit.scheduleCaption) {
 				let postStatus = wp.data.select('core/editor').getCurrentPostAttribute('status');
