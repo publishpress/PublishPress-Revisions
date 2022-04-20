@@ -10,7 +10,7 @@ jQuery(document).ready( function($) {
 		var refSelector = '#rvy_compare_button';
 
         if (!$(refSelector).length) {
-            var refSelector = 'div.misc-pub-section-last';
+            var refSelector = 'div.misc-pub-section:last';
         }
 
         if (!$(refSelector).length) {
@@ -60,7 +60,7 @@ jQuery(document).ready( function($) {
         }
 	}
 	var RvyUIInterval = setInterval(RvySubmissionUI, 100);
-	
+
 	$(document).on('click', 'a.save-timestamp, a.cancel-timestamp', function() {
         wp.autosave.server.triggerSave();
 	});
