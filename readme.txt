@@ -231,6 +231,11 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.0.16 - 20 Apr 2022 =
+* Fixed : Post Editor - New Revision button was not displayed 
+* Lang : Some translations did not load
+* Fixed : Edit Revision with Classic Editor - submit button not displayed for some custom post types
+
 = 3.0.15 - 31 Mar 2022 =
 * Fixed : Scheduled Revisions failed on WP 5.9 if WP Cron scheduling was disabled in Revisions settings
 
