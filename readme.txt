@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 5.9
-Stable tag: 3.0.15
+Stable tag: 3.0.16
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -230,6 +230,11 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
 == Changelog ==
+
+= 3.0.16 - 20 Apr 2022 =
+* Fixed : Post Editor - New Revision button was not displayed 
+* Lang : Some translations did not load
+* Fixed : Edit Revision with Classic Editor - submit button not displayed for some custom post types
 
 = 3.0.15 - 31 Mar 2022 =
 * Fixed : Scheduled Revisions failed on WP 5.9 if WP Cron scheduling was disabled in Revisions settings
