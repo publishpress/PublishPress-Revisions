@@ -22,7 +22,7 @@ class RevisionaryAdmin
 		global $pagenow, $post;
 
 		$script_name = (isset($_SERVER['SCRIPT_NAME'])) ? esc_url_raw($_SERVER['SCRIPT_NAME']) : '';
-		
+
 		add_action('admin_head', [$this, 'admin_head']);
 		add_action('admin_enqueue_scripts', [$this, 'admin_scripts']);
 		add_action('revisionary_admin_footer', [$this, 'publishpressFooter']);
@@ -47,36 +47,36 @@ class RevisionaryAdmin
 					echo '<style type="text/css">#plugin_update_from_iframe {display:none;}</style>';
 				});
 			}
-			
+
 			return; // no further filtering on WP plugin maintenance scripts
 		}
 
 		if (in_array($pagenow, array('post.php', 'post-new.php'))) {
 			if (empty($post)) {
 				$post = get_post(rvy_detect_post_id());
-	}
+			}
 
-			if ( $post && rvy_is_supported_post_type($post->post_type)) {
-					// only apply revisionary UI for currently published or scheduled posts
+			if ($post && rvy_is_supported_post_type($post->post_type)) {
+				// only apply revisionary UI for currently published or scheduled posts
 				if (!rvy_in_revision_workflow($post) && (in_array($post->post_status, rvy_filtered_statuses()) || ('future' == $post->post_status))) {
-						require_once( dirname(__FILE__).'/filters-admin-ui-item_rvy.php' );
+					require_once( dirname(__FILE__).'/filters-admin-ui-item_rvy.php' );
 					new RevisionaryPostEditorMetaboxes();
-	
+
 				} elseif (rvy_in_revision_workflow($post)) {
 					add_action('the_post', array($this, 'limitRevisionEditorUI'));
-	
+
 					require_once( dirname(__FILE__).'/edit-revision-ui_rvy.php' );
 					new RevisionaryEditRevisionUI();
-	
+          
 					if (\PublishPress\Revisions\Utils::isBlockEditorActive()) {
 						require_once( dirname(__FILE__).'/edit-revision-block-ui_rvy.php' );
 						new RevisionaryEditRevisionBlockUI();
 					} else {
 						require_once( dirname(__FILE__).'/edit-revision-classic-ui_rvy.php' );
 						new RevisionaryEditRevisionClassicUI();
-		}
-	}
-		}
+					}
+				}
+			}
 		}
 
 		if ( ! ( defined( 'SCOPER_VERSION' ) || defined( 'PP_VERSION' ) || defined( 'PPCE_VERSION' ) ) || defined( 'USE_RVY_RIGHTNOW' ) ) {
@@ -87,41 +87,41 @@ class RevisionaryAdmin
 			if ('revision.php' == $pagenow) {
 				require_once( dirname(__FILE__).'/history_rvy.php' );
 				new RevisionaryHistory();
-	}
-	}
-	
+			}
+		}
+
 		if ( rvy_get_option( 'scheduled_revisions' ) ) {
 			add_filter('dashboard_recent_posts_query_args', [$this, 'flt_dashboard_recent_posts_query_args']);
 		}
-	
+
 		if (!empty($_REQUEST['page']) && ('cms-tpv-page-page' == $_REQUEST['page'])) {
 			add_action('pre_get_posts', [$this, 'cmstpv_compat_get_posts']);
-	}
-	
+		}
+
 		add_filter('presspermit_status_control_scripts', [$this, 'fltDisableStatusControlScripts']);
-			
+
 		add_filter('cme_plugin_capabilities', [$this, 'fltPublishPressCapsSection']);
 	}
-	
+
 	function admin_scripts() {
 		global $pagenow;
 
 		if (in_array($pagenow, ['post.php', 'post-new.php', 'revision.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q']))) {
 			wp_enqueue_style('revisionary', RVY_URLPATH . '/admin/revisionary.css', [], PUBLISHPRESS_REVISIONS_VERSION);
-			}
+		}
 
 		if (in_array($pagenow, ['post.php', 'post-new.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q']))) {
 			wp_enqueue_style('revisionary-admin-common', RVY_URLPATH . '/common/css/pressshack-admin.css', [], PUBLISHPRESS_REVISIONS_VERSION);
-				}
+		}
 
 		if ((!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options']))) {
 			wp_enqueue_script('revisionary-settings', RVY_URLPATH . '/admin/settings.js', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
-			
+
 		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && ('admin.php' == $pagenow) && !empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options']) ) {
 			wp_enqueue_style('revisionary-settings', RVY_URLPATH . '/includes-pro/settings-pro.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
-	}
+ 	}
 
 	function admin_head() {
 		if ( isset($_SERVER['REQUEST_URI']) && (false !== strpos( urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'admin.php?page=rvy-revisions' ))) {
@@ -132,8 +132,8 @@ class RevisionaryAdmin
 		if ( ! defined('SCOPER_VERSION') ) {
 			// old js for notification recipient selection UI
 			wp_enqueue_script( 'rvy', RVY_URLPATH . "/admin/revisionary.js", array('jquery'), PUBLISHPRESS_REVISIONS_VERSION, true );
-				}
-			}
+		}
+	}
 
 	function actDashboardGlanceItems($items) {
 		require_once(dirname(__FILE__).'/admin-dashboard_rvy.php');
@@ -149,7 +149,7 @@ class RevisionaryAdmin
 
 		if ( isset($_SERVER['REQUEST_URI']) && (strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'wp-admin/network/' )) )
 			return;
-	
+
 		$path = RVY_ABSPATH;
 
 		// For Revisions Manager access, satisfy WordPress' demand that all admin links be properly defined in menu
@@ -181,22 +181,23 @@ class RevisionaryAdmin
 			return;
 
 		global $rvy_default_options, $rvy_options_sitewide;
-		
+
 		if ( empty($rvy_default_options) )
 			rvy_refresh_default_options();
 
 		if ( ! RVY_NETWORK || ( count($rvy_options_sitewide) != count($rvy_default_options) ) ) {
 			add_submenu_page( 'revisionary-q', esc_html__('PublishPress Revisions Settings', 'revisionary'), esc_html__('Settings', 'revisionary'), 'read', 'revisionary-settings', 'rvy_omit_site_options');
-			add_action('revisionary_page_revisionary-settings', 'rvy_omit_site_options' );	
+
+			add_action('revisionary_page_revisionary-settings', 'rvy_omit_site_options' );
 		}
 
 		if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 			add_submenu_page(
-	            'revisionary-q', 
+	            'revisionary-q',
 	            esc_html__('Upgrade to Pro', 'revisionary'),
 	            esc_html__('Upgrade to Pro', 'revisionary'),
-	            'read', 
-	            'revisionary-pro', 
+	            'read',
+	            'revisionary-pro',
 	            'rvy_omit_site_options'
 	        );
     	}
@@ -217,25 +218,25 @@ class RevisionaryAdmin
 			require_once(dirname(__FILE__).'/admin-dashboard_rvy.php');
 			$rvy_dash = new RevisionaryDashboard();
 			$query_args = $rvy_dash->recentPostsQueryArgs($query_args);
-					}
+		}
 
 		return $query_args;
-					}
-						
+	}
+
 	// adds a Settings link next to Deactivate, Edit in Plugins listing
 	function flt_plugin_action_links($links, $file) {
 		if ($file == plugin_basename(REVISIONARY_FILE)) {
 			$page = ( defined('RVY_NETWORK') && RVY_NETWORK ) ? 'rvy-net_options' : 'revisionary-settings';
 			$links[] = "<a href='admin.php?page=$page'>" . __awp('Settings') . "</a>";
-	}
+		}
 
 		return $links;
-	    }
+	}
 
 	public function fltPublishPressCapsSection($section_caps) {
 		$section_caps['PublishPress Revisions'] = ['edit_others_drafts', 'edit_others_revisions', 'list_others_revisions', 'manage_unsubmitted_revisions'];
 		return $section_caps;
-    }
+	}
 
 	public function fltDisableStatusControlScripts($enable_scripts) {
 		if ($post_id = rvy_detect_post_id()) {
@@ -244,11 +245,11 @@ class RevisionaryAdmin
 					$enable_scripts = false;
 				}
 			}
-	}
-	
-		return $enable_scripts;
 		}
-		
+
+		return $enable_scripts;
+	}
+
 	// Prevent PublishPress Revisions statuses from confusing the CMS Tree Page View plugin page listing
 	public function cmstpv_compat_get_posts($wp_query) {
 		$wp_query->query['post_mime_type'] = '';
@@ -265,7 +266,8 @@ class RevisionaryAdmin
 
 		<div class="pp-rating">
 		<a href="https://wordpress.org/support/plugin/revisionary/reviews/#new-post" target="_blank" rel="noopener noreferrer">
-		<?php printf( 
+
+		<?php printf(
 			esc_html__('If you like %s, please leave us a %s rating. Thank you!', 'revisionary'),
 			'<strong>PublishPress Revisions</strong>',
 			'<span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span><span class="dashicons dashicons-star-filled"></span>'

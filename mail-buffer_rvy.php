@@ -18,12 +18,16 @@ function _rvy_mail_send_limits() {
 }
 
 function _rvy_mail_check_buffer($new_msg = [], $args = []) {
+	global $wpdb;
+	
 	$log_only = !empty($args['log_only']);
 	
 	if (!$log_only) {
 		wp_cache_delete('revisionary_mail_buffer', 'options');
 		
-		if (!$buffer = get_option('revisionary_mail_buffer')) {
+		// @todo: re-enable buffer after troubleshooting for working copy redirect error
+
+		if (true) {
 			$buffer = [];
 			$first_buffer = true;
 		}
@@ -80,6 +84,8 @@ function _rvy_mail_check_buffer($new_msg = [], $args = []) {
 	if (!$log_only && $new_msg_buffered) {
 		$buffer = array_merge([$new_msg], $buffer);
 		update_option('revisionary_mail_buffer', $buffer);
+	} else {
+		$buffer = [];
 	}
 
 	if (!empty($purged)) {
@@ -87,12 +93,10 @@ function _rvy_mail_check_buffer($new_msg = [], $args = []) {
 	}
 
 	if (!empty($first_mail_log) && $sent_mail) {
-		global $wpdb;
 		$wpdb->query("UPDATE $wpdb->options SET autoload = 'no' WHERE option_name = 'revisionary_sent_mail'");
 	}
 
 	if (!empty($first_buffer) && $buffer) {
-		global $wpdb;
 		$wpdb->query("UPDATE $wpdb->options SET autoload = 'no' WHERE option_name = 'revisionary_mail_buffer'");
 	}
 

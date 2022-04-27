@@ -21,13 +21,13 @@ class Revisions {
 
 	private function load($args = [])
     {
-		if (defined('REVISIONARY_PRO_VERSION')) {
+		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 			add_action('admin_init', [$this, 'load_updater']);
 		}
 	}
 
 	public function load_updater() {
-        if (defined('REVISIONARY_PRO_VERSION')) {
+        if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 		    require_once(RVY_ABSPATH . '/includes-pro/library/Factory.php');
             $container = \PublishPress\Revisions\Factory::get_container();
 
@@ -37,7 +37,7 @@ class Revisions {
 
 	public function keyStatus($refresh = false)
     {
-        if (defined('REVISIONARY_PRO_VERSION')) {
+        if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
             require_once(RVY_ABSPATH . '/includes-pro/pro-key.php');
             return _revisionary_key_status($refresh);
         }
@@ -84,7 +84,11 @@ class Revisions {
         }
 
         $revision_id = $wpdb->get_var(
-            "SELECT ID FROM $wpdb->posts WHERE comment_count = '$post_id' AND post_author = '$user_id' AND post_status IN ('pending-revision', 'future-revision') ORDER BY ID DESC LIMIT 1"
+            $wpdb->prepare(
+                "SELECT ID FROM $wpdb->posts WHERE comment_count = %d AND post_author = %d AND post_status IN ('pending-revision', 'future-revision') ORDER BY ID DESC LIMIT 1",
+                $post_id,
+                $user_id
+            )
         );
 
         return $revision_id;

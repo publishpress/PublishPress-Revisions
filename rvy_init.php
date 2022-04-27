@@ -1,38 +1,35 @@
 <?php
-if ( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
+if (isset($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die();
 
 if (defined('REVISIONARY_FILE')) {
 	define('RVY_NETWORK', awp_is_mu() && rvy_plugin_active_for_network(plugin_basename(REVISIONARY_FILE)));
 }
 
+require_once(dirname(__FILE__).'/functions.php');
+require_once(dirname(__FILE__).'/utils.php');
+
 add_action('init', 'rvy_status_registrations', 40);
 
-add_action( 'rest_api_init', array( 'RVY_RestAPI', 'register_scheduled_rev_meta_field' ) );
-
-if (did_action('set_current_user')) {
+if (did_action('wp_loaded')) {
 	rvy_ajax_handler();
 } else {
-	add_action( 'set_current_user', 'rvy_ajax_handler', 20);
+	add_action( 'wp_loaded', 'rvy_ajax_handler', 20);
 }
 
 if (!empty($_REQUEST['preview']) && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id'])) {
-		add_filter('redirect_canonical', '_rvy_no_redirect_filter', 10, 2);
-	}
-
-add_action('init', 'rvy_maybe_redirect', 1);
+	add_filter('redirect_canonical', '_rvy_no_redirect_filter', 10, 2);
+}
 
 /*======== WP-Cron implentation for Email Notification Buffer ========*/
 add_action('init', 'rvy_set_notification_buffer_cron');
 add_action('rvy_mail_buffer_hook', 'rvy_send_buffered_mail' );
 add_filter('cron_schedules', 'rvy_mail_buffer_cron_interval');
 
-add_filter('wp_insert_post_empty_content', '_rvy_buffer_post_content', 10, 2);
+// wp-cron hook
+add_action('publish_revision_rvy', '_revisionary_publish_scheduled_cron');
 
-add_action('post_updated', '_rvy_restore_published_content', 99, 3);
-
-add_action('update_post_metadata', '_rvy_limit_postmeta_update', 10, 5);
-add_action('delete_post_metadata', '_rvy_limit_postmeta_update', 10, 5);
+add_action("update_option_rvy_scheduled_publish_cron", '_rvy_existing_schedules_to_cron', 10, 2);
 
 add_action('init', 
 	function() {
@@ -44,81 +41,23 @@ add_action('init',
 	}
 );
 
-
-function _rvy_limit_postmeta_update($block_update, $object_id, $meta_key, $meta_value, $prev_value) {
-	global $current_user;
-	
-	if (in_array($meta_key, apply_filters('revisionary_protect_published_meta_keys', ['_thumbnail_id', '_wp_page_template']), $object_id)) {
-		if ($status_obj = get_post_status_object(get_post_field('post_status', $object_id))) {
-			if (!empty($status_obj->public) || !empty($status_obj->private)) {
-				if (rvy_get_post_meta($object_id, "_save_as_revision_{$current_user->ID}", true) || !agp_user_can('edit_post', $object_id, '', ['skip_revision_allowance' => true])) {
-					$block_update = true;
-				}
-			}
-		}
-	}
-
-	return $block_update;
-}
-
-// Make sure upstream capability filtering never allows unauthorized updating of published post content
-function _rvy_restore_published_content( $post_ID, $post_after, $post_before ) {
-	global $wpdb, $current_user;
-
-	if (defined('RVY_DISABLE_CONTENT_BUFFER')) {
-		return;
-	}
-
-	if ($status_obj = get_post_status_object(get_post_field('post_status', $post_ID))) {
-		if (!empty($status_obj->public) || !empty($status_obj->private)) {
-			update_postmeta_cache($post_ID);
-			
-			if (rvy_get_post_meta($post_ID, "_save_as_revision_{$current_user->ID}", true) || !agp_user_can('edit_post', $post_ID, '', ['skip_revision_allowance' => true])) {
-				if ($post_content = rvy_get_transient('rvy_post_content_' . $post_ID)) {
-					$wpdb->update($wpdb->posts, ['post_content' => $post_content], ['ID' => $post_ID]);
-					rvy_delete_transient('rvy_post_content_' . $post_ID);
-				}
-			}
-		}
-	}
-}
-
 if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview']) 
 && ((empty($_REQUEST['preview_id']) && empty($_REQUEST['thumbnail_id']))
-|| (!empty($_REQUEST['preview_id']) && rvy_is_revision_status(get_post_field('post_status', (int) $_REQUEST['preview_id'])))
+|| (!empty($_REQUEST['preview_id']) && rvy_in_revision_workflow((int) $_REQUEST['preview_id']))
 )
 ) {
 	require_once('compat_rvy.php');
 	_rvy_jreviews_preview_compat();
 }
 
-function _rvy_buffer_post_content($maybe_empty, $postarr) {
-	global $wpdb, $current_user, $revisionary;
+// Default early beta testers to same revision status labeling they are already using. They will be directly notified of the new setting.
+$last_ver = get_option('revisionary_last_version');
 
-	if (empty($postarr['ID']) || defined('RVY_DISABLE_CONTENT_BUFFER')) { 
-		return $maybe_empty;
+if (version_compare($last_ver, '3.0-alpha', '>=') && version_compare($last_ver, '3.0-beta7', '<')) {
+	if (!get_option('pp_revisions_beta3_option_sync_done')) {
+		update_option('rvy_revision_statuses_noun_labels', 1);
+		update_option('pp_revisions_beta3_option_sync_done', 1);
 	}
-
-	if (!empty($postarr['post_type']) && $revisionary && empty($revisionary->enabled_post_types[$postarr['post_type']])) {
-		return $maybe_empty;
-	}
-
-	if ($status_obj = get_post_status_object(get_post_field('post_status', $postarr['ID']))) {
-		if (!empty($status_obj->public) || !empty($status_obj->private)) {
-			if (rvy_get_post_meta($postarr['ID'], "_save_as_revision_{$current_user->ID}", true) || !agp_user_can('edit_post', $postarr['ID'], '', ['skip_revision_allowance' => true])) {
-				if ($raw_content = $wpdb->get_var(
-					$wpdb->prepare(
-						"SELECT post_content FROM $wpdb->posts WHERE ID = %d",
-						$postarr['ID']
-					)
-				)) {
-					rvy_set_transient('rvy_post_content_' . $postarr['ID'], $raw_content, 60);
-				}
-			}
-		}
-	}
-
-	return $maybe_empty;
 }
 
 function rvy_mail_check_buffer($new_msg = [], $args = []) {
@@ -142,8 +81,6 @@ function rvy_send_buffered_mail() {
 function rvy_set_notification_buffer_cron() {
 	$cron_timestamp = wp_next_scheduled( 'rvy_mail_buffer_hook' );
 
-	//$wait_sec = time() - $cron_timestamp;
-
 	if (rvy_get_option('use_notification_buffer')) {
 		if (!$cron_timestamp) {
 			wp_schedule_event(time(), 'two_minutes', 'rvy_mail_buffer_hook');
@@ -161,9 +98,46 @@ function rvy_mail_buffer_cron_interval( $schedules ) {
  
     return $schedules;
 }
+
+function _revisionary_publish_scheduled_cron($args = []) {
+	global $wp_version;
+
+	if (get_option('rvy_scheduled_revisions') && (get_option('rvy_scheduled_publish_cron') || version_compare($wp_version, '5.9', '>='))) {
+		revisionary_publish_scheduled($args);
+	}
+}
+
 /*=================== End WP-Cron implementation ====================*/
 
 
+function _rvy_existing_schedules_to_cron($prev_use_cron, $use_cron) {
+	if ($use_cron && !$prev_use_cron) {
+		global $wpdb;
+
+		$time_gmt = current_time('mysql', 1);
+	
+		$results = $wpdb->get_results( 
+			$wpdb->prepare(
+				"SELECT * FROM $wpdb->posts WHERE post_type != 'revision' AND post_status != 'inherit' AND post_mime_type = 'future-revision' AND post_date_gmt > %s ORDER BY post_date_gmt DESC",
+				$time_gmt
+			)
+		);
+
+		foreach($results as $revision) {
+			wp_schedule_single_event(strtotime($revision->post_date_gmt), 'publish_revision_rvy', ['revision_id' => $revision->ID]);
+		}
+	}
+
+	if (!$use_cron && $prev_use_cron) {
+		require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
+		rvy_update_next_publish_date();
+	}
+}
+
+
+/*
+ * Revision previews: prevent redirect for non-standard post url
+ */
 function _rvy_no_redirect_filter($redirect, $orig) {
 	global $current_user, $wpdb;
 
@@ -174,128 +148,88 @@ function _rvy_no_redirect_filter($redirect, $orig) {
 	return $redirect;
 }
 
-function rvy_maybe_redirect() {
-	// temporary provision for 2.0 beta testers
-	if (strpos($_SERVER['REQUEST_URI'], 'page=rvy-moderation')) {
-		wp_redirect(str_replace('page=rvy-moderation', 'page=revisionary-q', esc_url($_SERVER['REQUEST_URI'])));
-		exit;
-	}
-}
-
-class RVY_RestAPI {
-    // register a postmeta field to flag the need for a redirect following scheduled revision creation
-    public static function register_scheduled_rev_meta_field() {
-			global $revisionary;
-
-			foreach(array_keys($revisionary->enabled_post_types) as $post_type ) {
-				// Thanks to Josh Pollock for demonstrating this:
-				// https://torquemag.io/2015/07/working-with-post-meta-data-using-the-wordpress-rest-api/
-				register_rest_field( $post_type, 'new_scheduled_revision', array(
-					'get_callback' => array( 'RVY_RestAPI', 'get_new_scheduled_revision_flag' ),
-					'schema' => null,
-					)
-				);
-
-				register_rest_field( $post_type, 'save_as_revision', array(
-					'get_callback' => array( 'RVY_RestAPI', 'get_save_as_revision_flag' ),
-					'schema' => null,
-					)
-				);
-			}
-    }
-    
-    public static function get_new_scheduled_revision_flag( $object ) {
-		global $current_user;
-        return ( isset( $object['id'] ) ) ? rvy_get_post_meta( $object['id'], "_new_scheduled_revision_{$current_user->ID}", true ) : false;
-	}
-	
-	public static function get_save_as_revision_flag( $object ) {
-		global $current_user;
-
-		if (!empty($object['id'])) {
-			return rvy_get_post_meta($object['id'], "_save_as_revision_{$current_user->ID}", true);
-		}
-
-		return false;
-    }
-}
-
 function rvy_ajax_handler() {
-	global $current_user;
+	global $current_user, $wpdb;
 
-	if (!empty($_REQUEST['rvy_ajax_field']) && !empty($_REQUEST['post_id'])) {
-		// @todo: make these query args consistent
-		if (in_array($_REQUEST['rvy_ajax_field'], ['save_as_pending', 'save_as_revision'])) {
-			$save_revision = isset($_REQUEST['rvy_ajax_value']) && in_array($_REQUEST['rvy_ajax_value'], ['true', true, 1, '1'], true);
-			rvy_update_post_meta((int) $_REQUEST['post_id'], "_save_as_revision_{$current_user->ID}", $save_revision);
-			update_postmeta_cache($_REQUEST['post_id']);
+	if (!empty($_REQUEST['rvy_ajax_field']) && !empty($_REQUEST['rvy_ajax_value'])) {
+		if ($post_id = intval($_REQUEST['rvy_ajax_value'])) {
+
+			switch ($_REQUEST['rvy_ajax_field']) {
+				case 'create_revision':
+					if (current_user_can('copy_post', $post_id)) {
+						$time_gmt = (!empty($_REQUEST['rvy_date_selection'])) ? intval($_REQUEST['rvy_date_selection']) : '';
+
+						require_once( dirname(REVISIONARY_FILE).'/revision-creation_rvy.php' );
+						$rvy_creation = new PublishPress\Revisions\RevisionCreation();
+
+						$revision_status = (rvy_get_option('auto_submit_revisions') && current_user_can('edit_post', $post_id)) ? 'pending-revision' : 'draft-revision';
+						$rvy_creation->createRevision($post_id, $revision_status, compact('time_gmt'));
+					}
+					exit;
+
+				case 'submit_revision':
+					// capability check is applied within function to support batch execution without redundant checks
+					require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');	
+					rvy_revision_submit($post_id);
+					$check_autosave = true;
+
+					break;
+
+				case 'create_scheduled_revision':
+					if (!empty($_REQUEST['rvy_date_selection'])) {
+						$time_gmt = intval($_REQUEST['rvy_date_selection']);
+
+						if (current_user_can('edit_post', $post_id)) {
+							require_once( dirname(REVISIONARY_FILE).'/revision-creation_rvy.php' );
+							$rvy_creation = new PublishPress\Revisions\RevisionCreation();
+							$rvy_creation->createRevision($post_id, 'future-revision', compact('time_gmt'));
+						}
+					}
+
+					break;
+
+				default:
+			}
+
+			if (!empty($check_autosave) && !defined('REVISIONARY_IGNORE_REVISION_AUTOSAVE')) {
+				if ($autosave_post = PublishPress\Revisions\Utils::get_post_autosave($post_id, $current_user->ID)) {
+					$main_post = get_post($post_id);
+
+					// If revision autosave is newer than revision post_updated date, copy over post data
+					if (strtotime($autosave_post->post_modified_gmt) > strtotime($main_post->post_modified_gmt)) {
+						$set_post_properties = [       
+							'post_content',
+							'post_content_filtered',
+							'post_title',
+							'post_excerpt',
+						];
+
+						foreach($set_post_properties as $prop) {
+							if (!empty($autosave_post->$prop)) {
+								$update_data[$prop] = $autosave_post->$prop;
+							}
+						}
+
+						$wpdb->update($wpdb->posts, $update_data, ['ID' => $post_id]);
+
+						$wpdb->delete($wpdb->posts, ['ID' => $autosave_post->ID]);
+					}
+				}
+			}
 
 			exit;
 		}
+
 	}
 
-	if (defined('DOING_AJAX') && DOING_AJAX && ('get-revision-diffs' == $_REQUEST['action'])) {
+	if (defined('DOING_AJAX') && DOING_AJAX && isset($_REQUEST['action']) && ('get-revision-diffs' == $_REQUEST['action'])) {
 		require_once( dirname(__FILE__).'/admin/history_rvy.php' );
 		new RevisionaryHistory();
 	}
 }
 
 function rvy_get_post_meta($post_id, $meta_key, $unused = false) {
-	global $wpdb;
-
-	$post_id = (is_object($post_id)) ? $post_id->ID : $post_id;
-
-	return $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s and post_id = %d",
-				$meta_key,
-				$post_id
-			)
-		);
-}
-
-function rvy_get_transient($transient) {
-	global $wpdb;
-
-	$option_name = '_transient_' . $transient;
-
-	$val = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT option_value FROM $wpdb->options WHERE option_name = %s",
-				$option_name
-			)
-		);
-
-	return (is_null($val)) ? '' : $val;
-}
-
-function rvy_set_transient($transient, $option_val, $timeout = 30) {
-	set_transient($transient, $option_val, $timeout);
-}
-
-function rvy_delete_transient($transient) {
-	global $wpdb;
-
-	$option_name = '_transient_timeout_' . $transient;
-
-	$wpdb->query(
-		$wpdb->prepare(
-			"DELETE FROM $wpdb->options WHERE option_name = %s",
-			$option_name
-		)
-	);
-
-	$option_name = '_transient_' . $transient;
-
-	$wpdb->get_var(
-			$wpdb->prepare(
-				"DELETE FROM $wpdb->options WHERE option_name = %s",
-				$option_name
-			)
-		);
-		
-	delete_transient($transient);
-
+	return get_post_meta($post_id, $meta_key, true);
 }
 
 function rvy_update_post_meta($post_id, $meta_key, $meta_value) {
@@ -310,62 +244,148 @@ function rvy_update_post_meta($post_id, $meta_key, $meta_value) {
 	if (!empty($revisionary)) {
 		$revisionary->internal_meta_update = true;
 	}
-
-	static $skip_deletion_keys;
-	
-	if (!isset($skip_deletion_keys)) {
-		$skip_deletion_keys = apply_filters('revisionary_multi_row_meta_keys', []);
-	}
-
-	if (!in_array($meta_key, $skip_deletion_keys)) {
-		// some extra low-level database operations until the cause of meta sync failure with WP 5.5 can be determined
-		rvy_delete_post_meta($post_id, $meta_key);
-	}
-
-	if ($meta_value) {
-		$wpdb->insert(
-			$wpdb->postmeta, 
-			['meta_value' => $meta_value, 'meta_key' => $meta_key, 'post_id' => $post_id]
-		);
-	}
 }
 
 function rvy_delete_post_meta($post_id, $meta_key) {
-	global $wpdb;
-
 	delete_post_meta($post_id, $meta_key);
-
-	// some extra low-level database operations until the cause of meta sync failure with WP 5.5 can be determined
-
-	$wpdb->query(
-		$wpdb->prepare(
-			"DELETE FROM $wpdb->postmeta WHERE meta_key = %s AND post_id = %d",
-			$meta_key,
-			$post_id
-		)
-	);
-
-	//wp_cache_delete($post_id, 'post_meta');
 }
 
 function rvy_status_registrations() {
-	register_post_status('pending-revision', array(
-		'label' => __('Pending Revision', 'revisionary'),
-		'labels' => (object)['publish' => __('Publish Revision', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Pending Revisions', 'revisionary'), 'short' => __('Pending', 'revisionary') ],
+	$labels = apply_filters('revisionary_status_labels',
+		rvy_get_option('revision_statuses_noun_labels') ?
+		[
+			'draft-revision' => [
+				'name' => esc_html__('Working Copy', 'revisionary'),
+				'submit' => esc_html__('Create Working Copy', 'revisionary'), 
+				'submit_short' => esc_html__('Create Copy', 'revisionary'), 
+				'submitting' => esc_html__('Creating Working Copy...', 'revisionary'),
+				'submitted' => esc_html__('Working Copy ready.', 'revisionary'),
+				'approve' => esc_html__('Approve Changes', 'revisionary'), 
+				'approving' => esc_html__('Approving Changes...', 'revisionary'),
+				'publish' => esc_html__('Publish Changes', 'revisionary'),
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Working Copies', 'revisionary'), 
+				'short' => esc_html__('Working Copy', 'revisionary'),
+				'count' => _n_noop('Working Copies <span class="count">(%d)</span>', 'Working Copies <span class="count">(%d)</span>', 'revisionary'),  // @todo: confirm API will support a fixed string
+				'basic' => 'Copy',
+			],
+		
+			'pending-revision' => [
+				'name' => esc_html__('Change Request', 'revisionary'),
+				'submit' => esc_html__('Submit Change Request', 'revisionary'),
+				'submit_short' => esc_html__('Submit Changes', 'revisionary'),
+				'submitting' => esc_html__('Submitting Changes...', 'revisionary'),
+				'submitted' => esc_html__('Changes Submitted.', 'revisionary'),
+				'approve' => esc_html__('Approve Changes', 'revisionary'), 
+				'approving' => esc_html__('Approving Changes...', 'revisionary'),
+				'publish' => esc_html__('Publish Changes', 'revisionary'), 
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Change Requests', 'revisionary'), 
+				'short' => esc_html__('Change Request', 'revisionary'),
+				'count' => _n_noop('Change Requests <span class="count">(%d)</span>', 'Change Requests <span class="count">(%d)</span>', 'revisionary'),
+				'enable' => esc_html__('Enable Change Requests', 'revisionary'),
+				'basic' => 'Change Request',
+			],
+
+			'future-revision' => [
+				'name' => esc_html__('Scheduled Change', 'revisionary'),
+				'submit' => esc_html__('Schedule Changes', 'revisionary'),
+				'submit_short' => esc_html__('Schedule Changes', 'revisionary'),
+				'submitting' => esc_html__('Scheduling Changes...', 'revisionary'),
+				'submitted' => esc_html__('Changes are Scheduled.', 'revisionary'),
+				'approve' => esc_html__('Schedule Changes', 'revisionary'), 
+				'publish' => esc_html__('Publish Changes', 'revisionary'), 
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Scheduled Changes', 'revisionary'), 
+				'short' => esc_html__('Scheduled Change', 'revisionary'),
+				'count' => _n_noop('Scheduled Changes <span class="count">(%d)</span>', 'Scheduled Changes <span class="count">(%d)</span>', 'revisionary'),
+				'basic' => 'Scheduled Change',
+			],
+		]
+
+		:
+		[
+			'draft-revision' => [
+				'name' => esc_html__('Unsubmitted Revision', 'revisionary'),
+				'submit' => esc_html__('New Revision', 'revisionary'), 
+				'submit_short' => esc_html__('New Revision', 'revisionary'), 
+				'submitting' => esc_html__('Creating Revision...', 'revisionary'),
+				'submitted' => esc_html__('Revision ready to edit.', 'revisionary'),
+				'approve' => esc_html__('Approve Revision', 'revisionary'), 
+				'publish' => esc_html__('Publish Revision', 'revisionary'), 
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Unsubmitted Revisions', 'revisionary'), 
+				'short' => esc_html__('Not Submitted', 'revisionary'),
+				'count' => _n_noop('Not Submitted for Approval <span class="count">(%s)</span>', 'Not Submitted for Approval <span class="count">(%s)</span>', 'revisionary'),   // @todo: confirm API will support a fixed string
+				'basic' => 'Revision',
+			],
+		
+			'pending-revision' => [
+				'name' => esc_html__('Submitted Revision', 'revisionary'),
+				'submit' => esc_html__('Submit Revision', 'revisionary'), 
+				'submitting' => esc_html__('Submitting Revision...', 'revisionary'),
+				'submitted' => esc_html__('Revision Submitted.', 'revisionary'),
+				'submit_short' => esc_html__('Submit Revision', 'revisionary'), 
+				'approve' => esc_html__('Approve Revision', 'revisionary'), 
+				'publish' => esc_html__('Publish Revision', 'revisionary'), 
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Submitted Revisions', 'revisionary'), 
+				'short' => esc_html__('Submitted', 'revisionary'),
+				'count' => _n_noop('Submitted for Approval <span class="count">(%s)</span>', 'Submitted for Approval <span class="count">(%s)</span>', 'revisionary'),
+				'basic' => 'Revision',
+			],
+
+			'future-revision' => [
+				'name' => esc_html__('Scheduled Revision', 'revisionary'),
+				'submit' => esc_html__('Schedule Revision', 'revisionary'), 
+				'submit_short' => esc_html__('Schedule Revision', 'revisionary'), 
+				'submitting' => esc_html__('Scheduling Revision...', 'revisionary'),
+				'submitted' => esc_html__('Revision Scheduled.', 'revisionary'),
+				'approve' => esc_html__('Approve Revision', 'revisionary'), 
+				'publish' => esc_html__('Publish Revision', 'revisionary'), 
+				'save' => esc_html__('Save Revision', 'revisionary'), 
+				'update' => esc_html__('Update Revision', 'revisionary'), 
+				'plural' => esc_html__('Scheduled Revisions', 'revisionary'), 
+				'short' => esc_html__('Scheduled', 'revisionary'),
+				'count' => _n_noop('Scheduled Revision <span class="count">(%s)</span>', 'Scheduled Revisions <span class="count">(%s)</span>', 'revisionary'),
+				'basic' => 'Scheduled Revision',
+			],
+		]
+	);
+
+	register_post_status('draft-revision', array(
+		'label' => $labels['draft-revision']['name'],
+		'labels' => (object) $labels['draft-revision'],
 		'protected' => true,
 		'internal' => true,
-		'label_count' => _n_noop('Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>'),
+		'label_count' => $labels['draft-revision']['count'],
+		'exclude_from_search' => false,
+		'show_in_admin_all_list' => false,
+		'show_in_admin_status_list' => false,
+	));
+	
+	register_post_status('pending-revision', array(
+		'label' => $labels['pending-revision']['name'],
+		'labels' => (object) $labels['pending-revision'],
+		'protected' => true,
+		'internal' => true,
+		'label_count' => $labels['pending-revision']['count'],
 		'exclude_from_search' => false,
 		'show_in_admin_all_list' => false,
 		'show_in_admin_status_list' => false,
 	));
 
 	register_post_status('future-revision', array(
-		'label' => __('Scheduled Revision', 'revisionary'),
-		'labels' => (object)['publish' => __('Publish Revision', 'revisionary'), 'save' => __('Save Revision', 'revisionary'), 'update' => __('Update Revision', 'revisionary'), 'plural' => __('Scheduled Revisions', 'revisionary'), 'short' => __('Scheduled', 'revisionary')],
+		'label' => $labels['future-revision']['name'],
+		'labels' => (object) $labels['future-revision'],
 		'protected' => true,
 		'internal' => true,
-		'label_count' => _n_noop('Scheduled <span class="count">(%s)</span>', 'Scheduled <span class="count">(%s)</span>'),
+		'label_count' => $labels['future-revision']['count'],
 		'exclude_from_search' => false,
 		'show_in_admin_all_list' => false,
 		'show_in_admin_status_list' => false,
@@ -374,6 +394,7 @@ function rvy_status_registrations() {
 	foreach(rvy_get_manageable_types() as $post_type) {
 		add_filter("rest_{$post_type}_collection_params", function($query_params, $post_type = '') 
 			{
+				$query_params['status']['items']['enum'] []= 'draft-revision';
 				$query_params['status']['items']['enum'] []= 'pending-revision';
 				$query_params['status']['items']['enum'] []= 'future-revision';
 				return $query_params;
@@ -384,7 +405,8 @@ function rvy_status_registrations() {
 	// WP > 5.3: Don't allow revision statuses to be blocked at the REST API level. Our own filters are sufficient to regulate their usage.
 	add_action( 'rest_api_init', function() {
 			global $wp_post_statuses;
-			foreach( ['pending-revision', 'future-revision'] as $status) {
+
+			foreach(rvy_revision_statuses() as $status) {
 				if (isset($wp_post_statuses[$status])) {
 					$wp_post_statuses[$status]->internal = false;
 				}
@@ -394,13 +416,52 @@ function rvy_status_registrations() {
 
 	add_action( 'rest_api_init', function() {
 		global $wp_post_statuses;
-		foreach( ['pending-revision', 'future-revision'] as $status) {
+
+		foreach(rvy_revision_statuses() as $status) {
 			if (isset($wp_post_statuses[$status])) {
 				$wp_post_statuses[$status]->internal = true;
 			}
 		}
 	}, 99
 );
+}
+
+function pp_revisions_status_label($status_name, $label_property) {
+	global $wp_post_statuses;
+
+	if (!empty($wp_post_statuses[$status_name]) && !empty($wp_post_statuses[$status_name]->labels->$label_property)) {
+		return $wp_post_statuses[$status_name]->labels->$label_property;
+	} else {
+		return '';
+	}
+}
+
+function pp_revisions_label($label_name) {
+	static $labels;
+
+	if (empty($labels)) {
+		$labels = apply_filters('revisionary_labels',
+		[
+			'my_revisions' => (rvy_get_option('revision_statuses_noun_labels')) 
+			? 							_n_noop('%sMy Copies & Changes%s(%s)</span>', '%sMy Copies & Changes%s(%s)</span>', 'revisionary')
+			: 							_n_noop('%sMy Revisions%s(%s)</span>', '%sMy Revisions%s(%s)</span>', 'revisionary'),
+			
+			'my_published_posts'		=> _n_noop('%sRevisions to My Posts%s(%s)</span>', '%sRevisions to My Posts%s(%s)', 'revisionary'),
+
+			'queue_col_revision' 		=> esc_html__('Revision', 'revisionary'),
+			'queue_col_revised_by' 		=> esc_html__('Revised By', 'revisionary'),
+			'queue_col_revision_date' 	=> esc_html__('Revision Date', 'revisionary'),
+			'queue_col_post_author' 	=> esc_html__('Post Author', 'revisionary'),
+			'queue_col_published_post' 	=> esc_html__('Published Post', 'revisionary'),
+			'update_revision' 			=> esc_html__('Update Revision', 'revisionary'),
+
+			'submit_revision' => (rvy_get_option('revision_statuses_noun_labels'))
+			?							esc_html__('Submit Revision', 'revisionary')
+			:							esc_html__('Submit Changes', 'revisionary')
+		]);
+	}
+
+	return (isset($labels[$label_name])) ? $labels[$label_name] : '';
 }
 
 // WP function is_plugin_active_for_network() is defined in admin
@@ -450,18 +511,68 @@ function rvy_add_revisor_custom_caps() {
 	if ( ! rvy_get_option( 'revisor_role_add_custom_rolecaps' ) )
 		return;
 
-	global $wp_roles;
+	global $wp_roles, $revisionary;
 
+	$custom_types = array_intersect_key(
+		get_post_types(['_builtin' => false], 'object'),
+		$revisionary->enabled_post_types
+	);
+		
 	if ( isset( $wp_roles->roles['revisor'] ) ) {
-		if ( $custom_types = get_post_types( array( 'public' => true, '_builtin' => false ), 'object' ) ) {
+		if ($custom_types) {
 			foreach( $custom_types as $post_type => $type_obj ) {
 				$cap = $type_obj->cap;	
 				$custom_caps = array_fill_keys( array( $cap->read_private_posts, $cap->edit_posts, $cap->edit_others_posts, "delete_{$post_type}s" ), true );
+
+				if (!empty($type_obj->cap->edit_published_posts)) {
+					$list_published_cap = str_replace('edit_', 'list_', $type_obj->cap->edit_published_posts);
+					$custom_caps[$list_published_cap] = true;
+				}
+
+				if (!empty($type_obj->cap->edit_private_posts)) {
+					$list_private_cap = str_replace('edit_', 'list_', $type_obj->cap->edit_private_posts);
+					$custom_caps[$list_private_cap] = true;
+				}
 
 				$wp_roles->roles['revisor']['capabilities'] = array_merge( $wp_roles->roles['revisor']['capabilities'], $custom_caps );
 				$wp_roles->role_objects['revisor']->capabilities = array_merge( $wp_roles->role_objects['revisor']->capabilities, $custom_caps );
 			}
 		}
+	}
+
+	if ( isset( $wp_roles->roles['contributor'] ) ) {
+		if ($custom_types) {
+			foreach( $custom_types as $post_type => $type_obj ) {
+				$cap = $type_obj->cap;	
+				$custom_caps = [];
+				
+				if (!empty($type_obj->cap->edit_published_posts)) {
+					$list_published_cap = str_replace('edit_', 'list_', $type_obj->cap->edit_published_posts);
+					$custom_caps[$list_published_cap] = true;
+				}
+
+				if (!empty($type_obj->cap->edit_private_posts)) {
+					$list_private_cap = str_replace('edit_', 'list_', $type_obj->cap->edit_private_posts);
+					$custom_caps[$list_private_cap] = true;
+				}
+
+				$wp_roles->roles['contributor']['capabilities'] = array_merge( $wp_roles->roles['contributor']['capabilities'], $custom_caps );
+				$wp_roles->role_objects['contributor']->capabilities = array_merge( $wp_roles->role_objects['contributor']->capabilities, $custom_caps );
+			}
+		}
+	}
+
+	global $current_user;
+
+	foreach(['contributor', 'revisor'] as $role_name) {
+		if (in_array($role_name, $current_user->roles)) {
+			$current_user->allcaps = array_merge($current_user->allcaps, $wp_roles->role_objects[$role_name]->capabilities);
+		}
+	}
+
+	if (function_exists('presspermit')) {
+		$user = presspermit()->getUser();
+		$user->allcaps = $current_user->allcaps;
 	}
 }
 
@@ -501,9 +612,9 @@ function rvy_detect_post_id() {
 	} elseif ( ! empty( $_GET['page_id'] ) ) {
 		$post_id = (int) $_GET['page_id'];
 
-	} elseif (defined('REST_REQUEST') && REST_REQUEST && strpos($_SERVER['REQUEST_URI'], 'autosaves')) {
+	} elseif (defined('REST_REQUEST') && REST_REQUEST && isset($_SERVER['REQUEST_URI']) && strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'autosaves')) {
 		require_once( dirname(__FILE__).'/rest_rvy.php' );
-		$post_id = Revisionary_REST::get_id_element($_SERVER['REQUEST_URI'], 1);
+		$post_id = Revisionary_REST::get_id_element(esc_url_raw($_SERVER['REQUEST_URI']), 1);
 
 	} elseif (defined('DOING_AJAX') && DOING_AJAX) {
 		$post_id = apply_filters('revisionary_detect_id', 0, ['is_ajax' => true]);
@@ -528,13 +639,18 @@ function rvy_add_revisor_role( $requested_blog_id = '' ) {
 		'edit_pages' => true,
 		'delete_pages' => true,
 		'edit_others_pages' => true,
+		'list_published_posts' => true,
+		'list_published_pages' => true,
+		'list_private_posts' => true,
+		'list_private_pages' => true,
+		'upload_files' => true,
 		'level_3' => true,
 		'level_2' => true,
 		'level_1' => true,
 		'level_0' => true
 	);
 
-	$wp_roles->add_role( 'revisor', __( 'Revisor', 'revisionary' ), $wp_role_caps );
+	$wp_roles->add_role( 'revisor', esc_html__( 'Revisor', 'revisionary' ), $wp_role_caps );
 }
 
 function rvy_apply_role_translation($translations, $text, $context, $domain) {
@@ -551,31 +667,29 @@ function rvy_role_translation_support() {
 }
 
 // wrapper function for use with wp_cron hook
-function revisionary_publish_scheduled() {
+function revisionary_publish_scheduled($args = []) {
 	require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
-	rvy_publish_scheduled_revisions();
+	rvy_publish_scheduled_revisions($args);
 }
 
-function revisionary_refresh_postmeta($post_id, $set_value = null, $args = []) {
+function revisionary_refresh_postmeta($post_id, $args = []) {
 	global $wpdb;
 
 	$ignore_revisions = (!empty($args['ignore_revisions'])) ? $args['ignore_revisions'] : [];
 
-	if (is_null($set_value)) {
-		$revision_status_csv = "'pending-revision', 'future-revision'";
+	$ignore_clause = ($ignore_revisions) ? " AND ID NOT IN (" . implode(",", array_map('intval', $ignore_revisions)) . ")" : '';
 
-		$ignore_clause = ($ignore_revisions) ? " AND ID NOT IN (" . implode(",", array_map('intval', $ignore_revisions)) . ")" : '';
+	$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
-		$has_revisions = $wpdb->get_var(
-			// account for post deletion
-			$wpdb->prepare(
-				"SELECT ID FROM $wpdb->posts WHERE post_status IN ($revision_status_csv) $ignore_clause AND comment_count = %d LIMIT 1",
-				$post_id
-			)
-		);
+	$has_revisions = $wpdb->get_var(
+		// account for post deletion
+		$wpdb->prepare(
+			"SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ('$revision_status_csv') $ignore_clause AND comment_count = %d LIMIT 1",
+			$post_id
+		)
+	);
 
-		$set_value = !empty($has_revisions);
-	}
+	$set_value = !empty($has_revisions);
 
 	if ($set_value) {
 		rvy_update_post_meta($post_id, '_rvy_has_revisions', $set_value);
@@ -591,12 +705,20 @@ if (!empty($_REQUEST['rvy_flush_flags'])) {
 function revisionary_refresh_revision_flags() {
 	global $wpdb;
 
-	$status_csv = "'" . implode("','", rvy_filtered_statuses()) . "'";
-	$arr_have_revisions = $wpdb->get_col("SELECT r.comment_count FROM $wpdb->posts r INNER JOIN $wpdb->posts p ON r.comment_count = p.ID WHERE p.post_status IN ($status_csv) AND r.post_status IN ('pending-revision', 'future-revision')");
+	$status_csv = implode("','", array_map('sanitize_key', rvy_filtered_statuses()));
+	$revision_base_status_csv = implode("','", array_map('sanitize_key', rvy_revision_base_statuses()));
+	$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
+
+	$arr_have_revisions = $wpdb->get_col(
+		"SELECT r.comment_count FROM $wpdb->posts r INNER JOIN $wpdb->posts p ON r.comment_count = p.ID"
+		. " WHERE p.post_status IN ('$status_csv') AND r.post_status IN ('$revision_base_status_csv') AND r.post_mime_type IN ('$revision_status_csv')"
+	);
+	
 	$have_revisions = implode("','", array_map('intval', array_unique($arr_have_revisions)));
 
 	if ($ids = $wpdb->get_col("SELECT meta_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_has_revisions' AND post_id NOT IN ('$have_revisions')")) {
-		$wpdb->query("DELETE FROM $wpdb->postmeta WHERE meta_id IN (" . implode(",", array_map('intval', $ids)) . ")");
+		$id_csv = implode("','", array_map('intval', $ids));
+		$wpdb->query("DELETE FROM $wpdb->postmeta WHERE meta_id IN ('$id_csv')");
 	}
 
 	$have_flag_ids = $wpdb->get_col("SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_has_revisions'");
@@ -693,10 +815,10 @@ function rvy_update_option( $option_basename, $option_val, $sitewide = -1 ) {
 		$sitewide = isset( $rvy_options_sitewide ) && ! empty( $rvy_options_sitewide[$option_basename] );
 	}
 		
-	if ( $sitewide ) {
-		update_site_option( "rvy_$option_basename", $option_val );
+	if ($sitewide) {
+		update_site_option("rvy_$option_basename", $option_val);
 	} else { 
-		update_option( "rvy_$option_basename", $option_val );
+		update_option("rvy_$option_basename", $option_val);
 	}
 }
 
@@ -739,6 +861,10 @@ function rvy_retrieve_options( $sitewide = false ) {
 		$rvy_blog_options = apply_filters( 'options_rvy', $rvy_blog_options );
 		return $rvy_blog_options;
 	}
+}
+
+function rvy_filter_option($option_basename, $args) {
+	return apply_filters("pp_revisions_option_{$option_basename}", rvy_get_option($option_basename), $args);
 }
 
 function rvy_get_option($option_basename, $sitewide = -1, $get_default = false) {
@@ -812,6 +938,8 @@ function rvy_confirm_async_execution($action) {
 	if ( is_array($requested_actions) && isset($requested_actions[$action]) ) {
 		unset( $requested_actions[$action] );
 		update_option( 'requested_remote_actions_rvy', $requested_actions );
+	} else {
+		exit;
 	}
 }
 
@@ -833,8 +961,6 @@ function rvy_error( $err_slug, $arg2 = '' ) {
 }
 
 function rvy_check_duplicate_mail($new_msg, $sent_mail, $buffer) {
-	// $new_msg = array_merge(compact('address', 'title', 'message'), ['time' => strtotime(current_time( 'mysql' )), 'time_gmt' => time()], $args);
-
 	foreach([$sent_mail, $buffer] as $compare_set) {
 		foreach($compare_set as $sent) {
 			foreach(['address', 'title', 'message'] as $field) {
@@ -856,9 +982,12 @@ function rvy_check_duplicate_mail($new_msg, $sent_mail, $buffer) {
 	}
 }
 
+/*
+ * wp_mail() wrapper, also implements mail buffer
+ * 
+ * args: ['revision_id' => $revision_id, 'post_id' => $published_post->ID, 'notification_type' => $notification_type, 'notification_class' => $notification_class]
+ */
 function rvy_mail( $address, $title, $message, $args ) {
-	// args: ['revision_id' => $revision_id, 'post_id' => $published_post->ID, 'notification_type' => $notification_type, 'notification_class' => $notification_class]
-
 	/*
 	 * [wp-cron action checks wp_option revisionary_mail_buffer. If wait time has elapsed, send buffered emails (up to limit per minute)]
 	 * 
@@ -911,9 +1040,9 @@ function rvy_mail( $address, $title, $message, $args ) {
 }
 
 function rvy_settings_scripts() {
-	if (defined('REVISIONARY_PRO_VERSION')) {
+	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 		$suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '.dev' : '';
-		wp_enqueue_script('revisionary-pro-settings', plugins_url('', REVISIONARY_FILE) . "/includes-pro/settings-pro{$suffix}.js", ['jquery', 'jquery-form'], REVISIONARY_VERSION, true);
+		wp_enqueue_script('revisionary-pro-settings', plugins_url('', REVISIONARY_FILE) . "/includes-pro/settings-pro{$suffix}.js", ['jquery', 'jquery-form'], PUBLISHPRESS_REVISIONS_VERSION, true);
 	}
 }
 
@@ -952,47 +1081,11 @@ function rvy_is_status_published( $status ) {
 	return false;
 }
 
-function rvy_revision_statuses() {
-	return array_map('sanitize_key', (array) apply_filters('rvy_revision_statuses', array('pending-revision', 'future-revision')));
-}
-
-function rvy_is_revision_status($status) {
-	return in_array($status, rvy_revision_statuses());
-}
-
-function rvy_post_id($revision_id) {
-	static $busy;
-
-	if (!empty($busy)) {
-		return;
-	}
-
-	$busy = true;
-	$published_id = rvy_get_post_meta( $revision_id, '_rvy_base_post_id', true );
-	$busy = false;
-
-	if (empty($published_id)) {
-		if ($_post = get_post($revision_id)) {
-			// if ID passed in is not a revision, return it as is
-			if (('revision' != $_post->post_type) && !rvy_is_revision_status($_post->post_status)) {
-				return $revision_id;
-			} elseif('revision' == $_post->post_type) {
-				return $_post->post_parent;
-			} else {
-				rvy_update_post_meta( $revision_id, '_rvy_base_post_id', $_post->comment_count );
-				return $_post->comment_count;
-			}
-		}
-	}
-
-	return ($published_id) ? $published_id : 0;
-}
-
 function rvy_halt( $msg, $title = '' ) {
 	if ( ! $title ) {
-		$title = __( 'Revision Workflow', 'revisionary' );
+		$title = esc_html__( 'Revision Workflow', 'revisionary' );
 	}
-	wp_die( $msg, $title, array( 'response' => 200 ) );
+	wp_die( esc_html($msg), esc_html($title), array( 'response' => 200 ) );
 }
 
 function _revisionary_dashboard_dismiss_msg() {
@@ -1026,11 +1119,7 @@ function rvy_get_manageable_types() {
 	}
 
 	foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
-		//if ( ! empty( $current_user->allcaps[$type_obj->cap->publish_posts] ) 
-		//&& ! empty( $current_user->allcaps[$type_obj->cap->edit_published_posts] ) 
-		//&& ! empty( $current_user->allcaps[$type_obj->cap->edit_others_posts] ) ) {
-			$types[$post_type]= $post_type;
-		//}
+		$types[$post_type]= $post_type;
 	}
 	
 	$types = array_diff_key($types, array('acf-field-group' => true));
@@ -1038,33 +1127,8 @@ function rvy_get_manageable_types() {
 }
 
 // thanks to GravityForms for the nifty dismissal script
-if ( in_array( basename($_SERVER['PHP_SELF']), array('admin.php', 'admin-ajax.php') ) ) {
+if (isset($_SERVER['PHP_SELF']) && in_array( basename($_SERVER['PHP_SELF']), array('admin.php', 'admin-ajax.php') ) ) {
 	add_action( 'wp_ajax_rvy_dismiss_msg', '_revisionary_dashboard_dismiss_msg' );
-}
-
-function revisionary_copy_meta_field( $meta_key, $from_post_id, $to_post_id, $mirror_empty = true ) {
-	global $wpdb;
-
-	if ( ! $to_post_id )
-		return;
-	
-	if ( $_post = $wpdb->get_row( 
-		$wpdb->prepare(
-			"SELECT * FROM $wpdb->posts WHERE ID = %d",
-			$from_post_id
-		)
-	) ) {
-		if ( $source_meta = $wpdb->get_row( 
-				$wpdb->prepare("SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s AND post_id = %d", $meta_key, $from_post_id )
-			)
-		) {
-			rvy_update_post_meta($to_post_id, $meta_key, $source_meta->meta_value);
-
-		} elseif ($mirror_empty && in_array($meta_key, apply_filters('revisionary_removable_meta_fields', [], $to_post_id))) {
-			// Disable postmeta deletion until further testing
-			delete_post_meta($to_post_id, $meta_key);
-		}
-	}
 }
 
 function rvy_is_network_activated($plugin_file = '')
@@ -1077,7 +1141,7 @@ function rvy_is_network_activated($plugin_file = '')
 }
 
 function rvy_init() {
-	global $wp_roles;
+	global $wp_roles, $wp_version;
 
 	if ( ! isset( $wp_roles->roles['revisor'] ) ) {
 		rvy_add_revisor_role();
@@ -1089,15 +1153,8 @@ function rvy_init() {
 
 	rvy_role_translation_support();
 
-	/*  // wp_cron hook @todo
-	if ( rvy_get_option( 'scheduled_revisions' ) ) {
-		add_action( 'publish_revision_rvy', 'revisionary_publish_scheduled' ); //wp-cron hook
-	}
-	*/
-
 	if ( is_admin() ) {
-		require_once( dirname(__FILE__).'/admin/admin-init_rvy.php' );
-		rvy_load_textdomain();
+		require_once(dirname(__FILE__).'/admin/admin-init_rvy.php');
 
 		if (defined('REVISIONARY_BULK_ACTION_EARLY_EXECUTION') || !isset($_REQUEST['action2'])) {
 			rvy_admin_init();
@@ -1108,27 +1165,29 @@ function rvy_init() {
 	} else {		// @todo: fix links instead
 		// fill in the missing args for Pending / Scheduled revision preview link from Edit Posts / Pages
 		if ( isset($_SERVER['HTTP_REFERER']) 
-		&& ( false !== strpos( urldecode($_SERVER['HTTP_REFERER']),'p-admin/edit-pages.php') 
-		|| false !== strpos( urldecode($_SERVER['HTTP_REFERER']),'p-admin/edit.php') ) ) {
+		&& ( false !== strpos( urldecode(esc_url_raw($_SERVER['HTTP_REFERER'])),'p-admin/edit-pages.php') 
+		|| false !== strpos( urldecode(esc_url_raw($_SERVER['HTTP_REFERER'])),'p-admin/edit.php') ) ) {
 
 			if ( ! empty($_GET['p']) ) {
 				if ( rvy_get_option( 'scheduled_revisions' ) || rvy_get_option( 'pending_revisions' ) ) {
-					if ( $post = get_post( $_GET['p'] ) ) {
-						if (rvy_is_revision_status($post->post_status)) {
+					if ( $post = get_post( sanitize_text_field($_GET['p']) ) ) {
+						if (rvy_in_revision_workflow($post)) {
 							$_GET['preview'] = 1;
 						}
 					}
 				}
 			}
 		// Is this an asynchronous request to publish scheduled revisions?
-		} elseif ( ! empty($_GET['action']) && ('publish_scheduled_revisions' == $_GET['action']) && rvy_get_option( 'scheduled_revisions' ) ) {
+		} elseif (!empty($_GET['action']) && ('publish_scheduled_revisions' == $_GET['action']) && rvy_get_option('scheduled_revisions') 
+		&& (!rvy_get_option('scheduled_publish_cron') && version_compare($wp_version, '5.9', '<'))) {
 				require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
 				add_action( 'rvy_init', '_rvy_publish_scheduled_revisions' );
 		}
 	}
 	
-	if ( empty( $_GET['action'] ) || ( 'publish_scheduled_revisions' != $_GET['action'] ) ) {
-		if ( ! strpos( $_SERVER['REQUEST_URI'], 'login.php' ) && rvy_get_option( 'scheduled_revisions' ) ) {
+	if (empty($_GET['action']) || (isset($_GET['action']) && ('publish_scheduled_revisions' != $_GET['action']))) {
+		if (isset($_SERVER['REQUEST_URI']) && ! strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'login.php' ) && rvy_get_option( 'scheduled_revisions' ) 
+		&& (!rvy_get_option('scheduled_publish_cron') && version_compare($wp_version, '5.9', '<'))) {
 		
 			// If a previously requested asynchronous request was ineffective, perform the actions now
 			// (this is not executed if the current URI is from a manual publication request with action=publish_scheduled_revisions)
@@ -1172,6 +1231,7 @@ function rvy_init() {
 
 	global $revisionary;
 	$revisionary = new Revisionary();
+	$revisionary->init();
 }
 
 function rvy_is_full_editor($post, $args = []) {
@@ -1204,7 +1264,6 @@ function rvy_is_full_editor($post, $args = []) {
 			return false;
 		}
 
-		// @todo: skip_revision_allowance?
 		return $revisionary->canEditPost($post, ['simple_cap_check' => true]);
 	}
 
@@ -1236,14 +1295,24 @@ function rvy_is_post_author($post, $user = false) {
 }
 
 function rvy_preview_url($revision, $args = []) {
+	if (is_scalar($revision)) {
+		$revision = get_post($revision);
+	}
+	
 	$defaults = ['post_type' => $revision->post_type];  // support preview url for past revisions, which are stored with post_type = 'revision'
 	foreach(array_keys($defaults) as $var) {
 		$$var = (!empty($args[$var])) ? $args[$var] : $defaults[$var]; 
 	}
 
+	if ('revision' == $post_type) {
+		$post_type = get_post_field('post_type', $revision->post_parent);
+	}
+
+	$post_type = sanitize_key($post_type);
+
 	if ($post_type_obj = get_post_type_object($revision->post_type)) {
-		if (empty($post_type_obj->public)) { // For non-public types, preview is not available so default to Compare Revisions screen
-			return apply_filters('revisionary_preview_url', admin_url("revision.php?revision=$revision->ID"), $revision, $args);
+		if (empty($post_type_obj->public) && !defined('FL_BUILDER_VERSION') && !apply_filters('revisionary_private_type_use_preview_url', false, $revision)) { // For non-public types, preview is not available so default to Compare Revisions screen
+			return apply_filters('revisionary_preview_url', rvy_admin_url("revision.php?revision=$revision->ID"), $revision, $args);
 		}
 	}
 
@@ -1287,7 +1356,7 @@ function rvy_preview_url($revision, $args = []) {
 	}
 
 	if (!defined('REVISIONARY_PREVIEW_NO_CACHEBUST')) {
-		$preview_url = add_query_arg('nc', substr(md5(rand()), 1, 8), $preview_url);
+		$preview_url = rvy_nc_url($preview_url);
 	}
 
 	return apply_filters('revisionary_preview_url', $preview_url, $revision, $args);
@@ -1302,12 +1371,20 @@ function rvy_set_ma_post_authors($post_id, $authors)
 	wp_set_object_terms($post_id, $authors, 'author');
 }
 
-function rvy_filtered_statuses($output = 'names') {
-	return apply_filters(
+function rvy_filtered_statuses($args = []) {
+	$defaults = ['output' => 'names', 'return' => 'array'];
+	$args = array_merge($defaults, $args);
+	foreach (array_keys($defaults) as $var) {
+		$$var = $args[$var];
+	}
+
+	$arr = apply_filters(
 		'revisionary_main_post_statuses', 
 		get_post_stati( ['public' => true, 'private' => true], $output, 'or' ),
 		$output
 	);
+
+	return ('csv' == $return) ? "'" . implode("','", $arr) . "'" : $arr;
 }
 
 // REST API Cache plugin compat
@@ -1316,10 +1393,14 @@ add_action('init', 'rvy_rest_cache_compat', 9999);
 function rvy_rest_cache_compat() {
 	global $wp_post_types;
 
-	$uri = $_SERVER['REQUEST_URI'];
+	if (!isset($_SERVER['REQUEST_URI'])) {
+		return;
+	}
+
+	$uri = esc_url_raw($_SERVER['REQUEST_URI']);
 
 	$rest_cache_active = false;
-	foreach(['rvy_ajax_field', 'rvy_ajax_value', 'revision_submitted', 'revision_updated'] as $param) {
+	foreach(['rvy_ajax_field', 'rvy_ajax_value'] as $param) {
 		if (strpos($uri, $param)) {
 			$rest_cache_active = true;
 			break;
@@ -1328,7 +1409,6 @@ function rvy_rest_cache_compat() {
 
 	$rest_cache_active = $rest_cache_active 
 	|| (strpos($uri, '_locale=user') && strpos($uri, 'wp-json') && strpos($uri, '/posts/') && rvy_is_plugin_active('wp-rest-cache/wp-rest-cache.php'));
-	//|| ((!empty($_REQUEST['wp-remove-post-lock']) || strpos($uri, '_locale=user')) && rvy_is_plugin_active('wp-rest-cache/wp-rest-cache.php'));
 
 	if ($rest_cache_active) {
 		foreach(array_keys($wp_post_types) as $key) {
@@ -1343,8 +1423,12 @@ function rvy_rest_cache_compat() {
 add_filter('wp_rest_cache/skip_caching', 'rvy_rest_cache_skip');
 
 function rvy_rest_cache_skip($skip) {
-	$uri = $_SERVER['REQUEST_URI'];
-	$uncached_params = array_merge($uncached_params, ['rvy_ajax_field', 'rvy_ajax_value', 'revision_submitted', 'revision_updated']);
+	if (!isset($_SERVER['REQUEST_URI'])) {
+		return;
+	}
+
+	$uri = esc_url_raw($_SERVER['REQUEST_URI']);
+	$uncached_params = array_merge($uncached_params, ['rvy_ajax_field', 'rvy_ajax_value']);
 
 	foreach($uncached_params as $param) {
 		if (strpos($uri, $param)) {
@@ -1355,39 +1439,3 @@ function rvy_rest_cache_skip($skip) {
 
 	return $skip;
 }
-
-/**
- * Full WP Engine cache flush (Hold for possible future use as needed)
- *
- * Based on WP Engine Cache Flush by Aaron Holbrook
- * https://github.org/a7/wpe-cache-flush/
- * http://github.org/a7/
- */
-/*
-function rvy_wpe_cache_flush() {
-    // Don't cause a fatal if there is no WpeCommon class
-    if ( ! class_exists( 'WpeCommon' ) ) {
-        return false;
-    }
-
-    if ( function_exists( 'WpeCommon::purge_memcached' ) ) {
-        \WpeCommon::purge_memcached();
-    }
-
-    if ( function_exists( 'WpeCommon::clear_maxcdn_cache' ) ) {
-        \WpeCommon::clear_maxcdn_cache();
-    }
-
-    if ( function_exists( 'WpeCommon::purge_varnish_cache' ) ) {
-        \WpeCommon::purge_varnish_cache();
-    }
-
-    global $wp_object_cache;
-    // Check for valid cache. Sometimes this is broken -- we don't know why! -- and it crashes when we flush.
-    // If there's no cache, we don't need to flush anyway.
-
-    if ( $wp_object_cache && is_object( $wp_object_cache ) ) {
-        @wp_cache_flush();
-    }
-}
-*/

@@ -1,62 +1,79 @@
-=== PublishPress Revisions: Submit, Moderate, Schedule and Approve Revisions ===
+=== PublishPress Revisions: Duplicate Posts, Submit, Approve and Schedule Content Changes ===
 
 Contributors: publishpress, kevinB, stevejburge, andergmartins
 Author: PublishPress
 Author URI: https://publishpress.com
-Tags: revision, submit changes, workflow, collaboration, permissions, moderate, posts, schedule revisions
+Tags: revision, submit changes, duplicate post, duplicate page, revisions, approve changes, scheduled changes
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
-Tested up to: 5.8
-Stable tag: 2.6.1
+Tested up to: 5.9
+Stable tag: 3.0.16
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-PublishPress Revisions gives you control over updating published content. Users can submit revisions. You can approve or reject them.
+PublishPress Revisions gives you control over updating published content. Users can duplicate posts and submit changes. You can approve, reject or schedule them.
 
 == Description ==
 
-PublishPress Revisions gives you control over updating published content. Users can submit revisions. You can approve or reject them.
+PublishPress Revisions is the ultimate tool for making content changes. Users get a safe space to work on content updates. When the changes are ready, they can ask for approval to publish the update. Administrators can approve or reject the changes. They can also schedule them to go live in the future.
 
-Your users can update posts using the normal WordPress editor, but their changes will not be published automatically. Instead, the changes are stored as a revision that can be approved, rejected or scheduled. PublishPress Revisions works with the familiar WordPress interface, including Gutenberg and the Classic Editor.
+Your users can update posts using the normal WordPress editor, but their changes will not be published automatically. Instead, the changes are stored in a "Revision Queue". The changes can be approved, rejected or scheduled. PublishPress Revisions works with the familiar WordPress interface, including Gutenberg and the Classic Editor.
 
-The Free version of PublishPress Revisions supports the WordPress core. The Pro version of PublishPress Revisions supports ACF, Yoast SEO, PODS, WooCommerce, WPML, Elementor, Beaver Builder, and many more plugins and themes.
+## PublishPress Revisions Pro ##
 
-= Submit Change Requests for Posts =
+> <strong>Upgrade to Revisions Pro</strong><br />
+> This plugin is the free version of the Revisions Pro plugin. The Free version of PublishPress Revisions supports the WordPress core. The Pro version of PublishPress Revisions supports ACF, Yoast SEO, PODS, WooCommerce, WPML, Elementor, Beaver Builder, and many more plugins and themes. <a href="https://publishpress.com/revisions"  title="Revisions Pro">Click here to purchase the best premium WordPress content update plugin now!</a>
+
+## Submit Change Requests for Posts ####
 PublishPress Revisions allows your users to submit change requests for published posts. Your users can update posts using the normal WordPress editor, but their changes will not be published automatically. Instead, the changes are stored as a "pending revision" that can be approved or rejected.
 [Click here to see how to submit revisions](https://publishpress.com/knowledge-base/revisions-start/).
 
-= Schedule Future Updates to Posts =
+## Schedule Future Updates to Posts ##
+
 PublishPress Revisions allows you to schedule WordPress revisions to be published in the future. When you're editing a published post, all you need to do is select a future date and click "Schedule Revision". Your changes will be published at the specified time.
 [Click here to see how to schedule revisions](https://publishpress.com/knowledge-base/schedule-revisions-future/).
 
-= Manage and Moderate Changes to Content =
-After you create a revision with PublishPress Revisions, you can find that revision on the Revision Queue screen. This screen shows you all the revisions that have been submitted for approval. Underneath each revision you can choose from several moderation tools: Edit, Delete, Preview and Compare.
+## Manage and Moderate Changes to Content ##
+
+After you create a revision with PublishPress Revisions, you can find that revision on the Revision Queue screen. This screen shows you all the revisions that have been submitted for approval. Underneath each duplicate post you can choose from several moderation tools: Edit, Delete, Preview and Compare.
+
 [Click here to see how to manage and moderate revisions](https://publishpress.com/knowledge-base/schedule-or-publish-revisions/).
 
-= Compare Current and Former Versions =
+## Compare Current and Former Versions ##
 Pending and Scheduled Revisions can include changes to post content, categories, tags, featured image, page parent and other options. Each of these changes can be reviewed in the familiar Compare Revisions interface.
 [Click here to see how to compare revisions](https://publishpress.com/knowledge-base/compare-revisions/).
 
-= Frontend Moderation of Changes =
+## Frontend Moderation of Content Changes ##
+
 It is possible to preview and moderate revisions via the frontend of your WordPress site. If you click Preview for a pending revision, you'll see a toolbar across the frontend of the site. This toolbar will change color so you can easily know the status of the revision. For example, if you're looking at a pending revision, the toolbar will be green. For scheduled revisions, the toolbar will be grey.
 [Click here to see how to manage from the frontend of your site](https://publishpress.com/knowledge-base/publishing-revisions-frontend/).
 
-= Email Notifications for Revisions =
+## Email Notifications for Revisions ##
+
 PublishPress Revisions will notify Administrators and Editors when a new revision is submitted. They can log in to preview, compare and approve the changes. PublishPress Revisions can also send emails for revision approval and publication. The Settings screen lets you disable unwanted notifications.
 [Click here for more on revision notifications](https://publishpress.com/knowledge-base/emails-revisionary/).
 
-= Additional Supported Plugins in the Pro Version =
-* Advanced Custom Fields integration
-* BeaverBuilder integration (front end revision submission)
-* WPML integration (revision queue follows language filter)
-* Pods compatibility
-* The Events Calendar compatibility
-* WooCommerce compatibility
-* Yoast SEO compatibility
+## Additional Plugins Supported in the Pro Version ##
+
+Page builder / front end editing integrations:
+
+* BeaverBuilder integration 
+* Divi Theme, Divi Builder integration
+* Elementor integration 
+
+Major plugins we maintain compatibility with:
+
+* Advanced Custom Fields
+* Pods
+* WPML
+* The Events Calendar
+* WooCommerce
+* Yoast SEO
 
 [Click here for the full list of supported plugins in the Pro version](https://publishpress.com/knowledge-base/plugins-revisions-support/).
 
-= Revision Permissions =
+## You Can Set Very Detailed Revision Permissions ##
+
 PublishPress Revisions works with the default WordPress user roles, and also introduces a Revisor role:
 
 * Contributors can submit revisions to their own published posts.
@@ -68,18 +85,22 @@ To schedule changes to a published post, just set the desired future date before
 By upgrading to Revisions Pro, you also gain advanced permissions control through the PublishPress Permissions Pro plugin. You can customize permissions by role or per-user, granting full editing or revision submission rights to specific posts, categories, or taxonomy terms.
 [Click here for more on revision permissions](https://publishpress.com/knowledge-base/permissions-revisions).
 
-= Join PublishPress and get the Pro plugins =
+## Join PublishPress and get the Pro plugins ##
+
+The Pro versions of the PublishPress plugins are well worth your investment. The Pro versions have extra features and faster support. [Click here to join PublishPress](https://publishpress.com/pricing/).
+
+Join PublishPress and you'll get access to these Pro plugins:
+
 * [PublishPress Authors Pro](https://publishpress.com/authors) allows you to add multiple authors and guest authors to WordPress posts.
+* [PublishPress Blocks Pro](https://publishpress.com/blocks) has everything you need to build professional websites with the WordPress block editor.
 * [PublishPress Capabilities Pro](https://publishpress.com/capabilities) is the plugin to manage your WordPress user roles, permissions, and capabilities.
 * [PublishPress Checklists Pro](https://publishpress.com/checklists) enables you to define tasks that must be completed before content is published.
 * [PublishPress Permissions Pro](https://publishpress.com/permissions) is the plugin for advanced WordPress permissions.
 * [PublishPress Pro](https://publishpress.com/publishpress) is the plugin for managing and scheduling WordPress content.
 * [PublishPress Revisions Pro](https://publishpress.com/revisions) allows you to update your published pages with teamwork and precision.
+* [PublishPress Series Pro](https://publishpress.com/series) enables you to group content together into a series 
 
-The Pro versions of the PublishPress plugins are well worth your investment. The Pro versions have extra features and faster support. 
-[Click here to join PublishPress](https://publishpress.com/pricing/).
-
-Together, these plugins are a suite of powerful publishing tools for WordPress. If you need to create a professional workflow in WordPress, with moderation, revisions, permissions and more then you should try PublishPress.
+Together, these plugins are a suite of powerful publishing tools for WordPress. If you need to create a professional workflow in WordPress, with moderation, revisions, permissions and more... then you should try PublishPress.
 
 = Bug Reports =
 Bug reports for PublishPress Revisions are welcomed in our [repository on GitHub](https://github.com/publishpress/publishpress-revisions). Please note that GitHub is not a support forum, and that issues that aren't properly qualified as bugs will be closed.
@@ -89,20 +110,237 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 
 == Screenshots ==
 
-1. Low-level user submits a "Pending Revision" to a Published Page 
-2. Email Notification Recipients (optionally adjustable)
-3. Pending Revision Confirmation
-4. Pending Revisions in Dashboard Right Now Count
-5. Revision Queue: filterable list of Pending, Scheduled Revisions
-6. Revision Queue actions
-7. Pending Revision Revision Preview / Approval
-8. Compare Pending and Scheduled Revisions using the familiar UI
-9. Scheduled Revision Creation (unrestricted editor)
-10. Scheduled Revision Confirmation
-11. Scheduled Revision Preview
-12. Scheduled Revisions in Publishing Soon list
+1. Schedule Revisions: PublishPress Revisions allows you to schedule WordPress revisions to be published in the future. 
+2. Control Revision Permissions: PublishPress Revisions allows you to control which users are able to submit revisions to published posts. 
+3. Submit Revisions: PublishPress Revisions enables you to submit change requests for published posts. 
+4. Preview and Compare Revisions: Every requested change can be reviewed in the normal Compare Revisions interface in WordPress.
+5. Manage and Moderate Revisions: PublishPress Revisions has a Revision Queue screen where you can search, approve, or deny changes to a published post's content.
+6. Email Notifications for Revisions: Administrators and Editors are notified by email when a new revision is submitted. PublishPress Revisions can also send emails for revision approval and publication.
+7. Support for Plugins: Revisions Pro adds support for the plugins such as Yoast SEO, WooCommrce and Advanced Custom Fields.
+8. Divi, Beaver Builder Integration: With Revisions Pro, your Contributors and Revisors will be able to submit revisions to published content using the front end editor of the Divi theme or Beaver Builder plugin.
+9. WPML Integration: With Revisions Pro, pending and scheduled revisions work in multi-language sites controlled by the WPML plugin. 
+10. Advanced Permissions: By upgrading to Revisions Pro, you also gain advanced permissions control through Permissions Pro. Customize permissions by role or per-user.
+
+== Frequently Asked Questions ==
+
+= How do I duplicate pages or other post types? =
+
+PublishPress Revisions can duplicate pages and any other post types. For example, to duplicate pages, go to the "Pages" screen in WordPress and click "New Revision" next to any page. You will be taken to a duplicate page that you can edit and save to the Revision Queue.
+
+= How do I duplicate WooCommerce products? =
+
+WooCommerce is the most popular way to build a WordPress eCommerce site. With PublishPress Revisions Pro you can submit, moderate, approve and schedule revisions to your WooCommerce products.
+
+When you are on the Products screen, click the New Revision link. Inside the product revision, the PublishPress buttons will appear in the top-right corner. When you save the product, it will appear on the main Revision Queue screen. 
+
+It is possible to schedule updates to WooCommerce products.
+
+- While updating an post or page created created with Elementor, click "Immediately" in the right sidebar.
+- Choose the new date for these changes to go live.
+- Click the "Update Revision" button.
+
+All key WooCommerce fields are supported by PublishPress Revisions Pro. If you are using 3rd party WooCommerce plugins, we do recommend testing their compatibility with WordPress revisions and PublishPress Revisions Pro. 
+
+[Click here for more on duplicate WooCommerce products](https://publishpress.com/knowledge-base/permissions-revisions).
+
+= How do I duplicate Elementor pages and posts? =
+
+PublishPress Revisions Pro has support for the Elementor plugin.
+
+Here's how to use PublishPress Revisions and Elementor together:
+
+- Find and a published post or page that was created with Elementor.
+- You will see a New revision link.
+- On the next screen, you can click Edit with Elementor to make changes.
+- You can use Submit Revision in the right sidebar to submit your changes. 
+- In the WordPress admin area, you can go to visit the Revision Queue screen and you will see the submitted revision of your Elementor page. It will be waiting for your approval.
+
+It is possible to schedule content updates to Elementor posts.
+
+- While updating an post or page created created with Elementor, click "Immediately" in the right sidebar.
+- Choose the new date for these changes to go live.
+- Click the "Update Revision" button.
+
+[Click here for more on duplicate Elementor posts (https://publishpress.com/knowledge-base/publishpress-revisions-elementor/).
+
+= How do I duplicate The Events Calendar events? =
+
+The Events Calendar plugin is one the most popular ways to create and list events in WordPress. PublishPress Revisions Pro and The Events Calendar work together successfully.
+
+- Make sure you are using the Gutenberg option for creating events.
+- After installing PublishPress Revisions Pro, you will be able to submit revisions to events using the New Revision option on the main Events screen.
+- You will see the normal Event screen, but with additional PublishPress Revisions button in the top-right corner.
+- Your event revisions will appear in the Revision Queue.
+- You will not be able to use the Compare link because The Events Calendar does not support that WordPress feature yet. However, all the other key features of PublishPress Revisions Pro will work. For example, PublishPress Revisions Pro will record changes to all your event fields and settings.
+
+[Click here for more on duplicate The Events Calendar events (https://publishpress.com/knowledge-base/revisions-events-calendar/).
+
+= How do I duplicate posts with Advanced Custom Fields? =
+
+PublishPress Revisions Pro has support for the Advanced Custom Fields (ACF) plugin. You can schedule, moderate and approve revisions for content that uses ACF.
+
+- To create a revision for post that use ACF, click on the New Revision link.
+- Go to the Revision Queue.
+- Click Edit and you can update the revision, including the ACF fields.
+- Click Compare and you can see what's changed in this revision. The Compare screen will show you any changes that have happened with ACF Fields.
+
+[Click here for more on duplicate posts with Advanced Custom Fields (https://publishpress.com/knowledge-base/revisionary-acf/).
+
+= How do I duplicate posts with WPML? =
+
+PublishPress Revisions Pro has support for the WPML plugin. For example, you can create revisions for a post in English and create separate revisions for the Spanish translation of that post.
+
+- Go to your Posts screen.
+- Click New Revisions and you can create a translated version of your content in any language. 
+
+[Click here for more on duplicate posts with WPML (https://publishpress.com/knowledge-base/revisionary-wpml/).
+    
+= How do I duplicate posts with Yoast SEO? =
+
+Yoast SEO is the most popular SEO plugin in WordPress. With PublishPress Revisions Pro you can submit, moderate, approve and schedule revisions to your WordPress posts, and they will keep all your SEO data.
+
+In the image below, you can Yoast SEO data. With PublishPress Revisions Pro you enter this data and it will be saved throughout the revision approval process.
+
+[Click here for more on duplicate posts with Yoast SEO (https://publishpress.com/knowledge-base/revisions-yoast-seo/).
+    
+= How do I duplicate posts with Beaver Builder? =
+
+PublishPress Revisions Pro has support for the Beaver Builder plugin. Here's how to use PublishPress Revisions Pro and Beaver Builder together:
+
+- In your WordPress admin area, click New Revision for a post or page that uses Beaver Builder.
+- On the next screen, you will be able to click Launch Beaver Builder and create a new version of this post.
+- Click Submit Revision to submit your updates.
+- In the WordPress admin area, you can visit the Revision Queue screen and you will see the submitted revision of your Beaver Builder page. It will be waiting for your approval.
+
+It is also possible to schedule revisions to Beaver Builder content.
+
+- When you're editing a revision, click Immediately.
+- Choose the date you want your post changes to go live.
+- Click the Submit Revision button.
+
+[Click here for more on duplicate posts with Beaver Builder (https://publishpress.com/knowledge-base/revisionary-beaver-builder/).
+
+= How do I duplicate posts with Divi Theme and Builder? =
+
+Divi is one of the most popular page-builders in WordPress, and it does integrate with PublishPress Revisions Pro. It is possible for lower-level users to edit a page with Divi and submit an update for approval. This workflow will apply to anyone with the correct permissions to submit revisions.
+
+- In your WordPress admin area, click New Revision for a post or page that uses Divi.
+- You will see the normal editing layout in Divi, with the PublishPress Revisions buttons in the top toolbar and right sidebar. Click "Edit With The Divi Builder" to make content changes.
+
+[Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
 == Changelog ==
+
+= 3.0.16 - 20 Apr 2022 =
+* Fixed : Post Editor - New Revision button was not displayed 
+* Lang : Some translations did not load
+* Fixed : Edit Revision with Classic Editor - submit button not displayed for some custom post types
+
+= 3.0.15 - 31 Mar 2022 =
+* Fixed : Scheduled Revisions failed on WP 5.9 if WP Cron scheduling was disabled in Revisions settings
+
+= 3.0.14 - 30 Mar 2022 =
+* Fixed : Output variable escaping, other coding standard improvements
+
+= 3.0.13 - 21 Mar 2022 =
+* Fixed : Revision submission in Classic Editor caused "Undefined" link next to "Preview" link
+* Fixed : New revisions created with "Auto-submit" option had wrong date (and listing order) in Revision Queue
+* Fixed : PHP error on revision approval under some configurations
+* Fixed : Dashboard Activity widget: Scheduled revisions were not included in Publishing Soon list
+* Fixed : API: wp_after_insert_post action was not applied at revision publication
+* Compat : Divi - Revision preview bar not visible on front end
+* Compat : Divi - Classic Editor setting did not trigger correct Revisions UI
+* Compat : Custom post types - revision submission button not displayed in some configurations
+* API: New filters pp_revisions_option_pending_revision_update_post_date, ​pp_revisions_option_pending_revision_update_modified_date, ​pp_revisions_option_scheduled_revision_update_post_date​, ​pp_revisions_option_scheduled_revision_update_modified_date
+
+= 3.0.12 - 3 Mar 2022 =
+* Feature : Edit link in post editor after revision creation / scheduling
+* Change : Option to auto-submit revisions created by users who can publish the main post
+* Change : Option to publish scheduled revisions using WP-Cron
+* Fixed : Scheduled publication of revisions fails on WP Engine if caching enabled (fix by enabling WP Cron scheduling)
+* Fixed : WP 5.9 - After editing a revision, approval button remained disabled after revision update
+* Fixed : New revisions were not listed in Revision Queue or linked to Preview button under some conditions
+* Fixed : Compare Revisions: error if ACF is active on a PHP 8 installation
+* Fixed : Revision Queue - column headers (to set sort field) had a bad link
+
+= 3.0.10 - 10 Feb 2022 =
+* Fixed : WordPress 5.9 - When editing a submitted revision, Save button was hidden
+* Fixed : Revision Compare did not load on some sites
+* Fixed : Option "Editing others' revisions requires role capability" was not applied
+
+= 3.0.9 - 27 Jan 2022
+* Compat : WordPress 5.9 - Revisions could not be updated using Gutenberg editor
+
+= 3.0.8 - 26 Jan 2022
+* Compat : WordPress 5.9 - Fatal error adding / editing posts (work around WP hooking late-defined function _disable_block_editor_for_navigation_post_type)
+
+= 3.0.7 - 5 Jan 2022 =
+* Fixed : Revision status changes not updated on sites running an object cache
+* Fixed : Revision deletion from within editor left an inaccessible trashed revision and redirected to Edit Posts. Now deletes revision and redirects to Revision Queue.
+* Fixed : manage_unsubmitted_revisions capability was required without any hint in plugin settings; Now not required unless configured in Revisions > Settings
+* Fixed : Classic Editor - Javascript error breaks plugin compatibility
+* Fixed : Gutenberg Editor - Top margin for Preview button following revision submission
+* Fixed : Compare screen - could not approve revisions
+* Fixed : Compare screen - ampersands in user display name were displayed with html encoding
+* Fixed : Revision Queue - Revisions from deactivated post types were listed with invalid Edit, Delete links and a blank Post Type
+* Fixed : Compare Revisions - Preview / Restore button for past revisions linked back to Compare screen
+* Fixed : Input sanitization consistency
+* Change : Revision preview top bar styling
+* Compat : LifterLMS - LLMS query filters broke Revision Queue
+* Compat : WPML - Database error in Revision Queue
+* Fixed : Revision Queue: PHP error on bulk action under some site configurations
+
+= 3.0.6 - 29 Nov 2021 =
+* Fixed : Edit Revision - revisions could not be updated unless SCRIPT_DEBUG is enabled on the site
+* Fixed : Revisions could not be scheduled if Settings > Revisions > Revision Submission is disabled
+
+= 3.0.5 - 23 Nov 2021 =
+* Fixed : Published custom post types not listed to Revisors under some configurations (Permissions integration requires Permissions 3.6.4)
+* Fixed : Multisite - network-wide settings screens were non-functional
+
+= 3.0.4 - 19 Nov 2021 =
+* Fixed : New Revision button not displayed in Admin Bar
+* Fixed : Revision Queue: revisions not listed in My Activity view
+
+= 3.0.3 - 18 Nov 2021 =
+* Fixed : Revisions Queue empty on sites with a large number of published posts
+* Compat : WooCommerce - Hide Product Variations, Linked Products tabs when editing a Product Revision
+
+= 3.0.2 - 15 Nov 2021 =
+* Compat : PublishPress Permissions - Revisions Submission permissions did not correctly adjust Edit Posts / Pages listing in some configurations (also requires Permissions 3.6.3)
+* Compat : The Events Calendar - Revisions could not be submitted in Classic Editor
+* Fixed : Classic Editor - Schedule button was incorrectly displayed (leading to failed scheduling attempt) if a single time element is changed followed by OK button
+* Fixed : Scheduled Revisions could not be updated in Gutenberg editor
+* Fixed : Admin Bar button "New Revision" was displayed even if Submitted Revisions are disabled
+* Fixed : Revision Queue: bulk deletion did not reduce revision counts
+* Fixed : Duplicate page selection dropdown in Quick Edit and other instances of wp_dropdown_pages()
+* Fixed : Invalid page hierarchy and broken Pages admin if a past revision that was originally submitted through the Revisions plugin is restored 
+* Fixed : Revision Preview was missing "Approve" button caption if revision is of an unpublished post
+* Change : Revisions Settings - clarify some captions
+
+= 3.0.1 - 10 Nov 2021 =
+* Fixed : Revisions created using Revisions 2.x were not listed in Revision Queue until plugin de/re-activation
+* Fixed : Front Page setting was cleared at revision submission on some sites
+* Fixed : Front Page setting dropdown in Settings > Reading included revisions
+* Fixed : Classic Editor : Schedule Revisions could not be submitted
+* Fixed : Classic Editor : Schedule button was displayed incorrectly while selecting a future date for scheduled revision
+* Compat : Gutenberg plugin - Edit Revision screen crashed on update attempt
+* API: Allow redirect to be disabled on revision creation
+
+= 3.0 - 9 Nov 2021 =
+* Feature : New revision submission mechanism: create an unsubmitted revision first instead of editing existing post. Edit revision directly, then submit for scheduling or publication.
+* Change : Revisions UI in Post / Revision editor
+* Feature : Admin Bar includes "New Revision" button
+* Change : Revision Queue filter captions
+* Compat : Permissions - revise_others_posts, revise_others_pages, etc. capabilties are equivalent to list_others capabilities in allowing uneditable items to be listed
+* Change : Include upload_files capability in the Revisor role
+
+= 2.6.3 - 11 Oct 2021 =
+* Fixed : Classic Editor - Error submitting a pending or scheduled revision
+
+= 2.6.2 - 7 Oct 2021 =
+* Change : Maintenance queries run at plugin activation to convert version 3.0 revisions back to 2.6 encoding
+* API : Support for WPML Translation Management support in Pro version
 
 = 2.6.1 - 15 Jul 2021 =
 * Fixed : Pending / Scheduled Revisions could become disassociated from main post due to third party plugin interactions
@@ -353,7 +591,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 * Lang : Correct textdomain on numerous translation calls
 * Lang : Improve translation string construction
 * Lang : Support translation of Revisor role name
-* Lang: Updated language files
+* Lang : Updated language files
 
 = 2.1.7 - 13 Jan 2020 =
 * Fixed : Excessive resource usage with some caching solutions
@@ -422,7 +660,7 @@ Follow PublishPress on [Facebook](https://www.facebook.com/publishpress), [Twitt
 * Fixed : Classic Editor - Invalid Revisions > Browse link displayed to Revisors
 * Compat : Classic Editor plugin - with "Allow users to switch editors" enabled, non-default editor did not have correct javascript loaded for Revisions
 * Compat : On themes that use a fixed position header, display preview top bar above header
-* Compat : PressPermit Pro - revision preview could not be viewed by Contributors under some configurations 
+* Compat : PressPermit Pro - revision preview could not be viewed by Contributors under some configurations
 * Fixed : On standard Compare Revisions screen (for past revisions), Preview and Manage button links did not update with slider selection change
 * Fixed : Pending, Schedule Revision notification - invalid preview link in some emails
 * Fixed : Trashed revisions were not identified as revisions in Edit Posts listing

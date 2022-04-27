@@ -5,6 +5,7 @@ class RevisionaryDashboard {
 
 	public function recentPostsQueryArgs($query_args) {
 		add_filter('posts_clauses_request', [&$this, 'fltDashboardQueryClauses']);
+
 		return $query_args;
 	}
 

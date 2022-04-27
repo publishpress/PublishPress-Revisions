@@ -1,12 +1,14 @@
 <?php
 class RevisionaryHistory
-{	
+{
     private $published_post_ids = [];
-    private $post_status = 'pending-revision';
+    private $revision_status = [];
     private $revision_id = 0;
     private $authors = [];
 
 	function __construct() {
+        $this->revision_status = ['draft-revision', 'pending-revision'];
+
         add_action('load-revision.php', [$this, 'actLoadRevision']);
 
         add_action('admin_enqueue_scripts', [$this, 'actEnqueueScripts'], 10, 1);
@@ -36,13 +38,19 @@ class RevisionaryHistory
     function actCompareRevisionsTweakUI() {
         global $revisionary;
 
-        $revision_id = (!empty($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : $_REQUEST['to'];
+        if (!empty($_REQUEST['revision'])) {
+            $revision_id = (int) $_REQUEST['revision'];
+        } elseif (isset($_REQUEST['to'])) {
+            $revision_id = (int) $_REQUEST['to'];
+        } else {
+            return;
+        }
 
         // Hide Restore button if user does not have permission
         if ($_post = get_post($revision_id)) {
-            if (!rvy_is_revision_status($_post->post_status)) {
+            if (!rvy_in_revision_workflow($_post)) {
                 if ($parent_post = get_post($_post->post_parent)) {
-                    if (!$revisionary->canEditPost($parent_post, ['skip_revision_allowance' => true])) :
+                    if (!$revisionary->canEditPost($parent_post)) :
         ?>
 						<style type='text/css'>
 				        input.restore-revision {display:none !important;}
@@ -62,11 +70,9 @@ class RevisionaryHistory
     public function actLoadRevision() {
         global $wpdb, $post;
 
-        //wp_reset_vars( array( 'revision', 'action', 'from', 'to' ) );
-
         if (!empty($_REQUEST['revision']) && is_scalar($_REQUEST['revision']) && !empty($_REQUEST['post_id']) && !is_numeric($_REQUEST['revision']) && rvy_is_revision_status(sanitize_key($_REQUEST['revision']))) {
             $revision_status = sanitize_key($_REQUEST['revision']);
-            
+
             $orderby = ('future-revision' == $revision_status) ? 'post_date' : 'ID';
             $order =   ('future-revision' == $revision_status) ? 'DESC' : 'ASC';
 
@@ -78,8 +84,8 @@ class RevisionaryHistory
             $revision_id = (isset($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : '';
         }
 
-        $from = (isset($_REQUEST['from'])) ? (int) $_REQUEST['from'] : ''; // absint( $from );
-        $to = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : ''; // absint( $to );
+        $from = (isset($_REQUEST['from'])) ? (int) $_REQUEST['from'] : '';
+        $to = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : '';
 
         $from = is_numeric( $from ) ? absint( $from ) : null;
         if ( ! $revision_id ) {
@@ -107,13 +113,13 @@ class RevisionaryHistory
                 // global variable used by WP core
                 $post = $revision;
 
-                if (rvy_is_revision_status($revision->post_status)) {
+                if (rvy_in_revision_workflow($revision)) {
                     if ( ! $published_post = get_post( rvy_post_id($revision->ID) ) ) {
                         return;
                     }
                 } else {
                     if ($from && $from_revision = get_post($from)) {
-                        if (rvy_is_revision_status($from_revision->post_status)) {
+                        if (rvy_in_revision_workflow($from_revision)) {
                             $_revision_id = $revision_id;   // @todo: eliminate this?
                             $revision = $from_revision;
                             $revision_id = $from;
@@ -125,11 +131,11 @@ class RevisionaryHistory
                     }
                 }
 
-                if (!rvy_is_revision_status($revision->post_status)) {
+                if (!rvy_in_revision_workflow($revision)) {
                     return;
                 }
 
-                if (!$published_post && !rvy_is_revision_status($from_revision->post_status)) {
+                if (!$published_post && !rvy_in_revision_workflow($from_revision)) {
                     if (!$published_post = get_post($revision->post_parent)) {
                         return;
                     }
@@ -144,19 +150,14 @@ class RevisionaryHistory
                     return;
                 }
 
-                if ('future-revision' == $revision->post_status) {
-                    $this->post_status = $revision->post_status;
-                } else {
-                    $this->post_status = 'pending-revision';
-                }
+                $this->revision_status = $revision->post_mime_type;
 
-                $status_obj = get_post_status_object($this->post_status);
+                $status_obj = get_post_status_object($revision->post_mime_type);
 
                 $post_edit_link = get_edit_post_link($published_post);
                 $post_title     = '<a href="' . $post_edit_link . '">' . _draft_or_post_title($published_post) . '</a>';
                 /* translators: %s: post title */
-                $h1             = sprintf( __( 'Compare %s of &#8220;%s&#8221;', 'revisionary' ), $status_obj->labels->plural, $post_title );
-                $return_to_post = '<a href="' . $post_edit_link . '">' . __( '&larr; Return to editor' ) . '</a>';
+                $do_h1 = true;
                 $title          = $status_obj->labels->plural;
 
                 $redirect = false;
@@ -166,18 +167,6 @@ class RevisionaryHistory
         do_action('rvy_compare_revisions');
 
         require ABSPATH . 'wp-admin/includes/revision.php';
-
-        /*
-        // Empty post_type means either malformed object found, or no valid parent was found.
-        if ( ! $redirect && empty( $post->post_type ) ) {
-            $redirect = 'edit.php';
-        }
-
-        if ( ! empty( $redirect ) ) {
-            wp_redirect( $redirect );
-            exit;
-        }
-        */
 
         // This is so that the correct "Edit" menu item is selected.
         if ( ! empty( $published_post->post_type ) && 'post' != $published_post->post_type ) {
@@ -195,8 +184,17 @@ class RevisionaryHistory
         ?>
 
         <div class="wrap">
-            <h1 class="long-header"><?php echo $h1; ?></h1>
-            <?php echo $return_to_post; ?>
+            <h1 class="long-header"><?php 
+            if (!empty($do_h1)) {
+                printf( esc_html__( 'Compare %s of "%s"', 'revisionary' ), $status_obj->labels->plural, $post_title );
+            }
+            ?>
+            </h1>
+            <?php
+            if (!empty($post_edit_link)) {
+                echo '<a href="' . esc_url($post_edit_link) . '">' . esc_html__( 'Return to editor' ) . '</a>';
+            }
+            ?>
         </div>
         <?php
         wp_print_revision_templates();
@@ -205,6 +203,10 @@ class RevisionaryHistory
         exit;
     }
 
+    public function fltFixMimeTypeClause($where) {
+		return str_replace("-revision/%'", "-revision'", $where);
+	}
+
     private function queryRevisions($post, $paged = false) {
         $this->published_post_ids = [$post->ID];
 
@@ -212,18 +214,20 @@ class RevisionaryHistory
         $q['post_type'] = $post->post_type;
 		$q['orderby'] = 'id'; // 'modified';
 		$q['order'] = 'ASC';
-		$q['post_status'] = (!empty($this->post_status)) ? $this->post_status : ['pending-revision', 'future-revision'];
+		$q['post_mime_type'] = ('future-revision' == $this->revision_status) ? $this->revision_status : array_diff(rvy_revision_statuses(), ['future-revision']);
         $q['posts_per_page'] = 99;
+        $q['is_revisions_query'] = true;
 
         $q = apply_filters('revisionary_compare_vars', $q);
 
-        //do_action('revisionary_history_query', $post);
         add_filter('posts_clauses', [$this, 'fltRevisionClauses'], 5, 2);
-        $rvy_query = new WP_Query($q);
+
+        add_filter('posts_where', [$this, 'fltFixMimeTypeClause']);
+		$rvy_query = new WP_Query($q);
+		remove_filter('posts_where', [$this, 'fltFixMimeTypeClause']);
 
         remove_filter('posts_clauses', [$this, 'fltRevisionClauses'], 5, 2);
-        //do_action('revisionary_history_query_done', $post);
-        
+
         $posts = [];
 
         // key by ID for js array prep
@@ -238,7 +242,7 @@ class RevisionaryHistory
         if (!did_action('rvy_compare_revisions')) {
             return;
         }
-        
+
         $revision_id = (isset($_REQUEST['revision'])) ? absint($_REQUEST['revision']) : '';
         $from = (isset($_REQUEST['from'])) ? (int) $_REQUEST['from'] : '';
         $to = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : '';
@@ -254,7 +258,7 @@ class RevisionaryHistory
             }
         }
 
-        $post_id = (rvy_is_revision_status($revision->post_status)) ? rvy_post_id($revision->ID) : $revision->post_parent;
+        $post_id = (rvy_in_revision_workflow($revision)) ? rvy_post_id($revision->ID) : $revision->post_parent;
 
         if (!$post = get_post($post_id)) {
             return;
@@ -276,11 +280,11 @@ class RevisionaryHistory
     public function fltRevisionQueryWhere($where, $args = []) {
         global $wpdb;
 
-        $p = (!empty($args['alias'])) ? $args['alias'] : $wpdb->posts;
+        $p = (!empty($args['alias'])) ? sanitize_text_field($args['alias']) : $wpdb->posts;
 
-		$post_id_csv = "'" . implode("','", $this->published_post_ids) . "'";
-        
-		$where .= " AND $p.comment_count IN ($post_id_csv)";
+		$post_id_csv = implode("','", array_map('intval', $this->published_post_ids));
+
+		$where .= " AND $p.comment_count IN ('$post_id_csv')";
 
         return $where;
     }
@@ -304,9 +308,11 @@ class RevisionaryHistory
 
     // port wp_ajax_get_revision_diffs() to support pending, scheduled revisions
     public function actAjaxRevisionDiffs() {
+        if (!isset($_REQUEST['post_id'])) {
+            return; 
+        }
 
         if ( ! $post = get_post( (int) $_REQUEST['post_id'] ) ) {
-            //wp_send_json_error();
             return;
         }
 
@@ -319,7 +325,7 @@ class RevisionaryHistory
         $to = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : '';
 
         if (!$revision_id && !$to && !empty($_REQUEST['compare'])) {
-            $compare = (array) $_REQUEST['compare'];
+            $compare = array_map('intval', (array) sanitize_text_field($_REQUEST['compare']));
             list( $from, $to ) = explode( ':', reset($compare)); // from:to
         }
 
@@ -332,46 +338,18 @@ class RevisionaryHistory
             return;
         }
 
-        if (!rvy_is_revision_status($revision->post_status)) {
+        if (!rvy_in_revision_workflow($revision)) {
             return;
         }
 
-        $this->post_status = $revision->post_status;
+        $this->revision_status = $revision->post_mime_type;
 
         if (!$rvy_revisions = $this->queryRevisions($post)) {
             return;
         }
 
-        // prime cache
-        //$revisions = wp_get_post_revisions( $post->ID, array( 'check_enabled' => false ) );
-    
         $return = array();
         @set_time_limit( 0 );
-        
-        /*
-        foreach ( $_REQUEST['compare'] as $compare_key ) {
-            list( $compare_from, $compare_to ) = explode( ':', $compare_key ); // from:to
-
-            $return[] = array(
-                'id'     => $compare_key,
-                'fields' => $this->getRevisionUIDiff( $post, $compare_from, $compare_to ),
-            );
-
-            foreach($rvy_revisions as $rvy_revision) {
-                if ($compare_from && $compare_from != $rvy_revision->ID) {
-                    $return[] = array(
-                        'id'     => "{$compare_from}:{$rvy_revision->ID}",
-                        'fields' => $this->getRevisionUIDiff( $post, $compare_from, $rvy_revision->ID ),
-                    );
-
-                    $return[] = array(
-                        'id'     => "{$rvy_revision->ID}:{$compare_from}",
-                        'fields' => $this->getRevisionUIDiff( $post, $rvy_revision->ID, $compare_from ),
-                    );
-                }
-            }
-        }
-        */
 
         $current_revision_id  = $post->ID;
 
@@ -412,14 +390,12 @@ class RevisionaryHistory
             // If we're dealing with the first revision...
             $compare_from = false;
         }
-    
+
         if ( ! $compare_to = get_post( $compare_to ) ) {
             return $return;
         }
 
-        $from_status = ($compare_from) ? $compare_from->post_status : '';
-
-        if (!rvy_is_revision_status($from_status) && ! rvy_is_revision_status($compare_to->post_status)) {
+        if (!rvy_in_revision_workflow($compare_from) && !rvy_in_revision_workflow($compare_to)) {
             return $return;
         }
 
@@ -447,35 +423,18 @@ class RevisionaryHistory
 
         $strip_tags = rvy_get_option('diff_display_strip_tags');
 
-        // If comparing revisions, make sure we're dealing with the right post parent.
-        // The parent post may be a 'revision' when revisions are disabled and we're looking at autosaves.
-        /*
-        if ( $compare_from && (rvy_post_id($compare_from->ID) != $post->ID) && ($compare_from->ID != $post->ID) ) {
-            return false;
-        }
-        if ( (rvy_post_id($compare_to->ID) != $post->ID) && ($compare_to->ID != $post->ID) ) {
-            return false;
-        }
-        */
-    
-        /*
-        if ( $compare_from && strtotime( $compare_from->post_date_gmt ) > strtotime( $compare_to->post_date_gmt ) ) {
-            $temp         = $compare_from;
-            $compare_from = $compare_to;
-            $compare_to   = $temp;
-        }
-        */
-    
         // Add default title if title field is empty
         if ( $compare_from && empty( $compare_from->post_title ) ) {
-            $compare_from->post_title = __( '(no title)' );
+            $compare_from->post_title = esc_html__( '(no title)' );
         }
         if ( empty( $compare_to->post_title ) ) {
-            $compare_to->post_title = __( '(no title)' );
+            $compare_to->post_title = esc_html__( '(no title)' );
         }
-    
+
         $return = array();
-    
+
+        $acf_active = function_exists('acf_get_setting');
+
         foreach ( $all_meta_fields = _wp_post_revision_fields( $compare_to ) as $field => $name ) {
             /**
              * Contextually filter a post revision field.
@@ -492,14 +451,18 @@ class RevisionaryHistory
              *                                      or the new one. Values are 'to' or 'from'.
              */
             $content_from = $compare_from ? apply_filters( "_wp_post_revision_field_{$field}", $compare_from->$field, $field, $compare_from, 'from' ) : '';
-    
+
             /** This filter is documented in wp-admin/includes/revision.php */
             $content_to = apply_filters( "_wp_post_revision_field_{$field}", $compare_to->$field, $field, $compare_to, 'to' );
-    
+
+            if ($acf_active && is_scalar($content_to) && (0 === strpos($content_to, 'field_'))) {
+                continue;
+            }
+
             $args = array(
                 'show_split_view' => true,
             );
-    
+
             /**
              * Filters revisions text diff options.
              *
@@ -518,35 +481,40 @@ class RevisionaryHistory
              * @param WP_Post $compare_to   The revision post to compare to.
              */
             $args = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
-    
+
             if ($strip_tags) {
-                $content_from = strip_tags($content_from);
-                $content_to = strip_tags($content_to);
+                if (is_string($content_from)) {
+                    $content_from = wp_strip_all_tags($content_from);
+                }
+
+                if (is_string($content_to)) {
+                    $content_to = wp_strip_all_tags($content_to);
+                }
             }
 
             $diff = wp_text_diff( $content_from, $content_to, $args );
-    
+
             if ( ! $diff && 'post_title' === $field ) {
                 // It's a better user experience to still show the Title, even if it didn't change.
                 // No, you didn't see this.
                 $diff = '<table class="diff"><colgroup><col class="content diffsplit left"><col class="content diffsplit middle"><col class="content diffsplit right"></colgroup><tbody><tr>';
-    
+
                 // In split screen mode, show the title before/after side by side.
                 if ( true === $args['show_split_view'] ) {
                     $diff .= '<td>' . esc_html( $compare_from->post_title ) . '</td><td></td><td>' . esc_html( $compare_to->post_title ) . '</td>';
                 } else {
                     $diff .= '<td>' . esc_html( $compare_from->post_title ) . '</td>';
-    
+
                     // In single column mode, only show the title once if unchanged.
                     if ( $compare_from->post_title !== $compare_to->post_title ) {
                         $diff .= '</tr><tr><td>' . esc_html( $compare_to->post_title ) . '</td>';
                     }
                 }
-    
+
                 $diff .= '</tr></tbody>';
                 $diff .= '</table>';
             }
-    
+
             if ( $diff ) {
                 $return[] = array(
                     'id'   => $field,
@@ -555,19 +523,27 @@ class RevisionaryHistory
                 );
             }
         }
-        
-        // === Add core post fields which cannot normally be versioned
-        foreach( apply_filters('revisionary_compare_post_fields',
-            [
-                'post_date' =>      __('Post Date', 'revisionary'), 
-                'post_parent' =>    __('Post Parent', 'revisionary'), 
-                'menu_order' =>     __('Menu Order', 'revisionary'), 
-                'comment_status' => __('Comment Status', 'revisionary'), 
-                'ping_status' =>    __('Ping Status', 'revisionary'), 
-            ]) as $field => $name
+
+        $compare_fields = [
+            'post_date' =>      esc_html__('Post Date', 'revisionary'),
+            'post_parent' =>    esc_html__('Post Parent', 'revisionary'),
+            'menu_order' =>     esc_html__('Menu Order', 'revisionary'),
+            'comment_status' => esc_html__('Comment Status', 'revisionary'),
+            'ping_status' =>    esc_html__('Ping Status', 'revisionary'),
+        ];
+
+        if (
+        ((('future-revision' == $compare_from->post_mime_type) || ('future-revision' == $compare_to->post_mime_type)) && !rvy_get_option('scheduled_revision_update_post_date'))
+        || ((in_array($compare_from->post_mime_type, ['draft-revision', 'pending-revision']) || in_array($compare_to->post_mime_type, ['draft-revision', 'pending-revision'])) && !rvy_get_option('pending_revision_update_post_date'))
         ) {
-            // don't display post date difference when it's set to a future date for scheduling 
-            if (strtotime($compare_to->post_date_gmt) > agp_time_gmt() || ('future-revision' == $compare_to->post_status)) {
+            unset($compare_fields['post_date']);
+        }
+
+        // === Add core post fields which cannot normally be versioned
+        foreach( apply_filters('revisionary_compare_post_fields', $compare_fields) as $field => $name
+        ) {
+            // don't display post date difference when it's set to a future date for scheduling
+            if (strtotime($compare_to->post_date_gmt) > agp_time_gmt() || ('future-revision' == $compare_to->post_mime_type)) {
                 continue;
             }
 
@@ -590,16 +566,16 @@ class RevisionaryHistory
                 $content_from = $compare_from ? apply_filters( "_wp_post_revision_field_{$field}", $compare_from->$field, $field, $compare_from, 'from' ) : '';
                 $content_to = apply_filters( "_wp_post_revision_field_{$field}", $compare_to->$field, $field, $compare_to, 'to' );
             }
-            
+
             $args = array(
                 'show_split_view' => true,
             );
 
             $args = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
-    
+
             if ($strip_tags) {
-                $content_from = strip_tags($content_from);
-                $content_to = strip_tags($content_to);
+                $content_from = wp_strip_all_tags($content_from);
+                $content_to = wp_strip_all_tags($content_to);
             }
 
             if ($diff = wp_text_diff( $content_from, $content_to, $args )) {
@@ -620,13 +596,13 @@ class RevisionaryHistory
                 $taxonomies[$taxonomy] = $tx_obj->labels->name;
             }
         }
-        
+
         $published_id = rvy_post_id($compare_from->ID);
 		$is_beaver = defined('FL_BUILDER_VERSION') && get_post_meta($published_id, '_fl_builder_data', true);
 
         foreach( apply_filters('revisionary_compare_taxonomies', $taxonomies) as $taxonomy => $name) {
             $field = $taxonomy;
-            
+
             if (!$terms = get_the_terms($compare_from, $taxonomy)) {
                 $terms = [];
             }
@@ -656,15 +632,15 @@ class RevisionaryHistory
                 'show_split_view' => true,
             );
 
-            if ($is_beaver 
-            && (!$other_term_names && !rvy_is_revision_status($compare_from->post_status)) 
-            || (!$term_names && !rvy_is_revision_status($compare_to->post_status))
+            if ($is_beaver
+            && (!$other_term_names && !rvy_in_revision_workflow($compare_from))
+            || (!$term_names && !rvy_in_revision_workflow($compare_to))
             ) {
                 continue;
             }
 
             $args = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
-    
+
             if ($diff = wp_text_diff( $content_from, $content_to, $args )) {
                 $return[] = array(
                     'id'   => $field,
@@ -688,20 +664,15 @@ class RevisionaryHistory
 
         $meta_fields = [];
 
-        $meta_fields['_wp_page_template'] = __('Page Template', 'revisionary');
+        $meta_fields['_wp_page_template'] = esc_html__('Page Template', 'revisionary');
 
         if (post_type_supports($compare_to->post_type, 'thumbnail')) {
-            $meta_fields ['_thumbnail_id'] = __('Featured Image', 'revisionary');
+            $meta_fields ['_thumbnail_id'] = esc_html__('Featured Image', 'revisionary');
         }
 
-        /*
-        $meta_fields['_wp_attached_file'] = __('Attached Files', 'revisionary');
-        $meta_fields['_wp_attachment_metadata'] = __('Attachment Meta', 'revisionary');
-        */
-
-        if (defined('REVISIONARY_PRO_VERSION') && defined('FL_BUILDER_VERSION') && defined('REVISIONARY_BEAVER_BUILDER_DIFF')) {  // todo: move to filter
-            $meta_fields['_fl_builder_data'] = __('Beaver Builder Data', 'revisionary');
-            $meta_fields['_fl_builder_data_settings'] = __('Beaver Builder Settings', 'revisionary');
+        if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && defined('FL_BUILDER_VERSION') && defined('REVISIONARY_BEAVER_BUILDER_DIFF')) {  // todo: move to filter
+            $meta_fields['_fl_builder_data'] = esc_html__('Beaver Builder Data', 'revisionary');
+            $meta_fields['_fl_builder_data_settings'] = esc_html__('Beaver Builder Settings', 'revisionary');
         }
 
         $native_fields = _wp_post_revision_fields( $to_meta, $compare_to );
@@ -715,28 +686,28 @@ class RevisionaryHistory
             } else {
                 $content_from = '';
             }
-            
+
             $val = get_post_meta($compare_to->ID, $field, true);
             $content_to = maybe_serialize(apply_filters( "_wp_post_revision_field_{$field}", $val, $field, $compare_to, 'to' ));
-            
+
             if ('_thumbnail_id' == $field) {
                 $content_from = ($content_from) ? "$content_from (" . wp_get_attachment_image_url($content_from, 'full') . ')' : '';
                 $content_to = ($content_to) ? "$content_to (" . wp_get_attachment_image_url($content_to, 'full') . ')' : '';
-            
+
                 // suppress false alarm for featured image clearance
                 if ($content_from && !$content_to) {
                     continue;
                 }
 
             } elseif(('_requested_slug' == $field)) {
-                if ($content_to && !rvy_is_revision_status($compare_to->post_status)) {
+                if ($content_to && !rvy_in_revision_workflow($compare_to)) {
                     $content_to = '';
                 }
 
-                if ($content_from && !rvy_is_revision_status($compare_from->post_status)) {
+                if ($content_from && !rvy_in_revision_workflow($compare_from)) {
                     $content_from = '';
                 }
-                
+
                 if ($content_to && !$content_from) {
 	                if ($parent_post = get_post($published_id)) {
 	                    $content_from = $parent_post->post_name;
@@ -755,8 +726,8 @@ class RevisionaryHistory
             $args = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
 
             if ($strip_tags) {
-                $content_from = strip_tags($content_from);
-                $content_to = strip_tags($content_to);
+                $content_from = wp_strip_all_tags($content_from);
+                $content_to = wp_strip_all_tags($content_to);
             }
 
             if ($diff = wp_text_diff( $content_from, $content_to, $args )) {
@@ -783,16 +754,16 @@ class RevisionaryHistory
             foreach($authors as $_author) {
                 $author_ids []= $_author->ID;
             }
-        } 
-        
+        }
+
         if (!$use_multiple_authors || !$author_ids) {
             $author_ids = [$revision->post_author];
-            
+
             if ($_author = new WP_User($revision->post_author)) {
                 $authors = [$_author];
             }
         }
-        
+
         sort($author_ids);
         $author_key = implode(",", $author_ids);
 
@@ -800,12 +771,12 @@ class RevisionaryHistory
             $author_captions = [];
             $avatars = '';
             foreach($authors as $_author) {
-                $author_captions []= ($use_multiple_authors) ? esc_html($_author->display_name) : get_the_author_meta('display_name', $_author->ID);
+                $author_captions []= ($use_multiple_authors) ? esc_html($_author->display_name) : htmlspecialchars_decode(get_the_author_meta('display_name', $_author->ID));
                 $avatars .= $show_avatars ? get_avatar( $_author->ID, 32 ) : '';
             }
 
             if (empty($author_captions)) {
-                $author_captions[] =  __('No author', 'revisionary');
+                $author_captions[] =  esc_html__('No author', 'revisionary');
             }
 
             $this->authors[ $author_key ] = array(
@@ -850,7 +821,7 @@ class RevisionaryHistory
                     unset( $revisions[ $revision_id ] );
                 }
             }
-            
+
             $revisions = [$post->ID => $post] + $revisions;
         }
 
@@ -859,8 +830,8 @@ class RevisionaryHistory
         cache_users( wp_list_pluck( $revisions, 'post_author' ) );
 
         $type_obj = get_post_type_object($post->post_type);
-        
-        $can_restore = agp_user_can('edit_post', $post->ID, '', ['skip_revision_allowance' => true]);
+
+        $can_restore = current_user_can('edit_post', $post->ID);
 
         $current_id  = false;
 
@@ -870,8 +841,6 @@ class RevisionaryHistory
             $modified     = strtotime( $revision->post_modified );
             $modified_gmt = strtotime( $revision->post_modified_gmt . ' +0000' );
 
-            //$autosave = (bool) wp_is_post_autosave( $revision );
-            //$current  = ! $autosave && $revision->post_modified_gmt === $post->post_modified_gmt;
             $current = ($revision->ID == $post->ID);
 
             if ( $current && ! empty( $current_id ) ) {
@@ -890,7 +859,7 @@ class RevisionaryHistory
             if ($current && !$revisions_disabled && !defined('RVY_LEGACY_COMPARE_REVISIONS_AUTHOR_DISPLAY')) {
                 if ($past_revisions = wp_get_post_revisions($post->ID, ['orderby' => 'ID', 'order' => 'DESC'])) {
 
-                    // Ignore autosaves. 
+                    // Ignore autosaves.
                     foreach($past_revisions as $id => $past_revision) {
                         if ( false !== strpos( $past_revision->post_name, "{$past_revision->post_parent}-autosave" ) ) {
                             unset($past_revisions[$id]);
@@ -908,51 +877,51 @@ class RevisionaryHistory
             $edit_url = false;
 
             // Until Reject button is implemented, just route to Preview screen so revision can be edited / deleted if necessary
-            if ( $current || in_array($revision->post_status, ['pending-revision', 'future-revision'])) {
+            if ($current || rvy_in_revision_workflow($revision)) {
                 $restore_link = rvy_preview_url($revision);  // default to revision preview link
-                
+
                 if ($can_restore) {
                     $published_post_id = rvy_post_id($revision->ID);
 
                     // For non-public types, force direct approval because preview is not available
-	                if ((($type_obj && empty($type_obj->public)) || rvy_get_option('compare_revisions_direct_approval')) && agp_user_can( 'edit_post', $published_post_id, '', ['skip_revision_allowance' => true] ) ) {
-                        $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url($_REQUEST['rvy_redirect']) : '';
+	                if ((($type_obj && !is_post_type_viewable($type_obj)) || rvy_get_option('compare_revisions_direct_approval')) && current_user_can( 'edit_post', $published_post_id) ) {
+                        $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
 
-                        if (in_array($revision->post_status, ['pending-revision'])) {
-                            $restore_link = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=approve$redirect_arg"), "approve-post_$published_post_id|{$revision->ID}" );
-                        
-                        } elseif (in_array($revision->post_status, ['future-revision'])) {
-                            $restore_link = wp_nonce_url( admin_url("admin.php?page=rvy-revisions&amp;revision={$revision->ID}&amp;action=publish$redirect_arg"), "publish-post_$published_post_id|{$revision->ID}" );
+                        if (in_array($revision->post_mime_type, ['draft-revision', 'pending-revision'])) {
+                            $restore_link = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision={$revision->ID}&action=approve$redirect_arg"), "approve-post_$published_post_id|{$revision->ID}" );
+
+                        } elseif (in_array($revision->post_mime_type, ['future-revision'])) {
+                            $restore_link = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision={$revision->ID}&action=publish$redirect_arg"), "publish-post_$published_post_id|{$revision->ID}" );
                         }
 
-                        if (agp_user_can('edit_post', $revision->ID)) {
-                            $edit_url = admin_url("post.php?action=edit&amp;post=$revision->ID");
+                        if (current_user_can('edit_post', $revision->ID)) {
+                            $edit_url = rvy_admin_url("post.php?action=edit&post=$revision->ID");
                         }
-	                } 
+	                }
                 }
             } else {
                 $restore_link = '';
             }
 
-            if ('future-revision' == $revision->post_status) {
-                $date_prefix = __('Scheduled for ', 'revisionary');
+            if ('future-revision' == $revision->post_mime_type) {
+                $date_prefix = esc_html__('Scheduled for ', 'revisionary');
                 $modified     = strtotime( $revision->post_date );
 		        $modified_gmt = strtotime( $revision->post_date_gmt . ' +0000' );
 
-            } elseif ('pending-revision' == $revision->post_status && (strtotime($revision->post_date_gmt) > $now_gmt ) ) {
-                $date_prefix = __('Requested for ', 'revisionary');
+            } elseif (in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && (strtotime($revision->post_date_gmt) > $now_gmt ) ) {
+                $date_prefix = esc_html__('Requested for ', 'revisionary');
                 $modified     = strtotime( $revision->post_date );
 		        $modified_gmt = strtotime( $revision->post_date_gmt . ' +0000' );
 
             } else {
-                $date_prefix = __('Submitted ', 'revisionary');
+                $date_prefix = esc_html__('Modified ', 'revisionary');
                 $modified     = strtotime( $revision->post_modified );
 		        $modified_gmt = strtotime( $revision->post_modified_gmt . ' +0000' );
             }
 
-            $time_diff_label = ($now_gmt > $modified_gmt) ? __( '%s%s ago' ) : __( '%s%s from now', 'revisionary');
+            $time_diff_label = ($now_gmt > $modified_gmt) ? esc_html__( '%s%s ago' ) : esc_html__( '%s%s from now', 'revisionary');
 
-            $use_multiple_authors = function_exists('get_multiple_authors') && !rvy_is_revision_status($revision->post_status);
+            $use_multiple_authors = function_exists('get_multiple_authors') && !rvy_in_revision_workflow($revision);
 
             // Just track single post_author for revision.  Changes to Authors taxonomy will be applied to published post.
             $author_key = $this->loadAuthorInfo($revision, $use_multiple_authors, compact('show_avatars'));
@@ -961,7 +930,7 @@ class RevisionaryHistory
                 'id'         => $revision->ID,
                 'title'      => get_the_title( $revision->ID ),
                 'author'     => $this->authors[ $author_key ],
-                'date'       => sprintf('%s%s', $date_prefix, date_i18n( __( 'M j, Y @ g:i a', 'revisionary' ), $modified )),
+                'date'       => sprintf('%s%s', $date_prefix, date_i18n( esc_html__( 'M j, Y @ g:i a', 'revisionary' ), $modified )),
                 'dateShort'  => date_i18n( _x( 'j M @ g:i a', 'revision date short format' ), $modified ),
                 'timeAgo'    => sprintf( $time_diff_label, $date_prefix, human_time_diff( $modified_gmt, $now_gmt ) ),
                 'autosave'   => false,
@@ -1006,9 +975,9 @@ class RevisionaryHistory
                 'id'         => $post->ID,
                 'title'      => get_the_title( $post->ID ),
                 'author'     => $this->authors[ $author_key ],
-                'date'       => date_i18n( __( 'M j, Y @ H:i', 'revisionary' ), strtotime( $post->post_modified ) ),
+                'date'       => date_i18n( esc_html__( 'M j, Y @ H:i', 'revisionary' ), strtotime( $post->post_modified ) ),
                 'dateShort'  => date_i18n( _x( 'j M @ H:i', 'revision date short format', 'revisionary' ), strtotime( $post->post_modified ) ),
-                'timeAgo'    => sprintf( __( '%s ago' ), human_time_diff( strtotime( $post->post_modified_gmt ), $now_gmt ) ),
+                'timeAgo'    => sprintf( esc_html__( '%s ago' ), human_time_diff( strtotime( $post->post_modified_gmt ), $now_gmt ) ),
                 'autosave'   => false,
                 'current'    => true,
                 'restoreUrl' => false,
@@ -1062,7 +1031,7 @@ class RevisionaryHistory
             'to'             => $selected_revision_id,
             'from'           => $from,
             'diffData'       => $diffs,
-            'baseUrl'        => parse_url( admin_url( 'revision.php' ), PHP_URL_PATH ),
+            'baseUrl'        => wp_parse_url( rvy_admin_url( 'revision.php' ), PHP_URL_PATH ),
             'compareTwoMode' => absint( $compare_two_mode ), // Apparently booleans are not allowed
             'revisionIds'    => array_keys( $revisions ),
         ];
@@ -1083,19 +1052,19 @@ class RevisionaryHistory
         }
 
         // For non-public types, force direct approval because preview is not available
-        $direct_approval = (($type_obj && empty($type_obj->public)) || rvy_get_option('compare_revisions_direct_approval')) 
-        && agp_user_can('edit_post', rvy_post_id($post_id), '', ['skip_revision_allowance' => true]);
+        $direct_approval = (($type_obj && !is_post_type_viewable($type_obj)) || rvy_get_option('compare_revisions_direct_approval'))
+        && current_user_can('edit_post', rvy_post_id($post_id));
 
         if ($post_id) {
-            $can_approve = agp_user_can('edit_post', rvy_post_id($post_id), 0, ['skip_revision_allowance' => true]);
+            $can_approve = current_user_can('edit_post', rvy_post_id($post_id));
         } else {
-            $can_approve = isset($type_obj->cap->edit_published_posts) && agp_user_can($type_obj->cap->edit_published_posts, 0, 0, ['skip_revision_allowance' => true]);
+            $can_approve = isset($type_obj->cap->edit_published_posts) && current_user_can($type_obj->cap->edit_published_posts);
         }
 
         if (empty($type_obj) || $can_approve) {
-            $button_label = $direct_approval ? __('Approve', 'revisionary') : __('View / Approve', 'revisionary');
+            $button_label = $direct_approval ? esc_html__('Approve', 'revisionary') : esc_html__('Preview / Approve', 'revisionary');
         } else {
-            $button_label = __('View', 'revisionary');
+            $button_label = esc_html__('Preview', 'revisionary');
         }
         ?>
         <script type="text/javascript">
@@ -1109,7 +1078,7 @@ class RevisionaryHistory
 
             var RvyDiffUI = function() {
                 if( $('input.restore-revision:not(.rvy-recaption)').length) {
-                    $('input.restore-revision').attr('value', '<?php echo $button_label;?>').addClass('rvy-recaption');
+                    $('input.restore-revision').attr('value', '<?php echo esc_html($button_label);?>').addClass('rvy-recaption');
 
                     $('h1').next('a').hide();
                 }
@@ -1120,7 +1089,7 @@ class RevisionaryHistory
                 if(!$('input.edit-revision').length) {
                     setTimeout(function() {
                         rvySearchParams = new URLSearchParams(window.location.search);
-                        
+
                         rvyRevisionID = rvySearchParams.get('to');
 
                         if (!rvyRevisionID) {
@@ -1128,7 +1097,7 @@ class RevisionaryHistory
                         }
 
                         if (!Number(rvyRevisionID)) {
-                            rvyRevisionID = <?php echo $this->revision_id;?>;
+                            rvyRevisionID = <?php echo esc_attr($this->revision_id);?>;
                         }
 
                         if (rvyRevisionID != rvyLastID) {
@@ -1137,7 +1106,7 @@ class RevisionaryHistory
                             for (rkey = 0; rkey < _wpRevisionsSettings.revisionData.length; rkey++) {
                                 if (_wpRevisionsSettings.revisionData[rkey].id == rselected) {
                                     if (_wpRevisionsSettings.revisionData[rkey].editUrl) {
-                                        $('input.restore-revision').after('<a href="' + _wpRevisionsSettings.revisionData[rkey].editUrl + '"><input type="button" class="edit-revision button button-primary" style="float:right" value="<?php _e('Edit');?>"></a>');
+                                        $('input.restore-revision').after('<a href="' + _wpRevisionsSettings.revisionData[rkey].editUrl + '"><input type="button" class="edit-revision button button-primary" style="float:right" value="<?php echo esc_attr('Edit');?>"></a>');
                                     }
                                 }
                             }
@@ -1156,11 +1125,11 @@ class RevisionaryHistory
 
     function actPastRevisionDiffScripts() {
         global $revisionary;
-        
+
         if (did_action('rvy_compare_revisions')) {
             return;
         }
-        
+
         $post_id = (isset($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : 0;
         if (!$post_id) {
             $post_id = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : 0;
@@ -1179,27 +1148,27 @@ class RevisionaryHistory
         }
 
         if (!empty($main_post) && !empty($main_post_status) && (empty($main_post_status->public) && empty($main_post_status->private))) {
-            $can_edit = $revisionary->canEditPost($main_post, ['skip_revision_allowance' => true]);
+            $can_edit = $revisionary->canEditPost($main_post);
         } else {
             $edit_published_cap = isset($type_obj->cap->edit_published_posts) ? $type_obj->cap->edit_published_posts : 'do_not_allow';
-            $can_edit = agp_user_can($edit_published_cap, 0, 0, ['skip_revision_allowance' => true]);
+            $can_edit = current_user_can($edit_published_cap);
         }
 
         $show_preview_link = rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin();
 
         if ($show_preview_link) {
-            $preview_label = (empty($type_obj) || $can_edit) 
-            ?  __('Preview / Restore', 'revisionary')
-            : __('Preview');
+            $preview_label = (empty($type_obj) || $can_edit)
+            ?  esc_html__('Preview / Restore', 'revisionary')
+            : esc_html__('Preview');
 
             $preview_url = rvy_preview_url($post);
         }
 
-        $manage_label = (empty($type_obj) || $can_edit) 
-        ?  __('Manage', 'revisionary')
-        : __('List', 'revisionary');
+        $manage_label = (empty($type_obj) || $can_edit)
+        ?  esc_html__('Manage', 'revisionary')
+        : esc_html__('List', 'revisionary');
 
-        $manage_url = admin_url("admin.php?page=rvy-revisions&revision=$post_id&action=view");
+        $manage_url = rvy_admin_url("admin.php?page=rvy-revisions&revision=$post_id&action=view");
         ?>
         <script type="text/javascript">
         /* <![CDATA[ */
@@ -1208,7 +1177,7 @@ class RevisionaryHistory
 
             var RvyDiffUI = function() {
                 rvySearchParams = new URLSearchParams(window.location.search);
-                        
+
                 var rvyRevisionID = rvySearchParams.get('to');
 
                 if (!rvyRevisionID) {
@@ -1216,25 +1185,25 @@ class RevisionaryHistory
                 }
 
                 if (!Number(rvyRevisionID)) {
-                    rvyRevisionID = <?php echo $this->revision_id;?>;
+                    rvyRevisionID = <?php echo esc_attr($this->revision_id);?>;
                 }
 
                 if (rvyRevisionID != rvyLastID) {
                     <?php if($show_preview_link):?>
-                    var rvyPreviewURL = '<?php echo $preview_url;?>';
-                    rvyPreviewURL = rvyPreviewURL.replace("page_id=" + <?php echo $post_id;?>, "page_id=" + rvyRevisionID);
-                    rvyPreviewURL = rvyPreviewURL.replace("p=" + <?php echo $post_id;?>, "p=" + rvyRevisionID);
+                    var rvyPreviewURL = '<?php echo esc_url($preview_url);?>';
+                    rvyPreviewURL = rvyPreviewURL.replace("page_id=" + <?php echo esc_attr($post_id);?>, "page_id=" + rvyRevisionID);
+                    rvyPreviewURL = rvyPreviewURL.replace("p=" + <?php echo esc_attr($post_id);?>, "p=" + rvyRevisionID);
                     <?php endif;?>
 
-                    var rvyManageURL = '<?php echo $manage_url;?>';
-                    rvyManageURL = rvyManageURL.replace("revision=" + <?php echo $post_id;?>, "revision=" + rvyRevisionID);
+                    var rvyManageURL = '<?php echo esc_url($manage_url);?>';
+                    rvyManageURL = rvyManageURL.replace("revision=" + <?php echo esc_attr($post_id);?>, "revision=" + rvyRevisionID);
 
                     if(!$('span.rvy-compare-preview').length) {
                         <?php if($show_preview_link):?>
-                        $('h1').append('<span class="rvy-compare-preview" style="margin-left:20px"><a class="rvy_preview_linkspan" href="<?php echo $preview_url;?>" target="_revision_preview"><input class="button" type="button" value="<?php echo $preview_label;?>"></a></span>');
+                        $('h1').append('<span class="rvy-compare-preview" style="margin-left:20px"><a class="rvy_preview_linkspan" href="<?php echo esc_url($preview_url);?>" target="_revision_preview"><input class="button" type="button" value="<?php echo esc_attr($preview_label);?>"></a></span>');
                         <?php endif;?>
 
-                        $('h1').append('<span class="rvy-compare-list" style="margin-left:10px"><a class="rvy_preview_linkspan" href="<?php echo $manage_url;?>" target="_revision_list"><input class="button" type="button" value="<?php echo $manage_label;?>"></a></span>');
+                        $('h1').append('<span class="rvy-compare-list" style="margin-left:10px"><a class="rvy_preview_linkspan" href="<?php echo esc_url($manage_url);?>" target="_revision_list"><input class="button" type="button" value="<?php echo esc_attr($manage_label);?>"></a></span>');
                     } else {
                         <?php if($show_preview_link):?>
                         $('span.rvy-compare-preview a').attr('href', rvyPreviewURL);

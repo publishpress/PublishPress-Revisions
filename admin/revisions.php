@@ -1,6 +1,6 @@
 <?php
 
-if( basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']) )
+if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die( 'This page cannot be called directly.' );
 	
 /**
@@ -17,10 +17,9 @@ global $revisionary;
 
 if ( defined( 'FV_FCK_NAME' ) && current_user_can('activate_plugins') ) {
 	echo( '<div class="error">' );
-	_e( "<strong>Note:</strong> For visual display of revisions, add the following code to foliopress-wysiwyg.php:<br />&nbsp;&nbsp;if ( strpos( $" . "_SERVER['REQUEST_URI'], 'admin.php?page=rvy-revisions' ) ) return;", 'revisionary');
+	esc_html_e( "<strong>Note:</strong> For visual display of revisions, add the following code to foliopress-wysiwyg.php:<br />&nbsp;&nbsp;if ( strpos( $" . "_SERVER['REQUEST_URI'], 'admin.php?page=rvy-revisions' ) ) return;", 'revisionary');
 	echo( '</div><br />' );
 }
-//wp_reset_vars( array('revision', 'left', 'right', 'action', 'revision_status') );
 
 if ( ! empty($_GET['revision']) )
 	$revision_id = absint($_GET['revision']);
@@ -34,19 +33,13 @@ if ( ! empty($_GET['right']) )
 	$right = absint($_GET['right']);
 else
 	$right = '';
-
-/*
-if ( ! empty($_GET['revision_status']) )
-	$revision_status = sanitize_key($_GET['revision_status']);
-else
-	$revision_status = '';
-*/	
+	
 $revision_status = 'inherit';
 
 if ( ! empty($_GET['action']) )
-	$action = sanitize_key($_GET['action']);
+	$_action = sanitize_key($_GET['action']);
 else
-	$action = '';
+	$_action = '';
 
 if ( ! empty($_GET['restored_post'] ) ) {
 	$revision_id = (int) $_GET['restored_post'];
@@ -54,21 +47,21 @@ if ( ! empty($_GET['restored_post'] ) ) {
 
 if ( empty($revision_id) && ! $left && ! $right ) {
 	echo( '<div><br />' );
-	_e( 'No revision specified.', 'revisionary');
+	esc_html_e( 'No revision specified.', 'revisionary');
 	echo( '</div>' );
 	return;
 }
 
 $revision_status_captions = array( 
-	'inherit' => __( 'Past', 'revisionary' ), 
+	'inherit' => esc_html__( 'Past', 'revisionary' ), 
 	'pending-revision' => __awp('Pending', 'revisionary'), 
 	'future-revision' => __awp( 'Scheduled', 'revisionary' ) 
 );
 
-if( 'edit' == $action )
-	$action = 'view';
+if( 'edit' == $_action )
+	$_action = 'view';
 
-switch ( $action ) :
+switch ( $_action ) :
 case 'diff' :
 	break;
 case 'view' :
@@ -79,7 +72,7 @@ default :
 	
 	if ( ! $revision = wp_get_post_revision( $revision_id ) ) {
 		if ($revision = get_post($revision_id)) {
-			if (!rvy_is_revision_status($revision->post_status)) {
+			if (!rvy_in_revision_workflow($revision)) {
 				$revision = false;
 			}
 		}
@@ -107,7 +100,7 @@ default :
 			break;
 
 		// actual status of compared objects overrides any revision_Status arg passed in
-		$revision_status = $revision->post_status;
+		$revision_status = $revision->post_mime_type;
 
 		if (!current_user_can( 'edit_post', $rvy_post->ID ) && !rvy_is_post_author($revision)) {
 			wp_die();
@@ -122,7 +115,7 @@ default :
 
 	$published_title = "<a href='post.php?action=edit&post=$rvy_post->ID'>$rvy_post->post_title</a>";
 	?>
-	<h1><?php printf(__('Revisions of %s', 'revisionary'), $published_title);?></h1>
+	<h1><?php printf(esc_html__('Revisions of %s', 'revisionary'), esc_html($published_title));?></h1>
 	<?php
 
 	// Sets up the diff radio buttons
@@ -148,7 +141,7 @@ endswitch;
 
 if ( empty($revision) && empty($right_revision) && empty($left_revision) ) {
 	echo( '<div><br />' );
-	_e( 'The requested revision does not exist.', 'revisionary');
+	esc_html_e( 'The requested revision does not exist.', 'revisionary');
 	echo( '</div>' );
 	return;
 }
@@ -160,15 +153,15 @@ if ( ! $revision_status )
 <div class="wrap">
 
 <?php
-if (!$can_fully_edit_post = agp_user_can( $edit_cap, $rvy_post->ID, '', ['skip_revision_allowance' => true])) {
+if (!$can_fully_edit_post = current_user_can( $edit_cap, $rvy_post->ID)) {
 	// post-assigned Revisor role is sufficient to edit others' revisions, but post-assigned Contributor role is not
-	$_can_edit_others = (!rvy_get_option('revisor_lock_others_revisions') || rvy_is_full_editor($rvy_post)) && agp_user_can( $edit_others_cap, $rvy_post->ID, 0, ['skip_revision_allowance' => true] );
+	$_can_edit_others = (!rvy_get_option('revisor_lock_others_revisions') || rvy_is_full_editor($rvy_post)) && current_user_can( $edit_others_cap, $rvy_post->ID);
 }
 
-if ( 'diff' != $action ) {
-	$can_edit = ( ( 'revision' == $revision->post_type ) || rvy_is_revision_status($revision->post_status) ) && (
+if ( 'diff' != $_action ) {
+	$can_edit = ( ( 'revision' == $revision->post_type ) || rvy_in_revision_workflow($revision) ) && (
 		$can_fully_edit_post || 
-		( (rvy_is_post_author($revision) || $_can_edit_others) && ('pending-revision' == $revision->post_status) ) 
+		( (rvy_is_post_author($revision) || $_can_edit_others) && (in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) ))
 		);
 }
 ?>
@@ -177,70 +170,81 @@ if ( 'diff' != $action ) {
 if ( $is_administrator = is_content_administrator_rvy() ) {
 	global $wpdb;
 
-	$status_csv = implode("','", array_merge(rvy_revision_statuses(), ['inherit']));
+	$base_status_csv = implode("','", array_merge(rvy_revision_base_statuses(), ['inherit']));
+	$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 	$results = $wpdb->get_results( 
 		$wpdb->prepare(
-			"SELECT post_status, COUNT( * ) AS num_posts FROM {$wpdb->posts}"
-			. " WHERE post_status IN ('$status_csv')"
-			. " AND ((post_type = 'revision' AND post_status = 'inherit' AND post_parent = %d) OR (post_type != 'revision' AND post_status != 'inherit' AND comment_count = %d))"
-			. " GROUP BY post_status",
+			"SELECT post_mime_type, COUNT( * ) AS num_posts FROM {$wpdb->posts}"
+			. " WHERE post_status IN ('$base_status_csv')"
+			. " AND ((post_type = 'revision' AND post_status = 'inherit' AND post_parent = %d) OR (post_type != 'revision' AND post_mime_type IN ('$revision_status_csv') AND comment_count = %d))"
+			. " GROUP BY post_mime_type",
 			$rvy_post->ID,
 			$rvy_post->ID
 		)
 	);
 	
-	$num_revisions = array( 'inherit' => 0, 'pending-revision' => 0, 'future-revision' => 0 );
-	foreach( $results as $row )
-		$num_revisions[$row->post_status] = $row->num_posts;
-		
+	$num_revisions = array( '' => 0, 'pending-revision' => 0, 'future-revision' => 0 );
+	foreach( $results as $row ) {
+		$num_revisions[$row->post_mime_type] = $row->num_posts;
+	}
+
+	$num_revisions['inherit'] = $num_revisions[''];
+	unset($num_revisions['']);
+
 	$num_revisions = (object) $num_revisions;
 }
 
-$status_links = '<ul class="subsubsub">';
+echo '<ul class="subsubsub">';
 foreach ( array_keys($revision_status_captions) as $_revision_status ) {
-	$post_id = ( ! empty($rvy_post->ID) ) ? $rvy_post->ID : $revision_id;
+	$_post_id = ( ! empty($rvy_post->ID) ) ? $rvy_post->ID : $revision_id;
 	
 	if ('inherit' == $_revision_status) {
-		$link = "admin.php?page=rvy-revisions&amp;revision={$post_id}&amp;revision_status=$_revision_status";
+		$_link = "admin.php?page=rvy-revisions&amp;revision={$_post_id}&amp;revision_status=$_revision_status";
 		$target = '';
 	} else {
-		$link = admin_url("admin.php?page=revisionary-q&published_post={$rvy_post->ID}&post_status={$_revision_status}");
-		$target = "target='_blank'";
+		$_link = rvy_admin_url("admin.php?page=revisionary-q&published_post={$rvy_post->ID}&post_status={$_revision_status}");
+		$target = "_blank";
 	}
 
-	$class = ( $revision_status == $_revision_status ) ? ' class="rvy_current_status rvy_select_status"' : 'class="rvy_select_status"';
+	$class = ( $revision_status == $_revision_status ) ? ' rvy_current_status rvy_select_status' : 'rvy_select_status';
 
 	switch( $_revision_status ) {
 		case 'inherit':
-			$status_caption = __( 'Past Revisions', 'revisionary' );
+			$status_caption = esc_html__( 'Past Revisions', 'revisionary' );
 			break;
+		case 'draft-revision':
 		case 'pending-revision':
-			$status_caption = __( 'Pending Revisions', 'revisionary' );
-			break;
 		case 'future-revision':
-			$status_caption = __( 'Scheduled Revisions', 'revisionary' );
+			$status_caption = pp_revisions_status_label($_revision_status, 'plural');
 			break;
 	}
 	
 	if ( $is_administrator ) {
 		if ($num_revisions->$_revision_status) {
-			$label = __( '%1$s <span class="count"> (%2$s)</span>', 'revisionary' );
-			$status_links .= "<li $class><a href='$link' $target>" . sprintf( _nx( $label, $label, $num_revisions->$_revision_status, $label ), $status_caption, number_format_i18n( $num_revisions->$_revision_status ) ) . '</a></li>';
+			echo "<li class='" . esc_attr($class) . "'><a href='" . esc_url($_link) . "' target='" . esc_attr($target) . "'>" 
+			. sprintf( 
+				esc_html__( '%1$s %2$s (%3$s)%4$s', 'revisionary' ), 
+				'<span class="count">',
+				esc_html($status_caption), 
+				esc_html(number_format_i18n( $num_revisions->$_revision_status )),
+				'</span>'
+			) 
+			. '</a></li>';
 		}
-	} else
-		$status_links .= "<li $class><a href='$link' $target>" . $status_caption . '</a></li>';
+	} else {
+		echo "<li class='" . esc_attr($class) . "'><a href='" . esc_url($_link) . "' target='" . esc_attr($target) . "'>" . esc_html($status_caption) . '</a></li>';
+		}
 }
-$status_links .= '</ul>';
 
-echo $status_links;
+echo '</ul>';
 
 $args = array( 'format' => 'form-table', 'parent' => true, 'right' => $right, 'left' => $left, 'current_id' => isset($revision_id) ? $revision_id : 0 );
 
 $count = rvy_list_post_revisions( $rvy_post, $revision_status, $args );
 if ( $count < 2 ) {
 	echo( '<br class="clear" /><p>' );
-	printf( __( 'no %s revisions available.', 'revisionary'), strtolower($revision_status_captions[$revision_status]) );
+	printf( esc_html__( 'no %s revisions available.', 'revisionary'), esc_html(strtolower($revision_status_captions[$revision_status])) );
 	echo( '</p>' );
 }
 
