@@ -666,8 +666,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		(in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && rvy_filter_option('pending_revision_update_post_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
 		|| (('future-revision' == $revision->post_mime_type) && rvy_filter_option('scheduled_revision_update_post_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
 	) {
-		$update_fields['post_date'] = $post_modified;
-		$update_fields['post_date_gmt'] = $post_modified_gmt;
+		$update_fields['post_date'] = current_time('mysql');
+		$update_fields['post_date_gmt'] = current_time('mysql', 1);
 
 	} elseif (!empty($update['post_date'])) {
 		$update_fields['post_date'] = $update['post_date'];
