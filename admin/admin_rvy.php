@@ -34,7 +34,7 @@ class RevisionaryAdmin
 			}
 			
 			add_action('admin_menu', [$this, 'build_menu']);
-			
+
 			if ( strpos($script_name, 'p-admin/plugins.php') ) {
 				add_filter( 'plugin_row_meta', [$this, 'flt_plugin_action_links'], 10, 2 );
 			}
@@ -67,7 +67,7 @@ class RevisionaryAdmin
 
 					require_once( dirname(__FILE__).'/edit-revision-ui_rvy.php' );
 					new RevisionaryEditRevisionUI();
-					
+
 					if (\PublishPress\Revisions\Utils::isBlockEditorActive()) {
 						require_once( dirname(__FILE__).'/edit-revision-block-ui_rvy.php' );
 						new RevisionaryEditRevisionBlockUI();
