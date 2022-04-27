@@ -32,7 +32,7 @@ class RevisionaryAdmin
 				require_once( dirname(__FILE__).'/admin_lib-mu_rvy.php' );
 				add_action('admin_menu', 'rvy_mu_site_menu', 15 );
 			}
-			
+
 			add_action('admin_menu', [$this, 'build_menu']);
 			
 			if ( strpos($script_name, 'p-admin/plugins.php') ) {
