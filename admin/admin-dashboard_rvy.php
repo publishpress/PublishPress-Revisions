@@ -24,8 +24,8 @@ class RevisionaryDashboard {
 		return $clauses;
 	}
 
-	public static function glancePending() {
-		return;
+	public static function glancePending($items = []) {
+		return $items;
 
 		// @todo: modify this function for post_mime_type schema
 	}
