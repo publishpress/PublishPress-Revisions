@@ -513,24 +513,11 @@ function rvy_add_revisor_custom_caps() {
 
 	global $wp_roles, $revisionary;
 
-	$custom_types = get_post_types(['public' => true, '_builtin' => false], 'object');
-
-	if (!defined('REVISIONARY_NO_PRIVATE_TYPES')) {
-		$private_types = array_merge(
-			get_post_types(['public' => false], 'object'), 
-			get_post_types(['public' => null], 'object')
-		);
+	$custom_types = array_intersect_key(
+		get_post_types(['_builtin' => false], 'object'),
+		$revisionary->enabled_post_types
+	);
 		
-		// by default, enable non-public post types that have type-specific capabilities defined
-		foreach($private_types as $post_type => $type_obj) {
-			if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages']))
-			|| defined('REVISIONARY_ENABLE_' . strtoupper($post_type) . '_TYPE')
-			) {
-				$custom_types[$post_type] = $type_obj;
-			}
-		}
-	}
-
 	if ( isset( $wp_roles->roles['revisor'] ) ) {
 		if ($custom_types) {
 			foreach( $custom_types as $post_type => $type_obj ) {
