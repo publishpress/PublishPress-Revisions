@@ -488,7 +488,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 						if ( $time_diff > 0 && $time_diff < DAY_IN_SECONDS ) {
 							$h_time = sprintf( esc_html__( '%s ago' ), human_time_diff( $time ) );
 						} else {
-							$h_time = mysql2date( esc_html__( 'Y/m/d g:i a', 'revisionary' ), $m_time );
+							$h_time = mysql2date( esc_html__( 'Y/m/d g:i a', 'revisionary' ), get_date_from_gmt($post->post_date_gmt) );
 							$h_time = str_replace( ' am', '&nbsp;am', $h_time );
 							$h_time = str_replace( ' pm', '&nbsp;pm', $h_time );
 							$h_time = str_replace( ' ', '<br />', $h_time );
