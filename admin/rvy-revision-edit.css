@@ -31,6 +31,10 @@ margin-right: 5px;
 margin: 0 10px 10px 10px;
 }
 
+#misc-publishing-actions a.rvy-direct-approve {
+margin-left: 5px;
+}
+
 #woocommerce-product-data ul.product_data_tabs li.variations_options,
 #woocommerce-product-data ul.product_data_tabs li.linked_product_options
 {

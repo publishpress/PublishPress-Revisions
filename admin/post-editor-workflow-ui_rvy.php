@@ -17,6 +17,8 @@ class PostEditorWorkflowUI {
             return [];
         }
 
+        $can_publish = current_user_can('edit_post', rvy_post_id($post->ID));
+
         $vars = [
             'postID' => $post->ID,
             'saveRevision' => pp_revisions_label('update_revision'),
@@ -26,13 +28,13 @@ class PostEditorWorkflowUI {
             'ajaxurl' => rvy_admin_url(''),
             'currentStatus' => str_replace('-revision', '', $post->post_mime_type),
             'onApprovalCaption' => esc_html__('(on approval)', 'revisionary'),
+            'canPublish' => $can_publish,
         ];
 
         $vars['disableRecaption'] = version_compare($wp_version, '5.9-beta', '>=') || is_plugin_active('gutenberg/gutenberg.php');
 
         if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
             $vars['viewURL'] = rvy_preview_url($post);
-            $can_publish = current_user_can('edit_post', rvy_post_id($post->ID));
 
             if ($type_obj && empty($type_obj->public)) {
                 $vars['viewURL']  = '';
@@ -77,7 +79,7 @@ class PostEditorWorkflowUI {
         $vars['draftDeletionURL'] = get_delete_post_link($post->ID, '', false);
 
         if ($vars['draftAjaxField']) {
-            $vars['draftActionCaption'] = pp_revisions_status_label('pending-revision', 'submit');
+            $vars['draftActionCaption'] = ($can_publish) ? pp_revisions_status_label('pending-revision', 'submit_short') : pp_revisions_status_label('pending-revision', 'submit');
             $vars['draftActionURL'] = '';
             $vars['draftInProcessCaption'] = pp_revisions_status_label('pending-revision', 'submitting');
             $vars['draftCompletedCaption'] = pp_revisions_status_label('pending-revision', 'submitted');
@@ -88,6 +90,8 @@ class PostEditorWorkflowUI {
         } else {
             $vars['draftActionCaption'] = '';
         }
+
+        $vars['approveCaption'] = ($can_publish) ? pp_revisions_status_label('pending-revision', 'approve_short') : '';
 
         $pending_obj = get_post_status_object('pending-revision');
         $vars['pendingStatusCaption'] = $pending_obj->label;

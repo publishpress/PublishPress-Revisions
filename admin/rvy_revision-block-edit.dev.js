@@ -27,7 +27,7 @@ jQuery(document).ready( function($) {
 		if ('future' == rvyObjEdit.currentStatus) {
 			caption = rvyObjEdit.updateCaption;
 		}
-		
+
 		if ( typeof waitForSaveDraftButton == 'undefined' ) {
 			waitForSaveDraftButton = false;
 		}
@@ -168,11 +168,22 @@ jQuery(document).ready( function($) {
 			}
 
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']) {
+				var approveButtonHTML = '';
+
+				if (rvyObjEdit.canPublish && ('pending' != rvyObjEdit.currentStatus)) {
+					approveButtonHTML = '<a href="' + rvyObjEdit['pendingActionURL'] + '" class="revision-approve">'
+					+ '<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button rvy-direct-approve">'
+					+ '<span class="dashicons dashicons-yes"></span>'
+					+ rvyObjEdit['approveCaption'] + '</button></a>'
+				}
+
 				$(refSelector).after(
 					'<div class="rvy-creation-ui"><a href="' + url + '" class="revision-approve">'
 					+ '<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button">'
 					+ '<span class="dashicons dashicons-yes"></span>'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</button></a>'
+
+					+ approveButtonHTML
 
 					+ '<div class="revision-submitting" style="display: none;">'
 					+ '<span class="revision-approve revision-submitting">'
@@ -283,12 +294,17 @@ jQuery(document).ready( function($) {
 	var rvyIsAutosaveDone = false;
 
 	$(document).on('click', 'button.revision-approve', function() {
+		var isApproval = $(this).hasClass('rvy-direct-approve');
+
 		// If autosave approvals are ever enabled, we will need this
-		var isSubmission = (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL'] == "");
+		var isSubmission = (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL'] == "") && !isApproval;
 
 		$('button.revision-approve').hide();
-		$('div.revision-submitting').show().css('display', 'block');
-		$('div.revision-submitting span.ppr-submission-spinner').css('visibility', 'visible');
+
+		if (isApproval) {
+			$('div.revision-submitting').show().css('display', 'block');
+			$('div.revision-submitting span.ppr-submission-spinner').css('visibility', 'visible');
+		}
 
 		if (!wp.data.select('core/editor').isEditedPostDirty()) {
 			if (isSubmission) {
