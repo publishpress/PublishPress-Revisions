@@ -27,12 +27,21 @@ jQuery(document).ready( function($) {
             }
             
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']) {
+                var approveButtonHTML = '';
+
+                if (rvyObjEdit.canPublish && ('pending' != rvyObjEdit.currentStatus)) {
+					approveButtonHTML = '&nbsp;<a href="' + rvyObjEdit['pendingActionURL'] + '" class="button rvy-direct-approve">'
+					+ rvyObjEdit['approveCaption'] + '</a>'
+				}
+
 				$(refSelector).after(
                     '<div class="rvy-creation-ui" style="float:left; padding-left:10px">'
 
                     + '<a href="' + url + '" class="button revision-approve">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</a>'
-				
+                
+                    + approveButtonHTML
+
                     + '<div class="revision-created-wrapper" style="display: none; margin: 8px 0 0 2px">'
 					+ '<span class="revision-approve revision-created" style="color:green">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
@@ -90,7 +99,7 @@ jQuery(document).ready( function($) {
         if (!rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL']) {
 			var revisionaryCreateDone = function () {
                 $('a.revision-approve').hide();
-				$('.revision-created-wrapper, .revision-created').show();
+                $('.revision-created-wrapper, .revision-created').show();
 
 				// @todo: abstract this for other workflows
 				rvyObjEdit.currentStatus = 'pending';
@@ -131,8 +140,38 @@ jQuery(document).ready( function($) {
         }
     });
     
+    $(document).on('click', 'a.rvy-direct-approve', function() {
+        if ($('a.rvy-direct-approve').attr('disabled')) {
+			return;
+		}
+
+        clearInterval(RvyUIInterval);
+
+        $('a.rvy-direct-approve').attr('disabled', 'disabled');
+
+        if (wp.autosave.server.postChanged()) {
+            wp.autosave.server.triggerSave();
+            var approvalDelay = 250;
+        } else {
+            var approvalDelay = 1;
+        }
+        
+        var tmoDirectApproval = setInterval(function() {
+            if (!wp.autosave.server.postChanged()) {
+                window.location = rvyObjEdit['pendingActionURL'];
+
+                clearInterval(tmoDirectApproval);
+            }
+        }, approvalDelay);
+
+        return false;
+    });
+
     $(document).on('click', '#post-body-content *, #content_ifr *, #wp-content-editor-container *, #tinymce *, #submitpost, span.revision-created', function() {
         $('.revision-created-wrapper, .revision-created').hide();
-        $('a.revision-approve').html(rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']).show().removeAttr('disabled');
+
+        if (!$('a.rvy-direct-approve').length) {
+            $('a.revision-approve').html(rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']).show().removeAttr('disabled');
+        }
     });
 });
