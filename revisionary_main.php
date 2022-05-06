@@ -876,7 +876,7 @@ class Revisionary
 		if (rvy_in_revision_workflow($post)) {
 			$object_type_obj = get_post_type_object($post->post_type);
 
-			if (('draft-revision' == $post->post_mime_type) && !rvy_is_post_author($post) && empty($wp_blogcaps['manage_unsubmitted_revisions'])) {
+			if (('draft-revision' == $post->post_mime_type) && !rvy_is_post_author($post) && rvy_get_option('manage_unsubmitted_capability') && empty($wp_blogcaps['manage_unsubmitted_revisions'])) {
 				unset($wp_blogcaps[$object_type_obj->cap->edit_others_posts]);
 			} else {
 				// If edit_others capability is being required for this post type, apply edit_others_revisions capability
