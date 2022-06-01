@@ -1151,7 +1151,9 @@ function rvy_revision_publish($revision_id = false) {
 
 	if (!$batch_process) {
 		if ($post) {
-			$redirect = get_permalink($post->ID); // published URL
+			$type_obj = get_post_type_object($post->post_type);
+
+			$redirect = ($type_obj && empty($type_obj->public)) ? rvy_admin_url("post.php?action=edit&post=$post->ID") : get_permalink($post->ID); // published URL
 		}
 
 		wp_redirect($redirect);
