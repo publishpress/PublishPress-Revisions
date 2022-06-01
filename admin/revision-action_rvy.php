@@ -23,7 +23,9 @@ function rvy_revision_create($post_id = 0) {
 		}
 	}
 
-	if (current_user_can('copy_post', $post_id)) {
+	$main_post_id = rvy_in_revision_workflow($post_id) ? rvy_post_id($post_id) : $post_id;
+
+	if (current_user_can('copy_post', $main_post_id)) {
 		require_once( dirname(REVISIONARY_FILE).'/revision-creation_rvy.php' );
 		$rvy_creation = new PublishPress\Revisions\RevisionCreation();
 		$rvy_creation->createRevision($post_id, 'draft-revision');
