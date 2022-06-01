@@ -1162,6 +1162,14 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					esc_html__( 'Edit' )
 				);
 			}
+
+			$main_post_id = rvy_post_id($post->ID);
+
+			if ($main_post_id && in_array($post->post_status, ['draft', 'pending']) && current_user_can('copy_post', $main_post_id)) {
+				$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
+				$url = rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg");
+				$actions['copy_revision'] = "<a href='$url'>" . esc_html__('Copy') . '</a>';
+			}
 		}
 
 		if ( current_user_can( 'delete_post', $post->ID ) ) {
