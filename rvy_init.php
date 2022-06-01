@@ -38,6 +38,10 @@ add_action('init',
 		if (!empty($kinsta_cache)) {
 			remove_action('init', [$kinsta_cache, 'init_cache'], 20);
 		}
+
+		if (defined('PP_REVISIONS_NO_POST_KSES')) {			
+			remove_filter('content_save_pre', 'wp_filter_post_kses');
+		}
 	}
 );
 
