@@ -6,8 +6,8 @@ Author URI: https://publishpress.com
 Tags: revision, submit changes, duplicate post, duplicate page, revisions, approve changes, scheduled changes
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
-Tested up to: 5.9
-Stable tag: 3.0.16
+Tested up to: 6.0
+Stable tag: 3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -230,6 +230,16 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
 == Changelog ==
+
+= 3.1 - 1 Jun 2022 =
+* Feature : Revision Edit - Administrators and editors have approval button for unsubmitted revisions
+* Feature : Revision Queue - Bulk Edit includes "Decline" action to return "Submitted" revisions back to "Not Submitted"
+* Feature : Revision Queue - New "Copy" row action
+* Compat : PublishPress Revisions - fatal error loading Customizer
+* Fixed : Scheduled Revisions fail on some sites
+* Fixed : Editors could not manage unsubmitted revisions without manage_unsubmitted_revisions capability, even if "Additional role capability required" setting disabled
+* Fixed : Post types with publicly_queryable set false had non-functional revision preview links, revision publication redirects
+* Fixed : Edit Revision - alignment and spacing in revision status sidebar
 
 = 3.0.16 - 20 Apr 2022 =
 * Fixed : Post Editor - New Revision button was not displayed 

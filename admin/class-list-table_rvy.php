@@ -488,7 +488,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 						if ( $time_diff > 0 && $time_diff < DAY_IN_SECONDS ) {
 							$h_time = sprintf( esc_html__( '%s ago' ), human_time_diff( $time ) );
 						} else {
-							$h_time = mysql2date( esc_html__( 'Y/m/d g:i a', 'revisionary' ), $m_time );
+							$h_time = mysql2date( esc_html__( 'Y/m/d g:i a', 'revisionary' ), get_date_from_gmt($post->post_date_gmt) );
 							$h_time = str_replace( ' am', '&nbsp;am', $h_time );
 							$h_time = str_replace( ' pm', '&nbsp;pm', $h_time );
 							$h_time = str_replace( ' ', '<br />', $h_time );
@@ -919,6 +919,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		if ($approval_potential = apply_filters('revisionary_bulk_action_approval', $approval_potential)) {
 			$actions['approve_revision'] = esc_html__('Approve');
+			$actions['decline_revision'] = esc_html__('Decline');
 			$actions['publish_revision'] = esc_html__('Publish');
 
 			if (rvy_get_option('scheduled_revisions')) {
@@ -1160,6 +1161,14 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					esc_attr('Edit Revision'),
 					esc_html__( 'Edit' )
 				);
+			}
+
+			$main_post_id = rvy_post_id($post->ID);
+
+			if ($main_post_id && in_array($post->post_status, ['draft', 'pending']) && current_user_can('copy_post', $main_post_id)) {
+				$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
+				$url = rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg");
+				$actions['copy_revision'] = "<a href='$url'>" . esc_html__('Copy') . '</a>';
 			}
 		}
 

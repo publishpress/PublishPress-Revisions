@@ -17,6 +17,10 @@ class PostEditorWorkflowUI {
             return [];
         }
 
+        $block_editor = \PublishPress\Revisions\Utils::isBlockEditorActive($post->post_type);
+
+        $can_publish = current_user_can('edit_post', rvy_post_id($post->ID));
+
         $vars = [
             'postID' => $post->ID,
             'saveRevision' => pp_revisions_label('update_revision'),
@@ -26,13 +30,13 @@ class PostEditorWorkflowUI {
             'ajaxurl' => rvy_admin_url(''),
             'currentStatus' => str_replace('-revision', '', $post->post_mime_type),
             'onApprovalCaption' => esc_html__('(on approval)', 'revisionary'),
+            'canPublish' => $can_publish,
         ];
 
         $vars['disableRecaption'] = version_compare($wp_version, '5.9-beta', '>=') || is_plugin_active('gutenberg/gutenberg.php');
 
         if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
             $vars['viewURL'] = rvy_preview_url($post);
-            $can_publish = current_user_can('edit_post', rvy_post_id($post->ID));
 
             if ($type_obj && empty($type_obj->public)) {
                 $vars['viewURL']  = '';
@@ -41,7 +45,7 @@ class PostEditorWorkflowUI {
 
             } elseif ($can_publish) {
                 if (version_compare($wp_version, '5.5-beta', '>=')) {
-                    $vars['viewCaption'] = esc_html__('Preview', 'revisionary');
+                    $vars['viewCaption'] = ($block_editor) ? esc_html__('Preview this Revision', 'revisionary') : esc_html__('Preview', 'revisionary');
                 } else {
                     $vars['viewCaption'] = ('future-revision' == $post->post_mime_type) ? esc_html__('View / Publish', 'revisionary') : esc_html__('View / Approve', 'revisionary');
                 }
@@ -77,17 +81,24 @@ class PostEditorWorkflowUI {
         $vars['draftDeletionURL'] = get_delete_post_link($post->ID, '', false);
 
         if ($vars['draftAjaxField']) {
-            $vars['draftActionCaption'] = pp_revisions_status_label('pending-revision', 'submit');
+            $vars['draftActionCaption'] = ($can_publish) ? pp_revisions_status_label('pending-revision', 'submit_short') : pp_revisions_status_label('pending-revision', 'submit');
             $vars['draftActionURL'] = '';
             $vars['draftInProcessCaption'] = pp_revisions_status_label('pending-revision', 'submitting');
             $vars['draftCompletedCaption'] = pp_revisions_status_label('pending-revision', 'submitted');
-            $vars['draftCompletedLinkCaption'] = esc_html__('Preview', 'revisionary');
-            $vars['draftCompletedURL'] = rvy_preview_url($post);
+
+            $preview_caption = ($block_editor) ? esc_html__('Preview this Revision', 'revisionary') : esc_html__('Preview', 'revisionary');
+
+            $vars['draftCompletedLinkCaption'] = (!empty($type_obj->public)) ? $preview_caption : '';
+            $vars['draftCompletedURL'] = (!empty($type_obj->public)) ? rvy_preview_url($post) : '';
+
             $vars['draftCompletedEditCaption'] = esc_html__('Edit', 'revisionary');
             $vars['draftCompletedEditURL'] = admin_url("post.php?post={$post->ID}&action=edit");
         } else {
             $vars['draftActionCaption'] = '';
         }
+
+        $vars['approveCaption'] = ($can_publish) ? pp_revisions_status_label('pending-revision', 'approve_short') : '';
+        $vars['approvingCaption'] = __('Approving the Revision...', 'revisionary');
 
         $pending_obj = get_post_status_object('pending-revision');
         $vars['pendingStatusCaption'] = $pending_obj->label;
@@ -113,13 +124,15 @@ class PostEditorWorkflowUI {
             $vars['futureDeletionURL'] = '';
         }
 
-        if (\PublishPress\Revisions\Utils::isBlockEditorActive()) {
+        if ($block_editor) {
             $vars['updateCaption'] =  esc_html__('Update Revision', 'revisionary');
         } else {
             if (!$vars['updateCaption'] = pp_revisions_status_label($post->post_mime_type, 'update')) {
                 $vars['updateCaption'] = pp_revisions_label('update_revision');
             }
         }
+
+        $vars['approvalLocked'] = false;
 
         return $vars;
     }
@@ -138,6 +151,8 @@ class PostEditorWorkflowUI {
         if (!$type_obj = get_post_type_object($post->post_type)) {
             return [];
         }
+
+        $type_obj = get_post_type_object($post->post_type);
 
         $vars = ['postID' => $post->ID, 'currentStatus' => $post->post_status];
 
@@ -166,6 +181,10 @@ class PostEditorWorkflowUI {
         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
         $published_post_id = rvy_post_id($post->ID);
 
+        $is_block_editor = \PublishPress\Revisions\Utils::isBlockEditorActive($post->post_type);
+        $preview_caption = $is_block_editor ? esc_html__('Preview Revision', 'revisionary') : esc_html__('Preview', 'revisionary');
+        $edit_caption = $is_block_editor ? esc_html__('Edit Revision', 'revisionary') : esc_html__('Edit', 'revisionary');
+
         if (rvy_get_option('pending_revisions') && current_user_can('copy_post', $post->ID)) {
             $vars = array_merge($vars, array(
                 'actionCaption' => pp_revisions_status_label('draft-revision', 'submit'),
@@ -173,9 +192,9 @@ class PostEditorWorkflowUI {
                 'actionDisabledTitle' => esc_attr(sprintf(esc_html__('Update post before creating %s.', 'revisionary'), strtolower(pp_revisions_status_label('draft-revision', 'basic')))),
                 'creatingCaption' => pp_revisions_status_label('draft-revision', 'submitting'),
                 'completedCaption' => pp_revisions_status_label('draft-revision', 'submitted'),
-                'completedLinkCaption' => esc_html__('Preview', 'revisionary'),
-                'completedURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
-                'completedEditLinkCaption' => esc_html__('Edit', 'revisionary'),
+                'completedLinkCaption' => (!empty($type_obj->public)) ? $preview_caption : '',
+                'completedURL' => (!empty($type_obj->public)) ? rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))) : '',
+                'completedEditLinkCaption' => $edit_caption,
                 'completedEditURL' => rvy_nc_url( add_query_arg('edit_new_revision', $post->ID, get_permalink($post->ID))),
                 'errorCaption' => esc_html__('Error Creating Revision', 'revisionary'),
                 'ajaxurl' => rvy_admin_url(''),
@@ -195,9 +214,9 @@ class PostEditorWorkflowUI {
                 'scheduleTitle' => '',
                 'scheduleDisabledTitle' => esc_attr(sprintf(esc_html__('For custom field changes, edit a scheduled %s.', 'revisionary'), strtolower(pp_revisions_status_label('draft-revision', 'basic')))),
                 'scheduledCaption' => pp_revisions_status_label('future-revision', 'submitted'),
-                'scheduledLinkCaption' => esc_html__('Preview', 'revisionary'),
-                'scheduledURL' => rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))),
-                'scheduledEditLinkCaption' => esc_html__('Edit', 'revisionary'),
+                'scheduledLinkCaption' => (!empty($type_obj->public)) ? $preview_caption : '',
+                'scheduledURL' => (!empty($type_obj->public)) ? rvy_nc_url( add_query_arg('get_new_revision', $post->ID, get_permalink($post->ID))) : '',
+                'scheduledEditLinkCaption' => $edit_caption,
                 'scheduledEditURL' => rvy_nc_url( add_query_arg('edit_new_revision', $post->ID, get_permalink($post->ID))),
                 'update' => esc_html__('Update', 'revisionary'),
             ));

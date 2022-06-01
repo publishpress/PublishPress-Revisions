@@ -542,7 +542,7 @@ div.components-panel div.revision-submitting {
 
 div.components-panel div.revision-creating {
   margin: 15px 0 15px 0;
-  padding: 6px 0 9px 2px; /*  @todo: review this spacing relative to button.revision-created */
+  padding: 6px 0 9px 80px; /*  @todo: review this spacing relative to button.revision-created */
 }
 
 div.components-panel span.ppr-submission-spinner, div.components-panel div.revision-submitting span.spinner {
@@ -553,7 +553,11 @@ height: 25px !important;
 div.components-panel button.revision-approve,
 div.components-panel div.revision-created
 {
-	margin: 15px 0 15px 0;
+	margin: 0 0 15px 0;
+}
+
+a.revision-approve button.is-primary {
+ margin-top: 15px;
 }
 
 .edit-post-sidebar .ppr-purple-button.components-button.is-tertiary,
@@ -563,6 +567,52 @@ div.components-panel div.revision-created
 
 div.rvy-revision-created {
 text-align: center;
+}
+
+span.revision-created, span.revision-scheduled {
+font-weight: bold;
+}
+
+div.components-panel div.revision-created {
+font-weight: bold;
+text-align: center;
+margin: 0;
+}
+
+div.components-panel div.revision-created a.revision-approve {
+margin-top: 5px;
+}
+
+div.revision-created-buttons {
+margin-top: 5px !important;
+margin-bottom: 5px;
+}
+
+button.revision-created {
+padding: 0;
+}
+
+#major-publishing-actions div.revision-created-wrapper {
+margin-top: 15px !important;
+margin-bottom: 20px !important;
+}
+
+#major-publishing-actions a.revision-preview, #major-publishing-actions a.revision-edit,
+div.rvy-creation-ui a.revision-preview, div.rvy-creation-ui a.revision-edit
+{
+margin-right: 5px !important;
+}
+
+div.edit-post-revision-status {
+justify-content: left;
+}
+
+div.edit-post-revision-status span {
+width: 35%;
+}
+
+div.edit-post-post-schedule span {
+width: 30%;
 }
 
 div.components-panel a.revision-edit {

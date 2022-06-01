@@ -38,6 +38,10 @@ add_action('init',
 		if (!empty($kinsta_cache)) {
 			remove_action('init', [$kinsta_cache, 'init_cache'], 20);
 		}
+
+		if (defined('PP_REVISIONS_NO_POST_KSES')) {			
+			remove_filter('content_save_pre', 'wp_filter_post_kses');
+		}
 	}
 );
 
@@ -99,11 +103,11 @@ function rvy_mail_buffer_cron_interval( $schedules ) {
     return $schedules;
 }
 
-function _revisionary_publish_scheduled_cron($args = []) {
+function _revisionary_publish_scheduled_cron($revision_id) {
 	global $wp_version;
 
 	if (get_option('rvy_scheduled_revisions') && (get_option('rvy_scheduled_publish_cron') || version_compare($wp_version, '5.9', '>='))) {
-		revisionary_publish_scheduled($args);
+		revisionary_publish_scheduled(compact('revision_id'));
 	}
 }
 
@@ -191,7 +195,7 @@ function rvy_ajax_handler() {
 				default:
 			}
 
-			if (!empty($check_autosave) && !defined('REVISIONARY_IGNORE_REVISION_AUTOSAVE')) {
+			if (('submit_revision' != $_REQUEST['rvy_ajax_field']) && !empty($check_autosave) && !defined('REVISIONARY_IGNORE_REVISION_AUTOSAVE')) {
 				if ($autosave_post = PublishPress\Revisions\Utils::get_post_autosave($post_id, $current_user->ID)) {
 					$main_post = get_post($post_id);
 
@@ -251,16 +255,19 @@ function rvy_delete_post_meta($post_id, $meta_key) {
 }
 
 function rvy_status_registrations() {
+	$block_editor = \PublishPress\Revisions\Utils::isBlockEditorActive();
+
 	$labels = apply_filters('revisionary_status_labels',
 		rvy_get_option('revision_statuses_noun_labels') ?
 		[
 			'draft-revision' => [
 				'name' => esc_html__('Working Copy', 'revisionary'),
 				'submit' => esc_html__('Create Working Copy', 'revisionary'), 
-				'submit_short' => esc_html__('Create Copy', 'revisionary'), 
+				'submit_short' => esc_html__('Copy', 'revisionary'),
 				'submitting' => esc_html__('Creating Working Copy...', 'revisionary'),
-				'submitted' => esc_html__('Working Copy ready.', 'revisionary'),
+				'submitted' => esc_html__('Working Copy ready', 'revisionary'),
 				'approve' => esc_html__('Approve Changes', 'revisionary'), 
+				'approve_short' => esc_html__('Approve', 'revisionary'),
 				'approving' => esc_html__('Approving Changes...', 'revisionary'),
 				'publish' => esc_html__('Publish Changes', 'revisionary'),
 				'save' => esc_html__('Save Revision', 'revisionary'), 
@@ -274,10 +281,11 @@ function rvy_status_registrations() {
 			'pending-revision' => [
 				'name' => esc_html__('Change Request', 'revisionary'),
 				'submit' => esc_html__('Submit Change Request', 'revisionary'),
-				'submit_short' => esc_html__('Submit Changes', 'revisionary'),
+				'submit_short' => esc_html__('Submit', 'revisionary'),
 				'submitting' => esc_html__('Submitting Changes...', 'revisionary'),
-				'submitted' => esc_html__('Changes Submitted.', 'revisionary'),
+				'submitted' => esc_html__('Changes Submitted', 'revisionary'),
 				'approve' => esc_html__('Approve Changes', 'revisionary'), 
+				'approve_short' => esc_html__('Approve', 'revisionary'),
 				'approving' => esc_html__('Approving Changes...', 'revisionary'),
 				'publish' => esc_html__('Publish Changes', 'revisionary'), 
 				'save' => esc_html__('Save Revision', 'revisionary'), 
@@ -296,6 +304,7 @@ function rvy_status_registrations() {
 				'submitting' => esc_html__('Scheduling Changes...', 'revisionary'),
 				'submitted' => esc_html__('Changes are Scheduled.', 'revisionary'),
 				'approve' => esc_html__('Schedule Changes', 'revisionary'), 
+				'approve_short' => esc_html__('Schedule Changes', 'revisionary'), 
 				'publish' => esc_html__('Publish Changes', 'revisionary'), 
 				'save' => esc_html__('Save Revision', 'revisionary'), 
 				'update' => esc_html__('Update Revision', 'revisionary'), 
@@ -313,8 +322,9 @@ function rvy_status_registrations() {
 				'submit' => esc_html__('New Revision', 'revisionary'), 
 				'submit_short' => esc_html__('New Revision', 'revisionary'), 
 				'submitting' => esc_html__('Creating Revision...', 'revisionary'),
-				'submitted' => esc_html__('Revision ready to edit.', 'revisionary'),
+				'submitted' => ($block_editor) ? esc_html__('The Revision is ready to edit.', 'revisionary') : esc_html__('Revision ready to edit.', 'revisionary'),
 				'approve' => esc_html__('Approve Revision', 'revisionary'), 
+				'approve_short' => esc_html__('Approve', 'revisionary'),
 				'publish' => esc_html__('Publish Revision', 'revisionary'), 
 				'save' => esc_html__('Save Revision', 'revisionary'), 
 				'update' => esc_html__('Update Revision', 'revisionary'), 
@@ -327,10 +337,11 @@ function rvy_status_registrations() {
 			'pending-revision' => [
 				'name' => esc_html__('Submitted Revision', 'revisionary'),
 				'submit' => esc_html__('Submit Revision', 'revisionary'), 
+				'submit_short' => esc_html__('Submit', 'revisionary'), 
 				'submitting' => esc_html__('Submitting Revision...', 'revisionary'),
-				'submitted' => esc_html__('Revision Submitted.', 'revisionary'),
-				'submit_short' => esc_html__('Submit Revision', 'revisionary'), 
+				'submitted' => ($block_editor) ? esc_html__('The Revision is Submitted', 'revisionary') : esc_html__('Revision Submitted', 'revisionary'),
 				'approve' => esc_html__('Approve Revision', 'revisionary'), 
+				'approve_short' => esc_html__('Approve', 'revisionary'),
 				'publish' => esc_html__('Publish Revision', 'revisionary'), 
 				'save' => esc_html__('Save Revision', 'revisionary'), 
 				'update' => esc_html__('Update Revision', 'revisionary'), 
@@ -345,8 +356,9 @@ function rvy_status_registrations() {
 				'submit' => esc_html__('Schedule Revision', 'revisionary'), 
 				'submit_short' => esc_html__('Schedule Revision', 'revisionary'), 
 				'submitting' => esc_html__('Scheduling Revision...', 'revisionary'),
-				'submitted' => esc_html__('Revision Scheduled.', 'revisionary'),
+				'submitted' => ($block_editor) ? esc_html__('The Revision is Scheduled', 'revisionary') :  esc_html__('Revision Scheduled', 'revisionary'),
 				'approve' => esc_html__('Approve Revision', 'revisionary'), 
+				'approve_short' => esc_html__('Approve', 'revisionary'), 
 				'publish' => esc_html__('Publish Revision', 'revisionary'), 
 				'save' => esc_html__('Save Revision', 'revisionary'), 
 				'update' => esc_html__('Update Revision', 'revisionary'), 
@@ -513,24 +525,11 @@ function rvy_add_revisor_custom_caps() {
 
 	global $wp_roles, $revisionary;
 
-	$custom_types = get_post_types(['public' => true, '_builtin' => false], 'object');
-
-	if (!defined('REVISIONARY_NO_PRIVATE_TYPES')) {
-		$private_types = array_merge(
-			get_post_types(['public' => false], 'object'), 
-			get_post_types(['public' => null], 'object')
-		);
+	$custom_types = array_intersect_key(
+		get_post_types(['_builtin' => false], 'object'),
+		$revisionary->enabled_post_types
+	);
 		
-		// by default, enable non-public post types that have type-specific capabilities defined
-		foreach($private_types as $post_type => $type_obj) {
-			if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages']))
-			|| defined('REVISIONARY_ENABLE_' . strtoupper($post_type) . '_TYPE')
-			) {
-				$custom_types[$post_type] = $type_obj;
-			}
-		}
-	}
-
 	if ( isset( $wp_roles->roles['revisor'] ) ) {
 		if ($custom_types) {
 			foreach( $custom_types as $post_type => $type_obj ) {

@@ -10,11 +10,11 @@ jQuery(document).ready( function($) {
 		var refSelector = '#rvy_compare_button';
 
         if (!$(refSelector).length) {
-            var refSelector = 'div.misc-pub-section:last';
+            var refSelector = '#submitdiv div.misc-pub-section:last';
         }
 
         if (!$(refSelector).length) {
-            var refSelector = 'div.misc-pub-curtime';
+            var refSelector = '#submitdiv div.misc-pub-curtime';
         }
 
 		if (rvyObjEdit.ajaxurl && !$('div.rvy-creation-ui').length && $(refSelector).length) {
@@ -27,21 +27,35 @@ jQuery(document).ready( function($) {
             }
             
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']) {
+                var approveButtonHTML = '';
+
+                if (rvyObjEdit.canPublish && ('pending' != rvyObjEdit.currentStatus) && ('future' != rvyObjEdit.currentStatus)) {
+					approveButtonHTML = '&nbsp;<a href="' + rvyObjEdit['pendingActionURL'] + '" class="button rvy-direct-approve">'
+					+ rvyObjEdit['approveCaption'] + '</a>'
+				}
+
+                var rvyPreviewLink = '';
+
+				if (rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption']) {
+                    rvyPreviewLink = '&nbsp; <a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-preview" target="_blank">' 
+                    + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a>';
+                }
+
 				$(refSelector).after(
-                    '<div class="rvy-creation-ui" style="float:left; padding-left:10px">'
+                    '<div class="rvy-creation-ui" style="flo-at:left; padding-left:10px; margin-bottom: 10px">'
 
                     + '<a href="' + url + '" class="button revision-approve">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</a>'
-				
+                
+                    + approveButtonHTML
+
                     + '<div class="revision-created-wrapper" style="display: none; margin: 8px 0 0 2px">'
 					+ '<span class="revision-approve revision-created" style="color:green">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
-
-					+ '&nbsp;<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-preview" target="_blank">' 
-                    + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a>'
+                    + rvyPreviewLink
                     + '</div>'
-                    
-					+ '</div> <br /><br />'
+
+                    + '</div>'
 				);
             }
             
@@ -60,6 +74,10 @@ jQuery(document).ready( function($) {
         }
 	}
 	var RvyUIInterval = setInterval(RvySubmissionUI, 100);
+
+    $('a.save-timestamp').click(function() {
+        $('#save-post').val(rvyObjEdit.updateCaption);
+    });
 
 	$(document).on('click', 'a.save-timestamp, a.cancel-timestamp', function() {
         wp.autosave.server.triggerSave();
@@ -90,7 +108,7 @@ jQuery(document).ready( function($) {
         if (!rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL']) {
 			var revisionaryCreateDone = function () {
                 $('a.revision-approve').hide();
-				$('.revision-created-wrapper, .revision-created').show();
+                $('.revision-created-wrapper, .revision-created').show();
 
 				// @todo: abstract this for other workflows
 				rvyObjEdit.currentStatus = 'pending';
@@ -121,7 +139,7 @@ jQuery(document).ready( function($) {
         } else {
             var tmoApproval = setInterval(function() {
                 if (!wp.autosave.server.postChanged()) {
-                    window.location = rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL'];
+                    window.location.href = rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL'];
 
                     clearInterval(tmoApproval);
                 }
@@ -131,8 +149,38 @@ jQuery(document).ready( function($) {
         }
     });
     
+    $(document).on('click', 'a.rvy-direct-approve', function() {
+        if ($('a.rvy-direct-approve').attr('disabled')) {
+			return;
+		}
+
+        clearInterval(RvyUIInterval);
+
+        $('a.rvy-direct-approve').attr('disabled', 'disabled');
+
+        if (wp.autosave.server.postChanged()) {
+            wp.autosave.server.triggerSave();
+            var approvalDelay = 250;
+        } else {
+            var approvalDelay = 1;
+        }
+        
+        var tmoDirectApproval = setInterval(function() {
+            if (!wp.autosave.server.postChanged()) {
+                window.location.href = rvyObjEdit['pendingActionURL'];
+
+                clearInterval(tmoDirectApproval);
+            }
+        }, approvalDelay);
+
+        return false;
+    });
+
     $(document).on('click', '#post-body-content *, #content_ifr *, #wp-content-editor-container *, #tinymce *, #submitpost, span.revision-created', function() {
         $('.revision-created-wrapper, .revision-created').hide();
-        $('a.revision-approve').html(rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']).show().removeAttr('disabled');
+
+        if (!$('a.rvy-direct-approve').length) {
+            $('a.revision-approve').html(rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']).show().removeAttr('disabled');
+        }
     });
 });

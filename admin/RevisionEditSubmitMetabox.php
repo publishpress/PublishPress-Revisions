@@ -57,7 +57,7 @@ class RvyRevisionEditSubmitMetabox
                     <?php // PP: no change from WP core
                     if (current_user_can("delete_post", $post->ID)) {
                         if (!EMPTY_TRASH_DAYS)
-                            $delete_text = esc_html__('Delete Permanently');
+                            $delete_text = esc_html__('Delete Revision');
                         else
                             $delete_text = esc_html__('Move to Trash');
                         ?>
@@ -105,6 +105,10 @@ class RvyRevisionEditSubmitMetabox
             $preview_link = rvy_preview_url($post);
 
             $type_obj = get_post_type_object($post->post_type);
+
+            if (empty($type_obj->public)) {
+                return;
+            }
 
             $can_publish = current_user_can('edit_post', rvy_post_id($post->ID));
 

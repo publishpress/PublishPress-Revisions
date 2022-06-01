@@ -304,7 +304,7 @@ class Revisionary
 			'revisionary_enabled_post_types', 
 			array_diff_key(
 				$enabled_post_types,
-				['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true]
+				['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true]
 			)
 		);
 
@@ -516,7 +516,9 @@ class Revisionary
 				$args['nc'] = sanitize_key($_REQUEST['nc']);
 			}
 
-			$preview_link = rvy_preview_url($revision, $args);
+			$type_obj = get_post_type_object($post->post_type);
+
+			$preview_link = (!empty($type_obj->public)) ? rvy_preview_url($revision, $args) : admin_url("post.php?post={$post->ID}&action=edit");
 			wp_redirect($preview_link);
 			exit;
 		}
@@ -529,13 +531,11 @@ class Revisionary
 	function act_edit_revision_redirect() {
 		global $current_user, $post;
 
-		if (is_admin() || empty($post) || empty($_REQUEST['edit_new_revision'])) {
+		if (is_admin() || (empty($post) && empty($_REQUEST['edit_new_revision']))) {
 			return;
 		}
 
-		$last_user_revision_id = (int) $_REQUEST['edit_new_revision'];
-
-		$published_post_id = rvy_post_id($post->ID);
+		$published_post_id = (!empty($_REQUEST['edit_new_revision'])) ? rvy_post_id($_REQUEST['edit_new_revision']) : rvy_post_id($post->ID);
 		$published_url = get_permalink($published_post_id);
 
 		$revision = $this->get_last_revision($published_post_id, $current_user->ID);
@@ -876,7 +876,7 @@ class Revisionary
 		if (rvy_in_revision_workflow($post)) {
 			$object_type_obj = get_post_type_object($post->post_type);
 
-			if (('draft-revision' == $post->post_mime_type) && !rvy_is_post_author($post) && empty($wp_blogcaps['manage_unsubmitted_revisions'])) {
+			if (('draft-revision' == $post->post_mime_type) && !rvy_is_post_author($post) && rvy_get_option('manage_unsubmitted_capability') && empty($wp_blogcaps['manage_unsubmitted_revisions'])) {
 				unset($wp_blogcaps[$object_type_obj->cap->edit_others_posts]);
 			} else {
 				// If edit_others capability is being required for this post type, apply edit_others_revisions capability

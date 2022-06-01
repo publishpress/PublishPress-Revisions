@@ -20,6 +20,8 @@ class RevisionaryFront {
 		add_filter('posts_results', [$this, 'inherit_status_workaround']);
 		add_filter('the_posts', [$this, 'undo_inherit_status_workaround']);
 
+		remove_action( 'init', 'register_block_core_post_comments' );
+
 		do_action('revisionary_front_init');
 	}
 
@@ -133,6 +135,10 @@ class RevisionaryFront {
 	// allows for front-end viewing of a revision by those who can edit the current revision (also needed for post preview by users editing for pending revision)
 	function act_template_redirect() {
 		if ( is_admin() ) {
+			return;
+		}
+
+		if (defined('FL_BUILDER_VERSION') && isset($_REQUEST['fl_builder'])) {
 			return;
 		}
 

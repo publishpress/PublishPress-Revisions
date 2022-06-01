@@ -33,6 +33,10 @@ class RevisionaryEditRevisionUI {
 			{
 				display: inline;
 			}
+
+			div.edit-post-post-status div.rvy-creation-ui div.revision-created {
+				display: block;
+			}
 			</style>
 			<?php
 		}

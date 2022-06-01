@@ -83,7 +83,7 @@ function rvy_admin_init() {
 			$url = admin_url("admin.php?page=revisionary-q");
 		}
 
-		$sendback = remove_query_arg( array('trashed', 'untrashed', 'submitted_count', 'approved_count', 'published_count', 'deleted', 'locked', 'ids', 'posts', '_wp_nonce', '_wp_http_referer'), $url);
+		$sendback = remove_query_arg( array('trashed', 'untrashed', 'submitted_count', 'declined_count', 'approved_count', 'published_count', 'deleted', 'locked', 'ids', 'posts', '_wp_nonce', '_wp_http_referer'), $url);
 	
 		if ( 'delete_all' == $doaction ) {
 			// Prepare for deletion of all posts with a specified post status (i.e. Empty trash).
@@ -184,6 +184,42 @@ function rvy_admin_init() {
 				if ($submitted) {
 					$arg = 'submitted_count';
 					$sendback = add_query_arg($arg, $submitted, $sendback);
+				}
+
+				break;
+
+			case 'decline_revision' :
+				$declined = 0;
+
+				$is_administrator = current_user_can('administrator');
+
+				require_once( dirname(__FILE__).'/revision-action_rvy.php');
+
+				foreach ((array) $post_ids as $post_id) {
+					if (!$revision = get_post($post_id)) {
+						continue;
+					}
+
+					if ('pending' != $revision->post_status) {
+						continue;
+					}
+
+					if (!$is_administrator && !current_user_can('set_revision_pending-revision', $revision->ID)) {
+						if (count($post_ids) == 1) {
+							wp_die( esc_html__('Sorry, you are not allowed to decline this revision.', 'revisionary') );
+						} else {
+							continue;
+						}
+					}	
+
+					if (rvy_revision_decline($revision->ID)) {
+						$declined++;
+					}
+				}
+	
+				if ($declined) {
+					$arg = 'declined_count';
+					$sendback = add_query_arg($arg, $declined, $sendback);
 				}
 
 				break;

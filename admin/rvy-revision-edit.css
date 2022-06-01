@@ -28,11 +28,20 @@ margin-right: 5px;
 
 
 #rvy_compare_button {
-margin: 0 10px 10px 10px;
+margin: 0 10px 8px 10px;
 }
 
-#woocommerce-product-data ul.product_data_tabs li.variations_options,
-#woocommerce-product-data ul.product_data_tabs li.linked_product_options
-{
-display: none !important;
+#misc-publishing-actions a.rvy-direct-approve {
+margin-left: 5px;
+}
+
+div.components-panel__row button.editor-post-trash {
+height: 25px;
+margin-top: 20px;
+color: #6f1b1b;
+box-shadow: inset 0 0 0 1px #6f1b1b;
+}
+
+span.revision-submitting {
+font-weight: bold;
 }

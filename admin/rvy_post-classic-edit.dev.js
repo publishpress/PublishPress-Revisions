@@ -15,14 +15,15 @@ jQuery(document).ready( function($) {
             var html = '<div class="rvy-creation-ui"' + hideStyle + '><a href="javascript:void(0)" class="button revision-approve revision-create" style="margin-top: 15px; margin-bottom: 15px" title="' 
 			+ rvyObjEdit.actionTitle + '">' 
 			+ rvyObjEdit.actionCaption + '</a>'
+			+ '<div class="revision-created-wrapper" style="display:none; margin: 10px 0 10px 5px; font-weight: bold">'
+			+ '<span class="revision-approve revision-created">' + rvyObjEdit.completedCaption + '</span> &nbsp;';
 			
-			+ '<div class="revision-created-wrapper" style="display:none; margin: 10px 0 10px 5px; font-weight: bold"><span class="revision-approve revision-created">' 
-			+ rvyObjEdit.completedCaption + '</span> '
-
-			+ '&nbsp;<a href="javascript:void(0)" class="revision-approve revision-preview" target="_blank">' 
-			+ rvyObjEdit.completedLinkCaption + '</a>'
+			if (rvyObjEdit.completedURL) {
+				html = html + '<a href="javascript:void(0)" class="revision-approve revision-preview" target="_blank">' 
+				+ rvyObjEdit.completedLinkCaption + '</a>&nbsp;';
+			}
 			
-			+ '&nbsp;<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">' 
+			html = html + '<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">' 
 			+ rvyObjEdit.completedEditLinkCaption + '</a>'
 			
 			+ '</div>';
@@ -37,12 +38,14 @@ jQuery(document).ready( function($) {
 					+ rvyObjEdit.scheduleCaption + '</a>'
 					
 					+ '<div class="revision-scheduled-wrapper" style="display:none; margin-top: 15px; margin-bottom: 15px; font-weight: bold"><span class="revision-approve revision-scheduled">'
-					+ rvyObjEdit.scheduledCaption + '</span> '
+					+ rvyObjEdit.scheduledCaption + '</span> ';
 
-					+ '&nbsp;<a href="javascript:void(0)" class="revision-approve revision-preview" target="_blank">' 
-					+ rvyObjEdit.scheduledLinkCaption + '</a>'
+					if (rvyObjEdit.scheduledLinkCaption) {
+						html += '&nbsp;<a href="javascript:void(0)" class="revision-approve revision-preview" target="_blank">' 
+						+ rvyObjEdit.scheduledLinkCaption + '</a>';
+					}
 					
-					+ '&nbsp;<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">' 
+					html += '&nbsp;<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">' 
 					+ rvyObjEdit.scheduledEditLinkCaption + '</a>'
 
 					+ '</div>';
@@ -95,7 +98,12 @@ jQuery(document).ready( function($) {
 			$('.revision-create').hide();
 			$('.revision-created-wrapper').show();
 
-			$('div.revision-created-wrapper a.revision-preview').attr('href', rvyObjEdit.completedURL);
+			if (rvyObjEdit.completedURL) {
+				$('div.revision-created-wrapper a.revision-preview').attr('href', rvyObjEdit.completedURL);
+			} else {
+				$('div.revision-created-wrapper a.revision-preview').hide();
+			}
+
 			$('div.revision-created-wrapper a.revision-edit').attr('href', rvyObjEdit.completedEditURL);
             $('a.revision-create').removeAttr('disabled');
 		}
