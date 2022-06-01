@@ -1442,7 +1442,7 @@ function rvy_update_next_publish_date($args = []) {
 	
 	if ($args && !empty($args['revision_id']) && (rvy_get_option('scheduled_publish_cron') || version_compare($wp_version, '5.9', '>='))) {
 		if ($revision = get_post($args['revision_id'])) {
-			wp_schedule_single_event(strtotime( $revision->post_date_gmt ), 'publish_revision_rvy', $args);
+			wp_schedule_single_event(strtotime( $revision->post_date_gmt ), 'publish_revision_rvy', array_intersect_key($args, ['revision_id' => true]));
 		}
 	}
 
