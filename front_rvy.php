@@ -138,6 +138,10 @@ class RevisionaryFront {
 			return;
 		}
 
+		if (defined('FL_BUILDER_VERSION') && isset($_REQUEST['fl_builder'])) {
+			return;
+		}
+
 		global $wp_query, $revisionary, $post;
 		if ($wp_query->is_404) {
 			if (!empty($_REQUEST['base_post'])) {
