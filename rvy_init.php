@@ -99,11 +99,11 @@ function rvy_mail_buffer_cron_interval( $schedules ) {
     return $schedules;
 }
 
-function _revisionary_publish_scheduled_cron($args = []) {
+function _revisionary_publish_scheduled_cron($revision_id) {
 	global $wp_version;
 
 	if (get_option('rvy_scheduled_revisions') && (get_option('rvy_scheduled_publish_cron') || version_compare($wp_version, '5.9', '>='))) {
-		revisionary_publish_scheduled($args);
+		revisionary_publish_scheduled(compact('revision_id'));
 	}
 }
 
