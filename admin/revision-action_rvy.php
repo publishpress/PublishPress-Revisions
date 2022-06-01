@@ -263,28 +263,30 @@ function rvy_revision_approve($revision_id = 0) {
 		}
 
 		if (!empty($_REQUEST['editor']) && !defined('REVISIONARY_IGNORE_AUTOSAVE')) {
-			if ($autosave_post = \PublishPress\Revisions\Utils::get_post_autosave($revision_id, $current_user->ID)) {
-				if (strtotime($autosave_post->post_modified_gmt) > strtotime($revision->post_modified_gmt)) {
-					$set_post_properties = [       
-						'post_content',
-						'post_content_filtered',
-						'post_title',
-						'post_excerpt',
-					];
-					
-					$update_data = [];
-
-					foreach($set_post_properties as $prop) {
-						if (!empty($autosave_post) && !empty($autosave_post->$prop)) {
-							$update_data[$prop] = $autosave_post->$prop;
+			if (!\PublishPress\Revisions\Utils::isBlockEditorActive()) {
+				if ($autosave_post = \PublishPress\Revisions\Utils::get_post_autosave($revision_id, $current_user->ID)) {
+					if (strtotime($autosave_post->post_modified_gmt) > strtotime($revision->post_modified_gmt)) {
+						$set_post_properties = [       
+							'post_content',
+							'post_content_filtered',
+							'post_title',
+							'post_excerpt',
+						];
+						
+						$update_data = [];
+	
+						foreach($set_post_properties as $prop) {
+							if (!empty($autosave_post) && !empty($autosave_post->$prop)) {
+								$update_data[$prop] = $autosave_post->$prop;
+							}
 						}
+	
+						if ($update_data) {
+							$wpdb->update($wpdb->posts, $update_data, ['ID' => $revision_id]);
+						}
+	
+						$wpdb->delete($wpdb->posts, ['ID' => $autosave_post->ID]);
 					}
-
-					if ($update_data) {
-						$wpdb->update($wpdb->posts, $update_data, ['ID' => $revision_id]);
-					}
-
-					$wpdb->delete($wpdb->posts, ['ID' => $autosave_post->ID]);
 				}
 			}
 		}
