@@ -1060,6 +1060,8 @@ function rvy_revision_bulk_delete() {
 			wp_delete_post($revision_id, true);
 			$delete_count++;
 
+			do_action('rvy_delete_revision', $revision_id);
+
 			rvy_delete_past_revisions($revision_id);
 		}
 
