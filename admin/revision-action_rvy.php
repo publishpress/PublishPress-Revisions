@@ -36,6 +36,17 @@ function rvy_revision_create($post_id = 0) {
 function rvy_revision_submit($revision_id = 0) {
 	global $wpdb, $revisionary;
 
+	// PublishPress Authors: Don't alter revision author
+	remove_action(
+		'save_post',
+		[
+			'MultipleAuthors\\Classes\\Post_Editor',
+			'action_save_post_set_initial_author',
+		],
+		10,
+		3
+	);
+
 	if (!$revision_id) {
 		$batch_process = false;
 
