@@ -531,13 +531,11 @@ class Revisionary
 	function act_edit_revision_redirect() {
 		global $current_user, $post;
 
-		if (is_admin() || empty($post) || empty($_REQUEST['edit_new_revision'])) {
+		if (is_admin() || (empty($post) && empty($_REQUEST['edit_new_revision']))) {
 			return;
 		}
 
-		$last_user_revision_id = (int) $_REQUEST['edit_new_revision'];
-
-		$published_post_id = rvy_post_id($post->ID);
+		$published_post_id = (!empty($_REQUEST['edit_new_revision'])) ? rvy_post_id($_REQUEST['edit_new_revision']) : rvy_post_id($post->ID);
 		$published_url = get_permalink($published_post_id);
 
 		$revision = $this->get_last_revision($published_post_id, $current_user->ID);
