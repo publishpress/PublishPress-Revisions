@@ -68,7 +68,7 @@ class RevisionaryAdmin
 					require_once( dirname(__FILE__).'/edit-revision-ui_rvy.php' );
 					new RevisionaryEditRevisionUI();
 
-					if (\PublishPress\Revisions\Utils::isBlockEditorActive()) {
+					if (\PublishPress\Revisions\Utils::isBlockEditorActive($post->post_type)) {
 						require_once( dirname(__FILE__).'/edit-revision-block-ui_rvy.php' );
 						new RevisionaryEditRevisionBlockUI();
 					} else {
