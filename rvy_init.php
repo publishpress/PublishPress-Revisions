@@ -191,7 +191,7 @@ function rvy_ajax_handler() {
 				default:
 			}
 
-			if (!empty($check_autosave) && !defined('REVISIONARY_IGNORE_REVISION_AUTOSAVE')) {
+			if (('submit_revision' != $_REQUEST['rvy_ajax_field']) && !empty($check_autosave) && !defined('REVISIONARY_IGNORE_REVISION_AUTOSAVE')) {
 				if ($autosave_post = PublishPress\Revisions\Utils::get_post_autosave($post_id, $current_user->ID)) {
 					$main_post = get_post($post_id);
 
