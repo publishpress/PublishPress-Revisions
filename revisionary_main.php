@@ -516,7 +516,9 @@ class Revisionary
 				$args['nc'] = sanitize_key($_REQUEST['nc']);
 			}
 
-			$preview_link = rvy_preview_url($revision, $args);
+			$type_obj = get_post_type_object($post->post_type);
+
+			$preview_link = (!empty($type_obj->public)) ? rvy_preview_url($revision, $args) : admin_url("post.php?post={$post->ID}&action=edit");
 			wp_redirect($preview_link);
 			exit;
 		}

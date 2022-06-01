@@ -106,6 +106,10 @@ class RvyRevisionEditSubmitMetabox
 
             $type_obj = get_post_type_object($post->post_type);
 
+            if (empty($type_obj->public)) {
+                return;
+            }
+
             $can_publish = current_user_can('edit_post', rvy_post_id($post->ID));
 
             if ($type_obj && empty($type_obj->public)) {
