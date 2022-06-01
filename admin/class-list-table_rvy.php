@@ -919,6 +919,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		if ($approval_potential = apply_filters('revisionary_bulk_action_approval', $approval_potential)) {
 			$actions['approve_revision'] = esc_html__('Approve');
+			$actions['decline_revision'] = esc_html__('Decline');
 			$actions['publish_revision'] = esc_html__('Publish');
 
 			if (rvy_get_option('scheduled_revisions')) {
