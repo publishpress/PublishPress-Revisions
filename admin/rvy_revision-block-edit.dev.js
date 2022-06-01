@@ -169,50 +169,49 @@ jQuery(document).ready( function($) {
 
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']) {
 				var approveButtonHTML = '';
+				var mainDashicon = '';
 
-				if (rvyObjEdit.canPublish && ('pending' != rvyObjEdit.currentStatus)) {
+                if (rvyObjEdit.canPublish && ('pending' != rvyObjEdit.currentStatus) && ('future' != rvyObjEdit.currentStatus)) {
 					approveButtonHTML = '<a href="' + rvyObjEdit['pendingActionURL'] + '" class="revision-approve">'
 					+ '<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button rvy-direct-approve">'
 					+ '<span class="dashicons dashicons-yes"></span>'
-					+ rvyObjEdit['approveCaption'] + '</button></a>'
+						+ rvyObjEdit['approveCaption'] + '</button></a>';
+						
+                    mainDashicon = 'dashicons-upload';
+                } else {
+                    if ('pending' == rvyObjEdit.currentStatus) {
+                        mainDashicon = 'dashicons-yes';
+                    } else {
+                        mainDashicon = 'dashicons-upload';
+                    }
 				}
 
-				$(refSelector).after(
-					'<div class="rvy-creation-ui"><a href="' + url + '" class="revision-approve">'
+				var rvyPreviewLink = '';
+				
+                if (rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption']) {
+                    rvyPreviewLink = '<br /><a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-approve revision-preview components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
+                        + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a>';
+				}
+				
+                $(refSelector).after('<div class="rvy-creation-ui"><a href="' + url + '" class="revision-approve">'
 					+ '<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button">'
-					+ '<span class="dashicons dashicons-yes"></span>'
+                    + '<span class="dashicons ' + mainDashicon + '"></span>'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</button></a>'
 
 					+ approveButtonHTML
-
 					+ '<div class="revision-submitting" style="display: none;">'
 					+ '<span class="revision-approve revision-submitting">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'InProcessCaption'] + '</span><span class="spinner ppr-submission-spinner" style=""></span></div>'
-
-					+ '<div class="revision-created" style="display: none">'
+                    + '<div class="revision-approving" style="display: none;">'
+                    + '<span class="revision-approve revision-submitting">'
+                    + rvyObjEdit.approvingCaption + '</span><span class="spinner ppr-submission-spinner" style=""></span></div>'
+                    + '<div class="revision-created" style="display: none; margin-top: 15px">'
 					+ '<span class="revision-approve revision-created">'
 					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
-
-					+ '<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-approve revision-preview components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
-					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a>'
-					
+                    + rvyPreviewLink
 					+ '</div>'
-
-					+ '</div>'
-				);
+					+ '</div>');
 			}
-
-			/*
-			if (RvyApprovalLocked != $('button.revision-approve').prop('disabled')) {
-				if (RvyApprovalLocked) {
-					$('button.revision-approve').html('Revision needs update.');
-				} else {
-					$('button.revision-approve').html(rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']);
-				}
-			}
-			*/
-
-			$('button.revision-approve').prop('disabled', RvyApprovalLocked && ('pending' == rvyObjEdit.currentStatus));
 
 			$('.edit-post-post-schedule__toggle').after('<button class="components-button is-tertiary post-schedule-footnote" disabled>' + rvyObjEdit.onApprovalCaption + '</button>');
 
@@ -220,8 +219,9 @@ jQuery(document).ready( function($) {
 				$('button.editor-post-trash').wrap('<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'DeletionURL'] + '" style="text-decoration:none"></a>');
 			}
 		}
+        $('button.post-schedule-footnote').toggle(!/\d/.test($('button.edit-post-post-schedule__toggle').html()));
 
-		$('button.post-schedule-footnote').toggle(!/\d/.test($('button.edit-post-post-schedule__toggle').html()));
+        $('button.editor-post-trash').parent().css('text-align', 'right');
 	}
 	var RvyUIInterval = setInterval(RvySubmissionUI, 100);
 

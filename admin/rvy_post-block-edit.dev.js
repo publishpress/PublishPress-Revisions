@@ -36,20 +36,24 @@ jQuery(document).ready( function($) {
 			+ rvyObjEdit.actionCaption + '</button></a>'
 
 			+ '<div class="revision-creating" style="display: none;">'
-			+ '<span class="revision-approve revision-creating">'
-			+ rvyObjEdit.creatingCaption + '</span><span class="spinner ppr-submission-spinner" style=""></span></div>'
+			+ '<span class="revision-approve revision-creating">' + rvyObjEdit.creatingCaption + '</span><span class="spinner ppr-submission-spinner" style=""></span>'
+			+ '</div>'
 
-			+ '<button type="button" class="revision-approve revision-created ppr-clear-button" style="display: none">'
-			+ '<span class="revision-approve revision-created">'
-			+ rvyObjEdit.completedCaption + '</span> '
+			+ '<div class="revision-approve revision-created">' + rvyObjEdit.completedCaption + '</div> '
 
+			+ '<div class="revision-approve revision-created revision-created-buttons">';
+
+			if (rvyObjEdit.completedURL) {
+				html = html + '<button type="button" class="revision-approve revision-created ppr-clear-button" style="display: none">'
 			+ '<a href="javascript:void(0)" class="revision-approve revision-preview components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
-			+ rvyObjEdit.completedLinkCaption + '</a>'
+				+ rvyObjEdit.completedLinkCaption + '</a></button>';
+			}
 			
+			html = html + '<button type="button" class="revision-approve revision-created revision-edit ppr-clear-button" style="display: none">'
 			+ '<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
 			+ rvyObjEdit.completedEditLinkCaption + '</a>'
-			
-			+ '</button>';
+			+ '</button>'
+			+ '</div>'
 
 			if (rvyObjEdit.scheduleCaption) {
 				let postStatus = wp.data.select('core/editor').getCurrentPostAttribute('status');
@@ -63,12 +67,14 @@ jQuery(document).ready( function($) {
 
 					+ '<button type="button" class="revision-approve revision-scheduled ppr-clear-button" style="display: none">'
 					+ '<span class="revision-approve revision-scheduled">'
-					+ rvyObjEdit.scheduledCaption + '</span> '
+					+ rvyObjEdit.scheduledCaption + '</span> ';
 
-					+ '<a href="javascript:void(0)" class="revision-approve revision-preview components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
-					+ rvyObjEdit.scheduledLinkCaption + '</a>'
+					if (rvyObjEdit.scheduledLinkCaption) {
+						html += '<a href="javascript:void(0)" class="revision-approve revision-preview components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
+						+ rvyObjEdit.scheduledLinkCaption + '</a>';
+					}
 
-					+ '<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
+					html += '<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
 					+ rvyObjEdit.scheduledEditLinkCaption + '</a>'
 					
 					+ '</button>';
@@ -182,7 +188,12 @@ jQuery(document).ready( function($) {
 
 			$('a.revision-approve span.spinner').css('visibility', 'hidden');
 
-			$('button.revision-created a.revision-preview').attr('href', rvyObjEdit.completedURL);
+			if (rvyObjEdit.completedURL) {
+				$('button.revision-created a.revision-preview').attr('href', rvyObjEdit.completedURL);
+			} else {
+				$('button.revision-created a.revision-preview').hide();
+			}
+
 			$('button.revision-created a.revision-edit').attr('href', rvyObjEdit.completedEditURL);
 		}
 

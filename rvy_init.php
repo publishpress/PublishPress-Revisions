@@ -251,6 +251,8 @@ function rvy_delete_post_meta($post_id, $meta_key) {
 }
 
 function rvy_status_registrations() {
+	$block_editor = \PublishPress\Revisions\Utils::isBlockEditorActive();
+
 	$labels = apply_filters('revisionary_status_labels',
 		rvy_get_option('revision_statuses_noun_labels') ?
 		[
@@ -259,7 +261,7 @@ function rvy_status_registrations() {
 				'submit' => esc_html__('Create Working Copy', 'revisionary'), 
 				'submit_short' => esc_html__('Copy', 'revisionary'),
 				'submitting' => esc_html__('Creating Working Copy...', 'revisionary'),
-				'submitted' => esc_html__('Working Copy ready.', 'revisionary'),
+				'submitted' => esc_html__('Working Copy ready', 'revisionary'),
 				'approve' => esc_html__('Approve Changes', 'revisionary'), 
 				'approve_short' => esc_html__('Approve', 'revisionary'),
 				'approving' => esc_html__('Approving Changes...', 'revisionary'),
@@ -277,7 +279,7 @@ function rvy_status_registrations() {
 				'submit' => esc_html__('Submit Change Request', 'revisionary'),
 				'submit_short' => esc_html__('Submit', 'revisionary'),
 				'submitting' => esc_html__('Submitting Changes...', 'revisionary'),
-				'submitted' => esc_html__('Changes Submitted.', 'revisionary'),
+				'submitted' => esc_html__('Changes Submitted', 'revisionary'),
 				'approve' => esc_html__('Approve Changes', 'revisionary'), 
 				'approve_short' => esc_html__('Approve', 'revisionary'),
 				'approving' => esc_html__('Approving Changes...', 'revisionary'),
@@ -316,7 +318,7 @@ function rvy_status_registrations() {
 				'submit' => esc_html__('New Revision', 'revisionary'), 
 				'submit_short' => esc_html__('New Revision', 'revisionary'), 
 				'submitting' => esc_html__('Creating Revision...', 'revisionary'),
-				'submitted' => esc_html__('Revision ready to edit.', 'revisionary'),
+				'submitted' => ($block_editor) ? esc_html__('The Revision is ready to edit.', 'revisionary') : esc_html__('Revision ready to edit.', 'revisionary'),
 				'approve' => esc_html__('Approve Revision', 'revisionary'), 
 				'approve_short' => esc_html__('Approve', 'revisionary'),
 				'publish' => esc_html__('Publish Revision', 'revisionary'), 
@@ -333,7 +335,7 @@ function rvy_status_registrations() {
 				'submit' => esc_html__('Submit Revision', 'revisionary'), 
 				'submit_short' => esc_html__('Submit', 'revisionary'), 
 				'submitting' => esc_html__('Submitting Revision...', 'revisionary'),
-				'submitted' => esc_html__('Revision Submitted.', 'revisionary'),
+				'submitted' => ($block_editor) ? esc_html__('The Revision is Submitted', 'revisionary') : esc_html__('Revision Submitted', 'revisionary'),
 				'approve' => esc_html__('Approve Revision', 'revisionary'), 
 				'approve_short' => esc_html__('Approve', 'revisionary'),
 				'publish' => esc_html__('Publish Revision', 'revisionary'), 
@@ -350,7 +352,7 @@ function rvy_status_registrations() {
 				'submit' => esc_html__('Schedule Revision', 'revisionary'), 
 				'submit_short' => esc_html__('Schedule Revision', 'revisionary'), 
 				'submitting' => esc_html__('Scheduling Revision...', 'revisionary'),
-				'submitted' => esc_html__('Revision Scheduled.', 'revisionary'),
+				'submitted' => ($block_editor) ? esc_html__('The Revision is Scheduled', 'revisionary') :  esc_html__('Revision Scheduled', 'revisionary'),
 				'approve' => esc_html__('Approve Revision', 'revisionary'), 
 				'approve_short' => esc_html__('Approve', 'revisionary'), 
 				'publish' => esc_html__('Publish Revision', 'revisionary'), 
