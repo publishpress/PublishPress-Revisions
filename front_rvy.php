@@ -20,6 +20,8 @@ class RevisionaryFront {
 		add_filter('posts_results', [$this, 'inherit_status_workaround']);
 		add_filter('the_posts', [$this, 'undo_inherit_status_workaround']);
 
+		remove_action( 'init', 'register_block_core_post_comments' );
+
 		do_action('revisionary_front_init');
 	}
 
