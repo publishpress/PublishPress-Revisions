@@ -45,7 +45,7 @@ class Utils {
 	 *
 	 * @return bool
 	 */
-	public static function isBlockEditorActive() {
+	public static function isBlockEditorActive($postType = false) {
 		global $wp_version;
 
 		// Check if PP Custom Post Statuses lower than v2.4 is installed. It disables Gutenberg.
@@ -77,8 +77,10 @@ class Utils {
 			'gutenberg-ramp' => class_exists('Gutenberg_Ramp'),
 		);
 
-		if ( ! $postType = rvy_detect_post_type() ) {
-			$postType = 'page';
+		if (!$postType) {
+			if ( ! $postType = rvy_detect_post_type() ) {
+				$postType = 'page';
+			}
 		}
 		
 		if ( $post_type_obj = get_post_type_object( $postType ) ) {
