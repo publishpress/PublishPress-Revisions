@@ -122,7 +122,7 @@ function rvy_revision_submit($revision_id = 0) {
 	}
 
 	if (empty($approval_error)) {
-		do_action( 'revision_submitted', $revision->post_parent, $revision->ID );
+		do_action( 'revision_submitted', $post->ID, $revision->ID );
 	}
 
 	if (!$batch_process) {
@@ -549,7 +549,7 @@ function rvy_revision_approve($revision_id = 0) {
 	}
 
 	if (empty($approval_error)) {
-		do_action( 'revision_approved', $revision->post_parent, $revision->ID );
+		do_action( 'revision_approved', $post->ID, $revision->ID );
 	}
 
 	if (!$batch_process) {
