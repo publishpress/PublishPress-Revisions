@@ -258,8 +258,10 @@ add_action(
 		// since sequence of set_current_user and init actions seems unreliable, make sure our current_user is loaded first
 		add_action('init', 'rvy_init', 1);
 		
-		add_action('init', 'rvy_add_revisor_custom_caps', 99);
-		add_action('wp_loaded', 'rvy_add_revisor_custom_caps', 99);
+		if (!defined('IFRAME_REQUEST')) {
+			add_action('init', 'rvy_add_revisor_custom_caps', 99);
+			add_action('wp_loaded', 'rvy_add_revisor_custom_caps', 99);
+		}
 		
 		add_action('init', 'rvy_configuration_late_init', PHP_INT_MAX - 1);
 
