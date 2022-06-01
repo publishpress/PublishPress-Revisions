@@ -55,11 +55,12 @@ class RevisionCreation {
 	function createRevision($post_id, $revision_status, $args = []) {
         global $wpdb, $current_user;
 
-        $published_post = get_post($post_id);
+		$is_revision = rvy_in_revision_workflow($post_id);
 
-		if (rvy_in_revision_workflow($published_post)) {
-			return;
-		}
+		$main_post_id = $is_revision ? rvy_post_id($post_id) : $post_id;
+
+        $published_post = get_post($main_post_id);
+		$source_post = get_post($post_id);
 
 		$set_post_properties = [       
 			'post_content',          
@@ -74,19 +75,21 @@ class RevisionCreation {
 
 		$data = [];
 
-		if ($autosave_post = Utils::get_post_autosave($post_id, $current_user->ID)) {
-			if (strtotime($autosave_post->post_modified_gmt) > strtotime($published_post->post_modified_gmt)) {
-				$use_autosave = true;
-				$args['meta_post_id'] = $autosave_post->ID;
+		if (!$is_revision) {
+			if ($autosave_post = Utils::get_post_autosave($post_id, $current_user->ID)) {
+				if (strtotime($autosave_post->post_modified_gmt) > strtotime($source_post->post_modified_gmt)) {
+					$use_autosave = true;
+					$args['meta_post_id'] = $autosave_post->ID;
+				}
 			}
 		}
 
 		foreach($set_post_properties as $prop) {
-			$data[$prop] = (!empty($use_autosave) && !empty($autosave_post->$prop)) ? $autosave_post->$prop : $published_post->$prop;
+			$data[$prop] = (!empty($use_autosave) && !empty($autosave_post->$prop)) ? $autosave_post->$prop : $source_post->$prop;
 		}
 
-		$data['post_type'] = $published_post->post_type;
-		$data['post_parent'] = $published_post->post_parent;
+		$data['post_type'] = $source_post->post_type;
+		$data['post_parent'] = ($is_revision) ? $published_post->post_parent : $source_post->post_parent;
 
 		if (!empty($args['time_gmt'])) {
 			$timestamp = $args['time_gmt'];
@@ -94,7 +97,9 @@ class RevisionCreation {
 			$data['post_date'] = gmdate( 'Y-m-d H:i:s', $timestamp + (int) ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ));
 		}
 
-		$revision_id = $this->insert_revision($data, $published_post->ID, $revision_status, $args);
+		$args['main_post_id'] = $main_post_id;
+
+		$revision_id = $this->insert_revision($data, $source_post->ID, $revision_status, $args);
 
 		if (!empty($use_autosave)) {
 			$wpdb->delete($wpdb->posts, ['ID' => $autosave_post->ID]);
@@ -142,7 +147,9 @@ class RevisionCreation {
 				$data['post_status'] = 'pending';
 		}
 
-		$data['comment_count'] = $base_post_id; 	// buffer this value in posts table for query efficiency (actual comment count stored for published post will not be overwritten)
+		$main_post_id = (!empty($args['main_post_id'])) ? $args['main_post_id'] : $base_post_id;
+
+		$data['comment_count'] = $main_post_id; 	// buffer this value in posts table for query efficiency (actual comment count stored for published post will not be overwritten)
 
 		$data['post_author'] = $current_user->ID;		// store current user as revision author (but will retain current post_author on restoration)
 
@@ -166,8 +173,8 @@ class RevisionCreation {
 		}
 
 		$update_data = ('pending-revision' == $data['post_mime_type'])  // 
-		? ['comment_count' => $base_post_id, 'post_modified_gmt' => $data['post_modified_gmt'], 'post_modified' => $data['post_modified']]
-		: ['comment_count' => $base_post_id];
+		? ['comment_count' => $main_post_id, 'post_modified_gmt' => $data['post_modified_gmt'], 'post_modified' => $data['post_modified']]
+		: ['comment_count' => $main_post_id];
 
 		$wpdb->update($wpdb->posts, $update_data, ['ID' => $revision_id]);
 
