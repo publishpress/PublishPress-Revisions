@@ -231,15 +231,22 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.1.1 - 8 Jun 2022 =
+* Fixed : Revision scheduling left a future date selection in editor. If the post is updated again without reloading the editor, it is unpublished until the selected date
+
 = 3.1 - 1 Jun 2022 =
 * Feature : Revision Edit - Administrators and editors have approval button for unsubmitted revisions
 * Feature : Revision Queue - Bulk Edit includes "Decline" action to return "Submitted" revisions back to "Not Submitted"
 * Feature : Revision Queue - New "Copy" row action
-* Compat : PublishPress Revisions - fatal error loading Customizer
+* Compat : PublishPress Permissions - fatal error loading Customizer
+* Compat : PublishPress Authors - Revision submission failed
+* Compat : PublishPress Permissions - Fatal error loading Customizer (also requires Permissions 3.7.6)
 * Fixed : Scheduled Revisions fail on some sites
 * Fixed : Editors could not manage unsubmitted revisions without manage_unsubmitted_revisions capability, even if "Additional role capability required" setting disabled
-* Fixed : Post types with publicly_queryable set false had non-functional revision preview links, revision publication redirects
+* Fixed : Non-public Post types had non-functional revision preview links, revision publication redirects
 * Fixed : Edit Revision - alignment and spacing in revision status sidebar
+* Fixed : Edit Revision - submit / approve buttons were re-enabled after toggle from Block to Post tab
+* Fixed : Revision Queue - checkbox column did not have a "select all" box
 
 = 3.0.16 - 20 Apr 2022 =
 * Fixed : Post Editor - New Revision button was not displayed 
