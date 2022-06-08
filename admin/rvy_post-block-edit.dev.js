@@ -225,6 +225,8 @@ jQuery(document).ready( function($) {
 
 			$('button.revision-scheduled a.revision-preview').attr('href', rvyObjEdit.scheduledURL);
 			$('button.revision-scheduled a.revision-edit').attr('href', rvyObjEdit.scheduledEditURL);
+
+			wp.data.dispatch('core/editor').editPost({date: wp.data.select('core/editor').getCurrentPostAttribute('date')});
 		}
 
 		var revisionaryScheduleError = function (data, txtStatus) {
