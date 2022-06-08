@@ -277,12 +277,18 @@ class Revisionary
 
 	// This is intentionally called twice: once for code that fires on 'init' and then very late on 'init' for types which were registered late on 'init'
 	public function setPostTypes() {
-		$enabled_post_types = array_merge(
-			array_fill_keys(
+		$enabled_post_types = array_fill_keys(
 				get_post_types(['public' => true]), true
-			),
-			['product' => true, 'order' => true, 'swfd-courses' => true, 'tribe_events' => true]
 		);
+
+		if (class_exists('WooCommerce')) {
+			$enabled_post_types['product'] = true;
+			$enabled_post_types['order'] = true;
+		}
+
+		if (class_exists('Tribe__Events__Main')) {
+			$enabled_post_types['tribe_events'] = true;
+		}
 
 		if (!defined('REVISIONARY_NO_PRIVATE_TYPES')) {
 			$private_types = array_merge(
