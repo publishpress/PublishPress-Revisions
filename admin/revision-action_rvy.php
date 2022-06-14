@@ -898,6 +898,18 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 	}
 
+	if (defined('PUBLISHPRESS_VERSION') && rvy_get_option('rev_publication_delete_ed_comments')) {
+		global $wpdb;
+
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM $wpdb->comments WHERE comment_approved = 'editorial-comment' AND (comment_post_ID = %d OR comment_post_ID = %d)",
+				$revision_id,
+				$published->ID
+			)
+		);
+	}
+
 	rvy_delete_past_revisions($revision_id);
 
 	rvy_delete_redundant_revisions($revision);
