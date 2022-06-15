@@ -93,6 +93,7 @@ $this->tab_captions = array( 'features' => esc_html__( 'Settings', 'revisionary'
 
 $this->section_captions = array(
 	'features' => array(
+		'post_types'			=> esc_html__('Post Types', 'revisionary'),
 		'role_definition' 	  	=> esc_html__('Revisors', 'revisionary'),
 		'revision_statuses'		=> esc_html__('Statuses', 'revisionary'),
 		'working_copy'			=> rvy_get_option('revision_statuses_noun_labels') ? pp_revisions_status_label('draft-revision', 'plural') : esc_html__('Revision Creation', 'revisionary'),
@@ -167,6 +168,7 @@ if ( defined('RVY_CONTENT_ROLES') ) {
 $this->form_options = apply_filters('revisionary_option_sections', [
 'features' => [
 	'license' =>			 ['edd_key'],
+	'post_types' =>			 ['enabled_post_types'],
 	'role_definition' => 	 ['revisor_role_add_custom_rolecaps', 'require_edit_others_drafts'],
 	'revision_statuses' =>	 ['revision_statuses_noun_labels'],
 	'working_copy' =>		 ['manage_unsubmitted_capability', 'copy_posts_capability', 'auto_submit_revisions', 'caption_copy_as_edit'],
@@ -357,6 +359,78 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 		</table>
 		<?php
 	}
+
+
+	$section = 'post_types';				// --- POST TYPES SECTION ---
+
+	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
+		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
+
+		<?php
+		$option_name = 'enabled_post_types';
+
+		$this->all_options []= $option_name;
+
+		esc_html_e('Enable revisions for these Post Types:', 'revisionary');
+        echo '<br /><br />';
+
+		$hidden_types = ['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true];
+		$locked_types = [];
+
+		$types = get_post_types(['public' => true, 'show_ui' => true], 'object', 'or');
+
+		$types = rvy_order_types($types);
+
+		foreach ($types as $key => $obj) {
+			if (!$key) {
+				continue;
+			}
+
+			$id = $option_name . '-' . $key;
+			$name = $option_name . "[$key]";
+			?>
+
+			<?php if ('nav_menu' == $key) : ?>
+				<input name="<?php echo esc_attr($name); ?>" type="hidden" id="<?php echo esc_attr($id); ?>" value="1"/>
+			<?php else : ?>
+			<?php if (isset($hidden_types[$key])) : ?>
+				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="<?php echo esc_attr($hidden_types[$key]); ?>"/>
+			<?php else : 
+					$locked = (!empty($locked_types[$key])) ? ' disabled ' : '';
+				?>
+			<div class="agp-vtight_input">
+				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="<?php echo (empty($locked_types[$key])) ? '0' : '1';?>"/>
+				<label for="<?php echo esc_attr($id); ?>" title="<?php echo esc_attr($key); ?>">
+					<input name="<?php if (empty($locked_types[$key])) echo esc_attr($name); ?>" type="checkbox" id="<?php echo esc_attr($id); ?>"
+						value="1" <?php checked('1', !empty($revisionary->enabled_post_types[$key])); echo esc_attr($locked); ?> />
+
+					<?php
+					if (isset($obj->labels_pp)) {
+						echo esc_html($obj->labels_pp->name);
+					} elseif (isset($obj->labels->name)) {
+						echo esc_html($obj->labels->name);
+					} else {
+						echo esc_html($key);
+					}
+
+					echo '</label>';
+					
+					if (!empty($revisionary->enabled_post_types[$key]) && isset($obj->capability_type) && !in_array($obj->capability_type, [$obj->name, 'post', 'page'])) {
+						if ($cap_type_obj = get_post_type_object($obj->capability_type)) {
+							echo '&nbsp;(' . esc_html(sprintf(__('%s capabilities'), $cap_type_obj->labels->singular_name)) . ')';
+						}
+					}
+
+					echo '</div>';
+				endif;
+			endif; // displaying checkbox UI
+
+		} // end foreach src_otype
+		?>
+
+	</td></tr></table>
+	<?php endif; // any options accessable in this section
+
 
 	$section = 'role_definition';			// --- ROLE DEFINITION SECTION ---
 

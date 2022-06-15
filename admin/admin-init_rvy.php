@@ -478,3 +478,54 @@ function rvy_get_post_revisions($post_id, $status = '', $args = '' ) {
 
 	return $revisions;
 }
+
+function rvy_order_types($types, $args = [])
+{
+	$defaults = ['order_property' => '', 'item_type' => 'post', 'labels_property' => ''];
+	$args = array_merge($defaults, $args);
+	foreach (array_keys($defaults) as $var) {
+		$$var = $args[$var];
+	}
+
+	if ('post' == $item_type) {
+		$post_types = get_post_types([], 'object');
+	} elseif ('taxonomy' == $item_type) {
+		$taxonomies = get_taxonomies([], 'object');
+	}
+
+	$ordered_types = [];
+	foreach (array_keys($types) as $name) {
+		if ('post' == $item_type) {
+			$ordered_types[$name] = (isset($post_types[$name]->labels->singular_name))
+				? $post_types[$name]->labels->singular_name
+				: '';
+		} elseif ('taxonomy' == $item_type) {
+			$ordered_types[$name] = (isset($taxonomies[$name]->labels->singular_name))
+				? $taxonomies[$name]->labels->singular_name
+				: '';
+		} else {
+			if (!is_object($types[$name])) {
+				return $types;
+			}
+
+			if ($order_property) {
+				$ordered_types[$name] = (isset($types[$name]->$order_property))
+					? $types[$name]->$order_property
+					: '';
+			} else {
+				$ordered_types[$name] = (isset($types[$name]->labels->$labels_property))
+					? $types[$name]->labels->$labels_property
+					: '';
+			}
+		}
+	}
+
+	asort($ordered_types);
+
+	foreach (array_keys($ordered_types) as $name) {
+		$ordered_types[$name] = $types[$name];
+	}
+
+	return $ordered_types;
+}
+	
