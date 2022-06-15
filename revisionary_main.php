@@ -277,31 +277,35 @@ class Revisionary
 
 	// This is intentionally called twice: once for code that fires on 'init' and then very late on 'init' for types which were registered late on 'init'
 	public function setPostTypes() {
-		$enabled_post_types = array_fill_keys(
-				get_post_types(['public' => true]), true
-		);
+		$enabled_post_types = get_option('rvy_enabled_post_types', false);
 
-		if (class_exists('WooCommerce')) {
-			$enabled_post_types['product'] = true;
-			$enabled_post_types['order'] = true;
-		}
-
-		if (class_exists('Tribe__Events__Main')) {
-			$enabled_post_types['tribe_events'] = true;
-		}
-
-		if (!defined('REVISIONARY_NO_PRIVATE_TYPES')) {
-			$private_types = array_merge(
-				get_post_types(['public' => false], 'object'), 
-				get_post_types(['public' => null], 'object')
+		if (false === $enabled_post_types) {
+			$enabled_post_types = array_fill_keys(
+					get_post_types(['public' => true]), true
 			);
-			
-			// by default, enable non-public post types that have type-specific capabilities defined
-			foreach($private_types as $post_type => $type_obj) {
-				if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages']))
-				|| defined('REVISIONARY_ENABLE_' . strtoupper($post_type) . '_TYPE')
-				) {
-					$enabled_post_types[$post_type] = true;
+	
+			if (class_exists('WooCommerce')) {
+				$enabled_post_types['product'] = true;
+				$enabled_post_types['order'] = true;
+			}
+	
+			if (class_exists('Tribe__Events__Main')) {
+				$enabled_post_types['tribe_events'] = true;
+			}
+	
+			if (!defined('REVISIONARY_NO_PRIVATE_TYPES')) {
+				$private_types = array_merge(
+					get_post_types(['public' => false], 'object'), 
+					get_post_types(['public' => null], 'object')
+				);
+				
+				// by default, enable non-public post types that have type-specific capabilities defined
+				foreach($private_types as $post_type => $type_obj) {
+					if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages']))
+					|| defined('REVISIONARY_ENABLE_' . strtoupper($post_type) . '_TYPE')
+					) {
+						$enabled_post_types[$post_type] = true;
+					}
 				}
 			}
 		}
@@ -310,7 +314,7 @@ class Revisionary
 			'revisionary_enabled_post_types', 
 			array_diff_key(
 				$enabled_post_types,
-				['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true]
+				['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true]
 			)
 		);
 
