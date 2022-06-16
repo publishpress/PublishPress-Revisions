@@ -101,6 +101,29 @@ class RevisionaryAdmin
 		add_filter('presspermit_status_control_scripts', [$this, 'fltDisableStatusControlScripts']);
 
 		add_filter('cme_plugin_capabilities', [$this, 'fltPublishPressCapsSection']);
+
+		add_action('init', function() { // late execution avoids clash with autoloaders in other plugins
+			global $pagenow;
+		
+			if (($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-settings'])
+			) {
+				if (!class_exists('\PublishPress\WordPressReviews\ReviewsController')) {
+					include_once RVY_ABSPATH . '/vendor/publishpress/wordpress-reviews/ReviewsController.php';
+				}
+		
+				if (class_exists('\PublishPress\WordPressReviews\ReviewsController')) {
+					$reviews = new \PublishPress\WordPressReviews\ReviewsController(
+						'revisionary',
+						'PublishPress Revisions',
+						plugin_dir_url(REVISIONARY_FILE) . 'common/img/revisions-wp-logo.jpg'
+					);
+		
+					add_filter('publishpress_wp_reviews_display_banner_revisions', [$this, 'shouldDisplayBanner']);
+		
+					$reviews->init();
+				}
+			}
+		});
 	}
 
 	function admin_scripts() {
@@ -133,6 +156,12 @@ class RevisionaryAdmin
 			// old js for notification recipient selection UI
 			wp_enqueue_script( 'rvy', RVY_URLPATH . "/admin/revisionary.js", array('jquery'), PUBLISHPRESS_REVISIONS_VERSION, true );
 		}
+	}
+
+	public function shouldDisplayBanner() {
+		global $pagenow;
+
+		return ($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-settings']);
 	}
 
 	function actDashboardGlanceItems($items) {
