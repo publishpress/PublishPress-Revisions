@@ -44,6 +44,20 @@ if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_ur
 if (isset($_SERVER['SCRIPT_NAME']) && strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/index-extra.php' ) || strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/update.php' ) )
 	return;
 
+$includeFileRelativePath = '/publishpress/publishpress-instance-protection/include.php';
+if (file_exists(__DIR__ . '/vendor' . $includeFileRelativePath)) {
+	require_once __DIR__ . '/vendor' . $includeFileRelativePath;
+}
+
+if (class_exists('PublishPressInstanceProtection\\Config')) {
+	$pluginCheckerConfig = new PublishPressInstanceProtection\Config();
+	$pluginCheckerConfig->pluginSlug    = 'revisionary';
+	$pluginCheckerConfig->pluginFolder  = 'revisionary';
+	$pluginCheckerConfig->pluginName    = 'PublishPress Revisions';
+
+	$pluginChecker = new PublishPressInstanceProtection\InstanceChecker($pluginCheckerConfig);
+}
+
 $pro_active = false;
 
 foreach ((array)get_option('active_plugins') as $plugin_file) {
