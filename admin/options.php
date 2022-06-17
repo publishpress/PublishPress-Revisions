@@ -221,7 +221,7 @@ if ( $customize_defaults )
 
 ?>
 <table width = "100%"><tr>
-<td width = "90%">
+<td width = "100%">
 <h1 class="wp-heading-inline"><?php
 if ( $sitewide )
 	esc_html_e('PublishPress Revisions Network Settings', 'revisionary');
@@ -239,6 +239,17 @@ else
 </tr></table>
 
 </header>
+
+<?php
+$div_class = apply_filters('publishpress_revisions_settings_sidebar', '');
+?>
+
+<div id="poststuff" class="metabox-holder <?php echo $div_class;?>">
+
+	<?php do_action('publishpress_revisions_settings_sidebar');?>
+
+	<div id="post-body" class="has-sidebar">	
+	<div id="post-body-content" class="has-sidebar-content ppseries-settings-body-content">
 
 <?php
 if ( $sitewide ) {
@@ -1050,6 +1061,11 @@ echo "javascript:if (confirm('"
 ?>" style="float:right;" />
 </p>
 </form>
+
+</div>
+</div>
+</div>
+
 <p style='clear:both'></p>
 
 <?php
