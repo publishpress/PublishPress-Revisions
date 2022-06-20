@@ -1191,7 +1191,7 @@ function rvy_revision_publish($revision_id = false) {
 }
 
 // rvy_init action passes Revisionary object
-function _rvy_publish_scheduled_revisions($args = []) {
+function _rvy_publish_scheduled_revisions($revisionary_obj, $args = []) {
 	rvy_publish_scheduled_revisions($args);
 }
 
