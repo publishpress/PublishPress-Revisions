@@ -64,6 +64,33 @@ if (version_compare($last_ver, '3.0-alpha', '>=') && version_compare($last_ver, 
 	}
 }
 
+// Revision Edit in Gutenberg: Enable non-Editors to set requested publish date
+add_action('init', function() {
+	global $revisionary;
+	
+	foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
+		add_filter("rest_prepare_{$post_type}", '_rvy_rest_prepare', 10, 3);
+	}
+}, 100);
+
+function _rvy_rest_prepare($response, $post, $request) {
+	if (!rvy_in_revision_workflow($post)) {
+		return $response;
+	}
+
+	if ($type_obj = get_post_type_object($post->post_type)) {
+		$rest_base = ! empty( $type_obj->rest_base ) ? $type_obj->rest_base : $type_obj->name;
+		$namespace = ! empty( $type_obj->rest_namespace ) ? $type_obj->rest_namespace : 'wp/v2';
+
+		$base = sprintf( '%s/%s', $namespace, $rest_base );
+		$href = rest_url( trailingslashit( $base ) . $post->ID );
+
+		$response->add_link('https://api.w.org/action-publish', $href);
+	}
+
+	return $response;
+}
+
 function rvy_mail_check_buffer($new_msg = [], $args = []) {
 	if (empty($args['log_only'])) {
 		if (!$use_buffer = rvy_get_option('use_notification_buffer')) {
