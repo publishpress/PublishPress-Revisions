@@ -813,18 +813,22 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	}
 
 	if ($published_id != $revision_id) {
-		$wpdb->update(
-			$wpdb->posts, 
-			['post_type' => 'revision', 
-			'post_status' => 'inherit', 
-			'post_date' => current_time('mysql'), 
-			'post_date_gmt' => current_time('mysql', 1), 
-			'post_parent' => $post_id, 
-			'comment_count' => 0,
-			'post_mime_type' => $published->post_mime_type
-			],
-			['ID' => $revision_id]
-		);
+		if (defined('REVISIONARY_ARCHIVE_SCHEDULED_REVISION')) {
+			$wpdb->update(
+				$wpdb->posts, 
+				['post_type' => 'revision', 
+				'post_status' => 'inherit', 
+				'post_date' => current_time('mysql'), 
+				'post_date_gmt' => current_time('mysql', 1), 
+				'post_parent' => $post_id, 
+				'comment_count' => 0,
+				'post_mime_type' => $published->post_mime_type
+				],
+				['ID' => $revision_id]
+			);
+		} else {
+			wp_delete_post($revision_id, true);
+		}
 
 		// todo: save change as past revision?
 		$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
