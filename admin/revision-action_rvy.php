@@ -813,7 +813,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	}
 
 	if ($published_id != $revision_id) {
-		if (defined('REVISIONARY_ARCHIVE_SCHEDULED_REVISION')) {
+		if (!defined('REVISIONARY_NO_SCHEDULED_REVISION_ARCHIVE')) {
 			$wpdb->update(
 				$wpdb->posts, 
 				['post_type' => 'revision', 
