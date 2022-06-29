@@ -46,7 +46,7 @@ class RvyOptionUI {
 		if ( in_array( $option_name, $this->form_options[$tab_name][$section_name] ) ) {
 			$this->all_options []= $option_name;
 
-			$return['val'] = rvy_get_option($option_name, $this->sitewide, $this->customize_defaults);
+			$return['val'] = rvy_get_option($option_name, $this->sitewide, $this->customize_defaults, ['bypass_condition_check' => true]);
 
 			echo "<div class='agp-vspaced_input'";
 			echo (isset($args['style']) && $args['style']) ? " style='" . esc_attr($args['style']) . "'" : '';
@@ -564,13 +564,11 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 		$this->option_checkbox( 'scheduled_revision_update_modified_date', $tab, $section, $hint, '' );
 
 		global $wp_version;
+		
+		$hint = esc_html__( 'Publish scheduled revisions using the WP-Cron mechanism. On some sites, publication will fail if this setting is disabled.', 'revisionary' );
+		$this->option_checkbox( 'scheduled_publish_cron', $tab, $section, $hint, '' );
 
-		if (version_compare($wp_version, '5.9', '<')) {
-			$hint = esc_html__( 'Publish scheduled revisions using the WP-Cron mechanism.', 'revisionary' );
-			$this->option_checkbox( 'scheduled_publish_cron', $tab, $section, $hint, '' );
-		}
-
-		if (!rvy_get_option('scheduled_publish_cron') && version_compare($wp_version, '5.9', '<')) {
+		if (!rvy_get_option('scheduled_publish_cron')) {
 			$hint = esc_html__( 'Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
 			$this->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
 		}
@@ -678,7 +676,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			'</a>'
 		);
 		?>
-
+		
 		</div>
 		<?php endif;?>
 
@@ -822,7 +820,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		}
 
 		if (!empty($_SERVER['REQUEST_URI'])) {
-		$uri = esc_url(esc_url_raw($_SERVER['REQUEST_URI']));
+			$uri = esc_url(esc_url_raw($_SERVER['REQUEST_URI']));
 		} else {
 			$uri = '';
 		}
