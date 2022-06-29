@@ -213,16 +213,14 @@ class Rvy_Revision_Workflow_UI {
             }
 
             if ( $recipient_ids ) {
-                global $wpdb;
+                $to_addresses = [];
 
-                $id_csv = implode("','", array_map('intval', $recipient_ids));
+                foreach($recipient_ids as $user_id) {
+                    $user = new WP_User($user_id);                
 
-                $results = $wpdb->get_results( 
-                    "SELECT ID, user_email FROM $wpdb->users WHERE ID IN ('$id_csv')" 
-                );
-                
-                foreach($results as $row) {
-                    $to_addresses[$row->ID] = $row->user_email;
+                    if ($user->exists() && !empty($user->user_email)) {
+                        $to_addresses[$user_id] = $user->user_email;
+                    }
                 }
 
                 $to_addresses = array_unique($to_addresses);
