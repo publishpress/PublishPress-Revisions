@@ -21,7 +21,7 @@ if (!empty($_REQUEST['preview']) && !empty($_REQUEST['post_type']) && empty($_RE
 	add_filter('redirect_canonical', '_rvy_no_redirect_filter', 10, 2);
 }
 
-/*======== WP-Cron implentation for Email Notification Buffer ========*/
+/*======== WP-Cron implementation for Email Notification Buffer ========*/
 add_action('init', 'rvy_set_notification_buffer_cron');
 add_action('rvy_mail_buffer_hook', 'rvy_send_buffered_mail' );
 add_filter('cron_schedules', 'rvy_mail_buffer_cron_interval');
