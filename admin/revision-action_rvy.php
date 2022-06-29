@@ -953,7 +953,7 @@ function rvy_do_revision_restore( $revision_id, $actual_revision_status = '' ) {
 
 	if ( $revision = wp_get_post_revision( $revision_id ) ) {
 		if ('future-revision' == $revision->post_mime_type) {
-			rvy_publish_scheduled_revisions(array('force_revision_id' => $revision->ID));
+			rvy_publish_scheduled_revisions(array('revision_id' => $revision->ID));
 			return $revision;
 		}
 		
@@ -1169,7 +1169,7 @@ function rvy_revision_publish($revision_id = false) {
 	} while (0);
 	
 	if (!empty($do_publish)) {
-		rvy_publish_scheduled_revisions(array('force_revision_id' => $revision->ID));
+		rvy_publish_scheduled_revisions(array('revision_id' => $revision->ID));
 
 		clean_post_cache($revision->ID);
 
@@ -1225,11 +1225,11 @@ function rvy_publish_scheduled_revisions($args = []) {
 		echo "current time: " . esc_html($time_gmt);
 	}
 
-	if (!empty($args['force_revision_id']) && is_scalar($args['force_revision_id'])) {
+	if (!empty($args['revision_id']) && is_scalar($args['revision_id'])) {
 		$results = $wpdb->get_results( 
 			$wpdb->prepare( 
 				"SELECT * FROM $wpdb->posts WHERE post_type != 'revision' AND post_status != 'inherit' AND post_mime_type = 'future-revision' AND ID = %d",
-				(int) $args['force_revision_id']
+				(int) $args['revision_id']
 			)
 		);
 	} else {
