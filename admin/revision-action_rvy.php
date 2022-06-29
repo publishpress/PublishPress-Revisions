@@ -1182,7 +1182,7 @@ function rvy_revision_publish($revision_id = false) {
 		if ($post) {
 			$type_obj = get_post_type_object($post->post_type);
 
-			$redirect = ($type_obj && empty($type_obj->public)) ? rvy_admin_url("post.php?action=edit&post=$post->ID") : get_permalink($post->ID); // published URL
+			$redirect = ($type_obj && empty($type_obj->public)) ? rvy_admin_url("post.php?action=edit&post=$post->ID") : add_query_arg('mark_current_revision', 1, get_permalink($post->ID)); // published URL
 		}
 
 		wp_redirect($redirect);
