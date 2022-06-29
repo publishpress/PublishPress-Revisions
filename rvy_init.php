@@ -1386,9 +1386,11 @@ function rvy_preview_url($revision, $args = []) {
 		$id_arg = 'page_id';
 	}
 
-	if (!strpos($preview_url, "{$id_arg}=")) {
-		$preview_url = add_query_arg($id_arg, $revision->ID, $preview_url);
+	if (strpos($preview_url, "{$id_arg}=")) {
+		$preview_url = remove_query_arg($id_arg, $preview_url);
 	}
+	
+	$preview_url = add_query_arg($id_arg, $revision->ID, $preview_url);
 
 	if (!strpos($preview_url, "post_type=")) {
 		$preview_url = add_query_arg('post_type', $post_type, $preview_url);
