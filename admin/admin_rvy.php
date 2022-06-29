@@ -107,6 +107,14 @@ class RevisionaryAdmin
 		
 			if (($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-settings'])
 			) {
+				global $wp_version;
+
+				if (defined('DISABLE_WP_CRON') && rvy_get_option('scheduled_revisions', -1, false, ['bypass_condition_check' => true]) 
+				&& rvy_get_option('scheduled_publish_cron')
+				) {
+					rvy_notice('Scheduled Revisions are not available because WP-Cron is disabled on this site.');
+				}
+
 				if (!class_exists('\PublishPress\WordPressReviews\ReviewsController')) {
 					include_once RVY_ABSPATH . '/vendor/publishpress/wordpress-reviews/ReviewsController.php';
 				}
