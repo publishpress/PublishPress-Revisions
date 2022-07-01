@@ -439,6 +439,13 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 		} // end foreach src_otype
 		?>
 
+	<br />
+	<div class="rs-subtext">
+	<?php
+	esc_html_e('Note: Third party code may cause some post types to be incompatible with PublishPress Revisions.', 'revisionary');
+	?>
+	</p>
+
 	</td></tr></table>
 	<?php endif; // any options accessable in this section
 
