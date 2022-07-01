@@ -1484,3 +1484,15 @@ function rvy_rest_cache_skip($skip) {
 
 	return $skip;
 }
+
+function pp_revisions_body_class() {
+	$classes = body_class();
+
+	if (function_exists('rvy_post_id')
+	&& ('page' === get_option('show_on_front'))
+	&& (rvy_post_id(get_the_ID()) == get_option('page_on_front'))) {
+		$classes []= 'home';
+	}
+
+	return $classes;
+}
