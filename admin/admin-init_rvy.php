@@ -38,6 +38,8 @@ function rvy_load_textdomain() {
 }
 
 function rvy_admin_init() {
+	do_action('pp_revisions_admin_init');
+
 	rvy_load_textdomain();
 
 	// @todo: clean up "Restore Revision" URL on Diff screen
