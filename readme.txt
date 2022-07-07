@@ -231,6 +231,17 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.1.2 =
+* Fixed : Filter 'use_block_editor_for_post' was not recognized in detecting block editor disable
+* Fixed : Revision Edit in Gutenberg: Enable non-Editors to set requested publish date
+* Fixed : Scheduled revisions were not published on some installations
+* Change : Allow WP-Cron publication method to be disabled for scheduled revisions
+* Feature : Option to Delete Editorial Comments on revision approval
+* Feature : Option to disable revisions per post type
+* Feature : Instance protection library warns about non-standard plugin folder, unnecessary free plugin activation
+* Feature : Plugin review request
+* Feature : Pro promo sidebar on settings screen
+
 = 3.1.1 - 8 Jun 2022 =
 * Fixed : Revision scheduling left a future date selection in editor. If the post is updated again without reloading the editor, it is unpublished until the selected date
 
