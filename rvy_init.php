@@ -21,7 +21,7 @@ if (!empty($_REQUEST['preview']) && !empty($_REQUEST['post_type']) && empty($_RE
 	add_filter('redirect_canonical', '_rvy_no_redirect_filter', 10, 2);
 }
 
-/*======== WP-Cron implentation for Email Notification Buffer ========*/
+/*======== WP-Cron implementation for Email Notification Buffer ========*/
 add_action('init', 'rvy_set_notification_buffer_cron');
 add_action('rvy_mail_buffer_hook', 'rvy_send_buffered_mail' );
 add_filter('cron_schedules', 'rvy_mail_buffer_cron_interval');
@@ -64,6 +64,33 @@ if (version_compare($last_ver, '3.0-alpha', '>=') && version_compare($last_ver, 
 	}
 }
 
+// Revision Edit in Gutenberg: Enable non-Editors to set requested publish date
+add_action('init', function() {
+	global $revisionary;
+	
+	foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
+		add_filter("rest_prepare_{$post_type}", '_rvy_rest_prepare', 10, 3);
+	}
+}, 100);
+
+function _rvy_rest_prepare($response, $post, $request) {
+	if (!rvy_in_revision_workflow($post)) {
+		return $response;
+	}
+
+	if ($type_obj = get_post_type_object($post->post_type)) {
+		$rest_base = ! empty( $type_obj->rest_base ) ? $type_obj->rest_base : $type_obj->name;
+		$namespace = ! empty( $type_obj->rest_namespace ) ? $type_obj->rest_namespace : 'wp/v2';
+
+		$base = sprintf( '%s/%s', $namespace, $rest_base );
+		$href = rest_url( trailingslashit( $base ) . $post->ID );
+
+		$response->add_link('https://api.w.org/action-publish', $href);
+	}
+
+	return $response;
+}
+
 function rvy_mail_check_buffer($new_msg = [], $args = []) {
 	if (empty($args['log_only'])) {
 		if (!$use_buffer = rvy_get_option('use_notification_buffer')) {
@@ -104,9 +131,7 @@ function rvy_mail_buffer_cron_interval( $schedules ) {
 }
 
 function _revisionary_publish_scheduled_cron($revision_id) {
-	global $wp_version;
-
-	if (get_option('rvy_scheduled_revisions') && (get_option('rvy_scheduled_publish_cron') || version_compare($wp_version, '5.9', '>='))) {
+	if (rvy_get_option('scheduled_revisions') && rvy_get_option('scheduled_publish_cron')) {
 		revisionary_publish_scheduled(compact('revision_id'));
 	}
 }
@@ -879,8 +904,14 @@ function rvy_filter_option($option_basename, $args) {
 	return apply_filters("pp_revisions_option_{$option_basename}", rvy_get_option($option_basename), $args);
 }
 
-function rvy_get_option($option_basename, $sitewide = -1, $get_default = false) {
+function rvy_get_option($option_basename, $sitewide = -1, $get_default = false, $args = []) {
 	if (('async_scheduled_publish' == $option_basename) && function_exists('relevanssi_query')) {
+		return false;
+	}
+	
+	if (('scheduled_revisions' == $option_basename) && empty($args['bypass_condition_check']) 
+	&& defined('DISABLE_WP_CRON') && rvy_get_option('scheduled_publish_cron')
+	) {
 		return false;
 	}
 	
@@ -1153,7 +1184,7 @@ function rvy_is_network_activated($plugin_file = '')
 }
 
 function rvy_init() {
-	global $wp_roles, $wp_version;
+	global $wp_roles;
 
 	if ( ! isset( $wp_roles->roles['revisor'] ) ) {
 		rvy_add_revisor_role();
@@ -1191,7 +1222,7 @@ function rvy_init() {
 			}
 		// Is this an asynchronous request to publish scheduled revisions?
 		} elseif (!empty($_GET['action']) && ('publish_scheduled_revisions' == $_GET['action']) && rvy_get_option('scheduled_revisions') 
-		&& (!rvy_get_option('scheduled_publish_cron') && version_compare($wp_version, '5.9', '<'))) {
+		&& !rvy_get_option('scheduled_publish_cron')) {
 				require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
 				add_action( 'rvy_init', '_rvy_publish_scheduled_revisions' );
 		}
@@ -1199,7 +1230,7 @@ function rvy_init() {
 	
 	if (empty($_GET['action']) || (isset($_GET['action']) && ('publish_scheduled_revisions' != $_GET['action']))) {
 		if (isset($_SERVER['REQUEST_URI']) && ! strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'login.php' ) && rvy_get_option( 'scheduled_revisions' ) 
-		&& (!rvy_get_option('scheduled_publish_cron') && version_compare($wp_version, '5.9', '<'))) {
+		&& !rvy_get_option('scheduled_publish_cron')) {
 		
 			// If a previously requested asynchronous request was ineffective, perform the actions now
 			// (this is not executed if the current URI is from a manual publication request with action=publish_scheduled_revisions)
@@ -1359,9 +1390,11 @@ function rvy_preview_url($revision, $args = []) {
 		$id_arg = 'page_id';
 	}
 
-	if (!strpos($preview_url, "{$id_arg}=")) {
-		$preview_url = add_query_arg($id_arg, $revision->ID, $preview_url);
+	if (strpos($preview_url, "{$id_arg}=")) {
+		$preview_url = remove_query_arg($id_arg, $preview_url);
 	}
+	
+	$preview_url = add_query_arg($id_arg, $revision->ID, $preview_url);
 
 	if (!strpos($preview_url, "post_type=")) {
 		$preview_url = add_query_arg('post_type', $post_type, $preview_url);
@@ -1450,4 +1483,16 @@ function rvy_rest_cache_skip($skip) {
 	}
 
 	return $skip;
+}
+
+function pp_revisions_body_class() {
+	$classes = body_class();
+
+	if (function_exists('rvy_post_id')
+	&& ('page' === get_option('show_on_front'))
+	&& (rvy_post_id(get_the_ID()) == get_option('page_on_front'))) {
+		$classes []= 'home';
+	}
+
+	return $classes;
 }

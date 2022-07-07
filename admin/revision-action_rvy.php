@@ -813,18 +813,22 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	}
 
 	if ($published_id != $revision_id) {
-		$wpdb->update(
-			$wpdb->posts, 
-			['post_type' => 'revision', 
-			'post_status' => 'inherit', 
-			'post_date' => current_time('mysql'), 
-			'post_date_gmt' => current_time('mysql', 1), 
-			'post_parent' => $post_id, 
-			'comment_count' => 0,
-			'post_mime_type' => $published->post_mime_type
-			],
-			['ID' => $revision_id]
-		);
+		if (!defined('REVISIONARY_NO_SCHEDULED_REVISION_ARCHIVE')) {
+			$wpdb->update(
+				$wpdb->posts, 
+				['post_type' => 'revision', 
+				'post_status' => 'inherit', 
+				'post_date' => current_time('mysql'), 
+				'post_date_gmt' => current_time('mysql', 1), 
+				'post_parent' => $post_id, 
+				'comment_count' => 0,
+				'post_mime_type' => $published->post_mime_type
+				],
+				['ID' => $revision_id]
+			);
+		} else {
+			wp_delete_post($revision_id, true);
+		}
 
 		// todo: save change as past revision?
 		$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
@@ -949,7 +953,7 @@ function rvy_do_revision_restore( $revision_id, $actual_revision_status = '' ) {
 
 	if ( $revision = wp_get_post_revision( $revision_id ) ) {
 		if ('future-revision' == $revision->post_mime_type) {
-			rvy_publish_scheduled_revisions(array('force_revision_id' => $revision->ID));
+			rvy_publish_scheduled_revisions(array('revision_id' => $revision->ID));
 			return $revision;
 		}
 		
@@ -1165,7 +1169,7 @@ function rvy_revision_publish($revision_id = false) {
 	} while (0);
 	
 	if (!empty($do_publish)) {
-		rvy_publish_scheduled_revisions(array('force_revision_id' => $revision->ID));
+		rvy_publish_scheduled_revisions(array('revision_id' => $revision->ID));
 
 		clean_post_cache($revision->ID);
 
@@ -1178,7 +1182,7 @@ function rvy_revision_publish($revision_id = false) {
 		if ($post) {
 			$type_obj = get_post_type_object($post->post_type);
 
-			$redirect = ($type_obj && empty($type_obj->public)) ? rvy_admin_url("post.php?action=edit&post=$post->ID") : get_permalink($post->ID); // published URL
+			$redirect = ($type_obj && empty($type_obj->public)) ? rvy_admin_url("post.php?action=edit&post=$post->ID") : add_query_arg('mark_current_revision', 1, get_permalink($post->ID)); // published URL
 		}
 
 		wp_redirect($redirect);
@@ -1191,7 +1195,7 @@ function rvy_revision_publish($revision_id = false) {
 }
 
 // rvy_init action passes Revisionary object
-function _rvy_publish_scheduled_revisions($args = []) {
+function _rvy_publish_scheduled_revisions($revisionary_obj, $args = []) {
 	rvy_publish_scheduled_revisions($args);
 }
 
@@ -1202,7 +1206,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 		remove_action( 'wp_insert_post', 'relevanssi_insert_edit', 99, 1 );
 	}
 
-	if (!rvy_get_option('scheduled_publish_cron') && version_compare($wp_version, '5.9', '<')) {
+	if (!rvy_get_option('scheduled_publish_cron')) {
 		rvy_confirm_async_execution( 'publish_scheduled_revisions' );
 	
 		// Prevent this function from being triggered simultaneously by another site request
@@ -1221,11 +1225,11 @@ function rvy_publish_scheduled_revisions($args = []) {
 		echo "current time: " . esc_html($time_gmt);
 	}
 
-	if (!empty($args['force_revision_id']) && is_scalar($args['force_revision_id'])) {
+	if (!empty($args['revision_id']) && is_scalar($args['revision_id'])) {
 		$results = $wpdb->get_results( 
 			$wpdb->prepare( 
 				"SELECT * FROM $wpdb->posts WHERE post_type != 'revision' AND post_status != 'inherit' AND post_mime_type = 'future-revision' AND ID = %d",
-				(int) $args['force_revision_id']
+				(int) $args['revision_id']
 			)
 		);
 	} else {
@@ -1453,7 +1457,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 		}
 	}
 
-	if (!rvy_get_option('scheduled_publish_cron') && version_compare($wp_version, '5.9', '<')) {
+	if (!rvy_get_option('scheduled_publish_cron')) {
 		rvy_update_next_publish_date();
 	}
 
@@ -1471,7 +1475,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 function rvy_update_next_publish_date($args = []) {
 	global $wpdb, $wp_version;
 	
-	if ($args && !empty($args['revision_id']) && (rvy_get_option('scheduled_publish_cron') || version_compare($wp_version, '5.9', '>='))) {
+	if ($args && !empty($args['revision_id']) && rvy_get_option('scheduled_publish_cron')) {
 		if ($revision = get_post($args['revision_id'])) {
 			wp_schedule_single_event(strtotime( $revision->post_date_gmt ), 'publish_revision_rvy', array_intersect_key($args, ['revision_id' => true]));
 		}

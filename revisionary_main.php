@@ -935,6 +935,18 @@ class Revisionary
 				}
 			}
 		}
+
+		// If this is already a scheduled revision and the date is being modified, update the WP-Cron entry
+		if (rvy_in_revision_workflow($postarr['ID']) && ('future-revision' == $postarr['post_mime_type'])) {
+
+			$current_post_date_gmt = get_post_field('post_date_gmt', $postarr['ID']);
+
+			if ($data['post_date_gmt'] != $current_post_date_gmt) {
+				wp_unschedule_event(strtotime($current_post_date_gmt), 'publish_revision_rvy', ['revision_id' => $postarr['ID']]);
+
+				wp_schedule_single_event(strtotime($data['post_date_gmt']), 'publish_revision_rvy', ['revision_id' => $postarr['ID']]);
+			}
+		}
 		
 		return $data;
 	}

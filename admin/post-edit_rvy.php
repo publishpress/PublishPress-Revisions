@@ -50,6 +50,8 @@ class RvyPostEdit {
 
             $args['deleteCaption'] = esc_html__('Delete Permanently', 'revisionary');
 
+            $args['submissionDelay'] = (defined('PUBLISHPRESS_VERSION')) ? 2000 : 200;
+
             wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
 
             if (defined('PUBLISHPRESS_VERSION')) {
