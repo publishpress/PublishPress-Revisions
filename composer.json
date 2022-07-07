@@ -15,6 +15,8 @@
     "minimum-stability": "stable",
     "require": {
       "php": ">=5.6.20",
+	    "publishpress/wordpress-reviews":  "^1.1",
+      "publishpress/publishpress-instance-protection": "^1.0",
       "publishpress/wordpress-version-notices": "dev-master"
     }
   }

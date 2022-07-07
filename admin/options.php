@@ -46,7 +46,7 @@ class RvyOptionUI {
 		if ( in_array( $option_name, $this->form_options[$tab_name][$section_name] ) ) {
 			$this->all_options []= $option_name;
 
-			$return['val'] = rvy_get_option($option_name, $this->sitewide, $this->customize_defaults);
+			$return['val'] = rvy_get_option($option_name, $this->sitewide, $this->customize_defaults, ['bypass_condition_check' => true]);
 
 			echo "<div class='agp-vspaced_input'";
 			echo (isset($args['style']) && $args['style']) ? " style='" . esc_attr($args['style']) . "'" : '';
@@ -93,6 +93,7 @@ $this->tab_captions = array( 'features' => esc_html__( 'Settings', 'revisionary'
 
 $this->section_captions = array(
 	'features' => array(
+		'post_types'			=> esc_html__('Post Types', 'revisionary'),
 		'role_definition' 	  	=> esc_html__('Revisors', 'revisionary'),
 		'revision_statuses'		=> esc_html__('Statuses', 'revisionary'),
 		'working_copy'			=> rvy_get_option('revision_statuses_noun_labels') ? pp_revisions_status_label('draft-revision', 'plural') : esc_html__('Revision Creation', 'revisionary'),
@@ -147,7 +148,8 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'compare_revisions_direct_approval' => 		esc_html__('Approve Button on Compare Revisions screen', 'revisionary'),
 	'copy_revision_comments_to_post' => 		esc_html__('Copy revision comments to published post', 'revisionary'),
 	'past_revisions_order_by' =>				esc_html__('Compare Past Revisions ordering:'), 
-	'list_unsubmitted_revisions' => 			sprintf(esc_html__('Include %s in My Activity, Revisions to My Posts views', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural'))
+	'list_unsubmitted_revisions' => 			sprintf(esc_html__('Include %s in My Activity, Revisions to My Posts views', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
+	'rev_publication_delete_ed_comments' =>		esc_html__('On Revision publication, delete Editorial Comments', 'revisionary'),
 	]
 );
 
@@ -166,6 +168,7 @@ if ( defined('RVY_CONTENT_ROLES') ) {
 $this->form_options = apply_filters('revisionary_option_sections', [
 'features' => [
 	'license' =>			 ['edd_key'],
+	'post_types' =>			 ['enabled_post_types'],
 	'role_definition' => 	 ['revisor_role_add_custom_rolecaps', 'require_edit_others_drafts'],
 	'revision_statuses' =>	 ['revision_statuses_noun_labels'],
 	'working_copy' =>		 ['manage_unsubmitted_capability', 'copy_posts_capability', 'auto_submit_revisions', 'caption_copy_as_edit'],
@@ -173,7 +176,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'],
-	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'display_hints'],
+	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'rev_publication_delete_ed_comments', 'display_hints'],
 	'notification'	=>		 ['pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 ]
 ]);
@@ -218,7 +221,7 @@ if ( $customize_defaults )
 
 ?>
 <table width = "100%"><tr>
-<td width = "90%">
+<td width = "100%">
 <h1 class="wp-heading-inline"><?php
 if ( $sitewide )
 	esc_html_e('PublishPress Revisions Network Settings', 'revisionary');
@@ -236,6 +239,17 @@ else
 </tr></table>
 
 </header>
+
+<?php
+$div_class = apply_filters('publishpress_revisions_settings_sidebar', '');
+?>
+
+<div id="poststuff" class="metabox-holder <?php echo $div_class;?>">
+
+	<?php do_action('publishpress_revisions_settings_sidebar');?>
+
+	<div id="post-body" class="has-sidebar">	
+	<div id="post-body-content" class="has-sidebar-content ppseries-settings-body-content">
 
 <?php
 if ( $sitewide ) {
@@ -356,6 +370,85 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 		</table>
 		<?php
 	}
+
+
+	$section = 'post_types';				// --- POST TYPES SECTION ---
+
+	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
+		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
+
+		<?php
+		$option_name = 'enabled_post_types';
+
+		$this->all_options []= $option_name;
+
+		esc_html_e('Enable revisions for these Post Types:', 'revisionary');
+        echo '<br /><br />';
+
+		$hidden_types = ['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true];
+		$locked_types = [];
+
+		$types = get_post_types(['public' => true, 'show_ui' => true], 'object', 'or');
+
+		$types = rvy_order_types($types);
+
+		foreach ($types as $key => $obj) {
+			if (!$key) {
+				continue;
+			}
+
+			$id = $option_name . '-' . $key;
+			$name = $option_name . "[$key]";
+			?>
+
+			<?php if ('nav_menu' == $key) : ?>
+				<input name="<?php echo esc_attr($name); ?>" type="hidden" id="<?php echo esc_attr($id); ?>" value="1"/>
+			<?php else : ?>
+			<?php if (isset($hidden_types[$key])) : ?>
+				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="<?php echo esc_attr($hidden_types[$key]); ?>"/>
+			<?php else : 
+					$locked = (!empty($locked_types[$key])) ? ' disabled ' : '';
+				?>
+			<div class="agp-vtight_input">
+				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="<?php echo (empty($locked_types[$key])) ? '0' : '1';?>"/>
+				<label for="<?php echo esc_attr($id); ?>" title="<?php echo esc_attr($key); ?>">
+					<input name="<?php if (empty($locked_types[$key])) echo esc_attr($name); ?>" type="checkbox" id="<?php echo esc_attr($id); ?>"
+						value="1" <?php checked('1', !empty($revisionary->enabled_post_types[$key])); echo esc_attr($locked); ?> />
+
+					<?php
+					if (isset($obj->labels_pp)) {
+						echo esc_html($obj->labels_pp->name);
+					} elseif (isset($obj->labels->name)) {
+						echo esc_html($obj->labels->name);
+					} else {
+						echo esc_html($key);
+					}
+
+					echo '</label>';
+					
+					if (!empty($revisionary->enabled_post_types[$key]) && isset($obj->capability_type) && !in_array($obj->capability_type, [$obj->name, 'post', 'page'])) {
+						if ($cap_type_obj = get_post_type_object($obj->capability_type)) {
+							echo '&nbsp;(' . esc_html(sprintf(__('%s capabilities'), $cap_type_obj->labels->singular_name)) . ')';
+						}
+					}
+
+					echo '</div>';
+				endif;
+			endif; // displaying checkbox UI
+
+		} // end foreach src_otype
+		?>
+
+	<br />
+	<div class="rs-subtext">
+	<?php
+	esc_html_e('Note: Third party code may cause some post types to be incompatible with PublishPress Revisions.', 'revisionary');
+	?>
+	</p>
+
+	</td></tr></table>
+	<?php endif; // any options accessable in this section
+
 
 	$section = 'role_definition';			// --- ROLE DEFINITION SECTION ---
 
@@ -478,13 +571,11 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 		$this->option_checkbox( 'scheduled_revision_update_modified_date', $tab, $section, $hint, '' );
 
 		global $wp_version;
+		
+		$hint = esc_html__( 'Publish scheduled revisions using the WP-Cron mechanism. On some sites, publication will fail if this setting is disabled.', 'revisionary' );
+		$this->option_checkbox( 'scheduled_publish_cron', $tab, $section, $hint, '' );
 
-		if (version_compare($wp_version, '5.9', '<')) {
-			$hint = esc_html__( 'Publish scheduled revisions using the WP-Cron mechanism.', 'revisionary' );
-			$this->option_checkbox( 'scheduled_publish_cron', $tab, $section, $hint, '' );
-		}
-
-		if (!rvy_get_option('scheduled_publish_cron') && version_compare($wp_version, '5.9', '<')) {
+		if (!rvy_get_option('scheduled_publish_cron')) {
 			$hint = esc_html__( 'Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
 			$this->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
 		}
@@ -592,7 +683,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			'</a>'
 		);
 		?>
-
+		
 		</div>
 		<?php endif;?>
 
@@ -628,6 +719,11 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 
 		$hint = esc_html__( 'Show descriptive captions for PublishPress Revisions settings', 'revisionary' );
 		$this->option_checkbox( 'display_hints', $tab, $section, $hint, '' );
+
+		if (defined('PUBLISHPRESS_VERSION')) {
+			echo "<br />";
+			$this->option_checkbox( 'rev_publication_delete_ed_comments', $tab, $section, $hint, '' );
+		}
 
 		do_action('revisionary_option_ui_revision_options', $this);
 		?>
@@ -731,7 +827,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		}
 
 		if (!empty($_SERVER['REQUEST_URI'])) {
-		$uri = esc_url(esc_url_raw($_SERVER['REQUEST_URI']));
+			$uri = esc_url(esc_url_raw($_SERVER['REQUEST_URI']));
 		} else {
 			$uri = '';
 		}
@@ -970,6 +1066,11 @@ echo "javascript:if (confirm('"
 ?>" style="float:right;" />
 </p>
 </form>
+
+</div>
+</div>
+</div>
+
 <p style='clear:both'></p>
 
 <?php

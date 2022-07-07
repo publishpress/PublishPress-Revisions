@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 6.0
-Stable tag: 3.1.1
+Stable tag: 3.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -230,6 +230,17 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
 == Changelog ==
+
+= 3.1.2 - 7 Jul 2022 =
+* Fixed : Filter 'use_block_editor_for_post' was not recognized in detecting block editor disable
+* Fixed : Revision Edit in Gutenberg: Enable non-Editors to set requested publish date
+* Fixed : Scheduled revisions were not published on some installations
+* Change : Allow WP-Cron publication method to be disabled for scheduled revisions
+* Feature : Option to Delete Editorial Comments on revision approval
+* Feature : Option to disable revisions per post type
+* Feature : Instance protection library warns about non-standard plugin folder, unnecessary free plugin activation
+* Feature : Plugin review request
+* Feature : Pro promo sidebar on settings screen
 
 = 3.1.1 - 8 Jun 2022 =
 * Fixed : Revision scheduling left a future date selection in editor. If the post is updated again without reloading the editor, it is unpublished until the selected date

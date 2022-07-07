@@ -5,7 +5,7 @@
  * Description: Maintain published content with teamwork and precision using the Revisions model to submit, approve and schedule changes.
  * Author: PublishPress
  * Author URI: https://publishpress.com
- * Version: 3.1.1
+ * Version: 3.1.2
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 4.9.7
@@ -36,13 +36,27 @@
 
 // Temporary usage within this module only; avoids multiple instances of version string
 global $pp_revisions_version;
-$pp_revisions_version = '3.1.1';
+$pp_revisions_version = '3.1.2';
 
 if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die( 'This page cannot be called directly.' );
 
 if (isset($_SERVER['SCRIPT_NAME']) && strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/index-extra.php' ) || strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/update.php' ) )
 	return;
+
+$includeFileRelativePath = '/publishpress/publishpress-instance-protection/include.php';
+if (file_exists(__DIR__ . '/vendor' . $includeFileRelativePath)) {
+	require_once __DIR__ . '/vendor' . $includeFileRelativePath;
+}
+
+if (class_exists('PublishPressInstanceProtection\\Config')) {
+	$pluginCheckerConfig = new PublishPressInstanceProtection\Config();
+	$pluginCheckerConfig->pluginSlug    = 'revisionary';
+	$pluginCheckerConfig->pluginFolder  = 'revisionary';
+	$pluginCheckerConfig->pluginName    = 'PublishPress Revisions';
+
+	$pluginChecker = new PublishPressInstanceProtection\InstanceChecker($pluginCheckerConfig);
+}
 
 $pro_active = false;
 

@@ -237,26 +237,30 @@ jQuery(document).ready( function($) {
 	function rvyDoSubmission() {
 		if (submitCheckSaveInterval) {
 			return;
-		}
+        }
+        
+        if (wp.data.select('core/editor').isEditedPostDirty() || wp.data.select('core/editor').isSavingPost()) {
+            submitCheckSaveInterval = setInterval(function () {
+                let saving = wp.data.select('core/editor').isSavingPost();
+                
+                if (saving || $('div.edit-post-header button.is-saved').length) {
+                    clearInterval(submitCheckSaveInterval);
+                    var redirectCheckSaveDoneInterval = setInterval(function () {
+                        let saving = wp.data.select('core/editor').isSavingPost();
+                        
+                        if (!saving || $('div.edit-post-header button.is-saved').length) {
+                            clearInterval(redirectCheckSaveDoneInterval);
+                            submitCheckSaveInterval = false;
 
-		submitCheckSaveInterval = setInterval(function () {
-			let saving = wp.data.select('core/editor').isSavingPost();
-			
-			if (saving || $('div.edit-post-header button.is-saved').length) {
-				clearInterval(submitCheckSaveInterval);
-				var redirectCheckSaveDoneInterval = setInterval(function () {
-					let saving = wp.data.select('core/editor').isSavingPost();
-
-					if (!saving || $('div.edit-post-header button.is-saved').length) {
-						clearInterval(redirectCheckSaveDoneInterval);
-						submitCheckSaveInterval = false;
-
-						rvySubmitCopy();
-					}
-				}, 100);
-			}
-        }, 100);
-	}
+                            rvySubmitCopy();
+                        }
+                    }, rvyObjEdit.submissionDelay);
+                }
+            }, 100);
+        } else {
+            rvySubmitCopy();
+        }
+    }
 
     var approveCheckSaveInterval = false;
 
@@ -305,7 +309,9 @@ jQuery(document).ready( function($) {
             $('div.revision-approving span.ppr-submission-spinner').css('visibility', 'visible');
 		}
 
-		wp.data.dispatch('core/editor').savePost();
+        if (wp.data.select('core/editor').isEditedPostDirty()) {
+			wp.data.dispatch('core/editor').savePost();
+        }
 
 		if (isApproval) {
 			rvyRedirectURL = $('div.rvy-creation-ui button.rvy-direct-approve').closest('a').attr('href');

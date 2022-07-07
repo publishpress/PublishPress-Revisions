@@ -142,7 +142,7 @@ class RevisionaryFront {
 			return;
 		}
 
-		global $wp_query, $revisionary, $post;
+		global $wp_query, $revisionary;
 		if ($wp_query->is_404) {
 			if (!empty($_REQUEST['base_post'])) {
 				if ($post = get_post(intval($_REQUEST['base_post']))) {
@@ -151,8 +151,6 @@ class RevisionaryFront {
 					exit;
 				}
 			}
-
-			return;
 		}
 
 		if (!empty($_REQUEST['page_id'])) {
@@ -160,8 +158,21 @@ class RevisionaryFront {
 		} elseif (!empty($_REQUEST['p'])) {
 			$revision_id = (int) $_REQUEST['p'];
 		} else {
-			if ($post) {
+			if (!empty($post)) {
 				$revision_id = $post->ID;
+			}
+		}
+
+		if ($wp_query->is_404 && !empty($revision_id)) {
+			// Work around timing issue when scheduled revision publication is underway
+			if ($published_id = get_post_meta($revision_id, '_rvy_base_post_id', true)) {
+				if ($post = get_post($published_id)) {
+					if ($type_obj = get_post_type_object($post->post_type)) {
+						$redirect = ($type_obj && empty($type_obj->public)) ? rvy_admin_url("post.php?action=edit&post=$post->ID") : add_query_arg('mark_current_revision', 1, get_permalink($post->ID)); // published URL
+						wp_redirect($redirect);
+						exit;	
+					}
+				}
 			}
 		}
 
@@ -169,14 +180,16 @@ class RevisionaryFront {
 
 		global $wpdb;
 
-		if (!$post = $wpdb->get_row(
-			$wpdb->prepare(
-				"SELECT * FROM $wpdb->posts WHERE ID = %d",
-				$revision_id
-			))
-		) {
-			if (!$post = wp_get_post_revision($revision_id)) {
-				return;
+		if (empty($_REQUEST['mark_current_revision'])) {
+			if (!$post = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM $wpdb->posts WHERE ID = %d",
+					$revision_id
+				))
+			) {
+				if (!$post = wp_get_post_revision($revision_id)) {
+					return;
+				}
 			}
 		}
 
@@ -428,7 +441,7 @@ class RevisionaryFront {
 				if (!empty($_REQUEST['et_fb']) && !defined('PP_REVISIONS_DIVI_NO_ADMIN_BAR') && function_exists('et_divi_replace_parent_stylesheet') && (!defined('ET_BUILDER_PRODUCT_VERSION') || version_compare(ET_BUILDER_PRODUCT_VERSION, '4.14.8', '<='))) {
 					var rvyAdminBarHeight = '32px';
 				} else {
-				var rvyAdminBarHeight = 0;
+					var rvyAdminBarHeight = 0;
 				}
 			}
 
