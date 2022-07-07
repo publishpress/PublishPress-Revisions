@@ -76,20 +76,22 @@ class CoreAdmin {
                     </div>
         
                     <div class="inside">
-                        <p><?php echo esc_html__('Enhance the power of PublishPress Revisions with the Pro version:', 'revisionary'); ?>
+                        <p><?php echo esc_html__('Upgrade to PublishPress Revisions Pro for integration with key features of these plugins:', 'revisionary'); ?>
                         </p>
                         <ul>
-                            <li><?php echo esc_html__('Elementor integration', 'revisionary'); ?></li>
-                            <li><?php echo esc_html__('Divi Builder integration', 'revisionary'); ?></li>
-                            <li><?php echo esc_html__('Beaver Builder integration', 'revisionary'); ?></li>
-                            <li><?php echo esc_html__('WooCommerce: Product Variation revisions', 'revisionary'); ?></li>
-                            <li><?php echo esc_html__('ACF custom field revision, difference display', 'revisionary'); ?></li>
-                            <li><?php echo esc_html__('Pods custom field revision', 'revisionary'); ?></li>
-                            <li><?php echo esc_html__('WPML: translate revisions', 'revisionary'); ?></li>
+                            <li><?php echo esc_html__('Elementor', 'revisionary'); ?></li>
+                            <li><?php echo esc_html__('Divi Builder', 'revisionary'); ?></li>
+                            <li><?php echo esc_html__('Beaver Builder', 'revisionary'); ?></li>
+                            <li><?php echo esc_html__('Advanced Custom Fields', 'revisionary'); ?></li>
+                            <li><?php echo esc_html__('Pods', 'revisionary'); ?></li>
+                            <li><?php echo esc_html__('WooCommerce', 'revisionary'); ?></li>
+                            <li><?php echo esc_html__('WPML', 'revisionary'); ?></li>
                             <li><?php echo esc_html__('WPML Translation Management', 'revisionary'); ?></li>
+                            <li class="no-icon"><a href="https://publishpress.com/knowledge-base/plugins-revisions-support/" target="__blank"><?php echo esc_html__('plugin integration details...', 'revisionary'); ?></a></li>
                         </ul>
+
                         <div class="upgrade-btn">
-                            <a href="https://publishpress.com/links/revisions-banner" target="__blank"><?php echo esc_html__('Upgrade to Pro', 'revisionary'); ?></a>
+                            <a href="https://publishpress.com/links/revisions-banner/" target="__blank"><?php echo esc_html__('Upgrade to Pro', 'revisionary'); ?></a>
                         </div>
                     </div>
                 </div>

@@ -713,6 +713,10 @@ font-weight: bold;
   margin-right: 5px;
 }
 
+.pp-revisions-pro-promo-right-sidebar div.upgrade-btn {
+  margin-top: 25px;
+}
+
 .pp-revisions-pro-promo-right-sidebar .upgrade-btn {
 margin-bottom: 5px;
 }
@@ -786,6 +790,10 @@ margin-bottom: 5px;
   -webkit-mask-repeat: no-repeat;
   mask-position: left;
   -webkit-mask-position: left;
+}
+
+.pp-revisions-pro-promo-right-sidebar .postbox-container .inside ul li.no-icon:before {
+  display: none;
 }
 
 .pp-revisions-pro-promo-right-sidebar a.advert-link,
