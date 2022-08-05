@@ -109,7 +109,7 @@ class RevisionaryAdmin
 			) {
 				global $wp_version;
 
-				if (defined('DISABLE_WP_CRON') && rvy_get_option('scheduled_revisions', -1, false, ['bypass_condition_check' => true]) 
+				if (defined('DISABLE_WP_CRON') && DISABLE_WP_CRON && rvy_get_option('scheduled_revisions', -1, false, ['bypass_condition_check' => true]) 
 				&& rvy_get_option('scheduled_publish_cron')
 				) {
 					rvy_notice('Scheduled Revisions are not available because WP-Cron is disabled on this site.');
