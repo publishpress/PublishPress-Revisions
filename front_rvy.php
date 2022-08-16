@@ -196,41 +196,47 @@ class RevisionaryFront {
 		if ((rvy_in_revision_workflow($post) || ('revision' == $post->post_type) || (!empty($_REQUEST['mark_current_revision']))) && !isset($_REQUEST['fl_builder'])) {
 			add_filter('redirect_canonical', array($this, 'flt_revision_preview_url'), 10, 2);
 
-			$published_post_id = rvy_post_id($revision_id);
-
-			do_action('revisionary_preview_load', $revision_id, $published_post_id);
-
-			if (!defined('REVISIONARY_PREVIEW_NO_META_MIRROR') && !class_exists('CWS_PageLinksTo')) {
-				// For display integrity, copy any missing keys from published post. Note: Any fields missing from revision are left unmodified at revision approval.
-				revisionary_copy_postmeta($published_post_id, $revision_id, ['empty_target_only' => true]);
-			}
-
-			if (!defined('REVISIONARY_PREVIEW_NO_TERM_MIRROR')) {
-				revisionary_copy_terms($published_post_id, $revision_id, ['empty_target_only' => true]);
-			}
-
-			if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && !defined('REVISIONARY_DISABLE_MA_PREVIEW_CORRECTION') && rvy_in_revision_workflow($post)) {
-				$_authors = get_multiple_authors($revision_id);
-
-				if (count($_authors) == 1) {
-					$_author = reset($_authors);
-
-					if ($_author && empty($_author->ID)) { // @todo: is this still necessary?
-						$_author = MultipleAuthors\Classes\Objects\Author::get_by_term_id($_author->term_id);
-					}
+			if (!empty($_REQUEST['mark_current_revision'])) {
+				global $post;
+				$published_post_id = (!empty($post)) ? $post->ID : 0;
+				$revision_id = $published_post_id;
+			} else {
+				$published_post_id = rvy_post_id($revision_id);
+	
+				do_action('revisionary_preview_load', $revision_id, $published_post_id);
+	
+				if (!defined('REVISIONARY_PREVIEW_NO_META_MIRROR') && !class_exists('CWS_PageLinksTo')) {
+					// For display integrity, copy any missing keys from published post. Note: Any fields missing from revision are left unmodified at revision approval.
+					revisionary_copy_postmeta($published_post_id, $revision_id, ['empty_target_only' => true]);
 				}
-
-				// If revision does not have valid multiple authors stored, correct to published post values
-				if (empty($_authors) || (!empty($_author) && $_author->ID == $post->post_author)) {
-					if (!$published_authors = wp_get_object_terms($published_post_id, 'author')) {
-						if ($published_post = get_post($published_post_id)) {
-							if ($author = MultipleAuthors\Classes\Objects\Author::get_by_user_id((int) $published_post->post_author)) {
-								$published_authors = [$author];
-							}
+	
+				if (!defined('REVISIONARY_PREVIEW_NO_TERM_MIRROR')) {
+					revisionary_copy_terms($published_post_id, $revision_id, ['empty_target_only' => true]);
+				}
+	
+				if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && !defined('REVISIONARY_DISABLE_MA_PREVIEW_CORRECTION') && rvy_in_revision_workflow($post)) {
+					$_authors = get_multiple_authors($revision_id);
+	
+					if (count($_authors) == 1) {
+						$_author = reset($_authors);
+	
+						if ($_author && empty($_author->ID)) { // @todo: is this still necessary?
+							$_author = MultipleAuthors\Classes\Objects\Author::get_by_term_id($_author->term_id);
 						}
 					}
-
-					rvy_set_ma_post_authors($revision_id, $published_authors);
+	
+					// If revision does not have valid multiple authors stored, correct to published post values
+					if (empty($_authors) || (!empty($_author) && $_author->ID == $post->post_author)) {
+						if (!$published_authors = wp_get_object_terms($published_post_id, 'author')) {
+							if ($published_post = get_post($published_post_id)) {
+								if ($author = MultipleAuthors\Classes\Objects\Author::get_by_user_id((int) $published_post->post_author)) {
+									$published_authors = [$author];
+								}
+							}
+						}
+	
+						rvy_set_ma_post_authors($revision_id, $published_authors);
+					}
 				}
 			}
 
