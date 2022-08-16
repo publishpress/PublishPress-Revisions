@@ -105,7 +105,7 @@ function revisionary_copy_terms($from_post, $target_id, $args = []) {
  * @return void
  */
 function revisionary_copy_postmeta($from_post, $to_post_id, $args = []) {
-    $defaults = ['empty_target_only' => false];
+    $defaults = ['empty_target_only' => false, 'apply_deletions' => false];
     $args = array_merge($defaults, $args);
     foreach (array_keys($defaults) as $var) {
         $$var = $args[$var];
@@ -160,7 +160,7 @@ function revisionary_copy_postmeta($from_post, $to_post_id, $args = []) {
         }
         
         foreach($delete_meta_keys as $meta_key) {
-            if (in_array($meta_key, $deletable_keys) || defined('PP_REVISIONS_APPLY_POSTMETA_DELETION')) {
+            if (in_array($meta_key, $deletable_keys) || !empty($args['apply_deletions']) || defined('PP_REVISIONS_APPLY_POSTMETA_DELETION')) {
                 delete_post_meta($to_post_id, $meta_key);
             }
         }
