@@ -1048,6 +1048,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 			echo "<" . esc_attr($tag) . " scope='" . esc_attr($scope) . "' id='" . esc_attr($id) . "' class='" . esc_attr($class) . "'>";
 			
+			$current_url = str_replace('#038;', '&', $current_url);
+			$current_url = remove_query_arg('orderby', $current_url);
+			$current_url = remove_query_arg('order', $current_url);
+
 			if ( isset( $sortable[ $column_key ] ) ) {
 				// kevinB modification: make column sort links double as filter clearance
 				// (If results are already filtered by column, first header click clears the filter, second click applies sorting)
