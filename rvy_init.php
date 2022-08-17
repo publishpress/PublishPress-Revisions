@@ -73,6 +73,30 @@ add_action('init', function() {
 	}
 }, 100);
 
+
+// Yoast SEO: Prevent invalid "indexable" maintenance operation on revision creation / submission
+if (defined('WPSEO_VERSION')) {
+	add_filter(
+		'wpseo_should_save_indexable',
+		function($intend_to_save, $indexable) {
+			if (function_exists('rvy_detect_post_id')) {
+				$post_id = rvy_detect_post_id();
+
+				if ($post_id && rvy_in_revision_workflow($post_id)) {
+					return false;
+				}
+			}
+
+			if (is_object($indexable) && isset($indexable->object_id) && empty($indexable->object_id)) {
+				// WordPress database error Duplicate entry '0' for key 'PRIMARY' for query INSERT INTO `wp_yoast_indexable`
+				return false;
+			}
+
+			return $intend_to_save;
+		},
+	10, 2);
+}
+
 function _rvy_rest_prepare($response, $post, $request) {
 	if (!rvy_in_revision_workflow($post)) {
 		return $response;
@@ -910,7 +934,7 @@ function rvy_get_option($option_basename, $sitewide = -1, $get_default = false, 
 	}
 	
 	if (('scheduled_revisions' == $option_basename) && empty($args['bypass_condition_check']) 
-	&& defined('DISABLE_WP_CRON') && rvy_get_option('scheduled_publish_cron')
+	&& defined('DISABLE_WP_CRON') && DISABLE_WP_CRON && rvy_get_option('scheduled_publish_cron') && apply_filters('revisionary_wp_cron_disabled', true)
 	) {
 		return false;
 	}
@@ -1404,7 +1428,10 @@ function rvy_preview_url($revision, $args = []) {
 		$preview_url = rvy_nc_url($preview_url);
 	}
 
-	return apply_filters('revisionary_preview_url', $preview_url, $revision, $args);
+	$preview_url = apply_filters('revisionary_preview_url', $preview_url, $revision, $args);
+	$preview_url = remove_query_arg('preview_id', $preview_url);
+	
+	return $preview_url;
 }
 
 function rvy_set_ma_post_authors($post_id, $authors)

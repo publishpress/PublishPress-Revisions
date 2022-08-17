@@ -309,7 +309,10 @@ class Rvy_Revision_Workflow_UI {
                             $_user = new WP_User($user_id);
                             $reqd_caps = map_meta_cap( 'edit_post', $user_id, $published_post->ID );
 
-                            if ( array_diff( $reqd_caps, array_keys( array_intersect( $_user->allcaps, array( true, 1, '1' ) ) ) ) ) {
+                            if (
+                                array_diff( $reqd_caps, array_keys( array_intersect( $_user->allcaps, array( true, 1, '1' ) ) ) ) 
+                                && !in_array('administrator', $_user->allcaps) 
+                            ) {
                                 unset( $recipient_ids[$key] );
                             }
                         }

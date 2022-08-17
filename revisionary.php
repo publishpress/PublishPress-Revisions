@@ -5,7 +5,7 @@
  * Description: Maintain published content with teamwork and precision using the Revisions model to submit, approve and schedule changes.
  * Author: PublishPress
  * Author URI: https://publishpress.com
- * Version: 3.1.2
+ * Version: 3.1.4
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 4.9.7
@@ -36,7 +36,7 @@
 
 // Temporary usage within this module only; avoids multiple instances of version string
 global $pp_revisions_version;
-$pp_revisions_version = '3.1.2';
+$pp_revisions_version = '3.1.4';
 
 if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die( 'This page cannot be called directly.' );
@@ -159,15 +159,19 @@ register_deactivation_hook(__FILE__, function()
 	{
 		global $wpdb;
 
-		require_once(dirname(__FILE__).'/functions.php');
+		require_once( dirname(__FILE__).'/rvy_init.php');
 
-		// convert pending / scheduled revisions to v2.x format, which also prevents them from being listed as regular drafts / pending posts
-		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
-		$wpdb->query("UPDATE $wpdb->posts SET post_status = post_mime_type WHERE post_mime_type IN ('$revision_status_csv')");
-		$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = '' WHERE post_mime_type IN ('$revision_status_csv')");
-		
-		if ($timestamp = wp_next_scheduled('rvy_mail_buffer_hook')) {
-		   wp_unschedule_event( $timestamp,'rvy_mail_buffer_hook');
+		if (!rvy_is_plugin_active('revisionary-pro/revisionary-pro.php')) {
+			require_once(dirname(__FILE__).'/functions.php');
+
+			// convert pending / scheduled revisions to v2.x format, which also prevents them from being listed as regular drafts / pending posts
+			$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
+			$wpdb->query("UPDATE $wpdb->posts SET post_status = post_mime_type WHERE post_mime_type IN ('$revision_status_csv')");
+			$wpdb->query("UPDATE $wpdb->posts SET post_mime_type = '' WHERE post_mime_type IN ('$revision_status_csv')");
+			
+			if ($timestamp = wp_next_scheduled('rvy_mail_buffer_hook')) {
+			wp_unschedule_event( $timestamp,'rvy_mail_buffer_hook');
+			}
 		}
 	}
 );
