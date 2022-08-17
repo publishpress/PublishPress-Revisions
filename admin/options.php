@@ -325,24 +325,31 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 
 <ul id="publishpress-revisions-settings-tabs" class="nav-tab-wrapper">
 	<?php
-	// Set first tab and content as active
-	$setActiveTab = '';
+	if (!empty($_REQUEST['ppr_tab'])) {
+		$setActiveTab = str_replace('ppr-tab-', '', sanitize_key($_REQUEST['ppr_tab']));
+	} else {
+		// Set first tab and content as active
+		$setActiveTab = '';
+	}
 
 	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !empty($this->form_options['features']['license'])) {
 		?>
-		<li class="nav-tab nav-tab-license nav-tab-active">
+		<li class="nav-tab nav-tab-license <?php if (empty($setActiveTab) || ($setActiveTab == 'license')) echo 'nav-tab-active';?>">
 			<a href="#ppr-tab-license">
 				<?php esc_html_e('License', 'revisionary') ?>
 			</a>
 		</li>
 		<?php
-		$setActiveTab = 'license';
+
+		if (empty($setActiveTab)) {
+			$setActiveTab = 'license';
+		}
 	}
 
 	foreach($this->section_captions['features'] as $section_name => $label) {
 		if (!empty($this->form_options[$tab][$section_name])) {
 		?>
-		<li class="nav-tab<?php echo (empty($setActiveTab)) ? ' nav-tab-active' : '' ?>">
+		<li class="nav-tab<?php echo (empty($setActiveTab) || ($setActiveTab == $section_name)) ? ' nav-tab-active' : '' ?>">
 			<a href="#ppr-tab-<?php echo esc_attr($section_name) ?>">
 				<?php echo esc_html($label) ?>
 			</a>
@@ -365,7 +372,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 		require_once(RVY_ABSPATH . '/includes-pro/SettingsLicense.php');
 		$license_ui = new RevisionaryLicenseSettings();
 		?>
-		<table class="form-table rs-form-table" id="ppr-tab-license">
+		<table class="form-table rs-form-table" id="ppr-tab-license"<?php echo ($setActiveTab != 'license') ? ' style="display:none;"' : '' ?>>
 			<?php $license_ui->display($sitewide, $customize_defaults); ?>
 		</table>
 		<?php
