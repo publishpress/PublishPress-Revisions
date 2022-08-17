@@ -231,7 +231,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.1.4 - 16 Aug 2022 =
+= 3.1.4 - 17 Aug 2022 =
 * Fixed : Approve Revision button in Gutenberg editor did not work
 * Fixed : Submit Revision button in Gutenberg editor failed under some conditions
 * Fixed : Detection of DISABLE_WP_CRON constant
@@ -239,6 +239,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 * Fixed : Revision Queue column ordering / filtering links didn't work as expected in some use cases
 * Fixed : When previewing a scheduled revision that has been published, "Edit" link in top bar had invalid URL
 * Compat : Yoast SEO: PHP Notices on revision creation / submission
+* Lang : Update Spanish, Italian translations
 
 = 3.1.2 - 7 Jul 2022 =
 * Fixed : Filter 'use_block_editor_for_post' was not recognized in detecting block editor disable
