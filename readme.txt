@@ -238,6 +238,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 * Fixed : Administrators did not receive revisions submission notifications under some configurations
 * Fixed : Revision Queue column ordering / filtering links didn't work as expected in some use cases
 * Fixed : When previewing a scheduled revision that has been published, "Edit" link in top bar had invalid URL
+* Fixed : If Pro plugin is activated, deactivation of free plugin hides all revisions
 * Compat : Yoast SEO: PHP Notices on revision creation / submission
 * Lang : Update Spanish, Italian translations
 
