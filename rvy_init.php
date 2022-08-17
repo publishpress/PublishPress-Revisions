@@ -1428,7 +1428,10 @@ function rvy_preview_url($revision, $args = []) {
 		$preview_url = rvy_nc_url($preview_url);
 	}
 
-	return apply_filters('revisionary_preview_url', $preview_url, $revision, $args);
+	$preview_url = apply_filters('revisionary_preview_url', $preview_url, $revision, $args);
+	$preview_url = remove_query_arg('preview_id', $preview_url);
+	
+	return $preview_url;
 }
 
 function rvy_set_ma_post_authors($post_id, $authors)
