@@ -740,7 +740,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			. "')";
 		}
 
-		$where = $this->revisions_where_filter("post_mime_type IN ('$status_csv') $type_clause", ['status_count' => true]);
+		$where = $this->revisions_where_filter("post_mime_type IN ('$status_csv') AND post_status != 'trash' $type_clause", ['status_count' => true]);
 
 		$query = "SELECT post_mime_type, COUNT( * ) AS num_posts FROM {$wpdb->posts} WHERE $where";
 		$query .= ' GROUP BY post_mime_type';
@@ -791,7 +791,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$where = $this->revisions_where_filter( 
 			$wpdb->prepare(
-				"$wpdb->posts.post_mime_type IN ('$revision_status_csv') AND $wpdb->posts.post_author = '%d'", 
+				"$wpdb->posts.post_mime_type IN ('$revision_status_csv') AND $wpdb->posts.post_status != 'trash' AND $wpdb->posts.post_author = '%d'", 
 				$current_user->ID
 			),
 			['status_count' => true]
@@ -830,7 +830,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		);
 
 		$status_csv = implode("','", array_map('sanitize_key', rvy_filtered_statuses()));
-		$count_query .= " AND p.post_status IN ('$status_csv')";
+		$count_query .= " AND p.post_status IN ('$status_csv') AND r.post_status != 'trash'";
 
 		// work around some versions of PressPermit inserting non-aliased post_type reference into where clause under some configurations
 		$count_query = str_replace("$wpdb->posts.post_type ", "p.post_type ", $count_query);
