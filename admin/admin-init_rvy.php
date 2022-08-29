@@ -276,7 +276,7 @@ function rvy_admin_init() {
 						}
 					} 
 	
-					if ( !wp_delete_post($post_id) )
+					if ( !wp_delete_post($post_id, true) )
 						wp_die( esc_html__('Error in deleting.') );
 	
 					$deleted++;
