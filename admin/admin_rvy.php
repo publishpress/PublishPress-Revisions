@@ -112,7 +112,13 @@ class RevisionaryAdmin
 				if (defined('DISABLE_WP_CRON') && DISABLE_WP_CRON && rvy_get_option('scheduled_revisions', -1, false, ['bypass_condition_check' => true]) 
 				&& rvy_get_option('scheduled_publish_cron') && apply_filters('revisionary_wp_cron_disabled', true)
 				) {
-					rvy_notice('Scheduled Revisions are not available because WP-Cron is disabled on this site.');
+					rvy_notice(
+						sprintf(
+							__('Scheduled Revisions are not available because WP-Cron is disabled on this site. See %sRevisions > Settings > Scheduled Revisions%s.', 'revisionary'),
+							'<a href="' . admin_url("admin.php?page=revisionary-settings&ppr_tab=scheduled_revisions") . '">',
+							'</a>'
+						)
+					);
 				}
 
 				if (!class_exists('\PublishPress\WordPressReviews\ReviewsController')) {
