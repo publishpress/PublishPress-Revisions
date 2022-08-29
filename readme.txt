@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 6.0
-Stable tag: 3.1.2
+Stable tag: 3.1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -231,14 +231,21 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.1.4 - 16 Aug 2022 =
+= 3.1.5-beta =
+* Fixed : Revision Submission from Gutenberg editor failed on some sites
+* Fixed : Bulk-deleted revisions were not removed from revision count
+* Fixed : PHP Warning for invalid regex if post type's REST registration or request has an invalid route string
+
+= 3.1.4 - 17 Aug 2022 =
 * Fixed : Approve Revision button in Gutenberg editor did not work
 * Fixed : Submit Revision button in Gutenberg editor failed under some conditions
 * Fixed : Detection of DISABLE_WP_CRON constant
 * Fixed : Administrators did not receive revisions submission notifications under some configurations
 * Fixed : Revision Queue column ordering / filtering links didn't work as expected in some use cases
 * Fixed : When previewing a scheduled revision that has been published, "Edit" link in top bar had invalid URL
+* Fixed : If Pro plugin is activated, deactivation of free plugin hides all revisions
 * Compat : Yoast SEO: PHP Notices on revision creation / submission
+* Lang : Update Spanish, Italian translations
 
 = 3.1.2 - 7 Jul 2022 =
 * Fixed : Filter 'use_block_editor_for_post' was not recognized in detecting block editor disable
