@@ -32,7 +32,7 @@ class RevisionaryAdmin
 				require_once( dirname(__FILE__).'/admin_lib-mu_rvy.php' );
 				add_action('admin_menu', 'rvy_mu_site_menu', 15 );
 			}
-			
+
 			add_action('admin_menu', [$this, 'build_menu']);
 
 			if ( strpos($script_name, 'p-admin/plugins.php') ) {
@@ -230,7 +230,6 @@ class RevisionaryAdmin
 
 		if ( ! RVY_NETWORK || ( count($rvy_options_sitewide) != count($rvy_default_options) ) ) {
 			add_submenu_page( 'revisionary-q', esc_html__('PublishPress Revisions Settings', 'revisionary'), esc_html__('Settings', 'revisionary'), 'read', 'revisionary-settings', 'rvy_omit_site_options');
-
 			add_action('revisionary_page_revisionary-settings', 'rvy_omit_site_options' );
 		}
 
@@ -309,7 +308,6 @@ class RevisionaryAdmin
 
 		<div class="pp-rating">
 		<a href="https://wordpress.org/support/plugin/revisionary/reviews/#new-post" target="_blank" rel="noopener noreferrer">
-
 		<?php printf(
 			esc_html__('If you like %s, please leave us a %s rating. Thank you!', 'revisionary'),
 			'<strong>PublishPress Revisions</strong>',
