@@ -328,8 +328,8 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 	if (!empty($_REQUEST['ppr_tab'])) {
 		$setActiveTab = str_replace('ppr-tab-', '', sanitize_key($_REQUEST['ppr_tab']));
 	} else {
-		// Set first tab and content as active
-		$setActiveTab = '';
+	// Set first tab and content as active
+	$setActiveTab = '';
 	}
 
 	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !empty($this->form_options['features']['license'])) {
@@ -342,8 +342,8 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 		<?php
 
 		if (empty($setActiveTab)) {
-			$setActiveTab = 'license';
-		}
+		$setActiveTab = 'license';
+	}
 	}
 
 	foreach($this->section_captions['features'] as $section_name => $label) {

@@ -280,10 +280,6 @@ jQuery(document).ready(function ($) {
 
         if (isSubmission) {
             rvyDoSubmission();
-
-            if (wp.data.select('core/editor').isEditedPostDirty()) {
-                wp.data.dispatch('core/editor').savePost();
-            }
         } else {
             rvyDoApproval();
         }
@@ -297,6 +293,10 @@ jQuery(document).ready(function ($) {
 
     function rvySubmitCopy() {
         var revisionaryCreateDone = function () {
+            if (wp.data.select('core/editor').isEditedPostDirty()) {
+                wp.data.dispatch('core/editor').savePost();
+            }
+
             $('.revision-approve').hide();
             $('div.revision-submitting').hide();
             $('.revision-created').show();

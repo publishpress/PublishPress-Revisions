@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 6.0
-Stable tag: 3.1.4
+Stable tag: 3.1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -230,6 +230,11 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
 == Changelog ==
+
+= 3.1.5 - 30 Aug 2022 =
+* Fixed : Revision Submission from Gutenberg editor failed on some sites
+* Fixed : Bulk-deleted revisions were not removed from revision count
+* Fixed : PHP Warning for invalid regex if post type's REST registration or request has an invalid route string
 
 = 3.1.4 - 17 Aug 2022 =
 * Fixed : Approve Revision button in Gutenberg editor did not work

@@ -34,7 +34,7 @@ class Revisionary_REST {
 		$path   = $request->get_route();
 		
 		foreach ( $rest_server->get_routes() as $route => $handlers ) {
-			if ( ! $match = preg_match( '@^' . $route . '$@i', $path, $args ) )
+			if ( ! $match = @preg_match( '@^' . $route . '$@i', $path, $args ) )
 				continue;
 
 			foreach ( $handlers as $handler ) {
