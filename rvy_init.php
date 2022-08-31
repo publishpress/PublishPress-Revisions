@@ -934,7 +934,7 @@ function rvy_get_option($option_basename, $sitewide = -1, $get_default = false, 
 	}
 
 	if (('scheduled_revisions' == $option_basename) && empty($args['bypass_condition_check']) 
-	&& defined('DISABLE_WP_CRON') && DISABLE_WP_CRON && rvy_get_option('scheduled_publish_cron') && apply_filters('revisionary_wp_cron_disabled', true)
+	&& defined('DISABLE_WP_CRON') && DISABLE_WP_CRON && rvy_get_option('scheduled_publish_cron') && !rvy_get_option('wp_cron_usage_detected') && apply_filters('revisionary_wp_cron_disabled', true)
 	) {
 		return false;
 	}
