@@ -10,7 +10,7 @@ if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_ur
  * @since       1.0.0
  */
 class Revisionary
-{		
+{
 	var $content_roles;			// object ref - instance of RevisionaryContentRoles subclass, set by external plugin
 	var $doing_rest = false;
 	var $rest = '';				// object ref - Revisionary_REST
@@ -281,18 +281,18 @@ class Revisionary
 
 		if (false === $enabled_post_types) {
 			$enabled_post_types = array_fill_keys(
-					get_post_types(['public' => true]), true
+				get_post_types(['public' => true]), true
 			);
-	
+
 			if (class_exists('WooCommerce')) {
 				$enabled_post_types['product'] = true;
 				$enabled_post_types['order'] = true;
 			}
-	
+
 			if (class_exists('Tribe__Events__Main')) {
 				$enabled_post_types['tribe_events'] = true;
 			}
-	
+
 			if (!defined('REVISIONARY_NO_PRIVATE_TYPES')) {
 				$private_types = array_merge(
 					get_post_types(['public' => false], 'object'), 
