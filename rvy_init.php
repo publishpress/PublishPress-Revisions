@@ -311,7 +311,7 @@ function rvy_status_registrations() {
 		[
 			'draft-revision' => [
 				'name' => esc_html__('Working Copy', 'revisionary'),
-				'submit' => esc_html__('Create Working Copy', 'revisionary'), 
+				'submit' => esc_html__('Create Working Copy', 'revisionary'),
 				'submit_short' => esc_html__('Copy', 'revisionary'),
 				'submitting' => esc_html__('Creating Working Copy...', 'revisionary'),
 				'submitted' => esc_html__('Working Copy ready', 'revisionary'),
@@ -333,7 +333,7 @@ function rvy_status_registrations() {
 				'submit_short' => esc_html__('Submit', 'revisionary'),
 				'submitting' => esc_html__('Submitting Changes...', 'revisionary'),
 				'submitted' => esc_html__('Changes Submitted', 'revisionary'),
-				'approve' => esc_html__('Approve Changes', 'revisionary'), 
+				'approve' => esc_html__('Approve Changes', 'revisionary'),
 				'approve_short' => esc_html__('Approve', 'revisionary'),
 				'approving' => esc_html__('Approving Changes...', 'revisionary'),
 				'publish' => esc_html__('Publish Changes', 'revisionary'), 
@@ -372,9 +372,9 @@ function rvy_status_registrations() {
 				'submit_short' => esc_html__('New Revision', 'revisionary'), 
 				'submitting' => esc_html__('Creating Revision...', 'revisionary'),
 				'submitted' => ($block_editor) ? esc_html__('The Revision is ready to edit.', 'revisionary') : esc_html__('Revision ready to edit.', 'revisionary'),
-				'approve' => esc_html__('Approve Revision', 'revisionary'), 
+				'approve' => esc_html__('Approve Revision', 'revisionary'),
 				'approve_short' => esc_html__('Approve', 'revisionary'),
-				'publish' => esc_html__('Publish Revision', 'revisionary'), 
+				'publish' => esc_html__('Publish Revision', 'revisionary'),
 				'save' => esc_html__('Save Revision', 'revisionary'), 
 				'update' => esc_html__('Update Revision', 'revisionary'), 
 				'plural' => esc_html__('Unsubmitted Revisions', 'revisionary'), 
@@ -385,11 +385,11 @@ function rvy_status_registrations() {
 		
 			'pending-revision' => [
 				'name' => esc_html__('Submitted Revision', 'revisionary'),
-				'submit' => esc_html__('Submit Revision', 'revisionary'), 
+				'submit' => esc_html__('Submit Revision', 'revisionary'),
 				'submit_short' => esc_html__('Submit', 'revisionary'), 
 				'submitting' => esc_html__('Submitting Revision...', 'revisionary'),
 				'submitted' => ($block_editor) ? esc_html__('The Revision is Submitted', 'revisionary') : esc_html__('Revision Submitted', 'revisionary'),
-				'approve' => esc_html__('Approve Revision', 'revisionary'), 
+				'approve' => esc_html__('Approve Revision', 'revisionary'),
 				'approve_short' => esc_html__('Approve', 'revisionary'),
 				'publish' => esc_html__('Publish Revision', 'revisionary'), 
 				'save' => esc_html__('Save Revision', 'revisionary'), 
@@ -578,7 +578,7 @@ function rvy_add_revisor_custom_caps() {
 		get_post_types(['_builtin' => false], 'object'),
 		$revisionary->enabled_post_types
 	);
-		
+
 	if ( isset( $wp_roles->roles['revisor'] ) ) {
 		if ($custom_types) {
 			foreach( $custom_types as $post_type => $type_obj ) {
@@ -932,9 +932,9 @@ function rvy_get_option($option_basename, $sitewide = -1, $get_default = false, 
 	if (('async_scheduled_publish' == $option_basename) && function_exists('relevanssi_query')) {
 		return false;
 	}
-	
+
 	if (('scheduled_revisions' == $option_basename) && empty($args['bypass_condition_check']) 
-	&& defined('DISABLE_WP_CRON') && DISABLE_WP_CRON && rvy_get_option('scheduled_publish_cron') && apply_filters('revisionary_wp_cron_disabled', true)
+	&& defined('DISABLE_WP_CRON') && DISABLE_WP_CRON && rvy_get_option('scheduled_publish_cron') && !rvy_get_option('wp_cron_usage_detected') && apply_filters('revisionary_wp_cron_disabled', true)
 	) {
 		return false;
 	}
@@ -1247,8 +1247,8 @@ function rvy_init() {
 		// Is this an asynchronous request to publish scheduled revisions?
 		} elseif (!empty($_GET['action']) && ('publish_scheduled_revisions' == $_GET['action']) && rvy_get_option('scheduled_revisions') 
 		&& !rvy_get_option('scheduled_publish_cron')) {
-				require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
-				add_action( 'rvy_init', '_rvy_publish_scheduled_revisions' );
+			require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
+			add_action( 'rvy_init', '_rvy_publish_scheduled_revisions' );
 		}
 	}
 	
@@ -1365,7 +1365,7 @@ function rvy_preview_url($revision, $args = []) {
 	if (is_scalar($revision)) {
 		$revision = get_post($revision);
 	}
-	
+
 	$defaults = ['post_type' => $revision->post_type];  // support preview url for past revisions, which are stored with post_type = 'revision'
 	foreach(array_keys($defaults) as $var) {
 		$$var = (!empty($args[$var])) ? $args[$var] : $defaults[$var]; 
