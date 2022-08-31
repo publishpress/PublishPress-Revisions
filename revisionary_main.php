@@ -70,6 +70,12 @@ class Revisionary
 
 		rvy_refresh_options_sitewide();
 
+		if (defined('DOING_CRON') && DOING_CRON) {
+			if (!rvy_get_option('wp_cron_usage_detected')) {
+				update_option('rvy_wp_cron_usage_detected', true);
+			}
+		}
+
 		require_once( dirname(__FILE__).'/classes/PublishPress/Revisions/PluginCompat.php' );
 		new PublishPress\Revisions\PluginCompat();
 

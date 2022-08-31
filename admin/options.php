@@ -129,6 +129,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'trigger_post_update_actions' => 			esc_html__('Revision Publication: API actions to mimic Post Update', 'revisionary'),
 	'diff_display_strip_tags' => 				esc_html__('Hide html tags on Compare Revisions screen', 'revisionary'),
 	'scheduled_publish_cron' =>					esc_html__('Use WP-Cron scheduling', 'revisionary'),
+	'wp_cron_usage_detected' =>					esc_html__('Site uses a custom trigger for WP-Cron tasks', 'revisionary'),
 	'async_scheduled_publish' => 				esc_html__('Asynchronous Publishing', 'revisionary'),
 	'scheduled_revision_update_post_date' => 	esc_html__('Update Publish Date', 'revisionary'),
 	'pending_revision_update_post_date' => 		esc_html__('Update Publish Date', 'revisionary'),
@@ -172,7 +173,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'role_definition' => 	 ['revisor_role_add_custom_rolecaps', 'require_edit_others_drafts'],
 	'revision_statuses' =>	 ['revision_statuses_noun_labels'],
 	'working_copy' =>		 ['manage_unsubmitted_capability', 'copy_posts_capability', 'auto_submit_revisions', 'caption_copy_as_edit'],
-	'scheduled_revisions' => ['scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date'],
+	'scheduled_revisions' => ['scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'wp_cron_usage_detected', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date'],
 	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'],
@@ -585,6 +586,11 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 		if (!rvy_get_option('scheduled_publish_cron')) {
 			$hint = esc_html__( 'Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
 			$this->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
+		}
+
+		if (defined('DISABLE_WP_CRON') && DISABLE_WP_CRON) {
+			$hint = esc_html__( 'The WP-Cron trigger is disabled, but scheduled tasks are still excecuted using a custom trigger.', 'revisionary' );
+			$this->option_checkbox( 'wp_cron_usage_detected', $tab, $section, $hint, '' );
 		}
 		?>
 		</td></tr></table>
