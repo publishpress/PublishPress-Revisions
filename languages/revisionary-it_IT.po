@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Plugins - PublishPress Revisions: Duplicate Posts, Submit, Approve and Schedule Content Changes - Stable (latest release)\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2022-08-17 17:29-0500\n"
+"PO-Revision-Date: 2022-08-31 16:53-0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
@@ -13,6 +13,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 3.0.1\n"
+
+#: admin/options.php:592
+msgid "The WP-Cron trigger is disabled, but scheduled tasks are still excecuted using a custom trigger."
+msgstr "Il trigger di WP-Cron è disattivato, ma le attività pianificate vengono comunque eseguite utilizzando un trigger personalizzato."
+
+#: admin/options.php:132
+msgid "Site uses a custom trigger for WP-Cron tasks"
+msgstr "Il sito utilizza un trigger personalizzato per le attività di WP-Cron"
 
 #: admin/admin_rvy.php:117
 msgid "Scheduled Revisions are not available because WP-Cron is disabled on this site. See %sRevisions > Settings > Scheduled Revisions%s."
@@ -78,23 +86,23 @@ msgstr "Aggiorna a PublishPress Revisions Pro per l'integrazione con le funzioni
 msgid "Upgrade to PublishPress Revisions Pro"
 msgstr "Aggiorna a PublishPress Revisions Pro"
 
-#: admin/options.php:582
+#: admin/options.php:583
 msgid "Publish scheduled revisions using the WP-Cron mechanism. On some sites, publication will fail if this setting is disabled."
 msgstr "Pubblica le revisioni programmate utilizzando il meccanismo WP-Cron. Su alcuni siti, la pubblicazione fallirà se questa impostazione è disattivata."
 
-#: admin/options.php:452
+#: admin/options.php:453
 msgid "Note: Third party code may cause some post types to be incompatible with PublishPress Revisions."
 msgstr "Nota: il codice di terze parti può causare l'incompatibilità di alcuni tipi di articoli con PublishPress Revisions."
 
-#: admin/options.php:438
+#: admin/options.php:439
 msgid "%s capabilities"
 msgstr "Capacità %s"
 
-#: admin/options.php:392
+#: admin/options.php:393
 msgid "Enable revisions for these Post Types:"
 msgstr "Abilita le revisioni per questi tipi di contenuto:"
 
-#: admin/options.php:152
+#: admin/options.php:153
 msgid "On Revision publication, delete Editorial Comments"
 msgstr "Quando la revisione viene pubblicata, eliminare i commenti editoriali"
 
@@ -154,12 +162,12 @@ msgstr "Pubblicare %sprevia approvazione%s"
 msgid "Search results for \"%s\""
 msgstr "Risultati della ricerca per \"%s\""
 
-#: admin/options.php:1005
+#: admin/options.php:1011
 msgctxt "opentag option_tabname closetag (explanatory note)"
 msgid "%1$s%2$s%3$s (%4$s)"
 msgstr "%1$s%2$s%3$s (%4$s)"
 
-#: admin/options.php:688
+#: admin/options.php:694
 msgid "For compatibility with Advanced Custom Fields, Beaver Builder and WPML, upgrade to %sPublishPress Revisions Pro%s."
 msgstr "Per avere una compatibilità con Advanced Custom Fields, Beaver Builder e WPML, aggiorna a %sPublishPress Revisions Pro%s."
 
@@ -183,7 +191,7 @@ msgstr "Compara %s di \"%s\""
 msgid "Show more details"
 msgstr "Mostra più dettagli"
 
-#: admin/options.php:509
+#: admin/options.php:510
 msgid "To enable a role, add the manage_unsubmitted_revisions capability"
 msgstr "Per abilitare un ruolo, aggiungi la capacità di manage_unsubmitted_revisions"
 
@@ -471,91 +479,91 @@ msgstr "Visualizza/Approva revisione salvata"
 msgid "(on approval)"
 msgstr "(in fase di approvazione)"
 
-#: admin/options.php:609
+#: admin/options.php:615
 msgid "Bypass the above restrictions for others' revisions to logged in user's own posts."
 msgstr "Ignora le restrizioni di cui sopra per le revisioni altrui degli articoli dell'utente connesso."
 
-#: admin/options.php:553 admin/options.php:577
+#: admin/options.php:554 admin/options.php:578
 msgid "When a %s is published, update post modified date to current time."
 msgstr "Quando un %s viene pubblicato, aggiorna la data di modifica dell'articolo all'ora corrente."
 
-#: admin/options.php:550 admin/options.php:574
+#: admin/options.php:551 admin/options.php:575
 msgid "When a %s is published, update post publish date to current time."
 msgstr "Quando un %s viene pubblicato, aggiorna la data di pubblicazione dell'articolo all'ora corrente."
 
-#: admin/options.php:547
+#: admin/options.php:548
 msgid "This restriction applies to users who are not full editors for the post type. To enable a role, add capabilities: revise_posts, revise_others_pages, etc."
 msgstr "Questa restrizione si applica agli utenti che non sono editori completi per il tipo di articolo. Per abilitare un ruolo, aggiungi le capacità: revise_posts, revise_others_pages, ecc."
 
-#: admin/options.php:541
+#: admin/options.php:542
 msgid "Enable published content to be copied, edited, submitted for approval and managed in %sRevision Queue%s."
 msgstr "Abilita il contenuto pubblicato ad essere copiato, modificato, sottoposto ad approvazione e gestito nella %sCoda revisione%s."
 
-#: admin/options.php:519
+#: admin/options.php:520
 msgid "If the user does not have a regular Edit link, recaption the %s link as \"Edit\""
 msgstr "Se l'utente non ha un collegamento regolare a Modifica, rinomina il link %s come \"Modifica\"."
 
-#: admin/options.php:505
+#: admin/options.php:506
 msgid "To expand the Posts / Pages listing for non-Editors, add capabilities: list_others_pages, list_published_posts, etc."
 msgstr "Per espandere l'elenco \"Articoli/Pagine\" per i non-editori, aggiungi le capacità: list_others_pages, list_published_posts, ecc."
 
-#: admin/options.php:500
+#: admin/options.php:501
 msgid "This restriction applies to users who are not full editors for the post type. To enable a role, add capabilities: copy_posts, copy_others_pages, etc."
 msgstr "Questa restrizione si applica agli utenti che non sono editor completi per il tipo di contenuto. Per abilitare un ruolo, aggiungi le capacità: copy_posts, copy_others_pages, ecc."
 
-#: admin/options.php:486
+#: admin/options.php:487
 msgid "Default labels are \"Not Submitted for Approval\", \"Submitted for Approval\", \"Scheduled Revision\""
 msgstr "Le etichette predefinite sono \"Non inviato per l'approvazione\", \"Inviato per l'approvazione\", \"Revisione programmata\"."
 
-#: admin/options.php:339
+#: admin/options.php:340
 msgid "License"
 msgstr "Licenza"
 
-#: admin/options.php:164
+#: admin/options.php:165
 msgid "Email Editors and Administrators when a %s is approved"
 msgstr "Invia una email agli editor e amministratori quando una %s è stata approvata"
 
-#: admin/options.php:163
+#: admin/options.php:164
 msgid "Email Editors and Administrators when a %s is published"
 msgstr "Invia una email agli editor e amministratori quando una %s è stata pubblicata"
 
-#: admin/options.php:162
+#: admin/options.php:163
 msgid "Email Editors and Administrators when a %s is submitted"
 msgstr "Invia una email agli editor e amministratori quando una %s è stata inviata"
 
-#: admin/options.php:160
+#: admin/options.php:161
 msgid "Email designated Publishers when a %s is approved"
 msgstr "Invia una email agli editori prestabiliti quando una %s è stata approvata"
 
-#: admin/options.php:159
+#: admin/options.php:160
 msgid "Email designated Publishers when a %s is published"
 msgstr "Invia una email agli editori designati quando una %s è stata pubblicata"
 
-#: admin/options.php:158
+#: admin/options.php:159
 msgid "Email designated Publishers when a %s is submitted"
 msgstr "Invia una email agli editori designati quando una %s è stata inviata"
 
-#: admin/options.php:151
+#: admin/options.php:152
 msgid "Include %s in My Activity, Revisions to My Posts views"
 msgstr "Includi %s nelle viste \"La mia attività\", \"Revisioni dei miei articoli\""
 
-#: admin/options.php:141
+#: admin/options.php:142
 msgid "Email the Revisor when a %s is published"
 msgstr "Invia una email ai revisori quando una %s è stata pubblicata"
 
-#: admin/options.php:140
+#: admin/options.php:141
 msgid "Email the original Author when a %s is published"
 msgstr "Invia una email agli autori originali quando una %s è stata pubblicata"
 
-#: admin/options.php:139
+#: admin/options.php:140
 msgid "Email the Revisor when a %s is approved"
 msgstr "Invia una email ai revisori quando una %s è stata approvata"
 
-#: admin/options.php:138
+#: admin/options.php:139
 msgid "Email the original Author when a %s is approved"
 msgstr "Invia una email agli autori originali quando una %s è stata approvata"
 
-#: admin/options.php:137
+#: admin/options.php:138
 msgid "Email original Author when a %s is submitted"
 msgstr "Invia una email agli autori originali quando una %s è stata inviata"
 
@@ -644,15 +652,15 @@ msgstr "La mia attività"
 msgid "Sorry, you are not allowed to submit this revision."
 msgstr "Non sei autorizzato a inviare questa revisione."
 
-#: admin/options.php:957
+#: admin/options.php:963
 msgid "Set \"Needs Update\" for any post with translations which was updated (possibly by revision approval) more recently than its translations."
 msgstr "Impostare \"Deve essere aggiornato\" per ogni articolo con traduzioni che è stato aggiornato (eventualmente con l'approvazione di una revisione) più recentemente delle sue traduzioni."
 
-#: admin/options.php:953
+#: admin/options.php:959
 msgid "Sync \"Needs Update\" flags"
 msgstr "Sincronizzare le segnalazioni di \"Deve essere aggiornato\""
 
-#: admin/options.php:946 includes/CoreAdmin.php:89
+#: admin/options.php:952 includes/CoreAdmin.php:89
 msgid "WPML Translation Management"
 msgstr "Gestione delle traduzioni con WPML"
 
@@ -668,15 +676,15 @@ msgstr "Notifica anche su aggiornamento della revisione"
 msgid "Hide html tags on Compare Revisions screen"
 msgstr "Nascondi i tag HTML nella schermata \"Confronta revisioni\""
 
-#: admin/options.php:135 admin/options.php:136
+#: admin/options.php:136 admin/options.php:137
 msgid "Update Modified Date"
 msgstr "Aggiorna la data di modifica"
 
-#: admin/options.php:717
+#: admin/options.php:723
 msgid "Modification Date"
 msgstr "Data di modifica"
 
-#: admin/options.php:150
+#: admin/options.php:151
 msgid "Compare Past Revisions ordering:"
 msgstr "Ordine per confrontare le revisioni precedenti:"
 
@@ -688,11 +696,11 @@ msgstr "Per elencare le revisioni altrui è necessaria una capacità di ruolo"
 msgid "Editing others' revisions requires role capability"
 msgstr "Per modificare le revisioni altrui è necessaria una capacità di ruolo"
 
-#: admin/options.php:618
+#: admin/options.php:624
 msgid "Regenerate \"post has revision\" flags"
 msgstr "Rigenera i flag «l'articolo ha una revisione»"
 
-#: admin/options.php:149
+#: admin/options.php:150
 msgid "Copy revision comments to published post"
 msgstr "Copia i commenti di revisione nell'articolo pubblicato"
 
@@ -714,15 +722,15 @@ msgstr "Abilita anteprima pubblica"
 msgid "Upgrade to Pro"
 msgstr "Aggiornare a Pro"
 
-#: admin/options.php:698
+#: admin/options.php:704
 msgid "This may improve compatibility with some plugins."
 msgstr "Ciò potrebbe migliorare la compatibilità con alcuni plugin."
 
-#: admin/options.php:633
+#: admin/options.php:639
 msgid "For themes that block revision preview, hide preview links from non-Administrators"
 msgstr "Per i temi che bloccano l'anteprima di revisione, nascondi i link di anteprima ai non amministratori"
 
-#: admin/options.php:146
+#: admin/options.php:147
 msgid "Show Preview Links"
 msgstr "Mostra i link di anteprima"
 
@@ -784,87 +792,87 @@ msgstr "Spiacente, non puoi approvare questa revisione."
 msgid "Publish"
 msgstr "Pubblica"
 
-#: admin/options.php:935
+#: admin/options.php:941
 msgid "Show with message content"
 msgstr "Mostra con il contenuto del messaggio"
 
-#: admin/options.php:933
+#: admin/options.php:939
 msgid "Show Notification Log / Buffer"
 msgstr "Mostra registro/buffer delle notifiche"
 
-#: admin/options.php:924
+#: admin/options.php:930
 msgid "Seconds until next buffer processing time: %d"
 msgstr "Secondi al successivo tempo di elaborazione del buffer: %d"
 
-#: admin/options.php:917
+#: admin/options.php:923
 msgid "Sent in last day: %d / %d"
 msgstr "Inviato lo scorso giorno: %d/%d"
 
-#: admin/options.php:916
+#: admin/options.php:922
 msgid "Sent in last hour: %d / %d"
 msgstr "Inviato nell'ultima ora: %d/%d"
 
-#: admin/options.php:915
+#: admin/options.php:921
 msgid "Sent in last minute: %d / %d"
 msgstr "Inviato negli ultimi minuti: %d/%d"
 
-#: admin/options.php:909
+#: admin/options.php:915
 msgid "Truncate Notification Log"
 msgstr "Troncare il registro delle notifiche"
 
-#: admin/options.php:903
+#: admin/options.php:909
 msgid "Purge Notification Buffer"
 msgstr "Elimina buffer di notifica"
 
-#: admin/options.php:874
+#: admin/options.php:880
 msgid "Notification Log"
 msgstr "Registro delle notifiche"
 
-#: admin/options.php:846
+#: admin/options.php:852
 msgid "Notification Buffer"
 msgstr "Buffer delle notifiche"
 
-#: admin/options.php:825
+#: admin/options.php:831
 msgid "To avoid notification failures, buffer emails for delayed sending once minute, hour or day limits are exceeded"
 msgstr "Per evitare errori di notifica, il buffer di messaggi di posta elettronica serve per l'invio ritardato quando vengono superati i limiti di un minuto, ora o giorno"
 
-#: admin/options.php:606
+#: admin/options.php:612
 msgid "This restriction applies to users who are not full editors for the post type. To enable a role, give it the list_others_revisions capability."
 msgstr "Questa restrizione si applica agli utenti che non sono editor completi per il tipo di articolo. Per abilitare un ruolo, forniscigli la funzionalità in capacità in list_others_revisions."
 
-#: admin/options.php:603
+#: admin/options.php:609
 msgid "This restriction applies to users who are not full editors for the post type. To enable a role, give it the edit_others_revisions capability."
 msgstr "Questa restrizione si applica agli utenti che non sono editor completi per il tipo di articolo. Per abilitare un ruolo, forniscigli la funzionalità edit_others_revisions."
 
-#: admin/options.php:666
+#: admin/options.php:672
 msgid "If disabled, Compare screen links to Revision Preview for approval"
 msgstr "Se disabilitato, la schermata «Confronta» si collega all'anteprima della revisione per l'approvazione"
 
-#: admin/options.php:656
+#: admin/options.php:662
 msgid "Some themes or plugins may require Revision Slug or Revision ID link type for proper template loading and field display."
 msgstr "Alcuni temi o plugin potrebbero richiedere il tipo di collegamento Slug revisione o ID revisione per il corretto caricamento del modello e la visualizzazione dei campi."
 
-#: admin/options.php:645
+#: admin/options.php:651
 msgid "Revision ID only"
 msgstr "Solo ID revisione"
 
-#: admin/options.php:645
+#: admin/options.php:651
 msgid "Revision Slug"
 msgstr "Slug della revisione"
 
-#: admin/options.php:645
+#: admin/options.php:651
 msgid "Published Post Slug"
 msgstr "Slug dell'articolo pubblicato"
 
-#: admin/options.php:148
+#: admin/options.php:149
 msgid "Approve Button on Compare Revisions screen"
 msgstr "Pulsante approva nella schermata «Confronta revisioni»"
 
-#: admin/options.php:147
+#: admin/options.php:148
 msgid "Preview Link Type"
 msgstr "Anteprima tipo di collegamento"
 
-#: admin/options.php:142
+#: admin/options.php:143
 msgid "Enable notification buffer"
 msgstr "Attiva buffer delle notifche"
 
@@ -1159,7 +1167,7 @@ msgstr "Ordinamento menu"
 msgid "Post Parent"
 msgstr "Articoli genitore"
 
-#: admin/history_rvy.php:528 admin/options.php:717
+#: admin/history_rvy.php:528 admin/options.php:723
 msgid "Post Date"
 msgstr "Data articolo"
 
@@ -1202,27 +1210,27 @@ msgstr "Visualizza/approva"
 msgid "View / Publish"
 msgstr "Visualizza/pubblica"
 
-#: admin/options.php:727
+#: admin/options.php:733
 msgid "Show descriptive captions for PublishPress Revisions settings"
 msgstr "Mostra didascalie descrittive per le impostazioni di PublishPress Revisions"
 
-#: admin/options.php:466
+#: admin/options.php:467
 msgid "The user role \"Revisor\" role is now available. Include capabilities for all custom post types in this role?"
 msgstr "Il ruolo utente \"Revisore\" è ora disponibile. Includere anche le funzionalità per tutti i tipi di articoli personalizzati in questo ruolo?"
 
-#: admin/options.php:231
+#: admin/options.php:232
 msgid "PublishPress Revisions Site Settings"
 msgstr "Impostazioni del sito per PublishPress Revisions"
 
-#: admin/admin_lib-mu_rvy.php:21 admin/options.php:229
+#: admin/admin_lib-mu_rvy.php:21 admin/options.php:230
 msgid "PublishPress Revisions Network Defaults"
 msgstr "Reti predefinite di PublishPress Revisions"
 
-#: admin/admin_lib-mu_rvy.php:10 admin/options.php:227
+#: admin/admin_lib-mu_rvy.php:10 admin/options.php:228
 msgid "PublishPress Revisions Network Settings"
 msgstr "Impostazioni di rete di PublishPress Revisions"
 
-#: admin/options.php:143
+#: admin/options.php:144
 msgid "All custom post types available to Revisors"
 msgstr "Tutti i tipi di articoli personalizzati disponibili per i revisori"
 
@@ -1242,7 +1250,7 @@ msgstr "Informazioni sul plugin"
 msgid "If you like %s, please leave us a %s rating. Thank you!"
 msgstr "Se ti piace %s, lasciaci una valutazione di %s!"
 
-#: admin/admin_rvy.php:232 admin/options.php:233
+#: admin/admin_rvy.php:232 admin/options.php:234
 msgid "PublishPress Revisions Settings"
 msgstr "Impostazione di PublishPress Revisions"
 
@@ -1428,79 +1436,79 @@ msgstr "Una revisione a %1$s \"%2$s\" è stata approvata."
 msgid "[%s] Revision Approval Notice"
 msgstr "[%s] Avviso di approvazione della revisione"
 
-#: admin/options.php:1071
+#: admin/options.php:1077
 msgid "All settings in this form (including those on unselected tabs) will be reset to DEFAULTS.  Are you sure?"
 msgstr "Tutte le impostazioni in questo modulo (comprese quelle nelle schede non selezionate) verranno ripristinate ai valori PREDEFINITI. Sei sicuro?"
 
-#: admin/options.php:995
+#: admin/options.php:1001
 msgid "Specify which PublishPress Revisions Settings to control network-wide. Unselected settings are controlled separately on each site."
 msgstr "Specifica le impostazioni di PublishPress Revisions per controllare ampiezza rete. Le impostazioni deselezionate vengono controllate separatamente su ogni sito."
 
-#: admin/options.php:1041
+#: admin/options.php:1047
 msgid "network-wide control of \"%s\""
 msgstr "controllo ampiezza di rete di \"%s\""
 
-#: admin/options.php:755 admin/options.php:776
+#: admin/options.php:761 admin/options.php:782
 msgid "Always"
 msgstr "Sempre"
 
-#: admin/options.php:755 admin/options.php:776
+#: admin/options.php:761 admin/options.php:782
 msgid "By default"
 msgstr "Per impostazione predefinita"
 
-#: admin/options.php:755 admin/options.php:776
+#: admin/options.php:761 admin/options.php:782
 msgid "Never"
 msgstr "Mai"
 
-#: admin/options.php:765 admin/options.php:811
+#: admin/options.php:771 admin/options.php:817
 msgid "select recipients"
 msgstr "seleziona recipienti"
 
-#: admin/options.php:586
+#: admin/options.php:587
 msgid "Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it."
 msgstr "Pubblica le revisioni pianificate in modo asincrono, tramite una richiesta http secondaria dal server. Di solito è la soluzione migliore poiché elimina i ritardi, ma alcuni server potrebbero non supportarla."
 
-#: admin/options.php:571
+#: admin/options.php:572
 msgid "If a currently published post or page is edited and a future date set, the change will not be applied until the selected date."
 msgstr "Se un articolo o una pagina attualmente pubblicati vengono modificati e viene impostata una data futura, la modifica non verrà applicata fino alla data selezionata."
 
-#: admin/options.php:471
+#: admin/options.php:472
 msgid "If checked, users lacking site-wide publishing capabilities will also be checked for the edit_others_drafts capability"
 msgstr "Se selezionata, verrà selezionata anche la funzionalità edit_others_drafts per gli utenti privi di funzionalità di pubblicazione a livello di sito"
 
-#: admin/options.php:312 admin/options.php:314
+#: admin/options.php:313 admin/options.php:315
 msgid "Note that %1$s network-wide settings%2$s may also be available."
 msgstr "Tieni presente che potrebbero essere disponibili anche %1$s impostazioni di rete%2$s."
 
-#: admin/options.php:302
+#: admin/options.php:303
 msgid "Here you can change the default value for settings which are controlled separately on each site."
 msgstr "Qui puoi modificare il valore predefinito per le impostazioni che sono controllate separatamente su ogni sito."
 
-#: admin/options.php:300
+#: admin/options.php:301
 msgid "Use this tab to make <strong>NETWORK-WIDE</strong> changes to PublishPress Revisions settings. %s"
 msgstr "Utilizzare questa scheda per apportare modifiche <strong>a tutta la rete</strong> delle impostazioni di PublishPress Revisions. %s"
 
-#: admin/options.php:299
+#: admin/options.php:300
 msgid "You can also specify %1$sdefaults for site-specific settings%2$s."
 msgstr "Puoi anche specificare %1$spredefinite per le impostazioni specifiche del sito%2$s."
 
-#: admin/options.php:261
+#: admin/options.php:262
 msgid "These are the <strong>default</strong> settings for options which can be adjusted per-site."
 msgstr "Queste sono le impostazioni <strong>predefinite</strong> per le opzioni che possono essere regolate per sito."
 
-#: admin/options.php:145
+#: admin/options.php:146
 msgid "Display Hints"
 msgstr "Visualizza suggerimenti"
 
-#: admin/options.php:144
+#: admin/options.php:145
 msgid "Prevent Revisors from editing other user's drafts"
 msgstr "Impedisci ai revisori di modificare le bozze di altri utenti"
 
-#: admin/options.php:133 admin/options.php:134
+#: admin/options.php:134 admin/options.php:135
 msgid "Update Publish Date"
 msgstr "Aggiorna data pubblicazione"
 
-#: admin/options.php:132
+#: admin/options.php:133
 msgid "Asynchronous Publishing"
 msgstr "Pubblicazione asincrona"
 
