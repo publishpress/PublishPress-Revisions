@@ -109,11 +109,16 @@ class Utils {
 		}
 
 		// phpcs:ignore WordPress.VIP.SuperGlobalInputUsage.AccessDetected, WordPress.Security.NonceVerification.NoNonceVerification
-		$conditions[] = (self::isWp5() || $pluginsState['gutenberg'])
-						&& ! $pluginsState['classic-editor']
-						&& ! $pluginsState['gutenberg-ramp']
-						&& apply_filters('use_block_editor_for_post_type', true, $postType, PHP_INT_MAX)
-						&& apply_filters('use_block_editor_for_post', true, get_post(rvy_detect_post_id()), PHP_INT_MAX);
+		
+		$_post = get_post(rvy_detect_post_id());
+		
+		if (!empty($_post)) {
+			$conditions[] = (self::isWp5() || $pluginsState['gutenberg'])
+							&& ! $pluginsState['classic-editor']
+							&& ! $pluginsState['gutenberg-ramp']
+							&& apply_filters('use_block_editor_for_post_type', true, $postType)
+							&& apply_filters('use_block_editor_for_post', true, $_post);
+		}
 
 		$conditions[] = self::isWp5()
                         && $pluginsState['classic-editor']
@@ -125,8 +130,10 @@ class Utils {
                         && (get_option('classic-editor-replace') === 'classic'
                             && isset($_GET['classic-editor__forget']));
 
-		$conditions[] = $pluginsState['gutenberg-ramp'] 
-						&& apply_filters('use_block_editor_for_post', true, get_post(rvy_detect_post_id()), PHP_INT_MAX);
+		if (!empty($_post)) {
+			$conditions[] = $pluginsState['gutenberg-ramp'] 
+							&& apply_filters('use_block_editor_for_post', true, $_post);
+		}
 
 		if (defined('PP_CAPABILITIES_RESTORE_NAV_TYPE_BLOCK_EDITOR_DISABLE') && version_compare($wp_version, '5.9-beta', '>=')) {
 			add_filter('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type', 10, 2 );
@@ -142,7 +149,7 @@ class Utils {
 			   ) > 0;
 	}
 
-	    /**
+	/**
 	 * Adds slashes only to strings.
 	 *
 	 * @param mixed $value Value to slash only if string.
@@ -168,17 +175,17 @@ class Utils {
 	
 	public static function get_post_autosave($post_id, $user_id) {
 		global $wpdb;
-	
+
 		$autosave = $wpdb->get_row(
 			$wpdb->prepare(
 				"SELECT *
-			FROM $wpdb->posts
-			WHERE post_parent = %d
-			AND post_type = 'revision'
-			AND post_status = 'inherit'
-			AND post_name LIKE '%" . intval($post_id) . "-autosave%'
-			AND post_author = %d
-			ORDER BY post_date DESC
+				FROM $wpdb->posts
+				WHERE post_parent = %d
+				AND post_type = 'revision'
+				AND post_status = 'inherit'
+				AND post_name LIKE '%" . intval($post_id) . "-autosave%'
+				AND post_author = %d
+				ORDER BY post_date DESC
 				LIMIT 1",
 				$post_id,
 				$user_id
