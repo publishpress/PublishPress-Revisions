@@ -193,7 +193,7 @@ class RevisionaryFront {
 			}
 		}
 
-		if ((rvy_in_revision_workflow($post) || ('revision' == $post->post_type) || (!empty($_REQUEST['mark_current_revision']))) && !isset($_REQUEST['fl_builder'])) {
+		if ((!empty($_REQUEST['mark_current_revision']) || rvy_in_revision_workflow($post) || ('revision' == $post->post_type)) && !isset($_REQUEST['fl_builder'])) {
 			add_filter('redirect_canonical', array($this, 'flt_revision_preview_url'), 10, 2);
 
 			if (!empty($_REQUEST['mark_current_revision'])) {
