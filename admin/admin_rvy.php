@@ -120,11 +120,15 @@ class RevisionaryAdmin
 						)
 					);
 				}
+			}
 
+			if (($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-settings'])
+			|| (defined('DOING_AJAX') && DOING_AJAX && !empty($_REQUEST['action']) && (false !== strpos(sanitize_key($_REQUEST['action']), 'revisionary')))
+			) {
 				if (!class_exists('\PublishPress\WordPressReviews\ReviewsController')) {
 					include_once RVY_ABSPATH . '/vendor/publishpress/wordpress-reviews/ReviewsController.php';
 				}
-		
+
 				if (class_exists('\PublishPress\WordPressReviews\ReviewsController')) {
 					$reviews = new \PublishPress\WordPressReviews\ReviewsController(
 						'revisionary',
@@ -132,7 +136,7 @@ class RevisionaryAdmin
 						plugin_dir_url(REVISIONARY_FILE) . 'common/img/revisions-wp-logo.jpg'
 					);
 		
-					add_filter('publishpress_wp_reviews_display_banner_revisions', [$this, 'shouldDisplayBanner']);
+					add_filter('publishpress_wp_reviews_display_banner_revisionary', [$this, 'shouldDisplayBanner']);
 		
 					$reviews->init();
 				}
