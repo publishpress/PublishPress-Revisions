@@ -160,6 +160,8 @@ class RevisionaryFront {
 		} else {
 			if (!empty($post)) {
 				$revision_id = $post->ID;
+			} else {
+				$revision_id = 0;
 			}
 		}
 
@@ -238,6 +240,10 @@ class RevisionaryFront {
 						rvy_set_ma_post_authors($revision_id, $published_authors);
 					}
 				}
+			}
+
+			if (empty($post)) {
+				global $post;
 			}
 
 			$datef = __awp( 'M j, Y @ g:i a' );
