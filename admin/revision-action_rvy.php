@@ -785,6 +785,14 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		$update_fields['post_parent'] = 0;
 	}
 
+	if ($author_selection = get_post_meta($revision_id, '_rvy_author_selection', true)) {
+		$user = get_user_by('ID', $author_selection);
+
+		if (is_a($user, 'WP_User')) {
+			$update_fields['post_author'] = $author_selection;
+		}
+	}
+
 	$wpdb->update($wpdb->posts, $update_fields, ['ID' => $post_id]);
 
 	// also copy all stored postmeta from revision

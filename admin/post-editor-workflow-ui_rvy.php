@@ -17,9 +17,11 @@ class PostEditorWorkflowUI {
             return [];
         }
 
+        $published_post_id = rvy_post_id($post->ID);
+
         $block_editor = \PublishPress\Revisions\Utils::isBlockEditorActive($post->post_type);
 
-        $can_publish = current_user_can('edit_post', rvy_post_id($post->ID));
+        $can_publish = current_user_can('edit_post', $published_post_id);
 
         $vars = [
             'postID' => $post->ID,
@@ -29,8 +31,9 @@ class PostEditorWorkflowUI {
             'statusLabel' => esc_html__('Status', 'revisionary'),
             'ajaxurl' => rvy_admin_url(''),
             'currentStatus' => str_replace('-revision', '', $post->post_mime_type),
+            'currentPostAuthor' => get_post_field('post_author', $published_post_id),
             'onApprovalCaption' => esc_html__('(on approval)', 'revisionary'),
-            'canPublish' => $can_publish,
+            'canPublish' => $can_publish
         ];
 
         $vars['disableRecaption'] = version_compare($wp_version, '5.9-beta', '>=') || is_plugin_active('gutenberg/gutenberg.php');
@@ -71,7 +74,6 @@ class PostEditorWorkflowUI {
         }
 
         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
-        $published_post_id = rvy_post_id($post->ID);
 
         $draft_obj = get_post_status_object('draft-revision');
         $vars['draftStatusCaption'] = $draft_obj->label;
