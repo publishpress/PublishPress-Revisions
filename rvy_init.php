@@ -241,6 +241,15 @@ function rvy_ajax_handler() {
 
 					break;
 
+				case 'author_select':
+					if (!empty($_REQUEST['rvy_selection'])) {
+						if (current_user_can('edit_post', $post_id)) {
+							update_post_meta($post_id, '_rvy_author_selection', $_REQUEST['rvy_selection']);
+						}
+					}
+
+					break;
+
 				default:
 			}
 
