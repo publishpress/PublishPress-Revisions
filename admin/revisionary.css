@@ -617,9 +617,11 @@ div.edit-post-revision-status span {
 width: 35%;
 }
 
+/*
 div.edit-post-post-schedule span {
 width: 30%;
 }
+*/
 
 div.components-panel a.revision-edit {
 text-decoration: underline;
