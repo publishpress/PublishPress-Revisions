@@ -231,6 +231,14 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.1.7 =
+* Feature : Revision submission and approval handles author selection
+* Fixed : Plugin review request dismissal was not applied
+* Fixed : Gutenberg Editor - for non-English locales, future date selection did not enable Scheduled Revision creation
+* Fixed : Gutenberg Editor - when editing an existing Scheduled Revision, publish date caption shows "Immediately"
+* Fixed : PHP Notice "Trying to get property 'post_type' of non-object" when another plugin hooks into "use_block_editor_for_post" filter
+* Lang : Update Spanish, French, Italian translations
+
 = 3.1.6 - 31 Aug 2022 =
 * Change : Support detection / indication of custom WP-Cron implementations when DISABLE_WP_CRON is set true
 
