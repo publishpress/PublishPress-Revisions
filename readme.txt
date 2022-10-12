@@ -231,7 +231,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.1.7 =
+= 3.1.7 - 12 Oct 2022 =
 * Feature : Revision submission and approval handles author selection
 * Fixed : Plugin review request dismissal was not applied
 * Fixed : Gutenberg Editor - for non-English locales, future date selection did not enable Scheduled Revision creation
