@@ -228,6 +228,8 @@ class Rvy_Revision_Workflow_UI {
                 $to_addresses = array();
             }
 
+            $message = str_replace('&quot;', '"', $message);
+
             foreach ( $to_addresses as $user_id => $address ) {
                 if (!empty($author_ids) && in_array($user_id, $author_ids)) {
                     $notification_class = 'rev_submission_notify_author';

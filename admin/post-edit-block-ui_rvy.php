@@ -16,6 +16,23 @@ if ($_post_id = rvy_detect_post_id()) {
                 return $pp_modules;
             }
         );
+
+        if ($_post = get_post($_post_id)) {
+            // For scheduled revisions, modified date was set equal to post date for queue sorting purposes. But this causes editor to display "Immediately" as the stored publish date.
+            if ($_post->post_modified_gmt == $_post->post_date_gmt) {
+                global $wpdb;
+
+                $_post->post_modified_gmt = gmdate('Y/m/d H:i:s', strtotime($_post->post_modified_gmt) - 1);
+                $_post->post_modified = gmdate('Y/m/d H:i:s', strtotime($_post->post_modified) - 1);
+                $wpdb->update($wpdb->posts, ['post_modified_gmt' => $_post->post_modified_gmt, 'post_modified' => $_post->post_modified], ['ID' => $_post->ID]);
+
+                if (!get_transient("revisionary-post-edit-redirect-{$_post_id}")) {
+                    set_transient("revisionary-post-edit-redirect-{$_post_id}", true, 30);
+                    wp_redirect(esc_url_raw($_SERVER['REQUEST_URI']));
+                    exit;
+                }
+            }
+        }
     }
 }
 
@@ -66,6 +83,9 @@ class RVY_PostBlockEditUI {
 
             $args['deleteCaption'] = esc_html__('Delete Permanently', 'revisionary');
 
+            if (!empty($type_obj->cap->edit_others_posts) && current_user_can($type_obj->cap->edit_others_posts)) {
+                add_action('admin_print_footer_scripts', ['RVY_PostBlockEditUI', 'author_ui'], 20);
+            }
         } elseif (current_user_can('edit_post', $post->ID)) {
             $status_obj = get_post_status_object($post->post_status);
 
@@ -79,5 +99,71 @@ class RVY_PostBlockEditUI {
         }
 
         wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
+    }
+
+	function author_ui() {
+        global $post;
+
+        if (!$type_obj = get_post_type_object($post->post_type)) {
+            return [];
+        }
+
+        $published_post_id = rvy_post_id($post->ID);
+        $published_author = get_post_field('post_author', $published_post_id);
+
+        $author_selection = get_post_meta($post->ID, '_rvy_author_selection', true);
+
+        $select_html = wp_dropdown_users(
+            array(
+                'capability'       => [$type_obj->cap->edit_posts],
+                'name'             => 'rvy_post_author',
+                'selected'         => ($author_selection) ? $author_selection : $published_author,
+                'include_selected' => true,
+                'show'             => 'display_name_with_login',
+                'echo'             => false,
+            )
+        );
+
+        $select_html = str_replace(["\n", "\r"], '', $select_html);
+        ?>
+		<script type="text/javascript">
+        /* <![CDATA[ */
+		jQuery(document).ready( function($) {
+            $(document).on('loaded-ui', 'div.rvy-submission-div', function() {
+                $('div.rvy-submission-div').append(
+                    "<br /><div class='rvy-author-selection'>"
+                    + '<label>' + '<?php _e("Author", 'revisionary');?>&nbsp;</label>'
+                    + '</div>'
+                    + "<br /><div class='rvy-author-selection'>"
+                    + "<?php echo $select_html;?>"
+                    + '</div>'
+                );
+            });
+
+            $(document).on('change', 'div.rvy-author-selection select', function(e) {
+                var data = {'rvy_ajax_field': 'author_select', 'rvy_ajax_value': <?php echo $post->ID;?>, 'rvy_selection': $('div.rvy-author-selection select').val(), 'nc': Math.floor(Math.random() * 99999999)};
+
+                $('div.rvy-author-selection select').attr('disabled', 'disabled');
+
+                $.ajax({
+                    url: rvyObjEdit.ajaxurl,
+                    data: data,
+                    dataType: "html",
+                    success: revisionarySelectAuthorDone,
+                    error: revisionarySelectAuthorError
+                });
+            });
+
+            function revisionarySelectAuthorDone() {
+                $('div.rvy-author-selection select').removeAttr('disabled');
+            }
+
+            function revisionarySelectAuthorError() {
+                $('div.rvy-author-selection select').removeAttr('disabled');
+            }
+        });
+		/* ]]> */
+		</script>
+		<?php
     }
 } // end class

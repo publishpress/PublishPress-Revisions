@@ -27,7 +27,7 @@ if(rvyObjEdit[rvyObjEdit.currentStatus+'ActionCaption']){var approveButtonHTML='
 +rvyObjEdit['approveCaption']+'</button></a>';mainDashicon='dashicons-upload';}else{if('pending'==rvyObjEdit.currentStatus){mainDashicon='dashicons-yes';}else{mainDashicon='dashicons-upload';}}
 var rvyPreviewLink='';if(rvyObjEdit[rvyObjEdit.currentStatus+'CompletedLinkCaption']){rvyPreviewLink='<br /><a href="'+rvyObjEdit[rvyObjEdit.currentStatus+'CompletedURL']+'" class="revision-approve revision-preview components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
 +rvyObjEdit[rvyObjEdit.currentStatus+'CompletedLinkCaption']+'</a>';}
-$(refSelector).after('<div class="rvy-creation-ui"><a href="'+url+'" class="revision-approve">'
+$(refSelector).after('<div class="rvy-creation-ui rvy-submission-div"><a href="'+url+'" class="revision-approve">'
 +'<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button">'
 +'<span class="dashicons '+mainDashicon+'"></span>'
 +rvyObjEdit[rvyObjEdit.currentStatus+'ActionCaption']+'</button></a>'
@@ -43,7 +43,7 @@ $(refSelector).after('<div class="rvy-creation-ui"><a href="'+url+'" class="revi
 +rvyObjEdit[rvyObjEdit.currentStatus+'CompletedCaption']+'</span> '
 +rvyPreviewLink
 +'</div>'
-+'</div>');}
++'</div>');$('div.rvy-submission-div').trigger('loaded-ui');}
 $('.edit-post-post-schedule__toggle').after('<button class="components-button is-tertiary post-schedule-footnote" disabled>'+rvyObjEdit.onApprovalCaption+'</button>');if(rvyObjEdit[rvyObjEdit.currentStatus+'DeletionURL']){$('button.editor-post-trash').wrap('<a href="'+rvyObjEdit[rvyObjEdit.currentStatus+'DeletionURL']+'" style="text-decoration:none"></a>');}}
 $('button.post-schedule-footnote').toggle(!/\d/.test($('button.edit-post-post-schedule__toggle').html()));$('button.editor-post-trash').parent().css('text-align','right');}
 var RvyUIInterval=setInterval(RvySubmissionUI,100);setInterval(function(){if(rvyObjEdit.deleteCaption&&$('button.editor-post-trash').length&&($('button.editor-post-trash').html()!=rvyObjEdit.deleteCaption)){$('button.editor-post-trash').html(rvyObjEdit.deleteCaption).closest('div').show();}},100);var redirectCheckSaveDoneInterval=false;function rvyDoSubmission(){rvySubmitCopy();}

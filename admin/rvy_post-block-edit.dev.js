@@ -266,6 +266,7 @@ jQuery(document).ready( function($) {
 			return;
 		}
 
+		selectedDateHTML = wp.data.select('core/editor').getEditedPostAttribute('date');
 		var selectedDate = new Date( selectedDateHTML );
 
 

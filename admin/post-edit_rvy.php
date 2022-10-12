@@ -58,6 +58,13 @@ class RvyPostEdit {
                 wp_dequeue_script('publishpress-custom_status');
                 wp_dequeue_style('publishpress-custom_status');
             }
+
+            $type_obj = get_post_type_object($post->post_type);
+
+            if ($type_obj && !empty($type_obj->cap->edit_others_posts) && current_user_can($type_obj->cap->edit_others_posts)) {
+                add_action('admin_print_footer_scripts', ['RvyPostEdit', 'author_ui'], 20);
+            }
+
         } elseif (current_user_can('edit_post', $post->ID)) {
             $status_obj = get_post_status_object($post->post_status);
 
@@ -173,4 +180,70 @@ class RvyPostEdit {
         return $allowance;
     }
 
+    // @todo: merge with RVY_PostBlockEditUI::author_ui()
+    function author_ui() {
+        global $post;
+
+        if (!$type_obj = get_post_type_object($post->post_type)) {
+            return [];
+        }
+
+        $published_post_id = rvy_post_id($post->ID);
+        $published_author = get_post_field('post_author', $published_post_id);
+
+        $author_selection = get_post_meta($post->ID, '_rvy_author_selection', true);
+
+        $select_html = wp_dropdown_users(
+            array(
+                'capability'       => [$type_obj->cap->edit_posts],
+                'name'             => 'rvy_post_author',
+                'selected'         => ($author_selection) ? $author_selection : $published_author,
+                'include_selected' => true,
+                'show'             => 'display_name_with_login',
+                'echo'             => false,
+            )
+        );
+
+        $select_html = str_replace(["\n", "\r"], '', $select_html);
+        ?>
+		<script type="text/javascript">
+        /* <![CDATA[ */
+		jQuery(document).ready( function($) {
+            //$(document).on('loaded-ui', 'div.rvy-submission-div', function() {
+                $('div.misc-pub-section:first').after(
+                    "<div class='misc-pub-section'><div class='rvy-author-selection'>"
+                    + '<label>' + '<?php _e("Author", 'revisionary');?>&nbsp;</label>'
+                    + '</div>'
+                    + "<div class='rvy-author-selection'>"
+                    + "<?php echo $select_html;?>"
+                    + '</div></div>'
+                );
+            //});
+
+            $(document).on('change', 'div.rvy-author-selection select', function(e) {
+                var data = {'rvy_ajax_field': 'author_select', 'rvy_ajax_value': <?php echo $post->ID;?>, 'rvy_selection': $('div.rvy-author-selection select').val(), 'nc': Math.floor(Math.random() * 99999999)};
+
+                $('div.rvy-author-selection select').attr('disabled', 'disabled');
+
+                $.ajax({
+                    url: rvyObjEdit.ajaxurl,
+                    data: data,
+                    dataType: "html",
+                    success: revisionarySelectAuthorDone,
+                    error: revisionarySelectAuthorError
+                });
+            });
+
+            function revisionarySelectAuthorDone() {
+                $('div.rvy-author-selection select').removeAttr('disabled');
+            }
+
+            function revisionarySelectAuthorError() {
+                $('div.rvy-author-selection select').removeAttr('disabled');
+            }
+        });
+		/* ]]> */
+		</script>
+		<?php
+    }
 }

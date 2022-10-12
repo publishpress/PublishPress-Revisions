@@ -160,6 +160,8 @@ class RevisionaryFront {
 		} else {
 			if (!empty($post)) {
 				$revision_id = $post->ID;
+			} else {
+				$revision_id = 0;
 			}
 		}
 
@@ -193,7 +195,7 @@ class RevisionaryFront {
 			}
 		}
 
-		if ((rvy_in_revision_workflow($post) || ('revision' == $post->post_type) || (!empty($_REQUEST['mark_current_revision']))) && !isset($_REQUEST['fl_builder'])) {
+		if ((!empty($_REQUEST['mark_current_revision']) || rvy_in_revision_workflow($post) || ('revision' == $post->post_type)) && !isset($_REQUEST['fl_builder'])) {
 			add_filter('redirect_canonical', array($this, 'flt_revision_preview_url'), 10, 2);
 
 			if (!empty($_REQUEST['mark_current_revision'])) {
@@ -238,6 +240,10 @@ class RevisionaryFront {
 						rvy_set_ma_post_authors($revision_id, $published_authors);
 					}
 				}
+			}
+
+			if (empty($post)) {
+				global $post;
 			}
 
 			$datef = __awp( 'M j, Y @ g:i a' );
