@@ -685,7 +685,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$per_page = $this->get_items_per_page( 'edit_page_per_page' );	//  use Pages setting
 
 		$total_items = $wp_query->found_posts;
-		
+
 		$this->set_pagination_args( [
 			'total_items' => $total_items,
 			'per_page' => $per_page
@@ -948,7 +948,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		);
 
 		echo '<label class="screen-reader-text" for="cat">' . esc_html__( 'Filter by category' ) . '</label>';
-			wp_dropdown_categories( $dropdown_options );
+		wp_dropdown_categories( $dropdown_options );
 	}
 
 	
@@ -1062,7 +1062,11 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					
 					echo '<a href="' . esc_url($_url) . '"><span>' . esc_html($column_display_name) . '</span><span class="sorting-indicator"></span></a>';
 				} else {
-					echo '<a href="' . esc_url( add_query_arg( compact( 'orderby', 'order' ), $current_url ) ) . '"><span>' . esc_html($column_display_name) . '</span><span class="sorting-indicator"></span></a>';
+					if (!empty($_REQUEST['orderby']) && ($column_key == $_REQUEST['orderby'])) {
+						echo '<a href="' . esc_url( add_query_arg( compact( 'orderby', 'order' ), $current_url ) ) . '"><span>' . esc_html($column_display_name) . '</span><span class="sorting-indicator"></span></a>';
+					} else {
+						echo '<a href="' . esc_url( add_query_arg( compact( 'orderby', 'order' ), $current_url ) ) . '"><span>' . esc_html($column_display_name) . '</span></a>';
+					}
 				}
 			}
 
@@ -1222,7 +1226,6 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$actions = apply_filters('revisionary_queue_row_actions', $actions, $post);
 
-
 		return $this->row_actions( $actions );
 	}
 
@@ -1245,6 +1248,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if (!empty($_SERVER['REQUEST_URI'])) {
 			$_SERVER['REQUEST_URI'] = str_replace('#038;', '&', esc_url_raw($_SERVER['REQUEST_URI']));
 		}
+
 		$this->pagination( $which );
 		?>
 
