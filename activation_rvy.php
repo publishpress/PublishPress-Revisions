@@ -64,6 +64,7 @@ class RevisionaryActivation {
             add_post_meta($new_revision_id, '_rvy_imported_revision', $old->rev_ID);
 
             if ($new['comment_count'] != $last_post_id) {  // avoid redundant update for same post
+                require_once(dirname(__FILE__).'/rvy_init.php');
                 rvy_update_post_meta($new['comment_count'], '_rvy_has_revisions', true);
                 $last_post_id = $new['comment_count'];
             }

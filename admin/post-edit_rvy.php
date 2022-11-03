@@ -181,7 +181,7 @@ class RvyPostEdit {
     }
 
     // @todo: merge with RVY_PostBlockEditUI::author_ui()
-    function author_ui() {
+    public static function author_ui() {
         global $post;
 
         if (!$type_obj = get_post_type_object($post->post_type)) {

@@ -6,8 +6,8 @@ Author URI: https://publishpress.com
 Tags: revision, submit changes, duplicate post, duplicate page, revisions, approve changes, scheduled changes
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
-Tested up to: 6.0
-Stable tag: 3.1.7
+Tested up to: 6.1
+Stable tag: 3.1.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -230,6 +230,11 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
 == Changelog ==
+
+= 3.1.8 - 3 Nov 2022 =
+* Fixed : PHP 8 - Unresponsive elements in post editor due to Javascript loading failure
+* Fixed : Avoid fatal error on plugin activation if loading sequence is non-standard
+* Compat : WP Buddy Rich Snippets - PHP error "The script tried to modify a property on an incomplete object" on revision creation
 
 = 3.1.7 - 12 Oct 2022 =
 * Feature : Revision submission and approval handles author selection
