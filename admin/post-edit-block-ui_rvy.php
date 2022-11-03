@@ -101,7 +101,7 @@ class RVY_PostBlockEditUI {
         wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
     }
 
-	function author_ui() {
+    public static function author_ui() {
         global $post;
 
         if (!$type_obj = get_post_type_object($post->post_type)) {
