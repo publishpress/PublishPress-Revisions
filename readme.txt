@@ -231,6 +231,11 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.1.8 - 3 Nov 2022 =
+* Fixed : PHP 8 - Unresponsive elements in post editor due to Javascript loading failure
+* Fixed : Avoid fatal error on plugin activation if loading sequence is non-standard
+* Compat : WP Buddy Rich Snippets - PHP error "The script tried to modify a property on an incomplete object" on revision creation
+
 = 3.1.7 - 12 Oct 2022 =
 * Feature : Revision submission and approval handles author selection
 * Fixed : Plugin review request dismissal was not applied
