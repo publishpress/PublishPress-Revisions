@@ -302,6 +302,10 @@ function rvy_admin_init() {
 	// don't bother with the checks in this block unless action arg was passed
 	} elseif ( ! empty($_GET['action']) || ! empty($_POST['action']) ) {
 		if (isset($_SERVER['REQUEST_URI']) && false !== strpos(urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'admin.php') && !empty($_REQUEST['page']) && ('rvy-revisions' == $_REQUEST['page'])) {
+			if (!defined('REVISIONARY_ACTIONS_DISABLE_WP_INCLUSION')) {
+				include_once(ABSPATH . 'wp-admin/includes/post.php');
+			}
+			
 			if ( ! empty($_GET['action']) && ('restore' == $_GET['action']) ) {
 				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
 				add_action( 'wp_loaded', 'rvy_revision_restore' );
