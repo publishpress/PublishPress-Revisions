@@ -78,7 +78,15 @@ function revisionary_copy_terms($from_post, $target_id, $args = []) {
          *
          * @return array
          */
-        $taxonomies_blacklist = apply_filters('revisionary_skip_taxonomies', []);
+        $taxonomies_blacklist = [];
+    
+        $taxonomies_blacklist = apply_filters('revisionary_skip_taxonomies', $taxonomies_blacklist);
+        
+        if (defined('POLYLANG_VERSION')) {
+            if (!empty($args['applying_revision'])) {
+                $taxonomies_blacklist = array_merge($taxonomies_blacklist, ['language', 'post_translations', 'term_language', 'term_translations', '']);
+            }
+        }
 
         foreach (array_diff($post_taxonomies, $taxonomies_blacklist) as $taxonomy) {
             if ($empty_target_only) {
