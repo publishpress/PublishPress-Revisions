@@ -1107,6 +1107,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 						echo '<a href="' . esc_url( add_query_arg( compact( 'orderby', 'order' ), $current_url ) ) . '"><span>' . esc_html($column_display_name) . '</span></a>';
 					}
 				}
+			} else {
+				echo $column_display_name;
 			}
 
 			echo "</" . esc_attr($tag) .">";
