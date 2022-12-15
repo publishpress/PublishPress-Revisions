@@ -8,6 +8,17 @@ if (isset($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url
 class RevisionaryEditRevisionUI {
 	function __construct () {
 		add_action('admin_head', [$this, 'add_js']);
+
+		// Prevent submission / scheduling of Post Expirator settings, for now
+		add_filter('pre_option_expirationdateGutenbergSupport', [$this, 'fltExpiratorBlockGutenbergMetabox'], 10, 3);
+	}
+
+	function fltExpiratorBlockGutenbergMetabox($option_val, $option_name, $default_val) {
+		if ('expirationdateGutenbergSupport' == $option_name) {
+			$option_val = 0;
+		}
+
+		return $option_val;
 	}
 
 	function add_js() {
