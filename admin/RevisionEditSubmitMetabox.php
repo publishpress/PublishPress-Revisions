@@ -19,7 +19,9 @@ class RvyRevisionEditSubmitMetabox
         $_args = array_merge($args, $_args);  // in case args passed into metabox are needed within static calls in the future
         ?>
         <div class="submitbox" id="submitpost">
+            <?php ob_start();
 
+            ?>
             <div id="minor-publishing">
                 <div id="minor-publishing-actions">
                     <div id="save-action">
@@ -69,6 +71,10 @@ class RvyRevisionEditSubmitMetabox
                 <div class="clear"></div>
             </div> <?php // major-publishing-actions ?>
 
+            <?php
+            $html = apply_filters('revisionary_submit_revision_metabox_classic', ob_get_clean(), $post);
+            echo $html;
+            ?>
         </div> <?php // submitpost ?>
 
         <?php
