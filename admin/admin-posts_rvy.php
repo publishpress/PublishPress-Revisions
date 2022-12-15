@@ -89,7 +89,7 @@ class RevisionaryAdminPosts {
 			$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 			$results = $wpdb->get_results(
-				"SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN ('$id_csv') AND post_status IN ('$revision_base_status_csv') AND post_mime_type IN ('$revision_status_csv') GROUP BY comment_count"
+				"SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN ('$id_csv') AND post_status IN ('$revision_base_status_csv') AND post_mime_type IN ('$revision_status_csv') AND post_type != '' GROUP BY comment_count"
 			);
 			
 			foreach($results as $row) {
