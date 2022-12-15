@@ -403,6 +403,7 @@ function rvy_revision_approve($revision_id = 0) {
 
 			$title = sprintf(esc_html__('[%s] Revision Approval Notice', 'revisionary' ), $blogname );
 			$message = sprintf( esc_html__('A revision to the %1$s "%2$s" has been approved.', 'revisionary' ), $type_caption, $post->post_title ) . "\r\n\r\n";
+			$message = str_replace($message, '&quot;', '"', $message);
 
 			if ( $revisor = new WP_User( $revision->post_author ) )
 				$message .= sprintf( esc_html__('The submitter was %1$s.', 'revisionary'), $revisor->display_name ) . "\r\n\r\n";
