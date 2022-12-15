@@ -55,6 +55,7 @@ function rvy_default_options_sitewide() {
 		'past_revisions_order_by' => true,
 		'list_unsubmitted_revisions' => true,
 		'rev_publication_delete_ed_comments' => true,
+		'deletion_queue' => true,
 	);
 
 	if ( $other_options = array_diff_key( rvy_default_options(), $def ) ) {
@@ -109,6 +110,7 @@ function rvy_default_options() {
 		'past_revisions_order_by' => '',
 		'list_unsubmitted_revisions' => 0,
 		'rev_publication_delete_ed_comments' => 0,
+		'deletion_queue' => 0,
 	);
 
 	return $def;

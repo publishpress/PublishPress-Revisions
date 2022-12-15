@@ -48,6 +48,7 @@ function rvy_admin_init() {
 		$_GET['revision'] = (int) $_GET['amp;revision'];
 		$_GET['action'] = sanitize_key($_GET['amp;action']);
 		$_GET['_wpnonce'] = sanitize_key($_GET['amp;_wpnonce']);
+
 		if (!empty($_REQUEST['amp;revision'])) {
 			$_REQUEST['revision'] = (int) $_REQUEST['amp;revision'];
 		}
@@ -95,6 +96,7 @@ function rvy_admin_init() {
 			} else {
 				$post_status = '';
 			}
+
 			// Verify the post status exists.
 			if ( get_post_status_object( $post_status ) ) {
 				$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_type=%s AND post_mime_type = %s", $post_type, $post_status ) );
@@ -285,8 +287,10 @@ function rvy_admin_init() {
 				break;
 	
 			default:
-				if (function_exists('get_current_screen')) {
-					$sendback = apply_filters( 'handle_bulk_actions-' . get_current_screen()->id, $sendback, $doaction, $post_ids );
+				if (!$sendback = apply_filters('revisionary_handle_admin_action', $sendback, $doaction, $post_ids)) {
+					if (function_exists('get_current_screen')) {
+						$sendback = apply_filters( 'handle_bulk_actions-' . get_current_screen()->id, $sendback, $doaction, $post_ids );
+					}
 				}
 				
 				break;
