@@ -166,7 +166,7 @@ class Revisionary
 		$parsed_args['echo'] = 0;
 
 		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
-		$parsed_args['exclude'] = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ('$revision_status_csv')");
+		$parsed_args['exclude'] = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ('$revision_status_csv') AND post_type !=''");
 		// ---- End PublishPress Modification ---
 
 		$pages  = get_pages( $parsed_args );
