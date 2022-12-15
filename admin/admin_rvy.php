@@ -102,6 +102,8 @@ class RevisionaryAdmin
 
 		add_filter('cme_plugin_capabilities', [$this, 'fltPublishPressCapsSection']);
 
+		add_filter('relevanssi_where', [$this, 'ftlRelevanssiWhere']);
+
 		add_action('init', function() { // late execution avoids clash with autoloaders in other plugins
 			global $pagenow;
 		
@@ -142,6 +144,17 @@ class RevisionaryAdmin
 				}
 			}
 		});
+	}
+
+	// Prevent Pending, Scheduled Revisions from inclusion in admin search results
+	function ftlRelevanssiWhere($where) {
+		global $wpdb;
+
+		if ($revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()))) {
+			$where .= " AND relevanssi.doc IN (SELECT ID FROM $wpdb->posts WHERE post_mime_type NOT IN ('" . $revision_status_csv . "'))";
+		}
+
+		return $where;
 	}
 
 	function admin_scripts() {
