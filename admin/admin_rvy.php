@@ -102,10 +102,12 @@ class RevisionaryAdmin
 
 		add_filter('cme_plugin_capabilities', [$this, 'fltPublishPressCapsSection']);
 
+		add_filter('relevanssi_where', [$this, 'ftlRelevanssiWhere']);
+
 		add_action('init', function() { // late execution avoids clash with autoloaders in other plugins
 			global $pagenow;
 		
-			if (($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-settings'])
+			if (($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-deletion', 'revisionary-settings'])
 			) {
 				global $wp_version;
 
@@ -144,14 +146,25 @@ class RevisionaryAdmin
 		});
 	}
 
+	// Prevent Pending, Scheduled Revisions from inclusion in admin search results
+	function ftlRelevanssiWhere($where) {
+		global $wpdb;
+
+		if ($revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()))) {
+			$where .= " AND relevanssi.doc IN (SELECT ID FROM $wpdb->posts WHERE post_mime_type NOT IN ('" . $revision_status_csv . "'))";
+		}
+
+		return $where;
+	}
+
 	function admin_scripts() {
 		global $pagenow;
 
-		if (in_array($pagenow, ['post.php', 'post-new.php', 'revision.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q']))) {
+		if (in_array($pagenow, ['post.php', 'post-new.php', 'revision.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion']))) {
 			wp_enqueue_style('revisionary', RVY_URLPATH . '/admin/revisionary.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
 
-		if (in_array($pagenow, ['post.php', 'post-new.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q']))) {
+		if (in_array($pagenow, ['post.php', 'post-new.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion']))) {
 			wp_enqueue_style('revisionary-admin-common', RVY_URLPATH . '/common/css/pressshack-admin.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
 
@@ -179,7 +192,7 @@ class RevisionaryAdmin
 	public function shouldDisplayBanner() {
 		global $pagenow;
 
-		return ($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-settings']);
+		return ($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-deletion', 'revisionary-settings']);
 	}
 
 	function actDashboardGlanceItems($items) {
@@ -221,6 +234,8 @@ class RevisionaryAdmin
 				add_menu_page( esc_html__($_menu_caption, 'pp'), esc_html__($_menu_caption, 'pp'), 'read', 'revisionary-q', array(&$this, 'moderation_queue'), 'dashicons-backup', 29 );
 
 				add_submenu_page('revisionary-q', esc_html__('Revision Queue', 'revisionary'), esc_html__('Revision Queue', 'revisionary'), 'read', 'revisionary-q', [$this, 'moderation_queue']);
+
+				do_action('revisionary_admin_menu');
 			}
 		}
 

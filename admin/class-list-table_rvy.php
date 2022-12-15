@@ -50,6 +50,45 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		$this->correctCommentCounts();
+
+		if (!defined('REVISIONARY_DISABLE_WP_CRON_RESTORATION') && rvy_get_option('scheduled_revisions') && rvy_get_option('scheduled_publish_cron')) {
+			add_action('admin_footer', [$this, 'act_reschedule_missed_cron_revisions']);
+		}
+	}
+
+	function act_reschedule_missed_cron_revisions() {
+		global $wpdb;
+
+		$time_gmt = current_time('mysql', 1);
+	
+		$cron_catchup_limit = (defined('REVISIONARY_SCHEDULED_CRON_RESTORATION_LIMIT_SECONDS')) ? REVISIONARY_SCHEDULED_CRON_RESTORATION_LIMIT_SECONDS : 3600 * 24 * 30;
+
+		$timezone = new DateTimeZone('UTC');
+		$datetime = new DateTime('now', $timezone);
+		$datetime->setTimestamp(strtotime($time_gmt) - $cron_catchup_limit);
+		$limit_time_gmt = $datetime->format('Y-m-d H:i:s');
+
+		$results = $wpdb->get_results( 
+			$wpdb->prepare(
+				"SELECT * FROM $wpdb->posts WHERE post_type != 'revision'"
+				. " AND post_status != 'inherit' AND post_mime_type = 'future-revision' AND post_date_gmt > %s AND post_date_gmt < %s"
+				. " ORDER BY post_date_gmt DESC",
+				
+				$limit_time_gmt,
+				$time_gmt
+			)
+		);
+
+		foreach($results as $revision) {
+			if (strtotime($time_gmt) - strtotime($revision->post_date_gmt) < $cron_catchup_limit) {  // safeguard to prevent ancient misses from being published now
+				if (!wp_get_scheduled_event('publish_revision_rvy', ['revision_id' => $revision->ID])) {
+					// safeguard to prevent future schedules from being published immediately
+					$schedule_time = strtotime($revision->post_date_gmt) < strtotime($time_gmt) ? strtotime($time_gmt) : strtotime($revision->post_date_gmt);
+					
+					wp_schedule_single_event($schedule_time, 'publish_revision_rvy', ['revision_id' => $revision->ID]);
+				}
+			}
+		}
 	}
 
 	function do_query( $q = false ) {
@@ -1068,6 +1107,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 						echo '<a href="' . esc_url( add_query_arg( compact( 'orderby', 'order' ), $current_url ) ) . '"><span>' . esc_html($column_display_name) . '</span></a>';
 					}
 				}
+			} else {
+				echo $column_display_name;
 			}
 
 			echo "</" . esc_attr($tag) .">";

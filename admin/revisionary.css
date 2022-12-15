@@ -412,7 +412,7 @@ width: 99%;
 vertical-align: top;
 }
 
-body.toplevel_page_revisionary-q h1 span.dashicons, body.revisions_page_revisionary-settings h1 span.dashicons, body.revisions_page_rvy-net_options h1 span.dashicons, body.revisions_page_rvy-default_options h1 span.dashicons {
+body.toplevel_page_revisionary-q h1 span.dashicons, body.revisions_page_revisionary-deletion h1 span.dashicons, body.revisions_page_revisionary-settings h1 span.dashicons, body.revisions_page_rvy-net_options h1 span.dashicons, body.revisions_page_rvy-default_options h1 span.dashicons {
 padding-top:5px;
 }
 
@@ -534,7 +534,7 @@ margin-right: 6px;
 margin-top: 2px;
 }
 
-.toplevel_page_revisionary-q .pressshack-admin-wrapper a {
+.toplevel_page_revisionary-q .pressshack-admin-wrapper a, .revisions_page_revisionary-deletion .pressshack-admin-wrapper a {
 color: #2271B1;
 }
 

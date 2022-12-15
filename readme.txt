@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 6.1
-Stable tag: 3.1.8
+Stable tag: 3.1.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -230,6 +230,14 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
 == Changelog ==
+
+= 3.1.9 - 15 Dec 2022 =
+* Fixed : Scheduled Revisions missed by WP-Cron were not rescheduled. To disable auto-reschedule, define constant REVISIONARY_DISABLE_WP_CRON_RESTORATION
+* Fixed : Revisions Queue table was missing a "check all" box
+* Fixed : Fatal error on revision approval on some sites
+* Compat : Relevanssi - If filtering is enabled for admin searches, Submitted / Scheduled Revisions are included in search results 
+* Compat : PublishPress Future - Attempted revision of post expiration settings caused unexpected behavior; disable for now
+* API : Classic Editor revision editor supports filter revisionary_submit_revision_metabox_classic
 
 = 3.1.8 - 3 Nov 2022 =
 * Fixed : PHP 8 - Unresponsive elements in post editor due to Javascript loading failure

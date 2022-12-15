@@ -166,7 +166,7 @@ class Revisionary
 		$parsed_args['echo'] = 0;
 
 		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
-		$parsed_args['exclude'] = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ('$revision_status_csv')");
+		$parsed_args['exclude'] = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ('$revision_status_csv') AND post_type !=''");
 		// ---- End PublishPress Modification ---
 
 		$pages  = get_pages( $parsed_args );
@@ -656,7 +656,7 @@ class Revisionary
 			}
 
 			if (rvy_in_revision_workflow($post_id)) {
-				return $caps;
+				return array_diff_key($caps, [$cap => true]);
 			}
 
 			$filter_args = [];
@@ -670,6 +670,15 @@ class Revisionary
 					if (rvy_get_option("copy_posts_capability")) {		
 						$base_prop = (rvy_is_post_author($post_id)) ? 'edit_posts' : 'edit_others_posts';
 						$copy_cap_name = str_replace('edit_', 'copy_', $type_obj->cap->$base_prop);
+
+						if (false === strpos($copy_cap_name, 'copy_')) {
+							if ('page' == $_post->post_type) {
+								$copy_cap_name = (rvy_is_post_author($post_id)) ? 'copy_pages' : 'copy_others_pages';
+							} else {
+								$copy_cap_name = (rvy_is_post_author($post_id)) ? 'copy_posts' : 'copy_others_posts';
+							}
+						}
+
 						$can_copy = current_user_can($copy_cap_name);
 					} else {
 						$can_copy = current_user_can($type_obj->cap->edit_posts);
@@ -684,6 +693,8 @@ class Revisionary
 			|| apply_filters('revisionary_can_submit', $can_copy, $post_id, 'pending', 'pending-revision', $filter_args)
 			) {
 				$caps = ['read'];
+			} else {
+				$caps = array_diff_key($caps, [$cap => true]);
 			}
 		
 		} elseif ('set_revision_pending-revision' == $cap) {

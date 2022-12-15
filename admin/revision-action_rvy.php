@@ -403,6 +403,7 @@ function rvy_revision_approve($revision_id = 0) {
 
 			$title = sprintf(esc_html__('[%s] Revision Approval Notice', 'revisionary' ), $blogname );
 			$message = sprintf( esc_html__('A revision to the %1$s "%2$s" has been approved.', 'revisionary' ), $type_caption, $post->post_title ) . "\r\n\r\n";
+			$message = str_replace($message, '&quot;', '"', $message);
 
 			if ( $revisor = new WP_User( $revision->post_author ) )
 				$message .= sprintf( esc_html__('The submitter was %1$s.', 'revisionary'), $revisor->display_name ) . "\r\n\r\n";
@@ -712,6 +713,16 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 	}
 	
+	if (defined('POLYLANG_VERSION')) {
+		$lang_terms = wp_get_object_terms($published->ID, 'post_translations', ['fields' => 'all']);
+
+		$lang_descripts = [];
+
+		foreach($lang_terms as $term) {
+			$lang_descripts[$term->term_taxonomy_id] = $term->description;
+		}
+	}
+
 	/**
 	* Filter revision data before applying the revision.
 	*
@@ -811,7 +822,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	revisionary_copy_postmeta($revision, $published->ID, ['apply_empty' => !$is_imported]);
 
 	// Allow Multiple Authors revisions to be applied to published post. Revision post_author is forced to actual submitting user.
-	revisionary_copy_terms($revision_id, $post_id, ['apply_empty' => !$is_imported]);
+	revisionary_copy_terms($revision_id, $post_id, ['apply_empty' => !$is_imported, 'applying_revision' => true]);
 
 	if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && $published_authors) {
 		// Make sure Multiple Authors values were not wiped due to incomplete revision data
@@ -851,6 +862,14 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		foreach($orig_terms as $taxonomy => $terms) {
 			if ($terms && !wp_get_object_terms($published->ID, $taxonomy, ['fields' => 'ids'])) {
 				wp_set_object_terms($published->ID, $terms, $taxonomy);
+			}
+		}
+	}
+
+	if (defined('POLYLANG_VERSION')) {
+		if (!empty($lang_descripts)) {
+			foreach($lang_descripts as $tt_id => $descript) {
+				$wpdb->update($wpdb->term_taxonomy, ['description' => $descript], ['term_taxonomy_id' => $tt_id]);
 			}
 		}
 	}

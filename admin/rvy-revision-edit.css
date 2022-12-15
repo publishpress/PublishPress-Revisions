@@ -15,6 +15,11 @@ display:inline-flex;
 display: none;
 }
 
+/* Prevent submission / scheduling of Post Expirator settings, for now */
+#expirationdatediv {
+display: none;
+}
+
 /* Gutenberg */
 a.rvy-post-preview.components-button.is-large {
 margin-right:5px;
