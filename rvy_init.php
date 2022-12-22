@@ -585,6 +585,10 @@ function rvy_add_revisor_custom_caps() {
 
 	global $wp_roles, $revisionary;
 
+	if (empty($revisionary)) {
+		return;
+	}
+
 	$custom_types = array_intersect_key(
 		get_post_types(['_builtin' => false], 'object'),
 		$revisionary->enabled_post_types
