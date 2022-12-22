@@ -162,7 +162,7 @@ function rvy_revision_decline($revision_id = 0) {
 			break;
 		}
 
-		if (!current_user_can('set_revision_pending-revision', $revision_id)) {
+		if (!current_user_can('administrator') && !current_user_can('set_revision_pending-revision', $revision_id)) {
 			break;
 		}
 
@@ -211,6 +211,8 @@ function rvy_revision_decline($revision_id = 0) {
 				$redirect = 'edit.php';
 		}
 	}
+
+	clean_post_cache($revision->ID);
 
 	if (empty($decline_error)) {
 		do_action( 'revision_declined', $revision->post_parent, $revision->ID );
