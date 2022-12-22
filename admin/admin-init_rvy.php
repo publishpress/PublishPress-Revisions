@@ -204,8 +204,10 @@ function rvy_admin_init() {
 						continue;
 					}
 
-					if ('pending' != $revision->post_status) {
-						continue;
+					if (defined('REVISIONARY_DECLINE_REVISIONS_SKIP_PENDING')) {
+						if ('pending' != $revision->post_status) {
+							continue;
+						}
 					}
 
 					if (!$is_administrator && !current_user_can('set_revision_pending-revision', $revision->ID)) {

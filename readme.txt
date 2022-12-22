@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 4.9.7
 Requires PHP: 5.6.20
 Tested up to: 6.1
-Stable tag: 3.1.9
+Stable tag: 3.1.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -230,6 +230,10 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
 == Changelog ==
+
+= 3.1.10 - 22 Dec 2022 =
+* Perf : Improve performance of post revision count, dropdown pages queries
+* Fixed : Revisions were not correctly declined on some cached sites
 
 = 3.1.9 - 15 Dec 2022 =
 * Fixed : Scheduled Revisions missed by WP-Cron were not rescheduled. To disable auto-reschedule, define constant REVISIONARY_DISABLE_WP_CRON_RESTORATION

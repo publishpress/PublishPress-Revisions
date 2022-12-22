@@ -70,7 +70,7 @@ function rvy_revision_submit($revision_id = 0) {
 			break;
 		}
 
-		if (!current_user_can('set_revision_pending-revision', $revision_id)) {
+		if (!current_user_can('administrator') && !current_user_can('set_revision_pending-revision', $revision_id)) {
 			break;
 		}
 
@@ -162,7 +162,7 @@ function rvy_revision_decline($revision_id = 0) {
 			break;
 		}
 
-		if (!current_user_can('set_revision_pending-revision', $revision_id)) {
+		if (!current_user_can('administrator') && !current_user_can('set_revision_pending-revision', $revision_id)) {
 			break;
 		}
 
@@ -212,6 +212,8 @@ function rvy_revision_decline($revision_id = 0) {
 		}
 	}
 
+	clean_post_cache($revision->ID);
+
 	if (empty($decline_error)) {
 		do_action( 'revision_declined', $revision->post_parent, $revision->ID );
 	}
@@ -227,7 +229,7 @@ function rvy_revision_decline($revision_id = 0) {
 }
 
 // schedules publication of a revision ( or publishes if requested publish date has already passed )
-function rvy_revision_approve($revision_id = 0) {
+function rvy_revision_approve($revision_id = 0, $args = []) {
 	global $current_user, $wpdb;
 
 	if (!$revision_id) {
@@ -486,7 +488,7 @@ function rvy_revision_approve($revision_id = 0) {
 				}
 			}
 			
-			if ( $db_action && rvy_get_option( 'rev_approval_notify_revisor' ) ) {
+			if (($db_action || !empty($args['force_notify'])) && rvy_get_option( 'rev_approval_notify_revisor' ) ) {
 				$title = sprintf(esc_html__('[%s] Revision Approval Notice', 'revisionary' ), $blogname );
 				$message = sprintf( esc_html__('The revision you submitted for the %1$s "%2$s" has been approved.', 'revisionary' ), $type_caption, $revision->post_title ) . "\r\n\r\n";
 

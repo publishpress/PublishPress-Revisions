@@ -78,7 +78,7 @@ class PostEditorWorkflowUI {
         $draft_obj = get_post_status_object('draft-revision');
         $vars['draftStatusCaption'] = $draft_obj->label;
 
-        $vars['draftAjaxField'] = (current_user_can('set_revision_pending-revision', $post->ID)) ? 'submit_revision' : '';
+        $vars['draftAjaxField'] = (current_user_can('administrator') || current_user_can('set_revision_pending-revision', $post->ID)) ? 'submit_revision' : '';
         $vars['draftErrorCaption'] = esc_html__('Revision Submission Error', 'revisionary');
         $vars['draftDeletionURL'] = get_delete_post_link($post->ID, '', false);
 
