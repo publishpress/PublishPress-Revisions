@@ -231,6 +231,18 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.1.10 - 22 Dec 2022 =
+* Perf : Improve performance of post revision count, dropdown pages queries
+* Fixed : Revisions were not correctly declined on some cached sites
+
+= 3.1.9 - 15 Dec 2022 =
+* Fixed : Scheduled Revisions missed by WP-Cron were not rescheduled. To disable auto-reschedule, define constant REVISIONARY_DISABLE_WP_CRON_RESTORATION
+* Fixed : Revisions Queue table was missing a "check all" box
+* Fixed : Fatal error on revision approval on some sites
+* Compat : Relevanssi - If filtering is enabled for admin searches, Submitted / Scheduled Revisions are included in search results 
+* Compat : PublishPress Future - Attempted revision of post expiration settings caused unexpected behavior; disable for now
+* API : Classic Editor revision editor supports filter revisionary_submit_revision_metabox_classic
+
 = 3.1.8 - 3 Nov 2022 =
 * Fixed : PHP 8 - Unresponsive elements in post editor due to Javascript loading failure
 * Fixed : Avoid fatal error on plugin activation if loading sequence is non-standard
