@@ -70,7 +70,7 @@ function rvy_revision_submit($revision_id = 0) {
 			break;
 		}
 
-		if (!current_user_can('set_revision_pending-revision', $revision_id)) {
+		if (!current_user_can('administrator') && !current_user_can('set_revision_pending-revision', $revision_id)) {
 			break;
 		}
 
