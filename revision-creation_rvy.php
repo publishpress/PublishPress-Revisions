@@ -51,7 +51,7 @@ class RevisionCreation {
 	
 	// Create a new revision, usually 'draft-revision' (Working Copy) or 'future-revision' (Scheduled Revision)
 
-	// If an autosave was stored for the current user prior to this creation, it will be retrieve in place of the main revision. 
+	// If an autosave was stored for the current user prior to this creation, it will be retrieved in place of the main revision. 
 	function createRevision($post_id, $revision_status, $args = []) {
         global $wpdb, $current_user;
 
