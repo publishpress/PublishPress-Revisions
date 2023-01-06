@@ -360,8 +360,12 @@ class RevisionaryFront {
 						$publish_caption = (!empty($status_obj->public) || !empty($status_obj->private)) ? esc_html__('Publish now', 'revisionary') : $approve_caption;
 						$publish_button .= ($can_publish) ? '<a href="' . $publish_url . '" class="button button-primary rvy-approve-revision">' . $publish_caption . '</a>' : '';
 					}
-
-					$message = sprintf( esc_html__('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label('draft-revision', 'name'), $view_published, $edit_button, $publish_button );
+					
+					if (!empty($_REQUEST['elementor-preview'])) {
+						$message = sprintf( esc_html__('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label('draft-revision', 'name'), '', '', '');
+					} else {
+						$message = sprintf( esc_html__('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label('draft-revision', 'name'), $view_published, $edit_button, $publish_button );
+					}
 
 					break;
 
@@ -373,22 +377,41 @@ class RevisionaryFront {
 					if ( strtotime( $post->post_date_gmt ) > agp_time_gmt() ) {
 						$class = 'pending_future';
 						$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-primary rvy-approve-revision">' . $approve_caption . '</a>' : '';
-						$message = sprintf( esc_html__('This is a %s (requested publish date: %s). %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $date, $view_published, $edit_button, $publish_button );
+						
+						if (!empty($_REQUEST['elementor-preview'])) {
+							$message = sprintf( esc_html__('This is a %s (requested publish date: %s). %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $date, '', '', '');
+						} else {
+							$message = sprintf( esc_html__('This is a %s (requested publish date: %s). %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $date, $view_published, $edit_button, $publish_button );
+						}
 					} else {
+						error_log(serialize($_REQUEST));
+
 						$class = 'pending';
 						$status_obj = get_post_status_object(get_post_field('post_status', rvy_post_id($revision_id)));
 						$publish_caption = (!empty($status_obj->public) || !empty($status_obj->private)) ? esc_html__('Publish now', 'revisionary') : $approve_caption;
 						$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-primary rvy-approve-revision">' . $publish_caption . '</a>' : '';
-						$message = sprintf( esc_html__('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $view_published, $edit_button, $publish_button );
+						
+						if (!empty($_REQUEST['elementor-preview'])) {
+							$message = sprintf( esc_html__('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), '', '', '' );
+						} else {
+							$message = sprintf( esc_html__('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $view_published, $edit_button, $publish_button );
+						}
 					}
+
 					break;
 
 				case 'future-revision' :
 					$class = 'future';
-
+					
 					$edit_url = rvy_admin_url("post.php?action=edit&amp;post=$revision_id");
 					$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-primary">' . esc_html__( 'Publish now', 'revisionary' ) . '</a>' : '';
-					$message = sprintf( esc_html__('This is a %s (for publication on %s). %s %s %s', 'revisionary'), pp_revisions_status_label('future-revision', 'name'), $date, $view_published, $edit_button, $publish_button );
+					
+					if (!empty($_REQUEST['elementor-preview'])) {
+						$message = sprintf( esc_html__('This is a %s (for publication on %s). %s %s %s', 'revisionary'), pp_revisions_status_label('future-revision', 'name'), $date, '', '', '' );
+					} else {
+						$message = sprintf( esc_html__('This is a %s (for publication on %s). %s %s %s', 'revisionary'), pp_revisions_status_label('future-revision', 'name'), $date, $view_published, $edit_button, $publish_button );
+					}
+
 					break;
 
 				case '' :
@@ -400,14 +423,23 @@ class RevisionaryFront {
 							$edit_button = '';
 						}
 
-						$message = sprintf( esc_html__('This is the Current Revision. %s', 'revisionary'), $edit_button );
+						if (!empty($_REQUEST['elementor-preview'])) {
+							$message = sprintf( esc_html__('This is the Current Revision. %s', 'revisionary'), '' );
+						} else {
+							$message = sprintf( esc_html__('This is the Current Revision. %s', 'revisionary'), $edit_button );
+						}
 
 					} elseif ('inherit' == $post->post_status) {
 						if ( current_user_can('edit_post', $revision_id ) ) {
 							$class = 'past';
 							$date = agp_date_i18n( $datef, strtotime( $post->post_modified ) );
 							$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-secondary">' . esc_html__( 'Restore', 'revisionary' ) . '</a>' : '';
-							$message = sprintf( esc_html__('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, $view_published, $publish_button );
+							
+							if (!empty($_REQUEST['elementor-preview'])) {
+								$message = sprintf( esc_html__('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, '', '' );
+							} else {
+								$message = sprintf( esc_html__('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, $view_published, $publish_button );
+							}
 						}
 					}
 				}
@@ -416,8 +448,10 @@ class RevisionaryFront {
 
 				add_action('wp_enqueue_scripts', [$this, 'rvyEnqueuePreviewJS']);
 
-				if (apply_filters('revisionary_admin_bar_absolute', !defined('REVISIONARY_PREVIEW_BAR_RELATIVE'))) {
-					add_action('wp_print_footer_scripts', [$this, 'rvyPreviewJS'], 50);
+				if (empty($_REQUEST['elementor-preview'])) {
+					if (apply_filters('revisionary_admin_bar_absolute', !defined('REVISIONARY_PREVIEW_BAR_RELATIVE'))) {
+						add_action('wp_print_footer_scripts', [$this, 'rvyPreviewJS'], 50);
+					}
 				}
 
 				$html = '<div id="pp_revisions_top_bar" class="' . esc_attr("rvy_view_revision rvy_view_" . $class) . '">' .
