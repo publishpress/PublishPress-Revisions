@@ -231,6 +231,11 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.1.11 - 9 Feb 2023 =
+* Fixed : Avoid PHP Warning on Revision Preview if requested revision cannot be loaded
+* Fixed : On Network-wide multisite activations, Settings screen displayed an unrendered html tag 
+* Lang : Update Spanish, French, Italian translations
+
 = 3.1.10 - 22 Dec 2022 =
 * Perf : Improve performance of post revision count, dropdown pages queries
 * Fixed : Revisions were not correctly declined on some cached sites
