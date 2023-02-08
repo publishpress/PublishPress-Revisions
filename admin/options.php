@@ -515,6 +515,8 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	<br />
 	<?php
 	$this->option_checkbox( 'auto_submit_revisions', $tab, $section, '', '' );
+
+	do_action('revisionary_auto_submit_setting_ui', $this, $tab, $section);
 	?>
 	<br />
 	<?php
