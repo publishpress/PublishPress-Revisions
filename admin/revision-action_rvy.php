@@ -14,7 +14,7 @@ add_action( '_wp_put_post_revision', 'rvy_review_revision' );
 function rvy_revision_diff() {
 }
 
-function rvy_revision_create($post_id = 0) {
+function rvy_revision_create($post_id = 0, $args = []) {
 	if (!$post_id) {
 		if (isset($_REQUEST['post'])) {
 			$post_id = (int) $_REQUEST['post'];
@@ -25,11 +25,15 @@ function rvy_revision_create($post_id = 0) {
 
 	$main_post_id = rvy_in_revision_workflow($post_id) ? rvy_post_id($post_id) : $post_id;
 
-	if (current_user_can('copy_post', $main_post_id)) {
+	if (!empty($args['force']) || current_user_can('copy_post', $main_post_id)) {
 		require_once( dirname(REVISIONARY_FILE).'/revision-creation_rvy.php' );
 		$rvy_creation = new PublishPress\Revisions\RevisionCreation();
-		$rvy_creation->createRevision($post_id, 'draft-revision');
+		$revision_id = $rvy_creation->createRevision($post_id, 'draft-revision', $args);
+	} else {
+		$revision_id = 0;
 	}
+
+	return $revision_id;
 }
 
 // Submits a revision (moving it to pending-revision status)
@@ -538,6 +542,8 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 		
 	} while (0);
 	
+	clean_post_cache($revision_id);
+
 	if (!empty($update_next_publish_date)) {
 		rvy_update_next_publish_date(['revision_id' => $revision_id]);
 	}
