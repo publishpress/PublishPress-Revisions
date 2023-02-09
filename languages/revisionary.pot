@@ -1,9 +1,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PublishPress Revisions\n"
+"Project-Id-Version: PublishPress Revisions Pro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-08 14:53-0500\n"
+"POT-Creation-Date: 2023-02-08 14:52-0500\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Kevin Behrens <kevin@publishpress.com>\n"
 "Language-Team: PublishPress <help@publishpress.com>\n"
@@ -18,9 +18,7 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: admin\n"
 "X-Poedit-SearchPath-2: classes\n"
-"X-Poedit-SearchPath-3: includes\n"
-"X-Poedit-SearchPath-4: lib\n"
-"X-Poedit-SearchPathExcluded-0: includes-pro\n"
+"X-Poedit-SearchPath-3: includes-pro\n"
 
 #: admin/RevisionEditSubmitMetabox.php:62 admin/class-list-table_rvy.php:1230
 msgid "Delete Revision"
@@ -38,6 +36,7 @@ msgstr ""
 #: admin/post-editor-workflow-ui_rvy.php:91
 #: admin/post-editor-workflow-ui_rvy.php:187 admin/revision-ui_rvy.php:260
 #: admin/revision-ui_rvy.php:302
+#: includes-pro/class-deletion-list-table_rvy.php:420
 msgid "Preview"
 msgstr ""
 
@@ -156,7 +155,7 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: admin/admin_rvy.php:258 admin/admin_rvy.php:259 includes/CoreAdmin.php:94
+#: admin/admin_rvy.php:258 admin/admin_rvy.php:259
 msgid "Upgrade to Pro"
 msgstr ""
 
@@ -200,10 +199,13 @@ msgid "unselect"
 msgstr ""
 
 #: admin/class-list-table_rvy.php:466 admin/post-editor-workflow-ui_rvy.php:31
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:168
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:135
 msgid "Status"
 msgstr ""
 
 #: admin/class-list-table_rvy.php:467
+#: includes-pro/class-deletion-list-table_rvy.php:114
 msgid "Post Type"
 msgstr ""
 
@@ -216,12 +218,13 @@ msgid "Y/m/d g:i:s a"
 msgstr ""
 
 #: admin/class-list-table_rvy.php:528 admin/class-list-table_rvy.php:1147
-#: admin/history_rvy.php:980
+#: admin/history_rvy.php:980 includes-pro/class-deletion-list-table_rvy.php:351
 #, php-format
 msgid "%s ago"
 msgstr ""
 
 #: admin/class-list-table_rvy.php:530 admin/class-list-table_rvy.php:1150
+#: includes-pro/class-deletion-list-table_rvy.php:353
 msgid "Y/m/d g:i a"
 msgstr ""
 
@@ -253,10 +256,13 @@ msgid "Filter"
 msgstr ""
 
 #: admin/class-list-table_rvy.php:639 admin/class-list-table_rvy.php:647
+#: includes-pro/class-deletion-list-table_rvy.php:411
+#: includes-pro/class-deletion-list-table_rvy.php:419
 msgid "View published post"
 msgstr ""
 
 #: admin/class-list-table_rvy.php:640
+#: includes-pro/class-deletion-list-table_rvy.php:412
 msgid "View"
 msgstr ""
 
@@ -281,14 +287,18 @@ msgstr ""
 msgid "All %s"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:957 front_rvy.php:357 rvy_init.php:344
-#: rvy_init.php:400
+#: admin/class-list-table_rvy.php:957 front_rvy.php:357
+#: includes-pro/compat/divi.php:113 includes-pro/compat/divi.php:114
+#: includes-pro/compat/elementor.php:697 rvy_init.php:344 rvy_init.php:400
 msgid "Submit"
 msgstr ""
 
 #: admin/class-list-table_rvy.php:960 admin/history_rvy.php:1065
-#: front_rvy.php:354 front_rvy.php:379 rvy_init.php:330 rvy_init.php:348
-#: rvy_init.php:387 rvy_init.php:404 rvy_init.php:421
+#: front_rvy.php:354 front_rvy.php:379
+#: includes-pro/compat/beaver-builder.php:89 includes-pro/compat/divi.php:106
+#: includes-pro/compat/divi.php:107 includes-pro/compat/elementor.php:707
+#: rvy_init.php:330 rvy_init.php:348 rvy_init.php:387 rvy_init.php:404
+#: rvy_init.php:421
 msgid "Approve"
 msgstr ""
 
@@ -296,7 +306,12 @@ msgstr ""
 msgid "Decline"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:962
+#: admin/class-list-table_rvy.php:962 includes-pro/compat/divi.php:95
+#: includes-pro/compat/divi.php:96 includes-pro/compat/divi.php:98
+#: includes-pro/compat/divi.php:99 includes-pro/compat/divi.php:106
+#: includes-pro/compat/divi.php:107 includes-pro/compat/divi.php:109
+#: includes-pro/compat/divi.php:110 includes-pro/compat/divi.php:119
+#: includes-pro/compat/divi.php:120 includes-pro/compat/elementor.php:707
 msgid "Publish"
 msgstr ""
 
@@ -306,6 +321,7 @@ msgstr ""
 
 #: admin/class-list-table_rvy.php:969 admin/post-edit-block-ui_rvy.php:84
 #: admin/post-edit_rvy.php:51
+#: includes-pro/class-deletion-list-table_rvy.php:183
 msgid "Delete Permanently"
 msgstr ""
 
@@ -314,10 +330,12 @@ msgid "Filter by category"
 msgstr ""
 
 #: admin/class-list-table_rvy.php:1044
+#: includes-pro/class-deletion-list-table_rvy.php:240
 msgid "Select All"
 msgstr ""
 
 #: admin/class-list-table_rvy.php:1130
+#: includes-pro/class-deletion-list-table_rvy.php:325
 #, php-format
 msgid "&#8220;%s&#8221; (Edit)"
 msgstr ""
@@ -328,6 +346,7 @@ msgstr ""
 
 #: admin/class-list-table_rvy.php:1231 admin/revision-ui_rvy.php:280
 #: admin/revision-ui_rvy.php:391
+#: includes-pro/class-deletion-list-table_rvy.php:432
 msgid "Delete"
 msgstr ""
 
@@ -358,6 +377,7 @@ msgid "Revision updated. %sView Preview%s"
 msgstr ""
 
 #: admin/edit-revision-classic-ui_rvy.php:108
+#: includes-pro/compat/elementor.php:653
 msgid "Revision updated."
 msgstr ""
 
@@ -374,7 +394,7 @@ msgstr ""
 msgid "(no title)"
 msgstr ""
 
-#: admin/history_rvy.php:528 admin/options.php:726
+#: admin/history_rvy.php:528 admin/options.php:727
 msgid "Post Date"
 msgstr ""
 
@@ -398,15 +418,15 @@ msgstr ""
 msgid "Page Template"
 msgstr ""
 
-#: admin/history_rvy.php:670
+#: admin/history_rvy.php:670 includes-pro/compat.php:267
 msgid "Featured Image"
 msgstr ""
 
-#: admin/history_rvy.php:674
+#: admin/history_rvy.php:674 includes-pro/compat.php:430
 msgid "Beaver Builder Data"
 msgstr ""
 
-#: admin/history_rvy.php:675
+#: admin/history_rvy.php:675 includes-pro/compat.php:431
 msgid "Beaver Builder Settings"
 msgstr ""
 
@@ -753,189 +773,189 @@ msgstr ""
 msgid "To enable a role, add the manage_unsubmitted_revisions capability"
 msgstr ""
 
-#: admin/options.php:523
+#: admin/options.php:524
 #, php-format
 msgid "If the user does not have a regular Edit link, recaption the %s link as \"Edit\""
 msgstr ""
 
-#: admin/options.php:545
+#: admin/options.php:546
 #, php-format
 msgid "Enable published content to be copied, edited, submitted for approval and managed in %sRevision Queue%s."
 msgstr ""
 
-#: admin/options.php:551
+#: admin/options.php:552
 msgid "This restriction applies to users who are not full editors for the post type. To enable a role, add capabilities: revise_posts, revise_others_pages, etc."
 msgstr ""
 
-#: admin/options.php:554 admin/options.php:578
+#: admin/options.php:555 admin/options.php:579
 #, php-format
 msgid "When a %s is published, update post publish date to current time."
 msgstr ""
 
-#: admin/options.php:557 admin/options.php:581
+#: admin/options.php:558 admin/options.php:582
 #, php-format
 msgid "When a %s is published, update post modified date to current time."
 msgstr ""
 
-#: admin/options.php:575
+#: admin/options.php:576
 msgid "If a currently published post or page is edited and a future date set, the change will not be applied until the selected date."
 msgstr ""
 
-#: admin/options.php:586
+#: admin/options.php:587
 msgid "Publish scheduled revisions using the WP-Cron mechanism. On some sites, publication will fail if this setting is disabled."
 msgstr ""
 
-#: admin/options.php:590
+#: admin/options.php:591
 msgid "Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it."
 msgstr ""
 
-#: admin/options.php:595
+#: admin/options.php:596
 msgid "The WP-Cron trigger is disabled, but scheduled tasks are still excecuted using a custom trigger."
 msgstr ""
 
-#: admin/options.php:612
+#: admin/options.php:613
 msgid "This restriction applies to users who are not full editors for the post type. To enable a role, give it the edit_others_revisions capability."
 msgstr ""
 
-#: admin/options.php:615
+#: admin/options.php:616
 msgid "This restriction applies to users who are not full editors for the post type. To enable a role, give it the list_others_revisions capability."
 msgstr ""
 
-#: admin/options.php:618
+#: admin/options.php:619
 msgid "Bypass the above restrictions for others' revisions to logged in user's own posts."
 msgstr ""
 
-#: admin/options.php:627
+#: admin/options.php:628
 msgid "Regenerate \"post has revision\" flags"
 msgstr ""
 
-#: admin/options.php:642
+#: admin/options.php:643
 msgid "For themes that block revision preview, hide preview links from non-Administrators"
 msgstr ""
 
-#: admin/options.php:654
+#: admin/options.php:655
 msgid "Published Post Slug"
 msgstr ""
 
-#: admin/options.php:654
+#: admin/options.php:655
 msgid "Revision Slug"
 msgstr ""
 
-#: admin/options.php:654
+#: admin/options.php:655
 msgid "Revision ID only"
 msgstr ""
 
-#: admin/options.php:665
+#: admin/options.php:666
 msgid "Some themes or plugins may require Revision Slug or Revision ID link type for proper template loading and field display."
 msgstr ""
 
-#: admin/options.php:675
+#: admin/options.php:676
 msgid "If disabled, Compare screen links to Revision Preview for approval"
 msgstr ""
 
-#: admin/options.php:697
+#: admin/options.php:698
 #, php-format
 msgid "For compatibility with Advanced Custom Fields, Beaver Builder and WPML, upgrade to %sPublishPress Revisions Pro%s."
 msgstr ""
 
-#: admin/options.php:707
+#: admin/options.php:708
 msgid "This may improve compatibility with some plugins."
 msgstr ""
 
-#: admin/options.php:726
+#: admin/options.php:727
 msgid "Modification Date"
 msgstr ""
 
-#: admin/options.php:736
+#: admin/options.php:737
 msgid "Show descriptive captions for PublishPress Revisions settings"
 msgstr ""
 
-#: admin/options.php:764 admin/options.php:785
+#: admin/options.php:765 admin/options.php:786
 msgid "Never"
 msgstr ""
 
-#: admin/options.php:764 admin/options.php:785
+#: admin/options.php:765 admin/options.php:786
 msgid "By default"
 msgstr ""
 
-#: admin/options.php:764 admin/options.php:785
+#: admin/options.php:765 admin/options.php:786
 msgid "Always"
 msgstr ""
 
-#: admin/options.php:774 admin/options.php:820
+#: admin/options.php:775 admin/options.php:821
 msgid "select recipients"
 msgstr ""
 
-#: admin/options.php:834
+#: admin/options.php:835
 msgid "To avoid notification failures, buffer emails for delayed sending once minute, hour or day limits are exceeded"
 msgstr ""
 
-#: admin/options.php:855
+#: admin/options.php:856
 msgid "Notification Buffer"
 msgstr ""
 
-#: admin/options.php:883
+#: admin/options.php:884
 msgid "Notification Log"
 msgstr ""
 
-#: admin/options.php:912
+#: admin/options.php:913
 msgid "Purge Notification Buffer"
 msgstr ""
 
-#: admin/options.php:918
+#: admin/options.php:919
 msgid "Truncate Notification Log"
-msgstr ""
-
-#: admin/options.php:924
-#, php-format
-msgid "Sent in last minute: %d / %d"
 msgstr ""
 
 #: admin/options.php:925
 #, php-format
-msgid "Sent in last hour: %d / %d"
+msgid "Sent in last minute: %d / %d"
 msgstr ""
 
 #: admin/options.php:926
 #, php-format
+msgid "Sent in last hour: %d / %d"
+msgstr ""
+
+#: admin/options.php:927
+#, php-format
 msgid "Sent in last day: %d / %d"
 msgstr ""
 
-#: admin/options.php:933
+#: admin/options.php:934
 #, php-format
 msgid "Seconds until next buffer processing time: %d"
 msgstr ""
 
-#: admin/options.php:942
+#: admin/options.php:943
 msgid "Show Notification Log / Buffer"
 msgstr ""
 
-#: admin/options.php:944
+#: admin/options.php:945
 msgid "Show with message content"
 msgstr ""
 
-#: admin/options.php:955 includes/CoreAdmin.php:89
+#: admin/options.php:956
 msgid "WPML Translation Management"
 msgstr ""
 
-#: admin/options.php:962
+#: admin/options.php:963
 msgid "Sync \"Needs Update\" flags"
 msgstr ""
 
-#: admin/options.php:966
+#: admin/options.php:967
 msgid "Set \"Needs Update\" for any post with translations which was updated (possibly by revision approval) more recently than its translations."
 msgstr ""
 
-#: admin/options.php:1004
+#: admin/options.php:1005
 msgid "Specify which PublishPress Revisions Settings to control network-wide. Unselected settings are controlled separately on each site."
 msgstr ""
 
-#: admin/options.php:1050
+#: admin/options.php:1051
 #, php-format
 msgid "network-wide control of \"%s\""
 msgstr ""
 
-#: admin/options.php:1080
+#: admin/options.php:1081
 msgid "All settings in this form (including those on unselected tabs) will be reset to DEFAULTS.  Are you sure?"
 msgstr ""
 
@@ -1023,6 +1043,8 @@ msgstr ""
 
 #: admin/post-editor-workflow-ui_rvy.php:203
 #: admin/post-editor-workflow-ui_rvy.php:223
+#: includes-pro/compat/elementor.php:699 includes-pro/compat/elementor.php:709
+#: includes-pro/compat/elementor.php:715 includes-pro/compat/elementor.php:719
 msgid "Update"
 msgstr ""
 
@@ -1109,7 +1131,7 @@ msgstr ""
 msgid "%s and %s are both disabled. See Revisions > Settings."
 msgstr ""
 
-#: admin/revision-queue_rvy.php:46
+#: admin/revision-queue_rvy.php:46 includes-pro/deletion-queue_rvy.php:31
 #, php-format
 msgid "%s revision submitted."
 msgstr ""
@@ -1140,6 +1162,8 @@ msgid "%s revision permanently deleted."
 msgstr ""
 
 #: admin/revision-queue_rvy.php:113 admin/revision-queue_rvy.php:114
+#: includes-pro/deletion-queue_rvy.php:79
+#: includes-pro/deletion-queue_rvy.php:80
 #, php-format
 msgid "%sPost Author: %s"
 msgstr ""
@@ -1149,7 +1173,7 @@ msgstr ""
 msgid "Revision Queue %s"
 msgstr ""
 
-#: admin/revision-queue_rvy.php:129
+#: admin/revision-queue_rvy.php:129 includes-pro/deletion-queue_rvy.php:92
 #, php-format
 msgid "Search results for \"%s\""
 msgstr ""
@@ -1298,64 +1322,406 @@ msgstr ""
 msgid "This is a Past Revision (from %s). %s %s"
 msgstr ""
 
-#: includes/CoreAdmin.php:74
-msgid "Upgrade to PublishPress Revisions Pro"
+#: includes-pro/SettingsLicense.php:60
+#, php-format
+msgid "Your license key has expired. For continued priority support, <a href=\"%s\">please renew</a>."
 msgstr ""
 
-#: includes/CoreAdmin.php:79
-msgid "Upgrade to PublishPress Revisions Pro for integration with key features of these plugins:"
+#: includes-pro/SettingsLicense.php:71
+#, php-format
+msgid "Your license key will expire today. For updates and priority support, <a href=\"%s\">please renew</a>."
 msgstr ""
 
-#: includes/CoreAdmin.php:82
-msgid "Elementor"
+#: includes-pro/SettingsLicense.php:78
+#, php-format
+msgid "Your license key will expire in %d day. For updates and priority support, <a href=\"%s\">please renew</a>."
 msgstr ""
 
-#: includes/CoreAdmin.php:83
-msgid "Divi Builder"
+#: includes-pro/SettingsLicense.php:92
+#, php-format
+msgid "For updates to PublishPress Revisions Pro, activate your %sPublishPress license key%s."
 msgstr ""
 
-#: includes/CoreAdmin.php:84
+#: includes-pro/SettingsLicense.php:105
+msgid "Key Expired"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:108 includes-pro/SettingsLicense.php:119
+#: includes-pro/SettingsLicense.php:234
+msgid "Deactivate Key"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:111
+msgid "Key Activated"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:112 includes-pro/SettingsProUI.php:14
+msgid "License Key"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:119 includes-pro/SettingsLicense.php:233
+msgid "Activate Key"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:127
+msgid "review your account info"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:134
+msgid "note: Renewal does not require deactivation. If you do deactivate, re-entry of the license key will be required."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:138
+msgid "note: If you deactive, re-entry of the license key will be required for re-activation."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:189
+#, php-format
+msgid "%1$s PublishPress Revisions Pro %2$s %3$s"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:190
+#, php-format
+msgid "%1$sInstalled Version:%2$s"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:197
+#, php-format
+msgid "view %s&nbsp;details"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:208
+msgid "update check / install"
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:235
+msgid "Connecting to publishpress.com server..."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:236
+msgid "The request could not be processed due to a connection failure."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:237
+msgid "Please enter the license key shown on your order receipt."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:238
+msgid "An unidentified error occurred."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:240
+msgid "The key has been deactivated."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:241
+msgid "The key has been activated."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:242
+msgid "The key has expired."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:243
+msgid "The key is invalid."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:244
+msgid "An unknown activation error occurred."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:245
+msgid "The key provided is not valid. Please double-check your entry."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:246
+msgid "This site is not valid to activate the key."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:247 includes-pro/SettingsLicense.php:253
+msgid "The key provided could not be validated by publishpress.com."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:248
+msgid "The key provided is already active on another site."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:249
+msgid "The key has already been activated on the allowed number of sites."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:250
+msgid "An unknown deactivation error occurred."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:251
+msgid "Unable to deactivate because the provided key is not valid."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:252
+msgid "This site is not valid to deactivate the key."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:254
+msgid "The key provided is not active on the specified site."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:259
+#, php-format
+msgid "If this is incorrect, <a href=\"%s\">request activation help</a>."
+msgstr ""
+
+#: includes-pro/SettingsLicense.php:260
+msgid "Please save settings before uploading site configuration."
+msgstr ""
+
+#: includes-pro/SettingsProUI.php:12
+msgid "Display PublishPress Branding in Admin"
+msgstr ""
+
+#: includes-pro/SettingsProUI.php:14
+msgid "Branding"
+msgstr ""
+
+#: includes-pro/SettingsProUI.php:20
+msgid "Change Requests for Unpublished Posts"
+msgstr ""
+
+#: includes-pro/SettingsProUI.php:20
+msgid "Revision Submission for Unpublished Posts"
+msgstr ""
+
+#: includes-pro/SettingsProUI.php:23
+msgid "Prevent Redundant Revisions"
+msgstr ""
+
+#: includes-pro/SettingsProUI.php:48
+msgid "Prevent REST requests from generating revisions (which may be stored without ACF fields)"
+msgstr ""
+
+#: includes-pro/SettingsProUI.php:54
+msgid "Revisors will be able to request the deletion of a published post. The Deletion Queue is not accessible until a deletion request exists."
+msgstr ""
+
+#: includes-pro/admin-load.php:59
+msgid "Current Post"
+msgstr ""
+
+#: includes-pro/class-deletion-list-table_rvy.php:113
+msgid "Post"
+msgstr ""
+
+#: includes-pro/class-deletion-list-table_rvy.php:115
+msgid "Requested By"
+msgstr ""
+
+#: includes-pro/class-deletion-list-table_rvy.php:116
+msgid "Request Date"
+msgstr ""
+
+#: includes-pro/class-deletion-list-table_rvy.php:182
+#: includes-pro/class-deletion-list-table_rvy.php:428
+msgid "Clear Request"
+msgstr ""
+
+#: includes-pro/compat.php:427
+msgid "Requested Slug"
+msgstr ""
+
+#: includes-pro/compat.php:435
+msgid "Author(s)"
+msgstr ""
+
+#: includes-pro/compat/beaver-builder.php:199
 msgid "Beaver Builder"
 msgstr ""
 
-#: includes/CoreAdmin.php:85
-msgid "Advanced Custom Fields"
+#: includes-pro/compat/divi.php:196 includes-pro/compat/divi.php:197
+msgid "Divi"
 msgstr ""
 
-#: includes/CoreAdmin.php:86
-msgid "Pods"
+#: includes-pro/compat/elementor.php:379
+msgid "Elementor: Generate CSS file for revision if needed"
 msgstr ""
 
-#: includes/CoreAdmin.php:87
-msgid "WooCommerce"
+#: includes-pro/compat/elementor.php:380
+msgid "Elementor: Auto-submit Template Revisions"
 msgstr ""
 
-#: includes/CoreAdmin.php:88
-msgid "WPML"
+#: includes-pro/compat/elementor.php:381
+msgid "Elementor: Send notifications for auto-submitted Template Revisions"
 msgstr ""
 
-#: includes/CoreAdmin.php:90
-msgid "plugin integration details..."
+#: includes-pro/compat/elementor.php:382
+msgid "Elementor: Send notifications when a Template Revision is updated"
 msgstr ""
 
-#: includes/CoreAdmin.php:101
-msgid "Need PublishPress Revisions Support?"
+#: includes-pro/compat/elementor.php:399
+msgid "Disable this setting if there is any problem viewing or editing revisions on the front end."
 msgstr ""
 
-#: includes/CoreAdmin.php:106
-msgid "If you need help or have a new feature request, let us know."
+#: includes-pro/compat/elementor.php:651
+msgid "Approval done."
 msgstr ""
 
-#: includes/CoreAdmin.php:108
-msgid "Request Support"
+#: includes-pro/compat/elementor.php:681 includes-pro/compat/elementor.php:682
+msgid "Elementor"
 msgstr ""
 
-#: includes/CoreAdmin.php:117
-msgid "Detailed documentation is also available on the plugin website."
+#: includes-pro/compat/wpml-translation-management.php:114
+#, php-format
+msgid "WPML Translation Management: %s translation flagged."
 msgstr ""
 
-#: includes/CoreAdmin.php:119
-msgid "View Knowledge Base"
+#: includes-pro/compat/wpml-translation-management.php:116
+msgid "WPML Translation Management: Flags already synchronized"
+msgstr ""
+
+#: includes-pro/deletion-queue-load.php:29
+#: includes-pro/deletion-queue-load.php:56
+#, php-format
+msgid "%s deletion requested."
+msgstr ""
+
+#: includes-pro/deletion-queue-load.php:40
+#: includes-pro/deletion-queue_rvy.php:33
+#, php-format
+msgid "%s post deleted."
+msgstr ""
+
+#: includes-pro/deletion-queue-load.php:68
+msgid "Request Deletion"
+msgstr ""
+
+#: includes-pro/deletion-queue-load.php:96
+msgid "Deletion Queue"
+msgstr ""
+
+#: includes-pro/deletion-queue_rvy.php:9
+msgid "You are not allowed to manage deletion requests."
+msgstr ""
+
+#: includes-pro/deletion-queue_rvy.php:32
+#, php-format
+msgid "%s deletion request cleared."
+msgstr ""
+
+#: includes-pro/deletion-queue_rvy.php:86
+#, php-format
+msgid "Deletion Queue %s"
+msgstr ""
+
+#: includes-pro/deletion-workflow_rvy.php:35 revision-workflow_rvy.php:161
+#, php-format
+msgid "[%s] %s"
+msgstr ""
+
+#: includes-pro/deletion-workflow_rvy.php:37
+#, php-format
+msgid "%1$s submitted a deletion request for the %2$s \"%3$s\"."
+msgstr ""
+
+#: includes-pro/deletion-workflow_rvy.php:39
+msgid "Deletion Queue: "
+msgstr ""
+
+#: includes-pro/deletion-workflow_rvy.php:41
+msgid "Edit Post:"
+msgstr ""
+
+#: includes-pro/library/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:242
+#: vendor/alledia/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:242
+#, php-format
+msgid "There is a new version of %1$s available. %2$sView version %3$s details%4$s."
+msgstr ""
+
+#: includes-pro/library/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:250
+#: vendor/alledia/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:250
+#, php-format
+msgid "There is a new version of %1$s available. %2$sView version %3$s details%4$s or %5$supdate now%6$s."
+msgstr ""
+
+#: includes-pro/library/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:493
+#: vendor/alledia/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:493
+msgid "You do not have permission to install plugin updates"
+msgstr ""
+
+#: includes-pro/library/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:493
+#: vendor/alledia/edd-sl-plugin-updater/EDD_SL_Plugin_Updater.php:493
+msgid "Error"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/License.php:112
+#: vendor/alledia/wordpress-edd-license-integration/src/core/License.php:114
+msgid "Sorry, an error occurred. Please check the error log and contact the PublishPress support team."
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:122
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:89
+msgid "Missing license"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:125
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:92
+msgid "Your license key is expired"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:128
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:95
+msgid "Your license key has been disabled"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:132
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:99
+msgid "Invalid license"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:135
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:102
+msgid "Your license is not active for this URL"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:139
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:106
+msgid "This appears to be an invalid license key for this product"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:145
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:112
+msgid "Your license key has reached its activation limit"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:152
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:119
+msgid "Activated"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:171
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:138
+msgid "Click here to read more about licenses."
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:174
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:141
+msgid "More information"
+msgstr ""
+
+#: includes-pro/library/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:193
+msgid "Enter the license key for being able to update the plugin."
+msgstr ""
+
+#: includes-pro/pro-load.php:181
+#, php-format
+msgid "%sCompare%s%sView Current Draft%s"
+msgstr ""
+
+#: includes-pro/pro-load.php:194
+#, php-format
+msgid "%sView Current Draft%s"
+msgstr ""
+
+#: includes-pro/pro-maint.php:49 includes-pro/pro-maint.php:63
+msgid "An error occurred. Please, try again or contact the support team."
 msgstr ""
 
 #: lib/debug.php:110
@@ -1377,11 +1743,6 @@ msgstr ""
 msgid "%1$s updated a %2$s of the %3$s \"%4$s\"."
 msgstr ""
 
-#: revision-workflow_rvy.php:161
-#, php-format
-msgid "[%s] %s"
-msgstr ""
-
 #: revision-workflow_rvy.php:163
 #, php-format
 msgid "%1$s submitted changes to the %2$s \"%3$s\". You can review the changes for possible publication:"
@@ -1400,26 +1761,22 @@ msgstr ""
 msgid "Edit %s: "
 msgstr ""
 
-#: revisionary.php:85
-msgid "<strong>This plugin can be deleted.</strong>"
-msgstr ""
-
-#: revisionary.php:103 revisionary.php:193
+#: revisionary-pro.php:70 revisionary-pro.php:201
 #, php-format
 msgid "Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s: \"%2$s\")"
 msgstr ""
 
-#: revisionary.php:105 revisionary.php:195
+#: revisionary-pro.php:72 revisionary-pro.php:203
 #, php-format
 msgid "Another copy of PublishPress Revisions (or Revisionary) is already activated (version %1$s)"
 msgstr ""
 
-#: revisionary.php:214
+#: revisionary-pro.php:222
 #, php-format
 msgid "PublishPress Revisions requires PHP version %s or higher."
 msgstr ""
 
-#: revisionary.php:221
+#: revisionary-pro.php:229
 #, php-format
 msgid "PublishPress Revisions requires WordPress version %s or higher."
 msgstr ""
@@ -1625,6 +1982,10 @@ msgstr ""
 msgid "Revision Workflow"
 msgstr ""
 
+#: vendor/alledia/wordpress-edd-license-integration/src/core/Setting/Field/License_key.php:122
+msgid "Not validated yet"
+msgstr ""
+
 #: vendor/publishpress/publishpress-instance-protection/core/InstanceChecker.php:212
 msgid "This plugin is outdated. You already have a more recent version installed. Please remove this version."
 msgstr ""
@@ -1672,8 +2033,4 @@ msgstr ""
 
 #: vendor/publishpress/wordpress-reviews/ReviewsController.php:626
 msgid "I already did"
-msgstr ""
-
-#: vendor/publishpress/wordpress-version-notices/src/Module/MenuLink/Module.php:129
-msgid "Amazing! We are redirecting you to our site..."
 msgstr ""
