@@ -165,7 +165,7 @@ class RevisionaryFront {
 			}
 		}
 
-		if ($wp_query->is_404 && !empty($revision_id)) {
+		if ($wp_query->is_404 && !empty($revision_id) && (in_array(get_post_field('post_status', $revision_id), ['future', 'publish']) || defined('REVISIONARY_FORCE_PUBLICATION_REDIRECT'))) {
 			// Work around timing issue when scheduled revision publication is underway
 			if ($published_id = get_post_meta($revision_id, '_rvy_base_post_id', true)) {
 				if ($post = get_post($published_id)) {
