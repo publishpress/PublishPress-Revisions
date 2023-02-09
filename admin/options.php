@@ -299,7 +299,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 
 	if ( $sitewide ) {
 		$site_defaults_caption = ( count( $rvy_options_sitewide ) < count( $rvy_default_options ) ) ? sprintf( esc_html__( 'You can also specify %1$sdefaults for site-specific settings%2$s.', 'revisionary' ), '<a href="admin.php?page=rvy-default_options">', '</a>' ) : '';
-		printf( esc_html__('Use this tab to make <strong>NETWORK-WIDE</strong> changes to PublishPress Revisions settings. %s', 'revisionary'), esc_html($site_defaults_caption) );
+		printf( esc_html__('Use this tab to make NETWORK-WIDE changes to PublishPress Revisions settings. %s', 'revisionary'), esc_html($site_defaults_caption) );
 	} elseif ( $customize_defaults ) {
 		esc_html_e('Here you can change the default value for settings which are controlled separately on each site.', 'revisionary');
 	}
@@ -515,6 +515,8 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	<br />
 	<?php
 	$this->option_checkbox( 'auto_submit_revisions', $tab, $section, '', '' );
+
+	do_action('revisionary_auto_submit_setting_ui', $this, $tab, $section);
 	?>
 	<br />
 	<?php

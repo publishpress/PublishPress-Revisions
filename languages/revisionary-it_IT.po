@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Plugins - PublishPress Revisions: Duplicate Posts, Submit, Approve and Schedule Content Changes - Stable (latest release)\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2022-08-31 16:53-0500\n"
+"PO-Revision-Date: 2023-01-11 15:57+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
@@ -14,7 +14,15 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 3.0.1\n"
 
-#: admin/options.php:592
+#: admin/options.php:154
+msgid "Enable deletion queue"
+msgstr "Abilita la coda di cancellazione"
+
+#: admin/post-edit-block-ui_rvy.php:135 admin/post-edit_rvy.php:215
+msgid "Author"
+msgstr "Autore"
+
+#: admin/options.php:593
 msgid "The WP-Cron trigger is disabled, but scheduled tasks are still excecuted using a custom trigger."
 msgstr "Il trigger di WP-Cron è disattivato, ma le attività pianificate vengono comunque eseguite utilizzando un trigger personalizzato."
 
@@ -22,7 +30,7 @@ msgstr "Il trigger di WP-Cron è disattivato, ma le attività pianificate vengon
 msgid "Site uses a custom trigger for WP-Cron tasks"
 msgstr "Il sito utilizza un trigger personalizzato per le attività di WP-Cron"
 
-#: admin/admin_rvy.php:117
+#: admin/admin_rvy.php:119
 msgid "Scheduled Revisions are not available because WP-Cron is disabled on this site. See %sRevisions > Settings > Scheduled Revisions%s."
 msgstr "Le revisioni programmate non sono disponibili perché WP-Cron è disabilitato su questo sito. Vedere %sRevisioni > Impostazioni > Revisioni programmate%s."
 
@@ -86,19 +94,19 @@ msgstr "Aggiorna a PublishPress Revisions Pro per l'integrazione con le funzioni
 msgid "Upgrade to PublishPress Revisions Pro"
 msgstr "Aggiorna a PublishPress Revisions Pro"
 
-#: admin/options.php:583
+#: admin/options.php:584
 msgid "Publish scheduled revisions using the WP-Cron mechanism. On some sites, publication will fail if this setting is disabled."
 msgstr "Pubblica le revisioni programmate utilizzando il meccanismo WP-Cron. Su alcuni siti, la pubblicazione fallirà se questa impostazione è disattivata."
 
-#: admin/options.php:453
+#: admin/options.php:454
 msgid "Note: Third party code may cause some post types to be incompatible with PublishPress Revisions."
 msgstr "Nota: il codice di terze parti può causare l'incompatibilità di alcuni tipi di articoli con PublishPress Revisions."
 
-#: admin/options.php:439
+#: admin/options.php:440
 msgid "%s capabilities"
 msgstr "Capacità %s"
 
-#: admin/options.php:393
+#: admin/options.php:394
 msgid "Enable revisions for these Post Types:"
 msgstr "Abilita le revisioni per questi tipi di contenuto:"
 
@@ -110,15 +118,15 @@ msgstr "Quando la revisione viene pubblicata, eliminare i commenti editoriali"
 msgid "Post Types"
 msgstr "Tipi di contenuto"
 
-#: rvy_init.php:408
+#: rvy_init.php:419
 msgid "The Revision is Scheduled"
 msgstr "La revisione è stata programmata"
 
-#: rvy_init.php:391
+#: rvy_init.php:402
 msgid "The Revision is Submitted"
 msgstr "La revisione è stata inviata"
 
-#: rvy_init.php:374
+#: rvy_init.php:385
 msgid "The Revision is ready to edit."
 msgstr "La revisione è pronta per la modifica."
 
@@ -128,24 +136,24 @@ msgid_plural "%s revisions declined."
 msgstr[0] "%s revisioni rifiutate."
 msgstr[1] "%s revisione rifiutata."
 
-#: admin/post-editor-workflow-ui_rvy.php:101
+#: admin/post-editor-workflow-ui_rvy.php:103
 msgid "Approving the Revision..."
 msgstr "La revisione è in fase di approvazione…"
 
-#: admin/post-editor-workflow-ui_rvy.php:48
-#: admin/post-editor-workflow-ui_rvy.php:89
+#: admin/post-editor-workflow-ui_rvy.php:51
+#: admin/post-editor-workflow-ui_rvy.php:91
 msgid "Preview this Revision"
 msgstr "Visualizza questa revisione"
 
-#: admin/class-list-table_rvy.php:1175 rvy_init.php:315
+#: admin/class-list-table_rvy.php:1220 rvy_init.php:326
 msgid "Copy"
 msgstr "Copia"
 
-#: admin/class-list-table_rvy.php:922
+#: admin/class-list-table_rvy.php:961
 msgid "Decline"
 msgstr "Rifiuta"
 
-#: admin/admin-init_rvy.php:213
+#: admin/admin-init_rvy.php:215
 msgid "Sorry, you are not allowed to decline this revision."
 msgstr "Non sei autorizzato a rifiutare questa revisione."
 
@@ -153,7 +161,7 @@ msgstr "Non sei autorizzato a rifiutare questa revisione."
 msgid "%1$s %2$s (%3$s)%4$s"
 msgstr "%1$s %2$s (%3$s)%4$s"
 
-#: admin/RevisionEditSubmitMetabox.php:188
+#: admin/RevisionEditSubmitMetabox.php:194
 msgid "Publish %son approval%s"
 msgstr "Pubblicare %sprevia approvazione%s"
 
@@ -162,12 +170,12 @@ msgstr "Pubblicare %sprevia approvazione%s"
 msgid "Search results for \"%s\""
 msgstr "Risultati della ricerca per \"%s\""
 
-#: admin/options.php:1011
+#: admin/options.php:1012
 msgctxt "opentag option_tabname closetag (explanatory note)"
 msgid "%1$s%2$s%3$s (%4$s)"
 msgstr "%1$s%2$s%3$s (%4$s)"
 
-#: admin/options.php:694
+#: admin/options.php:695
 msgid "For compatibility with Advanced Custom Fields, Beaver Builder and WPML, upgrade to %sPublishPress Revisions Pro%s."
 msgstr "Per avere una compatibilità con Advanced Custom Fields, Beaver Builder e WPML, aggiorna a %sPublishPress Revisions Pro%s."
 
@@ -187,11 +195,11 @@ msgstr "Torna all'editor"
 msgid "Compare %s of \"%s\""
 msgstr "Compara %s di \"%s\""
 
-#: admin/class-list-table_rvy.php:661
+#: admin/class-list-table_rvy.php:700
 msgid "Show more details"
 msgstr "Mostra più dettagli"
 
-#: admin/options.php:510
+#: admin/options.php:511
 msgid "To enable a role, add the manage_unsubmitted_revisions capability"
 msgstr "Per abilitare un ruolo, aggiungi la capacità di manage_unsubmitted_revisions"
 
@@ -199,183 +207,183 @@ msgstr "Per abilitare un ruolo, aggiungi la capacità di manage_unsubmitted_revi
 msgid "Additional role capability required to manage %s"
 msgstr "Capacità di ruolo aggiuntiva richiesta per gestire %s"
 
-#: rvy_init.php:362
+#: rvy_init.php:373
 msgid "Scheduled Changes <span class=\"count\">(%d)</span>"
 msgid_plural "Scheduled Changes <span class=\"count\">(%d)</span>"
 msgstr[0] "Modifica programmata <span class=\"count\">(%d)</span>"
 msgstr[1] "Modifiche programmate <span class=\"count\">(%d)</span>"
 
-#: rvy_init.php:514
+#: rvy_init.php:525
 msgid "Revision Date"
 msgstr "Data della revisione"
 
-#: rvy_init.php:510
+#: rvy_init.php:521
 msgid "%sRevisions to My Posts%s(%s)</span>"
 msgid_plural "%sRevisions to My Posts%s(%s)"
 msgstr[0] "%sRevisioni del mio articolo%s(%s)</span>"
 msgstr[1] "%sRevisioni dei miei articoli%s(%s)"
 
-#: rvy_init.php:508
+#: rvy_init.php:519
 msgid "%sMy Revisions%s(%s)</span>"
 msgid_plural "%sMy Revisions%s(%s)</span>"
 msgstr[0] "%sLa mia revisione%s(%s)</span>"
 msgstr[1] "%sLe mie revisioni%s(%s)</span>"
 
-#: rvy_init.php:507
+#: rvy_init.php:518
 msgid "%sMy Copies & Changes%s(%s)</span>"
 msgid_plural "%sMy Copies & Changes%s(%s)</span>"
 msgstr[0] "%sLa mia copia e le mie modifiche%s(%s)</span>"
 msgstr[1] "%sLe mie copie e le mie modifiche%s(%s)</span>"
 
-#: rvy_init.php:408
+#: rvy_init.php:419
 msgid "Revision Scheduled"
 msgstr "Revisione programmata"
 
-#: rvy_init.php:407
+#: rvy_init.php:418
 msgid "Scheduling Revision..."
 msgstr "Programmazione della revisione…"
 
-#: rvy_init.php:399
+#: rvy_init.php:410
 msgid "Submitted for Approval <span class=\"count\">(%s)</span>"
 msgid_plural "Submitted for Approval <span class=\"count\">(%s)</span>"
 msgstr[0] "Inviata per l'approvazione <span class=\"count\">(%s)</span>"
 msgstr[1] "Inviate per l'approvazione <span class=\"count\">(%s)</span>"
 
-#: rvy_init.php:397
+#: rvy_init.php:408
 msgid "Submitted Revisions"
 msgstr "Revisioni inviate"
 
-#: rvy_init.php:391
+#: rvy_init.php:402
 msgid "Revision Submitted"
 msgstr "Revisione inviata"
 
-#: rvy_init.php:390
+#: rvy_init.php:401
 msgid "Submitting Revision..."
 msgstr "Invio della revisione…"
 
-#: rvy_init.php:387
+#: rvy_init.php:398
 msgid "Submitted Revision"
 msgstr "Revisione inviata"
 
-#: rvy_init.php:382
+#: rvy_init.php:393
 msgid "Not Submitted for Approval <span class=\"count\">(%s)</span>"
 msgid_plural "Not Submitted for Approval <span class=\"count\">(%s)</span>"
 msgstr[0] "Non inviata per l'approvazione<span class=\"count\">(%s)</span>"
 msgstr[1] "Non inviate per l'approvazione<span class=\"count\">(%s)</span>"
 
-#: rvy_init.php:381
+#: rvy_init.php:392
 msgid "Not Submitted"
 msgstr "Non inviata"
 
-#: rvy_init.php:380
+#: rvy_init.php:391
 msgid "Unsubmitted Revisions"
 msgstr "Revisioni non inviate"
 
-#: rvy_init.php:374
+#: rvy_init.php:385
 msgid "Revision ready to edit."
 msgstr "Revisioni pronte per la modifica."
 
-#: rvy_init.php:373
+#: rvy_init.php:384
 msgid "Creating Revision..."
 msgstr "Creazione della revisione…"
 
-#: rvy_init.php:371 rvy_init.php:372
+#: rvy_init.php:382 rvy_init.php:383
 msgid "New Revision"
 msgstr "Nuova revisione"
 
-#: rvy_init.php:370
+#: rvy_init.php:381
 msgid "Unsubmitted Revision"
 msgstr "Revisione non inviata"
 
-#: rvy_init.php:360
+#: rvy_init.php:371
 msgid "Scheduled Changes"
 msgstr "Modifiche programmate"
 
-#: rvy_init.php:354
+#: rvy_init.php:365
 msgid "Changes are Scheduled."
 msgstr "Le modifiche sono state programmate."
 
-#: rvy_init.php:353
+#: rvy_init.php:364
 msgid "Scheduling Changes..."
 msgstr "Programmazione delle modifiche…"
 
-#: rvy_init.php:351 rvy_init.php:352 rvy_init.php:355 rvy_init.php:356
+#: rvy_init.php:362 rvy_init.php:363 rvy_init.php:366 rvy_init.php:367
 msgid "Schedule Changes"
 msgstr "Modifiche alla programmazione"
 
-#: rvy_init.php:350 rvy_init.php:361
+#: rvy_init.php:361 rvy_init.php:372
 msgid "Scheduled Change"
 msgstr "Modifica programmata"
 
-#: rvy_init.php:345
+#: rvy_init.php:356
 msgid "Enable Change Requests"
 msgstr "Abilita le richieste di modifica"
 
-#: rvy_init.php:344
+#: rvy_init.php:355
 msgid "Change Requests <span class=\"count\">(%d)</span>"
 msgid_plural "Change Requests <span class=\"count\">(%d)</span>"
 msgstr[0] "Richieste di modifica <span class=\"count\">(%d)</span>"
 msgstr[1] "Richieste di modifiche <span class=\"count\">(%d)</span>"
 
-#: rvy_init.php:342
+#: rvy_init.php:353
 msgid "Change Requests"
 msgstr "Richieste di modifica"
 
-#: rvy_init.php:335
+#: rvy_init.php:346
 msgid "Changes Submitted"
 msgstr "Modifiche inviate"
 
-#: rvy_init.php:334
+#: rvy_init.php:345
 msgid "Submitting Changes..."
 msgstr "Invio delle modifiche…"
 
-#: rvy_init.php:521
+#: rvy_init.php:532
 msgid "Submit Changes"
 msgstr "Invia le modifiche"
 
-#: rvy_init.php:332
+#: rvy_init.php:343
 msgid "Submit Change Request"
 msgstr "Invia richiesta di modifica"
 
-#: rvy_init.php:331 rvy_init.php:343
+#: rvy_init.php:342 rvy_init.php:354
 msgid "Change Request"
 msgstr "Richiesta di modifica"
 
-#: rvy_init.php:326
+#: rvy_init.php:337
 msgid "Working Copies <span class=\"count\">(%d)</span>"
 msgid_plural "Working Copies <span class=\"count\">(%d)</span>"
 msgstr[0] "Copia di lavoro <span class=\"count\">(%d)</span>"
 msgstr[1] "Copie di lavoro <span class=\"count\">(%d)</span>"
 
-#: rvy_init.php:324
+#: rvy_init.php:335
 msgid "Working Copies"
 msgstr "Copie di lavoro"
 
-#: rvy_init.php:321 rvy_init.php:339 rvy_init.php:357
+#: rvy_init.php:332 rvy_init.php:350 rvy_init.php:368
 msgid "Publish Changes"
 msgstr "Pubblica le modifiche"
 
-#: rvy_init.php:320 rvy_init.php:338
+#: rvy_init.php:331 rvy_init.php:349
 msgid "Approving Changes..."
 msgstr "Approvando le modifiche…"
 
-#: rvy_init.php:318 rvy_init.php:336
+#: rvy_init.php:329 rvy_init.php:347
 msgid "Approve Changes"
 msgstr "Approvare le modifiche"
 
-#: rvy_init.php:317
+#: rvy_init.php:328
 msgid "Working Copy ready"
 msgstr "Copia di lavoro pronta"
 
-#: rvy_init.php:316
+#: rvy_init.php:327
 msgid "Creating Working Copy..."
 msgstr "Creazione della copia di lavoro…"
 
-#: rvy_init.php:314
+#: rvy_init.php:325
 msgid "Create Working Copy"
 msgstr "Crea copia di lavoro"
 
-#: rvy_init.php:313 rvy_init.php:325
+#: rvy_init.php:324 rvy_init.php:336
 msgid "Working Copy"
 msgstr "Copia di lavoro"
 
@@ -399,27 +407,27 @@ msgstr "%1$s ha aggiornato un %2$s del %3$s \"%4$s\"."
 msgid "[%s] %s Updated"
 msgstr "[%s] %s aggiornato"
 
-#: front_rvy.php:385
+#: front_rvy.php:391
 msgid "This is a %s (for publication on %s). %s %s %s"
 msgstr "Questa è una %s (per la pubblicazione il %s). %s %s %s"
 
-#: front_rvy.php:370
+#: front_rvy.php:376
 msgid "This is a %s (requested publish date: %s). %s %s %s"
 msgstr "Questa è una %s (data di pubblicazione richiesta: %s). %s %s %s"
 
-#: front_rvy.php:358 front_rvy.php:376
+#: front_rvy.php:364 front_rvy.php:382
 msgid "This is a %s. %s %s %s"
 msgstr "Questa è una %s. %s %s %s"
 
-#: front_rvy.php:291
+#: front_rvy.php:297
 msgid "%sView Published Post%s"
 msgstr "%sVisualizza l'articolo pubblicato%s"
 
-#: front_rvy.php:277
+#: front_rvy.php:283
 msgid "%sCompare%s%sView Published Post%s"
 msgstr "%sConfronta%s%sVisualizza l'articolo pubblicato%s"
 
-#: front_rvy.php:268
+#: front_rvy.php:274
 msgid "%sView Queue%s"
 msgstr "%sVisualizza la coda%s"
 
@@ -433,113 +441,113 @@ msgstr[1] "%s revisioni inviate."
 msgid "%s and %s are both disabled. See Revisions > Settings."
 msgstr "%s e %s sono entrambi disabilitati. Vai a Revisioni > Impostazioni."
 
-#: admin/revision-action_rvy.php:1355
+#: admin/revision-action_rvy.php:1386
 msgid "[%s] %s Publication"
 msgstr "[%s] %s Pubblicazione"
 
-#: admin/revision-action_rvy.php:1272 admin/revision-action_rvy.php:1294
+#: admin/revision-action_rvy.php:1303 admin/revision-action_rvy.php:1325
 msgid "[%s] %s Publication Notice"
 msgstr "[%s] %s Notifica di pubblicazione"
 
-#: admin/post-editor-workflow-ui_rvy.php:215
+#: admin/post-editor-workflow-ui_rvy.php:217
 msgid "For custom field changes, edit a scheduled %s."
 msgstr "Per le modifiche ai campi personalizzati, modifica un %s programmato."
 
-#: admin/post-editor-workflow-ui_rvy.php:199
+#: admin/post-editor-workflow-ui_rvy.php:201
 msgid "Error Creating Revision"
 msgstr "Si è verificato un errore durante la creazione della revisione"
 
-#: admin/post-editor-workflow-ui_rvy.php:192
+#: admin/post-editor-workflow-ui_rvy.php:194
 msgid "Update post before creating %s."
 msgstr "Aggiornare l'articolo prima di creare una %s."
 
-#: admin/post-editor-workflow-ui_rvy.php:68
+#: admin/post-editor-workflow-ui_rvy.php:71
 msgid "%s%s Revision Edit"
 msgid_plural "%s%s Revision Edits"
 msgstr[0] "%s%s Modifica revisione"
 msgstr[1] "%s%s Modifiche revisioni"
 
-#: admin/post-editor-workflow-ui_rvy.php:56
+#: admin/post-editor-workflow-ui_rvy.php:59
 msgid "View / Submit saved revision"
 msgstr "Visualizza/Invia revisione salvata"
 
-#: admin/post-editor-workflow-ui_rvy.php:55
+#: admin/post-editor-workflow-ui_rvy.php:58
 msgid "View / Submit"
 msgstr "Visualizza/Invia"
 
-#: admin/post-editor-workflow-ui_rvy.php:55
+#: admin/post-editor-workflow-ui_rvy.php:58
 msgid "Preview / Submit"
 msgstr "Anteprima/Invia"
 
-#: admin/post-editor-workflow-ui_rvy.php:53
+#: admin/post-editor-workflow-ui_rvy.php:56
 msgid "View / Approve saved revision"
 msgstr "Visualizza/Approva revisione salvata"
 
-#: admin/post-editor-workflow-ui_rvy.php:32
+#: admin/post-editor-workflow-ui_rvy.php:35
 msgid "(on approval)"
 msgstr "(in fase di approvazione)"
 
-#: admin/options.php:615
+#: admin/options.php:616
 msgid "Bypass the above restrictions for others' revisions to logged in user's own posts."
 msgstr "Ignora le restrizioni di cui sopra per le revisioni altrui degli articoli dell'utente connesso."
 
-#: admin/options.php:554 admin/options.php:578
+#: admin/options.php:555 admin/options.php:579
 msgid "When a %s is published, update post modified date to current time."
 msgstr "Quando un %s viene pubblicato, aggiorna la data di modifica dell'articolo all'ora corrente."
 
-#: admin/options.php:551 admin/options.php:575
+#: admin/options.php:552 admin/options.php:576
 msgid "When a %s is published, update post publish date to current time."
 msgstr "Quando un %s viene pubblicato, aggiorna la data di pubblicazione dell'articolo all'ora corrente."
 
-#: admin/options.php:548
+#: admin/options.php:549
 msgid "This restriction applies to users who are not full editors for the post type. To enable a role, add capabilities: revise_posts, revise_others_pages, etc."
 msgstr "Questa restrizione si applica agli utenti che non sono editori completi per il tipo di articolo. Per abilitare un ruolo, aggiungi le capacità: revise_posts, revise_others_pages, ecc."
 
-#: admin/options.php:542
+#: admin/options.php:543
 msgid "Enable published content to be copied, edited, submitted for approval and managed in %sRevision Queue%s."
 msgstr "Abilita il contenuto pubblicato ad essere copiato, modificato, sottoposto ad approvazione e gestito nella %sCoda revisione%s."
 
-#: admin/options.php:520
+#: admin/options.php:521
 msgid "If the user does not have a regular Edit link, recaption the %s link as \"Edit\""
 msgstr "Se l'utente non ha un collegamento regolare a Modifica, rinomina il link %s come \"Modifica\"."
 
-#: admin/options.php:506
+#: admin/options.php:507
 msgid "To expand the Posts / Pages listing for non-Editors, add capabilities: list_others_pages, list_published_posts, etc."
 msgstr "Per espandere l'elenco \"Articoli/Pagine\" per i non-editori, aggiungi le capacità: list_others_pages, list_published_posts, ecc."
 
-#: admin/options.php:501
+#: admin/options.php:502
 msgid "This restriction applies to users who are not full editors for the post type. To enable a role, add capabilities: copy_posts, copy_others_pages, etc."
 msgstr "Questa restrizione si applica agli utenti che non sono editor completi per il tipo di contenuto. Per abilitare un ruolo, aggiungi le capacità: copy_posts, copy_others_pages, ecc."
 
-#: admin/options.php:487
+#: admin/options.php:488
 msgid "Default labels are \"Not Submitted for Approval\", \"Submitted for Approval\", \"Scheduled Revision\""
 msgstr "Le etichette predefinite sono \"Non inviato per l'approvazione\", \"Inviato per l'approvazione\", \"Revisione programmata\"."
 
-#: admin/options.php:340
+#: admin/options.php:341
 msgid "License"
 msgstr "Licenza"
 
-#: admin/options.php:165
+#: admin/options.php:166
 msgid "Email Editors and Administrators when a %s is approved"
 msgstr "Invia una email agli editor e amministratori quando una %s è stata approvata"
 
-#: admin/options.php:164
+#: admin/options.php:165
 msgid "Email Editors and Administrators when a %s is published"
 msgstr "Invia una email agli editor e amministratori quando una %s è stata pubblicata"
 
-#: admin/options.php:163
+#: admin/options.php:164
 msgid "Email Editors and Administrators when a %s is submitted"
 msgstr "Invia una email agli editor e amministratori quando una %s è stata inviata"
 
-#: admin/options.php:161
+#: admin/options.php:162
 msgid "Email designated Publishers when a %s is approved"
 msgstr "Invia una email agli editori prestabiliti quando una %s è stata approvata"
 
-#: admin/options.php:160
+#: admin/options.php:161
 msgid "Email designated Publishers when a %s is published"
 msgstr "Invia una email agli editori designati quando una %s è stata pubblicata"
 
-#: admin/options.php:159
+#: admin/options.php:160
 msgid "Email designated Publishers when a %s is submitted"
 msgstr "Invia una email agli editori designati quando una %s è stata inviata"
 
@@ -639,12 +647,12 @@ msgstr "Modificato "
 msgid "Publish <b>on approval</b>"
 msgstr "Pubblicare <b>su approvazione</b>"
 
-#: admin/class-list-table_rvy.php:918 front_rvy.php:347 rvy_init.php:333
-#: rvy_init.php:389
+#: admin/class-list-table_rvy.php:957 front_rvy.php:353 rvy_init.php:344
+#: rvy_init.php:400
 msgid "Submit"
 msgstr "Invia"
 
-#: admin/class-list-table_rvy.php:886
+#: admin/class-list-table_rvy.php:925
 msgid "My Activity"
 msgstr "La mia attività"
 
@@ -652,15 +660,15 @@ msgstr "La mia attività"
 msgid "Sorry, you are not allowed to submit this revision."
 msgstr "Non sei autorizzato a inviare questa revisione."
 
-#: admin/options.php:963
+#: admin/options.php:964
 msgid "Set \"Needs Update\" for any post with translations which was updated (possibly by revision approval) more recently than its translations."
 msgstr "Impostare \"Deve essere aggiornato\" per ogni articolo con traduzioni che è stato aggiornato (eventualmente con l'approvazione di una revisione) più recentemente delle sue traduzioni."
 
-#: admin/options.php:959
+#: admin/options.php:960
 msgid "Sync \"Needs Update\" flags"
 msgstr "Sincronizzare le segnalazioni di \"Deve essere aggiornato\""
 
-#: admin/options.php:952 includes/CoreAdmin.php:89
+#: admin/options.php:953 includes/CoreAdmin.php:89
 msgid "WPML Translation Management"
 msgstr "Gestione delle traduzioni con WPML"
 
@@ -680,7 +688,7 @@ msgstr "Nascondi i tag HTML nella schermata \"Confronta revisioni\""
 msgid "Update Modified Date"
 msgstr "Aggiorna la data di modifica"
 
-#: admin/options.php:723
+#: admin/options.php:724
 msgid "Modification Date"
 msgstr "Data di modifica"
 
@@ -696,7 +704,7 @@ msgstr "Per elencare le revisioni altrui è necessaria una capacità di ruolo"
 msgid "Editing others' revisions requires role capability"
 msgstr "Per modificare le revisioni altrui è necessaria una capacità di ruolo"
 
-#: admin/options.php:624
+#: admin/options.php:625
 msgid "Regenerate \"post has revision\" flags"
 msgstr "Rigenera i flag «l'articolo ha una revisione»"
 
@@ -718,15 +726,15 @@ msgstr[1] "Revisioni di %s non pianificate."
 msgid "Enable public preview"
 msgstr "Abilita anteprima pubblica"
 
-#: admin/admin_rvy.php:239 admin/admin_rvy.php:240 includes/CoreAdmin.php:94
+#: admin/admin_rvy.php:258 admin/admin_rvy.php:259 includes/CoreAdmin.php:94
 msgid "Upgrade to Pro"
 msgstr "Aggiornare a Pro"
 
-#: admin/options.php:704
+#: admin/options.php:705
 msgid "This may improve compatibility with some plugins."
 msgstr "Ciò potrebbe migliorare la compatibilità con alcuni plugin."
 
-#: admin/options.php:639
+#: admin/options.php:640
 msgid "For themes that block revision preview, hide preview links from non-Administrators"
 msgstr "Per i temi che bloccano l'anteprima di revisione, nascondi i link di anteprima ai non amministratori"
 
@@ -753,30 +761,30 @@ msgctxt "Author Name"
 msgid "%s: "
 msgstr "%s: "
 
-#: admin/RevisionEditSubmitMetabox.php:185
+#: admin/RevisionEditSubmitMetabox.php:191
 msgid "Publish on: %s"
 msgstr "Pubblica il: %s"
 
-#: admin/RevisionEditSubmitMetabox.php:182
+#: admin/RevisionEditSubmitMetabox.php:188
 msgid "Scheduled for: %s"
 msgstr "Programmato per: %s"
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:632
+#: admin/class-list-table_rvy.php:671
 msgid "Compare Past Revisions"
 msgstr "Confronta le revisioni passate"
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:588
+#: admin/class-list-table_rvy.php:627
 msgid "View only revisions of %s"
 msgstr "Visualizza solo le revisioni di %s"
 
-#: rvy_init.php:726
+#: rvy_init.php:741
 msgctxt "User role"
 msgid "Revisor"
 msgstr "Revisore"
 
-#: rvy_init.php:404
+#: rvy_init.php:415
 msgid "Scheduled Revision"
 msgstr "Revisione programmata"
 
@@ -784,83 +792,83 @@ msgstr "Revisione programmata"
 msgid "Revision updated. %sView Preview%s"
 msgstr "Revisione aggiornata. %sVisualizza anteprima%s"
 
-#: admin/admin-init_rvy.php:136 admin/admin-init_rvy.php:248
+#: admin/admin-init_rvy.php:136 admin/admin-init_rvy.php:250
 msgid "Sorry, you are not allowed to approve this revision."
 msgstr "Spiacente, non puoi approvare questa revisione."
 
-#: admin/class-list-table_rvy.php:923
+#: admin/class-list-table_rvy.php:962
 msgid "Publish"
 msgstr "Pubblica"
 
-#: admin/options.php:941
+#: admin/options.php:942
 msgid "Show with message content"
 msgstr "Mostra con il contenuto del messaggio"
 
-#: admin/options.php:939
+#: admin/options.php:940
 msgid "Show Notification Log / Buffer"
 msgstr "Mostra registro/buffer delle notifiche"
 
-#: admin/options.php:930
+#: admin/options.php:931
 msgid "Seconds until next buffer processing time: %d"
 msgstr "Secondi al successivo tempo di elaborazione del buffer: %d"
 
-#: admin/options.php:923
+#: admin/options.php:924
 msgid "Sent in last day: %d / %d"
 msgstr "Inviato lo scorso giorno: %d/%d"
 
-#: admin/options.php:922
+#: admin/options.php:923
 msgid "Sent in last hour: %d / %d"
 msgstr "Inviato nell'ultima ora: %d/%d"
 
-#: admin/options.php:921
+#: admin/options.php:922
 msgid "Sent in last minute: %d / %d"
 msgstr "Inviato negli ultimi minuti: %d/%d"
 
-#: admin/options.php:915
+#: admin/options.php:916
 msgid "Truncate Notification Log"
 msgstr "Troncare il registro delle notifiche"
 
-#: admin/options.php:909
+#: admin/options.php:910
 msgid "Purge Notification Buffer"
 msgstr "Elimina buffer di notifica"
 
-#: admin/options.php:880
+#: admin/options.php:881
 msgid "Notification Log"
 msgstr "Registro delle notifiche"
 
-#: admin/options.php:852
+#: admin/options.php:853
 msgid "Notification Buffer"
 msgstr "Buffer delle notifiche"
 
-#: admin/options.php:831
+#: admin/options.php:832
 msgid "To avoid notification failures, buffer emails for delayed sending once minute, hour or day limits are exceeded"
 msgstr "Per evitare errori di notifica, il buffer di messaggi di posta elettronica serve per l'invio ritardato quando vengono superati i limiti di un minuto, ora o giorno"
 
-#: admin/options.php:612
+#: admin/options.php:613
 msgid "This restriction applies to users who are not full editors for the post type. To enable a role, give it the list_others_revisions capability."
 msgstr "Questa restrizione si applica agli utenti che non sono editor completi per il tipo di articolo. Per abilitare un ruolo, forniscigli la funzionalità in capacità in list_others_revisions."
 
-#: admin/options.php:609
+#: admin/options.php:610
 msgid "This restriction applies to users who are not full editors for the post type. To enable a role, give it the edit_others_revisions capability."
 msgstr "Questa restrizione si applica agli utenti che non sono editor completi per il tipo di articolo. Per abilitare un ruolo, forniscigli la funzionalità edit_others_revisions."
 
-#: admin/options.php:672
+#: admin/options.php:673
 msgid "If disabled, Compare screen links to Revision Preview for approval"
 msgstr "Se disabilitato, la schermata «Confronta» si collega all'anteprima della revisione per l'approvazione"
 
-#: admin/options.php:662
+#: admin/options.php:663
 msgid "Some themes or plugins may require Revision Slug or Revision ID link type for proper template loading and field display."
 msgstr "Alcuni temi o plugin potrebbero richiedere il tipo di collegamento Slug revisione o ID revisione per il corretto caricamento del modello e la visualizzazione dei campi."
 
-#: admin/options.php:651
+#: admin/options.php:652
 msgid "Revision ID only"
 msgstr "Solo ID revisione"
 
-#: admin/options.php:651
+#: admin/options.php:652
 msgid "Revision Slug"
 msgstr "Slug della revisione"
 
-#: admin/options.php:651
+#: admin/options.php:652
 msgid "Published Post Slug"
 msgstr "Slug dell'articolo pubblicato"
 
@@ -898,7 +906,7 @@ msgstr[1] "Revisioni di %s approvate."
 msgid "Compare this revision to published copy, or to other revisions"
 msgstr "Confronta questa revisione con la copia pubblicata o con altre revisioni"
 
-#: rvy_init.php:375 rvy_init.php:392 rvy_init.php:409
+#: rvy_init.php:386 rvy_init.php:403 rvy_init.php:420
 msgid "Approve Revision"
 msgstr "Approva la revisione"
 
@@ -906,136 +914,136 @@ msgstr "Approva la revisione"
 msgid "Every 2 Minutes"
 msgstr "Ogni 2 minuti"
 
-#: front_rvy.php:397
+#: front_rvy.php:403
 msgid "This is the Current Revision. %s"
 msgstr "Questa è la revisione corrente. %s"
 
-#: front_rvy.php:404
+#: front_rvy.php:410
 msgid "This is a Past Revision (from %s). %s %s"
 msgstr "Questa è una revisione precedente (da %s). %s %s"
 
-#: front_rvy.php:403
+#: front_rvy.php:409
 msgid "Restore"
 msgstr "Ripristina"
 
-#: admin/class-list-table_rvy.php:921 admin/history_rvy.php:1065
-#: front_rvy.php:344 front_rvy.php:365 rvy_init.php:319 rvy_init.php:337
-#: rvy_init.php:376 rvy_init.php:393 rvy_init.php:410
+#: admin/class-list-table_rvy.php:960 admin/history_rvy.php:1065
+#: front_rvy.php:350 front_rvy.php:371 rvy_init.php:330 rvy_init.php:348
+#: rvy_init.php:387 rvy_init.php:404 rvy_init.php:421
 msgid "Approve"
 msgstr "Approva"
 
-#: admin/post-editor-workflow-ui_rvy.php:64
+#: admin/post-editor-workflow-ui_rvy.php:67
 msgid "View unsaved changes"
 msgstr "Visualizza modifiche non salvate"
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:1218
+#: admin/class-list-table_rvy.php:1263
 msgid "Compare Changes"
 msgstr "Confronta le modifiche"
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:1203
-#: admin/post-editor-workflow-ui_rvy.php:185
+#: admin/class-list-table_rvy.php:1248
+#: admin/post-editor-workflow-ui_rvy.php:187
 msgid "Preview Revision"
 msgstr "Anteprima revisione"
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:1185 admin/RevisionEditSubmitMetabox.php:60
+#: admin/class-list-table_rvy.php:1230 admin/RevisionEditSubmitMetabox.php:62
 msgid "Delete Revision"
 msgstr "Elimina revisione"
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:1085
+#: admin/class-list-table_rvy.php:1130
 msgid "&#8220;%s&#8221; (Edit)"
 msgstr "&#8220;%s&#8221; (Modifica)"
 
-#: admin/class-list-table_rvy.php:1005
+#: admin/class-list-table_rvy.php:1044
 msgid "Select All"
 msgstr "Seleziona tutto"
 
-#: admin/class-list-table_rvy.php:950
+#: admin/class-list-table_rvy.php:989
 msgid "Filter by category"
 msgstr "Filtra per categoria"
 
-#: admin/class-list-table_rvy.php:894
+#: admin/class-list-table_rvy.php:933
 msgid "All %s"
 msgstr "Tutti %s"
 
-#: admin/class-list-table_rvy.php:633
+#: admin/class-list-table_rvy.php:672
 msgid "History"
 msgstr "Cronologia"
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:600 admin/class-list-table_rvy.php:608
+#: admin/class-list-table_rvy.php:639 admin/class-list-table_rvy.php:647
 msgid "View published post"
 msgstr "Visualizza l'articolo pubblicato"
 
-#: admin/class-list-table_rvy.php:589
+#: admin/class-list-table_rvy.php:628
 msgid "Filter"
 msgstr "Filtro"
 
-#: admin/class-list-table_rvy.php:505
+#: admin/class-list-table_rvy.php:544
 msgid "Missed schedule"
 msgstr "Programma mancato"
 
-#: admin/class-list-table_rvy.php:501
+#: admin/class-list-table_rvy.php:540
 msgid "Requested publication: %s"
 msgstr "Pubblicazione richiesta: %s"
 
-#: admin/class-list-table_rvy.php:498
+#: admin/class-list-table_rvy.php:537
 msgid "Scheduled publication: %s"
 msgstr "Pubblicazione pianificata: %s"
 
-#: admin/class-list-table_rvy.php:491 admin/class-list-table_rvy.php:1105
+#: admin/class-list-table_rvy.php:530 admin/class-list-table_rvy.php:1150
 msgid "Y/m/d g:i a"
 msgstr "D/m/y g:i a"
 
-#: admin/class-list-table_rvy.php:481 admin/class-list-table_rvy.php:1097
+#: admin/class-list-table_rvy.php:520 admin/class-list-table_rvy.php:1142
 msgid "Y/m/d g:i:s a"
 msgstr "D/m/y g:i:s a"
 
-#: rvy_init.php:515
+#: rvy_init.php:526
 msgid "Post Author"
 msgstr "Autore articolo"
 
-#: rvy_init.php:516
+#: rvy_init.php:527
 msgid "Published Post"
 msgstr "Articolo pubblicato"
 
-#: admin/class-list-table_rvy.php:438
+#: admin/class-list-table_rvy.php:477
 msgid "Schedule"
 msgstr "Programma"
 
-#: rvy_init.php:513
+#: rvy_init.php:524
 msgid "Revised By"
 msgstr "Rivisto da"
 
-#: admin/class-list-table_rvy.php:428
+#: admin/class-list-table_rvy.php:467
 msgid "Post Type"
 msgstr "Tipo di articolo"
 
-#: admin/class-list-table_rvy.php:427 admin/post-editor-workflow-ui_rvy.php:29
+#: admin/class-list-table_rvy.php:466 admin/post-editor-workflow-ui_rvy.php:31
 msgid "Status"
 msgstr "Stato"
 
-#: admin/admin-posts_rvy.php:140 rvy_init.php:512
+#: admin/admin-posts_rvy.php:140 rvy_init.php:523
 msgid "Revision"
 msgstr "Revisione"
 
 #. translators: Publish box date formt, see http://php.net/date
-#: admin/RevisionEditSubmitMetabox.php:177
+#: admin/RevisionEditSubmitMetabox.php:183
 msgid "M j, Y @ G:i"
 msgstr "J M Y @ G:i"
 
-#: admin/RevisionEditSubmitMetabox.php:144
+#: admin/RevisionEditSubmitMetabox.php:150
 msgid "Status:"
 msgstr "Stato:"
 
-#: admin/RevisionEditSubmitMetabox.php:62
+#: admin/RevisionEditSubmitMetabox.php:64
 msgid "Move to Trash"
 msgstr "Sposta nel cestino"
 
-#: admin/class-list-table_rvy.php:930 admin/post-edit-block-ui_rvy.php:67
+#: admin/class-list-table_rvy.php:969 admin/post-edit-block-ui_rvy.php:84
 #: admin/post-edit_rvy.php:51
 msgid "Delete Permanently"
 msgstr "Elimina definitivamente"
@@ -1052,11 +1060,11 @@ msgstr "Coda revisione %s"
 msgid "%sPost Author: %s"
 msgstr "%sAutore articolo: %s"
 
-#: admin/admin-init_rvy.php:282
+#: admin/admin-init_rvy.php:284
 msgid "Error in deleting."
 msgstr "Errore durante l'eliminazione."
 
-#: admin/admin-init_rvy.php:277
+#: admin/admin-init_rvy.php:279
 msgid "Sorry, you are not allowed to delete this revision."
 msgstr "Spiacente, non hai l'autorizzazione per eliminare questa revisione."
 
@@ -1076,7 +1084,7 @@ msgstr "%1$s (corrente)"
 msgid "Revisions of %s"
 msgstr "Revisioni di %s"
 
-#: admin/revision-action_rvy.php:419 admin/revision-action_rvy.php:501
+#: admin/revision-action_rvy.php:422 admin/revision-action_rvy.php:504
 msgid "Editor: "
 msgstr "Editore: "
 
@@ -1096,7 +1104,7 @@ msgstr "Anteprima/ripristina"
 msgid "Preview / Approval"
 msgstr "Anteprima/approvazione"
 
-#: admin/class-list-table_rvy.php:489 admin/class-list-table_rvy.php:1102
+#: admin/class-list-table_rvy.php:528 admin/class-list-table_rvy.php:1147
 #: admin/history_rvy.php:980
 msgid "%s ago"
 msgstr "%s fa"
@@ -1123,7 +1131,7 @@ msgstr "%s%s da adesso"
 msgid "%s%s ago"
 msgstr "%s%s fa"
 
-#: rvy_init.php:398
+#: rvy_init.php:409
 msgid "Submitted"
 msgstr "Inviato"
 
@@ -1131,7 +1139,7 @@ msgstr "Inviato"
 msgid "Requested for "
 msgstr "Richiesto per "
 
-#: admin/class-list-table_rvy.php:546 admin/history_rvy.php:779
+#: admin/class-list-table_rvy.php:585 admin/history_rvy.php:779
 msgid "No author"
 msgstr "Senza autore"
 
@@ -1167,7 +1175,7 @@ msgstr "Ordinamento menu"
 msgid "Post Parent"
 msgstr "Articoli genitore"
 
-#: admin/history_rvy.php:528 admin/options.php:723
+#: admin/history_rvy.php:528 admin/options.php:724
 msgid "Post Date"
 msgstr "Data articolo"
 
@@ -1183,50 +1191,50 @@ msgstr "Reti predefiniti"
 msgid "Network Settings"
 msgstr "Impostazioni rete"
 
-#: admin/class-list-table_rvy.php:1219
-#: admin/edit-revision-classic-ui_rvy.php:92 admin/post-edit_rvy.php:127
-#: admin/post-edit_rvy.php:141
+#: admin/class-list-table_rvy.php:1264
+#: admin/edit-revision-classic-ui_rvy.php:92 admin/post-edit_rvy.php:134
+#: admin/post-edit_rvy.php:148
 msgctxt "revisions"
 msgid "Compare"
 msgstr "Confronta"
 
-#: admin/post-edit_rvy.php:105 admin/RevisionEditSubmitMetabox.php:122
+#: admin/post-edit_rvy.php:112 admin/RevisionEditSubmitMetabox.php:128
 msgid "View saved revision"
 msgstr "Visualizza revisione salvata"
 
-#: admin/post-edit_rvy.php:102 admin/RevisionEditSubmitMetabox.php:119
+#: admin/post-edit_rvy.php:109 admin/RevisionEditSubmitMetabox.php:125
 msgid "View / moderate saved revision"
 msgstr "Visualizza/modera revisione salvata"
 
-#: admin/class-list-table_rvy.php:601
+#: admin/class-list-table_rvy.php:640
 msgid "View"
 msgstr "Visualizza"
 
-#: admin/post-editor-workflow-ui_rvy.php:50
+#: admin/post-editor-workflow-ui_rvy.php:53
 msgid "View / Approve"
 msgstr "Visualizza/approva"
 
-#: admin/post-editor-workflow-ui_rvy.php:50
+#: admin/post-editor-workflow-ui_rvy.php:53
 msgid "View / Publish"
 msgstr "Visualizza/pubblica"
 
-#: admin/options.php:733
+#: admin/options.php:734
 msgid "Show descriptive captions for PublishPress Revisions settings"
 msgstr "Mostra didascalie descrittive per le impostazioni di PublishPress Revisions"
 
-#: admin/options.php:467
+#: admin/options.php:468
 msgid "The user role \"Revisor\" role is now available. Include capabilities for all custom post types in this role?"
 msgstr "Il ruolo utente \"Revisore\" è ora disponibile. Includere anche le funzionalità per tutti i tipi di articoli personalizzati in questo ruolo?"
 
-#: admin/options.php:232
+#: admin/options.php:233
 msgid "PublishPress Revisions Site Settings"
 msgstr "Impostazioni del sito per PublishPress Revisions"
 
-#: admin/admin_lib-mu_rvy.php:21 admin/options.php:230
+#: admin/admin_lib-mu_rvy.php:21 admin/options.php:231
 msgid "PublishPress Revisions Network Defaults"
 msgstr "Reti predefinite di PublishPress Revisions"
 
-#: admin/admin_lib-mu_rvy.php:10 admin/options.php:228
+#: admin/admin_lib-mu_rvy.php:10 admin/options.php:229
 msgid "PublishPress Revisions Network Settings"
 msgstr "Impostazioni di rete di PublishPress Revisions"
 
@@ -1234,27 +1242,27 @@ msgstr "Impostazioni di rete di PublishPress Revisions"
 msgid "All custom post types available to Revisors"
 msgstr "Tutti i tipi di articoli personalizzati disponibili per i revisori"
 
-#: admin/admin_rvy.php:327
+#: admin/admin_rvy.php:346
 msgid "Contact"
 msgstr "Contatto"
 
-#: admin/admin_rvy.php:325
+#: admin/admin_rvy.php:344
 msgid "Documentation"
 msgstr "Documentazione"
 
-#: admin/admin_rvy.php:323
+#: admin/admin_rvy.php:342
 msgid "About"
 msgstr "Informazioni sul plugin"
 
-#: admin/admin_rvy.php:312
+#: admin/admin_rvy.php:331
 msgid "If you like %s, please leave us a %s rating. Thank you!"
 msgstr "Se ti piace %s, lasciaci una valutazione di %s!"
 
-#: admin/admin_rvy.php:232 admin/options.php:234
+#: admin/admin_rvy.php:251 admin/options.php:235
 msgid "PublishPress Revisions Settings"
 msgstr "Impostazione di PublishPress Revisions"
 
-#: admin/admin-posts_rvy.php:172 admin/admin_rvy.php:219
+#: admin/admin-posts_rvy.php:172 admin/admin_rvy.php:236
 msgid "Revision Queue"
 msgstr "Coda revisioni"
 
@@ -1262,11 +1270,11 @@ msgstr "Coda revisioni"
 msgid "Could not insert revision into the database"
 msgstr "Impossibile inserire la revisione nel database"
 
-#: admin/post-editor-workflow-ui_rvy.php:80
+#: admin/post-editor-workflow-ui_rvy.php:82
 msgid "Revision Submission Error"
 msgstr "Errore di invio della revisione"
 
-#: admin/post-editor-workflow-ui_rvy.php:186
+#: admin/post-editor-workflow-ui_rvy.php:188
 msgid "Edit Revision"
 msgstr "Modifica revisione"
 
@@ -1274,22 +1282,22 @@ msgstr "Modifica revisione"
 msgid "Revision Queue: "
 msgstr "Coda revisione: "
 
-#: rvy_init.php:416
+#: rvy_init.php:427
 msgid "Scheduled Revision <span class=\"count\">(%s)</span>"
 msgid_plural "Scheduled Revisions <span class=\"count\">(%s)</span>"
 msgstr[0] "Revisione programmata <span class=\"count\">(%s)</span>"
 msgstr[1] "Revisioni programmate <span class=\"count\">(%s)</span>"
 
-#: rvy_init.php:415
+#: rvy_init.php:426
 msgid "Scheduled"
 msgstr "Programmato"
 
-#: rvy_init.php:322 rvy_init.php:340 rvy_init.php:358 rvy_init.php:378
-#: rvy_init.php:395 rvy_init.php:412
+#: rvy_init.php:333 rvy_init.php:351 rvy_init.php:369 rvy_init.php:389
+#: rvy_init.php:406 rvy_init.php:423
 msgid "Save Revision"
 msgstr "Salva revisione"
 
-#: rvy_init.php:377 rvy_init.php:394 rvy_init.php:411
+#: rvy_init.php:388 rvy_init.php:405 rvy_init.php:422
 msgid "Publish Revision"
 msgstr "Pubblica revisione"
 
@@ -1345,7 +1353,7 @@ msgstr "Azioni di gruppo"
 msgid "Actions"
 msgstr "Azioni"
 
-#: admin/class-list-table_rvy.php:926 admin/revision-ui_rvy.php:270
+#: admin/class-list-table_rvy.php:965 admin/revision-ui_rvy.php:270
 msgid "Unschedule"
 msgstr "Non programmato"
 
@@ -1390,109 +1398,109 @@ msgstr "Non verranno inviate notifiche email."
 msgid "Publishers will be notified (but cannot be selected here)."
 msgstr "Gli editori riceveranno una notifica (ma non possono essere selezionati qui)."
 
-#: admin/revision-action_rvy.php:1357
+#: admin/revision-action_rvy.php:1388
 msgid "A scheduled revision to the %1$s \"%2$s\" has been published."
 msgstr "È stata pubblicata una revisione pianificata per %1$s \"%2$s\"."
 
-#: admin/revision-action_rvy.php:1298 admin/revision-action_rvy.php:1360
+#: admin/revision-action_rvy.php:1329 admin/revision-action_rvy.php:1391
 msgid "It was submitted by %1$s."
 msgstr "È stata inviata da %1$s."
 
-#: admin/revision-action_rvy.php:1295
+#: admin/revision-action_rvy.php:1326
 msgid "A scheduled revision to your %1$s \"%2$s\" has been published."
 msgstr "Una revisione programmata del tuo %1$s \"%2$s\" è stata pubblicata."
 
-#: admin/revision-action_rvy.php:1273
+#: admin/revision-action_rvy.php:1304
 msgid "The scheduled revision you submitted for the %1$s \"%2$s\" has been published."
 msgstr "La revisione programmata che hai inviato per il %1$s \"%2$s\" è stata pubblicata."
 
-#: admin/revision-action_rvy.php:490
+#: admin/revision-action_rvy.php:493
 msgid "The revision you submitted for the %1$s \"%2$s\" has been approved."
 msgstr "La revisione che hai inviato per il %1$s \"%2$s\" è stata approvata."
 
-#: admin/revision-action_rvy.php:421 admin/revision-action_rvy.php:503
-#: admin/revision-action_rvy.php:1276 admin/revision-action_rvy.php:1301
-#: admin/revision-action_rvy.php:1363
+#: admin/revision-action_rvy.php:424 admin/revision-action_rvy.php:506
+#: admin/revision-action_rvy.php:1307 admin/revision-action_rvy.php:1332
+#: admin/revision-action_rvy.php:1394
 msgid "View it online: "
 msgstr "Visualizzala online: "
 
-#: admin/revision-action_rvy.php:416 admin/revision-action_rvy.php:498
+#: admin/revision-action_rvy.php:419 admin/revision-action_rvy.php:501
 msgid "Preview it here: "
 msgstr "Visualizza qui l'anteprima: "
 
-#: admin/revision-action_rvy.php:412 admin/revision-action_rvy.php:494
+#: admin/revision-action_rvy.php:415 admin/revision-action_rvy.php:497
 msgid "It will be published on %s"
 msgstr "Sarà pubblicata il %s"
 
-#: admin/revision-action_rvy.php:408
+#: admin/revision-action_rvy.php:411
 msgid "The submitter was %1$s."
 msgstr "Il mittente era %1$s."
 
-#: admin/revision-action_rvy.php:405
+#: admin/revision-action_rvy.php:407
 msgid "A revision to the %1$s \"%2$s\" has been approved."
 msgstr "Una revisione a %1$s \"%2$s\" è stata approvata."
 
-#: admin/revision-action_rvy.php:404 admin/revision-action_rvy.php:489
+#: admin/revision-action_rvy.php:406 admin/revision-action_rvy.php:492
 msgid "[%s] Revision Approval Notice"
 msgstr "[%s] Avviso di approvazione della revisione"
 
-#: admin/options.php:1077
+#: admin/options.php:1078
 msgid "All settings in this form (including those on unselected tabs) will be reset to DEFAULTS.  Are you sure?"
 msgstr "Tutte le impostazioni in questo modulo (comprese quelle nelle schede non selezionate) verranno ripristinate ai valori PREDEFINITI. Sei sicuro?"
 
-#: admin/options.php:1001
+#: admin/options.php:1002
 msgid "Specify which PublishPress Revisions Settings to control network-wide. Unselected settings are controlled separately on each site."
 msgstr "Specifica le impostazioni di PublishPress Revisions per controllare ampiezza rete. Le impostazioni deselezionate vengono controllate separatamente su ogni sito."
 
-#: admin/options.php:1047
+#: admin/options.php:1048
 msgid "network-wide control of \"%s\""
 msgstr "controllo ampiezza di rete di \"%s\""
 
-#: admin/options.php:761 admin/options.php:782
+#: admin/options.php:762 admin/options.php:783
 msgid "Always"
 msgstr "Sempre"
 
-#: admin/options.php:761 admin/options.php:782
+#: admin/options.php:762 admin/options.php:783
 msgid "By default"
 msgstr "Per impostazione predefinita"
 
-#: admin/options.php:761 admin/options.php:782
+#: admin/options.php:762 admin/options.php:783
 msgid "Never"
 msgstr "Mai"
 
-#: admin/options.php:771 admin/options.php:817
+#: admin/options.php:772 admin/options.php:818
 msgid "select recipients"
 msgstr "seleziona recipienti"
 
-#: admin/options.php:587
+#: admin/options.php:588
 msgid "Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it."
 msgstr "Pubblica le revisioni pianificate in modo asincrono, tramite una richiesta http secondaria dal server. Di solito è la soluzione migliore poiché elimina i ritardi, ma alcuni server potrebbero non supportarla."
 
-#: admin/options.php:572
+#: admin/options.php:573
 msgid "If a currently published post or page is edited and a future date set, the change will not be applied until the selected date."
 msgstr "Se un articolo o una pagina attualmente pubblicati vengono modificati e viene impostata una data futura, la modifica non verrà applicata fino alla data selezionata."
 
-#: admin/options.php:472
+#: admin/options.php:473
 msgid "If checked, users lacking site-wide publishing capabilities will also be checked for the edit_others_drafts capability"
 msgstr "Se selezionata, verrà selezionata anche la funzionalità edit_others_drafts per gli utenti privi di funzionalità di pubblicazione a livello di sito"
 
-#: admin/options.php:313 admin/options.php:315
+#: admin/options.php:314 admin/options.php:316
 msgid "Note that %1$s network-wide settings%2$s may also be available."
 msgstr "Tieni presente che potrebbero essere disponibili anche %1$s impostazioni di rete%2$s."
 
-#: admin/options.php:303
+#: admin/options.php:304
 msgid "Here you can change the default value for settings which are controlled separately on each site."
 msgstr "Qui puoi modificare il valore predefinito per le impostazioni che sono controllate separatamente su ogni sito."
 
-#: admin/options.php:301
+#: admin/options.php:302
 msgid "Use this tab to make <strong>NETWORK-WIDE</strong> changes to PublishPress Revisions settings. %s"
 msgstr "Utilizzare questa scheda per apportare modifiche <strong>a tutta la rete</strong> delle impostazioni di PublishPress Revisions. %s"
 
-#: admin/options.php:300
+#: admin/options.php:301
 msgid "You can also specify %1$sdefaults for site-specific settings%2$s."
 msgstr "Puoi anche specificare %1$spredefinite per le impostazioni specifiche del sito%2$s."
 
-#: admin/options.php:262
+#: admin/options.php:263
 msgid "These are the <strong>default</strong> settings for options which can be adjusted per-site."
 msgstr "Queste sono le impostazioni <strong>predefinite</strong> per le opzioni che possono essere regolate per sito."
 
@@ -1516,7 +1524,7 @@ msgstr "Pubblicazione asincrona"
 msgid "Setting Scope"
 msgstr "Ambito di impostazione"
 
-#: admin/admin_rvy.php:232 admin/options.php:92
+#: admin/admin_rvy.php:251 admin/options.php:92
 msgid "Settings"
 msgstr "Impostazioni"
 
@@ -1548,9 +1556,9 @@ msgstr "nessuna revisione di %s disponibile."
 msgid "Past Revisions"
 msgstr "Revisioni passate"
 
-#: admin/post-editor-workflow-ui_rvy.php:128 rvy_init.php:323 rvy_init.php:341
-#: rvy_init.php:359 rvy_init.php:379 rvy_init.php:396 rvy_init.php:413
-#: rvy_init.php:517
+#: admin/post-editor-workflow-ui_rvy.php:130 rvy_init.php:334 rvy_init.php:352
+#: rvy_init.php:370 rvy_init.php:390 rvy_init.php:407 rvy_init.php:424
+#: rvy_init.php:528
 msgid "Update Revision"
 msgstr "Aggiorna revisione"
 
@@ -1570,39 +1578,39 @@ msgstr "Nessuna revisione specificata."
 msgid "<strong>Note:</strong> For visual display of revisions, add the following code to foliopress-wysiwyg.php:<br />&nbsp;&nbsp;if ( strpos( $_SERVER['REQUEST_URI'], 'admin.php?page=rvy-revisions' ) ) return;"
 msgstr "<strong>Nota:</strong> Per la visualizzazione visiva delle revisioni, aggiungi il codice seguente a foliopress-wysiwyg.php:<br />&nbsp;&nbsp;if ( strpos( $_SERVER['REQUEST_URI'], 'admin.php?page=rvy-revisions' ) ) return;"
 
-#: rvy_init.php:414
+#: rvy_init.php:425
 msgid "Scheduled Revisions"
 msgstr "Revisioni programmate"
 
-#: rvy_init.php:388 rvy_init.php:520
+#: rvy_init.php:399 rvy_init.php:531
 msgid "Submit Revision"
 msgstr "Invia revisione"
 
-#: admin/post-editor-workflow-ui_rvy.php:201
-#: admin/post-editor-workflow-ui_rvy.php:221
+#: admin/post-editor-workflow-ui_rvy.php:203
+#: admin/post-editor-workflow-ui_rvy.php:223
 msgid "Update"
 msgstr "Aggiorna"
 
-#: rvy_init.php:405 rvy_init.php:406
+#: rvy_init.php:416 rvy_init.php:417
 msgid "Schedule Revision"
 msgstr "Revisione programmata"
 
-#: admin/class-list-table_rvy.php:1186 admin/revision-ui_rvy.php:391
+#: admin/class-list-table_rvy.php:1231 admin/revision-ui_rvy.php:391
 msgid "Delete"
 msgstr "Elimina"
 
-#: admin/admin_rvy.php:200 admin/admin_rvy.php:216
+#: admin/admin_rvy.php:217 admin/admin_rvy.php:233
 msgid "Revisions"
 msgstr "Revisioni"
 
-#: admin/post-edit_rvy.php:26 admin/post-edit_rvy.php:73
+#: admin/post-edit_rvy.php:26 admin/post-edit_rvy.php:80
 msgid "Current Time"
 msgstr "Ora attuale"
 
-#: admin/admin-posts_rvy.php:187 admin/class-list-table_rvy.php:576
-#: admin/class-list-table_rvy.php:1166 admin/post-editor-workflow-ui_rvy.php:94
-#: admin/post-editor-workflow-ui_rvy.php:186
-#: admin/RevisionEditSubmitMetabox.php:193 front_rvy.php:302
+#: admin/admin-posts_rvy.php:187 admin/class-list-table_rvy.php:615
+#: admin/class-list-table_rvy.php:1211 admin/post-editor-workflow-ui_rvy.php:96
+#: admin/post-editor-workflow-ui_rvy.php:188
+#: admin/RevisionEditSubmitMetabox.php:199 front_rvy.php:308
 msgid "Edit"
 msgstr "Modifica"
 
@@ -1610,13 +1618,13 @@ msgstr "Modifica"
 msgid "M j, Y @ g:i a"
 msgstr "J M, Y @ g:i a"
 
-#: admin/class-list-table_rvy.php:609 admin/class-list-table_rvy.php:1204
+#: admin/class-list-table_rvy.php:648 admin/class-list-table_rvy.php:1249
 #: admin/history_rvy.php:1067 admin/history_rvy.php:1162
-#: admin/post-editor-workflow-ui_rvy.php:48
-#: admin/post-editor-workflow-ui_rvy.php:89
-#: admin/post-editor-workflow-ui_rvy.php:185 admin/post-edit_rvy.php:87
-#: admin/revision-ui_rvy.php:260 admin/RevisionEditSubmitMetabox.php:118
-#: admin/RevisionEditSubmitMetabox.php:121
+#: admin/post-editor-workflow-ui_rvy.php:51
+#: admin/post-editor-workflow-ui_rvy.php:91
+#: admin/post-editor-workflow-ui_rvy.php:187 admin/post-edit_rvy.php:94
+#: admin/revision-ui_rvy.php:260 admin/RevisionEditSubmitMetabox.php:124
+#: admin/RevisionEditSubmitMetabox.php:127
 msgid "Preview"
 msgstr "Anteprima"
 
@@ -1636,15 +1644,15 @@ msgstr "La revisione era prevista per la pubblicazione."
 msgid "The revision was restored."
 msgstr "La revisione è stata ripristinata."
 
-#: front_rvy.php:354 front_rvy.php:374 front_rvy.php:384
+#: front_rvy.php:360 front_rvy.php:380 front_rvy.php:390
 msgid "Publish now"
 msgstr "Pubblica ora"
 
-#: rvy_init.php:1153
+#: rvy_init.php:1168
 msgid "Revision Workflow"
 msgstr "Workflow revisione"
 
-#: rvy_init.php:714
+#: rvy_init.php:729
 msgid "Revisor"
 msgstr "Revisore"
 
