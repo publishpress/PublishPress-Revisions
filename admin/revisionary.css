@@ -412,7 +412,12 @@ width: 99%;
 vertical-align: top;
 }
 
-body.toplevel_page_revisionary-q h1 span.dashicons, body.revisions_page_revisionary-deletion h1 span.dashicons, body.revisions_page_revisionary-settings h1 span.dashicons, body.revisions_page_rvy-net_options h1 span.dashicons, body.revisions_page_rvy-default_options h1 span.dashicons {
+body.toplevel_page_revisionary-q h1 span.dashicons,
+body.revisions_page_revisionary-deletion h1 span.dashicons,
+body.revisions_page_revisionary-settings h1 span.dashicons,
+body.revisions_page_rvy-net_options h1 span.dashicons,
+body.revisions_page_rvy-default_options h1 span.dashicons,
+body.revisions_page_revisionary-archive h1 span.dashicons {
 padding-top:5px;
 }
 

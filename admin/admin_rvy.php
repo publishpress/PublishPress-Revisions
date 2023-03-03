@@ -106,12 +106,12 @@ class RevisionaryAdmin
 
 		add_action('init', function() { // late execution avoids clash with autoloaders in other plugins
 			global $pagenow;
-		
+
 			if (($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-deletion', 'revisionary-settings'])
 			) {
 				global $wp_version;
 
-				if (defined('DISABLE_WP_CRON') && DISABLE_WP_CRON && rvy_get_option('scheduled_revisions', -1, false, ['bypass_condition_check' => true]) 
+				if (defined('DISABLE_WP_CRON') && DISABLE_WP_CRON && rvy_get_option('scheduled_revisions', -1, false, ['bypass_condition_check' => true])
 				&& rvy_get_option('scheduled_publish_cron') && !rvy_get_option('wp_cron_usage_detected') && apply_filters('revisionary_wp_cron_disabled', true)
 				) {
 					rvy_notice(
@@ -137,9 +137,9 @@ class RevisionaryAdmin
 						'PublishPress Revisions',
 						plugin_dir_url(REVISIONARY_FILE) . 'common/img/revisions-wp-logo.jpg'
 					);
-		
+
 					add_filter('publishpress_wp_reviews_display_banner_revisionary', [$this, 'shouldDisplayBanner']);
-		
+
 					$reviews->init();
 				}
 			}
@@ -160,11 +160,11 @@ class RevisionaryAdmin
 	function admin_scripts() {
 		global $pagenow;
 
-		if (in_array($pagenow, ['post.php', 'post-new.php', 'revision.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion']))) {
+		if (in_array($pagenow, ['post.php', 'post-new.php', 'revision.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion', 'revisionary-archive']))) {
 			wp_enqueue_style('revisionary', RVY_URLPATH . '/admin/revisionary.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
 
-		if (in_array($pagenow, ['post.php', 'post-new.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion']))) {
+		if (in_array($pagenow, ['post.php', 'post-new.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion', 'revisionary-archive']))) {
 			wp_enqueue_style('revisionary-admin-common', RVY_URLPATH . '/common/css/pressshack-admin.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
 
@@ -204,6 +204,10 @@ class RevisionaryAdmin
 		require_once( dirname(__FILE__).'/revision-queue_rvy.php');
 	}
 
+	function revision_archive() {
+		require_once( dirname( __FILE__ ).'/revision-archive_rvy.php' );
+	}
+
 	function build_menu() {
 		global $current_user;
 
@@ -234,6 +238,16 @@ class RevisionaryAdmin
 				add_menu_page( esc_html__($_menu_caption, 'pp'), esc_html__($_menu_caption, 'pp'), 'read', 'revisionary-q', array(&$this, 'moderation_queue'), 'dashicons-backup', 29 );
 
 				add_submenu_page('revisionary-q', esc_html__('Revision Queue', 'revisionary'), esc_html__('Revision Queue', 'revisionary'), 'read', 'revisionary-q', [$this, 'moderation_queue']);
+
+				// Revision Archive page
+				add_submenu_page(
+					'revisionary-q',
+					esc_html__( 'Revision Archive', 'revisionary' ),
+					esc_html__( 'Revision Archive', 'revisionary' ),
+					'read',
+					'revisionary-archive',
+					[$this, 'revision_archive']
+				);
 
 				do_action('revisionary_admin_menu');
 			}
