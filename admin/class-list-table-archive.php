@@ -48,7 +48,47 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 									ORDER BY p2.ID DESC
 									LIMIT 0,1
 								)
-							) AS origin_author
+							) AS origin_post_author,
+							IF( r3.comment_count > 0,
+								(
+									SELECT p2.post_date
+									FROM $wpdb->posts p2
+									WHERE p2.ID = (
+										SELECT r3.comment_count
+										FROM $wpdb->posts r3
+										WHERE r.post_parent = r3.ID
+										ORDER BY r3.ID DESC
+										LIMIT 0,1
+									)
+								),
+								(
+									SELECT p2.post_date
+									FROM $wpdb->posts p2
+									WHERE p2.ID = r.post_parent
+									ORDER BY p2.ID DESC
+									LIMIT 0,1
+								)
+							) AS origin_post_date,
+							IF( r3.comment_count > 0,
+								(
+									SELECT p2.post_type
+									FROM $wpdb->posts p2
+									WHERE p2.ID = (
+										SELECT r3.comment_count
+										FROM $wpdb->posts r3
+										WHERE r.post_parent = r3.ID
+										ORDER BY r3.ID DESC
+										LIMIT 0,1
+									)
+								),
+								(
+									SELECT p2.post_type
+									FROM $wpdb->posts p2
+									WHERE p2.ID = r.post_parent
+									ORDER BY p2.ID DESC
+									LIMIT 0,1
+								)
+							) AS origin_post_type
 						FROM $wpdb->posts r
 						LEFT JOIN $wpdb->posts r3 ON r.post_parent = r3.ID
 						WHERE r.post_type = '$post_type'
@@ -78,7 +118,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			'revision_post_date' 	=> __( 'Revision date', 'revisionary' ),
 			'origin_post_date'		=> __( 'Published date', 'revisionary' ),
 			'revision_author'		=> __( 'Revised by', 'revisionary' ),
-			'origin_author'			=> __( 'Author', 'revisionary' ),
+			'origin_post_author'			=> __( 'Author', 'revisionary' ),
         );
     }
 
@@ -100,10 +140,10 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
                 return $item->$column_name;
 				break;
 
-			case 'origin_author':
+			case 'origin_post_author':
 				return get_the_author_meta(
 					'display_name',
-					isset( $item->origin_author ) ? $item->origin_author : $item->revision_author
+					isset( $item->origin_post_author ) ? $item->origin_post_author : $item->revision_author
 				);
 				break;
 
