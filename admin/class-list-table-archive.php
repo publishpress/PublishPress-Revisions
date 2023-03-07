@@ -16,31 +16,48 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
     }
 
     public function prepare_items() {
-		global $wpdb;
+		global $wpdb, $per_page;
 
-		$post_type 	= 'revision';
-		$per_page 	= 10;
-		$paged 		= isset( $_REQUEST['paged'] ) ? max( 0, intval( $_REQUEST['paged'] ) - 1 ) : 0;
-		$offset 	= $paged * $per_page;
-		$query 		= "SELECT r.ID, r.post_title, r.post_date, r.post_parent, r.post_author as revision_author,
-				    (
-				        SELECT p2.post_author
-				        FROM $wpdb->posts p2
-				        WHERE p2.ID = (
-							SELECT r3.comment_count
-							FROM $wpdb->posts r3
-							WHERE r.post_parent = r3.ID
-							ORDER BY r3.ID DESC
-							LIMIT 0,1
-						)
-				    ) AS original_author
-				    FROM $wpdb->posts r
-				    WHERE r.post_type = %s
-				    ORDER BY r.post_modified DESC
-				    LIMIT %d,%d";
-		//$query = "SELECT ID, post_title, post_date, post_author, (SELECT post_author FROM $wpdb->posts WHERE ID = p.post_parent) as author FROM $wpdb->posts p WHERE post_type = %s ORDER BY post_modified DESC LIMIT %d,%d";
-		$results 	= $wpdb->get_results( $wpdb->prepare( $query, $post_type, $offset, $per_page ) );
-        $total_items 	= $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->posts WHERE post_type = %s", $post_type ) );
+		$filter_types	= ['post', 'page', 'product']; // Post types where revisions belongs to
+		$post_type		= 'revision'; // We're looking for revisions
+		$per_page 		= $this->get_items_per_page( 'edit_page_per_page' );
+		$paged 			= isset( $_REQUEST['paged'] ) ? max( 0, intval( $_REQUEST['paged'] ) - 1 ) : 0;
+		$offset 		= $paged * $per_page;
+
+		$base_query		= "SELECT
+							r.ID AS revision_ID,
+							r.post_title AS revision_post_title,
+							r.post_date AS revision_post_date,
+							r.post_author AS revision_author,
+							IF( r3.comment_count > 0,
+								(
+									SELECT p2.post_author
+									FROM $wpdb->posts p2
+									WHERE p2.ID = (
+										SELECT r3.comment_count
+										FROM $wpdb->posts r3
+										WHERE r.post_parent = r3.ID
+										ORDER BY r3.ID DESC
+										LIMIT 0,1
+									)
+								),
+								(
+									SELECT p2.post_author
+									FROM $wpdb->posts p2
+									WHERE p2.ID = r.post_parent
+									ORDER BY p2.ID DESC
+									LIMIT 0,1
+								)
+							) AS origin_author
+						FROM $wpdb->posts r
+						LEFT JOIN $wpdb->posts r3 ON r.post_parent = r3.ID
+						WHERE r.post_type = '$post_type'
+						ORDER BY r.post_modified DESC";
+
+		$posts_query	= $base_query . " LIMIT %d,%d";
+		$results 		= $wpdb->get_results( $wpdb->prepare( $posts_query, $offset, $per_page ) );
+		$count_query	= "SELECT COUNT(*) as total_items FROM ($base_query) as subquery";
+        $total_items 	= $wpdb->get_var( $wpdb->prepare( $count_query ) );
         $this->items 	= $results;
 
 		$this->set_pagination_args( array(
@@ -55,34 +72,38 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
     public function get_columns() {
         return array(
-            'cb' 				=> '<input type="checkbox" />',
-			'post_title' 		=> __( 'Revision', 'revisionary' ),
-			//'post_date' 		=> __( 'Published date', 'revisionary' ),
-			'post_date' 		=> __( 'Revision date', 'revisionary' ),
+            'cb'					=> '<input type="checkbox" />',
+			'revision_post_title' 	=> __( 'Revision', 'revisionary' ),
+			'origin_post_type' 		=> __( 'Post type', 'revisionary' ),
+			'revision_post_date' 	=> __( 'Revision date', 'revisionary' ),
+			'origin_post_date'		=> __( 'Published date', 'revisionary' ),
 			'revision_author'		=> __( 'Revised by', 'revisionary' ),
-			'original_author'	=> __( 'Author', 'revisionary' ),
+			'origin_author'			=> __( 'Author', 'revisionary' ),
         );
     }
 
     public function column_default( $item, $column_name ) {
         switch ( $column_name ) {
-            case 'post_title':
+            case 'revision_post_title':
 				return sprintf(
-					'<a class="row-title rvy-open-popup" href="#" data-label="%s" data-link="%s">%s</a>' . ' (' . $item->ID . ')',
+					'<a class="row-title rvy-open-popup" href="#" data-label="%s" data-link="%s">%s</a>' . ' (' . $item->revision_ID . ')',
 					esc_attr( $item->$column_name ),
-					get_edit_post_link( $item->ID ) . '&width=900&height=600&rvy-popup=true&TB_iframe=1', //admin_url( 'admin.php?page=revisionary-archive-single&rvy-popup=true&width=900&height=700&revision=' . $item->ID ),
+					get_edit_post_link( $item->ID ) . '&width=900&height=600&rvy-popup=true&TB_iframe=1',
 					$item->$column_name
 				);
 				break;
 
-			case 'post_date':
+			case 'revision_post_date':
+			case 'revision_post_type':
+			case 'origin_post_date':
+			case 'origin_post_type':
                 return $item->$column_name;
 				break;
 
-			case 'original_author':
+			case 'origin_author':
 				return get_the_author_meta(
 					'display_name',
-					isset( $item->original_author ) ? $item->original_author : $item->revision_author
+					isset( $item->origin_author ) ? $item->origin_author : $item->revision_author
 				);
 				break;
 
