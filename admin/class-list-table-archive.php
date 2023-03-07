@@ -18,7 +18,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
     public function prepare_items() {
 		global $wpdb, $per_page;
 
-		$filter_types	= ['post', 'page', 'product']; // Post types where revisions belongs to
+		$filter_types	= array_map( 'sanitize_key', ['post', 'page'] ); // Post types where revisions belongs to
 		$post_type		= 'revision'; // We're looking for revisions
 		$per_page 		= $this->get_items_per_page( 'edit_page_per_page' );
 		$paged 			= isset( $_REQUEST['paged'] ) ? max( 0, intval( $_REQUEST['paged'] ) - 1 ) : 0;
@@ -92,6 +92,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 						FROM $wpdb->posts r
 						LEFT JOIN $wpdb->posts r3 ON r.post_parent = r3.ID
 						WHERE r.post_type = '$post_type'
+						HAVING origin_post_type IN( '" . implode("','", $filter_types ) . "')
 						ORDER BY r.post_modified DESC";
 
 		$posts_query	= $base_query . " LIMIT %d,%d";
