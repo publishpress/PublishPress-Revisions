@@ -37,20 +37,32 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$offset 		= $paged * $per_page;
 
 		// Filters
-		$filters		= isset( $_REQUEST['origin_post_type'] )
+		$having_filters = isset( $_REQUEST['origin_post_type'] )
 							? "HAVING origin_post_type = '" . sanitize_key( $_REQUEST['origin_post_type'] ) . "'"
 							: "HAVING origin_post_type IN ('" . implode( "','", $this->post_types ) . "')";
 
-		$filters	   .= isset( $_REQUEST['origin_post_author'] )
+		$having_filters.= isset( $_REQUEST['origin_post_author'] )
 								? " AND origin_post_author = " . (int) $_REQUEST['origin_post_author']
 								: "";
+
+		$having_filters.= isset( $_REQUEST['revision_post_author'] )
+								? " AND revision_post_author = " . (int) $_REQUEST['revision_post_author']
+								: "";
+
+		$order_by		= isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], ['origin_post_date', 'revision_post_date'] )
+							? sanitize_key( $_REQUEST['orderby'] )
+							: 'revision_post_date';
+
+		$order			= isset( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], ['asc', 'desc'] )
+							? sanitize_key( $_REQUEST['order'] )
+							: 'desc';
 
 		// @TODO - Optimize query
 		$base_query		= "SELECT
 							r.ID AS ID,
 							r.post_title AS revision_post_title,
 							r.post_date AS revision_post_date,
-							r.post_author AS revision_author,
+							r.post_author AS revision_post_author,
 							IF( r3.comment_count > 0,
 								(
 									SELECT p2.post_author
@@ -114,8 +126,8 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 						FROM $wpdb->posts r
 						LEFT JOIN $wpdb->posts r3 ON r.post_parent = r3.ID
 						WHERE r.post_type = 'revision'
-						{$filters}
-						ORDER BY revision_post_date DESC";
+						{$having_filters}
+						ORDER BY {$order_by} {$order}";
 
 		$posts_query	= $base_query . " LIMIT %d,%d";
 		$results 		= $wpdb->get_results( $wpdb->prepare( $posts_query, $offset, $per_page ) );
@@ -140,7 +152,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			'origin_post_type' 		=> __( 'Post type', 'revisionary' ),
 			'revision_post_date' 	=> __( 'Revision date', 'revisionary' ),
 			'origin_post_date'		=> __( 'Published date', 'revisionary' ),
-			'revision_author'		=> __( 'Revised by', 'revisionary' ),
+			'revision_post_author'		=> __( 'Revised by', 'revisionary' ),
 			'origin_post_author'			=> __( 'Author', 'revisionary' ),
         );
     }
@@ -156,21 +168,36 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				);
 				break;
 
+			case 'origin_post_type':
+				return $this->build_filter_url(
+					$item->$column_name,
+					[
+						'origin_post_type' => sanitize_key( $item->$column_name )
+					]
+				);
+				break;
+
 			case 'revision_post_date':
 			case 'origin_post_date':
-			case 'origin_post_type':
                 return $item->$column_name;
 				break;
 
 			case 'origin_post_author':
-				return '<a href="' . admin_url( 'admin.php?page=revisionary-archive&origin_post_author=' . (int) $item->origin_post_author ) . '">' . get_the_author_meta(
-					'display_name',
-					$item->origin_post_author
-				) . '</a>';
+				return $this->build_filter_url(
+					get_the_author_meta( 'display_name', $item->$column_name ),
+					[
+						'origin_post_author' => (int) $item->$column_name
+					]
+				);
 				break;
 
-			case 'revision_author':
-                return get_the_author_meta( 'display_name', $item->$column_name );
+			case 'revision_post_author':
+				return $this->build_filter_url(
+					get_the_author_meta( 'display_name', $item->$column_name ),
+					[
+						'revision_post_author' => (int) $item->$column_name
+					]
+				);
 				break;
 
 			default:
@@ -227,19 +254,71 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 	protected function get_sortable_columns() {
 		return [
-			'origin_post_date' => 'origin_post_date',
+			'origin_post_date' 		=> 'origin_post_date',
+			'revision_post_date' 	=> 'revision_post_date',
+			'origin_post_type'		=> 'origin_post_type'
 		];
 	}
 
+	/**
+	 * Generate all the hidden input fields to use as filters in database
+	 *
+	 * @return html
+	 */
 	public function hidden_input() {
 		?>
 		<input type="hidden" name="page" value="revisionary-archive" />
 		<?php
-		if( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) ) :
+		$this->single_hidden_input( 'origin_post_type' );
+		$this->single_hidden_input( 'origin_post_author', true );
+		$this->single_hidden_input( 'revision_post_author', true );
+	}
+
+	/**
+	 * Generate hidden input fields to use as filters in database
+	 *
+	 * @param string $field	The field name from database query
+	 * @param bool $integer	The field is a number?
+	 *
+	 * @return html
+	 */
+	public function single_hidden_input( $field, $integer = false ) {
+		if( isset( $_REQUEST[$field] ) && ! empty( $_REQUEST[$field] ) ) :
 			?>
-			<input type="hidden" name="origin_post_author" value="<?php echo (int) $_REQUEST['origin_post_author'] ?>" />
+			<input type="hidden"
+				name="<?php echo $field ?>"
+				value="<?php echo $integer ? (int) $_REQUEST[$field] : sanitize_key( $_REQUEST[$field] ) ?>" />
 			<?php
 		endif;
+	}
+
+	/**
+	 * Generate hidden input fields to use as filters in database
+	 *
+	 * @param string $label	The label to display
+	 * @param array $args	URL parameters
+	 *
+	 * @return html
+	 */
+	public function build_filter_url( $label, $args ) {
+		$args = array_merge(
+			[
+				'page' => 'revisionary-archive'
+			],
+			$args
+		);
+
+		// Include origin_post_type filter if exists
+		if( isset( $_REQUEST['origin_post_type'] ) ) {
+			$args = array_merge(
+				[
+					'origin_post_type' => sanitize_key( $_REQUEST['origin_post_type'] )
+				],
+				$args
+			);
+		}
+
+		return '<a href="' . add_query_arg( $args, admin_url( 'admin.php' ) ) . '">' . sanitize_text_field( $label ) . '</a>';
 	}
 
 	/**
