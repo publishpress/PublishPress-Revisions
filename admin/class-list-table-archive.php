@@ -2,8 +2,11 @@
 require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 
 class Revisionary_Archive_List_Table extends WP_List_Table {
+	private $post_types = [];
 
 	public function __construct( $args ) {
+		global $revisionary;
+
 		$args = wp_parse_args(
 			$args,
 			[
@@ -13,19 +16,38 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		);
 
 		parent::__construct( $args );
+
+		// We only support these post types if enabled in Revisions settings
+		$this->post_types = array_intersect( ['post', 'page'], array_keys( $revisionary->enabled_post_types ) );
+
+		$omit_types 		= ['forum', 'topic', 'reply'];
+		$this->post_types 	= array_diff( $this->post_types, $omit_types );
+
+		/*echo '<pre>';
+		var_dump($_REQUEST);
+		var_dump($_SERVER['REQUEST_URI']);
+		echo '</pre>';*/
     }
 
     public function prepare_items() {
 		global $wpdb, $per_page;
 
-		$filter_types	= array_map( 'sanitize_key', ['post', 'page'] ); // Post types where revisions belongs to
-		$post_type		= 'revision'; // We're looking for revisions
 		$per_page 		= $this->get_items_per_page( 'edit_page_per_page' );
 		$paged 			= isset( $_REQUEST['paged'] ) ? max( 0, intval( $_REQUEST['paged'] ) - 1 ) : 0;
 		$offset 		= $paged * $per_page;
 
+		// Filters
+		$filters		= isset( $_REQUEST['origin_post_type'] )
+							? "HAVING origin_post_type = '" . sanitize_key( $_REQUEST['origin_post_type'] ) . "'"
+							: "HAVING origin_post_type IN ('" . implode( "','", $this->post_types ) . "')";
+
+		$filters	   .= isset( $_REQUEST['origin_post_author'] )
+								? " AND origin_post_author = " . (int) $_REQUEST['origin_post_author']
+								: "";
+
+		// @TODO - Optimize query
 		$base_query		= "SELECT
-							r.ID AS revision_ID,
+							r.ID AS ID,
 							r.post_title AS revision_post_title,
 							r.post_date AS revision_post_date,
 							r.post_author AS revision_author,
@@ -91,9 +113,9 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 							) AS origin_post_type
 						FROM $wpdb->posts r
 						LEFT JOIN $wpdb->posts r3 ON r.post_parent = r3.ID
-						WHERE r.post_type = '$post_type'
-						HAVING origin_post_type IN( '" . implode("','", $filter_types ) . "')
-						ORDER BY r.post_modified DESC";
+						WHERE r.post_type = 'revision'
+						{$filters}
+						ORDER BY revision_post_date DESC";
 
 		$posts_query	= $base_query . " LIMIT %d,%d";
 		$results 		= $wpdb->get_results( $wpdb->prepare( $posts_query, $offset, $per_page ) );
@@ -127,7 +149,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
         switch ( $column_name ) {
             case 'revision_post_title':
 				return sprintf(
-					'<a class="row-title rvy-open-popup" href="#" data-label="%s" data-link="%s">%s</a>' . ' (' . $item->revision_ID . ')',
+					'<a class="row-title rvy-open-popup" href="#" data-label="%s" data-link="%s">%s</a>' . ' (' . $item->ID . ')',
 					esc_attr( $item->$column_name ),
 					get_edit_post_link( $item->ID ) . '&width=900&height=600&rvy-popup=true&TB_iframe=1',
 					$item->$column_name
@@ -135,17 +157,16 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				break;
 
 			case 'revision_post_date':
-			case 'revision_post_type':
 			case 'origin_post_date':
 			case 'origin_post_type':
                 return $item->$column_name;
 				break;
 
 			case 'origin_post_author':
-				return get_the_author_meta(
+				return '<a href="' . admin_url( 'admin.php?page=revisionary-archive&origin_post_author=' . (int) $item->origin_post_author ) . '">' . get_the_author_meta(
 					'display_name',
-					isset( $item->origin_post_author ) ? $item->origin_post_author : $item->revision_author
-				);
+					$item->origin_post_author
+				) . '</a>';
 				break;
 
 			case 'revision_author':
@@ -162,6 +183,64 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
             '<input type="checkbox" name="post[]" value="%s" />', $item->ID
         );
     }
+
+	protected function extra_tablenav( $which ) {
+		?>
+		<div class="alignleft actions">
+		<?php
+		if ( 'top' === $which ) {
+			ob_start();
+
+			$this->post_types_dropdown();
+
+			$output = ob_get_clean();
+
+			if ( ! empty( $output ) ) {
+				echo $output;
+				submit_button( __( 'Filter' ), '', 'filter_action', false, array( 'id' => 'post-query-submit' ) );
+			}
+		}
+		?>
+		</div>
+		<?php
+	}
+
+	protected function post_types_dropdown() {
+		$current_option = isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] )
+							? sanitize_key( $_REQUEST['origin_post_type'] )
+							: '';
+		?>
+		<select name="origin_post_type" class="postform">
+			<option <?php echo $current_option === '' ? 'selected' : '' ?>
+				value="">
+				<?php esc_html_e( 'All post types', 'revisionary' ) ?>
+			</option>
+			<?php foreach( $this->post_types as $type ) : ?>
+				<option <?php echo $current_option === $type ? 'selected' : '' ?>
+					value="<?php echo $type ?>">
+					<?php echo $type ?>
+				</option>
+			<?php endforeach; ?>
+		</select>
+		<?php
+	}
+
+	protected function get_sortable_columns() {
+		return [
+			'origin_post_date' => 'origin_post_date',
+		];
+	}
+
+	public function hidden_input() {
+		?>
+		<input type="hidden" name="page" value="revisionary-archive" />
+		<?php
+		if( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) ) :
+			?>
+			<input type="hidden" name="origin_post_author" value="<?php echo (int) $_REQUEST['origin_post_author'] ?>" />
+			<?php
+		endif;
+	}
 
 	/**
 	 * Override WP_Posts_List_Table::no_items

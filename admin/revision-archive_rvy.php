@@ -37,8 +37,11 @@ $wp_list_table->prepare_items();
 			<?php esc_html_e( 'Revision Archive', 'revisionary' ) ?>
 		</h1>
 	</header>
-	<form method="post">
-        <?php $wp_list_table->display(); ?>
+	<form method="get">
+		<?php
+		$wp_list_table->hidden_input();
+		$wp_list_table->display();
+		?>
     </form>
 
 	<?php do_action( 'revisionary_admin_footer' ); ?>
