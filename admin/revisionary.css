@@ -820,3 +820,11 @@ margin-bottom: 5px;
 .ppseries-content-promo-box.advertisement-box-content {
   border: 1px solid #655897;
 }
+
+table th#revision_post_date,
+table th#origin_post_type,
+table th#origin_post_date,
+table th#revision_post_author,
+table th#origin_post_author {
+  width: 12%;
+}

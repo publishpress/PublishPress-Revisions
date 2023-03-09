@@ -196,8 +196,8 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			'revision_post_title' 	=> __( 'Revision', 'revisionary' ),
 			'origin_post_type' 		=> __( 'Post Type', 'revisionary' ),
 			'revision_post_date' 	=> __( 'Revision Date', 'revisionary' ),
-			'origin_post_date'		=> __( 'Published Date', 'revisionary' ),
 			'revision_post_author'	=> __( 'Revised By', 'revisionary' ),
+			'origin_post_date'		=> __( 'Published Date', 'revisionary' ),
 			'origin_post_author'	=> __( 'Author', 'revisionary' ),
         );
     }
@@ -225,7 +225,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				floor( $time_diff / 3600 )
 			);
 		} else {
-			$result = date( 'M j, Y', $timestamp );
+			$result = date( 'M j, Y h:i a', $timestamp );
 		}
 
 		$saved_time = date( 'Y/m/d H:i:s' );
@@ -236,16 +236,17 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
     public function column_default( $item, $column_name ) {
         switch ( $column_name ) {
             case 'revision_post_title':
-				return sprintf(
-					'<a class="row-title rvy-open-popup" href="#" data-label="%s" data-link="%s">%s</a>' . ' (' . $item->ID . ')',
+				printf(
+					'<strong><a class="row-title rvy-open-popup" href="#" data-label="%s" data-link="%s">%s</a>' . ' (' . $item->ID . ')</strong>',
 					esc_attr( $item->$column_name ),
 					get_edit_post_link( $item->ID ) . '&width=900&height=600&rvy-popup=true&TB_iframe=1',
 					$item->$column_name
 				);
+				echo $this->handle_revision_row_actions( $item );
 				break;
 
 			case 'origin_post_type':
-				return $this->build_filter_url(
+				echo $this->build_filter_url(
 					$item->$column_name,
 					[
 						'origin_post_type' => sanitize_key( $item->$column_name )
@@ -259,7 +260,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				break;
 
 			case 'origin_post_author':
-				return $this->build_filter_url(
+				echo $this->build_filter_url(
 					get_the_author_meta( 'display_name', $item->$column_name ),
 					[
 						'origin_post_author' => (int) $item->$column_name
@@ -268,7 +269,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				break;
 
 			case 'revision_post_author':
-				return $this->build_filter_url(
+				echo $this->build_filter_url(
 					get_the_author_meta( 'display_name', $item->$column_name ),
 					[
 						'revision_post_author' => (int) $item->$column_name
@@ -327,10 +328,12 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				value="">
 				<?php esc_html_e( 'All post types', 'revisionary' ) ?>
 			</option>
-			<?php foreach( $this->post_types as $type ) : ?>
+			<?php foreach( $this->post_types as $type ) :
+				$type_obj = get_post_type_object( $type );
+				?>
 				<option <?php echo $current_option === $type ? 'selected' : '' ?>
 					value="<?php echo $type ?>">
-					<?php echo $type ?>
+					<?php echo $type_obj->labels->singular_name; ?>
 				</option>
 			<?php endforeach; ?>
 		</select>
@@ -370,6 +373,57 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			</li>
 		</ul>
 		<?php
+	}
+
+	protected function handle_revision_row_actions( $item ) {
+		$actions 			= [];
+		$title				= _draft_or_post_title();
+		$can_read_post		= current_user_can( 'read_post', $item->ID );
+		$can_edit_post		= current_user_can( 'edit_post', $item->ID );
+		$can_delete_post	= current_user_can( 'delete_post', $item->ID );
+		$post_type_object 	= get_post_type_object( $item->origin_post_type );
+
+		if ( $can_delete_post ) {
+			if ( $delete_link = get_delete_post_link( $item->ID, '', true ) ) {
+				$actions['delete'] = sprintf(
+					'<a href="%1$s" class="submitdelete" title="%2$s" aria-label="%2$s">%3$s</a>',
+					$delete_link,
+					esc_attr( sprintf( esc_html__( 'Delete Revision', 'revisionary' ), $title ) ),
+					esc_html__( 'Delete' )
+				);
+			}
+		}
+
+		if ( $can_read_post || $can_edit_post ) {
+			$actions['diff'] = sprintf(
+				'<a href="%1$s" class="" title="%2$s" aria-label="%2$s" target="_revision_diff">%3$s</a>',
+				admin_url( "revision.php?revision=$item->ID" ),
+				esc_attr( sprintf( esc_html__('Compare Changes', 'revisionary'), $title ) ),
+				_x( 'Compare', 'revisions', 'revisionary' )
+			);
+		}
+
+		if ( is_post_type_viewable( $post_type_object ) ) {
+			if ( $can_read_post && $post_type_object && ! empty( $post_type_object->public ) ) {
+				if ( rvy_get_option( 'revision_preview_links' ) || current_user_can('administrator') || is_super_admin() ) {
+					do_action('pp_revisions_get_post_link', $item->ID);
+
+					$preview_link = rvy_preview_url( $item );
+
+					$preview_link = remove_query_arg( 'preview_id', $preview_link );
+					$actions['view'] = sprintf(
+						'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
+						esc_url( $preview_link ),
+						esc_attr( esc_html__( 'Preview Revision', 'revisionary' ) ),
+						esc_html__( 'Preview' )
+					);
+
+					do_action('pp_revisions_post_link_done', $item->ID);
+				}
+			}
+		}
+
+		return $this->row_actions( $actions );
 	}
 
 	/**
