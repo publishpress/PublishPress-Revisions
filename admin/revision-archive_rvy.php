@@ -40,7 +40,7 @@ $wp_list_table->prepare_items();
 	<?php $wp_list_table->views(); ?>
 	<form method="get">
 		<?php
-		$wp_list_table->search_box( 'Search Revisions', 'post' );
+		$wp_list_table->search_box( 'Search Revisions', 'revision' );
 		$wp_list_table->hidden_input();
 		$wp_list_table->display();
 		?>
