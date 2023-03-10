@@ -19,17 +19,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 		parent::__construct( $args );
 
-		// We only support these post types if enabled in Revisions settings
-		$this->post_types = array_intersect( ['post', 'page'], array_keys( $revisionary->enabled_post_types ) );
-
-		$omit_types 		= ['forum', 'topic', 'reply'];
-		$this->post_types 	= array_diff( $this->post_types, $omit_types );
-
-		/*/echo count($_REQUEST);
-		echo '<pre>';
-		var_dump($_REQUEST);
-		//var_dump($_SERVER['REQUEST_URI']);
-		echo '</pre>';*/
+		$this->post_types = array_keys( $revisionary->enabled_post_types );
     }
 
     public function prepare_items() {
@@ -91,7 +81,6 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$where .= $search && isset( $_REQUEST['s'] ) && ! empty( trim( $_REQUEST['s'] ) )
 					? " AND LOWER(r.post_title) LIKE '%" . strtolower( sanitize_text_field( trim( $_REQUEST['s'] ) ) ) . "%'"
 					: "";
-
 
 		// @TODO - Optimize query
 		return "SELECT
