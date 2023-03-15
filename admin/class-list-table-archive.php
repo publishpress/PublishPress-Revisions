@@ -22,68 +22,99 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$this->post_types = array_keys( $revisionary->enabled_post_types );
     }
 
+	/**
+	 * Override WP_List_Table::prepare_items()
+	 */
     public function prepare_items() {
 		global $wpdb, $per_page, $current_user;
 
 		$per_page 		= $this->get_items_per_page( 'edit_page_per_page' );
 		$paged 			= isset( $_REQUEST['paged'] ) ? max( 0, intval( $_REQUEST['paged'] ) - 1 ) : 0;
 		$offset 		= $paged * $per_page;
+		$orderby		= isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], ['origin_post_date', 'revision_post_date'] )
+			? sanitize_key( $_REQUEST['orderby'] )
+			: 'revision_post_date';
+
+		$order			= isset( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], ['asc', 'desc'] )
+			? sanitize_key( strtoupper( $_REQUEST['order'] ) )
+			: 'DESC';
 
 		// Filters
-		$having			= $this->having_filter( [
-							'origin_post_author' 	=> isset( $_REQUEST['origin_post_author'] )
-														? (int) $_REQUEST['origin_post_author']
-														: null,
-							'revision_post_author' 	=> isset( $_REQUEST['revision_post_author'] )
-														? (int) $_REQUEST['revision_post_author']
-														: null
-						] );
-		$order_by		= $this->orderby_filter();
-		$order			= $this->order_filter();
-		$base_query		= $this->base_query(
-							$having,
-							$order_by,
-							$order,
-							true
-						);
-		$results 		= $wpdb->get_results( $wpdb->prepare( $base_query . " LIMIT {$offset},{$per_page}" ) );
-		$count_query	= $this->count_query( $base_query );
-        $total_items 	= $wpdb->get_var( $wpdb->prepare( $count_query ) );
-        $this->items 	= $results;
+		$base_query = $this->do_query(
+			[],
+			$orderby,
+			$order
+		);
+
+		$results = $wpdb->get_results(
+			$wpdb->prepare(
+				$base_query . ' LIMIT %d,%d',
+				$offset,
+				$per_page
+			)
+		);
+
+		$total_items = $wpdb->get_var(
+			$wpdb->prepare(
+				$this->count_query( 'total_items', $base_query )
+			)
+		);
 
 		$this->set_pagination_args( [
             'total_items' => $total_items,
             'per_page'    => $per_page,
         ] );
 
-		// Get revisions count to use in view links
-		$all_revisions_base_query	= $this->base_query( $this->having_filter() );
-		$this->all_revisions_count 	= $wpdb->get_var( $wpdb->prepare(
-			$this->count_query( $all_revisions_base_query )
-		) );
+		$this->items = $results;
 
-		$my_revisions_base_query	= $this->base_query( $this->having_filter( ['revision_post_author' => $current_user->ID] ) );
-		$this->my_revisions_count 	= $wpdb->get_var( $wpdb->prepare(
-			$this->count_query( $my_revisions_base_query )
-		) );
+		// 'All Revisions' link with count
+		$this->all_revisions_count = $wpdb->get_var(
+			$wpdb->prepare(
+				$this->count_query( 'all_items', $base_query )
+			)
+		);
+
+		// 'My Revisions' link with count
+		$this->my_revisions_count = $wpdb->get_var(
+			$wpdb->prepare(
+				$this->count_query(
+					'my_items',
+					$this->do_query(
+						[
+							['revision_post_author' => $current_user->ID]
+						]
+					)
+				)
+			)
+		);
     }
 
-	private function count_query( $base ) {
-		return "SELECT COUNT(*) as total_items FROM ($base) as subquery";
+	/**
+	 * Generate hidden input fields to use as filters in database
+	 *
+	 * @param string $alias	A string to differentiate the query for debugging purposes
+	 * @param string  $base	The do_query() query to count records from
+	 *
+	 * @return string
+	 */
+	private function count_query( $alias, $base ) {
+		return "SELECT COUNT(*) as {$alias} FROM ($base) as {$alias}_subquery";
 	}
 
-	private function base_query( $having, $order_by = 'revision_post_date', $order = 'DESC', $search = false ) {
+	/**
+	 * Build database query select to retrieve data to display later in table
+	 *
+	 * @param string $orderby	The database field to order by (can be an alias from the query)
+	 * @param string $order 	Sort results in DESC or ASC
+	 * @param array $having 	Array with database fields from query select to override filters
+	 *
+	 * @return string
+	 */
+	private function do_query( $args = [], $orderby = 'revision_post_date', $order = 'DESC' ) {
 		global $wpdb;
 
-		$where 	= "WHERE r.post_type = 'revision'";
-
-		// Only when search is enabled
-		$where .= $search && isset( $_REQUEST['s'] ) && ! empty( trim( $_REQUEST['s'] ) )
-					? " AND LOWER(r.post_title) LIKE '%" . strtolower( sanitize_text_field( trim( $_REQUEST['s'] ) ) ) . "%'"
-					: "";
-
 		// @TODO - Optimize query
-		return "SELECT
+		$query = "SELECT
 			r.ID AS ID,
 			r.post_title AS revision_post_title,
 			r.post_date AS revision_post_date,
@@ -150,35 +181,109 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			) AS origin_post_type
 		FROM $wpdb->posts r
 		LEFT JOIN $wpdb->posts r3 ON r.post_parent = r3.ID
-		{$where}
-		{$having}
-		ORDER BY {$order_by} {$order}";
-	}
+		WHERE r.post_type = 'revision'";
 
-	private function orderby_filter() {
-		return isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], ['origin_post_date', 'revision_post_date'] )
-							? sanitize_key( $_REQUEST['orderby'] )
-							: 'revision_post_date';
-	}
-
-	private function order_filter() {
-		return isset( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], ['asc', 'desc'] )
-							? sanitize_key( $_REQUEST['order'] )
-							: 'desc';
-	}
-
-	private function having_filter( $columns = [] ) {
-		$filter = isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] )
-							? "HAVING origin_post_type = '" . sanitize_key( $_REQUEST['origin_post_type'] ) . "'"
-							: "HAVING origin_post_type IN ('" . implode( "','", $this->post_types ) . "')";
-
-		foreach( $columns as $key => $value ) {
-			$filter .= $value ? " AND {$key} = " . $value : "";
+		// Only when Search input is valid
+		if( isset( $_REQUEST['s'] ) && ! empty( trim( $_REQUEST['s'] ) ) ) {
+			$query .= $wpdb->prepare(
+				" AND LOWER(r.post_title) LIKE '%s'",
+				'%' . $wpdb->esc_like( strtolower( sanitize_text_field( trim( $_REQUEST['s'] ) ) ) ) . '%'
+			);
 		}
 
-		return $filter;
+		$count = 0;
+
+		// Filter by origin_post_author from URL/form params
+		if( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) ) {
+			$query .= $wpdb->prepare(
+				$this->having_and( $count ) .
+				' origin_post_author LIKE %d',
+				$wpdb->esc_like( $_REQUEST['origin_post_author'] )
+			);
+			$count++;
+		}
+
+		// Filter by revision_post_author from URL/form params
+		if( isset( $_REQUEST['revision_post_author'] )
+			&& ! empty( $_REQUEST['revision_post_author'] )
+			&& ! $this->key_exists_in_args( $args, 'revision_post_author' )
+		) {
+			$query .= $wpdb->prepare(
+				$this->having_and( $count ) .
+				' revision_post_author LIKE %d',
+				$wpdb->esc_like( $_REQUEST['revision_post_author'] )
+			);
+			$count++;
+		}
+
+		// Filter by origin_post_type from URL/form params
+		if( isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] ) ) {
+			$query .= $wpdb->prepare(
+				$this->having_and( $count ) .
+				' origin_post_type LIKE %s AND origin_post_type IN ("' . implode('","', $this->post_types ) . '")',
+				$wpdb->esc_like( $_REQUEST['origin_post_type'] )
+			);
+			$count++;
+		} else {
+			$query .= $wpdb->prepare(
+				' ' . $this->having_and( $count ) .
+				' origin_post_type IN ("' . implode('","', $this->post_types ) . '")'
+			);
+			$count++;
+		}
+
+		/* Filter by revision_post_author as filter to build a different query to output different data
+		   e.g. A link to 'My Revisions' above the list table */
+		if( count( $args ) && $this->key_exists_in_args( $args, 'revision_post_author' ) ) {
+			$query .= $wpdb->prepare(
+				$this->having_and( $count ) .
+				' revision_post_author LIKE %d',
+				$wpdb->esc_like( $this->key_exists_in_args( $args, 'revision_post_author' ) )
+			);
+			$count++;
+		}
+
+		// Set order by and order
+		$query .= $wpdb->prepare(
+			" ORDER BY {$orderby} " . strtoupper( $order )
+		);
+
+		return $query;
 	}
 
+	/**
+	 * Check if a key exists inside a 2-level array
+	 *
+	 * @param string $friend	Which key are we looking in an array
+	 * @return string
+	 */
+	private function key_exists_in_args( $array, $find ) {
+		foreach ( $array as $item ) {
+			if ( array_key_exists( $find, $item ) ) {
+				$find_value = $item[$find];
+				break;
+			}
+		}
+
+		if ( isset( $find_value ) ) {
+			return $find_value;
+		}
+
+		return false;
+	}
+
+	/**
+	 * HAVING clause helper to build dynamic query
+	 *
+	 * @return string
+	 */
+	private function having_and( $count ) {
+		return $count > 0 ? ' AND' : ' HAVING';
+	}
+
+	/**
+	 * Override WP_List_Table::get_columns()
+	 */
     public function get_columns() {
         return array(
             'cb'					=> '<input type="checkbox" />',
@@ -191,6 +296,11 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
         );
     }
 
+	/**
+	 * Make post datetime friendly
+	 *
+	 * @return html
+	 */
 	public function friendly_date( $time ) {
 		$timezone = get_option( 'timezone_string' );
 		if ( $timezone ) {
@@ -222,6 +332,9 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		return '<abbr title="' . esc_attr( $saved_time ) . '">' . $result . '</abbr>';
 	}
 
+	/**
+	 * Override WP_List_Table::column_default()
+	 */
     public function column_default( $item, $column_name ) {
         switch ( $column_name ) {
             case 'revision_post_title':
@@ -271,12 +384,18 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
         }
     }
 
+	/**
+	 * Override WP_List_Table::column_cb()
+	 */
     public function column_cb( $item ) {
         return sprintf(
             '<input type="checkbox" name="post[]" value="%s" />', $item->ID
         );
     }
 
+	/**
+	 * Override WP_List_Table::extra_tablenav()
+	 */
 	protected function extra_tablenav( $which ) {
 		?>
 		<div class="alignleft actions">
@@ -307,6 +426,11 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		<?php
 	}
 
+	/**
+	 * Create dropdown to list and switch post types filter
+	 *
+	 * @return html
+	 */
 	protected function post_types_dropdown() {
 		$current_option = isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] )
 							? sanitize_key( $_REQUEST['origin_post_type'] )
@@ -329,6 +453,9 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		<?php
 	}
 
+	/**
+	 * Override WP_List_Table::get_sortable_columns()
+	 */
 	protected function get_sortable_columns() {
 		return [
 			'origin_post_date' 		=> 'origin_post_date',
@@ -336,6 +463,9 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		];
 	}
 
+	/**
+	 * Override WP_List_Table::get_views()
+	 */
 	protected function get_views() {
 		global $current_user;
 		?>
@@ -364,6 +494,9 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		<?php
 	}
 
+	/**
+	 * Override WP_List_Table::extra_tablenav()
+	 */
 	protected function handle_revision_row_actions( $item ) {
 		$actions 			= [];
 		$title				= _draft_or_post_title();
@@ -450,12 +583,13 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	/**
 	 * Generate hidden input fields to use as filters in database
 	 *
-	 * @param string $label	The label to display
-	 * @param array $args	URL parameters
+	 * @param string $label		The label to display
+	 * @param array $args		URL filter parameters for the generated link
+	 * @param integer $count	Number of records to display
 	 *
 	 * @return html
 	 */
-	public function build_filter_url( $label, $args, $count = false ) {
+	public function build_filter_url( $label, $args, $count = null ) {
 		$args = array_merge(
 			[
 				'page' => 'revisionary-archive'
@@ -473,14 +607,13 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			);
 		}
 
-		$count = $count ? ' <span class="count">(' . $count . ')</span>' : '';
+		$count = $count ==! null ? ' <span class="count">(' . $count . ')</span>' : '';
 
 		return '<a href="' . add_query_arg( $args, admin_url( 'admin.php' ) ) . '">' . sanitize_text_field( $label ) . $count . '</a>';
 	}
 
 	/**
-	 * Override WP_Posts_List_Table::no_items
-	 *
+	 * Override WP_List_Table::no_items()
 	 */
 	public function no_items() {
 		_e( 'No revisions found.', 'revisionary' );
