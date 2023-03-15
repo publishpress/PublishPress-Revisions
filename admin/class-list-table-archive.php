@@ -570,26 +570,30 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		global $current_user;
 		?>
 		<ul class="subsubsub">
-			<li class="all current">
-				<?php
-				echo $this->build_filter_url(
-					__( 'All', 'revisionary' ),
-					[],
-					$this->all_revisions_count
-				);
-				?>
-			</li>
-			<li class="mine">
-				<?php
-				echo $this->build_filter_url(
-					__( 'My Revisions', 'revisionary' ),
-					[
-						'revision_post_author' => $current_user->ID
-					],
-					$this->my_revisions_count
-				);
-				?>
-			</li>
+			<?php if( $this->all_revisions_count ) : ?>
+				<li class="all current">
+					<?php
+					echo $this->build_filter_url(
+						__( 'All', 'revisionary' ),
+						[],
+						$this->all_revisions_count
+					);
+					?>
+				</li>
+			<?php endif; ?>
+			<?php if( $this->my_revisions_count ) : ?>
+				<li class="mine">
+					<?php
+					echo $this->build_filter_url(
+						__( 'My Revisions', 'revisionary' ),
+						[
+							'revision_post_author' => $current_user->ID
+						],
+						$this->my_revisions_count
+					);
+					?>
+				</li>
+			<?php endif; ?>
 		</ul>
 		<?php
 	}
