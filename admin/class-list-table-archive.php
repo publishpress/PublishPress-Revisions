@@ -31,11 +31,11 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$per_page 		= $this->get_items_per_page( 'edit_page_per_page' );
 		$paged 			= isset( $_REQUEST['paged'] ) ? max( 0, intval( $_REQUEST['paged'] ) - 1 ) : 0;
 		$offset 		= $paged * $per_page;
-		$orderby		= isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], ['origin_post_date', 'revision_post_date'] )
+		$orderby		= $this->check_param( 'orderby' ) && in_array( $_REQUEST['orderby'], ['origin_post_date', 'revision_post_date'] )
 			? sanitize_key( $_REQUEST['orderby'] )
 			: 'revision_post_date';
 
-		$order			= isset( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], ['asc', 'desc'] )
+		$order			= $this->check_param( 'order' ) && in_array( $_REQUEST['order'], ['asc', 'desc'] )
 			? sanitize_key( strtoupper( $_REQUEST['order'] ) )
 			: 'DESC';
 
@@ -100,8 +100,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$count = 0;
 
 		// Post type
-		if( isset( $_REQUEST['origin_post_type'] )
-			&& ! empty( $_REQUEST['origin_post_type'] )
+		if( $this->check_param( 'origin_post_type' )
 			&& in_array( $_REQUEST['origin_post_type'], $this->post_types )
 		) {
 			$obj = get_post_type_object( sanitize_key( $_REQUEST['origin_post_type'] ) );
@@ -111,7 +110,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		}
 
 		// Revision post author
-		if( isset( $_REQUEST['revision_post_author'] ) && ! empty( $_REQUEST['revision_post_author'] ) ) {
+		if( $this->check_param( 'revision_post_author' ) ) {
 			$heading .= $this->heading_spacing( $count );
 			$heading .= sprintf(
 				__( 'Revision Author: %s' ,'revisionary' ),
@@ -121,7 +120,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		}
 
 		// Origin post author
-		if( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) ) {
+		if( $this->check_param( 'origin_post_author' ) ) {
 			$heading .= $this->heading_spacing( $count );
 			$heading .= sprintf(
 				__( 'Post Author: %s' ,'revisionary' ),
@@ -145,7 +144,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	public function search_in_heading() {
 		$heading = '';
 
-		if( isset( $_REQUEST['s'] ) && ! empty( trim( $_REQUEST['s'] ) ) ) {
+		if( $this->check_param( 's' ) && ! empty( trim( $_REQUEST['s'] ) ) ) {
 			$heading .= sprintf(
 				__( 'Search results for "%s"', 'revisionary' ),
 				strtolower(
@@ -257,7 +256,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		WHERE r.post_type = 'revision'";
 
 		// Only when Search input is valid
-		if( isset( $_REQUEST['s'] ) && ! empty( trim( $_REQUEST['s'] ) ) ) {
+		if( $this->check_param( 's' ) && ! empty( trim( $_REQUEST['s'] ) ) ) {
 			$query .= $wpdb->prepare(
 				" AND LOWER(r.post_title) LIKE '%s'",
 				'%' . $wpdb->esc_like( strtolower( sanitize_text_field( trim( $_REQUEST['s'] ) ) ) ) . '%'
@@ -267,7 +266,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$count = 0;
 
 		// Filter by origin_post_author from URL/form params
-		if( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) ) {
+		if( $this->check_param( 'origin_post_author' ) ) {
 			$query .= $wpdb->prepare(
 				$this->having_and( $count ) .
 				' origin_post_author LIKE %d',
@@ -277,8 +276,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		}
 
 		// Filter by revision_post_author from URL/form params
-		if( isset( $_REQUEST['revision_post_author'] )
-			&& ! empty( $_REQUEST['revision_post_author'] )
+		if( $this->check_param( 'revision_post_author' )
 			&& ! $this->key_exists_in_args( $args, 'revision_post_author' )
 		) {
 			$query .= $wpdb->prepare(
@@ -290,7 +288,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		}
 
 		// Filter by origin_post_type from URL/form params
-		if( isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] ) ) {
+		if( $this->check_param( 'origin_post_type' ) ) {
 			$query .= $wpdb->prepare(
 				$this->having_and( $count ) .
 				' origin_post_type LIKE %s AND origin_post_type IN ("' . implode('","', $this->post_types ) . '")',
@@ -327,7 +325,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	/**
 	 * Check if a key exists inside a 2-level array
 	 *
-	 * @param string $friend	Which key are we looking in an array
+	 * @param string $find	Which key are we looking in an array
 	 *
 	 * @return string|bool
 	 */
@@ -341,6 +339,21 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 		if ( isset( $find_value ) ) {
 			return $find_value;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if a form filter is active
+	 *
+	 * @param string $field	e.g. 'origin_post_author'
+	 *
+	 * @return bool
+	 */
+	private function check_param( $field ) {
+		if( isset( $_REQUEST[$field] ) && ! empty( $_REQUEST[$field] ) ) {
+			return true;
 		}
 
 		return false;
