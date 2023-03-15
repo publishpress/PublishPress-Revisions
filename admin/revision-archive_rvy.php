@@ -34,8 +34,12 @@ $wp_list_table->prepare_items();
 	<header>
 		<h1 class="wp-heading-inline">
 			<span class="dashicons dashicons-backup"></span>
-			<?php esc_html_e( 'Revision Archive', 'revisionary' ) ?>
+			<?php
+			esc_html_e( 'Revision Archive', 'revisionary' );
+			echo $wp_list_table->filters_in_heading();
+			?>
 		</h1>
+		<?php echo $wp_list_table->search_in_heading(); ?>
 	</header>
 	<?php $wp_list_table->views(); ?>
 	<form method="get">

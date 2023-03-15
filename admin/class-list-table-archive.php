@@ -90,6 +90,79 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
     }
 
 	/**
+	 * Generate a heading depeding the filters in use
+	 *
+	 * @return string
+	 */
+	public function filters_in_heading() {
+		$heading = '';
+
+		$count = 0;
+
+		// Post type
+		if( isset( $_REQUEST['origin_post_type'] )
+			&& ! empty( $_REQUEST['origin_post_type'] )
+			&& in_array( $_REQUEST['origin_post_type'], $this->post_types )
+		) {
+			$obj = get_post_type_object( sanitize_key( $_REQUEST['origin_post_type'] ) );
+			$heading .= $this->heading_spacing( $count );
+			$heading .= $obj->labels->singular_name;
+			$count++;
+		}
+
+		// Revision post author
+		if( isset( $_REQUEST['revision_post_author'] ) && ! empty( $_REQUEST['revision_post_author'] ) ) {
+			$heading .= $this->heading_spacing( $count );
+			$heading .= sprintf(
+				__( 'Revision Author: %s' ,'revisionary' ),
+				get_the_author_meta( 'display_name', (int) $_REQUEST['revision_post_author'] )
+			);
+			$count++;
+		}
+
+		// Origin post author
+		if( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) ) {
+			$heading .= $this->heading_spacing( $count );
+			$heading .= sprintf(
+				__( 'Post Author: %s' ,'revisionary' ),
+				get_the_author_meta( 'display_name', (int) $_REQUEST['origin_post_author'] )
+			);
+			$count++;
+		}
+
+		if( ! empty( $heading ) ) {
+			$heading = ' (' . $heading . ')';
+		}
+
+		return $heading;
+	}
+
+	/**
+	 * Generate a label next to heading for search results
+	 *
+	 * @return string
+	 */
+	public function search_in_heading() {
+		$heading = '';
+
+		if( isset( $_REQUEST['s'] ) && ! empty( trim( $_REQUEST['s'] ) ) ) {
+			$heading .= sprintf(
+				__( 'Search results for "%s"', 'revisionary' ),
+				strtolower(
+					sanitize_text_field(
+						trim( $_REQUEST['s'] )
+					)
+				)
+			);
+		}
+
+		return sprintf(
+			'<span class="subtitle">%s</span>',
+			$heading
+		);
+	}
+
+	/**
 	 * Generate hidden input fields to use as filters in database
 	 *
 	 * @param string $alias	A string to differentiate the query for debugging purposes
@@ -255,7 +328,8 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	 * Check if a key exists inside a 2-level array
 	 *
 	 * @param string $friend	Which key are we looking in an array
-	 * @return string
+	 *
+	 * @return string|bool
 	 */
 	private function key_exists_in_args( $array, $find ) {
 		foreach ( $array as $item ) {
@@ -275,10 +349,23 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	/**
 	 * HAVING clause helper to build dynamic query
 	 *
+	 * @param int $count Number that later decide the return
+	 *
 	 * @return string
 	 */
 	private function having_and( $count ) {
 		return $count > 0 ? ' AND' : ' HAVING';
+	}
+
+	/**
+	 * Generate dynamic spacing
+	 *
+	 * @param int $count Number that later decide the return
+	 *
+	 * @return string
+	 */
+	private function heading_spacing( $count ) {
+		return $count > 0 ? ' - ' : '';
 	}
 
 	/**
