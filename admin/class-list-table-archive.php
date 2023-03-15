@@ -31,20 +31,33 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$per_page 		= $this->get_items_per_page( 'edit_page_per_page' );
 		$paged 			= isset( $_REQUEST['paged'] ) ? max( 0, intval( $_REQUEST['paged'] ) - 1 ) : 0;
 		$offset 		= $paged * $per_page;
-		$orderby		= $this->check_param( 'orderby' ) && in_array( $_REQUEST['orderby'], ['origin_post_date', 'revision_post_date'] )
+		$orderby		= isset( $_REQUEST['orderby'] ) && ! empty( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], ['origin_post_date', 'revision_post_date'] )
 			? sanitize_key( $_REQUEST['orderby'] )
 			: 'revision_post_date';
 
-		$order			= $this->check_param( 'order' ) && in_array( $_REQUEST['order'], ['asc', 'desc'] )
+		$order			= isset( $_REQUEST['order'] ) && ! empty( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], ['asc', 'desc'] )
 			? sanitize_key( strtoupper( $_REQUEST['order'] ) )
 			: 'DESC';
 
 		// Filters
-		$base_query = $this->do_query(
-			[],
-			$orderby,
-			$order
-		);
+		$args = [
+			'orderby' 	=> $orderby,
+			'order'		=> $order
+		];
+		if( isset( $_REQUEST['s'] ) && ! empty( trim( $_REQUEST['s'] ) ) ) {
+			$args['s'] = strtolower( sanitize_text_field( trim( $_REQUEST['s'] ) ) );
+		}
+		if( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) ) {
+			$args['origin_post_author'] = (int) $_REQUEST['origin_post_author'];
+		}
+		if( isset( $_REQUEST['revision_post_author'] ) && ! empty( $_REQUEST['revision_post_author'] ) ) {
+			$args['revision_post_author'] = (int) $_REQUEST['revision_post_author'];
+		}
+		if( isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] ) ) {
+			$args['origin_post_type'] = sanitize_text_field( $_REQUEST['origin_post_type'] );
+		}
+
+		$base_query = $this->do_query( $args );
 
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
@@ -70,7 +83,10 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		// 'All Revisions' link with count
 		$this->all_revisions_count = $wpdb->get_var(
 			$wpdb->prepare(
-				$this->count_query( 'all_items', $base_query )
+				$this->count_query(
+					'all_items',
+					$this->do_query()
+				)
 			)
 		);
 
@@ -79,11 +95,9 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			$wpdb->prepare(
 				$this->count_query(
 					'my_items',
-					$this->do_query(
-						[
-							['revision_post_author' => $current_user->ID]
-						]
-					)
+					$this->do_query( [
+						'revision_post_author' => $current_user->ID
+					] )
 				)
 			)
 		);
@@ -100,7 +114,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$count = 0;
 
 		// Post type
-		if( $this->check_param( 'origin_post_type' )
+		if( isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] )
 			&& in_array( $_REQUEST['origin_post_type'], $this->post_types )
 		) {
 			$obj = get_post_type_object( sanitize_key( $_REQUEST['origin_post_type'] ) );
@@ -110,7 +124,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		}
 
 		// Revision post author
-		if( $this->check_param( 'revision_post_author' ) ) {
+		if( isset( $_REQUEST['revision_post_author'] ) && ! empty( $_REQUEST['revision_post_author'] ) ) {
 			$heading .= $this->heading_spacing( $count );
 			$heading .= sprintf(
 				__( 'Revision Author: %s' ,'revisionary' ),
@@ -120,7 +134,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		}
 
 		// Origin post author
-		if( $this->check_param( 'origin_post_author' ) ) {
+		if( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) ) {
 			$heading .= $this->heading_spacing( $count );
 			$heading .= sprintf(
 				__( 'Post Author: %s' ,'revisionary' ),
@@ -144,7 +158,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	public function search_in_heading() {
 		$heading = '';
 
-		if( $this->check_param( 's' ) && ! empty( trim( $_REQUEST['s'] ) ) ) {
+		if( isset( $_REQUEST['s'] ) && ! empty( trim( $_REQUEST['s'] ) ) ) {
 			$heading .= sprintf(
 				__( 'Search results for "%s"', 'revisionary' ),
 				strtolower(
@@ -162,7 +176,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Generate hidden input fields to use as filters in database
+	 * Generate count query database SELECT
 	 *
 	 * @param string $alias	A string to differentiate the query for debugging purposes
 	 * @param string  $base	The do_query() query to count records from
@@ -176,14 +190,16 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	/**
 	 * Build database query select to retrieve data to display later in table
 	 *
-	 * @param string $orderby	The database field to order by (can be an alias from the query)
-	 * @param string $order 	Sort results in DESC or ASC
-	 * @param array $having 	Array with database fields from query select to override filters
+	 * @param array $args	The database field to order by (can be an alias from the query)
 	 *
 	 * @return string
 	 */
-	private function do_query( $args = [], $orderby = 'revision_post_date', $order = 'DESC' ) {
+	private function do_query( $args = [] ) {
 		global $wpdb;
+
+		$orderby 	= array_key_exists( 'orderby', $args ) ? $args['orderby'] : 'revision_post_date';
+		$order 		= array_key_exists( 'order', $args ) ? $args['order'] : 'DESC';
+
 
 		// @TODO - Optimize query
 		$query = "SELECT
@@ -256,60 +272,49 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		WHERE r.post_type = 'revision'";
 
 		// Only when Search input is valid
-		if( $this->check_param( 's' ) && ! empty( trim( $_REQUEST['s'] ) ) ) {
+		if( isset( $args['s'] ) ) {
 			$query .= $wpdb->prepare(
 				" AND LOWER(r.post_title) LIKE '%s'",
-				'%' . $wpdb->esc_like( strtolower( sanitize_text_field( trim( $_REQUEST['s'] ) ) ) ) . '%'
+				'%' . $wpdb->esc_like( $args['s'] ) . '%'
 			);
 		}
 
 		$count = 0;
 
-		// Filter by origin_post_author from URL/form params
-		if( $this->check_param( 'origin_post_author' ) ) {
+		// Filter by origin_post_author
+		if( isset( $args['origin_post_author'] ) ) {
 			$query .= $wpdb->prepare(
 				$this->having_and( $count ) .
 				' origin_post_author LIKE %d',
-				$wpdb->esc_like( $_REQUEST['origin_post_author'] )
+				$wpdb->esc_like( $args['origin_post_author'] )
 			);
 			$count++;
 		}
 
-		// Filter by revision_post_author from URL/form params
-		if( $this->check_param( 'revision_post_author' )
-			&& ! $this->key_exists_in_args( $args, 'revision_post_author' )
+		// Filter by revision_post_author
+		if( isset( $args['revision_post_author'] )
+			//&& ! $this->key_in_args( $args, 'revision_post_author' )
 		) {
 			$query .= $wpdb->prepare(
 				$this->having_and( $count ) .
 				' revision_post_author LIKE %d',
-				$wpdb->esc_like( $_REQUEST['revision_post_author'] )
+				$wpdb->esc_like( $args['revision_post_author'] )
 			);
 			$count++;
 		}
 
-		// Filter by origin_post_type from URL/form params
-		if( $this->check_param( 'origin_post_type' ) ) {
+		// Filter by origin_post_type
+		if( isset( $args['origin_post_type'] ) ) {
 			$query .= $wpdb->prepare(
 				$this->having_and( $count ) .
 				' origin_post_type LIKE %s AND origin_post_type IN ("' . implode('","', $this->post_types ) . '")',
-				$wpdb->esc_like( $_REQUEST['origin_post_type'] )
+				$wpdb->esc_like( $args['origin_post_type'] )
 			);
 			$count++;
 		} else {
 			$query .= $wpdb->prepare(
 				' ' . $this->having_and( $count ) .
 				' origin_post_type IN ("' . implode('","', $this->post_types ) . '")'
-			);
-			$count++;
-		}
-
-		/* Filter by revision_post_author as filter to build a different query to output different data
-		   e.g. A link to 'My Revisions' above the list table */
-		if( count( $args ) && $this->key_exists_in_args( $args, 'revision_post_author' ) ) {
-			$query .= $wpdb->prepare(
-				$this->having_and( $count ) .
-				' revision_post_author LIKE %d',
-				$wpdb->esc_like( $this->key_exists_in_args( $args, 'revision_post_author' ) )
 			);
 			$count++;
 		}
@@ -323,37 +328,20 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Check if a key exists inside a 2-level array
+	 * Check if a key exists in array
 	 *
-	 * @param string $find	Which key are we looking in an array
+	 * @param string $array	e.g. ['origin_post_author' => $current_user->ID]
+	 * @param string $find	Which key are we looking in an array. e.g. 'origin_post_author'
 	 *
 	 * @return string|bool
 	 */
-	private function key_exists_in_args( $array, $find ) {
-		foreach ( $array as $item ) {
-			if ( array_key_exists( $find, $item ) ) {
-				$find_value = $item[$find];
-				break;
-			}
+	private function key_in_args( $array, $find ) {
+		if ( array_key_exists( $find, $array ) ) {
+			$find_value = $array[$find];
 		}
 
 		if ( isset( $find_value ) ) {
 			return $find_value;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Check if a form filter is active
-	 *
-	 * @param string $field	e.g. 'origin_post_author'
-	 *
-	 * @return bool
-	 */
-	private function check_param( $field ) {
-		if( isset( $_REQUEST[$field] ) && ! empty( $_REQUEST[$field] ) ) {
-			return true;
 		}
 
 		return false;
@@ -448,7 +436,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				break;
 
 			case 'origin_post_type':
-				echo $this->build_filter_url(
+				echo $this->build_filter_link(
 					$item->$column_name,
 					[
 						'origin_post_type' => sanitize_key( $item->$column_name )
@@ -462,7 +450,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				break;
 
 			case 'origin_post_author':
-				echo $this->build_filter_url(
+				echo $this->build_filter_link(
 					get_the_author_meta( 'display_name', $item->$column_name ),
 					[
 						'origin_post_author' => (int) $item->$column_name
@@ -471,7 +459,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				break;
 
 			case 'revision_post_author':
-				echo $this->build_filter_url(
+				echo $this->build_filter_link(
 					get_the_author_meta( 'display_name', $item->$column_name ),
 					[
 						'revision_post_author' => (int) $item->$column_name
@@ -571,11 +559,13 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		?>
 		<ul class="subsubsub">
 			<?php if( $this->all_revisions_count ) : ?>
-				<li class="all current">
+				<li>
 					<?php
-					echo $this->build_filter_url(
+					echo $this->build_filter_link(
 						__( 'All', 'revisionary' ),
-						[],
+						[
+							'v' => 'all'
+						],
 						$this->all_revisions_count
 					);
 					?>
@@ -584,10 +574,11 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			<?php if( $this->my_revisions_count ) : ?>
 				<li class="mine">
 					<?php
-					echo $this->build_filter_url(
+					echo $this->build_filter_link(
 						__( 'My Revisions', 'revisionary' ),
 						[
-							'revision_post_author' => $current_user->ID
+							'revision_post_author' => $current_user->ID,
+							'v' => 'mine'
 						],
 						$this->my_revisions_count
 					);
@@ -685,15 +676,16 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Generate hidden input fields to use as filters in database
+	 * Generate a link with filter params
 	 *
 	 * @param string $label		The label to display
 	 * @param array $args		URL filter parameters for the generated link
 	 * @param integer $count	Number of records to display
+	 * @param bool $current 	This link is current page?
 	 *
 	 * @return html
 	 */
-	public function build_filter_url( $label, $args, $count = null ) {
+	public function build_filter_link( $label, $args, $count = null, $current = false ) {
 		$args = array_merge(
 			[
 				'page' => 'revisionary-archive'
@@ -713,7 +705,18 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 		$count = $count ==! null ? ' <span class="count">(' . $count . ')</span>' : '';
 
-		return '<a href="' . add_query_arg( $args, admin_url( 'admin.php' ) ) . '">' . sanitize_text_field( $label ) . $count . '</a>';
+		// Check if $args['v'] exists and is current page
+		$v = '';
+		if( array_key_exists( 'v', $args )
+			&& isset( $_REQUEST['v'] )
+			&& sanitize_key( $_REQUEST['v'] ) === $args['v']
+		) {
+			$v = ' class="current"';
+		}
+
+		return '<a href="' . add_query_arg( $args, admin_url( 'admin.php' ) ) . '"' . $v . '>'
+		. sanitize_text_field( $label ) . $count
+		. '</a>';
 	}
 
 	/**
