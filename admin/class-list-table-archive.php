@@ -207,6 +207,13 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			r.post_title AS revision_post_title,
 			r.post_date AS revision_post_date,
 			r.post_author AS revision_post_author,
+			r.post_parent AS revision_post_parent,
+			(
+				SELECT COUNT(*)
+				FROM $wpdb->posts p3
+				WHERE p3.post_parent = r.post_parent
+				AND p3.post_type = 'revision'
+			) AS revision_post_count,
 			IF( r3.comment_count > 0,
 				(
 					SELECT p2.post_author
@@ -292,9 +299,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		}
 
 		// Filter by revision_post_author
-		if( isset( $args['revision_post_author'] )
-			//&& ! $this->key_in_args( $args, 'revision_post_author' )
-		) {
+		if( isset( $args['revision_post_author'] ) ) {
 			$query .= $wpdb->prepare(
 				$this->having_and( $count ) .
 				' revision_post_author LIKE %d',
@@ -427,10 +432,14 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
         switch ( $column_name ) {
             case 'revision_post_title':
 				printf(
-					'<strong><a class="row-title rvy-open-popup" href="#" data-label="%s" data-link="%s">%s</a>' . ' (' . $item->ID . ')</strong>',
+					'<strong><a class="row-title rvy-open-popup" href="#" data-label="%s" data-link="%s">%s</a>  — %s</strong> <span style="opacity:0.5;">ID: ' . $item->ID . '</span>',
 					esc_attr( $item->$column_name ),
 					get_edit_post_link( $item->ID ) . '&width=900&height=600&rvy-popup=true&TB_iframe=1',
-					$item->$column_name
+					$item->$column_name,
+					sprintf(
+						_n( '%s Revision', '%s Revisions', (int) $item->revision_post_count, 'revisionary' ),
+						number_format_i18n( $item->revision_post_count )
+					)
 				);
 				echo $this->handle_revision_row_actions( $item );
 				break;
@@ -566,7 +575,8 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 						[
 							'v' => 'all'
 						],
-						$this->all_revisions_count
+						$this->all_revisions_count,
+						false
 					);
 					?>
 				</li>
@@ -580,7 +590,8 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 							'revision_post_author' => $current_user->ID,
 							'v' => 'mine'
 						],
-						$this->my_revisions_count
+						$this->my_revisions_count,
+						false
 					);
 					?>
 				</li>
@@ -681,11 +692,13 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	 * @param string $label		The label to display
 	 * @param array $args		URL filter parameters for the generated link
 	 * @param integer $count	Number of records to display
-	 * @param bool $current 	This link is current page?
+	 * @param bool $url_args	Include parameters from URL?
+	 *							e.g. from: admin.php?origin_post_type=post&page=revisionary-archive&v=all
+	 *							take origin_post_type value
 	 *
 	 * @return html
 	 */
-	public function build_filter_link( $label, $args, $count = null, $current = false ) {
+	public function build_filter_link( $label, $args, $count = null, $url_args = true ) {
 		$args = array_merge(
 			[
 				'page' => 'revisionary-archive'
@@ -693,8 +706,8 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			$args
 		);
 
-		// Include origin_post_type filter if exists
-		if( isset( $_REQUEST['origin_post_type'] ) ) {
+		// Include origin_post_type filter if enabled and exists
+		if( $url_args && isset( $_REQUEST['origin_post_type'] ) ) {
 			$args = array_merge(
 				[
 					'origin_post_type' => sanitize_key( $_REQUEST['origin_post_type'] )
