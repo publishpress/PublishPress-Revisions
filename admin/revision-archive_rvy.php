@@ -29,9 +29,6 @@ wp_add_inline_script(
 require_once( dirname( __FILE__ ) . '/class-list-table-archive.php' );
 $wp_list_table = new Revisionary_Archive_List_Table(['screen' => 'revisionary-archive']);
 $wp_list_table->prepare_items();
-echo '<pre>';
-var_dump($_REQUEST);
-echo '</pre>';
 ?>
 <div class="wrap pressshack-admin-wrapper revision-archive">
 	<header>

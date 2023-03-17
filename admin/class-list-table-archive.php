@@ -31,7 +31,16 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$per_page 		= $this->get_items_per_page( 'edit_page_per_page' );
 		$paged 			= isset( $_REQUEST['paged'] ) ? max( 0, intval( $_REQUEST['paged'] ) - 1 ) : 0;
 		$offset 		= $paged * $per_page;
-		$orderby		= isset( $_REQUEST['orderby'] ) && ! empty( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], ['origin_post_date', 'revision_post_date', 'revision_post_count'] )
+		$orderby		= isset( $_REQUEST['orderby'] )
+			&& ! empty( $_REQUEST['orderby'] )
+			&& in_array(
+				$_REQUEST['orderby'],
+				[
+					'origin_post_date',
+					'revision_post_date',
+					'revision_post_count'
+				]
+			)
 			? sanitize_key( $_REQUEST['orderby'] )
 			: 'revision_post_date';
 
@@ -139,11 +148,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		// Revision post parent
 		if( isset( $_REQUEST['revision_post_parent'] ) && ! empty( $_REQUEST['revision_post_parent'] ) ) {
 			$heading .= $this->heading_spacing( $count );
-			$heading .= sprintf(
-				__( 'Revisions from %s: "%s"' ,'revisionary' ),
-				get_post_type( (int) $_REQUEST['revision_post_parent'] ),
-				get_the_title( (int) $_REQUEST['revision_post_parent'] )
-			);
+			$heading .= '"' . get_the_title( (int) $_REQUEST['revision_post_parent'] ) . '"';
 			$count++;
 		}
 
