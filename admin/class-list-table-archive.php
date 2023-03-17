@@ -31,7 +31,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$per_page 		= $this->get_items_per_page( 'edit_page_per_page' );
 		$paged 			= isset( $_REQUEST['paged'] ) ? max( 0, intval( $_REQUEST['paged'] ) - 1 ) : 0;
 		$offset 		= $paged * $per_page;
-		$orderby		= isset( $_REQUEST['orderby'] ) && ! empty( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], ['origin_post_date', 'revision_post_date'] )
+		$orderby		= isset( $_REQUEST['orderby'] ) && ! empty( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], ['origin_post_date', 'revision_post_date', 'revision_post_count'] )
 			? sanitize_key( $_REQUEST['orderby'] )
 			: 'revision_post_date';
 
@@ -587,6 +587,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		return [
 			'origin_post_date' 		=> 'origin_post_date',
 			'revision_post_date' 	=> 'revision_post_date',
+			'revision_post_count' 	=> 'revision_post_count',
 		];
 	}
 
