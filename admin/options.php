@@ -102,7 +102,8 @@ $this->section_captions = array(
 		'revision_queue'		=> esc_html__('Queue', 'revisionary'),
 		'preview'				=> esc_html__('Preview / Approval', 'revisionary'),
 		'revisions'				=> esc_html__('Options', 'revisionary'),
-		'notification'			=> esc_html__('Notifications', 'revisionary')
+		'notification'			=> esc_html__('Notifications', 'revisionary'),
+		'archive'				=> esc_html__('Archive', 'revisionary')
 	)
 );
 
@@ -148,7 +149,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'preview_link_type' => 						esc_html__('Preview Link Type', 'revisionary'),
 	'compare_revisions_direct_approval' => 		esc_html__('Approve Button on Compare Revisions screen', 'revisionary'),
 	'copy_revision_comments_to_post' => 		esc_html__('Copy revision comments to published post', 'revisionary'),
-	'past_revisions_order_by' =>				esc_html__('Compare Past Revisions ordering:'), 
+	'past_revisions_order_by' =>				esc_html__('Compare Past Revisions ordering:'),
 	'list_unsubmitted_revisions' => 			sprintf(esc_html__('Include %s in My Activity, Revisions to My Posts views', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
 	'rev_publication_delete_ed_comments' =>		esc_html__('On Revision publication, delete Editorial Comments', 'revisionary'),
 	'deletion_queue' => 						esc_html__('Enable deletion queue', 'revisionary'),
@@ -180,6 +181,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'],
 	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'rev_publication_delete_ed_comments', 'deletion_queue', 'display_hints'],
 	'notification'	=>		 ['pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
+	'archive' =>			 ['enabled_post_types_archive']
 ]
 ]);
 
@@ -250,7 +252,7 @@ $div_class = apply_filters('publishpress_revisions_settings_sidebar', '');
 
 	<?php do_action('publishpress_revisions_settings_sidebar');?>
 
-	<div id="post-body" class="has-sidebar">	
+	<div id="post-body" class="has-sidebar">
 	<div id="post-body-content" class="has-sidebar-content ppseries-settings-body-content">
 
 <?php
@@ -415,7 +417,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 			<?php else : ?>
 			<?php if (isset($hidden_types[$key])) : ?>
 				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="<?php echo esc_attr($hidden_types[$key]); ?>"/>
-			<?php else : 
+			<?php else :
 					$locked = (!empty($locked_types[$key])) ? ' disabled ' : '';
 				?>
 			<div class="agp-vtight_input">
@@ -434,7 +436,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 					}
 
 					echo '</label>';
-					
+
 					if (!empty($revisionary->enabled_post_types[$key]) && isset($obj->capability_type) && !in_array($obj->capability_type, [$obj->name, 'post', 'page'])) {
 						if ($cap_type_obj = get_post_type_object($obj->capability_type)) {
 							echo '&nbsp;(' . esc_html(sprintf(__('%s capabilities'), $cap_type_obj->labels->singular_name)) . ')';
@@ -445,7 +447,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 				endif;
 			endif; // displaying checkbox UI
 
-		} // end foreach src_otype
+		} // end foreach $types
 		?>
 
 	<br />
@@ -582,7 +584,7 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 		$this->option_checkbox( 'scheduled_revision_update_modified_date', $tab, $section, $hint, '' );
 
 		global $wp_version;
-		
+
 		$hint = esc_html__( 'Publish scheduled revisions using the WP-Cron mechanism. On some sites, publication will fail if this setting is disabled.', 'revisionary' );
 		$this->option_checkbox( 'scheduled_publish_cron', $tab, $section, $hint, '' );
 
@@ -691,7 +693,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) :
 		?>
 		<div id="revisions-pro-descript" class="activating">
-		
+
 		<?php
 		printf(
 			esc_html__('For compatibility with Advanced Custom Fields, Beaver Builder and WPML, upgrade to %sPublishPress Revisions Pro%s.', 'revisionary'),
@@ -699,7 +701,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			'</a>'
 		);
 		?>
-		
+
 		</div>
 		<?php endif;?>
 
@@ -975,6 +977,84 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		</table>
 	<?php endif; // any options accessable in this section
 
+	$section = 'archive';				// --- ARCHIVE SECTION ---
+
+	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
+		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
+
+		<?php
+		$option_name = 'enabled_post_types_archive';
+
+		$this->all_options []= $option_name;
+
+		esc_html_e('Enable revisions archive for these Post Types:', 'revisionary');
+        echo '<br /><br />';
+
+		$hidden_types = ['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true];
+		$locked_types = [];
+
+		$types = get_post_types(['public' => true, 'show_ui' => true], 'object', 'or');
+
+		$types = rvy_order_types($types);
+
+		foreach ($types as $key => $obj) {
+			if (!$key) {
+				continue;
+			}
+
+			$id = $option_name . '-' . $key;
+			$name = $option_name . "[$key]";
+			?>
+
+			<?php if ('nav_menu' == $key) : ?>
+				<input name="<?php echo esc_attr($name); ?>" type="hidden" id="<?php echo esc_attr($id); ?>" value="1"/>
+			<?php else : ?>
+			<?php if (isset($hidden_types[$key])) : ?>
+				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="<?php echo esc_attr($hidden_types[$key]); ?>"/>
+			<?php else :
+					$locked = (!empty($locked_types[$key])) ? ' disabled ' : '';
+				?>
+			<div class="agp-vtight_input">
+				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="<?php echo (empty($locked_types[$key])) ? '0' : '1';?>"/>
+				<label for="<?php echo esc_attr($id); ?>" title="<?php echo esc_attr($key); ?>">
+					<input name="<?php if (empty($locked_types[$key])) echo esc_attr($name); ?>" type="checkbox" id="<?php echo esc_attr($id); ?>"
+						value="1" <?php checked('1', !empty($revisionary->enabled_post_types_archive[$key])); echo esc_attr($locked); ?> />
+
+					<?php
+					if (isset($obj->labels_pp)) {
+						echo esc_html($obj->labels_pp->name);
+					} elseif (isset($obj->labels->name)) {
+						echo esc_html($obj->labels->name);
+					} else {
+						echo esc_html($key);
+					}
+
+					echo '</label>';
+
+					if (!empty($revisionary->enabled_post_types_archive[$key]) && isset($obj->capability_type) && !in_array($obj->capability_type, [$obj->name, 'post', 'page'])) {
+						if ($cap_type_obj = get_post_type_object($obj->capability_type)) {
+							echo '&nbsp;(' . esc_html(sprintf(__('%s capabilities'), $cap_type_obj->labels->singular_name)) . ')';
+						}
+					}
+
+					echo '</div>';
+				endif;
+			endif; // displaying checkbox UI
+
+		} // end foreach src_otype
+		?>
+		<br />
+		<p class="rs-subtext">
+		<?php
+		printf(
+			__( 'This setttings apply to <a href="%s">Revision Archive</a> screen only', 'revisionary' ),
+			admin_url( 'admin.php?page=revisionary-archive' )
+		);
+		?>
+		</p>
+	</td></tr></table>
+	<?php endif; // any options accessable in this section
+
 endif;
 ?>
 
@@ -1075,9 +1155,9 @@ echo "<input type='hidden' name='rvy_submission_topic' value='options' />";
 ?>
 <p class="submit">
 <input type="submit" name="rvy_submit" class="button button-primary" value="<?php echo esc_attr('Save Changes', 'revisionary');?>" />
-<input type="submit" name="rvy_defaults" class="button button-secondary" value="<?php echo esc_attr('Revert to Defaults', 'revisionary') ?>" onclick="<?php 
-echo "javascript:if (confirm('" 
-. esc_html__( "All settings in this form (including those on unselected tabs) will be reset to DEFAULTS.  Are you sure?", 'revisionary' ) 
+<input type="submit" name="rvy_defaults" class="button button-secondary" value="<?php echo esc_attr('Revert to Defaults', 'revisionary') ?>" onclick="<?php
+echo "javascript:if (confirm('"
+. esc_html__( "All settings in this form (including those on unselected tabs) will be reset to DEFAULTS.  Are you sure?", 'revisionary' )
 . "')) {return true;} else {return false;}";
 ?>" style="float:right;" />
 </p>

@@ -19,7 +19,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 		parent::__construct( $args );
 
-		$this->post_types = array_keys( $revisionary->enabled_post_types );
+		$this->post_types = array_keys( $revisionary->enabled_post_types_archive );
     }
 
 	/**
@@ -530,8 +530,8 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	 */
 	protected function post_types_dropdown() {
 		$current_option = isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] )
-							? sanitize_key( $_REQUEST['origin_post_type'] )
-							: '';
+			? sanitize_key( $_REQUEST['origin_post_type'] )
+			: '';
 		?>
 		<select name="origin_post_type" class="postform">
 			<option <?php echo $current_option === '' ? 'selected' : '' ?>
