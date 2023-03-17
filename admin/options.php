@@ -447,7 +447,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 				endif;
 			endif; // displaying checkbox UI
 
-		} // end foreach $types
+		} // end foreach src_otype
 		?>
 
 	<br />
@@ -1041,7 +1041,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 				endif;
 			endif; // displaying checkbox UI
 
-		} // end foreach src_otype
+		} // end foreach $types
 		?>
 		<br />
 		<p class="rs-subtext">
