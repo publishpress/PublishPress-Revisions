@@ -56,6 +56,9 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		if( isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] ) ) {
 			$args['origin_post_type'] = sanitize_text_field( $_REQUEST['origin_post_type'] );
 		}
+		if( isset( $_REQUEST['revision_post_parent'] ) && ! empty( $_REQUEST['revision_post_parent'] ) ) {
+			$args['revision_post_parent'] = (int) $_REQUEST['revision_post_parent'];
+		}
 
 		$base_query = $this->do_query( $args );
 
@@ -129,6 +132,17 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			$heading .= sprintf(
 				__( 'Revision Author: %s' ,'revisionary' ),
 				get_the_author_meta( 'display_name', (int) $_REQUEST['revision_post_author'] )
+			);
+			$count++;
+		}
+
+		// Revision post parent
+		if( isset( $_REQUEST['revision_post_parent'] ) && ! empty( $_REQUEST['revision_post_parent'] ) ) {
+			$heading .= $this->heading_spacing( $count );
+			$heading .= sprintf(
+				__( 'Revisions from %s: "%s"' ,'revisionary' ),
+				get_post_type( (int) $_REQUEST['revision_post_parent'] ),
+				get_the_title( (int) $_REQUEST['revision_post_parent'] )
 			);
 			$count++;
 		}
@@ -308,6 +322,16 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			$count++;
 		}
 
+		// Filter by revision_post_parent
+		if( isset( $args['revision_post_parent'] ) ) {
+			$query .= $wpdb->prepare(
+				$this->having_and( $count ) .
+				' revision_post_parent LIKE %d',
+				$wpdb->esc_like( $args['revision_post_parent'] )
+			);
+			$count++;
+		}
+
 		// Filter by origin_post_type
 		if( isset( $args['origin_post_type'] ) ) {
 			$query .= $wpdb->prepare(
@@ -381,6 +405,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
         return array(
             'cb'					=> '<input type="checkbox" />',
 			'revision_post_title' 	=> __( 'Revision', 'revisionary' ),
+			'revision_post_count' 	=> __( 'Count', 'revisionary' ),
 			'origin_post_type' 		=> __( 'Post Type', 'revisionary' ),
 			'revision_post_date' 	=> __( 'Revision Date', 'revisionary' ),
 			'revision_post_author'	=> __( 'Revised By', 'revisionary' ),
@@ -432,14 +457,10 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
         switch ( $column_name ) {
             case 'revision_post_title':
 				printf(
-					'<strong><a class="row-title rvy-open-popup" href="#" data-label="%s" data-link="%s">%s</a>  — %s</strong> <span style="opacity:0.5;">ID: ' . $item->ID . '</span>',
+					'<strong><a class="row-title rvy-open-popup" href="#" data-label="%s" data-link="%s">%s</a></strong> <span style="opacity:0.5;">ID: ' . $item->ID . ' - post_parent:' . $item->revision_post_parent . '</span>',
 					esc_attr( $item->$column_name ),
 					get_edit_post_link( $item->ID ) . '&width=900&height=600&rvy-popup=true&TB_iframe=1',
-					$item->$column_name,
-					sprintf(
-						_n( '%s Revision', '%s Revisions', (int) $item->revision_post_count, 'revisionary' ),
-						number_format_i18n( $item->revision_post_count )
-					)
+					$item->$column_name
 				);
 				echo $this->handle_revision_row_actions( $item );
 				break;
@@ -472,6 +493,15 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 					get_the_author_meta( 'display_name', $item->$column_name ),
 					[
 						'revision_post_author' => (int) $item->$column_name
+					]
+				);
+				break;
+
+			case 'revision_post_count':
+				echo $this->build_filter_link(
+					(int) $item->$column_name,
+					[
+						'revision_post_parent' => (int) $item->revision_post_parent
 					]
 				);
 				break;
@@ -666,6 +696,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$this->single_hidden_input( 'origin_post_type' );
 		$this->single_hidden_input( 'origin_post_author', true );
 		$this->single_hidden_input( 'revision_post_author', true );
+		$this->single_hidden_input( 'revision_post_parent', true );
 	}
 
 	/**

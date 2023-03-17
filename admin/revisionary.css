@@ -826,5 +826,9 @@ table th#origin_post_type,
 table th#origin_post_date,
 table th#revision_post_author,
 table th#origin_post_author {
-  width: 12%;
+  width: 11%;
+}
+
+table th#revision_post_count {
+  width: 5%;
 }
