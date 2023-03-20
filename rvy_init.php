@@ -1388,15 +1388,15 @@ function rvy_preview_url($revision, $args = []) {
 
 	if ('revision' == $post_type) {
 		$post_type = get_post_field('post_type', $revision->post_parent);
+	} else {
+		if ($post_type_obj = get_post_type_object($revision->post_type)) {
+			if (empty($post_type_obj->public) && !defined('FL_BUILDER_VERSION') && !apply_filters('revisionary_private_type_use_preview_url', false, $revision)) { // For non-public types, preview is not available so default to Compare Revisions screen
+				return apply_filters('revisionary_preview_url', rvy_admin_url("revision.php?revision=$revision->ID"), $revision, $args);
+			}
+		}
 	}
 
 	$post_type = sanitize_key($post_type);
-
-	if ($post_type_obj = get_post_type_object($revision->post_type)) {
-		if (empty($post_type_obj->public) && !defined('FL_BUILDER_VERSION') && !apply_filters('revisionary_private_type_use_preview_url', false, $revision)) { // For non-public types, preview is not available so default to Compare Revisions screen
-			return apply_filters('revisionary_preview_url', rvy_admin_url("revision.php?revision=$revision->ID"), $revision, $args);
-		}
-	}
 
 	$link_type = rvy_get_option('preview_link_type');
 
