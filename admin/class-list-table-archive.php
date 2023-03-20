@@ -73,16 +73,14 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
-				$base_query . ' LIMIT %d,%d',
+				"{$base_query} LIMIT %d,%d",
 				$offset,
 				$per_page
 			)
 		);
 
 		$total_items = $wpdb->get_var(
-			$wpdb->prepare(
-				$this->count_query( 'total_items', $base_query )
-			)
+			$this->count_query( 'total_items', $base_query )
 		);
 
 		$this->set_pagination_args( [
@@ -94,23 +92,19 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 		// 'All Revisions' link with count
 		$this->all_revisions_count = $wpdb->get_var(
-			$wpdb->prepare(
-				$this->count_query(
-					'all_items',
-					$this->do_query()
-				)
+			$this->count_query(
+				'all_items',
+				$this->do_query()
 			)
 		);
 
 		// 'My Revisions' link with count
 		$this->my_revisions_count = $wpdb->get_var(
-			$wpdb->prepare(
-				$this->count_query(
-					'my_items',
-					$this->do_query( [
-						'revision_post_author' => $current_user->ID
-					] )
-				)
+			$this->count_query(
+				'my_items',
+				$this->do_query( [
+					'revision_post_author' => $current_user->ID
+				] )
 			)
 		);
     }
@@ -310,8 +304,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		// Filter by origin_post_author
 		if( isset( $args['origin_post_author'] ) ) {
 			$query .= $wpdb->prepare(
-				$this->having_and( $count ) .
-				' origin_post_author LIKE %d',
+				"{$this->having_and( $count )} origin_post_author LIKE %d",
 				$wpdb->esc_like( $args['origin_post_author'] )
 			);
 			$count++;
@@ -320,8 +313,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		// Filter by revision_post_author
 		if( isset( $args['revision_post_author'] ) ) {
 			$query .= $wpdb->prepare(
-				$this->having_and( $count ) .
-				' revision_post_author LIKE %d',
+				"{$this->having_and( $count )} revision_post_author LIKE %d",
 				$wpdb->esc_like( $args['revision_post_author'] )
 			);
 			$count++;
@@ -330,8 +322,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		// Filter by revision_post_parent
 		if( isset( $args['revision_post_parent'] ) ) {
 			$query .= $wpdb->prepare(
-				$this->having_and( $count ) .
-				' revision_post_parent LIKE %d',
+				"{$this->having_and( $count )} revision_post_parent LIKE %d",
 				$wpdb->esc_like( $args['revision_post_parent'] )
 			);
 			$count++;
@@ -340,23 +331,17 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		// Filter by origin_post_type
 		if( isset( $args['origin_post_type'] ) ) {
 			$query .= $wpdb->prepare(
-				$this->having_and( $count ) .
-				' origin_post_type LIKE %s AND origin_post_type IN ("' . implode('","', $this->post_types ) . '")',
+				"{$this->having_and( $count )} origin_post_type LIKE %s",
 				$wpdb->esc_like( $args['origin_post_type'] )
-			);
-			$count++;
-		} else {
-			$query .= $wpdb->prepare(
-				' ' . $this->having_and( $count ) .
-				' origin_post_type IN ("' . implode('","', $this->post_types ) . '")'
 			);
 			$count++;
 		}
 
+		$query .= $this->having_and( $count ) . ' origin_post_type IN ("' . implode('","', $this->post_types ) . '")';
+		$count++;
+
 		// Set order by and order
-		$query .= $wpdb->prepare(
-			" ORDER BY {$orderby} " . strtoupper( $order )
-		);
+		$query .= ' ORDER BY ' . $orderby . ' ' . strtoupper( $order );
 
 		return $query;
 	}
