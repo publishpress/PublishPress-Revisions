@@ -434,6 +434,8 @@ class Revisionary
 			wp_delete_post($revision_id, true);
 		}
 
+		revisionary_refresh_revision_flags($post_id, ['ignore_revision_ids' => $post_ids]);
+
 		$post = get_post($post_id);
 
 		if ($post && rvy_in_revision_workflow($post)) {
