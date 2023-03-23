@@ -64,9 +64,9 @@ class Revisionary_Submittee {
 	function update_sitewide() {
 		check_admin_referer( 'rvy-update-options' );
 		
-		$reviewed_options = isset($_POST['rvy_all_movable_options']) ? array_map('sanitize_key', explode(',', sanitize_text_field($_POST['rvy_all_movable_options']))) : array();
+		$reviewed_options = isset($_POST['rvy_all_movable_options']) ? array_map('sanitize_key', explode(',', $_POST['rvy_all_movable_options'])) : array();
 		
-		$options_sitewide = isset($_POST['rvy_options_sitewide']) ? array_map('sanitize_key', (array) sanitize_text_field($_POST['rvy_options_sitewide'])) : array();
+		$options_sitewide = isset($_POST['rvy_options_sitewide']) ? array_map('sanitize_key', (array) $_POST['rvy_options_sitewide']) : array();
 
 		update_site_option( "rvy_options_sitewide_reviewed", $reviewed_options );
 		update_site_option( "rvy_options_sitewide", $options_sitewide );
