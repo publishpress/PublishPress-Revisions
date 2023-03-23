@@ -31,6 +31,23 @@ add_action('publish_revision_rvy', '_revisionary_publish_scheduled_cron');
 
 add_action("update_option_rvy_scheduled_publish_cron", '_rvy_existing_schedules_to_cron', 10, 2);
 
+add_action('before_delete_post', 
+	function($delete_post_id) {
+		if (rvy_in_revision_workflow($delete_post_id)) {
+			if ($published_post_id = rvy_post_id($delete_post_id)) {
+				_rvy_delete_revision($delete_post_id, $published_post_id);
+			}
+		}
+	}
+);
+
+add_action('rvy_delete_revision', '_rvy_delete_revision', 999, 2);
+add_action('untrash_post', 
+	function($post_id) {
+		revisionary_refresh_revision_flags($post_id);
+	}
+);
+
 add_action('init', 
 	function() {
 		global $kinsta_cache;
@@ -95,6 +112,10 @@ if (defined('WPSEO_VERSION')) {
 			return $intend_to_save;
 		},
 	10, 2);
+}
+
+function _rvy_delete_revision($revision_id, $published_post_id) {
+	revisionary_refresh_revision_flags($published_post_id, ['ignore_revision_ids' => $revision_id]);
 }
 
 function _rvy_rest_prepare($response, $post, $request) {
@@ -802,6 +823,12 @@ function revisionary_refresh_revision_flags() {
 	if ($posts_missing_flag = array_diff($arr_have_revisions, $have_flag_ids)) {
 		foreach($posts_missing_flag as $post_id) {
 			rvy_update_post_meta($post_id, '_rvy_has_revisions', true);
+		}
+	}
+
+	if ($posts_invalid_flag = array_diff($have_flag_ids, $arr_have_revisions)) {
+		foreach($posts_missing_flag as $post_id) {
+			rvy_delete_post_meta($post_id, '_rvy_has_revisions');
 		}
 	}
 }
