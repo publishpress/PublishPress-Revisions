@@ -268,7 +268,7 @@ class RevisionaryFront {
 
 			$published_url = ($published_post_id) ? get_permalink($published_post_id) : '';
 			$diff_url = rvy_admin_url("revision.php?revision=$revision_id");
-			$queue_url = rvy_admin_url("admin.php?page=revisionary-q&published_post=$published_post_id");
+			$queue_url = rvy_admin_url("admin.php?page=revisionary-q&published_post={$published_post_id}&all=1");
 
 			if ((!rvy_get_option('revisor_hide_others_revisions') && !empty($type_obj) && current_user_can($type_obj->cap->edit_posts)) || current_user_can('read_post', $revision_id)) {
 				$view_published = ($published_url)
