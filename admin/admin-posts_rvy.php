@@ -85,8 +85,16 @@ class RevisionaryAdminPosts {
 
 		if ($listed_ids) {
 			$id_csv = implode("','", array_map('intval', $listed_ids));
-			$revision_base_status_csv = implode("','", array_map('sanitize_key', rvy_revision_base_statuses()));
 			$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
+
+			$revision_base_statuses = array_map('sanitize_key', rvy_revision_base_statuses());
+
+			if (!rvy_get_option('pending_revision_unpublished')) {
+				$published_statuses = get_post_stati( ['public' => true, 'private' => true], 'names', 'or' );
+				$revision_base_statuses = array_intersect($revision_base_statuses, $published_statuses);
+			}
+
+			$revision_base_status_csv = implode("','", $revision_base_statuses);
 
 			$results = $wpdb->get_results(
 				"SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN ('$id_csv') AND post_status IN ('$revision_base_status_csv') AND post_mime_type IN ('$revision_status_csv') AND post_type != '' GROUP BY comment_count"
