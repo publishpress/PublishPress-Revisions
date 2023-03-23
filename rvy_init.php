@@ -778,17 +778,28 @@ if (!empty($_REQUEST['rvy_flush_flags'])) {
 	revisionary_refresh_revision_flags();
 }
 
-function revisionary_refresh_revision_flags() {
+function revisionary_refresh_revision_flags($published_post_id = 0, $args = []) {
 	global $wpdb;
+
+	$ignore_revision_ids = (!empty($args['ignore_revision_ids'])) ? (array) $args['ignore_revision_ids'] : [];
 
 	$status_csv = implode("','", array_map('sanitize_key', rvy_filtered_statuses()));
 	$revision_base_status_csv = implode("','", array_map('sanitize_key', rvy_revision_base_statuses()));
 	$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
-	$arr_have_revisions = $wpdb->get_col(
-		"SELECT r.comment_count FROM $wpdb->posts r INNER JOIN $wpdb->posts p ON r.comment_count = p.ID"
-		. " WHERE p.post_status IN ('$status_csv') AND r.post_status IN ('$revision_base_status_csv') AND r.post_mime_type IN ('$revision_status_csv')"
-	);
+	$query = "SELECT r.comment_count FROM $wpdb->posts r INNER JOIN $wpdb->posts p ON r.comment_count = p.ID"
+	. " WHERE p.post_status IN ('$status_csv') AND r.post_status IN ('$revision_base_status_csv') AND r.post_mime_type IN ('$revision_status_csv')";
+
+	if ($published_post_id) {
+		$query = $wpdb->prepare("$query AND p.ID = %d", $published_post_id);
+	}
+
+	if ($ignore_revision_ids) {
+		$ignore_revisions_csv = implode("','", array_map('sanitize_key', $ignore_revision_ids));
+		$query .= " AND r.ID NOT IN ('$ignore_revisions_csv')";
+	}
+
+	$arr_have_revisions = $wpdb->get_col($query);
 	
 	$have_revisions = implode("','", array_map('intval', array_unique($arr_have_revisions)));
 
@@ -797,7 +808,13 @@ function revisionary_refresh_revision_flags() {
 		$wpdb->query("DELETE FROM $wpdb->postmeta WHERE meta_id IN ('$id_csv')");
 	}
 
-	$have_flag_ids = $wpdb->get_col("SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_has_revisions'");
+	$query = "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_has_revisions'";
+
+	if ($published_post_id) {
+		$query = $wpdb->prepare("$query AND post_id = %d", $published_post_id);
+	}
+
+	$have_flag_ids = $wpdb->get_col($query);
 	
 	if ($posts_missing_flag = array_diff($arr_have_revisions, $have_flag_ids)) {
 		foreach($posts_missing_flag as $post_id) {
