@@ -169,7 +169,7 @@ class RevisionaryAdminPosts {
 
 		if (!empty($this->post_revision_count[$post->ID])) {
 			if ( 'trash' != $post->post_status && wp_check_post_lock( $post->ID ) === false ) {
-				$actions['revision_queue'] = "<a href='admin.php?page=revisionary-q&published_post=$post->ID'>" . esc_html__('Revision Queue', 'revisionary') . '</a>';
+				$actions['revision_queue'] = "<a href='admin.php?page=revisionary-q&published_post={$post->ID}&all=1'>" . esc_html__('Revision Queue', 'revisionary') . '</a>';
 			}
 		}
 		
