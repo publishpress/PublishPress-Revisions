@@ -955,6 +955,11 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	clean_post_cache($revision_id);
 	clean_post_cache($published->ID);
+
+	if (defined('LSCWP_V')) {
+		do_action('litespeed_purge_post', $published->ID);
+	}
+
 	// Passing ignore_revision_ids is not theoretically necessary here since this call occurs after deletion, but avoid any cache clearance timing issues.
 	revisionary_refresh_revision_flags($published->ID, ['ignore_revision_ids' => $revision_id]);
 
