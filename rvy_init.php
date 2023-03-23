@@ -31,6 +31,23 @@ add_action('publish_revision_rvy', '_revisionary_publish_scheduled_cron');
 
 add_action("update_option_rvy_scheduled_publish_cron", '_rvy_existing_schedules_to_cron', 10, 2);
 
+add_action('before_delete_post', 
+	function($delete_post_id) {
+		if (rvy_in_revision_workflow($delete_post_id)) {
+			if ($published_post_id = rvy_post_id($delete_post_id)) {
+				_rvy_delete_revision($delete_post_id, $published_post_id);
+			}
+		}
+	}
+);
+
+add_action('rvy_delete_revision', '_rvy_delete_revision', 999, 2);
+add_action('untrash_post', 
+	function($post_id) {
+		revisionary_refresh_revision_flags($post_id);
+	}
+);
+
 add_action('init', 
 	function() {
 		global $kinsta_cache;
@@ -95,6 +112,10 @@ if (defined('WPSEO_VERSION')) {
 			return $intend_to_save;
 		},
 	10, 2);
+}
+
+function _rvy_delete_revision($revision_id, $published_post_id) {
+	revisionary_refresh_revision_flags($published_post_id, ['ignore_revision_ids' => $revision_id]);
 }
 
 function _rvy_rest_prepare($response, $post, $request) {
@@ -778,17 +799,28 @@ if (!empty($_REQUEST['rvy_flush_flags'])) {
 	revisionary_refresh_revision_flags();
 }
 
-function revisionary_refresh_revision_flags() {
+function revisionary_refresh_revision_flags($published_post_id = 0, $args = []) {
 	global $wpdb;
+
+	$ignore_revision_ids = (!empty($args['ignore_revision_ids'])) ? (array) $args['ignore_revision_ids'] : [];
 
 	$status_csv = implode("','", array_map('sanitize_key', rvy_filtered_statuses()));
 	$revision_base_status_csv = implode("','", array_map('sanitize_key', rvy_revision_base_statuses()));
 	$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
-	$arr_have_revisions = $wpdb->get_col(
-		"SELECT r.comment_count FROM $wpdb->posts r INNER JOIN $wpdb->posts p ON r.comment_count = p.ID"
-		. " WHERE p.post_status IN ('$status_csv') AND r.post_status IN ('$revision_base_status_csv') AND r.post_mime_type IN ('$revision_status_csv')"
-	);
+	$query = "SELECT r.comment_count FROM $wpdb->posts r INNER JOIN $wpdb->posts p ON r.comment_count = p.ID"
+	. " WHERE p.post_status IN ('$status_csv') AND r.post_status IN ('$revision_base_status_csv') AND r.post_mime_type IN ('$revision_status_csv')";
+
+	if ($published_post_id) {
+		$query = $wpdb->prepare("$query AND p.ID = %d", $published_post_id);
+	}
+
+	if ($ignore_revision_ids) {
+		$ignore_revisions_csv = implode("','", array_map('sanitize_key', $ignore_revision_ids));
+		$query .= " AND r.ID NOT IN ('$ignore_revisions_csv')";
+	}
+
+	$arr_have_revisions = $wpdb->get_col($query);
 	
 	$have_revisions = implode("','", array_map('intval', array_unique($arr_have_revisions)));
 
@@ -797,11 +829,23 @@ function revisionary_refresh_revision_flags() {
 		$wpdb->query("DELETE FROM $wpdb->postmeta WHERE meta_id IN ('$id_csv')");
 	}
 
-	$have_flag_ids = $wpdb->get_col("SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_has_revisions'");
+	$query = "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_has_revisions'";
+
+	if ($published_post_id) {
+		$query = $wpdb->prepare("$query AND post_id = %d", $published_post_id);
+	}
+
+	$have_flag_ids = $wpdb->get_col($query);
 	
 	if ($posts_missing_flag = array_diff($arr_have_revisions, $have_flag_ids)) {
 		foreach($posts_missing_flag as $post_id) {
 			rvy_update_post_meta($post_id, '_rvy_has_revisions', true);
+		}
+	}
+
+	if ($posts_invalid_flag = array_diff($have_flag_ids, $arr_have_revisions)) {
+		foreach($posts_missing_flag as $post_id) {
+			rvy_delete_post_meta($post_id, '_rvy_has_revisions');
 		}
 	}
 }
@@ -1388,15 +1432,15 @@ function rvy_preview_url($revision, $args = []) {
 
 	if ('revision' == $post_type) {
 		$post_type = get_post_field('post_type', $revision->post_parent);
+	} else {
+		if ($post_type_obj = get_post_type_object($revision->post_type)) {
+			if (empty($post_type_obj->public) && !defined('FL_BUILDER_VERSION') && !apply_filters('revisionary_private_type_use_preview_url', false, $revision)) { // For non-public types, preview is not available so default to Compare Revisions screen
+				return apply_filters('revisionary_preview_url', rvy_admin_url("revision.php?revision=$revision->ID"), $revision, $args);
+			}
+		}
 	}
 
 	$post_type = sanitize_key($post_type);
-
-	if ($post_type_obj = get_post_type_object($revision->post_type)) {
-		if (empty($post_type_obj->public) && !defined('FL_BUILDER_VERSION') && !apply_filters('revisionary_private_type_use_preview_url', false, $revision)) { // For non-public types, preview is not available so default to Compare Revisions screen
-			return apply_filters('revisionary_preview_url', rvy_admin_url("revision.php?revision=$revision->ID"), $revision, $args);
-		}
-	}
 
 	$link_type = rvy_get_option('preview_link_type');
 

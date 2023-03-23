@@ -231,6 +231,14 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.1.12 - 23 Mar 2023 =
+* Fixed : Posts were left with invalid "Has Revision" links after publication or deletion of all their revisions
+* Fixed : If Revision Submission for Unpublished Posts is disabled but revisions of draft posts were previously created, those caused a "Has Revisions" label without displaying the revisions in Queue
+* Fixed : Links to Revision Queue for a specific published post (including "Has Revision" links from Posts listing) failed to list unsubmitted revisions
+* Fixed : Revision Compare > Manage : Non-rendered html tags, incorrect table formatting 
+* Fixed : Compare Past Revisions - invalid link on Preview / Restore button
+* Fixed : Request Deletion link was displayed even if revisions are not enabled for post type
+
 = 3.1.11 - 9 Feb 2023 =
 * Fixed : Revision preview failure under some conditions
 * Fixed : Avoid PHP Warning on Revision Preview if requested revision cannot be loaded

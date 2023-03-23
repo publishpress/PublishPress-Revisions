@@ -956,6 +956,13 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	clean_post_cache($revision_id);
 	clean_post_cache($published->ID);
 
+	if (defined('LSCWP_V')) {
+		do_action('litespeed_purge_post', $published->ID);
+	}
+
+	// Passing ignore_revision_ids is not theoretically necessary here since this call occurs after deletion, but avoid any cache clearance timing issues.
+	revisionary_refresh_revision_flags($published->ID, ['ignore_revision_ids' => $revision_id]);
+
 	/**
 	 * Trigger after a revision has been applied.
 	 *
@@ -1083,6 +1090,8 @@ function rvy_revision_bulk_delete() {
 		$post_ids = [];
 
 		foreach ($delete_revisions as $revision_id) {
+			$published_post_id = rvy_post_id();
+			
 			// this function is only used for past revisions (status=inherit)
 			if ( ! $revision = wp_get_post_revision( $revision_id ) )
 				continue;
@@ -1111,7 +1120,7 @@ function rvy_revision_bulk_delete() {
 			wp_delete_post($revision_id, true);
 			$delete_count++;
 
-			do_action('rvy_delete_revision', $revision_id);
+			do_action('rvy_delete_revision', $revision_id, $published_post_id);
 
 			rvy_delete_past_revisions($revision_id);
 		}

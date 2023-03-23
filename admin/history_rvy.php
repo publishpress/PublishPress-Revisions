@@ -1190,12 +1190,12 @@ class RevisionaryHistory
 
                 if (rvyRevisionID != rvyLastID) {
                     <?php if($show_preview_link):?>
-                    var rvyPreviewURL = '<?php echo esc_url($preview_url);?>';
+                    var rvyPreviewURL = '<?php echo esc_url_raw($preview_url);?>';
                     rvyPreviewURL = rvyPreviewURL.replace("page_id=" + <?php echo esc_attr($post_id);?>, "page_id=" + rvyRevisionID);
                     rvyPreviewURL = rvyPreviewURL.replace("p=" + <?php echo esc_attr($post_id);?>, "p=" + rvyRevisionID);
                     <?php endif;?>
 
-                    var rvyManageURL = '<?php echo esc_url($manage_url);?>';
+                    var rvyManageURL = '<?php echo esc_url_raw($manage_url);?>';
                     rvyManageURL = rvyManageURL.replace("revision=" + <?php echo esc_attr($post_id);?>, "revision=" + rvyRevisionID);
 
                     if(!$('span.rvy-compare-preview').length) {
