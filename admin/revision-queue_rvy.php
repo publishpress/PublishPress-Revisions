@@ -97,7 +97,7 @@ if (!empty($_REQUEST['author'])) {
 
 if (!empty($_REQUEST['post_status'])) {
 	if ($status_obj = get_post_status_object(sanitize_key($_REQUEST['post_status']))) {
-		$filters['post_status'] = $status_obj->labels->plural;
+		$filters['post_status'] = (!empty($status_obj->labels->plural)) ? $status_obj->labels->plural : $status_obj->label;
 	}
 }
 
