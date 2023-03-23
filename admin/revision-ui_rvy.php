@@ -244,7 +244,7 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 			
 			$datef = __awp( 'M j, Y @ g:i a' );
 			
-			$rows .= "<tr class='" . esc_attr($class) . ">";
+			$rows .= "<tr class='" . esc_attr($class) . "'>";
 
 			if ( $post->ID != $revision->ID ) {
 				if ('inherit' == $revision->post_status) {
