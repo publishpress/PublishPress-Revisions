@@ -113,9 +113,14 @@ default :
 		$delete_cap = $type_obj->cap->delete_post;
 	}
 
-	$published_title = "<a href='post.php?action=edit&post=$rvy_post->ID'>$rvy_post->post_title</a>";
 	?>
-	<h1><?php printf(esc_html__('Revisions of %s', 'revisionary'), esc_html($published_title));?></h1>
+	<h1>
+	<?php printf(
+			esc_html__('Revisions of %s', 'revisionary'), 
+			"<a href='post.php?action=edit&post=$rvy_post->ID'>" . esc_html($rvy_post->post_title) . "</a>"
+		);
+	?>
+	</h1>
 	<?php
 
 	// Sets up the diff radio buttons
@@ -222,15 +227,19 @@ foreach ( array_keys($revision_status_captions) as $_revision_status ) {
 	
 	if ( $is_administrator ) {
 		if ($num_revisions->$_revision_status) {
-			echo "<li class='" . esc_attr($class) . "'><a href='" . esc_url($_link) . "' target='" . esc_attr($target) . "'>" 
-			. sprintf( 
+			echo "<li class='" . esc_attr($class) . "'><a href='" . esc_url($_link) . "' target='" . esc_attr($target) . "'>";
+			
+			$span_style = ('inherit' == $_revision_status) ? ' style="font-weight:bold"' : '';
+
+			printf( 
 				esc_html__( '%1$s %2$s (%3$s)%4$s', 'revisionary' ), 
-				'<span class="count">',
+				"<span class='count' $span_style>",
 				esc_html($status_caption), 
 				esc_html(number_format_i18n( $num_revisions->$_revision_status )),
 				'</span>'
-			) 
-			. '</a></li>';
+			) ;
+			
+			echo '</a></li>&nbsp;&nbsp;';
 		}
 	} else {
 		echo "<li class='" . esc_attr($class) . "'><a href='" . esc_url($_link) . "' target='" . esc_attr($target) . "'>" . esc_html($status_caption) . '</a></li>';
