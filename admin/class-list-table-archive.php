@@ -432,11 +432,13 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				esc_html__( '%s hours ago', 'revisionary' ),
 				floor( $time_diff / 3600 )
 			);
+		} elseif ( date( 'Y' ) === date( 'Y', $timestamp ) ) {
+			$result = date( 'M j @ h:i a', $timestamp );
 		} else {
-			$result = date( 'M j, Y h:i a', $timestamp );
+			$result = date( 'M j, Y @ h:i a', $timestamp );
 		}
 
-		$saved_time = date( 'Y/m/d H:i:s' );
+		$saved_time = date( 'Y/m/d H:i:s', $timestamp );
 
 		return '<abbr title="' . esc_attr( $saved_time ) . '">' . $result . '</abbr>';
 	}
