@@ -447,12 +447,32 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
     public function column_default( $item, $column_name ) {
         switch ( $column_name ) {
             case 'post_title':
-				printf(
-					'<strong><a class="row-title rvy-open-popup" href="%s" data-label="%s">%s</a></strong>',
-					esc_url_raw( get_edit_post_link( $item->ID ) . '&width=900&height=600&rvy-popup=true&TB_iframe=1' ),
-					esc_attr( $item->$column_name ),
-					$item->$column_name
-				);
+				// Are revisions enabled for the post type of this post parent?
+				$post_object 		= get_post( $item->post_parent );
+				$revisions_enabled	= wp_revisions_enabled( $post_object );
+				if( $revisions_enabled ) {
+					// Show title with link
+					printf(
+						'<strong><a class="row-title rvy-open-popup" href="%s" data-label="%s">%s</a></strong>',
+						esc_url_raw( get_edit_post_link( $item->ID ) . '&width=900&height=600&rvy-popup=true&TB_iframe=1' ),
+						esc_attr( $item->$column_name ),
+						$item->$column_name
+					);
+				} else {
+					// Show title WITHOUT link
+					printf(
+						'<strong>%s</strong> %s',
+						$item->$column_name,
+						sprintf(
+							'<span class="dashicons dashicons-info" title="%s"></span>',
+							sprintf(
+								esc_attr__( 'Revisions are disabled for %s post type', 'revisionary' ),
+								$item->origin_post_type
+							)
+						)
+					);
+				}
+
 				break;
 
 			case 'origin_post_type':
@@ -630,11 +650,12 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		}
 
 		$actions 			= [];
-		$title				= _draft_or_post_title();
 		$can_read_post		= current_user_can( 'read_post', $item->ID );
 		$can_edit_post		= current_user_can( 'edit_post', $item->ID );
 		$can_delete_post	= current_user_can( 'delete_post', $item->ID );
 		$post_type_object 	= get_post_type_object( $item->origin_post_type );
+		$post_object 		= get_post( $item->post_parent );
+		$revisions_enabled	= wp_revisions_enabled( $post_object );
 
 		// @TODO - Why delete is not visible, even for admins?
 		if ( $can_delete_post ) {
@@ -642,17 +663,22 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				$actions['delete'] = sprintf(
 					'<a href="%1$s" class="submitdelete" title="%2$s" aria-label="%2$s">%3$s</a>',
 					$delete_link,
-					esc_attr( sprintf( esc_html__( 'Delete Revision', 'revisionary' ), $title ) ),
+					esc_attr( sprintf( esc_html__( 'Delete Revision', 'revisionary' ), esc_attr( $item->post_title ) ) ),
 					esc_html__( 'Delete' )
 				);
 			}
 		}
 
-		if ( $can_read_post || $can_edit_post ) {
+		if ( ( $can_read_post || $can_edit_post ) && $revisions_enabled ) {
 			$actions['diff'] = sprintf(
 				'<a href="%1$s" class="" title="%2$s" aria-label="%2$s" target="_revision_diff">%3$s</a>',
 				admin_url( "revision.php?revision=$item->ID" ),
-				esc_attr( sprintf( esc_html__('Compare Changes', 'revisionary'), $title ) ),
+				esc_attr(
+					sprintf(
+						esc_html__( 'Compare Changes in %s', 'revisionary' ),
+						$item->post_title
+					)
+				),
 				_x( 'Compare', 'revisions', 'revisionary' )
 			);
 		}
