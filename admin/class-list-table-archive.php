@@ -448,7 +448,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
         switch ( $column_name ) {
             case 'post_title':
 				printf(
-					'<strong><a class="row-title rvy-open-popup" href="%s" data-label="%s">%s</a></strong> <span style="opacity:0.5;">ID: ' . $item->ID . ' - post_parent:' . $item->post_parent . '</span>',
+					'<strong><a class="row-title rvy-open-popup" href="%s" data-label="%s">%s</a></strong>',
 					esc_url_raw( get_edit_post_link( $item->ID ) . '&width=900&height=600&rvy-popup=true&TB_iframe=1' ),
 					esc_attr( $item->$column_name ),
 					$item->$column_name
