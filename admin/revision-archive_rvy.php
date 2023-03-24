@@ -21,7 +21,7 @@ wp_add_inline_script(
 		$('.rvy-open-popup').unbind('click').click(function (e) {
 			e.preventDefault();
 			var label = '" . esc_html__( 'Revision for:', 'revisionary' ) . "' + ' ' + $(this).data('label');
-			tb_show(label, $(this).data('link'));
+			tb_show(label, $(this).attr('href'));
 		});
 	});"
 );
