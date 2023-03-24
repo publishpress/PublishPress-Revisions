@@ -636,6 +636,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$can_delete_post	= current_user_can( 'delete_post', $item->ID );
 		$post_type_object 	= get_post_type_object( $item->origin_post_type );
 
+		// @TODO - Why delete is not visible, even for admins?
 		if ( $can_delete_post ) {
 			if ( $delete_link = get_delete_post_link( $item->ID, '', true ) ) {
 				$actions['delete'] = sprintf(
