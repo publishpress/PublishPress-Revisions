@@ -218,7 +218,7 @@ add_action(
 
 		if (version_compare($wp_version, $min_wp_version, '<')) {
 			if (is_admin() && current_user_can('activate_plugins')) {
-				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(esc_html__('PublishPress Revisions requires WordPress version %s or higher.', 'revisionary'), '4.9.7') . "</div>"; });
+				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(esc_html__('PublishPress Revisions requires WordPress version %s or higher.', 'revisionary'), $min_wp_version) . "</div>"; });
 			}
 			return;
 		}
