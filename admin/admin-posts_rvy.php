@@ -88,12 +88,6 @@ class RevisionaryAdminPosts {
 			$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 			$revision_base_statuses = array_map('sanitize_key', rvy_revision_base_statuses());
-
-			if (!rvy_get_option('pending_revision_unpublished')) {
-				$published_statuses = get_post_stati( ['public' => true, 'private' => true], 'names', 'or' );
-				$revision_base_statuses = array_intersect($revision_base_statuses, $published_statuses);
-			}
-
 			$revision_base_status_csv = implode("','", $revision_base_statuses);
 
 			$results = $wpdb->get_results(

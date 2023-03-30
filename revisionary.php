@@ -5,11 +5,11 @@
  * Description: Maintain published content with teamwork and precision using the Revisions model to submit, approve and schedule changes.
  * Author: PublishPress
  * Author URI: https://publishpress.com
- * Version: 3.1.12
+ * Version: 3.1.13
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 4.9.7
- * Requires PHP: 5.6.20
+ * Requires PHP: 7.2.5
  * 
  * Copyright (c) 2022 PublishPress
  *
@@ -36,7 +36,7 @@
 
 // Temporary usage within this module only; avoids multiple instances of version string
 global $pp_revisions_version;
-$pp_revisions_version = '3.1.12';
+$pp_revisions_version = '3.1.13';
 
 if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die( 'This page cannot be called directly.' );
@@ -204,21 +204,21 @@ add_action(
 		global $wp_version;
 
 		$min_wp_version = '4.9.7';
-		$min_php_version = '5.6.20';
+		$min_php_version = '7.2.5';
 
 		$php_version = phpversion();
 
 		// Critical errors that prevent initialization
 		if (version_compare($min_php_version, $php_version, '>')) {
 			if (is_admin() && current_user_can('activate_plugins')) {
-				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(esc_html__('PublishPress Revisions requires PHP version %s or higher.', 'revisionary'), '5.6.20') . "</div>"; });
+				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(esc_html__('PublishPress Revisions requires PHP version %s or higher.', 'revisionary'), $min_php_version) . "</div>"; });
 			}
 			return;
 		}
 
 		if (version_compare($wp_version, $min_wp_version, '<')) {
 			if (is_admin() && current_user_can('activate_plugins')) {
-				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(esc_html__('PublishPress Revisions requires WordPress version %s or higher.', 'revisionary'), '4.9.7') . "</div>"; });
+				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(esc_html__('PublishPress Revisions requires WordPress version %s or higher.', 'revisionary'), $min_wp_version) . "</div>"; });
 			}
 			return;
 		}

@@ -939,9 +939,10 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		if (empty($_REQUEST['mailinfo'])):?>
 			<br />
 			<div style="padding-left:22px">
-			<a href="<?php echo esc_url(add_query_arg('mailinfo', '1', $uri));?>"><?php esc_html_e('Show Notification Log / Buffer', 'revisionary');?></a>
+
+			<a href="<?php echo esc_url(add_query_arg('ppr_tab', 'notification', add_query_arg('mailinfo', '1', $uri)));?>"><?php esc_html_e('Show Notification Log / Buffer', 'revisionary');?></a>
 			<br /><br />
-			<a href="<?php echo esc_url(add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $uri)));?>"><?php esc_html_e('Show with message content', 'revisionary');?></a>
+			<a href="<?php echo esc_url(add_query_arg('ppr_tab', 'notification', add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $uri))));?>"><?php esc_html_e('Show with message content', 'revisionary');?></a>
 			</div>
 		<?php endif;
 

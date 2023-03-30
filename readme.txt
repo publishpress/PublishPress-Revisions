@@ -5,9 +5,9 @@ Author: PublishPress
 Author URI: https://publishpress.com
 Tags: revision, submit changes, duplicate post, duplicate page, revisions, approve changes, scheduled changes
 Requires at least: 4.9.7
-Requires PHP: 5.6.20
-Tested up to: 6.1
-Stable tag: 3.1.12
+Requires PHP: 7.2.5
+Tested up to: 6.2
+Stable tag: 3.1.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -230,6 +230,11 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
 == Changelog ==
+
+= 3.1.13 - 30 Mar 2023 =
+* Fixed : Posts screen - Has Revision caption was not displayed unless "Revision Submission for Unpublished Posts" setting is enabled  
+* Fixed : Settings > Notifications > "Show Notification Log / Buffer" link did not redirect back to Notifications tab
+* Change : Minimum PHP version 7.2.5
 
 = 3.1.12 - 23 Mar 2023 =
 * Fixed : Posts were left with invalid "Has Revision" links after publication or deletion of all their revisions
