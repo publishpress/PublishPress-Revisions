@@ -9,7 +9,7 @@
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 4.9.7
- * Requires PHP: 5.6.20
+ * Requires PHP: 7.2.5
  * 
  * Copyright (c) 2022 PublishPress
  *
@@ -204,14 +204,14 @@ add_action(
 		global $wp_version;
 
 		$min_wp_version = '4.9.7';
-		$min_php_version = '5.6.20';
+		$min_php_version = '7.2.5';
 
 		$php_version = phpversion();
 
 		// Critical errors that prevent initialization
 		if (version_compare($min_php_version, $php_version, '>')) {
 			if (is_admin() && current_user_can('activate_plugins')) {
-				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(esc_html__('PublishPress Revisions requires PHP version %s or higher.', 'revisionary'), '5.6.20') . "</div>"; });
+				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(esc_html__('PublishPress Revisions requires PHP version %s or higher.', 'revisionary'), $min_php_version) . "</div>"; });
 			}
 			return;
 		}
