@@ -5,7 +5,7 @@ Author: PublishPress
 Author URI: https://publishpress.com
 Tags: revision, submit changes, duplicate post, duplicate page, revisions, approve changes, scheduled changes
 Requires at least: 4.9.7
-Requires PHP: 5.6.20
+Requires PHP: 7.2.5
 Tested up to: 6.1
 Stable tag: 3.1.12
 License: GPLv2 or later
