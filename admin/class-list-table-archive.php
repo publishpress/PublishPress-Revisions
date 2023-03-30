@@ -419,8 +419,10 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$timestamp 		= strtotime( $time );
 		$current_time 	= time();
 		$time_diff		= $current_time - $timestamp;
+		$date_format 	= sanitize_text_field( get_option( 'date_format' ) );
+		$time_format 	= sanitize_text_field( get_option( 'time_format' ) );
 
-		if ( $time_diff < 60 ) {
+		/*if ( $time_diff < 60 ) {
 			$result = esc_html__( 'just now', 'revisionary' );
 		} elseif ( $time_diff < 3600 ) {
 			$result = sprintf(
@@ -432,12 +434,16 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				esc_html__( '%s hours ago', 'revisionary' ),
 				floor( $time_diff / 3600 )
 			);
-		} elseif ( date( 'Y' ) === date( 'Y', $timestamp ) ) {
-			$result = date( 'M j @ h:i a', $timestamp );
+		} elseif ( $time_diff < 2592000 ) {
+			$result = sprintf(
+				esc_html__( '%s days ago', 'revisionary' ),
+				floor( $time_diff / 86400 )
+			);
 		} else {
-			$result = date( 'M j, Y @ h:i a', $timestamp );
-		}
+			$result = date_i18n( "$date_format @ $time_format", $timestamp );
+		}*/
 
+		$result		= date_i18n( "$date_format @ $time_format", $timestamp );
 		$saved_time = date( 'Y/m/d H:i:s', $timestamp );
 
 		return '<abbr title="' . esc_attr( $saved_time ) . '">' . $result . '</abbr>';
