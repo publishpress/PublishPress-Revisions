@@ -231,6 +231,11 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.1.13 - 30 Mar 2023 =
+* Fixed : Posts screen - Has Revision caption was not displayed unless "Revision Submission for Unpublished Posts" setting is enabled  
+* Fixed : Settings > Notifications > "Show Notification Log / Buffer" link did not redirect back to Notifications tab
+* Change : Minimum PHP version 7.2.5
+
 = 3.1.12 - 23 Mar 2023 =
 * Fixed : Posts were left with invalid "Has Revision" links after publication or deletion of all their revisions
 * Fixed : If Revision Submission for Unpublished Posts is disabled but revisions of draft posts were previously created, those caused a "Has Revisions" label without displaying the revisions in Queue
