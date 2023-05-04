@@ -5,7 +5,7 @@ function rvy_mu_site_menu() {
 		return;
 
 	// WP MU site options
-	if ( awp_is_mu() ) {
+	if (defined('RVY_NETWORK') && RVY_NETWORK) {
 		// Network-Wide Settings
 		add_submenu_page( 'revisionary-q', esc_html__('PublishPress Revisions Network Settings', 'revisionary'), esc_html__('Network Settings', 'revisionary'), 'read', 'rvy-net_options', 'rvy_mu_include_options_sitewide');
 		add_action( 'revisionary_page_rvy-net_options', 'rvy_mu_include_options_sitewide' );	
