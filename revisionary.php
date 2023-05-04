@@ -8,7 +8,7 @@
  * Version: 3.1.13
  * Text Domain: revisionary
  * Domain Path: /languages/
- * Min WP Version: 4.9.7
+ * Min WP Version: 5.5
  * Requires PHP: 7.2.5
  * 
  * Copyright (c) 2022 PublishPress
@@ -203,23 +203,13 @@ add_action(
 
 		global $wp_version;
 
-		$min_wp_version = '4.9.7';
 		$min_php_version = '7.2.5';
+		$min_wp_version  = '5.5';
 
-		$php_version = phpversion();
+		$invalid_php_version = version_compare(phpversion(), $min_php_version, '<');
+		$invalid_wp_version = version_compare($wp_version, $min_wp_version, '<');
 
-		// Critical errors that prevent initialization
-		if (version_compare($min_php_version, $php_version, '>')) {
-			if (is_admin() && current_user_can('activate_plugins')) {
-				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(esc_html__('PublishPress Revisions requires PHP version %s or higher.', 'revisionary'), $min_php_version) . "</div>"; });
-			}
-			return;
-		}
-
-		if (version_compare($wp_version, $min_wp_version, '<')) {
-			if (is_admin() && current_user_can('activate_plugins')) {
-				add_action('all_admin_notices', function(){echo "<div id='message' class='notice error'>" . sprintf(esc_html__('PublishPress Revisions requires WordPress version %s or higher.', 'revisionary'), $min_wp_version) . "</div>"; });
-			}
+		if ($invalid_php_version || $invalid_wp_version) {
 			return;
 		}
 
