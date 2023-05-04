@@ -1390,7 +1390,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 							}
 						}
 			
-						if (array_intersect($user->roles, $skip_notification_revisor_roles)) {
+						if (!empty($skip_notification_revisor_roles) && array_intersect($user->roles, $skip_notification_revisor_roles)) {
 							$skip_notification = true;
 						}
 					}

@@ -908,6 +908,12 @@ class Revisionary
 			if (('draft-revision' == $post->post_mime_type) && !rvy_is_post_author($post) && rvy_get_option('manage_unsubmitted_capability') && empty($wp_blogcaps['manage_unsubmitted_revisions'])) {
 				unset($wp_blogcaps[$object_type_obj->cap->edit_others_posts]);
 			} else {
+				if (defined('DOING_AJAX') && DOING_AJAX && !empty($_REQUEST['action']) && (false !== strpos(sanitize_key($_REQUEST['action']), 'query-attachments'))) {
+					if ('post' == $post->post_type) {
+						return $wp_blogcaps;
+					}
+				}
+
 				// If edit_others capability is being required for this post type, apply edit_others_revisions capability
 				if (!empty($object_type_obj->cap) && in_array($object_type_obj->cap->edit_others_posts, $reqd_caps)) {
 					if (!empty($current_user->allcaps['edit_others_revisions']) || !rvy_get_option('revisor_lock_others_revisions')) {
