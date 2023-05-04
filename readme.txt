@@ -239,6 +239,11 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.2 - 4 May 2023 =
+* Change : Bump WordPress version requirement to 5.5
+* Change : Bump PHP version requirement to 7.2.5
+* Change : Update vendor libraries based on revised PHP version support
+
 = 3.1.13 - 30 Mar 2023 =
 * Fixed : Posts screen - Has Revision caption was not displayed unless "Revision Submission for Unpublished Posts" setting is enabled  
 * Fixed : Settings > Notifications > "Show Notification Log / Buffer" link did not redirect back to Notifications tab
