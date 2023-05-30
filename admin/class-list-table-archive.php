@@ -213,8 +213,6 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$orderby 	= array_key_exists( 'orderby', $args ) ? $args['orderby'] : 'post_date';
 		$order 		= array_key_exists( 'order', $args ) ? $args['order'] : 'DESC';
 
-
-		// @TODO - Optimize query
 		$query = "SELECT
 			r.ID AS ID,
 			r.post_type AS post_type,
@@ -228,65 +226,26 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				WHERE p3.post_parent = r.post_parent
 				AND p3.post_type = 'revision'
 			) AS post_count,
-			IF( r3.comment_count > 0,
-				(
-					SELECT p2.post_author
-					FROM $wpdb->posts p2
-					WHERE p2.ID = (
-						SELECT r3.comment_count
-						FROM $wpdb->posts r3
-						WHERE r.post_parent = r3.ID
-						ORDER BY r3.ID DESC
-						LIMIT 0,1
-					)
-				),
-				(
-					SELECT p2.post_author
-					FROM $wpdb->posts p2
-					WHERE p2.ID = r.post_parent
-					ORDER BY p2.ID DESC
-					LIMIT 0,1
-				)
+			(
+				SELECT p2.post_author
+				FROM $wpdb->posts p2
+				WHERE p2.ID = r.post_parent
+				ORDER BY p2.ID DESC
+				LIMIT 0,1
 			) AS origin_post_author,
-			IF( r3.comment_count > 0,
-				(
-					SELECT p2.post_date
-					FROM $wpdb->posts p2
-					WHERE p2.ID = (
-						SELECT r3.comment_count
-						FROM $wpdb->posts r3
-						WHERE r.post_parent = r3.ID
-						ORDER BY r3.ID DESC
-						LIMIT 0,1
-					)
-				),
-				(
-					SELECT p2.post_date
-					FROM $wpdb->posts p2
-					WHERE p2.ID = r.post_parent
-					ORDER BY p2.ID DESC
-					LIMIT 0,1
-				)
+			(
+				SELECT p2.post_date
+				FROM $wpdb->posts p2
+				WHERE p2.ID = r.post_parent
+				ORDER BY p2.ID DESC
+				LIMIT 0,1
 			) AS origin_post_date,
-			IF( r3.comment_count > 0,
-				(
-					SELECT p2.post_type
-					FROM $wpdb->posts p2
-					WHERE p2.ID = (
-						SELECT r3.comment_count
-						FROM $wpdb->posts r3
-						WHERE r.post_parent = r3.ID
-						ORDER BY r3.ID DESC
-						LIMIT 0,1
-					)
-				),
-				(
-					SELECT p2.post_type
-					FROM $wpdb->posts p2
-					WHERE p2.ID = r.post_parent
-					ORDER BY p2.ID DESC
-					LIMIT 0,1
-				)
+			(
+				SELECT p2.post_type
+				FROM $wpdb->posts p2
+				WHERE p2.ID = r.post_parent
+				ORDER BY p2.ID DESC
+				LIMIT 0,1
 			) AS origin_post_type
 		FROM $wpdb->posts r
 		LEFT JOIN $wpdb->posts r3 ON r.post_parent = r3.ID
