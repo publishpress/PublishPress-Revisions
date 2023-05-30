@@ -489,7 +489,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				echo $this->build_filter_link(
 					$type_label,
 					[
-						'origin_post_type' => sanitize_key( $type_label )
+						'origin_post_type' => sanitize_key( $item->$column_name )
 					]
 				);
 				break;
