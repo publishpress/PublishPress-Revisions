@@ -483,10 +483,13 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				break;
 
 			case 'origin_post_type':
+				$type_obj = get_post_type_object($item->$column_name);
+				$type_label = (!empty($type_obj)) ? $type_obj->labels->singular_name : $item->$column_name;
+
 				echo $this->build_filter_link(
-					$item->$column_name,
+					$type_label,
 					[
-						'origin_post_type' => sanitize_key( $item->$column_name )
+						'origin_post_type' => sanitize_key( $type_label )
 					]
 				);
 				break;
