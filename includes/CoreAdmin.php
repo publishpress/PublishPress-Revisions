@@ -9,25 +9,36 @@ class CoreAdmin {
         add_filter('publishpress_revisions_settings_sidebar', function($class) {return 'has-right-sidebar';});
 
         if (is_admin()) {
-            $autoloadPath = RVY_ABSPATH . '/vendor/autoload.php';
-			if (file_exists($autoloadPath)) {
-				require_once $autoloadPath;
-			}
-
-            require_once RVY_ABSPATH . '/vendor/publishpress/wordpress-version-notices/includes.php';
-    
-            add_filter(\PPVersionNotices\Module\TopNotice\Module::SETTINGS_FILTER, function ($settings) {
-                $settings['revisionary'] = [
-                    'message' => 'You\'re using PublishPress Revisions Free. The Pro version has more features and support. %sUpgrade to Pro%s',
-                    'link'    => 'https://publishpress.com/links/revisions-banner',
-                    'screens' => [
-                        ['base' => 'toplevel_page_revisionary-q'],
-                        ['base' => 'revisions_page_revisionary-settings'],
-                    ]
-                ];
-    
-                return $settings;
-            });
+        	// Previous Version Notices implementation:
+            // require_once RVY_ABSPATH . '/vendor/publishpress/wordpress-version-notices/includes.php';
+        	
+            add_action(
+                'plugins_loaded',
+                function() {
+                    if (defined('PUBLISHPRESS_REVISIONS_VENDOR_PATH')) {
+                        if (!defined('PP_VERSION_NOTICES_LOADED')) {
+                            $includesPath = PUBLISHPRESS_REVISIONS_VENDOR_PATH . 'publishpress/wordpress-version-notices/includes.php';
+            
+                            if (file_exists($includesPath)) {
+                                require_once $includesPath;
+                            }
+						}
+			
+			            add_filter(\PPVersionNotices\Module\TopNotice\Module::SETTINGS_FILTER, function ($settings) {
+			                $settings['revisionary'] = [
+			                    'message' => 'You\'re using PublishPress Revisions Free. The Pro version has more features and support. %sUpgrade to Pro%s',
+			                    'link'    => 'https://publishpress.com/links/revisions-banner',
+			                    'screens' => [
+			                        ['base' => 'toplevel_page_revisionary-q'],
+			                        ['base' => 'revisions_page_revisionary-settings'],
+			                    ]
+			                ];
+			    
+			                return $settings;
+			            });
+                    }
+                }
+            );
         }
     }
 

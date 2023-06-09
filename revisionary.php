@@ -44,9 +44,13 @@ if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_ur
 if (isset($_SERVER['SCRIPT_NAME']) && strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/index-extra.php' ) || strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/update.php' ) )
 	return;
 
-$includeFileRelativePath = '/publishpress/publishpress-instance-protection/include.php';
-if (file_exists(__DIR__ . '/vendor' . $includeFileRelativePath)) {
-	require_once __DIR__ . '/vendor' . $includeFileRelativePath;
+if (! defined('REVISIONS_INTERNAL_VENDORPATH')) {
+	define('REVISIONS_INTERNAL_VENDORPATH', __DIR__ . '/libraries/internal-vendor');
+}
+
+$includeFileRelativePath = REVISIONS_INTERNAL_VENDORPATH . '/publishpress/publishpress-instance-protection/include.php';
+if (file_exists($includeFileRelativePath)) {
+	require_once $includeFileRelativePath;
 }
 
 if (class_exists('PublishPressInstanceProtection\\Config')) {
@@ -111,7 +115,15 @@ if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1
 	return;
 }
 
-define('REVISIONARY_FILE', __FILE__);
+if (!defined('REVISIONARY_FILE')) {
+	define('REVISIONARY_FILE', __FILE__);
+
+	if (! class_exists('ComposerAutoloaderInitRevisionsPro')
+		&& file_exists(REVISIONS_INTERNAL_VENDORPATH . '/autoload.php')
+	) {
+		require_once REVISIONS_INTERNAL_VENDORPATH . '/autoload.php';
+	}
+}
 
 add_action(
 	'init', 
