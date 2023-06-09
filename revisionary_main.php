@@ -152,7 +152,9 @@ class Revisionary
 
 		add_filter('wp_dropdown_pages', [$this, 'fltDropdownPages'], 10, 3);
 
-		do_action( 'rvy_init', $this );
+		if (defined('REVISIONARY_RVY_INIT_ACTION')) {
+			do_action( 'rvy_init', $this );
+		}
 	}
 
 	// Work around unfilterable get_pages() query by replacing the wp_dropdown_pages() return array
