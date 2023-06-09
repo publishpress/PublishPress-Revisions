@@ -239,7 +239,16 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.2 - 4 May 2023 =
+= 3.2.1 - 12 Jun 2023 =
+* Feature : Revisions > Settings > Revision Creation > "Limit to one active revision per post"
+* Fixed : Plugin compat - dashboard_glance_items was improperly filtered
+* Fixed : Revisions were incorrectly attributed to original page author under some conditions
+* Compat : Revision Queue - Work around unidentified plugin conflict inserting inappropriate clauses into our posts query
+* Compat : PublishPress Authors - Author changes in revision were not applied at revision publication
+* Compat : PublishPress Authors - Revision Queue "Revised By" column always showed original post author
+* Compat : Permissions + WordFence - Add Media query was not filtered based on Permissions settings
+* Fixed : Multisite - Some settings UI were not displayed when plugin on network installations when plugin is not activated network-wide 
+* Fixed : Multisite - Settings previously configured for network-wide activation were not displayed on sub-site settings screen even after network deactivation
 * Change : Bump WordPress version requirement to 5.5
 * Change : Bump PHP version requirement to 7.2.5
 * Change : Update vendor libraries based on revised PHP version support
