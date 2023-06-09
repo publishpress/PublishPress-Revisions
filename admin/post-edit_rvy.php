@@ -188,6 +188,10 @@ class RvyPostEdit {
     public static function author_ui() {
         global $post;
 
+        if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
+            return [];
+        }
+
         if (!$type_obj = get_post_type_object($post->post_type)) {
             return [];
         }
