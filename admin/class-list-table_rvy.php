@@ -201,6 +201,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			remove_filter('posts_where', ['MultipleAuthors\\Classes\\Query', 'filter_posts_where'], 10, 2);
 			remove_filter('posts_join', ['MultipleAuthors\\Classes\\Query', 'filter_posts_join'], 10, 2);
 			remove_filter('posts_groupby', ['MultipleAuthors\\Classes\\Query', 'filter_posts_groupby'], 10, 2);
+
+			if (!defined('PUBLISHPRESS_AUTHORS_DISABLE_FILTER_THE_AUTHOR')) {
+				define('PUBLISHPRESS_AUTHORS_DISABLE_FILTER_THE_AUTHOR', true);
+			}
 		}
 
 		if (!empty($_REQUEST['s'])) {
