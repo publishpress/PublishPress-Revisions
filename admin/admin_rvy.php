@@ -124,7 +124,7 @@ class RevisionaryAdmin
 				}
 			}
 
-			if (($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-settings'])
+			if ((($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-settings'])
 			|| (defined('DOING_AJAX') && DOING_AJAX && !empty($_REQUEST['action']) && (false !== strpos(sanitize_key($_REQUEST['action']), 'revisionary')))
 			) && !defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 				if (!class_exists('\PublishPress\WordPressReviews\ReviewsController')) {
