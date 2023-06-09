@@ -225,7 +225,7 @@ class Revisionary
 			if (!empty($status_obj->public) || !empty($status_obj->private) || rvy_get_option('pending_revision_unpublished')) {
 				if ($type_obj = get_post_type_object($post->post_type)) {
 
-					if (current_user_can('copy_post', $post->ID)) {
+					if (current_user_can('copy_post', $post->ID) && rvy_post_revision_supported($post)) {
 						$admin_bar->add_menu([
 								'id'    => 'rvy-create-revision',
 								'title' => pp_revisions_status_label('draft-revision', 'submit_short'), // Your menu title

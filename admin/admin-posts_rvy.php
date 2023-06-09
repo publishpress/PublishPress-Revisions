@@ -182,7 +182,7 @@ class RevisionaryAdminPosts {
 		}
 
 		if (!empty($status_obj->public) || !empty($status_obj->private) || rvy_get_option('pending_revision_unpublished')) {
-			if (rvy_get_option('pending_revisions') && current_user_can('copy_post', $post->ID)) {
+			if (rvy_get_option('pending_revisions') && current_user_can('copy_post', $post->ID) && rvy_post_revision_supported($post)) {
 				$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
 				$url = rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg");
 				

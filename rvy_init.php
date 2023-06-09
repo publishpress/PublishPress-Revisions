@@ -795,6 +795,20 @@ function revisionary_refresh_postmeta($post_id, $args = []) {
 	}
 }
 
+function rvy_post_revision_supported($post) {
+	$post_id = (is_scalar($post)) ? $post : $post->ID;
+
+	if ($post_id) {
+		if (1 === intval(rvy_get_option('revision_limit_per_post'))) {
+			if (rvy_get_post_meta($post_id, '_rvy_has_revisions')) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
 if (!empty($_REQUEST['rvy_flush_flags'])) {
 	revisionary_refresh_revision_flags();
 }
