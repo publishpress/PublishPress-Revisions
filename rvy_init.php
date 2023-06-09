@@ -726,6 +726,10 @@ function rvy_detect_post_id() {
 function rvy_add_revisor_role( $requested_blog_id = '' ) {
 	global $wp_roles;
 	
+	if (defined('REVISIONARY_NO_REVISOR_ROLE')) {
+		return;
+	}
+
 	$wp_role_caps = array(
 		'read' => true,
 		'read_private_posts' => true,
