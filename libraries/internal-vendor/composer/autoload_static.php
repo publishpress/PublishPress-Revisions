@@ -11,35 +11,7 @@ class ComposerStaticInitRevisionary
         '24b27b1b9a32bf58eda571c3e5ae3480' => __DIR__ . '/..' . '/publishpress/pimple-pimple/lib/include.php',
         'ae5402d95e35627098d5ce680b32fe09' => __DIR__ . '/..' . '/publishpress/vendor-locator-revisions/includes.php',
         '41c664bd04a95c2d6a2f2a3e00f06593' => __DIR__ . '/..' . '/publishpress/wordpress-reviews/ReviewsController.php',
-    );
-
-    public static $prefixLengthsPsr4 = array (
-        'P' => 
-        array (
-            'Psr\\Container\\' => 14,
-            'PPVersionNotices\\' => 17,
-        ),
-    );
-
-    public static $prefixDirsPsr4 = array (
-        'Psr\\Container\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/container/src',
-        ),
-        'PPVersionNotices\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/publishpress/wordpress-version-notices/src',
-        ),
-    );
-
-    public static $prefixesPsr0 = array (
-        'P' => 
-        array (
-            'Pimple' => 
-            array (
-                0 => __DIR__ . '/..' . '/pimple/pimple/src',
-            ),
-        ),
+        'a61bc28a742b9f9f2fd5ef4d2d1e2037' => __DIR__ . '/..' . '/publishpress/wordpress-version-notices/src/include.php',
     );
 
     public static $classMap = array (
@@ -49,9 +21,6 @@ class ComposerStaticInitRevisionary
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitRevisionary::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitRevisionary::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitRevisionary::$prefixesPsr0;
             $loader->classMap = ComposerStaticInitRevisionary::$classMap;
 
         }, null, ClassLoader::class);
