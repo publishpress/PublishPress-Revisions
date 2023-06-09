@@ -36,8 +36,10 @@ if ($_post_id = rvy_detect_post_id()) {
     }
 }
 
-add_action( 'enqueue_block_editor_assets', ['RVY_PostBlockEditUI', 'disablePublishPressStatusesScripts'], 1);
-add_action( 'enqueue_block_editor_assets', array( 'RVY_PostBlockEditUI', 'act_object_guten_scripts' ) );
+if (rvy_post_revision_supported($_post_id)) {
+	add_action( 'enqueue_block_editor_assets', ['RVY_PostBlockEditUI', 'disablePublishPressStatusesScripts'], 1);
+	add_action( 'enqueue_block_editor_assets', array( 'RVY_PostBlockEditUI', 'act_object_guten_scripts' ) );
+}
 
 class RVY_PostBlockEditUI {
 	public static function disablePublishPressStatusesScripts() {
