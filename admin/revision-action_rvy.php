@@ -23,6 +23,10 @@ function rvy_revision_create($post_id = 0, $args = []) {
 		}
 	}
 
+	if (!rvy_post_revision_supported($post_id)) {
+		return;
+	}
+
 	$main_post_id = rvy_in_revision_workflow($post_id) ? rvy_post_id($post_id) : $post_id;
 
 	if (!empty($args['force']) || current_user_can('copy_post', $main_post_id)) {
