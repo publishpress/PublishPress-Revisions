@@ -960,6 +960,11 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	clean_post_cache($revision_id);
 	clean_post_cache($published->ID);
 
+	if (!defined('REVISIONARY_DISABLE_SECONDARY_CACHE_FLUSH')) {
+		wp_cache_delete( $published->ID, 'posts' );
+		wp_cache_delete( $published->ID, 'post_meta' );
+	}
+
 	if (defined('LSCWP_V')) {
 		do_action('litespeed_purge_post', $published->ID);
 	}
