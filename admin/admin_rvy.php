@@ -80,7 +80,7 @@ class RevisionaryAdmin
 		}
 
 		if ( ! ( defined( 'SCOPER_VERSION' ) || defined( 'PP_VERSION' ) || defined( 'PPCE_VERSION' ) ) || defined( 'USE_RVY_RIGHTNOW' ) ) {
-			add_action('dashboard_glance_items', [$this, 'actDashboardGlanceItems']);
+			add_filter('dashboard_glance_items', [$this, 'fltDashboardGlanceItems']);
 		}
 
 		if ( rvy_get_option( 'pending_revisions' ) || rvy_get_option( 'scheduled_revisions' ) ) {
@@ -195,9 +195,11 @@ class RevisionaryAdmin
 		return ($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-deletion', 'revisionary-settings']);
 	}
 
-	function actDashboardGlanceItems($items) {
+	function fltDashboardGlanceItems($items) {
 		require_once(dirname(__FILE__).'/admin-dashboard_rvy.php');
 		RevisionaryDashboard::glancePending();
+
+		return $items;
 	}
 
 	function moderation_queue() {
