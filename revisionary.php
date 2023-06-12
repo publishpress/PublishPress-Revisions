@@ -41,6 +41,18 @@ $pp_revisions_version = '3.2';
 if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die( 'This page cannot be called directly.' );
 
+global $wp_version;
+
+$min_php_version = '7.2.5';
+$min_wp_version  = '5.5';
+
+$invalid_php_version = version_compare(phpversion(), $min_php_version, '<');
+$invalid_wp_version = version_compare($wp_version, $min_wp_version, '<');
+
+if ($invalid_php_version || $invalid_wp_version) {
+	return;
+}
+
 if (isset($_SERVER['SCRIPT_NAME']) && strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/index-extra.php' ) || strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/update.php' ) )
 	return;
 
@@ -210,18 +222,6 @@ add_action(
 					echo "<div id='message' class='notice error' style='color:black'>" . esc_html($message) . '</div>';
 				}, 5);
 			}
-			return;
-		}
-
-		global $wp_version;
-
-		$min_php_version = '7.2.5';
-		$min_wp_version  = '5.5';
-
-		$invalid_php_version = version_compare(phpversion(), $min_php_version, '<');
-		$invalid_wp_version = version_compare($wp_version, $min_wp_version, '<');
-
-		if ($invalid_php_version || $invalid_wp_version) {
 			return;
 		}
 
