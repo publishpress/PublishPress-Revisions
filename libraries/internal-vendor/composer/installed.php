@@ -46,15 +46,6 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-        'publishpress/vendor-locator-revisions' => array(
-            'pretty_version' => '1.0.0',
-            'version' => '1.0.0.0',
-            'reference' => '54f05c375ca020f7a2b043f0ae2bb8836874ae56',
-            'type' => 'library',
-            'install_path' => __DIR__ . '/../publishpress/vendor-locator-revisions',
-            'aliases' => array(),
-            'dev_requirement' => false,
-        ),
         'publishpress/wordpress-reviews' => array(
             'pretty_version' => 'v1.1.19',
             'version' => '1.1.19.0',
