@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4f5012aa4ebb6662623b0333bc087194",
+    "content-hash": "9e0491b02bfcb557a25294364568f2db",
     "packages": [
         {
             "name": "publishpress/instance-protection",
@@ -241,43 +241,6 @@
                 "source": "https://github.com/publishpress/library-psr-container/tree/2.0.1.10"
             },
             "time": "2023-05-30T18:17:45+00:00"
-        },
-        {
-            "name": "publishpress/vendor-locator-revisions",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/publishpress/vendor-locator-revisions.git",
-                "reference": "54f05c375ca020f7a2b043f0ae2bb8836874ae56"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/publishpress/vendor-locator-revisions/zipball/54f05c375ca020f7a2b043f0ae2bb8836874ae56",
-                "reference": "54f05c375ca020f7a2b043f0ae2bb8836874ae56",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "./includes.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "PublishPress",
-                    "email": "help@publishpress.com",
-                    "homepage": "https://publishpress.com",
-                    "role": "Developer"
-                }
-            ],
-            "support": {
-                "source": "https://github.com/publishpress/vendor-locator-revisions/tree/1.0.0"
-            },
-            "time": "2023-05-10T14:49:36+00:00"
         },
         {
             "name": "publishpress/wordpress-reviews",
