@@ -28,9 +28,8 @@ function _rvy_jreviews_preview_compat() {
     remove_action('manage_users_custom_column',    [$JReviews, 'show_user_id_column_content'], 10, 3);
 
     /**
-        * Site functions
-        */
-
+    * Site functions
+    */
     remove_action('wp_enqueue_scripts',            [$JReviews,'assets']);
 
     remove_action('wp_footer',                     [$JReviews,'assets']);

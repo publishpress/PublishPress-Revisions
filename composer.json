@@ -1,29 +1,29 @@
 {
-    "name": "publishpress/publishpress-revisions",
-    "type": "wordpress-plugin",
-    "description": "",
+  "name": "publishpress/publishpress-revisions",
+  "type": "wordpress-plugin",
+  "description": "",
   "homepage": "https://publishpress.com/",
-    "license": "GPL-2",
-    "authors": [
-      {
-        "name": "PublishPress",
-        "email": "help@publishpress.com"
+  "license": "GPL-2",
+  "authors": [
+    {
+      "name": "PublishPress",
+      "email": "help@publishpress.com"
     },
     {
       "name": "Kevin Behrens",
       "email": "kevin@agapetry.net",
       "homepage": "https://agapetry.net",
       "role": "Lead Developer"
-      }
-    ],
-    "config": {
+    }
+  ],
+  "config": {
     "preferred-install": {
       "*": "dist"
     }
-    },
-    "minimum-stability": "stable",
+  },
+  "minimum-stability": "stable",
   "prefer-stable": true,
-    "require": {
+  "require": {
     "php": ">=7.2.5"
   },
   "scripts": {
@@ -37,4 +37,4 @@
     "plugin-name": "publishpress-revisions",
     "plugin-folder": "revisionary"
   }
-    }
+}

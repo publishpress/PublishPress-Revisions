@@ -854,7 +854,7 @@ function revisionary_refresh_revision_flags($published_post_id = 0, $args = []) 
 	}
 
 	$have_flag_ids = $wpdb->get_col($query);
-	
+
 	if ($posts_missing_flag = array_diff($arr_have_revisions, $have_flag_ids)) {
 		foreach($posts_missing_flag as $post_id) {
 			rvy_update_post_meta($post_id, '_rvy_has_revisions', true);

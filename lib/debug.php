@@ -5,7 +5,7 @@ if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_ur
 	
 if ( ! function_exists('d_echo') ) {
 function d_echo($str) {
-		return;
+	return;
 }
 }
 

@@ -9,9 +9,6 @@ class CoreAdmin {
         add_filter('publishpress_revisions_settings_sidebar', function($class) {return 'has-right-sidebar';});
 
         if (is_admin()) {
-        	// Previous Version Notices implementation:
-            // require_once RVY_ABSPATH . '/vendor/publishpress/wordpress-version-notices/includes.php';
-        	
             add_action(
                 'plugins_loaded',
                 function() {
@@ -23,7 +20,7 @@ class CoreAdmin {
                                 require_once $includesPath;
                             }
 						}
-			
+
 			            add_filter(\PPVersionNotices\Module\TopNotice\Module::SETTINGS_FILTER, function ($settings) {
 			                $settings['revisionary'] = [
 			                    'message' => 'You\'re using PublishPress Revisions Free. The Pro version has more features and support. %sUpgrade to Pro%s',
@@ -33,7 +30,7 @@ class CoreAdmin {
 			                        ['base' => 'revisions_page_revisionary-settings'],
 			                    ]
 			                ];
-			    
+
 			                return $settings;
 			            });
                     }

@@ -68,9 +68,9 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 			. "agp_display_if('" . esc_attr("div_{$agents_subset}_{$id_prefix}") . "', this.id);"
 			. "agp_display_if('" . esc_attr("chk-links_{$agents_subset}_{$id_prefix}") . "', this.id);"
 			. "\" /> ";
-	
+			
 			echo "<strong><label for='" . esc_attr("chk_{$agents_subset}_{$id_prefix}") . "'>";
-	
+
 			if (CURRENT_ITEMS_RVY == $agents_subset) {
 				printf(esc_html_e('show current users (%d)', 'revisionary'), esc_html($agent_count[$agents_subset]));
 			} else {
@@ -98,7 +98,7 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 			. "onclick=\""
 			. "agp_check_by_name('" . esc_attr($id_prefix) . "[]', true, true, false, '" . esc_attr("list_{$agents_subset}_{$id_prefix}") . "', 1);"
 			. "\">";
-		
+			
 			_e ('select', 'revisionary');
 			echo '</a>&nbsp;&nbsp;';
 			
