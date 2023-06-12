@@ -20,7 +20,7 @@
             },
             "time": "2023-04-18T17:50:38+00:00",
             "type": "library",
-            "installation-source": "source",
+            "installation-source": "dist",
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-3.0-or-later"
@@ -283,7 +283,7 @@
             },
             "time": "2022-06-03T13:38:53+00:00",
             "type": "library",
-            "installation-source": "source",
+            "installation-source": "dist",
             "autoload": {
                 "files": [
                     "ReviewsController.php"
@@ -360,7 +360,7 @@
                     "action-register-priority": "-190"
                 }
             },
-            "installation-source": "source",
+            "installation-source": "dist",
             "autoload": {
                 "files": [
                     "src/include.php"
