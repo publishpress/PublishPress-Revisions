@@ -724,7 +724,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 			$orig_terms['category'] = wp_get_object_terms($published->ID, 'category', ['fields' => 'ids']);
 		}
 	}
-	
+
 	if (defined('POLYLANG_VERSION')) {
 		$lang_terms = wp_get_object_terms($published->ID, 'post_translations', ['fields' => 'all']);
 
@@ -1398,7 +1398,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 								$skip_notification_revisor_roles = ['editor', 'administrator'];
 							}
 						}
-			
+
 						if (!empty($skip_notification_revisor_roles) && array_intersect($user->roles, $skip_notification_revisor_roles)) {
 							$skip_notification = true;
 						}
