@@ -239,7 +239,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.2.1 - 12 Jun 2023 =
+= 3.2.1 - 14 Jun 2023 =
 * Feature : Revisions > Settings > Revision Creation > "Limit to one active revision per post"
 * Fixed : Plugin compat - dashboard_glance_items was improperly filtered
 * Fixed : Revisions were incorrectly attributed to original page author under some conditions
