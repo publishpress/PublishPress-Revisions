@@ -1,0 +1,7 @@
+.phplint-cache
+
+.idea/
+vendor/
+
+.vscode/*
+*.code-workspace
