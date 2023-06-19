@@ -251,7 +251,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 * Fixed : Multisite - Settings previously configured for network-wide activation were not displayed on sub-site settings screen even after network deactivation
 * Change : Bump WordPress version requirement to 5.5
 * Change : Bump PHP version requirement to 7.2.5
-* Change : Update vendor libraries based on revised PHP version support
+* Change : Update vendor libraries based on revised PHP version support, using new internal-vendor structure
 
 = 3.1.13 - 30 Mar 2023 =
 * Fixed : Posts screen - Has Revision caption was not displayed unless "Revision Submission for Unpublished Posts" setting is enabled  
