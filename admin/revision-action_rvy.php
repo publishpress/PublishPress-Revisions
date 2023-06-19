@@ -7,7 +7,7 @@ add_action( '_wp_put_post_revision', 'rvy_review_revision' );
 /**
  * @package     PublishPress\Revisions\RevisionaryAction
  * @author      PublishPress <help@publishpress.com>
- * @copyright   Copyright (c) 2021 PublishPress. All rights reserved.
+ * @copyright   Copyright (c) 2023 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
  */
@@ -21,6 +21,10 @@ function rvy_revision_create($post_id = 0, $args = []) {
 		} else {
 			return;
 		}
+	}
+
+	if (!rvy_post_revision_supported($post_id)) {
+		return;
 	}
 
 	$main_post_id = rvy_in_revision_workflow($post_id) ? rvy_post_id($post_id) : $post_id;
@@ -720,7 +724,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 			$orig_terms['category'] = wp_get_object_terms($published->ID, 'category', ['fields' => 'ids']);
 		}
 	}
-	
+
 	if (defined('POLYLANG_VERSION')) {
 		$lang_terms = wp_get_object_terms($published->ID, 'post_translations', ['fields' => 'all']);
 
@@ -834,7 +838,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && $published_authors) {
 		// Make sure Multiple Authors values were not wiped due to incomplete revision data
-		if (!get_multiple_authors($post_id)) {
+		if (function_exists('get_post_authors') && !get_post_authors($post_id, true)) {
 			rvy_set_ma_post_authors($post_id, $published_authors);
 		}
 	}
@@ -955,6 +959,11 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	clean_post_cache($revision_id);
 	clean_post_cache($published->ID);
+
+	if (!defined('REVISIONARY_DISABLE_SECONDARY_CACHE_FLUSH')) {
+		wp_cache_delete( $published->ID, 'posts' );
+		wp_cache_delete( $published->ID, 'post_meta' );
+	}
 
 	if (defined('LSCWP_V')) {
 		do_action('litespeed_purge_post', $published->ID);
@@ -1389,7 +1398,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 								$skip_notification_revisor_roles = ['editor', 'administrator'];
 							}
 						}
-			
+
 						if (!empty($skip_notification_revisor_roles) && array_intersect($user->roles, $skip_notification_revisor_roles)) {
 							$skip_notification = true;
 						}

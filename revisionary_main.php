@@ -5,7 +5,7 @@ if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_ur
 /**
  * @package     PublishPress\Revisions
  * @author      PublishPress <help@publishpress.com>
- * @copyright   Copyright (c) 2021 PublishPress. All rights reserved.
+ * @copyright   Copyright (c) 2023 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
  */
@@ -152,7 +152,9 @@ class Revisionary
 
 		add_filter('wp_dropdown_pages', [$this, 'fltDropdownPages'], 10, 3);
 
-		do_action( 'rvy_init', $this );
+		if (defined('REVISIONARY_RVY_INIT_ACTION')) {
+			do_action( 'rvy_init', $this );
+		}
 	}
 
 	// Work around unfilterable get_pages() query by replacing the wp_dropdown_pages() return array
@@ -225,7 +227,7 @@ class Revisionary
 			if (!empty($status_obj->public) || !empty($status_obj->private) || rvy_get_option('pending_revision_unpublished')) {
 				if ($type_obj = get_post_type_object($post->post_type)) {
 
-					if (current_user_can('copy_post', $post->ID)) {
+					if (current_user_can('copy_post', $post->ID) && rvy_post_revision_supported($post)) {
 						$admin_bar->add_menu([
 								'id'    => 'rvy-create-revision',
 								'title' => pp_revisions_status_label('draft-revision', 'submit_short'), // Your menu title

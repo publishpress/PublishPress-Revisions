@@ -66,13 +66,17 @@ class RvyPostEdit {
             }
 
         } elseif (current_user_can('edit_post', $post->ID)) {
-            $status_obj = get_post_status_object($post->post_status);
+            if (rvy_post_revision_supported($post)) {
+	            $status_obj = get_post_status_object($post->post_status);
 
-		    if (('future' != $post->post_status) && (!empty($status_obj->public) || !empty($status_obj->private) || rvy_get_option('pending_revision_unpublished'))) {
-                wp_enqueue_script('rvy_object_edit', RVY_URLPATH . "/admin/rvy_post-classic-edit{$suffix}.js", ['jquery', 'jquery-form'], PUBLISHPRESS_REVISIONS_VERSION, true);
+			    if (('future' != $post->post_status) && (!empty($status_obj->public) || !empty($status_obj->private) || rvy_get_option('pending_revision_unpublished'))) {
+	                wp_enqueue_script('rvy_object_edit', RVY_URLPATH . "/admin/rvy_post-classic-edit{$suffix}.js", ['jquery', 'jquery-form'], PUBLISHPRESS_REVISIONS_VERSION, true);
 
-                $args = \PublishPress\Revisions\PostEditorWorkflowUI::postLinkParams(compact('post', 'do_pending_revisions', 'do_scheduled_revisions'));
-                wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
+	                $args = \PublishPress\Revisions\PostEditorWorkflowUI::postLinkParams(compact('post', 'do_pending_revisions', 'do_scheduled_revisions'));
+	                wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
+	            }
+            } else {
+                return;
             }
         }
 
@@ -183,6 +187,10 @@ class RvyPostEdit {
     // @todo: merge with RVY_PostBlockEditUI::author_ui()
     public static function author_ui() {
         global $post;
+
+        if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
+            return [];
+        }
 
         if (!$type_obj = get_post_type_object($post->post_type)) {
             return [];

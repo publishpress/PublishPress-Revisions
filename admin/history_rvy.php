@@ -325,8 +325,13 @@ class RevisionaryHistory
         $to = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : '';
 
         if (!$revision_id && !$to && !empty($_REQUEST['compare'])) {
-            $compare = array_map('intval', (array) sanitize_text_field($_REQUEST['compare']));
-            list( $from, $to ) = explode( ':', reset($compare)); // from:to
+            $compare = sanitize_text_field(
+                is_array($_REQUEST['compare'])
+                ? reset($_REQUEST['compare'])
+                : $_REQUEST['compare']
+            );
+            
+            list( $from, $to ) = explode( ':', $compare); // from:to
         }
 
         $from = is_numeric( $from ) ? absint( $from ) : null;

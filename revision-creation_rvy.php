@@ -91,6 +91,10 @@ class RevisionCreation {
 		$data['post_type'] = $source_post->post_type;
 		$data['post_parent'] = ($is_revision) ? $published_post->post_parent : $source_post->post_parent;
 
+		if (!defined('REVISIONARY_LEGACY_REVISION_AUTHOR') && !empty($current_user) && !empty($current_user->ID)) {
+			$data['post_author'] = $current_user->ID;
+		}
+
 		if (!empty($args['time_gmt'])) {
 			$timestamp = $args['time_gmt'];
 			$data['post_date_gmt'] = gmdate( 'Y-m-d H:i:s', $timestamp);

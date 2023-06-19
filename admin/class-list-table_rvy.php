@@ -116,9 +116,35 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		
 		//$qp['meta_key'] = '_rvy_has_revisions';
 
+		global $wpdb;
+
 		if (!empty($q['post_author'])) {
 			do_action('revisionary_queue_pre_query');
 			$_pre_query = new WP_Query( $qp );
+
+			// workaround for unidentified plugin conflict inserting inappropriate clauses into our query
+			if (!defined('REVISIONARY_QUEUE_DISABLE_QUERY_COMPAT_WORKAROUNDS')) {
+				if (false !== stripos($_pre_query->request, ", IF ( _has_featured_image.meta_value IS NULL, 0, 1 ) AS has_featured_image")) {
+					$_pre_query->request = str_ireplace(
+						", IF ( _has_featured_image.meta_value IS NULL, 0, 1 ) AS has_featured_image",
+						'',
+						$_pre_query->request
+					);
+
+					$_pre_query->request = str_ireplace(
+						"LEFT JOIN wp_postmeta AS _has_featured_image ON _has_featured_image.post_id = $wpdb->posts.ID and _has_featured_image.meta_key = '_thumbnail_id'",
+						'',
+						$_pre_query->request
+					);
+
+					$_pre_query->request = str_ireplace(
+						'ORDER BY has_featured_image DESC,',
+						'ORDER BY ',
+						$_pre_query->request
+					);
+				}
+			}
+
 			$this->published_post_count_ids_query = $_pre_query->request;
 			do_action('revisionary_queue_pre_query_done');
 
@@ -131,6 +157,30 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		add_filter($filter_name, [$this, 'pre_query_filter'], 5, 2);
 		add_filter($filter_name, [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
 		$pre_query = new WP_Query( $qp );
+
+		// workaround for unidentified plugin conflict inserting inappropriate clauses into our query
+		if (!defined('REVISIONARY_QUEUE_DISABLE_QUERY_COMPAT_WORKAROUNDS')) {
+			if (false !== stripos($pre_query->request, ", IF ( _has_featured_image.meta_value IS NULL, 0, 1 ) AS has_featured_image")) {
+				$pre_query->request = str_ireplace(
+					", IF ( _has_featured_image.meta_value IS NULL, 0, 1 ) AS has_featured_image",
+					'',
+					$pre_query->request
+				);
+
+				$pre_query->request = str_ireplace(
+					"LEFT JOIN wp_postmeta AS _has_featured_image ON _has_featured_image.post_id = $wpdb->posts.ID and _has_featured_image.meta_key = '_thumbnail_id'",
+					'',
+					$pre_query->request
+				);
+
+				$pre_query->request = str_ireplace(
+					'ORDER BY has_featured_image DESC,',
+					'ORDER BY ',
+					$pre_query->request
+				);
+			}
+		}
+
 		remove_filter($filter_name, [$this, 'pre_query_filter'], 5, 2);
 		remove_filter($filter_name, [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
 		do_action('revisionary_queue_pre_query_done');
@@ -201,6 +251,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			remove_filter('posts_where', ['MultipleAuthors\\Classes\\Query', 'filter_posts_where'], 10, 2);
 			remove_filter('posts_join', ['MultipleAuthors\\Classes\\Query', 'filter_posts_join'], 10, 2);
 			remove_filter('posts_groupby', ['MultipleAuthors\\Classes\\Query', 'filter_posts_groupby'], 10, 2);
+
+			if (!defined('PUBLISHPRESS_AUTHORS_DISABLE_FILTER_THE_AUTHOR')) {
+				define('PUBLISHPRESS_AUTHORS_DISABLE_FILTER_THE_AUTHOR', true);
+			}
 		}
 
 		if (!empty($_REQUEST['s'])) {

@@ -17,5 +17,8 @@ wp-content/plugins/hello.php
 /sitemap.xml
 /sitemap.xml.gz
 
-.idea/*.*
-.vscode/*.*
+.idea/
+.vscode/
+
+/vendor
+/libraries/**/.git

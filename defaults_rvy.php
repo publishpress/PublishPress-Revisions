@@ -5,7 +5,7 @@ if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_ur
 /**
  * @package     PublishPress\Revisions\RevisionaryOptions
  * @author      PublishPress <help@publishpress.com>
- * @copyright   Copyright (c) 2021 PublishPress. All rights reserved.
+ * @copyright   Copyright (c) 2023 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
  */
@@ -56,6 +56,7 @@ function rvy_default_options_sitewide() {
 		'list_unsubmitted_revisions' => true,
 		'rev_publication_delete_ed_comments' => true,
 		'deletion_queue' => true,
+		'revision_limit_per_post' => true,
 	);
 
 	if ( $other_options = array_diff_key( rvy_default_options(), $def ) ) {
@@ -111,6 +112,7 @@ function rvy_default_options() {
 		'list_unsubmitted_revisions' => 0,
 		'rev_publication_delete_ed_comments' => 0,
 		'deletion_queue' => 0,
+		'revision_limit_per_post' => 0,
 	);
 
 	return $def;

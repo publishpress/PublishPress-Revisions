@@ -45,7 +45,7 @@ jQuery(document).ready( function($) {
 
 			if (rvyObjEdit.completedURL) {
 				html = html + '<button type="button" class="revision-approve revision-created ppr-clear-button" style="display: none">'
-			+ '<a href="javascript:void(0)" class="revision-approve revision-preview components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
+				+ '<a href="javascript:void(0)" class="revision-approve revision-preview components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
 				+ rvyObjEdit.completedLinkCaption + '</a></button>';
 			}
 			

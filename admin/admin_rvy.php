@@ -2,7 +2,7 @@
 /**
  * @package     PublishPress\Revisions\RevisionaryAdmin
  * @author      PublishPress <help@publishpress.com>
- * @copyright   Copyright (c) 2021 PublishPress. All rights reserved.
+ * @copyright   Copyright (c) 2023 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
  *
@@ -80,7 +80,7 @@ class RevisionaryAdmin
 		}
 
 		if ( ! ( defined( 'SCOPER_VERSION' ) || defined( 'PP_VERSION' ) || defined( 'PPCE_VERSION' ) ) || defined( 'USE_RVY_RIGHTNOW' ) ) {
-			add_action('dashboard_glance_items', [$this, 'actDashboardGlanceItems']);
+			add_filter('dashboard_glance_items', [$this, 'fltDashboardGlanceItems']);
 		}
 
 		if ( rvy_get_option( 'pending_revisions' ) || rvy_get_option( 'scheduled_revisions' ) ) {
@@ -124,11 +124,11 @@ class RevisionaryAdmin
 				}
 			}
 
-			if (($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-settings'])
+			if ((($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-settings'])
 			|| (defined('DOING_AJAX') && DOING_AJAX && !empty($_REQUEST['action']) && (false !== strpos(sanitize_key($_REQUEST['action']), 'revisionary')))
-			) {
+			) && !defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 				if (!class_exists('\PublishPress\WordPressReviews\ReviewsController')) {
-					include_once RVY_ABSPATH . '/vendor/publishpress/wordpress-reviews/ReviewsController.php';
+					include_once RVY_ABSPATH . '/libraries/internal-vendor/publishpress/wordpress-reviews/ReviewsController.php';
 				}
 
 				if (class_exists('\PublishPress\WordPressReviews\ReviewsController')) {
@@ -195,9 +195,11 @@ class RevisionaryAdmin
 		return ($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-deletion', 'revisionary-settings']);
 	}
 
-	function actDashboardGlanceItems($items) {
+	function fltDashboardGlanceItems($items) {
 		require_once(dirname(__FILE__).'/admin-dashboard_rvy.php');
 		RevisionaryDashboard::glancePending();
+
+		return $items;
 	}
 
 	function moderation_queue() {

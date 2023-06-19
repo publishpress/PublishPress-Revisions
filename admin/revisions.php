@@ -243,7 +243,7 @@ foreach ( array_keys($revision_status_captions) as $_revision_status ) {
 		}
 	} else {
 		echo "<li class='" . esc_attr($class) . "'><a href='" . esc_url($_link) . "' target='" . esc_attr($target) . "'>" . esc_html($status_caption) . '</a></li>';
-		}
+	}
 }
 
 echo '</ul>';

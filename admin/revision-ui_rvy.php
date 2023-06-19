@@ -408,7 +408,7 @@ echo $rows; // output variables escaped upstream
 			if ($rows) {
 				echo "<ul class='post-revisions'>\n$rows</ul>"; // output variables escaped upstream
 			}
-				
+
 			return $count;	
 		} else
 			if ($rows) {

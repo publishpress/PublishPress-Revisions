@@ -5,7 +5,7 @@
  * Description: Maintain published content with teamwork and precision using the Revisions model to submit, approve and schedule changes.
  * Author: PublishPress
  * Author URI: https://publishpress.com
- * Version: 3.2
+ * Version: 3.3
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 5.5
@@ -30,23 +30,39 @@
  *
  * @package     PublishPress\Revisions
  * @author      PublishPress
- * @copyright   Copyright (C) 2022 PublishPress. All rights reserved.
+ * @copyright   Copyright (C) 2023 PublishPress. All rights reserved.
  *
  **/
 
 // Temporary usage within this module only; avoids multiple instances of version string
 global $pp_revisions_version;
-$pp_revisions_version = '3.2';
+$pp_revisions_version = '3.3';
 
 if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die( 'This page cannot be called directly.' );
 
+global $wp_version;
+
+$min_php_version = '7.2.5';
+$min_wp_version  = '5.5';
+
+$invalid_php_version = version_compare(phpversion(), $min_php_version, '<');
+$invalid_wp_version = version_compare($wp_version, $min_wp_version, '<');
+
+if ($invalid_php_version || $invalid_wp_version) {
+	return;
+}
+
 if (isset($_SERVER['SCRIPT_NAME']) && strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/index-extra.php' ) || strpos( esc_url_raw($_SERVER['SCRIPT_NAME']), 'p-admin/update.php' ) )
 	return;
 
-$includeFileRelativePath = '/publishpress/publishpress-instance-protection/include.php';
-if (file_exists(__DIR__ . '/vendor' . $includeFileRelativePath)) {
-	require_once __DIR__ . '/vendor' . $includeFileRelativePath;
+if (! defined('REVISIONS_INTERNAL_VENDORPATH')) {
+	define('REVISIONS_INTERNAL_VENDORPATH', __DIR__ . '/libraries/internal-vendor');
+}
+
+$includeFileRelativePath = REVISIONS_INTERNAL_VENDORPATH . '/publishpress/publishpress-instance-protection/include.php';
+if (file_exists($includeFileRelativePath)) {
+	require_once $includeFileRelativePath;
 }
 
 if (class_exists('PublishPressInstanceProtection\\Config')) {
@@ -111,7 +127,15 @@ if ( defined('RVY_VERSION') || defined('REVISIONARY_FILE') ) {  // Revisionary 1
 	return;
 }
 
-define('REVISIONARY_FILE', __FILE__);
+if (!defined('REVISIONARY_FILE')) {
+	define('REVISIONARY_FILE', __FILE__);
+
+	if (! class_exists('ComposerAutoloaderInitRevisionsPro')
+		&& file_exists(REVISIONS_INTERNAL_VENDORPATH . '/autoload.php')
+	) {
+		require_once REVISIONS_INTERNAL_VENDORPATH . '/autoload.php';
+	}
+}
 
 add_action(
 	'init', 
@@ -198,18 +222,6 @@ add_action(
 					echo "<div id='message' class='notice error' style='color:black'>" . esc_html($message) . '</div>';
 				}, 5);
 			}
-			return;
-		}
-
-		global $wp_version;
-
-		$min_php_version = '7.2.5';
-		$min_wp_version  = '5.5';
-
-		$invalid_php_version = version_compare(phpversion(), $min_php_version, '<');
-		$invalid_wp_version = version_compare($wp_version, $min_wp_version, '<');
-
-		if ($invalid_php_version || $invalid_wp_version) {
 			return;
 		}
 

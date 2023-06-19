@@ -193,7 +193,7 @@ class Utils {
 	
 		return $value;
 	}
-	
+
 	public static function get_post_autosave($post_id, $user_id) {
 		global $wpdb;
 
