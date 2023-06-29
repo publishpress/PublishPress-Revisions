@@ -15,6 +15,7 @@ class CoreAdmin {
                 'screens' => [
                     ['base' => 'toplevel_page_revisionary-q'],
                     ['base' => 'revisions_page_revisionary-settings'],
+                    ['base' => 'revisions_page_revisionary-archive'],
                 ]
             ];
 
@@ -23,6 +24,10 @@ class CoreAdmin {
     }
 
     function setUpgradeMenuLink() {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
         $url = 'https://publishpress.com/links/revisions-menu';
         ?>
         <style type="text/css">

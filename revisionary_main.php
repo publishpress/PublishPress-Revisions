@@ -20,6 +20,7 @@ class Revisionary
 
 	var $config_loaded = false;		// configuration related to post types and statuses must be loaded late on the init action
 	var $enabled_post_types = [];	// enabled_post_types property is set (keyed by post type slug) late on the init action. 
+	var $enabled_post_types_archive = [];	// enabled_post_types_archive property is set (keyed by post type slug) late on the init action.
 
 	// minimal config retrieval to support pre-init usage by WP_Scoped_User before text domain is loaded
 	function __construct() {
@@ -67,6 +68,7 @@ class Revisionary
 		}
 
 		$this->setPostTypes();
+		$this->setPostTypesArchive();
 
 		rvy_refresh_options_sitewide();
 
@@ -245,6 +247,7 @@ class Revisionary
 
 	function configurationLateInit() {
 		$this->setPostTypes();
+		$this->setPostTypesArchive();
 		$this->config_loaded = true;
 	}
 
@@ -330,6 +333,96 @@ class Revisionary
 
 		unset($this->enabled_post_types['attachment']);
 		$this->enabled_post_types = array_filter($this->enabled_post_types);
+	}
+
+	public function setPostTypesArchive() {
+		global $current_user;
+
+	    $enabled_post_types_archive = get_option('rvy_enabled_post_types_archive', false);
+
+	    if (false === $enabled_post_types_archive) {
+			$types = get_post_types(['public' => true]);
+
+			$enabled_post_types_archive = array_fill_keys(
+	            $types, true
+	        );
+
+			if (!defined('REVISIONARY_NO_PRIVATE_TYPES')) {
+	            $private_types = array_merge(
+	                get_post_types(['public' => false], 'object'),
+	                get_post_types(['public' => null], 'object')
+	            );
+
+	            // by default, enable non-public post types that have type-specific capabilities defined
+	            foreach($private_types as $post_type => $type_obj) {
+	                if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages']))
+	                || defined('REVISIONARY_ENABLE_' . strtoupper($post_type) . '_TYPE')
+	                ) {
+	                    $enabled_post_types_archive[$post_type] = true;
+	                }
+	            }
+	        }
+
+			foreach (array_keys($enabled_post_types_archive) as $post_type) {
+				if (!post_type_supports($post_type, 'revisions')) {
+					unset($enabled_post_types_archive[$post_type]);
+				}
+			}
+
+	        if (class_exists('WooCommerce')) {
+	            $enabled_post_types_archive['product'] = true;
+	            $enabled_post_types_archive['order'] = true;
+	        }
+
+	        if (class_exists('Tribe__Events__Main')) {
+	            $enabled_post_types_archive['tribe_events'] = true;
+	        }
+	    }
+
+	    $enabled_post_types_archive = array_diff_key(
+			$enabled_post_types_archive,
+			[
+				'attachment' => true,
+				'tablepress_table' => true,
+				'acf-field-group' => true,
+				'acf-field' => true,
+				'nav_menu_item' => true,
+				'custom_css' => true,
+				'customize_changeset' => true,
+				'wp_block' => true,
+				'wp_template' => true,
+				'wp_template_part' => true,
+				'wp_global_styles' => true,
+				'wp_navigation' => true,
+				'product_variation' => true,
+				'shop_order_refund' => true
+			]
+		);
+
+		// Remove the post_types that doesn't have a valid object (null)
+		foreach( array_keys( $enabled_post_types_archive ) as $type ) :
+			$type_obj = get_post_type_object( $type );
+			if( ! $type_obj ) :
+				unset( $enabled_post_types_archive[$type] );
+			endif;
+
+			if (
+			(!empty($type_obj->cap->edit_others_posts) && empty($current_user->allcaps[$type_obj->cap->edit_others_posts]))
+			|| (!empty($type_obj->cap->edit_published_posts) && empty($current_user->allcaps[$type_obj->cap->edit_published_posts]))
+			) {
+				unset($enabled_post_types_archive[$type]);
+			}
+		endforeach;
+
+		$this->enabled_post_types_archive = array_merge(
+			$this->enabled_post_types_archive,
+			$enabled_post_types_archive
+		);
+
+		$this->enabled_post_types_archive = apply_filters(
+			'revisionary_archive_post_types', 
+			array_filter($this->enabled_post_types_archive)
+		);
 	}
 
 	function canEditPost($post, $args = []) {
