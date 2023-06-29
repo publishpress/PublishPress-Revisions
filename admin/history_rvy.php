@@ -1173,7 +1173,7 @@ class RevisionaryHistory
         ?  esc_html__('Manage', 'revisionary')
         : esc_html__('List', 'revisionary');
 
-        $manage_url = rvy_admin_url("admin.php?page=rvy-revisions&revision=$post_id&action=view");
+        $manage_url = rvy_admin_url("admin.php?page=revisionary-archive&origin_post=$main_post_id");
         ?>
         <script type="text/javascript">
         /* <![CDATA[ */

@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.2
-Stable tag: 3.3
+Stable tag: 3.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -238,6 +238,9 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
 == Changelog ==
+
+= 3.4 - 29 Jun 2023 =
+* Feature : Revision Archive screen
 
 = 3.3 - 19 Jun 2023 =
 * Feature : Revisions > Settings > Revision Creation > "Limit to one active revision per post"

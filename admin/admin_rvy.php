@@ -27,6 +27,8 @@ class RevisionaryAdmin
 		add_action('admin_enqueue_scripts', [$this, 'admin_scripts']);
 		add_action('revisionary_admin_footer', [$this, 'publishpressFooter']);
 
+		add_action('admin_print_scripts', [$this, 'hideAdminMenuToolbar'], 50);
+
 		if ( ! defined('XMLRPC_REQUEST') && ! strpos($script_name, 'p-admin/async-upload.php' ) ) {
 			if ( RVY_NETWORK && ( is_main_site() ) ) {
 				require_once( dirname(__FILE__).'/admin_lib-mu_rvy.php' );
@@ -160,11 +162,11 @@ class RevisionaryAdmin
 	function admin_scripts() {
 		global $pagenow;
 
-		if (in_array($pagenow, ['post.php', 'post-new.php', 'revision.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion']))) {
+		if (in_array($pagenow, ['post.php', 'post-new.php', 'revision.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion', 'revisionary-archive']))) {
 			wp_enqueue_style('revisionary', RVY_URLPATH . '/admin/revisionary.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
 
-		if (in_array($pagenow, ['post.php', 'post-new.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion']))) {
+		if (in_array($pagenow, ['post.php', 'post-new.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion', 'revisionary-archive']))) {
 			wp_enqueue_style('revisionary-admin-common', RVY_URLPATH . '/common/css/pressshack-admin.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
 
@@ -206,6 +208,10 @@ class RevisionaryAdmin
 		require_once( dirname(__FILE__).'/revision-queue_rvy.php');
 	}
 
+	function revision_archive() {
+		require_once( dirname( __FILE__ ).'/revision-archive_rvy.php' );
+	}
+
 	function build_menu() {
 		global $current_user;
 
@@ -219,9 +225,12 @@ class RevisionaryAdmin
 			add_submenu_page( 'none', esc_html__('Revisions', 'revisionary'), esc_html__('Revisions', 'revisionary'), 'read', 'rvy-revisions', 'rvy_include_admin_revisions' );
 		}
 
-		if ($types = rvy_get_manageable_types()) {
+		$types = rvy_get_manageable_types();
+		$revision_archive = true;
+
 			$can_edit_any = false;
 
+		if ($types || current_user_can('manage_options')) {
 			foreach ($types as $_post_type) {
 				if ($type_obj = get_post_type_object($_post_type)) {
 					if (!empty($current_user->allcaps[$type_obj->cap->edit_posts]) || (is_multisite() && is_super_admin())) {
@@ -230,16 +239,39 @@ class RevisionaryAdmin
 					}
 				}
 			}
+		}
 
-			if (apply_filters('revisionary_add_menu', $can_edit_any)) {
+		$can_edit_any = apply_filters('revisionary_add_menu', $can_edit_any);
+
+		if ($revision_archive || $can_edit_any || current_user_can('manage_options')) {
 				$_menu_caption = ( defined( 'RVY_MODERATION_MENU_CAPTION' ) ) ? RVY_MODERATION_MENU_CAPTION : esc_html__('Revisions');
-				add_menu_page( esc_html__($_menu_caption, 'pp'), esc_html__($_menu_caption, 'pp'), 'read', 'revisionary-q', array(&$this, 'moderation_queue'), 'dashicons-backup', 29 );
 
+			if ($can_edit_any) {
+				$menu_slug = 'revisionary-q';
+				$menu_func = [$this, 'moderation_queue'];
+			} else {
+				$menu_slug = 'revisionary-archive';
+				$menu_func = [$this, 'revision_archive'];
+			}
+
+			add_menu_page( esc_html__($_menu_caption, 'pp'), esc_html__($_menu_caption, 'pp'), 'read', $menu_slug, $menu_func, 'dashicons-backup', 29 );
+
+			if ($can_edit_any) {
 				add_submenu_page('revisionary-q', esc_html__('Revision Queue', 'revisionary'), esc_html__('Revision Queue', 'revisionary'), 'read', 'revisionary-q', [$this, 'moderation_queue']);
+			}
 
 				do_action('revisionary_admin_menu');
 			}
-		}
+
+		// Revision Archive page
+		add_submenu_page(
+			'revisionary-q',
+			esc_html__( 'Revision Archive', 'revisionary' ),
+			esc_html__( 'Revision Archive', 'revisionary' ),
+			'read',
+			'revisionary-archive',
+			[$this, 'revision_archive']
+		);
 
 		if ( ! current_user_can( 'manage_options' ) )
 			return;
@@ -364,4 +396,33 @@ class RevisionaryAdmin
 		</footer>
 		<?php
 	}
+
+	function hideAdminMenuToolbar() {
+        $current_screen = get_current_screen();
+        if ( $current_screen->id === 'revision' && isset( $_GET['rvy-popup'] ) && $_GET['rvy-popup'] === 'true' ) {
+            ?>
+            <style type="text/css">
+            #wpadminbar,
+            #adminmenumain,
+            #screen-meta-links,
+            #wpfooter,
+            .wrap > .long-header,
+            .wrap > a,
+            input.restore-revision,
+            .revisions-controls .revisions-checkbox {
+                display: none !important;
+            }
+            #wpbody {
+                padding-top: 0 !important;
+            }
+            #wpcontent {
+                margin-left: 0 !important;
+            }
+            #wpbody-content {
+                padding-bottom: 30px !important;
+            }
+            </style>
+            <?php
+        }
+    }
 } // end class RevisionaryAdmin

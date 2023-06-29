@@ -380,6 +380,8 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 			$revision_status = 'future-revision';
 			$last_arg = array( "revision_action" => 1, 'scheduled' => $revision->ID );
 			$scheduled = $revision->post_date;
+
+			update_post_meta($revision->ID, '_rvy_approved_by', $current_user->ID);
 		}
 
 		clean_post_cache($revision->ID);
@@ -867,6 +869,13 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	
 	rvy_update_post_meta($revision_id, '_rvy_published_gmt', $post_modified_gmt);
 
+	rvy_update_post_meta($revision_id, '_rvy_prev_revision_status', $actual_revision_status);
+
+	if ('future-revision' != $actual_revision_status) {
+		global $current_user;
+		rvy_update_post_meta($revision_id, '_rvy_approved_by', $current_user->ID);
+	}
+
 	// If published revision was the last remaining pending / scheduled, clear _rvy_has_revisions postmeta flag 
 	revisionary_refresh_postmeta($post_id);
 
@@ -1057,7 +1066,8 @@ function rvy_revision_delete() {
 
 		// before deleting the revision, note its status for redirect
 		wp_delete_post_revision( $revision_id );
-		$redirect = "admin.php?page=rvy-revisions&revision={$revision->post_parent}&action=view&revision_status={$revision->post_mime_type}&deleted=1";
+
+		$redirect = "admin.php?page=revisionary-archive&origin_post={$revision->post_parent}&revision_status={$revision->post_mime_type}&deleted=1";
 
 		rvy_delete_past_revisions($revision_id);
 
@@ -1139,7 +1149,7 @@ function rvy_revision_bulk_delete() {
 		}
 	}
 
-	$redirect = "admin.php?page=rvy-revisions&revision=$post_id&action=view&revision_status=$revision_status&bulk_deleted=$delete_count";
+	$redirect = "admin.php?page=revisionary-archive&origin_post=$post_id&revision_status=$revision_status&bulk_deleted=$delete_count";
 	
 	wp_redirect( $redirect );
 	exit;
