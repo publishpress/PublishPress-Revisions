@@ -243,11 +243,12 @@ class RevisionaryAdmin
 
 		$can_edit_any = apply_filters('revisionary_add_menu', $can_edit_any);
 
+		$menu_slug = 'revisionary-q';
+
 		if ($revision_archive || $can_edit_any || current_user_can('manage_options')) {
 				$_menu_caption = ( defined( 'RVY_MODERATION_MENU_CAPTION' ) ) ? RVY_MODERATION_MENU_CAPTION : esc_html__('Revisions');
 
 			if ($can_edit_any) {
-				$menu_slug = 'revisionary-q';
 				$menu_func = [$this, 'moderation_queue'];
 			} else {
 				$menu_slug = 'revisionary-archive';
@@ -265,7 +266,7 @@ class RevisionaryAdmin
 
 		// Revision Archive page
 		add_submenu_page(
-			'revisionary-q',
+			$menu_slug,
 			esc_html__( 'Revision Archive', 'revisionary' ),
 			esc_html__( 'Revision Archive', 'revisionary' ),
 			'read',
@@ -282,13 +283,13 @@ class RevisionaryAdmin
 			rvy_refresh_default_options();
 
 		if ( ! RVY_NETWORK || ( count($rvy_options_sitewide) != count($rvy_default_options) ) ) {
-			add_submenu_page( 'revisionary-q', esc_html__('PublishPress Revisions Settings', 'revisionary'), esc_html__('Settings', 'revisionary'), 'read', 'revisionary-settings', 'rvy_omit_site_options');
+			add_submenu_page( $menu_slug, esc_html__('PublishPress Revisions Settings', 'revisionary'), esc_html__('Settings', 'revisionary'), 'read', 'revisionary-settings', 'rvy_omit_site_options');
 			add_action('revisionary_page_revisionary-settings', 'rvy_omit_site_options' );
 		}
 
 		if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 			add_submenu_page(
-	            'revisionary-q',
+	            $menu_slug,
 	            esc_html__('Upgrade to Pro', 'revisionary'),
 	            esc_html__('Upgrade to Pro', 'revisionary'),
 	            'read',
