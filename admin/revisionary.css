@@ -412,7 +412,12 @@ width: 99%;
 vertical-align: top;
 }
 
-body.toplevel_page_revisionary-q h1 span.dashicons, body.revisions_page_revisionary-deletion h1 span.dashicons, body.revisions_page_revisionary-settings h1 span.dashicons, body.revisions_page_rvy-net_options h1 span.dashicons, body.revisions_page_rvy-default_options h1 span.dashicons {
+body.toplevel_page_revisionary-q h1 span.dashicons,
+body.revisions_page_revisionary-deletion h1 span.dashicons,
+body.revisions_page_revisionary-settings h1 span.dashicons,
+body.revisions_page_rvy-net_options h1 span.dashicons,
+body.revisions_page_rvy-default_options h1 span.dashicons,
+body.revisions_page_revisionary-archive h1 span.dashicons {
 padding-top:5px;
 }
 
@@ -815,3 +820,16 @@ margin-bottom: 5px;
 .ppseries-content-promo-box.advertisement-box-content {
   border: 1px solid #655897;
 }
+
+table th#revision_post_date,
+table th#origin_post_type,
+table th#origin_post_date,
+table th#revision_post_author,
+table th#origin_post_author {
+  width: 11%;
+}
+
+table th#revision_post_count {
+  width: 5%;
+}
+

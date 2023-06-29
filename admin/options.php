@@ -395,7 +395,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 
 		$this->all_options []= $option_name;
 
-		esc_html_e('Enable revisions for these Post Types:', 'revisionary');
+		esc_html_e('Enable revision submission for these Post Types:', 'revisionary');
         echo '<br /><br />';
 
 		$hidden_types = ['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true];

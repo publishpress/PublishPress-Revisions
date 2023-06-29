@@ -1,0 +1,836 @@
+<?php
+require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+
+class Revisionary_Archive_List_Table extends WP_List_Table {
+	private $post_types = [];
+	private $all_revisions_count = null;
+	private $my_revisions_count = null;
+	private $show_approved_by_col = true;
+
+	public function __construct( $args ) {
+		global $revisionary;
+
+		$args = wp_parse_args(
+			$args,
+			[
+				'plural' => 'posts',
+				'screen' => 'revisionary-archive',
+			]
+		);
+
+		parent::__construct( $args );
+
+		$this->post_types = array_keys( $revisionary->enabled_post_types_archive );
+    }
+
+	/**
+	 * Override WP_List_Table::prepare_items()
+	 */
+    public function prepare_items() {
+		global $wpdb, $per_page, $current_user;
+
+		$per_page 		= $this->get_items_per_page( 'edit_page_per_page' );
+		$paged 			= isset( $_REQUEST['paged'] ) ? max( 0, intval( $_REQUEST['paged'] ) - 1 ) : 0;
+		$offset 		= $paged * $per_page;
+		$orderby		= isset( $_REQUEST['orderby'] )
+			&& ! empty( $_REQUEST['orderby'] )
+			&& in_array(
+				$_REQUEST['orderby'],
+				[
+					'origin_post_date',
+					'post_date',
+					'post_count'
+				]
+			)
+			? sanitize_key( $_REQUEST['orderby'] )
+			: 'post_date';
+
+		$order			= isset( $_REQUEST['order'] ) && ! empty( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], ['asc', 'desc'] )
+			? sanitize_key( strtoupper( $_REQUEST['order'] ) )
+			: 'DESC';
+
+		// Filters
+		$args = [
+			'orderby' 	=> $orderby,
+			'order'		=> $order
+		];
+		if( isset( $_REQUEST['s'] ) && ! empty( trim( $_REQUEST['s'] ) ) ) {
+			$args['s'] = strtolower( sanitize_text_field( trim( $_REQUEST['s'] ) ) );
+		}
+		if( isset( $_REQUEST['origin_post'] ) && ! empty( $_REQUEST['origin_post'] ) ) {
+			$args['origin_post'] = (int) $_REQUEST['origin_post'];
+		}
+		if( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) ) {
+			$args['origin_post_author'] = (int) $_REQUEST['origin_post_author'];
+		}
+		if( isset( $_REQUEST['post_author'] ) && ! empty( $_REQUEST['post_author'] ) ) {
+			$args['post_author'] = (int) $_REQUEST['post_author'];
+		}
+		if( isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] ) ) {
+			$args['origin_post_type'] = sanitize_text_field( $_REQUEST['origin_post_type'] );
+		}
+		if( isset( $_REQUEST['post_parent'] ) && ! empty( $_REQUEST['post_parent'] ) ) {
+			$args['post_parent'] = (int) $_REQUEST['post_parent'];
+		}
+
+		$base_query = $this->do_query( $args );
+
+		$results = $wpdb->get_results(
+			$wpdb->prepare(
+				"{$base_query} LIMIT %d,%d",
+				$offset,
+				$per_page
+			)
+		);
+
+		$total_items = $wpdb->get_var(
+			$this->count_query( 'total_items', $base_query )
+		);
+
+		$this->set_pagination_args( [
+            'total_items' => $total_items,
+            'per_page'    => $per_page,
+        ] );
+
+		$this->items = $results;
+
+		// @todo: determine if any items have an approved_by postmeta row
+		$post_id_csv = implode("','", wp_list_pluck($results, 'ID'));
+
+		$this->show_approved_by_col = $wpdb->get_var(
+			"SELECT meta_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_approved_by' AND meta_value > 0 AND post_id IN ('$post_id_csv') LIMIT 1"
+		);
+
+		// 'All Revisions' link with count
+		$this->all_revisions_count = $wpdb->get_var(
+			$this->count_query(
+				'all_items',
+				$this->do_query()
+			)
+		);
+
+		// 'My Revisions' link with count
+		$this->my_revisions_count = $wpdb->get_var(
+			$this->count_query(
+				'my_items',
+				$this->do_query( [
+					'post_author' => $current_user->ID
+				] )
+			)
+		);
+    }
+
+	/**
+	 * Generate a heading depeding the filters in use
+	 *
+	 * @return string
+	 */
+	public function filters_in_heading() {
+		$heading = '';
+
+		$count = 0;
+
+		// Post title
+		if( isset( $_REQUEST['origin_post'] ) && ! empty( $_REQUEST['origin_post'] )
+		) {
+			if ($post_title = get_post_field('post_title', (int) $_REQUEST['origin_post'])) {
+				$heading .= $this->heading_spacing( $count );
+				$heading .= $post_title;
+				$count++;
+			}
+		} else {
+			// Post type
+			if( isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] )
+				&& in_array( $_REQUEST['origin_post_type'], $this->post_types )
+			) {
+				$obj = get_post_type_object( sanitize_key( $_REQUEST['origin_post_type'] ) );
+				$heading .= $this->heading_spacing( $count );
+				$heading .= $obj->labels->name;
+				$count++;
+			}
+		}
+
+		// Revision post author
+		if( isset( $_REQUEST['post_author'] ) && ! empty( $_REQUEST['post_author'] ) ) {
+			$heading .= $this->heading_spacing( $count );
+			$heading .= sprintf(
+				__( 'Revision Author: %s' ,'revisionary' ),
+				get_the_author_meta( 'display_name', (int) $_REQUEST['post_author'] )
+			);
+			$count++;
+		}
+
+		// Revision post parent
+		if( isset( $_REQUEST['post_parent'] ) && ! empty( $_REQUEST['post_parent'] ) ) {
+			$heading .= $this->heading_spacing( $count );
+			$heading .= '"' . get_the_title( (int) $_REQUEST['post_parent'] ) . '"';
+			$count++;
+		}
+
+		// Origin post author
+		if( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) ) {
+			$heading .= $this->heading_spacing( $count );
+			$heading .= sprintf(
+				__( 'Post Author: %s' ,'revisionary' ),
+				get_the_author_meta( 'display_name', (int) $_REQUEST['origin_post_author'] )
+			);
+			$count++;
+		}
+
+		if( ! empty( $heading ) ) {
+			$heading = ' (' . $heading . ')';
+		}
+
+		return $heading;
+	}
+
+	/**
+	 * Generate a label next to heading for search results
+	 *
+	 * @return string
+	 */
+	public function search_in_heading() {
+		$heading = '';
+
+		if( isset( $_REQUEST['s'] ) && ! empty( trim( $_REQUEST['s'] ) ) ) {
+			$heading .= sprintf(
+				__( 'Search results for "%s"', 'revisionary' ),
+				strtolower(
+					sanitize_text_field(
+						trim( $_REQUEST['s'] )
+					)
+				)
+			);
+		}
+
+		return sprintf(
+			'<span class="subtitle">%s</span>',
+			$heading
+		);
+	}
+
+	/**
+	 * Generate count query database SELECT
+	 *
+	 * @param string $alias	A string to differentiate the query for debugging purposes
+	 * @param string  $base	The do_query() query to count records from
+	 *
+	 * @return string
+	 */
+	private function count_query( $alias, $base ) {
+		return "SELECT COUNT(*) as {$alias} FROM ($base) as {$alias}_subquery";
+	}
+
+	/**
+	 * Build database query select to retrieve data to display later in table
+	 *
+	 * @param array $args	The database field to order by (can be an alias from the query)
+	 *
+	 * @return string
+	 */
+	private function do_query( $args = [] ) {
+		global $wpdb;
+
+		$orderby 	= array_key_exists( 'orderby', $args ) ? $args['orderby'] : 'post_date';
+		$order 		= array_key_exists( 'order', $args ) ? $args['order'] : 'DESC';
+
+		$query = "SELECT
+			r.ID AS ID,
+			r.post_type AS post_type,
+			r.post_title AS post_title,
+			r.post_date AS post_date,
+			r.post_author AS post_author,
+			r.post_parent AS post_parent,
+			(
+				SELECT COUNT(*)
+				FROM $wpdb->posts p3
+				WHERE p3.post_parent = r.post_parent
+				AND p3.post_type = 'revision'
+			) AS post_count,
+			(
+				SELECT p2.post_author
+				FROM $wpdb->posts p2
+				WHERE p2.ID = r.post_parent
+				ORDER BY p2.ID DESC
+				LIMIT 0,1
+			) AS origin_post_author,			
+			(
+				SELECT p2.post_date
+				FROM $wpdb->posts p2
+				WHERE p2.ID = r.post_parent
+				ORDER BY p2.ID DESC
+				LIMIT 0,1
+			) AS origin_post_date,
+			(
+				SELECT p2.post_type
+				FROM $wpdb->posts p2
+				WHERE p2.ID = r.post_parent
+				ORDER BY p2.ID DESC
+				LIMIT 0,1
+			) AS origin_post_type
+		FROM $wpdb->posts r
+		LEFT JOIN $wpdb->posts r3 ON r.post_parent = r3.ID
+		WHERE r.post_type = 'revision'";
+
+		// Only when Search input is valid
+		if( isset( $args['s'] ) ) {
+			$query .= $wpdb->prepare(
+				" AND LOWER(r.post_title) LIKE '%s'",
+				'%' . $wpdb->esc_like( $args['s'] ) . '%'
+			);
+		}
+
+		$count = 0;
+
+		// Filter by origin_post_author
+		if( isset( $args['origin_post'] ) ) {
+			$query .= $wpdb->prepare(
+				"{$this->having_and( $count )} post_parent = %d",
+				$args['origin_post']
+			);
+			$count++;
+		}
+
+		// Filter by origin_post_author
+		if( isset( $args['origin_post_author'] ) ) {
+			$query .= $wpdb->prepare(
+				"{$this->having_and( $count )} origin_post_author LIKE %d",
+				$wpdb->esc_like( $args['origin_post_author'] )
+			);
+			$count++;
+		}
+
+		// Filter by post_author
+		if( isset( $args['post_author'] ) ) {
+			$query .= $wpdb->prepare(
+				"{$this->having_and( $count )} post_author LIKE %d",
+				$wpdb->esc_like( $args['post_author'] )
+			);
+			$count++;
+		}
+
+		// Filter by post_parent
+		if( isset( $args['post_parent'] ) ) {
+			$query .= $wpdb->prepare(
+				"{$this->having_and( $count )} post_parent LIKE %d",
+				$wpdb->esc_like( $args['post_parent'] )
+			);
+			$count++;
+		}
+
+		// Filter by origin_post_type
+		if( isset( $args['origin_post_type'] ) ) {
+			$query .= $wpdb->prepare(
+				"{$this->having_and( $count )} origin_post_type LIKE %s",
+				$wpdb->esc_like( $args['origin_post_type'] )
+			);
+			$count++;
+		}
+
+		$query .= $this->having_and( $count ) . ' origin_post_type IN ("' . implode('","', $this->post_types ) . '")';
+		$count++;
+
+		// Set order by and order
+		$query .= ' ORDER BY ' . $orderby . ' ' . strtoupper( $order );
+
+		return $query;
+	}
+
+	/**
+	 * Check if a key exists in array
+	 *
+	 * @param string $array	e.g. ['origin_post_author' => $current_user->ID]
+	 * @param string $find	Which key are we looking in an array. e.g. 'origin_post_author'
+	 *
+	 * @return string|bool
+	 */
+	private function key_in_args( $array, $find ) {
+		if ( array_key_exists( $find, $array ) ) {
+			$find_value = $array[$find];
+		}
+
+		if ( isset( $find_value ) ) {
+			return $find_value;
+		}
+
+		return false;
+	}
+
+	/**
+	 * HAVING clause helper to build dynamic query
+	 *
+	 * @param int $count Number that later decide the return
+	 *
+	 * @return string
+	 */
+	private function having_and( $count ) {
+		return $count > 0 ? ' AND' : ' HAVING';
+	}
+
+	/**
+	 * Generate dynamic spacing
+	 *
+	 * @param int $count Number that later decide the return
+	 *
+	 * @return string
+	 */
+	private function heading_spacing( $count ) {
+		return $count > 0 ? ', ' : '';
+	}
+
+	/**
+	 * Override WP_List_Table::get_columns()
+	 */
+    public function get_columns() {
+        $arr = array(
+            'cb'					=> '<input type="checkbox" />',
+			'post_title' 	=> __( 'Revision', 'revisionary' ),
+			'post_count' 	=> __( 'Count', 'revisionary' ),
+			'origin_post_type' 		=> __( 'Post Type', 'revisionary' ),
+			'post_author'	=> __( 'Revised By', 'revisionary' ),
+			'post_date' 	=> __( 'Revision Date', 'revisionary' ),
+			'publication_method' => __('Method', 'revisionary'),
+			'approved_by'	=> __('Approved By', 'revisionary'),
+			'origin_post_date'		=> __( 'Published Date', 'revisionary' ),
+			'origin_post_author'	=> __( 'Published Author', 'revisionary' ),
+        );
+
+		if (!$this->show_approved_by_col) {
+			unset($arr['approved_by']);
+		}
+
+		return $arr;
+    }
+
+	/**
+	 * Make post datetime friendly
+	 *
+	 * @return html
+	 */
+	public function friendly_date( $time ) {
+		$timezone = get_option( 'timezone_string' );
+		if ( $timezone ) {
+			date_default_timezone_set( $timezone );
+		}
+
+		$timestamp 		= strtotime( $time );
+		$current_time 	= time();
+		$time_diff		= $current_time - $timestamp;
+		$date_format 	= sanitize_text_field( get_option( 'date_format' ) );
+		$time_format 	= sanitize_text_field( get_option( 'time_format' ) );
+
+		if ( $time_diff < 60 ) {
+			$result = esc_html__( 'just now', 'revisionary' );
+		} elseif ( $time_diff < 3600 ) {
+			$result = sprintf(
+				esc_html__( '%s minutes ago', 'revisionary' ),
+				floor( $time_diff / 60 )
+			);
+		} elseif ( $time_diff < 86400 ) {
+			$result = sprintf(
+				esc_html__( '%s hours ago', 'revisionary' ),
+				floor( $time_diff / 3600 )
+			);
+		} /*elseif ( $time_diff < 2592000 ) {
+			$result = sprintf(
+				esc_html__( '%s days ago', 'revisionary' ),
+				floor( $time_diff / 86400 )
+			);
+		}*/ else {
+			$result = date_i18n( "$date_format @ $time_format", $timestamp );
+		}
+
+		$saved_time = date( 'Y/m/d H:i:s', $timestamp );
+
+		return '<abbr title="' . esc_attr( $saved_time ) . '">' . $result . '</abbr>';
+	}
+
+	/**
+	 * Override WP_List_Table::column_default()
+	 */
+    public function column_default( $item, $column_name ) {
+        switch ( $column_name ) {
+            case 'post_title':
+				// Are revisions enabled for the post type of this post parent?
+				$post_object 		= get_post( $item->post_parent );
+				$revisions_enabled	= wp_revisions_enabled( $post_object );
+				if( $revisions_enabled ) {
+					// Show title with link
+					printf(
+						'<strong><a class="row-title rvy-open-popup" href="%s" data-label="%s">%s</a></strong>',
+						esc_url_raw( get_edit_post_link( $item->ID ) . '&width=900&height=600&rvy-popup=true&TB_iframe=1' ),
+						esc_attr( $item->$column_name ),
+						$item->$column_name
+					);
+				} else {
+					// Show title WITHOUT link
+					printf(
+						'<strong>%s</strong> %s',
+						$item->$column_name,
+						sprintf(
+							'<span class="dashicons dashicons-info" title="%s"></span>',
+							sprintf(
+								esc_attr__( 'Revisions are disabled for %s post type', 'revisionary' ),
+								$item->origin_post_type
+							)
+						)
+					);
+				}
+
+				break;
+
+			case 'origin_post_type':
+				$type_obj = get_post_type_object($item->$column_name);
+				$type_label = (!empty($type_obj)) ? $type_obj->labels->singular_name : $item->$column_name;
+
+				echo $this->build_filter_link(
+					$type_label,
+					[
+						'origin_post_type' => sanitize_key( $item->$column_name )
+					]
+				);
+				break;
+
+			case 'post_date':
+			case 'origin_post_date':
+                return $this->friendly_date( $item->$column_name );
+				break;
+
+			case 'origin_post_author':
+				echo $this->build_filter_link(
+					get_the_author_meta( 'display_name', $item->$column_name ),
+					[
+						'origin_post_author' => (int) $item->$column_name
+					]
+				);
+				break;
+
+			case 'post_author':
+				echo $this->build_filter_link(
+					get_the_author_meta( 'display_name', $item->$column_name ),
+					[
+						'post_author' => (int) $item->$column_name
+					]
+				);
+				break;
+
+			case 'publication_method':
+				$revision_publication = get_post_meta($item->ID, '_rvy_published_gmt', true);
+				$prev_revision_status = get_post_meta($item->ID, '_rvy_prev_revision_status', true);
+
+				switch ($prev_revision_status) {
+					case 'future-revision':
+						printf(__('Scheduled Rev.'));
+						break;
+
+					case 'pending-revision':
+					case 'draft-revision':
+						printf(__('Submitted Rev.', 'revisionary'));
+						break;
+
+					default:
+						if (!empty($revision_publication)) {
+							printf(__('Submitted Rev.', 'revisionary'));
+						} else {
+							printf(__('Direct Edit', 'revisionary'));
+						}
+				}
+
+				break;
+
+			case 'approved_by':
+				if ($approver_id = get_post_meta($item->ID, '_rvy_approved_by', true)) {
+					if ($user = new WP_User($approver_id)) {
+						echo $user->display_name;
+					}
+				}
+
+				break;
+
+			case 'post_count':
+				echo $this->build_filter_link(
+					(int) $item->$column_name,
+					[
+						'post_parent' => (int) $item->post_parent
+					]
+				);
+				break;
+
+			default:
+                return '';
+        }
+    }
+
+	/**
+	 * Override WP_List_Table::column_cb()
+	 */
+    public function column_cb( $item ) {
+        return sprintf(
+            '<input type="checkbox" name="post[]" value="%s" />', $item->ID
+        );
+    }
+
+	/**
+	 * Override WP_List_Table::extra_tablenav()
+	 */
+	protected function extra_tablenav( $which ) {
+		?>
+		<div class="alignleft actions">
+		<?php
+		if ( 'top' === $which ) {
+			ob_start();
+
+			$this->post_types_dropdown();
+
+			$output = ob_get_clean();
+
+			if ( ! empty( $output ) ) {
+				echo $output;
+				submit_button( __( 'Filter' ), '', 'filter_action', false, array( 'id' => 'post-query-submit' ) );
+			}
+
+			if( count( $_REQUEST ) > 1 ) :
+				?>
+				<a href="<?php echo add_query_arg( ['page' => 'revisionary-archive'], admin_url( 'admin.php' ) ) ?>"
+					class="button">
+					<?php esc_html_e( 'Reset Filters', 'revisionary' ) ?>
+				</a>
+				<?php
+			endif;
+		}
+		?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Create dropdown to list and switch post types filter
+	 *
+	 * @return html
+	 */
+	protected function post_types_dropdown() {
+		$current_option = isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] )
+			? sanitize_key( $_REQUEST['origin_post_type'] )
+			: '';
+		?>
+		<select name="origin_post_type" class="postform">
+			<option <?php echo $current_option === '' ? 'selected' : '' ?>
+				value="">
+				<?php esc_html_e( 'All post types', 'revisionary' ) ?>
+			</option>
+			<?php foreach( $this->post_types as $type ) :
+				$type_obj = get_post_type_object( $type );
+				?>
+				<option <?php echo $current_option === $type ? 'selected' : '' ?>
+					value="<?php echo $type ?>">
+					<?php echo $type_obj->labels->singular_name; ?>
+				</option>
+			<?php endforeach; ?>
+		</select>
+		<?php
+	}
+
+	/**
+	 * Override WP_List_Table::get_sortable_columns()
+	 */
+	protected function get_sortable_columns() {
+		return [
+			'origin_post_date' 		=> 'origin_post_date',
+			'post_date' 	=> 'post_date',
+			'post_count' 	=> 'post_count',
+		];
+	}
+
+	/**
+	 * Override WP_List_Table::get_views()
+	 */
+	protected function get_views() {
+		global $current_user;
+		?>
+		<ul class="subsubsub">
+			<?php if( $this->all_revisions_count ) : ?>
+				<li>
+					<?php
+					echo $this->build_filter_link(
+						__( 'All', 'revisionary' ),
+						[
+							'v' => 'all'
+						],
+						$this->all_revisions_count,
+						false
+					);
+					?>
+				</li>
+			<?php endif; ?>
+			<?php if( $this->my_revisions_count ) : ?>
+				<?php if( $this->all_revisions_count ) : ?> | <?php endif;?><li class="mine">
+					<?php
+					echo $this->build_filter_link(
+						__( 'My Revisions', 'revisionary' ),
+						[
+							'post_author' => $current_user->ID,
+							'v' => 'mine'
+						],
+						$this->my_revisions_count,
+						false
+					);
+					?>
+				</li>
+			<?php endif; ?>
+		</ul>
+		<?php
+	}
+
+	/**
+	 * Override WP_List_Table::handle_row_actions()
+	 */
+	protected function handle_row_actions( $item, $column_name, $primary ) {
+		if ( $primary !== $column_name ) {
+			return '';
+		}
+
+		$actions 			= [];
+		$can_read_post		= current_user_can( 'read_post', $item->ID );
+		$can_edit_post		= current_user_can( 'edit_post', $item->ID );
+		$can_delete_post	= current_user_can( 'delete_post', $item->ID );
+		$post_type_object 	= get_post_type_object( $item->origin_post_type );
+		$post_object 		= get_post( $item->post_parent );
+		$revisions_enabled	= wp_revisions_enabled( $post_object );
+
+		// @TODO - Why delete is not visible, even for admins?
+		if ( $can_delete_post ) {
+			if ( $delete_link = get_delete_post_link( $item->ID, '', true ) ) {
+				$actions['delete'] = sprintf(
+					'<a href="%1$s" class="submitdelete" title="%2$s" aria-label="%2$s">%3$s</a>',
+					$delete_link,
+					esc_attr( sprintf( esc_html__( 'Delete Revision', 'revisionary' ), esc_attr( $item->post_title ) ) ),
+					esc_html__( 'Delete' )
+				);
+			}
+		}
+
+		if ( ( $can_read_post || $can_edit_post ) && $revisions_enabled ) {
+			$actions['diff'] = sprintf(
+				'<a href="%1$s" class="" title="%2$s" aria-label="%2$s" target="_revision_diff">%3$s</a>',
+				admin_url( "revision.php?revision=$item->ID" ),
+				esc_attr(
+					sprintf(
+						esc_html__( 'Compare Changes in %s', 'revisionary' ),
+						$item->post_title
+					)
+				),
+				_x( 'Compare', 'revisions', 'revisionary' )
+			);
+		}
+
+		if ( is_post_type_viewable( $post_type_object ) ) {
+			if ( $can_read_post && $post_type_object && ! empty( $post_type_object->public ) ) {
+				if ( rvy_get_option( 'revision_preview_links' ) || current_user_can('administrator') || is_super_admin() ) {
+					do_action('pp_revisions_get_post_link', $item->ID);
+
+					$preview_link = rvy_preview_url( $item );
+
+					$preview_link = remove_query_arg( 'preview_id', $preview_link );
+					$actions['view'] = sprintf(
+						'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
+						esc_url( $preview_link ),
+						esc_attr( esc_html__( 'Preview Revision', 'revisionary' ) ),
+						esc_html__( 'Preview' )
+					);
+
+					do_action('pp_revisions_post_link_done', $item->ID);
+				}
+			}
+		}
+
+		$actions['post_filter'] = sprintf(
+			'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
+			add_query_arg('origin_post', $item->post_parent, untrailingslashit(site_url('')) . esc_url_raw( $_SERVER['REQUEST_URI'] )),
+			esc_attr( esc_html__( 'List Revisions of this Post', 'revisionary' ) ),
+			esc_html__( 'Filter', 'revisionary' )
+		);
+
+		return $this->row_actions( $actions );
+	}
+
+	/**
+	 * Generate all the hidden input fields to use as filters in database
+	 *
+	 * @return html
+	 */
+	public function hidden_input() {
+		?>
+		<input type="hidden" name="page" value="revisionary-archive" />
+		<?php
+		$this->single_hidden_input( 'origin_post_type' );
+		$this->single_hidden_input( 'origin_post_author', true );
+		$this->single_hidden_input( 'post_author', true );
+		$this->single_hidden_input( 'post_parent', true );
+	}
+
+	/**
+	 * Generate hidden input fields to use as filters in database
+	 *
+	 * @param string $field	The field name from database query
+	 * @param bool $integer	The field is a number?
+	 *
+	 * @return html
+	 */
+	public function single_hidden_input( $field, $integer = false ) {
+		if( isset( $_REQUEST[$field] ) && ! empty( $_REQUEST[$field] ) ) :
+			?>
+			<input type="hidden"
+				name="<?php echo $field ?>"
+				value="<?php echo $integer ? (int) $_REQUEST[$field] : sanitize_key( $_REQUEST[$field] ) ?>" />
+			<?php
+		endif;
+	}
+
+	/**
+	 * Generate a link with filter params
+	 *
+	 * @param string $label		The label to display
+	 * @param array $args		URL filter parameters for the generated link
+	 * @param integer $count	Number of records to display
+	 * @param bool $url_args	Include parameters from URL?
+	 *							e.g. from: admin.php?origin_post_type=post&page=revisionary-archive&v=all
+	 *							take origin_post_type value
+	 *
+	 * @return html
+	 */
+	public function build_filter_link( $label, $args, $count = null, $url_args = true ) {
+		foreach (['origin_post', 'origin_post_type', 'post_author', 'origin_post_author'] as $var) {
+			// Include origin_post_type filter if enabled and exists
+			if( $url_args && isset( $_REQUEST[$var] ) ) {
+				$args = array_merge(
+					[
+						$var => sanitize_key( $_REQUEST[$var] )
+					],
+					$args
+				);
+			}
+		}
+
+		$count = $count ==! null ? ' <span class="count">(' . $count . ')</span>' : '';
+
+		// Check if $args['v'] exists and is current page
+		$v = '';
+		if( array_key_exists( 'v', $args )
+			&& isset( $_REQUEST['v'] )
+			&& sanitize_key( $_REQUEST['v'] ) === $args['v']
+		) {
+			$v = ' class="current"';
+		}
+
+		return '<a href="' . add_query_arg( $args, admin_url( 'admin.php?page=revisionary-archive' ) ) . '"' . $v . '>'
+		. sanitize_text_field( $label ) . $count
+		. '</a>';
+	}
+
+	/**
+	 * Override WP_List_Table::no_items()
+	 */
+	public function no_items() {
+		_e( 'No revisions found.', 'revisionary' );
+	}
+}
