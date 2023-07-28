@@ -1,4 +1,4 @@
-name: devworkspace_authors_free
+name: devworkspace_revisions_free
 services:
     terminal:
         build: ./docker
