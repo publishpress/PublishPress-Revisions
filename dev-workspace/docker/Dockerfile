@@ -1,4 +1,4 @@
-FROM publishpress/dev-workspace-terminal:generic-2.0.0
+FROM publishpress/dev-workspace-terminal:generic-2.0.1
 
 ENV PLUGIN_NAME="PublishPress Revisions"
 ENV PLUGIN_TYPE="FREE"
