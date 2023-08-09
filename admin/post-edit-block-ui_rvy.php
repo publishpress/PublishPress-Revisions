@@ -50,6 +50,14 @@ class RVY_PostBlockEditUI {
 		        if (!empty($publishpress) && !empty($publishpress->custom_status->module->options)) {
 		            $publishpress->custom_status->module->options->post_types = [];
 		        }
+
+                // Permalink Manager plugin
+                add_filter('permalink_manager_show_uri_editor_post', 
+                    function($enable, $post_obj, $post_type) {
+                        return false;
+                    },
+                    10, 3
+                );
 		    }
         }
     }
