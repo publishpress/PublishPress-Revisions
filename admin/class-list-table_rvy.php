@@ -884,7 +884,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$where = $this->revisions_where_filter( 
 			$wpdb->prepare(
-				"$wpdb->posts.post_mime_type IN ('$revision_status_csv') AND $wpdb->posts.post_status != 'trash' AND $wpdb->posts.post_author = '%d'", 
+				"$wpdb->posts.post_mime_type IN ('$revision_status_csv') AND $wpdb->posts.post_status IN ('draft', 'pending', 'future') AND $wpdb->posts.post_author = '%d'", 
 				$current_user->ID
 			),
 			['status_count' => true]
