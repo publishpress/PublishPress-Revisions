@@ -48,7 +48,7 @@ class RvyPostEdit {
 
             $args = \PublishPress\Revisions\PostEditorWorkflowUI::revisionLinkParams(compact('post', 'do_pending_revisions', 'do_scheduled_revisions'));
 
-            $args['deleteCaption'] = esc_html__('Delete Permanently', 'revisionary');
+            $args['deleteCaption'] = (defined('RVY_DISCARD_CAPTION')) ? esc_html__( 'Discard Revision', 'revisionary' ) : esc_html__('Delete Revision', 'revisionary');
 
             $args['submissionDelay'] = (defined('PUBLISHPRESS_VERSION')) ? 2000 : 200;
 
