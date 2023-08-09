@@ -1179,7 +1179,7 @@ function rvy_revision_unschedule($revision_id) {
 			break;
 		}
 
-		$wpdb->update( $wpdb->posts, array( 'post_status' => 'draft-revision' ), array( 'ID' => $revision->ID ) );
+		$wpdb->update( $wpdb->posts, ['post_status' => 'draft', 'post_mime_type' => 'draft-revision'], ['ID' => $revision->ID] );
 		
 		clean_post_cache($revision->ID);
 
