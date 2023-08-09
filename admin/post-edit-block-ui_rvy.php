@@ -83,7 +83,7 @@ class RVY_PostBlockEditUI {
 
             $args = \PublishPress\Revisions\PostEditorWorkflowUI::revisionLinkParams(compact('post', 'do_pending_revisions', 'do_scheduled_revisions'));
 
-            $args['deleteCaption'] = esc_html__('Delete Permanently', 'revisionary');
+            $args['deleteCaption'] = (defined('RVY_DISCARD_CAPTION')) ? esc_html__('Discard Revision', 'revisionary') : esc_html__('Delete Revision', 'revisionary');
 
             if (!empty($type_obj->cap->edit_others_posts) && current_user_can($type_obj->cap->edit_others_posts)) {
                 add_action('admin_print_footer_scripts', ['RVY_PostBlockEditUI', 'author_ui'], 20);
