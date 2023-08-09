@@ -239,7 +239,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.4.2-beta =
+= 3.5 - 10 Aug 2023 =
 * Fixed : Unscheduling a revision using bulk edit in Revision Queue caused it to become inaccessible
 * Compat : Permalink Manager plugin - Suppress permalink modification in Revision edit
 * Change : Change revision deletion captions to clarify that only the revision is deleted
