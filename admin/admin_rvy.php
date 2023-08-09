@@ -130,7 +130,7 @@ class RevisionaryAdmin
 			|| (defined('DOING_AJAX') && DOING_AJAX && !empty($_REQUEST['action']) && (false !== strpos(sanitize_key($_REQUEST['action']), 'revisionary')))
 			) && !defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 				if (!class_exists('\PublishPress\WordPressReviews\ReviewsController')) {
-					include_once RVY_ABSPATH . '/libraries/internal-vendor/publishpress/wordpress-reviews/ReviewsController.php';
+					include_once RVY_ABSPATH . '/lib/vendor/publishpress/wordpress-reviews/ReviewsController.php';
 				}
 
 				if (class_exists('\PublishPress\WordPressReviews\ReviewsController')) {
@@ -175,7 +175,7 @@ class RevisionaryAdmin
 		}
 
 		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && ('admin.php' == $pagenow) && !empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options']) ) {
-			wp_enqueue_style('revisionary-settings', RVY_URLPATH . '/includes-pro/settings-pro.css', [], PUBLISHPRESS_REVISIONS_VERSION);
+			wp_enqueue_style('revisionary-settings', plugins_url('', REVISIONARY_PRO_FILE) . '/includes-pro/settings-pro.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
  	}
 
