@@ -375,7 +375,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 // possible TODO: replace redundant hardcoded IDs with $id
 
 	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !empty($this->form_options['features']['license'])) {
-		require_once(RVY_ABSPATH . '/includes-pro/SettingsLicense.php');
+		require_once(REVISIONARY_PRO_ABSPATH . '/includes-pro/SettingsLicense.php');
 		$license_ui = new RevisionaryLicenseSettings();
 		?>
 		<table class="form-table rs-form-table" id="ppr-tab-license"<?php echo ($setActiveTab != 'license') ? ' style="display:none;"' : '' ?>>

@@ -28,7 +28,7 @@ class Revisions {
 
 	public function load_updater() {
         if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
-		    require_once(RVY_ABSPATH . '/includes-pro/library/Factory.php');
+		    require_once(REVISIONARY_PRO_ABSPATH . '/includes-pro/library/Factory.php');
             $container = \PublishPress\Revisions\Factory::get_container();
 
             return $container['edd_container']['update_manager'];
@@ -38,7 +38,7 @@ class Revisions {
 	public function keyStatus($refresh = false)
     {
         if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
-            require_once(RVY_ABSPATH . '/includes-pro/pro-key.php');
+            require_once(REVISIONARY_PRO_ABSPATH . '/includes-pro/pro-key.php');
             return _revisionary_key_status($refresh);
         }
     }

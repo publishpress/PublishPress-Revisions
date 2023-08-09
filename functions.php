@@ -344,3 +344,43 @@ function pp_revisions_plugin_updated($current_version) {
         delete_option('revisionary_sent_mail');
     }
 }
+
+function pp_revisions_plugin_activation() {
+    // force this timestamp to be regenerated, in case something went wrong before
+    delete_option( 'rvy_next_rev_publish_gmt' );
+
+    if (!class_exists('RevisionaryActivation')) {
+        require_once(dirname(__FILE__).'/activation_rvy.php');
+    }
+
+    require_once(dirname(__FILE__).'/functions.php');
+
+    // import from Revisionary 1.x
+    new RevisionaryActivation(['import_legacy' => true]);
+
+    // convert pending / scheduled revisions to v3.0 format
+    global $wpdb;
+    $revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
+
+    $wpdb->query("DELETE FROM $wpdb->posts WHERE post_mime_type IN ('draft-revision', 'pending-revision', 'future-revision') AND post_status = 'trash'");
+
+    $wpdb->query("UPDATE $wpdb->posts SET post_mime_type = post_status WHERE post_status IN ('$revision_status_csv')");
+    $wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft', post_mime_type = 'draft-revision' WHERE post_status IN ('draft-revision')");
+    $wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending', post_mime_type = 'pending-revision' WHERE post_status IN ('pending-revision')");
+    $wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending', post_mime_type = 'future-revision' WHERE post_status IN ('future-revision')");
+}
+
+function pp_revisions_plugin_deactivation() {
+    global $wpdb;
+
+    require_once(dirname(__FILE__).'/functions.php');
+
+    // Prevents pending / scheduled revisions from being listed as regular drafts / pending posts after plugin is deactivated
+    $revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
+    $wpdb->query("UPDATE $wpdb->posts SET post_status = post_mime_type WHERE post_mime_type IN ('$revision_status_csv')");
+    $wpdb->query("UPDATE $wpdb->posts SET post_mime_type = '' WHERE post_mime_type IN ('$revision_status_csv')");
+
+    if ($timestamp = wp_next_scheduled('rvy_mail_buffer_hook')) {
+        wp_unschedule_event($timestamp,'rvy_mail_buffer_hook');
+    }
+}
