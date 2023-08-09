@@ -331,16 +331,28 @@ jQuery(document).ready(function ($) {
             $('button.editor-post-save-draft:not(.rvy-recaption)').addClass('rvy-recaption').removeClass('is-tertiary').addClass('is-primary').addClass('ppr-purple-button');
 		}
 		
+        if (rvyObjEdit.viewTitleExtra) {
+            var newPreviewItem = '<div class="components-menu-group"><div role="group"><div class="edit-post-header-preview__grouping-external">'
+                + '<a href="' + rvyObjEdit.viewURL + '" target="pp_revisions_copy" role="menuitem" class="ppr-purple-button components-button is-primary edit-post-header-preview__button-external">'
+                + rvyObjEdit.viewTitle + '</a></div></div></div>';
+
+            if (rvyObjEdit.viewTitleExtra && !$('div.rvy-revision-preview').length) {
+                if (rvyObjEdit.viewTitleExtra) {
+                    $('div.block-editor-post-preview__dropdown').after(newPreviewItem).addClass('rvy-revision-preview');
+                }
+            }
+        }
+
         if (($('div.edit-post-header__settings a.editor-post-preview:visible').length || $('div.block-editor-post-preview__dropdown button.block-editor-post-preview__button-toggle:visible').length) && !$('a.rvy-post-preview').length) {
             if (rvyObjEdit.viewURL && $('.block-editor-post-preview__button-toggle').length) {
                 if ($('div.edit-post-header-preview__grouping-external').length == 1) {
-					var svgElem = $('div.edit-post-header-preview__grouping-external a svg').clone()[0].outerHTML;
+					var elemTemp = $('div.edit-post-header-preview__grouping-external a svg').clone();
+                    
+                    if (typeof elemTemp[0] != 'undefined') {
+                        var svgElem = elemTemp[0].outerHTML;
 					
-					$('div.edit-post-header-preview__grouping-external').after(
-						'<div class="components-menu-group"><div role="group"><div class="edit-post-header-preview__grouping-external">'
-                        + '<a href="' + rvyObjEdit.viewURL + '" target="pp_revisions_copy" role="menuitem" class="components-button edit-post-header-preview__button-external">'
-						+ rvyObjEdit.viewTitle + svgElem + '</a></div></div></div>'
-					);
+					    $('div.edit-post-header-preview__grouping-external').after(newPreviewItem);
+                    }
 				}
 				
                 if (rvyObjEdit.viewCaption) {

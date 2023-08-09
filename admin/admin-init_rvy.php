@@ -3,11 +3,6 @@ global $pagenow, $revisionary;
 
 add_action( 'init', '_rvy_post_edit_ui' );
 
-if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
-	require_once(RVY_ABSPATH . '/includes-pro/admin-load.php');
-	new RevisionaryProAdmin();
-}
-
 function _rvy_post_edit_ui() {
 	global $pagenow, $revisionary;
 
@@ -359,7 +354,7 @@ function rvy_admin_init() {
 	}
 
 	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !empty($_REQUEST['rvy_ajax_settings'])) {
-		include_once(RVY_ABSPATH . '/includes-pro/pro-activation-ajax.php');
+		include_once(REVISIONARY_PRO_ABSPATH . '/includes-pro/pro-activation-ajax.php');
 	}
 
 	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !empty($_REQUEST['rvy_refresh_updates'])) {
