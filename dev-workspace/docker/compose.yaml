@@ -2,7 +2,7 @@ name: devworkspace_revisions_free
 services:
     terminal:
         build: ./docker
-        image: publishpress/dev-workspace-terminal:revisions-free-2
+        image: publishpress/dev-workspace-terminal:revisions-free-2.0
         command: ["zsh"]
         stdin_open: true
         tty: true
