@@ -2,8 +2,16 @@
 if (isset($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die();
 
-if (defined('REVISIONARY_FILE')) {
-	define('RVY_NETWORK', awp_is_mu() && rvy_plugin_active_for_network(plugin_basename(REVISIONARY_FILE)));
+require_once( dirname(__FILE__).'/lib/agapetry_wp_core_lib.php');
+
+if (defined('REVISIONARY_PRO_FILE')) {
+	$filepath = REVISIONARY_PRO_FILE;
+} else {
+	$filepath = defined('REVISIONARY_FILE') ? REVISIONARY_FILE : '';
+}
+
+if ($filepath) {
+	define('RVY_NETWORK', awp_is_mu() && rvy_plugin_active_for_network(plugin_basename($filepath)));
 }
 
 require_once(dirname(__FILE__).'/functions.php');
@@ -1186,7 +1194,7 @@ function rvy_mail( $address, $title, $message, $args ) {
 function rvy_settings_scripts() {
 	if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 		$suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '.dev' : '';
-		wp_enqueue_script('revisionary-pro-settings', plugins_url('', REVISIONARY_FILE) . "/includes-pro/settings-pro{$suffix}.js", ['jquery', 'jquery-form'], PUBLISHPRESS_REVISIONS_VERSION, true);
+		wp_enqueue_script('revisionary-pro-settings', plugins_url('', REVISIONARY_PRO_FILE) . "/includes-pro/settings-pro{$suffix}.js", ['jquery', 'jquery-form'], PUBLISHPRESS_REVISIONS_VERSION, true);
 	}
 }
 

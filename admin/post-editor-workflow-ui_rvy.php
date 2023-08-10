@@ -37,6 +37,7 @@ class PostEditorWorkflowUI {
         ];
 
         $vars['disableRecaption'] = version_compare($wp_version, '5.9-beta', '>=') || is_plugin_active('gutenberg/gutenberg.php');
+        $vars['viewTitleExtra'] = '';
 
         if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
             $vars['viewURL'] = rvy_preview_url($post);
@@ -57,6 +58,10 @@ class PostEditorWorkflowUI {
             } else {
                 $vars['viewCaption'] = version_compare($wp_version, '5.5-beta', '>=') ? esc_html__('Preview / Submit') :  esc_html__('View / Submit');
                 $vars['viewTitle'] =  esc_html__('View / Submit saved revision', 'revisionary');
+            }
+
+            if (defined('RVY_EXTRA_VIEW_BUTTON')) {
+                $vars['viewTitleExtra'] = $vars['viewTitle'];
             }
         } else {
             $vars['viewURL']  = '';

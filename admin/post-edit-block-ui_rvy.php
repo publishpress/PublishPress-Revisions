@@ -50,6 +50,14 @@ class RVY_PostBlockEditUI {
 		        if (!empty($publishpress) && !empty($publishpress->custom_status->module->options)) {
 		            $publishpress->custom_status->module->options->post_types = [];
 		        }
+
+                // Permalink Manager plugin
+                add_filter('permalink_manager_show_uri_editor_post', 
+                    function($enable, $post_obj, $post_type) {
+                        return false;
+                    },
+                    10, 3
+                );
 		    }
         }
     }
@@ -83,7 +91,7 @@ class RVY_PostBlockEditUI {
 
             $args = \PublishPress\Revisions\PostEditorWorkflowUI::revisionLinkParams(compact('post', 'do_pending_revisions', 'do_scheduled_revisions'));
 
-            $args['deleteCaption'] = esc_html__('Delete Permanently', 'revisionary');
+            $args['deleteCaption'] = (defined('RVY_DISCARD_CAPTION')) ? esc_html__('Discard Revision', 'revisionary') : esc_html__('Delete Revision', 'revisionary');
 
             if (!empty($type_obj->cap->edit_others_posts) && current_user_can($type_obj->cap->edit_others_posts)) {
                 add_action('admin_print_footer_scripts', ['RVY_PostBlockEditUI', 'author_ui'], 20);

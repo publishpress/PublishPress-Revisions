@@ -2,7 +2,7 @@ name: devworkspace_revisions_free
 services:
     terminal:
         build: ./docker
-        image: publishpress/dev-workspace-terminal:revisions-free
+        image: publishpress/dev-workspace-terminal:revisions-free-2
         command: ["zsh"]
         stdin_open: true
         tty: true
@@ -18,6 +18,6 @@ services:
             - ../cache/.composer/auth.json:/root/.composer/auth.json
             - /var/run/docker.sock:/var/run/docker.sock
         extra_hosts:
-            - "dockerhost:${DOCKER_HOST_IP}"
+            - "dockerhost:172.17.0.1"
         environment:
             - DOCKER_HOST_IP=${DOCKER_HOST_IP}

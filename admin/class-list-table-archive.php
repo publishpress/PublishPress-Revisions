@@ -700,10 +700,12 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		// @TODO - Why delete is not visible, even for admins?
 		if ( $can_delete_post ) {
 			if ( $delete_link = get_delete_post_link( $item->ID, '', true ) ) {
+				$delete_caption = (defined('RVY_DISCARD_CAPTION')) ? esc_html__( 'Discard Revision', 'revisionary-pro' ) : esc_html__( 'Delete Revision', 'revisionary' );
+
 				$actions['delete'] = sprintf(
 					'<a href="%1$s" class="submitdelete" title="%2$s" aria-label="%2$s">%3$s</a>',
 					$delete_link,
-					esc_attr( sprintf( esc_html__( 'Delete Revision', 'revisionary' ), esc_attr( $item->post_title ) ) ),
+					esc_attr( sprintf( $delete_caption, esc_attr( $item->post_title ) ) ),
 					esc_html__( 'Delete' )
 				);
 			}

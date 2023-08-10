@@ -6,8 +6,8 @@ Author URI: https://publishpress.com
 Tags: revision, submit changes, duplicate post, duplicate page, revisions, approve changes, scheduled changes
 Requires at least: 5.5
 Requires PHP: 7.2.5
-Tested up to: 6.2
-Stable tag: 3.4.1
+Tested up to: 6.3
+Stable tag: 3.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -238,6 +238,13 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
 == Changelog ==
+
+= 3.5 - 10 Aug 2023 =
+* Fixed : Unscheduling a revision using bulk edit in Revision Queue caused it to become inaccessible
+* Compat : Permalink Manager plugin - Suppress permalink modification in Revision edit
+* Change : Change revision deletion captions to clarify that only the revision is deleted
+* Change: Modified internal vendor library structure for shorter paths (lib/vendor)
+* Change: Free plugin is loaded through internal vendor library
 
 = 3.4.1 - 29 Jun 2023 =
 * Fixed : Incorrect admin menu item display if revision submission is disabled for all post types
