@@ -17,6 +17,7 @@ if ($filepath && !defined('RVY_NETWORK')) {
 
 require_once(dirname(__FILE__).'/functions.php');
 require_once(dirname(__FILE__).'/utils.php');
+require_once(dirname(__FILE__).'/defaults_rvy.php');
 
 function _rvy_delete_revision($revision_id, $published_post_id) {
 	revisionary_refresh_revision_flags($published_post_id, ['ignore_revision_ids' => $revision_id]);
