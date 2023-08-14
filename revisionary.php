@@ -216,10 +216,6 @@ if ((!defined('REVISIONARY_FILE') && !$revisionary_pro_active) || $revisionary_l
 	function revisionary_load() {
 		global $pp_revisions_version;
 		
-		if (function_exists('revisionary')) {
-			return;
-		}
-		
 		define('PUBLISHPRESS_REVISIONS_VERSION', $pp_revisions_version);
 
 		if ( ! defined( 'RVY_VERSION' ) ) {
