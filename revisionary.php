@@ -124,6 +124,18 @@ if (false === $revisionary_loaded_by_pro) {
             },
             10, 2
         );
+
+		add_action(
+			'admin_notices',
+			function () {
+				if (current_user_can('activate_plugins')) {
+					echo '<div class="notice notice-error"><p>'
+					. 'Revisions Pro requires the free plugin (PublishPress Revisions) to be deactivated.'
+					. '</p></div>';
+				}
+			}
+		);
+
         return;
     }
 }
@@ -165,8 +177,11 @@ if ((!defined('REVISIONARY_FILE') && !$revisionary_pro_active) || $revisionary_l
 		'init', 
 		function() {
 			global $pp_revisions_version;
-			require_once(dirname(__FILE__).'/functions.php');
-			pp_revisions_plugin_updated($pp_revisions_version);
+
+			if (!function_exists('revisionary')) {
+				require_once(dirname(__FILE__).'/functions.php');
+				pp_revisions_plugin_updated($pp_revisions_version);
+			}
 		},
 		2
 	);
@@ -176,7 +191,9 @@ if ((!defined('REVISIONARY_FILE') && !$revisionary_pro_active) || $revisionary_l
 		{
 			global $pp_revisions_version;
 
-			require_once(dirname(__FILE__).'/functions.php');
+			if (!function_exists('revisionary')) {
+				require_once(dirname(__FILE__).'/functions.php');
+			}
 
 			pp_revisions_plugin_updated($pp_revisions_version);
 			pp_revisions_plugin_activation();
@@ -185,7 +202,9 @@ if ((!defined('REVISIONARY_FILE') && !$revisionary_pro_active) || $revisionary_l
 
 	register_deactivation_hook(__FILE__, function()
 		{
-			require_once( dirname(__FILE__).'/rvy_init.php');
+			if (!function_exists('rvy_init')) {
+				require_once( dirname(__FILE__).'/rvy_init.php');
+			}
 
 			if (!rvy_is_plugin_active('revisionary-pro/revisionary-pro.php')) {
 				pp_revisions_plugin_deactivation();
@@ -196,6 +215,11 @@ if ((!defined('REVISIONARY_FILE') && !$revisionary_pro_active) || $revisionary_l
 	// negative priority to precede any default WP action handlers
 	function revisionary_load() {
 		global $pp_revisions_version;
+		
+		if (function_exists('revisionary')) {
+			return;
+		}
+		
 		define('PUBLISHPRESS_REVISIONS_VERSION', $pp_revisions_version);
 
 		if ( ! defined( 'RVY_VERSION' ) ) {
