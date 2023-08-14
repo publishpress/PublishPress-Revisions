@@ -281,6 +281,7 @@ jQuery(document).ready(function ($) {
         }
 
         if (isSubmission) {
+            $('div.revision-submitting').show();
             rvyDoSubmission();
         } else {
             rvyDoApproval();
