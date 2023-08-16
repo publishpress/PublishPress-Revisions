@@ -148,7 +148,7 @@ if (! defined('REVISIONS_INTERNAL_VENDORPATH')) {
 	define('REVISIONS_INTERNAL_VENDORPATH', __DIR__ . '/lib/vendor');
 }
 
-if (! $revisionary_loaded_by_pro) {
+if (!defined('REVISIONARY_FILE') && !$revisionary_loaded_by_pro) {
 	$includeFileRelativePath = REVISIONS_INTERNAL_VENDORPATH . '/publishpress/publishpress-instance-protection/include.php';
 	if (file_exists($includeFileRelativePath)) {
 		require_once $includeFileRelativePath;
@@ -170,7 +170,7 @@ if (! $revisionary_loaded_by_pro) {
     }
 }
 
-if ((!defined('REVISIONARY_FILE') && !$revisionary_pro_active) || $revisionary_loaded_by_pro) {
+if (!defined('REVISIONARY_FILE') && (!$revisionary_pro_active || $revisionary_loaded_by_pro)) {
 	define('REVISIONARY_FILE', __FILE__);
 
 	add_action(
