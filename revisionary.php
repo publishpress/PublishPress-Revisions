@@ -5,7 +5,7 @@
  * Description: Maintain published content with teamwork and precision using the Revisions model to submit, approve and schedule changes.
  * Author: PublishPress
  * Author URI: https://publishpress.com
- * Version: 3.5.1
+ * Version: 3.5.2
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 5.5
@@ -39,7 +39,7 @@
 // Temporary usage within this module only; avoids multiple instances of version string
 global $pp_revisions_version;
 
-$pp_revisions_version = '3.5.1';
+$pp_revisions_version = '3.5.2';
 
 global $wp_version;
 
@@ -124,6 +124,18 @@ if (false === $revisionary_loaded_by_pro) {
             },
             10, 2
         );
+
+		add_action(
+			'admin_notices',
+			function () {
+				if (current_user_can('activate_plugins')) {
+					echo '<div class="notice notice-error"><p>'
+					. 'Revisions Pro requires the free plugin (PublishPress Revisions) to be deactivated.'
+					. '</p></div>';
+				}
+			}
+		);
+
         return;
     }
 }
@@ -136,7 +148,7 @@ if (! defined('REVISIONS_INTERNAL_VENDORPATH')) {
 	define('REVISIONS_INTERNAL_VENDORPATH', __DIR__ . '/lib/vendor');
 }
 
-if (! $revisionary_loaded_by_pro) {
+if (!defined('REVISIONARY_FILE') && !$revisionary_loaded_by_pro) {
 	$includeFileRelativePath = REVISIONS_INTERNAL_VENDORPATH . '/publishpress/publishpress-instance-protection/include.php';
 	if (file_exists($includeFileRelativePath)) {
 		require_once $includeFileRelativePath;
@@ -158,15 +170,18 @@ if (! $revisionary_loaded_by_pro) {
     }
 }
 
-if ((!defined('REVISIONARY_FILE') && !$revisionary_pro_active) || $revisionary_loaded_by_pro) {
+if (!defined('REVISIONARY_FILE') && (!$revisionary_pro_active || $revisionary_loaded_by_pro)) {
 	define('REVISIONARY_FILE', __FILE__);
 
 	add_action(
 		'init', 
 		function() {
 			global $pp_revisions_version;
-			require_once(dirname(__FILE__).'/functions.php');
-			pp_revisions_plugin_updated($pp_revisions_version);
+
+			if (!function_exists('revisionary')) {
+				require_once(dirname(__FILE__).'/functions.php');
+				pp_revisions_plugin_updated($pp_revisions_version);
+			}
 		},
 		2
 	);
@@ -176,7 +191,9 @@ if ((!defined('REVISIONARY_FILE') && !$revisionary_pro_active) || $revisionary_l
 		{
 			global $pp_revisions_version;
 
-			require_once(dirname(__FILE__).'/functions.php');
+			if (!function_exists('revisionary')) {
+				require_once(dirname(__FILE__).'/functions.php');
+			}
 
 			pp_revisions_plugin_updated($pp_revisions_version);
 			pp_revisions_plugin_activation();
@@ -185,7 +202,9 @@ if ((!defined('REVISIONARY_FILE') && !$revisionary_pro_active) || $revisionary_l
 
 	register_deactivation_hook(__FILE__, function()
 		{
-			require_once( dirname(__FILE__).'/rvy_init.php');
+			if (!function_exists('rvy_init')) {
+				require_once( dirname(__FILE__).'/rvy_init.php');
+			}
 
 			if (!rvy_is_plugin_active('revisionary-pro/revisionary-pro.php')) {
 				pp_revisions_plugin_deactivation();
@@ -196,6 +215,7 @@ if ((!defined('REVISIONARY_FILE') && !$revisionary_pro_active) || $revisionary_l
 	// negative priority to precede any default WP action handlers
 	function revisionary_load() {
 		global $pp_revisions_version;
+		
 		define('PUBLISHPRESS_REVISIONS_VERSION', $pp_revisions_version);
 
 		if ( ! defined( 'RVY_VERSION' ) ) {

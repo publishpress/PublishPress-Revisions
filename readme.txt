@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.3
-Stable tag: 3.5.1
+Stable tag: 3.5.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -238,6 +238,12 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
 == Changelog ==
+
+= 3.5.2 - 14 Aug 2023 =
+* Fixed : Pro - Fatal error on activation if plugin settings were not previously saved (packaging error reverted fix in 3.5.1)
+* Fixed : Revision Edit - No progress caption was shown after Submit button click
+* Fixed : Options screen - html markup error (missing closing div tag)
+* Lang : Updated Spanish, French, Italian translations
 
 = 3.5.1 - 11 Aug 2023 =
 * Fixed : Bedrock - Unable to activate plugin due to three internal libraries missing from GitHub commit

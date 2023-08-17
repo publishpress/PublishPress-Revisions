@@ -457,7 +457,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 	<?php
 	esc_html_e('Note: Third party code may cause some post types to be incompatible with PublishPress Revisions.', 'revisionary');
 	?>
-	</p>
+	</div>
 
 	</td></tr></table>
 	<?php endif; // any options accessable in this section
