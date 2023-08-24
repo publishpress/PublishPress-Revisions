@@ -62,7 +62,9 @@ function revisionary_copy_terms($from_post, $target_id, $args = []) {
         }
 
         // Clear default category (added by wp_insert_post).
-        wp_set_object_terms( $target_id, null, 'category' );
+        if (!$empty_target_only || !wp_get_object_terms($target_id, 'category', ['fields' => 'ids'])) {
+            wp_set_object_terms( $target_id, null, 'category' );
+        }
 
         $post_taxonomies = get_object_taxonomies( $from_post->post_type );
         
