@@ -270,7 +270,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			) AS origin_post_type
 		FROM $wpdb->posts r
 		LEFT JOIN $wpdb->posts r3 ON r.post_parent = r3.ID
-		WHERE r.post_type = 'revision'";
+		WHERE r.post_type = 'revision' AND r.post_name NOT LIKE '%-autosave-v%'";
 
 		// Only when Search input is valid
 		if( isset( $args['s'] ) ) {
