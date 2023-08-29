@@ -228,7 +228,7 @@ class RevisionaryAdmin
 		$types = rvy_get_manageable_types();
 		$revision_archive = true;
 
-			$can_edit_any = false;
+		$can_edit_any = false;
 
 		if ($types || current_user_can('manage_options')) {
 			foreach ($types as $_post_type) {
@@ -246,7 +246,7 @@ class RevisionaryAdmin
 		$menu_slug = 'revisionary-q';
 
 		if ($revision_archive || $can_edit_any || current_user_can('manage_options')) {
-				$_menu_caption = ( defined( 'RVY_MODERATION_MENU_CAPTION' ) ) ? RVY_MODERATION_MENU_CAPTION : esc_html__('Revisions');
+			$_menu_caption = ( defined( 'RVY_MODERATION_MENU_CAPTION' ) ) ? RVY_MODERATION_MENU_CAPTION : esc_html__('Revisions');
 
 			if ($can_edit_any) {
 				$menu_func = [$this, 'moderation_queue'];
@@ -261,8 +261,8 @@ class RevisionaryAdmin
 				add_submenu_page('revisionary-q', esc_html__('Revision Queue', 'revisionary'), esc_html__('Revision Queue', 'revisionary'), 'read', 'revisionary-q', [$this, 'moderation_queue']);
 			}
 
-				do_action('revisionary_admin_menu');
-			}
+			do_action('revisionary_admin_menu');
+		}
 
 		// Revision Archive page
 		add_submenu_page(
