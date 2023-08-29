@@ -17,6 +17,7 @@ class Revisionary
 	var $internal_meta_update = false;
 	var $skip_filtering = false;
 	var $is_revisions_query = false;
+	var $front = false;
 
 	var $config_loaded = false;		// configuration related to post types and statuses must be loaded late on the init action
 	var $enabled_post_types = [];	// enabled_post_types property is set (keyed by post type slug) late on the init action. 
@@ -82,9 +83,11 @@ class Revisionary
 		new PublishPress\Revisions\PluginCompat();
 
 		// NOTE: $_GET['preview'] and $_GET['post_type'] arguments are set by rvy_init() at response to ?p= request when the requested post is a revision.
-		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && (((!empty($_GET['preview']) || !empty($_GET['_ppp'])) && empty($_REQUEST['preview_id'])) || !empty($_GET['mark_current_revision']))) { // preview_id indicates a regular preview via WP core, based on autosave revision
-			require_once( dirname(__FILE__).'/front_rvy.php' );
-			$this->front = new RevisionaryFront();
+		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST)) { // preview_id indicates a regular preview via WP core, based on autosave revision
+			if ((defined('FL_BUILDER_VERSION') && rvy_in_revision_workflow(rvy_detect_post_id())) || ((!empty($_GET['preview']) || !empty($_GET['_ppp'])) && empty($_REQUEST['preview_id'])) || !empty($_GET['mark_current_revision'])) {
+				require_once( dirname(__FILE__).'/front_rvy.php' );
+				$this->front = new RevisionaryFront();
+			}
 		}
 
 		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && (!empty($_GET['preview']) && !empty($_REQUEST['preview_id']))) {			
