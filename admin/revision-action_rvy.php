@@ -1067,7 +1067,11 @@ function rvy_revision_delete() {
 		// before deleting the revision, note its status for redirect
 		wp_delete_post_revision( $revision_id );
 
-		$redirect = "admin.php?page=revisionary-archive&origin_post={$revision->post_parent}&revision_status={$revision->post_mime_type}&deleted=1";
+		if (!empty($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'revisionary-archive')) {
+			$redirect = add_query_arg('deleted', '1', esc_url_raw($_SERVER['HTTP_REFERER']));
+		} else {
+			$redirect = "admin.php?page=revisionary-archive&origin_post={$revision->post_parent}&revision_status={$revision->post_mime_type}&deleted=1";
+		}
 
 		rvy_delete_past_revisions($revision_id);
 
