@@ -153,6 +153,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'list_unsubmitted_revisions' => 			sprintf(esc_html__('Include %s in My Activity, Revisions to My Posts views', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
 	'rev_publication_delete_ed_comments' =>		esc_html__('On Revision publication, delete Editorial Comments', 'revisionary'),
 	'deletion_queue' => 						esc_html__('Enable deletion queue', 'revisionary'),
+	'revision_archive_deletion' => 				esc_html__('Enable deletion in Revision Archive', 'revisionary'),
 	]
 );
 
@@ -179,7 +180,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'],
-	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'rev_publication_delete_ed_comments', 'deletion_queue', 'display_hints'],
+	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'rev_publication_delete_ed_comments', 'deletion_queue', 'revision_archive_deletion', 'display_hints'],
 	'notification'	=>		 ['pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 ]
 ]);
@@ -751,6 +752,9 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		}
 
 		do_action('revisionary_option_ui_revision_options', $this);
+
+		$hint = '';
+		$this->option_checkbox( 'revision_archive_deletion', $tab, $section, $hint, '' );
 		?>
 
 		</td></tr></table>

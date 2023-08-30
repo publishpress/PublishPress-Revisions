@@ -1283,17 +1283,17 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 						'<a href="%1$s" class="submitdelete" title="%2$s" aria-label="%2$s">%3$s</a>',
 						$delete_link,
 						/* translators: %s: post title */
-							esc_attr( sprintf( esc_html__( 'Discard Revision', 'revisionary' ), $title ) ),
-							esc_html__( 'Discard' )
-						);
-					} else {
-						$delete_caption = (defined('RVY_DISCARD_CAPTION')) ? esc_html__( 'Discard Revision', 'revisionary-pro' ) : esc_html__( 'Delete Revision', 'revisionary' );
-	
-						$actions['delete'] = sprintf(
-							'<a href="%1$s" class="submitdelete" title="%2$s" aria-label="%2$s">%3$s</a>',
-							$delete_link,
-							/* translators: %s: post title */
-							esc_attr( sprintf( $delete_caption, $title ) ),
+						esc_attr( sprintf( esc_html__( 'Discard Revision', 'revisionary' ), $title ) ),
+						esc_html__( 'Discard' )
+					);
+				} else {
+					$delete_caption = (defined('RVY_DISCARD_CAPTION')) ? esc_html__( 'Discard Revision', 'revisionary-pro' ) : esc_html__( 'Delete Revision', 'revisionary' );
+
+					$actions['delete'] = sprintf(
+						'<a href="%1$s" class="submitdelete" title="%2$s" aria-label="%2$s">%3$s</a>',
+						$delete_link,
+						/* translators: %s: post title */
+						esc_attr( sprintf( $delete_caption, $title ) ),
 						esc_html__( 'Delete' )
 					);
 				}

@@ -1,6 +1,8 @@
 <?php
 
 class RevisionaryFront {
+	var $orig_inherit_protected_value = false;
+
 	function __construct() {
 		global $revisionary;
 

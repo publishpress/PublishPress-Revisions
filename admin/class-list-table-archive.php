@@ -270,7 +270,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			) AS origin_post_type
 		FROM $wpdb->posts r
 		LEFT JOIN $wpdb->posts r3 ON r.post_parent = r3.ID
-		WHERE r.post_type = 'revision'";
+		WHERE r.post_type = 'revision' AND r.post_name NOT LIKE '%-autosave-v%'";
 
 		// Only when Search input is valid
 		if( isset( $args['s'] ) ) {
@@ -376,6 +376,47 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	 */
 	private function heading_spacing( $count ) {
 		return $count > 0 ? ', ' : '';
+	}
+
+	protected function get_bulk_actions() {
+		if (rvy_get_option('revision_archive_deletion')) {
+			$actions = [];
+			$actions['delete'] = esc_html__( 'Delete Revision', 'revisionary' );
+		}
+
+		return $actions;
+	}
+
+	// override default nonce field
+	protected function display_tablenav( $which ) {
+		if (!rvy_get_option('revision_archive_deletion')) {
+			return;
+		}
+		
+		if ( 'top' === $which ) {
+			wp_nonce_field( 'bulk-revision-archive' );
+		}
+		?>
+	<div class="tablenav <?php echo esc_attr( $which ); ?>">
+
+		<?php if ( $this->has_items() ) : ?>
+		<div class="alignleft actions bulkactions">
+			<?php $this->bulk_actions( $which ); ?>
+		</div>
+			<?php
+		endif;
+		$this->extra_tablenav( $which );
+
+		if (!empty($_SERVER['REQUEST_URI'])) {
+			$_SERVER['REQUEST_URI'] = str_replace('#038;', '&', esc_url_raw($_SERVER['REQUEST_URI']));
+		}
+
+		$this->pagination( $which );
+		?>
+
+		<br class="clear" />
+	</div>
+		<?php
 	}
 
 	/**
@@ -691,25 +732,11 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 		$actions 			= [];
 		$can_read_post		= current_user_can( 'read_post', $item->ID );
-		$can_edit_post		= current_user_can( 'edit_post', $item->ID );
-		$can_delete_post	= current_user_can( 'delete_post', $item->ID );
+		$can_edit_post		= current_user_can( 'edit_post', $item->post_parent );
+		//$can_delete_post	= current_user_can( 'delete_post', $item->ID );
 		$post_type_object 	= get_post_type_object( $item->origin_post_type );
 		$post_object 		= get_post( $item->post_parent );
 		$revisions_enabled	= wp_revisions_enabled( $post_object );
-
-		// @TODO - Why delete is not visible, even for admins?
-		if ( $can_delete_post ) {
-			if ( $delete_link = get_delete_post_link( $item->ID, '', true ) ) {
-				$delete_caption = (defined('RVY_DISCARD_CAPTION')) ? esc_html__( 'Discard Revision', 'revisionary-pro' ) : esc_html__( 'Delete Revision', 'revisionary' );
-
-				$actions['delete'] = sprintf(
-					'<a href="%1$s" class="submitdelete" title="%2$s" aria-label="%2$s">%3$s</a>',
-					$delete_link,
-					esc_attr( sprintf( $delete_caption, esc_attr( $item->post_title ) ) ),
-					esc_html__( 'Delete' )
-				);
-			}
-		}
 
 		if ( ( $can_read_post || $can_edit_post ) && $revisions_enabled ) {
 			$actions['diff'] = sprintf(
@@ -751,6 +778,20 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			esc_attr( esc_html__( 'List Revisions of this Post', 'revisionary' ) ),
 			esc_html__( 'Filter', 'revisionary' )
 		);
+
+		if ( $can_edit_post && rvy_get_option('revision_archive_deletion')) {
+			$delete_link = esc_url(wp_nonce_url(
+				"admin.php?page=rvy-revisions&amp;action=delete&amp;revision={$item->ID}", 
+				'delete-revision_' . $item->ID 
+			));
+
+			$actions['delete'] = sprintf(
+				'<a href="%1$s" class="submitdelete" title="%2$s" aria-label="%2$s">%3$s</a>',
+				$delete_link,
+				esc_html__( 'Delete Past Revision', 'revisionary' ),
+				esc_html__( 'Delete' )
+			);
+		}
 
 		return $this->row_actions( $actions );
 	}

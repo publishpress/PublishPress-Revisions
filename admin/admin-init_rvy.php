@@ -72,6 +72,64 @@ function rvy_admin_init() {
 			$handler->handle_submission( 'default', $sitewide, $customize_defaults );
 		}
 		
+	} elseif (isset($_REQUEST['action2']) && !empty($_REQUEST['page']) && ('revisionary-archive' == $_REQUEST['page']) && !empty($_REQUEST['post']) && rvy_get_option('revision_archive_deletion')) {
+		$doaction = (!empty($_REQUEST['action']) && !is_numeric($_REQUEST['action'])) ? sanitize_key($_REQUEST['action']) : sanitize_key($_REQUEST['action2']);
+
+		check_admin_referer('bulk-revision-archive');
+
+		if (!$url = str_replace('#038;', '&', wp_get_referer())) {
+			$url = admin_url("admin.php?page=revisionary-archive");
+		}
+
+		$sendback = remove_query_arg( array('deleted', 'ids', 'posts', '_wp_nonce', '_wp_http_referer'), $url);
+	
+		if ( isset( $_REQUEST['ids'] ) ) {
+			$post_ids =  array_map('intval', explode( ',', sanitize_text_field($_REQUEST['ids']) ));
+		} elseif ( !empty( $_REQUEST['post'] ) ) {
+			$post_ids = array_map('intval', $_REQUEST['post']);
+		}
+	
+		if ( !isset( $post_ids ) ) {
+			exit;
+		}
+	
+		switch ( $doaction ) {
+			case 'delete':
+				$deleted = 0;
+				foreach ( (array) $post_ids as $post_id ) {
+					if ( ! $revision = wp_get_post_revision($post_id)) {
+						continue;
+					}
+
+					if ( !current_user_can('administrator') && !current_user_can( 'edit_post', $revision->post_parent) ) {  // @todo: review Administrator cap check
+						wp_die( esc_html__('Sorry, you are not allowed to delete this revision.', 'revisionary') );
+					} 
+	
+					if ( !wp_delete_post_revision($post_id, true) )
+						wp_die( esc_html__('Error in deleting.') );
+	
+					$deleted++;
+				}
+				$sendback = add_query_arg('deleted', $deleted, $sendback);
+				break;
+	
+			default:
+				if (!$sendback = apply_filters('revisionary_handle_archive_action', $sendback, $doaction, $post_ids)) {
+					if (function_exists('get_current_screen')) {
+						$sendback = apply_filters( 'handle_bulk_actions-' . get_current_screen()->id, $sendback, $doaction, $post_ids );
+					}
+				}
+				
+				break;
+		}
+	
+		if ($sendback) {
+			$sendback = remove_query_arg( array('action', 'action2', '_wp_http_referer', '_wpnonce', 'post', 'bulk_edit', 'post_view'), $sendback );
+			$sendback = str_replace('#038;', '&', $sendback);	// @todo Proper decode
+			wp_redirect($sendback);
+			exit;
+		}
+
 	} elseif (isset($_REQUEST['action2']) && !empty($_REQUEST['page']) && ('revisionary-q' == $_REQUEST['page']) && !empty($_REQUEST['post'])) {
 		$doaction = (!empty($_REQUEST['action']) && !is_numeric($_REQUEST['action'])) ? sanitize_key($_REQUEST['action']) : sanitize_key($_REQUEST['action2']);
 
