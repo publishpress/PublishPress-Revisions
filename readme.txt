@@ -240,7 +240,9 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 == Changelog ==
 
 = 3.5.3 - 30 Aug 2023 =
+* Feature : Option to enable deletion of revisions in Revision Archive 
 * Fixed : Category / taxonomy changes were cleared by revision preview, not applied at revision approval
+* Fixed : Revision Archive included autosaves
 * Fixed : PHP 8.1 - Warning for dynamic property creation in revision preview
 
 = 3.5.2 - 17 Aug 2023 =
