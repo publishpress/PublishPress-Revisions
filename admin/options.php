@@ -262,7 +262,7 @@ if ( $sitewide ) {
 } elseif ( $customize_defaults ) {
 	$color_class = 'rs-backgreen';
 	echo '<p style="margin-top:0">';
-	esc_html_e( 'These are the <strong>default</strong> settings for options which can be adjusted per-site.', 'revisionary' );
+	esc_html_e( 'These are the default settings for options which can be adjusted per-site.', 'revisionary' );
 	echo '</p>';
 
 } else
