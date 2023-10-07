@@ -1050,7 +1050,7 @@ foreach ( $available_form_options as $tab_name => $sections ) {
 		echo '</strong><ul style="margin-left:2em">';
 
 		foreach ( $option_names as $option_name ) {
-			if ( $option_name && $this->option_captions[$option_name] ) {
+			if ( $option_name && !empty($this->option_captions[$option_name]) ) {
 				$all_movable_options []= $option_name;
 				echo '<li>';
 
