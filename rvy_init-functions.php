@@ -81,6 +81,10 @@ function rvy_mail_buffer_cron_interval( $schedules ) {
 }
 
 function _revisionary_publish_scheduled_cron($revision_id) {
+	if (is_array($revision_id) && isset($revision_id['revision_id'])) {
+		$revision_id = $revision_id['revision_id'];
+	}
+
 	if (rvy_get_option('scheduled_revisions') && rvy_get_option('scheduled_publish_cron')) {
 		revisionary_publish_scheduled(compact('revision_id'));
 	}
