@@ -159,7 +159,7 @@ msgstr ""
 #: admin/revision-archive_rvy.php:38
 #, fuzzy
 msgid "Revision Archive"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: admin/admin_rvy.php:269 admin/options.php:236
 msgid "PublishPress Revisions Settings"
@@ -215,7 +215,7 @@ msgstr ""
 #: admin/class-list-table-archive.php:157
 #, fuzzy, php-format
 msgid "Revision Author: %s"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: admin/class-list-table-archive.php:174
 #, php-format
@@ -242,7 +242,7 @@ msgstr ""
 #: admin/class-list-table-archive.php:391 rvy_init.php:546
 #, fuzzy
 msgid "Revision Date"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: admin/class-list-table-archive.php:392
 msgid "Method"
@@ -307,7 +307,7 @@ msgstr ""
 #: admin/class-list-table-archive.php:669
 #, fuzzy
 msgid "My Revisions"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: admin/class-list-table-archive.php:707 admin/class-list-table_rvy.php:1285
 #: admin/revision-ui_rvy.php:280 admin/revision-ui_rvy.php:391
@@ -317,7 +317,7 @@ msgstr ""
 #: admin/class-list-table-archive.php:718
 #, fuzzy, php-format
 msgid "Compare Changes in %s"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: admin/class-list-table-archive.php:722 admin/class-list-table_rvy.php:1318
 #: admin/edit-revision-classic-ui_rvy.php:92 admin/post-edit_rvy.php:138
@@ -333,7 +333,7 @@ msgstr ""
 #: admin/class-list-table-archive.php:749
 #, fuzzy
 msgid "List Revisions of this Post"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: admin/class-list-table-archive.php:834
 msgid "No revisions found."
@@ -599,17 +599,17 @@ msgstr ""
 #: admin/options.php:97
 #, fuzzy
 msgid "Revisors"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: admin/options.php:98
 #, fuzzy
 msgid "Statuses"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: admin/options.php:99
 #, fuzzy
 msgid "Revision Creation"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: admin/options.php:100 admin/options.php:111
 msgid "Revision Submission"
@@ -1154,7 +1154,7 @@ msgstr ""
 #: admin/post-editor-workflow-ui_rvy.php:91
 #, fuzzy
 msgid "Preview this Revision"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: admin/post-editor-workflow-ui_rvy.php:53
 msgid "View / Publish"
@@ -1206,7 +1206,7 @@ msgstr ""
 #: admin/post-editor-workflow-ui_rvy.php:188
 #, fuzzy
 msgid "Edit Revision"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: admin/post-editor-workflow-ui_rvy.php:194
 #, php-format
@@ -1310,7 +1310,7 @@ msgstr ""
 #: admin/revision-archive_rvy.php:23
 #, fuzzy
 msgid "Revision for:"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: admin/revision-queue_rvy.php:46
 #, php-format
@@ -1360,7 +1360,7 @@ msgstr ""
 #: admin/revision-queue_rvy.php:121
 #, fuzzy, php-format
 msgid "Revision Queue for \"%s\"%s"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: admin/revision-queue_rvy.php:123
 #, php-format
@@ -1462,7 +1462,7 @@ msgstr ""
 #: admin/revisions.php:119
 #, fuzzy, php-format
 msgid "Revisions of %s"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: admin/revisions.php:149
 msgid "The requested revision does not exist."
@@ -1808,7 +1808,7 @@ msgstr ""
 #: rvy_init.php:403 rvy_init.php:404
 #, fuzzy
 msgid "New Revision"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: rvy_init.php:405
 msgid "Creating Revision..."
@@ -1857,7 +1857,7 @@ msgstr ""
 #: rvy_init.php:423
 #, fuzzy
 msgid "Revision Submitted"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: rvy_init.php:429
 msgid "Submitted Revisions"
@@ -1886,7 +1886,7 @@ msgstr ""
 #: rvy_init.php:440
 #, fuzzy
 msgid "Revision Scheduled"
-msgstr "%sMy Revisionz%s(%s)"
+msgstr 
 
 #: rvy_init.php:446
 msgid "Scheduled Revisions"
@@ -1914,4 +1914,4 @@ msgstr ""
 
 #, fuzzy, php-format
 #~ msgid "%sMy Revisions%s (%s)"
-#~ msgstr "%sMy Revisionz%s(%s)"
+#~ msgstr 
