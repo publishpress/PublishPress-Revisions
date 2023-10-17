@@ -211,6 +211,8 @@ if ( RVY_NETWORK ) {
 
 do_action('revisionary_settings_ui', $this, $sitewide, $customize_defaults);
 ?>
+<header>
+
 <?php
 echo '<form action="" method="post" autocomplete="off">';
 wp_nonce_field( 'rvy-update-options' );
@@ -239,6 +241,8 @@ else
 <td>
 </td>
 </tr></table>
+
+</header>
 
 <?php
 $div_class = apply_filters('publishpress_revisions_settings_sidebar', '');
