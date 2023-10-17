@@ -239,6 +239,13 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.5.4 - 17 Oct 2023 =
+* Fixed : Past Revision previews did not display (since 3.5.3)
+* Fixed : Scheduled Revisions were not published under some configurations
+* Fixed : Custom fields with multiple values stored to the same key were not revisioned correctly
+* Fixed : Improve html validation of Revisions Settings screens, possibly resolving rendering issue on some browsers 
+* Compat : PublishPress Authors - Default author setting overrides actual revision author
+
 = 3.5.3 - 30 Aug 2023 =
 * Feature : Option to enable deletion of revisions in Revision Archive 
 * Fixed : Category / taxonomy changes were cleared by revision preview, not applied at revision approval
