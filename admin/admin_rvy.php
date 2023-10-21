@@ -180,6 +180,8 @@ class RevisionaryAdmin
  	}
 
 	function admin_head() {
+		global $pagenow;
+
 		if ( isset($_SERVER['REQUEST_URI']) && (false !== strpos( urldecode(esc_url_raw($_SERVER['REQUEST_URI'])), 'admin.php?page=rvy-revisions' ))) {
 			// legacy revision management UI for past revisions
 			require_once( dirname(__FILE__).'/revision-ui_rvy.php' );
@@ -188,6 +190,17 @@ class RevisionaryAdmin
 		if ( ! defined('SCOPER_VERSION') ) {
 			// old js for notification recipient selection UI
 			wp_enqueue_script( 'rvy', RVY_URLPATH . "/admin/revisionary.js", array('jquery'), PUBLISHPRESS_REVISIONS_VERSION, true );
+		}
+
+		if (($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-archive'])) {
+			add_screen_option(
+				'per_page',
+				
+				['label' => _x('Revisions', 'groups per page (screen options)', 'revisionary'), 
+				'default' => 20, 
+				'option' => ('revisionary-archive' == $_GET['page']) ? 'revision_archive_per_page' : 'revisions_per_page'
+				]
+			);
 		}
 	}
 
