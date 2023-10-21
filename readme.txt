@@ -244,6 +244,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 * Fixed : Scheduled Revisions were not published under some configurations
 * Fixed : Custom fields with multiple values stored to the same key were not revisioned correctly
 * Fixed : Improve html validation of Revisions Settings screens, possibly resolving rendering issue on some browsers 
+* Change : Screen Options on Revision Queue and Revision Archive to set Revisions per Page (previously used setting from Pages screen)
 * Compat : PublishPress Authors - Default author setting overrides actual revision author
 
 = 3.5.3 - 30 Aug 2023 =

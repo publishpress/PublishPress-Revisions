@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the PublishPress Revisions plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: PublishPress Revisions 3.5.4-rc\n"
+"Project-Id-Version: PublishPress Revisions 3.5.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/project\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-10-17T15:24:19+00:00\n"
+"POT-Creation-Date: 2023-10-21T02:00:27+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: revisionary\n"
@@ -75,7 +75,7 @@ msgid "Has Revision"
 msgstr ""
 
 #: admin/admin-posts_rvy.php:174
-#: admin/admin_rvy.php:261
+#: admin/admin_rvy.php:274
 msgid "Revision Queue"
 msgstr ""
 
@@ -101,45 +101,50 @@ msgstr ""
 msgid "Scheduled Revisions are not available because WP-Cron is disabled on this site. See %sRevisions > Settings > Scheduled Revisions%s."
 msgstr ""
 
-#: admin/admin_rvy.php:225
+#: admin/admin_rvy.php:199
+msgctxt "groups per page (screen options)"
 msgid "Revisions"
 msgstr ""
 
-#: admin/admin_rvy.php:270
-#: admin/admin_rvy.php:271
+#: admin/admin_rvy.php:238
+msgid "Revisions"
+msgstr ""
+
+#: admin/admin_rvy.php:283
+#: admin/admin_rvy.php:284
 #: admin/revision-archive_rvy.php:80
 msgid "Revision Archive"
 msgstr ""
 
-#: admin/admin_rvy.php:286
+#: admin/admin_rvy.php:299
 #: admin/options.php:237
 msgid "PublishPress Revisions Settings"
 msgstr ""
 
-#: admin/admin_rvy.php:286
+#: admin/admin_rvy.php:299
 #: admin/options.php:92
 msgid "Settings"
 msgstr ""
 
-#: admin/admin_rvy.php:293
-#: admin/admin_rvy.php:294
+#: admin/admin_rvy.php:306
+#: admin/admin_rvy.php:307
 #: includes/CoreAdmin.php:93
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: admin/admin_rvy.php:366
+#: admin/admin_rvy.php:379
 msgid "If you like %s, please leave us a %s rating. Thank you!"
 msgstr ""
 
-#: admin/admin_rvy.php:377
+#: admin/admin_rvy.php:390
 msgid "About"
 msgstr ""
 
-#: admin/admin_rvy.php:379
+#: admin/admin_rvy.php:392
 msgid "Documentation"
 msgstr ""
 
-#: admin/admin_rvy.php:381
+#: admin/admin_rvy.php:394
 msgid "Contact"
 msgstr ""
 

@@ -29,7 +29,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
     public function prepare_items() {
 		global $wpdb, $per_page, $current_user;
 
-		$per_page 		= $this->get_items_per_page( 'edit_page_per_page' );
+		$per_page 		= $this->get_items_per_page( 'revision_archive_per_page' );
 		$paged 			= isset( $_REQUEST['paged'] ) ? max( 0, intval( $_REQUEST['paged'] ) - 1 ) : 0;
 		$offset 		= $paged * $per_page;
 		$orderby		= isset( $_REQUEST['orderby'] )
