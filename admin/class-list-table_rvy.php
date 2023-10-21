@@ -218,7 +218,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$qr['order'] = 'DESC';
 		}
 
-		$per_page = "edit_page_per_page";	// use Pages setting
+		$per_page = "revisions_per_page";
 		$qr['posts_per_page'] = (int) get_user_option( $per_page );
 		
 		if ( empty( $qr['posts_per_page'] ) || $qr['posts_per_page'] < 1 )
@@ -775,7 +775,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		// is going to call wp()
 		$avail_post_stati = $this->do_query();
 		
-		$per_page = $this->get_items_per_page( 'edit_page_per_page' );	//  use Pages setting
+		$per_page = $this->get_items_per_page( 'revisions_per_page' );
 
 		$total_items = $wp_query->found_posts;
 
