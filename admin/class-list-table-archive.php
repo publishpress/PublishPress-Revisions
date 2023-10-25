@@ -29,7 +29,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
     public function prepare_items() {
 		global $wpdb, $per_page, $current_user;
 
-		$per_page 		= $this->get_items_per_page( 'edit_page_per_page' );
+		$per_page 		= $this->get_items_per_page( 'revision_archive_per_page' );
 		$paged 			= isset( $_REQUEST['paged'] ) ? max( 0, intval( $_REQUEST['paged'] ) - 1 ) : 0;
 		$offset 		= $paged * $per_page;
 		$orderby		= isset( $_REQUEST['orderby'] )
@@ -730,9 +730,17 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			return '';
 		}
 
+		static $is_administrator;
+
+		if (!isset($is_administrator)) {
+			$is_administrator = current_user_can('administrator') || is_super_admin();
+		}
+
+		$post_status_obj = get_post_status_object(get_post_field('post_status', $item->post_parent));
+		
 		$actions 			= [];
-		$can_read_post		= current_user_can( 'read_post', $item->ID );
-		$can_edit_post		= current_user_can( 'edit_post', $item->post_parent );
+		$can_read_post		= !empty($post_status_obj) && current_user_can( 'read_post', $item->ID );
+		$can_edit_post		= $is_administrator || (!empty($post_status_obj && current_user_can('edit_post', $item->post_parent)));
 		//$can_delete_post	= current_user_can( 'delete_post', $item->ID );
 		$post_type_object 	= get_post_type_object( $item->origin_post_type );
 		$post_object 		= get_post( $item->post_parent );
@@ -754,7 +762,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 		if ( is_post_type_viewable( $post_type_object ) ) {
 			if ( $can_read_post && $post_type_object && ! empty( $post_type_object->public ) ) {
-				if ( rvy_get_option( 'revision_preview_links' ) || current_user_can('administrator') || is_super_admin() ) {
+				if ( rvy_get_option( 'revision_preview_links' ) || $is_administrator ) {
 					do_action('pp_revisions_get_post_link', $item->ID);
 
 					$preview_link = rvy_preview_url( $item );

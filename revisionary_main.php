@@ -1065,9 +1065,9 @@ class Revisionary
 			$current_post_date_gmt = get_post_field('post_date_gmt', $postarr['ID']);
 
 			if ($data['post_date_gmt'] != $current_post_date_gmt) {
-				wp_unschedule_event(strtotime($current_post_date_gmt), 'publish_revision_rvy', ['revision_id' => $postarr['ID']]);
+				wp_unschedule_event(strtotime($current_post_date_gmt), 'publish_revision_rvy', [$postarr['ID']]);
 
-				wp_schedule_single_event(strtotime($data['post_date_gmt']), 'publish_revision_rvy', ['revision_id' => $postarr['ID']]);
+				wp_schedule_single_event(strtotime($data['post_date_gmt']), 'publish_revision_rvy', [$postarr['ID']]);
 			}
 		}
 		

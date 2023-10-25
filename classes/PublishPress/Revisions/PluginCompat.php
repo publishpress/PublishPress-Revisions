@@ -37,7 +37,17 @@ class PluginCompat {
 				return $retval;
 			});
 		}
+
+		add_filter('authors_default_author', [$this, 'fltAuthorsDefaultAuthor'], 10, 2);
     }
+
+	function fltAuthorsDefaultAuthor($default_author, $post) {
+		if (rvy_in_revision_workflow($post)) {
+			return false;
+		}
+
+		return $default_author;
+	}
 
     function fltODBCworkaround($data, $postarr) {
 		// ODBC does not support UPDATE of ID

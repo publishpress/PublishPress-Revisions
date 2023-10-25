@@ -224,8 +224,8 @@ if ( $customize_defaults )
 	echo "<input type='hidden' name='rvy_options_customize_defaults' value='1' />";
 
 ?>
-<table width = "100%"><tr>
-<td width = "100%">
+<table><tr>
+<td>
 <h1 class="wp-heading-inline"><?php
 if ( $sitewide )
 	esc_html_e('PublishPress Revisions Network Settings', 'revisionary');
@@ -262,7 +262,7 @@ if ( $sitewide ) {
 } elseif ( $customize_defaults ) {
 	$color_class = 'rs-backgreen';
 	echo '<p style="margin-top:0">';
-	esc_html_e( 'These are the <strong>default</strong> settings for options which can be adjusted per-site.', 'revisionary' );
+	esc_html_e( 'These are the default settings for options which can be adjusted per-site.', 'revisionary' );
 	echo '</p>';
 
 } else
@@ -389,7 +389,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 	$section = 'post_types';				// --- POST TYPES SECTION ---
 
 	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
+		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 		<?php
 		$option_name = 'enabled_post_types';
@@ -467,7 +467,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 	$section = 'role_definition';			// --- ROLE DEFINITION SECTION ---
 
 	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
+		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 		<?php
 		$hint = esc_html__('The user role "Revisor" role is now available. Include capabilities for all custom post types in this role?', 'revisionary');
@@ -487,7 +487,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 $section = 'revision_statuses';			// --- REVISION STATUSES SECTION ---
 
 if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
+	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 	<?php
 		$hint = esc_html__('Default labels are "Not Submitted for Approval", "Submitted for Approval", "Scheduled Revision"', 'revisionary');
@@ -501,7 +501,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 $section = 'working_copy';			// --- WORKING COPIES SECTION ---
 
 if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
+	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 	<?php
 	$hint = esc_html__('This restriction applies to users who are not full editors for the post type. To enable a role, add capabilities: copy_posts, copy_others_pages, etc.', 'revisionary');
@@ -545,7 +545,7 @@ $pending_revisions_available ) :
 	$section = 'pending_revisions';			// --- PENDING REVISIONS SECTION ---
 
 	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
+		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 		<?php
 		$this->option_checkbox('pending_revisions', $tab, $section, '', '', ['style' => 'margin-bottom: 0']);
@@ -579,7 +579,7 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 	$section = 'scheduled_revisions';			// --- SCHEDULED REVISIONS SECTION ---
 
 	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
+		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 		<?php
 		$hint = esc_html__( 'If a currently published post or page is edited and a future date set, the change will not be applied until the selected date.', 'revisionary' );
@@ -616,7 +616,7 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 		$section = 'revision_queue';			// --- REVISION QUEUE SECTION ---
 
 		if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-			<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
+			<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 			<?php
 			$hint = esc_html__('This restriction applies to users who are not full editors for the post type. To enable a role, give it the edit_others_revisions capability.', 'revisionary');
@@ -646,7 +646,7 @@ endif;
 $section = 'preview';			// --- PREVIEW SECTION ---
 
 if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
+	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 	<?php
 	$hint = esc_html__('For themes that block revision preview, hide preview links from non-Administrators', 'revisionary');
@@ -695,7 +695,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 	$section = 'revisions';			// --- REVISIONS SECTION ---
 
 	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
+		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 		<?php
 		if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) :
@@ -764,7 +764,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 	$section = 'notification';			// --- NOTIFICATION SECTION ---
 
 	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr valign="top"><td>
+		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 		<?php
 		if( $pending_revisions_available ) {
@@ -965,7 +965,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		<?php
 		if ((defined('REVISIONARY_PRO_VERSION') || defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) && defined('ICL_SITEPRESS_VERSION') && defined('WPML_TM_VERSION')) :?>
 
-		<tr valign="top"><th scope="row">
+		<tr><th scope="row">
 		<?php esc_html_e('WPML Translation Management', 'revisionary') ?>
 		</th></td>
 		<td>
@@ -1050,7 +1050,7 @@ foreach ( $available_form_options as $tab_name => $sections ) {
 		echo '</strong><ul style="margin-left:2em">';
 
 		foreach ( $option_names as $option_name ) {
-			if ( $option_name && $this->option_captions[$option_name] ) {
+			if ( $option_name && !empty($this->option_captions[$option_name]) ) {
 				$all_movable_options []= $option_name;
 				echo '<li>';
 
@@ -1095,11 +1095,12 @@ echo "javascript:if (confirm('"
 . "')) {return true;} else {return false;}";
 ?>" style="float:right;" />
 </p>
-</form>
 
 </div>
 </div>
 </div>
+
+</form>
 
 <p style='clear:both'></p>
 
