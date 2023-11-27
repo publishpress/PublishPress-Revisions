@@ -57,6 +57,21 @@ add_action('init',
 	}
 );
 
+
+// Advanced Custom Fields plugin: Prevent invalid filtering of revision ID
+if (class_exists('ACF')) {
+	add_filter(
+		'acf/pre_load_post_id', 
+		function($return_val, $post_id) {
+			if (rvy_in_revision_workflow($post_id)) {
+				$return_val = $post_id;
+			}
+
+			return $return_val;
+		}, 10, 2
+	);
+}
+
 if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview']) 
 && ((empty($_REQUEST['preview_id']) && empty($_REQUEST['thumbnail_id']))
 || (!empty($_REQUEST['preview_id']) && rvy_in_revision_workflow((int) $_REQUEST['preview_id']))
