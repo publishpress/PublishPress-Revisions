@@ -14,12 +14,14 @@ jQuery(document).ready( function($) {
         }
 
         if (!$(refSelector).length) {
-            var refSelector = '#submitdiv div.misc-pub-curtime';
+            var refSelector = '#submitdiv div.curtime';
+        }
+
+        if (rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption'] && (rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption'] != $('#post-status-display').html())) {
+            $('#post-status-display').html(rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']);
         }
 
 		if (rvyObjEdit.ajaxurl && !$('div.rvy-creation-ui').length && $(refSelector).length) {
-            $('#post-status-display').html(rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']);
-			
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL']) {
 				var url = rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL'];
 			} else {
@@ -77,6 +79,7 @@ jQuery(document).ready( function($) {
 
     $('a.save-timestamp').click(function() {
         $('#save-post').val(rvyObjEdit.updateCaption);
+        $('a.revision-approve, a.rvy-direct-approve').attr('disabled', 'disabled');
     });
 
 	$(document).on('click', 'a.save-timestamp, a.cancel-timestamp', function() {
@@ -93,7 +96,7 @@ jQuery(document).ready( function($) {
 
 	$(document).on('click', 'a.revision-approve', function() {
         if ($('a.revision-approve').attr('disabled')) {
-			return;
+			return false;
 		}
 
         $('a.revision-approve').attr('disabled', 'disabled');
@@ -151,7 +154,7 @@ jQuery(document).ready( function($) {
     
     $(document).on('click', 'a.rvy-direct-approve', function() {
         if ($('a.rvy-direct-approve').attr('disabled')) {
-			return;
+			return false;
 		}
 
         clearInterval(RvyUIInterval);
