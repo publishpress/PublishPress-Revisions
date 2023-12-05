@@ -6,6 +6,17 @@ class RevisionaryFront {
 	function __construct() {
 		global $revisionary;
 
+		// This filter may be required in some configurations, but problematic in others
+		if (!defined('PP_REVISIONS_NO_PAGE_ON_FRONT_FILTER')) {
+			add_filter("option_page_on_front", [$this, 'fltOptionPageOnFront']);
+		}
+
+		add_action('parse_query', [$this, 'actSetQueriedObject'], 20);
+		add_action('parse_query', [$this, 'actFlagHomeRevision'], 20);
+		add_filter('body_class', [$this, 'fltBodyClass'], 20, 2);
+
+		add_filter('acf/load_value', [$this, 'fltACFLoadValue'], 10, 3);
+
 		if ( ! defined('RVY_CONTENT_ROLES') || !$revisionary->content_roles->is_direct_file_access() ) {
 			add_filter('posts_request', [$this, 'flt_view_revision'] );
 			add_action('template_redirect', [$this, 'act_template_redirect'], 5 );
@@ -25,6 +36,72 @@ class RevisionaryFront {
 		remove_action( 'init', 'register_block_core_post_comments' );
 
 		do_action('revisionary_front_init');
+	}
+
+	function fltACFLoadValue($value, $post_id, $field) {
+		if ((null === $value) && rvy_in_revision_workflow($post_id) && function_exists('acf_get_value')) {
+
+			if ($published_post_id = rvy_post_id($post_id)) {
+
+				if (($published_post_id != $post_id) && !rvy_in_revision_workflow($published_post_id)) {
+					return acf_get_value($published_post_id, $field);
+				}
+			}
+		}
+
+		return $value;
+	}
+
+	function fltOptionPageOnFront($front_page_id) {
+		global $post;
+
+		// extra caution and perf optimization for front end execution
+		if (!empty($post) && is_object($post) && rvy_in_revision_workflow($post) && ($post->comment_count == $front_page_id)) {
+			return $post->ID;
+		} 
+
+		return $front_page_id;
+	}
+
+	function fltBodyClass($classes, $css_class) {
+		if ($this->isHomeRevision()) {
+			$classes = array_merge(['home'], $classes);
+			$classes = array_diff($classes, ['blog']);
+		}
+
+		return $classes;
+	}
+
+	function actSetQueriedObject(&$query) {
+		if ($post_id = rvy_detect_post_id()) {
+			if (rvy_in_revision_workflow($post_id)) {
+				$query->queried_object = get_post($post_id);
+				$query->queried_object_id = $post_id;
+			}
+		}
+	}
+
+    function actFlagHomeRevision(&$query) {
+		if ($this->isHomeRevision()) {
+			$query->is_home = true;
+			$query->is_front_page = true;
+		}
+	}
+
+	private function isHomeRevision() {
+		if ($post_id = rvy_detect_post_id()) {
+			if ($published_post_id = rvy_post_id($post_id)) {
+				if ($published_post_id != $post_id) {
+					if ( ('page' === get_option( 'show_on_front' )) 
+					&& in_array( get_option( 'page_on_front' ), [$published_post_id, $post_id] )
+					) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 
 	public function actRevisionPreviewRedirect() {

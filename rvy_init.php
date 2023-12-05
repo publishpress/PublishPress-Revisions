@@ -12,7 +12,13 @@ if (did_action('wp_loaded')) {
 	add_action( 'wp_loaded', 'rvy_ajax_handler', 20);
 }
 
-if (!empty($_REQUEST['preview']) && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id'])) {
+if (!defined('RVY_PREVIEW_ARG')) {
+	define('RVY_PREVIEW_ARG', 'rv_preview');
+}
+
+$preview_arg = sanitize_key(constant('RVY_PREVIEW_ARG'));
+
+if (!empty($_REQUEST[$preview_arg]) && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id'])) {
 	add_filter('redirect_canonical', '_rvy_no_redirect_filter', 10, 2);
 }
 

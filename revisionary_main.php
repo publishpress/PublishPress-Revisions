@@ -84,7 +84,9 @@ class Revisionary
 
 		// NOTE: $_GET['preview'] and $_GET['post_type'] arguments are set by rvy_init() at response to ?p= request when the requested post is a revision.
 		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST)) { // preview_id indicates a regular preview via WP core, based on autosave revision
-			if ((defined('FL_BUILDER_VERSION') && rvy_in_revision_workflow(rvy_detect_post_id())) || ((!empty($_GET['preview']) || !empty($_GET['_ppp'])) && empty($_REQUEST['preview_id'])) || !empty($_GET['mark_current_revision'])) {
+			$preview_arg = sanitize_key(constant('RVY_PREVIEW_ARG'));
+			
+			if ((defined('FL_BUILDER_VERSION') && rvy_in_revision_workflow(rvy_detect_post_id())) || ((!empty($_GET[$preview_arg]) || !empty($_GET['_ppp'])) && empty($_REQUEST['preview_id'])) || !empty($_GET['mark_current_revision'])) {
 				require_once( dirname(__FILE__).'/front_rvy.php' );
 				$this->front = new RevisionaryFront();
 			}
@@ -143,11 +145,6 @@ class Revisionary
 
 		add_action('post_updated', [$this, 'actUpdateRevision'], 10, 2);
 		add_action('post_updated', [$this, 'actUpdateRevisionFixCommentCount'], 999, 2);
-
-		// This filter may be required in some configurations, but problematic in others
-		if (defined('PP_REVISIONS_PAGE_ON_FRONT_FILTER')) {
-			add_filter("option_page_on_front", [$this, 'fltOptionPageOnFront']);
-		}
 
 		add_filter('posts_clauses', [$this, 'fltPostsClauses'], 10, 2);
 
@@ -471,17 +468,6 @@ class Revisionary
 			$last_result[$post->ID] = $return;
 			return $return;
 		}
-	}
-
-	public function fltOptionPageOnFront($front_page_id) {
-		global $post;
-
-		// extra caution and perf optimization for front end execution
-		if (!empty($post) && is_object($post) && rvy_in_revision_workflow($post) && ($post->comment_count == $front_page_id)) {
-			return $post->ID;
-		} 
-
-		return $front_page_id;
 	}
 
 	// On post deletion, clear corresponding _rvy_has_revisions postmeta flag
@@ -899,8 +885,10 @@ class Revisionary
 
 		$busy = true;
 
+		$preview_arg = sanitize_key(constant('RVY_PREVIEW_ARG'));
+
 		if (in_array($cap, ['read_post', 'read_page'])	// WP Query imposes edit_post capability requirement for front end viewing of protected statuses 
-			|| (!empty($_REQUEST['preview']) && in_array($cap, array('edit_post', 'edit_page')) && did_action('posts_selection') && !did_action('template_redirect'))
+			|| (!empty($_REQUEST[$preview_arg]) && in_array($cap, array('edit_post', 'edit_page')) && did_action('posts_selection') && !did_action('template_redirect'))
 		) {
 			if ($post && rvy_in_revision_workflow($post)) {
 				$type_obj = get_post_type_object($post->post_type);
