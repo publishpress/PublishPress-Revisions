@@ -1225,7 +1225,7 @@ function rvy_init() {
 				if ( rvy_get_option( 'scheduled_revisions' ) || rvy_get_option( 'pending_revisions' ) ) {
 					if ( $post = get_post( sanitize_text_field($_GET['p']) ) ) {
 						if (rvy_in_revision_workflow($post)) {
-							$preview_arg = sanitize_key(constant('RVY_PREVIEW_ARG'));
+							$preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';
 							$_GET[$preview_arg] = 1;
 						}
 					}
@@ -1374,7 +1374,7 @@ function rvy_preview_url($revision, $args = []) {
 	$status_obj = get_post_status_object(get_post_field('post_status', rvy_post_id($revision->ID)));
 	$post_is_published = $status_obj && (!empty($status_obj->public) || !empty($status_obj->private));
 
-	$preview_arg = sanitize_key(constant('RVY_PREVIEW_ARG'));
+	$preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';
 
 	if ('id_only' == $link_type) {
 		// support using ids only if theme or plugins do not tolerate published post url and do not require standard format with revision slug

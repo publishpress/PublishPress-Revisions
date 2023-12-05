@@ -16,7 +16,7 @@ if (!defined('RVY_PREVIEW_ARG')) {
 	define('RVY_PREVIEW_ARG', 'rv_preview');
 }
 
-$preview_arg = sanitize_key(constant('RVY_PREVIEW_ARG'));
+$preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';
 
 if (!empty($_REQUEST[$preview_arg]) && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id'])) {
 	add_filter('redirect_canonical', '_rvy_no_redirect_filter', 10, 2);
@@ -62,7 +62,6 @@ add_action('init',
 		}
 	}
 );
-
 
 // Advanced Custom Fields plugin: Prevent invalid filtering of revision ID
 if (class_exists('ACF')) {
