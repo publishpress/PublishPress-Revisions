@@ -239,11 +239,19 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.5.5-beta =
+* Compat : Advanced Custom Fields - Prevent invalid filtering of revision ID
+* Fixed : Front page template was not loaded for revision previews of front page
+* Fixed : Revision previews were not loaded correctly on some sites
+* Fixed : Classic Editor - Revision Status no longer displayed after changing publish time
+* Fixed : Classic Editor - Modified publish time discarded if Submit / Approve clicked before Update Revision
+* Fixed : Classic Editor - Revision Submit button was still (mal)functional when disabled
+
 = 3.5.4 - 17 Oct 2023 =
 * Fixed : Past Revision previews did not display (since 3.5.3)
 * Fixed : Scheduled Revisions were not published under some configurations
 * Fixed : Custom fields with multiple values stored to the same key were not revisioned correctly
-* Fixed : Improve html validation of Revisions Settings screens, possibly resolving rendering issue on some browsers 
+* Fixed : Improve html validation of Revisions Settings screens, possibly resolving rendering issue on some browsers
 * Change : Screen Options on Revision Queue and Revision Archive to set Revisions per Page (previously used setting from Pages screen)
 * Compat : PublishPress Authors - Default author setting overrides actual revision author
 
