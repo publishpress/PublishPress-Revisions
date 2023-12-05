@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the PublishPress Revisions plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: PublishPress Revisions 3.5.4\n"
+"Project-Id-Version: PublishPress Revisions 3.5.5-rc2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/project\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-10-21T02:00:27+00:00\n"
+"POT-Creation-Date: 2023-12-05T20:54:46+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: revisionary\n"
@@ -462,8 +462,8 @@ msgid "j M @ H:i"
 msgstr ""
 
 #: admin/history_rvy.php:1070
-#: front_rvy.php:356
-#: front_rvy.php:381
+#: front_rvy.php:433
+#: front_rvy.php:458
 #: rvy_init-functions.php:260
 #: rvy_init-functions.php:278
 #: rvy_init-functions.php:317
@@ -1000,7 +1000,7 @@ msgstr ""
 
 #: admin/post-editor-workflow-ui_rvy.php:101
 #: admin/post-editor-workflow-ui_rvy.php:193
-#: front_rvy.php:314
+#: front_rvy.php:391
 msgid "Edit"
 msgstr ""
 
@@ -1209,11 +1209,11 @@ msgstr ""
 msgid "%1$s <span class=\"rvy-revision-pubish-date\">(Publish date: %2$s)</span>"
 msgstr ""
 
-#: admin/revision-ui_rvy.php:276
+#: admin/revision-ui_rvy.php:277
 msgid "The revision will be deleted. Are you sure?"
 msgstr ""
 
-#: admin/revision-ui_rvy.php:369
+#: admin/revision-ui_rvy.php:370
 msgid "Modified Date"
 msgstr ""
 
@@ -1258,58 +1258,58 @@ msgstr ""
 msgid "no %s revisions available."
 msgstr ""
 
-#: front_rvy.php:280
+#: front_rvy.php:357
 msgid "%sView Queue%s"
 msgstr ""
 
-#: front_rvy.php:289
+#: front_rvy.php:366
 msgid "%sCompare%s%sView Published Post%s"
 msgstr ""
 
-#: front_rvy.php:303
+#: front_rvy.php:380
 msgid "%sView Published Post%s"
 msgstr ""
 
-#: front_rvy.php:359
+#: front_rvy.php:436
 #: rvy_init-functions.php:274
 #: rvy_init-functions.php:330
 msgid "Submit"
 msgstr ""
 
-#: front_rvy.php:366
-#: front_rvy.php:395
-#: front_rvy.php:411
+#: front_rvy.php:443
+#: front_rvy.php:472
+#: front_rvy.php:488
 msgid "Publish now"
 msgstr ""
 
-#: front_rvy.php:371
-#: front_rvy.php:373
-#: front_rvy.php:399
-#: front_rvy.php:401
+#: front_rvy.php:448
+#: front_rvy.php:450
+#: front_rvy.php:476
+#: front_rvy.php:478
 msgid "This is a %s. %s %s %s"
 msgstr ""
 
-#: front_rvy.php:388
-#: front_rvy.php:390
+#: front_rvy.php:465
+#: front_rvy.php:467
 msgid "This is a %s (requested publish date: %s). %s %s %s"
 msgstr ""
 
-#: front_rvy.php:414
-#: front_rvy.php:416
+#: front_rvy.php:491
+#: front_rvy.php:493
 msgid "This is a %s (for publication on %s). %s %s %s"
 msgstr ""
 
-#: front_rvy.php:431
-#: front_rvy.php:433
+#: front_rvy.php:508
+#: front_rvy.php:510
 msgid "This is the Current Revision. %s"
 msgstr ""
 
-#: front_rvy.php:440
+#: front_rvy.php:517
 msgid "Restore"
 msgstr ""
 
-#: front_rvy.php:443
-#: front_rvy.php:445
+#: front_rvy.php:520
+#: front_rvy.php:522
 msgid "This is a Past Revision (from %s). %s %s"
 msgstr ""
 
