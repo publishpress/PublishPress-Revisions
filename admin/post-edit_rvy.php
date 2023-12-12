@@ -12,6 +12,7 @@ class RvyPostEdit {
         add_filter('presspermit_preview_post_title', [$this, 'fltPreviewTitle']);
 
         add_action('post_submitbox_misc_actions', [$this, 'act_post_submit_revisions_links'], 5);
+        add_action('post_submitbox_misc_actions', [$this, 'actPostSubmitboxActions'], 20);
 
         add_filter('user_has_cap', [$this, 'fltAllowBrowseRevisionsLink'], 50, 3);
 
@@ -103,11 +104,47 @@ class RvyPostEdit {
     public function fltPreviewTitle($preview_title) {
         global $post;
 
-        $type_obj = get_post_type_object($post->post_type);
+        if (!empty($post) && !empty($post->ID) && rvy_in_revision_workflow($post->ID)) {
+            $type_obj = get_post_type_object($post->post_type);
 
-        if ($type_obj && empty($type_obj->public)) {
-            return $preview_title;
+            if ($type_obj && !empty($type_obj->public)) {
+                $preview_title = esc_html__('View revision in progress', 'revisionary');
+            }
         }
+
+        return $preview_title;
+    }
+
+    function actPostSubmitboxActions($post) {
+        ?>
+
+        <div id="preview-action" style="float: right; padding: 5px 10px 10px 5px">
+        <?php self::revision_preview_button($post); ?>
+        </div>
+
+        <?php
+    }
+
+    public static function revision_preview_button($post)
+    {
+        if (empty($post) || !is_object($post) || empty($post->ID)) {
+            return;
+        }
+
+        if (!rvy_in_revision_workflow($post->ID)) {
+            return;
+        }
+
+        if ($type_obj = get_post_type_object($post->post_type)) {
+            if (empty($type_obj->public) && empty($type_obj->publicly_queryable)) {
+                return;
+            }
+        }
+
+        ?>
+        <?php
+        $preview_link = rvy_preview_url($post->ID);
+        $preview_button = esc_html__('View Saved Revision');
 
         if (current_user_can('edit_post', rvy_post_id($post->ID))) {
             $preview_title = esc_html__('View / moderate saved revision', 'revisionary');
@@ -116,7 +153,10 @@ class RvyPostEdit {
             $preview_title = esc_html__('View saved revision', 'revisionary');
         }
 
-        return $preview_title;
+        ?>
+        <a class="preview button" href="<?php echo esc_url($preview_link); ?>" target="revision-preview" id="revision-preview"
+           tabindex="4" title="<?php echo esc_html($preview_title);?>"><?php echo esc_html($preview_button); ?></a>
+        <?php
     }
 
     function act_post_submit_revisions_links() {

@@ -80,7 +80,6 @@ class RvyRevisionEditSubmitMetabox
         <?php
     }
 
-
     /*
      *  Classic Editor Post Submit Metabox: Post Save Button HTML
      */
@@ -108,7 +107,7 @@ class RvyRevisionEditSubmitMetabox
         ?>
         <?php
         if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
-            $preview_link = rvy_preview_url($post);
+            $preview_link = esc_url(get_permalink($post->ID));
 
             $type_obj = get_post_type_object($post->post_type);
 
@@ -120,17 +119,15 @@ class RvyRevisionEditSubmitMetabox
 
             if ($type_obj && empty($type_obj->public)) {
                 return;
-            } elseif ($can_publish) {
-                $preview_button = esc_html__('Preview', 'revisionary');
-                $preview_title = esc_html__('View / moderate saved revision', 'revisionary');
             } else {
                 $preview_button = esc_html__('Preview', 'revisionary');
-                $preview_title = esc_html__('View saved revision', 'revisionary');
+                $preview_title = esc_html__('Preview revision in progress', 'revisionary');
             }
             ?>
-            <a class="preview button" href="<?php echo esc_url($preview_link); ?>" target="_blank" id="revision-preview"
+            <a class="preview button" href="<?php echo esc_url($preview_link); ?>" target="_blank" id="post-preview"
             tabindex="4" title="<?php echo esc_attr($preview_title);?>"><?php echo esc_html($preview_button); ?></a>
 
+            <input type="hidden" name="wp-preview" id="wp-preview" value="">
             <?php
         }
     }
