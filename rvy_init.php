@@ -138,3 +138,8 @@ if (defined('WPSEO_VERSION')) {
 		},
 	10, 2);
 }
+
+// Prevent any default filters from screwing with our paging settings
+foreach(['revisions_per_page', 'revision_archive_per_page'] as $option_val) {
+	add_filter("set_screen_option_{$option_val}", function($screen_option, $option, $value ) {return $value;}, 99, 3);
+}
