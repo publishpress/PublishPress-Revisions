@@ -779,6 +779,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		$update_fields['post_status'] = $published->post_status;
 	}
 
+	$update_fields = apply_filters('revisionary_apply_revision_fields', $update_fields, $revision, $published, $actual_revision_status);
+
 	if (
 		(in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && rvy_filter_option('pending_revision_update_modified_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
 		|| (('future-revision' == $revision->post_mime_type) && rvy_filter_option('scheduled_revision_update_modified_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
