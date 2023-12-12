@@ -16,6 +16,16 @@ if (!defined('RVY_PREVIEW_ARG')) {
 	define('RVY_PREVIEW_ARG', 'rv_preview');
 }
 
+if (('preview' != RVY_PREVIEW_ARG) && !empty($_REQUEST['preview']) && !empty($_REQUEST['nc'])) {
+	$url = sanitize_url($_SERVER['REQUEST_URI']);
+	$arr = parse_url(site_url());
+	$url = $arr['scheme'] . '://' . $arr['host'] . $url;
+
+	$url = str_replace('preview=', RVY_PREVIEW_ARG . '=', $url);
+	wp_redirect($url);
+	exit;
+}
+
 $preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';
 
 if (!empty($_REQUEST[$preview_arg]) && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id'])) {
