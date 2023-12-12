@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the PublishPress Revisions plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: PublishPress Revisions 3.5.5-rc2\n"
+"Project-Id-Version: PublishPress Revisions 3.5.5\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/project\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-12-05T20:54:46+00:00\n"
+"POT-Creation-Date: 2023-12-12T15:42:27+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: revisionary\n"
@@ -184,7 +184,7 @@ msgstr ""
 #: admin/class-list-table_rvy.php:1023
 #: admin/class-list-table_rvy.php:1290
 #: admin/post-edit-block-ui_rvy.php:94
-#: admin/post-edit_rvy.php:51
+#: admin/post-edit_rvy.php:52
 #: admin/RevisionEditSubmitMetabox.php:62
 msgid "Delete Revision"
 msgstr ""
@@ -272,8 +272,8 @@ msgstr ""
 #: admin/class-list-table-archive.php:759
 #: admin/class-list-table_rvy.php:1331
 #: admin/edit-revision-classic-ui_rvy.php:92
-#: admin/post-edit_rvy.php:138
-#: admin/post-edit_rvy.php:152
+#: admin/post-edit_rvy.php:178
+#: admin/post-edit_rvy.php:192
 msgctxt "revisions"
 msgid "Compare"
 msgstr ""
@@ -365,7 +365,7 @@ msgstr ""
 #: admin/class-list-table_rvy.php:1023
 #: admin/class-list-table_rvy.php:1286
 #: admin/post-edit-block-ui_rvy.php:94
-#: admin/post-edit_rvy.php:51
+#: admin/post-edit_rvy.php:52
 #: admin/RevisionEditSubmitMetabox.php:62
 msgid "Discard Revision"
 msgstr ""
@@ -480,8 +480,7 @@ msgstr ""
 #: admin/post-editor-workflow-ui_rvy.php:52
 #: admin/post-editor-workflow-ui_rvy.php:96
 #: admin/post-editor-workflow-ui_rvy.php:192
-#: admin/RevisionEditSubmitMetabox.php:124
-#: admin/RevisionEditSubmitMetabox.php:127
+#: admin/RevisionEditSubmitMetabox.php:123
 msgid "Preview"
 msgstr ""
 
@@ -955,7 +954,7 @@ msgid "All settings in this form (including those on unselected tabs) will be re
 msgstr ""
 
 #: admin/post-edit-block-ui_rvy.php:150
-#: admin/post-edit_rvy.php:223
+#: admin/post-edit_rvy.php:263
 msgid "Author"
 msgstr ""
 
@@ -977,7 +976,7 @@ msgid "View / Approve"
 msgstr ""
 
 #: admin/post-editor-workflow-ui_rvy.php:57
-msgid "View / Approve saved revision"
+msgid "View / Moderate saved revision"
 msgstr ""
 
 #: admin/post-editor-workflow-ui_rvy.php:60
@@ -1040,71 +1039,73 @@ msgstr ""
 msgid "For custom field changes, edit a scheduled %s."
 msgstr ""
 
-#: admin/post-edit_rvy.php:26
-#: admin/post-edit_rvy.php:84
+#: admin/post-edit_rvy.php:27
+#: admin/post-edit_rvy.php:85
 msgid "Current Time"
 msgstr ""
 
-#: admin/post-edit_rvy.php:113
-#: admin/RevisionEditSubmitMetabox.php:125
+#: admin/post-edit_rvy.php:111
+msgid "View revision in progress"
+msgstr ""
+
+#: admin/post-edit_rvy.php:150
 msgid "View / moderate saved revision"
 msgstr ""
 
-#: admin/post-edit_rvy.php:116
-#: admin/RevisionEditSubmitMetabox.php:128
+#: admin/post-edit_rvy.php:153
 msgid "View saved revision"
 msgstr ""
 
-#: admin/revision-action_rvy.php:416
-#: admin/revision-action_rvy.php:502
+#: admin/revision-action_rvy.php:417
+#: admin/revision-action_rvy.php:503
 msgid "[%s] Revision Approval Notice"
 msgstr ""
 
-#: admin/revision-action_rvy.php:417
+#: admin/revision-action_rvy.php:418
 msgid "A revision to the %1$s \"%2$s\" has been approved."
 msgstr ""
 
-#: admin/revision-action_rvy.php:421
+#: admin/revision-action_rvy.php:422
 msgid "The submitter was %1$s."
 msgstr ""
 
-#: admin/revision-action_rvy.php:425
-#: admin/revision-action_rvy.php:507
+#: admin/revision-action_rvy.php:426
+#: admin/revision-action_rvy.php:508
 msgid "It will be published on %s"
 msgstr ""
 
-#: admin/revision-action_rvy.php:429
-#: admin/revision-action_rvy.php:511
+#: admin/revision-action_rvy.php:430
+#: admin/revision-action_rvy.php:512
 msgid "Preview it here: "
 msgstr ""
 
-#: admin/revision-action_rvy.php:432
-#: admin/revision-action_rvy.php:514
+#: admin/revision-action_rvy.php:433
+#: admin/revision-action_rvy.php:515
 msgid "Editor: "
 msgstr ""
 
-#: admin/revision-action_rvy.php:434
-#: admin/revision-action_rvy.php:516
-#: admin/revision-action_rvy.php:1343
-#: admin/revision-action_rvy.php:1368
-#: admin/revision-action_rvy.php:1430
+#: admin/revision-action_rvy.php:435
+#: admin/revision-action_rvy.php:517
+#: admin/revision-action_rvy.php:1346
+#: admin/revision-action_rvy.php:1371
+#: admin/revision-action_rvy.php:1433
 msgid "View it online: "
 msgstr ""
 
-#: admin/revision-action_rvy.php:503
+#: admin/revision-action_rvy.php:504
 msgid "The revision you submitted for the %1$s \"%2$s\" has been approved."
 msgstr ""
 
-#: admin/revision-action_rvy.php:1339
-#: admin/revision-action_rvy.php:1361
+#: admin/revision-action_rvy.php:1342
+#: admin/revision-action_rvy.php:1364
 msgid "[%s] %s Publication Notice"
 msgstr ""
 
-#: admin/revision-action_rvy.php:1340
+#: admin/revision-action_rvy.php:1343
 msgid "The scheduled revision you submitted for the %1$s \"%2$s\" has been published."
 msgstr ""
 
-#: admin/revision-action_rvy.php:1362
+#: admin/revision-action_rvy.php:1365
 msgid "A scheduled revision to your %1$s \"%2$s\" has been published."
 msgstr ""
 
@@ -1217,12 +1218,16 @@ msgstr ""
 msgid "Modified Date"
 msgstr ""
 
+#: admin/RevisionEditSubmitMetabox.php:124
+msgid "Preview revision in progress"
+msgstr ""
+
 #. translators: Publish box date formt, see http://php.net/date
-#: admin/RevisionEditSubmitMetabox.php:183
+#: admin/RevisionEditSubmitMetabox.php:180
 msgid "M j, Y @ G:i"
 msgstr ""
 
-#: admin/RevisionEditSubmitMetabox.php:194
+#: admin/RevisionEditSubmitMetabox.php:191
 msgid "Publish %son approval%s"
 msgstr ""
 
