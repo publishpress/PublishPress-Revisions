@@ -54,7 +54,7 @@ class PostEditorWorkflowUI {
                     $vars['viewCaption'] = ('future-revision' == $post->post_mime_type) ? esc_html__('View / Publish', 'revisionary') : esc_html__('View / Approve', 'revisionary');
                 }
 
-                $vars['viewTitle'] =  esc_html__('View / Approve saved revision', 'revisionary');
+                $vars['viewTitle'] =  esc_html__('View / Moderate saved revision', 'revisionary');
             } else {
                 $vars['viewCaption'] = version_compare($wp_version, '5.5-beta', '>=') ? esc_html__('Preview / Submit') :  esc_html__('View / Submit');
                 $vars['viewTitle'] =  esc_html__('View / Submit saved revision', 'revisionary');
