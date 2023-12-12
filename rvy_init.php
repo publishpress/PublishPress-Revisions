@@ -12,7 +12,23 @@ if (did_action('wp_loaded')) {
 	add_action( 'wp_loaded', 'rvy_ajax_handler', 20);
 }
 
-if (!empty($_REQUEST['preview']) && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id'])) {
+if (!defined('RVY_PREVIEW_ARG')) {
+	define('RVY_PREVIEW_ARG', 'rv_preview');
+}
+
+if (('preview' != RVY_PREVIEW_ARG) && !empty($_REQUEST['preview']) && !empty($_REQUEST['nc'])) {
+	$url = sanitize_url($_SERVER['REQUEST_URI']);
+	$arr = parse_url(site_url());
+	$url = $arr['scheme'] . '://' . $arr['host'] . $url;
+
+	$url = str_replace('preview=', RVY_PREVIEW_ARG . '=', $url);
+	wp_redirect($url);
+	exit;
+}
+
+$preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';
+
+if (!empty($_REQUEST[$preview_arg]) && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id'])) {
 	add_filter('redirect_canonical', '_rvy_no_redirect_filter', 10, 2);
 }
 
@@ -56,6 +72,20 @@ add_action('init',
 		}
 	}
 );
+
+// Advanced Custom Fields plugin: Prevent invalid filtering of revision ID
+if (class_exists('ACF')) {
+	add_filter(
+		'acf/pre_load_post_id', 
+		function($return_val, $post_id) {
+			if (rvy_in_revision_workflow($post_id)) {
+				$return_val = $post_id;
+			}
+
+			return $return_val;
+		}, 10, 2
+	);
+}
 
 if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview']) 
 && ((empty($_REQUEST['preview_id']) && empty($_REQUEST['thumbnail_id']))
@@ -107,4 +137,9 @@ if (defined('WPSEO_VERSION')) {
 			return $intend_to_save;
 		},
 	10, 2);
+}
+
+// Prevent any default filters from screwing with our paging settings
+foreach(['revisions_per_page', 'revision_archive_per_page'] as $option_val) {
+	add_filter("set_screen_option_{$option_val}", function($screen_option, $option, $value ) {return $value;}, 99, 3);
 }

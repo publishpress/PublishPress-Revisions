@@ -249,7 +249,8 @@ function rvy_list_post_revisions( $post_id = 0, $status = '', $args = null ) {
 			if ( $post->ID != $revision->ID ) {
 				if ('inherit' == $revision->post_status) {
 					// @todo: need this case?
-					$preview_url = add_query_arg( 'preview', '1', get_post_permalink( $revision->ID ) . '&post_type=revision' );
+					$preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';
+					$preview_url = add_query_arg($preview_arg, '1', get_post_permalink( $revision->ID ) . '&post_type=revision' );
 				} else {
 					$preview_url = rvy_preview_url($revision, ['post_type' => $post->post_type]);
 				}

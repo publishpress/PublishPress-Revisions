@@ -379,8 +379,9 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	}
 
 	protected function get_bulk_actions() {
+		$actions = [];
+
 		if (rvy_get_option('revision_archive_deletion')) {
-			$actions = [];
 			$actions['delete'] = esc_html__( 'Delete Revision', 'revisionary' );
 		}
 
@@ -389,10 +390,6 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 	// override default nonce field
 	protected function display_tablenav( $which ) {
-		if (!rvy_get_option('revision_archive_deletion')) {
-			return;
-		}
-		
 		if ( 'top' === $which ) {
 			wp_nonce_field( 'bulk-revision-archive' );
 		}

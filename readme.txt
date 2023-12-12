@@ -6,8 +6,8 @@ Author URI: https://publishpress.com
 Tags: revision, submit changes, duplicate post, duplicate page, revisions, approve changes, scheduled changes
 Requires at least: 5.5
 Requires PHP: 7.2.5
-Tested up to: 6.3
-Stable tag: 3.5.4
+Tested up to: 6.4
+Stable tag: 3.5.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -239,11 +239,20 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.5.5 - 12 Dec 2023 =
+* Compat : Advanced Custom Fields - Prevent invalid filtering of revision ID
+* Fixed : Front page template was not loaded for revision previews of front page
+* Fixed : Revision previews were not loaded correctly on some sites
+* Fixed : Classic Editor - Revision Status no longer displayed after changing publish time
+* Fixed : Classic Editor - Modified publish time discarded if Submit / Approve clicked before Update Revision
+* Fixed : Classic Editor - Revision Submit button was still (mal)functional when disabled
+* Change : Classic Editor - Separate buttons to Preview changes in progress, View / Approve Saved Revision
+
 = 3.5.4 - 17 Oct 2023 =
 * Fixed : Past Revision previews did not display (since 3.5.3)
 * Fixed : Scheduled Revisions were not published under some configurations
 * Fixed : Custom fields with multiple values stored to the same key were not revisioned correctly
-* Fixed : Improve html validation of Revisions Settings screens, possibly resolving rendering issue on some browsers 
+* Fixed : Improve html validation of Revisions Settings screens, possibly resolving rendering issue on some browsers
 * Change : Screen Options on Revision Queue and Revision Archive to set Revisions per Page (previously used setting from Pages screen)
 * Compat : PublishPress Authors - Default author setting overrides actual revision author
 

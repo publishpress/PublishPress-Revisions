@@ -1225,7 +1225,8 @@ function rvy_init() {
 				if ( rvy_get_option( 'scheduled_revisions' ) || rvy_get_option( 'pending_revisions' ) ) {
 					if ( $post = get_post( sanitize_text_field($_GET['p']) ) ) {
 						if (rvy_in_revision_workflow($post)) {
-							$_GET['preview'] = 1;
+							$preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';
+							$_GET[$preview_arg] = 1;
 						}
 					}
 				}
@@ -1373,9 +1374,11 @@ function rvy_preview_url($revision, $args = []) {
 	$status_obj = get_post_status_object(get_post_field('post_status', rvy_post_id($revision->ID)));
 	$post_is_published = $status_obj && (!empty($status_obj->public) || !empty($status_obj->private));
 
+	$preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';
+
 	if ('id_only' == $link_type) {
 		// support using ids only if theme or plugins do not tolerate published post url and do not require standard format with revision slug
-		$preview_url = add_query_arg('preview', true, get_post_permalink($revision));
+		$preview_url = add_query_arg($preview_arg, true, get_post_permalink($revision));
 
 		if ('page' == $post_type) {
 			$preview_url = str_replace('p=', "page_id=", $preview_url);
@@ -1385,7 +1388,7 @@ function rvy_preview_url($revision, $args = []) {
 		}
 	} elseif (('revision_slug' == $link_type) || !$post_is_published) {
 		// support using actual revision slug in case theme or plugins do not tolerate published post url
-		$preview_url = add_query_arg('preview', true, get_permalink($revision));
+		$preview_url = add_query_arg($preview_arg, true, get_permalink($revision));
 
 		if ('page' == $post_type) {
 			$preview_url = str_replace('p=', "page_id=", $preview_url);
@@ -1395,7 +1398,7 @@ function rvy_preview_url($revision, $args = []) {
 		}
 	} else { // 'published_slug'
 		// default to published post url, appended with 'preview' and page_id args
-		$preview_url = add_query_arg('preview', true, get_permalink(rvy_post_id($revision->ID)));
+		$preview_url = add_query_arg($preview_arg, true, get_permalink(rvy_post_id($revision->ID)));
 		$id_arg = 'page_id';
 	}
 
