@@ -98,7 +98,10 @@ class Revisionary
 				new PublishPress\Revisions\PostPreview();
 			}
 		}
-		
+
+		add_filter('presspermit_is_preview', [$this, 'fltIsPreview']);
+		add_filter('presspermit_query_post_statuses', [$this, 'fltQueryPostStatuses'], 10, 2);
+
 		add_filter('map_meta_cap', [$this, 'fltStatusChangeCap'], 5, 4);
 
 		if ( ! is_content_administrator_rvy() ) {
@@ -1112,4 +1115,24 @@ class Revisionary
 
 		return $count;
 	}
+
+	function fltIsPreview($is_preview) {
+        if (defined('RVY_PREVIEW_ARG') && RVY_PREVIEW_ARG && !empty($_REQUEST[RVY_PREVIEW_ARG])) {
+            $is_preview = true;
+        }
+
+        return $is_preview;
+    }
+
+	/*
+	 * PublishPress Permissions: Make query filtering allow for revision previews
+	 */  
+	function fltQueryPostStatuses($statuses, $args) {
+        if (((defined('RVY_PREVIEW_ARG') && RVY_PREVIEW_ARG && !empty($_REQUEST[RVY_PREVIEW_ARG])))
+        && !empty($args['required_operation']) && ('edit' == $args['required_operation']) && function_exists('rvy_revision_base_statuses')) {
+            $statuses = array_merge($statuses, array_fill_keys(rvy_revision_base_statuses(), (object)[]));
+        }
+
+        return $statuses;
+    }
 } // end Revisionary class
