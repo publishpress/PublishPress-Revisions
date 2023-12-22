@@ -79,7 +79,13 @@ if (class_exists('ACF')) {
 		'acf/pre_load_post_id', 
 		function($return_val, $post_id) {
 			if (rvy_in_revision_workflow($post_id)) {
-				$return_val = $post_id;
+				if (is_object($post_id)) {
+					if (!empty($post_id->ID)) {
+						$return_val = $post_id->ID;
+					}	
+				} else {
+					$return_val = $post_id;
+				}
 			}
 
 			return $return_val;
