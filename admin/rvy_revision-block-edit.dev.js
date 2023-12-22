@@ -144,7 +144,12 @@ jQuery(document).ready(function ($) {
             var refSelector = 'div.edit-post-post-schedule';
         } else {
             var refSelector = 'div.edit-post-post-visibility';
+
+            if (!$(refSelector).length) {
+                refSelector = 'div.edit-post-post-status h2';
+            }
         }
+
         if (rvyObjEdit.ajaxurl && !$('div.edit-post-revision-status').length && $(refSelector).length) {
 			$(refSelector).before(
 				'<div class="components-panel__row rvy-creation-ui edit-post-revision-status">'
