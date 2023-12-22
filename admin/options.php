@@ -147,6 +147,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'display_hints' => 							esc_html__('Display Hints'),
 	'revision_preview_links' => 				esc_html__('Show Preview Links', 'revisionary'),
 	'preview_link_type' => 						esc_html__('Preview Link Type', 'revisionary'),
+	'preview_link_alternate_preview_arg' =>		esc_html__('Modify preview link for better theme compatibility', 'revisionary'),
 	'compare_revisions_direct_approval' => 		esc_html__('Approve Button on Compare Revisions screen', 'revisionary'),
 	'copy_revision_comments_to_post' => 		esc_html__('Copy revision comments to published post', 'revisionary'),
 	'past_revisions_order_by' =>				esc_html__('Compare Past Revisions ordering:'), 
@@ -179,7 +180,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'scheduled_revisions' => ['scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'wp_cron_usage_detected', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date'],
 	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions'],
-	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'compare_revisions_direct_approval'],
+	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'compare_revisions_direct_approval'],
 	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'rev_publication_delete_ed_comments', 'deletion_queue', 'revision_archive_deletion', 'display_hints'],
 	'notification'	=>		 ['pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 ]
@@ -676,6 +677,21 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			?>
 			</div>
 		<?php endif;
+
+		echo '<br />';
+		
+		if (defined('RVY_PREVIEW_ARG_LOCKED') && defined('RVY_PREVIEW_ARG')) {
+			printf(
+				esc_html__(
+					'The revision preview argument is configured by constant definition: %s',
+					'revisionary'
+				),
+				RVY_PREVIEW_ARG
+			);
+		} else {
+			$hint = esc_html__('Adjust preview links to use "rv_preview" argument instead of "preview". Experiment to see which works best with your theme.', 'revisionary');
+			$this->option_checkbox( 'preview_link_alternate_preview_arg', $tab, $section, $hint, '' );
+		}
 		?>
 		</div>
 		<br />
