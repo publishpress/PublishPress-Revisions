@@ -13,7 +13,12 @@ if (did_action('wp_loaded')) {
 }
 
 if (!defined('RVY_PREVIEW_ARG')) {
-	define('RVY_PREVIEW_ARG', 'rv_preview');
+	$preview_arg = (rvy_get_option('preview_link_alternate_preview_arg')) ? 'rv_preview' : 'preview';
+	define('RVY_PREVIEW_ARG', $preview_arg);
+} else {
+	if (!defined('RVY_PREVIEW_ARG_LOCKED')) {
+		define('RVY_PREVIEW_ARG_LOCKED', true);
+	}
 }
 
 if (('preview' != RVY_PREVIEW_ARG) && !empty($_REQUEST['preview']) && !empty($_REQUEST['nc'])) {
