@@ -5,8 +5,8 @@ msgstr ""
 "Project-Id-Version: Plugins - PublishPress Revisions: Duplicate Posts, "
 "Submit, Approve and Schedule Content Changes - Stable (latest release)\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/project\n"
-"POT-Creation-Date: 2023-10-21T02:00:27+00:00\n"
-"PO-Revision-Date: 2023-10-26 16:40+0200\n"
+"POT-Creation-Date: 2023-12-12T15:42:27+00:00\n"
+"PO-Revision-Date: 2023-12-13 10:10+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -182,7 +182,7 @@ msgstr "Resultados de la búsqueda de «%s»"
 
 #: admin/class-list-table-archive.php:384 admin/class-list-table_rvy.php:1023
 #: admin/class-list-table_rvy.php:1290 admin/post-edit-block-ui_rvy.php:94
-#: admin/post-edit_rvy.php:51 admin/RevisionEditSubmitMetabox.php:62
+#: admin/post-edit_rvy.php:52 admin/RevisionEditSubmitMetabox.php:62
 msgid "Delete Revision"
 msgstr "Borrar revisión"
 
@@ -264,8 +264,8 @@ msgid "Compare Changes in %s"
 msgstr "Comparar los cambios en %s"
 
 #: admin/class-list-table-archive.php:759 admin/class-list-table_rvy.php:1331
-#: admin/edit-revision-classic-ui_rvy.php:92 admin/post-edit_rvy.php:138
-#: admin/post-edit_rvy.php:152
+#: admin/edit-revision-classic-ui_rvy.php:92 admin/post-edit_rvy.php:178
+#: admin/post-edit_rvy.php:192
 msgctxt "revisions"
 msgid "Compare"
 msgstr "Comparar"
@@ -349,7 +349,7 @@ msgstr "Desprogramar"
 
 #. translators: %s: post title
 #: admin/class-list-table_rvy.php:1023 admin/class-list-table_rvy.php:1286
-#: admin/post-edit-block-ui_rvy.php:94 admin/post-edit_rvy.php:51
+#: admin/post-edit-block-ui_rvy.php:94 admin/post-edit_rvy.php:52
 #: admin/RevisionEditSubmitMetabox.php:62
 msgid "Discard Revision"
 msgstr "Descartar la revisión"
@@ -444,7 +444,7 @@ msgctxt "revision date short format"
 msgid "j M @ H:i"
 msgstr "j M @ H:i"
 
-#: admin/history_rvy.php:1070 front_rvy.php:356 front_rvy.php:381
+#: admin/history_rvy.php:1070 front_rvy.php:433 front_rvy.php:458
 #: rvy_init-functions.php:260 rvy_init-functions.php:278
 #: rvy_init-functions.php:317 rvy_init-functions.php:334
 #: rvy_init-functions.php:351
@@ -458,8 +458,7 @@ msgstr "Vista previa / Aprobar"
 #: admin/history_rvy.php:1072 admin/post-editor-workflow-ui_rvy.php:52
 #: admin/post-editor-workflow-ui_rvy.php:96
 #: admin/post-editor-workflow-ui_rvy.php:192
-#: admin/RevisionEditSubmitMetabox.php:124
-#: admin/RevisionEditSubmitMetabox.php:127
+#: admin/RevisionEditSubmitMetabox.php:123
 msgid "Preview"
 msgstr "Vista previa"
 
@@ -1073,7 +1072,7 @@ msgstr ""
 "Todos los ajustes de este formulario (incluidos los de las pestañas no "
 "seleccionadas) se restablecerán a los valores por defecto.  ¿Estás seguro?"
 
-#: admin/post-edit-block-ui_rvy.php:150 admin/post-edit_rvy.php:223
+#: admin/post-edit-block-ui_rvy.php:150 admin/post-edit_rvy.php:263
 msgid "Author"
 msgstr "Autor"
 
@@ -1095,8 +1094,8 @@ msgid "View / Approve"
 msgstr "Ver / Aprobar"
 
 #: admin/post-editor-workflow-ui_rvy.php:57
-msgid "View / Approve saved revision"
-msgstr "Ver / Aprobar revisión guardada"
+msgid "View / Moderate saved revision"
+msgstr "Ver / moderar la revisión guardada"
 
 #: admin/post-editor-workflow-ui_rvy.php:60
 msgid "View / Submit saved revision"
@@ -1117,7 +1116,7 @@ msgid "Revision Submission Error"
 msgstr "Error de envío de revisión"
 
 #: admin/post-editor-workflow-ui_rvy.php:101
-#: admin/post-editor-workflow-ui_rvy.php:193 front_rvy.php:314
+#: admin/post-editor-workflow-ui_rvy.php:193 front_rvy.php:391
 msgid "Edit"
 msgstr "Editar"
 
@@ -1153,64 +1152,68 @@ msgstr "Actualizar"
 msgid "For custom field changes, edit a scheduled %s."
 msgstr "Para los cambios de campos personalizados, edita una %s programada."
 
-#: admin/post-edit_rvy.php:26 admin/post-edit_rvy.php:84
+#: admin/post-edit_rvy.php:27 admin/post-edit_rvy.php:85
 msgid "Current Time"
 msgstr "Hora actual"
 
-#: admin/post-edit_rvy.php:113 admin/RevisionEditSubmitMetabox.php:125
+#: admin/post-edit_rvy.php:111
+msgid "View revision in progress"
+msgstr "Ver la revisión en progreso"
+
+#: admin/post-edit_rvy.php:150
 msgid "View / moderate saved revision"
 msgstr "Ver / moderar la revisión guardada"
 
-#: admin/post-edit_rvy.php:116 admin/RevisionEditSubmitMetabox.php:128
+#: admin/post-edit_rvy.php:153
 msgid "View saved revision"
 msgstr "Ver la revisión guardada"
 
-#: admin/revision-action_rvy.php:416 admin/revision-action_rvy.php:502
+#: admin/revision-action_rvy.php:417 admin/revision-action_rvy.php:503
 msgid "[%s] Revision Approval Notice"
 msgstr "[%s] Aviso de aprobación de revisión"
 
-#: admin/revision-action_rvy.php:417
+#: admin/revision-action_rvy.php:418
 msgid "A revision to the %1$s \"%2$s\" has been approved."
 msgstr "Una revisión para la %1$s «%2$s» ha sido aprobada."
 
-#: admin/revision-action_rvy.php:421
+#: admin/revision-action_rvy.php:422
 msgid "The submitter was %1$s."
 msgstr "El remitente fue %1$s."
 
-#: admin/revision-action_rvy.php:425 admin/revision-action_rvy.php:507
+#: admin/revision-action_rvy.php:426 admin/revision-action_rvy.php:508
 msgid "It will be published on %s"
 msgstr "Se publicará el %s"
 
-#: admin/revision-action_rvy.php:429 admin/revision-action_rvy.php:511
+#: admin/revision-action_rvy.php:430 admin/revision-action_rvy.php:512
 msgid "Preview it here: "
 msgstr "Una vista previa aquí: "
 
-#: admin/revision-action_rvy.php:432 admin/revision-action_rvy.php:514
+#: admin/revision-action_rvy.php:433 admin/revision-action_rvy.php:515
 msgid "Editor: "
 msgstr "Editor: "
 
-#: admin/revision-action_rvy.php:434 admin/revision-action_rvy.php:516
-#: admin/revision-action_rvy.php:1343 admin/revision-action_rvy.php:1368
-#: admin/revision-action_rvy.php:1430
+#: admin/revision-action_rvy.php:435 admin/revision-action_rvy.php:517
+#: admin/revision-action_rvy.php:1346 admin/revision-action_rvy.php:1371
+#: admin/revision-action_rvy.php:1433
 msgid "View it online: "
 msgstr "Ver en línea: "
 
-#: admin/revision-action_rvy.php:503
+#: admin/revision-action_rvy.php:504
 msgid "The revision you submitted for the %1$s \"%2$s\" has been approved."
 msgstr "La revisión que has enviado para la %1$s «%2$s» ha sido aprobada."
 
-#: admin/revision-action_rvy.php:1339 admin/revision-action_rvy.php:1361
+#: admin/revision-action_rvy.php:1342 admin/revision-action_rvy.php:1364
 msgid "[%s] %s Publication Notice"
 msgstr "[%s] %s aviso de publicación"
 
-#: admin/revision-action_rvy.php:1340
+#: admin/revision-action_rvy.php:1343
 msgid ""
 "The scheduled revision you submitted for the %1$s \"%2$s\" has been "
 "published."
 msgstr ""
 "La revisión programada que has enviado para la %1$s «%2$s» ha sido publicada."
 
-#: admin/revision-action_rvy.php:1362
+#: admin/revision-action_rvy.php:1365
 msgid "A scheduled revision to your %1$s \"%2$s\" has been published."
 msgstr "Se ha publicado una revisión programada de tu %1$s «%2$s."
 
@@ -1321,20 +1324,24 @@ msgstr ""
 "%1$s <span class=\"rvy-revision-pubish-date\">(Fecha de publicación: %2$s)</"
 "span>"
 
-#: admin/revision-ui_rvy.php:276
+#: admin/revision-ui_rvy.php:277
 msgid "The revision will be deleted. Are you sure?"
 msgstr "La revisión será borrada. ¿Estás seguro?"
 
-#: admin/revision-ui_rvy.php:369
+#: admin/revision-ui_rvy.php:370
 msgid "Modified Date"
 msgstr "Fecha de modificación"
 
+#: admin/RevisionEditSubmitMetabox.php:124
+msgid "Preview revision in progress"
+msgstr "Previsualizar la revisión en progreso"
+
 #. translators: Publish box date formt, see http://php.net/date
-#: admin/RevisionEditSubmitMetabox.php:183
+#: admin/RevisionEditSubmitMetabox.php:180
 msgid "M j, Y @ G:i"
 msgstr "j \\d\\e F \\d\\e Y @ H:i"
 
-#: admin/RevisionEditSubmitMetabox.php:194
+#: admin/RevisionEditSubmitMetabox.php:191
 msgid "Publish %son approval%s"
 msgstr "Publicar %sprevia aprobación%s"
 
@@ -1376,47 +1383,47 @@ msgstr "%1$s %2$s (%3$s)%4$s"
 msgid "no %s revisions available."
 msgstr "no hay revisiones %s disponibles."
 
-#: front_rvy.php:280
+#: front_rvy.php:357
 msgid "%sView Queue%s"
 msgstr "%sVer cola%s"
 
-#: front_rvy.php:289
+#: front_rvy.php:366
 msgid "%sCompare%s%sView Published Post%s"
 msgstr "%sComparar%s%sVer entrada publicada%s"
 
-#: front_rvy.php:303
+#: front_rvy.php:380
 msgid "%sView Published Post%s"
 msgstr "%sVer entrada publicada%s"
 
-#: front_rvy.php:359 rvy_init-functions.php:274 rvy_init-functions.php:330
+#: front_rvy.php:436 rvy_init-functions.php:274 rvy_init-functions.php:330
 msgid "Submit"
 msgstr "Enviar"
 
-#: front_rvy.php:366 front_rvy.php:395 front_rvy.php:411
+#: front_rvy.php:443 front_rvy.php:472 front_rvy.php:488
 msgid "Publish now"
 msgstr "Publicar ahora"
 
-#: front_rvy.php:371 front_rvy.php:373 front_rvy.php:399 front_rvy.php:401
+#: front_rvy.php:448 front_rvy.php:450 front_rvy.php:476 front_rvy.php:478
 msgid "This is a %s. %s %s %s"
 msgstr "Esto es un %s. %s %s %s"
 
-#: front_rvy.php:388 front_rvy.php:390
+#: front_rvy.php:465 front_rvy.php:467
 msgid "This is a %s (requested publish date: %s). %s %s %s"
 msgstr "Esto es un %s (fecha de publicación solicitada: %s). %s %s %s"
 
-#: front_rvy.php:414 front_rvy.php:416
+#: front_rvy.php:491 front_rvy.php:493
 msgid "This is a %s (for publication on %s). %s %s %s"
 msgstr "Esto es un %s (para publicar en %s). %s %s %s"
 
-#: front_rvy.php:431 front_rvy.php:433
+#: front_rvy.php:508 front_rvy.php:510
 msgid "This is the Current Revision. %s"
 msgstr "Esta es la revisión actual. %s"
 
-#: front_rvy.php:440
+#: front_rvy.php:517
 msgid "Restore"
 msgstr "Restaurar"
 
-#: front_rvy.php:443 front_rvy.php:445
+#: front_rvy.php:520 front_rvy.php:522
 msgid "This is a Past Revision (from %s). %s %s"
 msgstr "Esta es una revisión anterior (de %s). %s %s"
 
@@ -1795,6 +1802,9 @@ msgstr "Revisor"
 #: rvy_init-functions.php:1139
 msgid "Revision Workflow"
 msgstr "Flujo de trabajo de revisión"
+
+#~ msgid "View / Approve saved revision"
+#~ msgstr "Ver / Aprobar revisión guardada"
 
 #~ msgid "Move to Trash"
 #~ msgstr "Mover a la papelera"
