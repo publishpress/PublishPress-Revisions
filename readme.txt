@@ -239,7 +239,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.5.6 =
+= 3.5.6 - 2 Jan 2024 =
 * Feature : New setting Revisions > Settings > Preview > "Modify preview link for better theme compatibility". Some themes require one setting, some require the other.
 * Fixed : ACF - Revision update, preview fails if ACF plugin is active
 * Fixed : Edit Revision - Approve, Submit buttons missing in Gutenberg 17
