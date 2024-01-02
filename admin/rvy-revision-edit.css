@@ -50,3 +50,7 @@ box-shadow: inset 0 0 0 1px #6f1b1b;
 span.revision-submitting {
 font-weight: bold;
 }
+
+div.edit-post-post-status h2 {
+margin-top: 10px !important;
+}
