@@ -689,6 +689,10 @@ function revisionary_refresh_postmeta($post_id, $args = []) {
 
 	$ignore_clause = ($ignore_revisions) ? " AND ID NOT IN (" . implode(",", array_map('intval', $ignore_revisions)) . ")" : '';
 
+	if (defined('REVISIONARY_LIMIT_IGNORE_UNSUBMITTED')) {
+		$ignore_clause .= " AND post_mime_type != 'draft-revision'";
+	}
+
 	$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 	$has_revisions = $wpdb->get_var(
@@ -733,7 +737,14 @@ function revisionary_refresh_revision_flags($published_post_id = 0, $args = []) 
 
 	$status_csv = implode("','", array_map('sanitize_key', rvy_filtered_statuses()));
 	$revision_base_status_csv = implode("','", array_map('sanitize_key', rvy_revision_base_statuses()));
-	$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
+	
+	$revision_statuses = rvy_revision_statuses();
+	
+	if (defined('REVISIONARY_LIMIT_IGNORE_UNSUBMITTED')) {
+		$revision_statuses = array_diff($revision_statuses, ['draft-revision']);
+	}
+	
+	$revision_status_csv = implode("','", array_map('sanitize_key', $revision_statuses));
 
 	$query = "SELECT r.comment_count FROM $wpdb->posts r INNER JOIN $wpdb->posts p ON r.comment_count = p.ID"
 	. " WHERE p.post_status IN ('$status_csv') AND r.post_status IN ('$revision_base_status_csv') AND r.post_mime_type IN ('$revision_status_csv')";

@@ -100,6 +100,10 @@ function rvy_revision_submit($revision_id = 0) {
 		if ( empty($status_obj->public) && empty($status_obj->private) ) {
 			$wpdb->update($wpdb->posts, ['post_status' => 'pending', 'post_mime_type' => 'pending-revision'], ['ID' => $revision_id]);
 
+			if (defined('REVISIONARY_LIMIT_IGNORE_UNSUBMITTED')) {
+				rvy_update_post_meta($published_id, '_rvy_has_revisions', true);
+			}
+
 			clean_post_cache($revision_id);
 
 			require_once( dirname(REVISIONARY_FILE).'/revision-workflow_rvy.php' );
