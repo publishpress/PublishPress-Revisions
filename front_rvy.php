@@ -113,7 +113,16 @@ class RevisionaryFront {
 	}
 
     function actFlagHomeRevision(&$query) {
-		if ($this->isHomeRevision()) {
+		if ($this->isHomeRevision() 
+		&& (
+			!defined('ELEMENTOR_VERSION') 
+			|| (
+				(empty($_REQUEST['action']) || ('elementor' != $_REQUEST['actions']))
+				&& empty($_REQUEST['elementor-preview'])
+				&& empty($_REQUEST['elementor_ajax'])
+				)
+			) 
+		) {
 			if (rvy_get_option('home_preview_set_home_flag')) {
 				$query->is_home = true;
 			}
