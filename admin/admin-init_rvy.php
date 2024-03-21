@@ -167,7 +167,7 @@ function rvy_admin_init() {
 		} elseif ( isset( $_REQUEST['ids'] ) ) {
 			$post_ids =  array_map('intval', explode( ',', sanitize_text_field($_REQUEST['ids']) ));
 		} elseif ( !empty( $_REQUEST['post'] ) ) {
-			$post_ids = array_map('intval', $_REQUEST['post']);
+			$post_ids = array_map('intval', (array) $_REQUEST['post']);
 		}
 	
 		if ( !isset( $post_ids ) ) {
