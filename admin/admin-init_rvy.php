@@ -130,10 +130,17 @@ function rvy_admin_init() {
 			exit;
 		}
 
-	} elseif (isset($_REQUEST['action2']) && !empty($_REQUEST['page']) && ('revisionary-q' == $_REQUEST['page']) && !empty($_REQUEST['post'])) {
+	} elseif (
+		(isset($_REQUEST['action2']) && !empty($_REQUEST['page']) && ('revisionary-q' == $_REQUEST['page']) && !empty($_REQUEST['post']))
+		|| (isset($_REQUEST['action']) && in_array($_REQUEST['action'], ['decline_revision']))
+	) {
 		$doaction = (!empty($_REQUEST['action']) && !is_numeric($_REQUEST['action'])) ? sanitize_key($_REQUEST['action']) : sanitize_key($_REQUEST['action2']);
 
-		check_admin_referer('bulk-revision-queue');
+		if (isset($_REQUEST['action']) && in_array($_REQUEST['action'], ['decline_revision'])) {
+			check_admin_referer('decline-revision');
+		} else {
+			check_admin_referer('bulk-revision-queue');
+		}
 
 		if (!$url = str_replace('#038;', '&', wp_get_referer())) {
 			$url = admin_url("admin.php?page=revisionary-q");
