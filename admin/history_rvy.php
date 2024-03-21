@@ -49,8 +49,11 @@ class RevisionaryHistory
         // Hide Restore button if user does not have permission
         if ($_post = get_post($revision_id)) {
             if (!rvy_in_revision_workflow($_post)) {
-                if ($parent_post = get_post($_post->post_parent)) {
-                    if (!$revisionary->canEditPost($parent_post)) :
+                $parent_post = get_post($_post->post_parent);
+
+                if (($parent_post && !$revisionary->canEditPost($parent_post))
+                || (rvy_get_option('revision_restore_require_cap') && !current_user_can('administrator') && !is_super_admin() && !current_user_can('restore_revisions'))
+                ) :
         ?>
 						<style type='text/css'>
 				        input.restore-revision {display:none !important;}
@@ -58,7 +61,6 @@ class RevisionaryHistory
 				        <?php
 
                     endif;
-                }
             }
         }
     }

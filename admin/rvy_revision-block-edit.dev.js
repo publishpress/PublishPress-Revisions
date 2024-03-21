@@ -11,9 +11,7 @@ jQuery(document).ready(function ($) {
             return;
 		}
 		
-		let node = document.querySelector(btnSelector);
-		
-        if (node) {
+        if (document.querySelector(btnSelector)) {
 			document.querySelector(btnSelector).innerText = `${btnCaption}`;
 			
             if (btnIcon) {
@@ -39,6 +37,7 @@ jQuery(document).ready(function ($) {
 	
 	// Force spans to be regenerated following modal settings window access
 	var RvyDetectPublishOptionsDivClosureInterval = '';
+    var RvyDetectPublishOptionsClosure = '';
     var RvyDetectPublishOptionsDiv = function () {
         if ($('div.components-modal__header').length) {
 			clearInterval(RvyDetectPublishOptionsDivInterval);
@@ -47,7 +46,7 @@ jQuery(document).ready(function ($) {
                 rvyObjEdit.overrideColor = $('span.pp-recaption-button').first().css('color');
 			}
 			
-            var RvyDetectPublishOptionsClosure = function () {
+            RvyDetectPublishOptionsClosure = function () {
                 if (!$('div.components-modal__header').length) {
 					clearInterval(RvyDetectPublishOptionsDivClosureInterval);
 					
@@ -135,6 +134,8 @@ jQuery(document).ready(function ($) {
                 $('button.editor-post-publish-panel__toggle').show();
             }
         }
+
+        ediv = null;
 	}
 	var RvyHideInterval = setInterval(RvyHideElements, 50);
 	
@@ -219,6 +220,13 @@ jQuery(document).ready(function ($) {
                 $('button.editor-post-trash').wrap('<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'DeletionURL'] + '" style="text-decoration:none"></a>');
             }
         }
+
+        refSelector = null;
+        url = null;
+        approveButtonHTML = null;
+        mainDashicon = null;
+        rvyPreviewLink = null;
+
         $('button.post-schedule-footnote').toggle(!/\d/.test($('button.edit-post-post-schedule__toggle').html()));
 
         $('button.editor-post-trash').parent().css('text-align', 'right');
@@ -240,11 +248,8 @@ jQuery(document).ready(function ($) {
         setTimeout(
             function() {
                 var redirectCheckSaveDoneInterval = setInterval(function () {
-                    let saving = wp.data.select('core/editor').isSavingPost();
-                    
-                    if (!saving || $('div.edit-post-header button.is-saved').length) {
+                    if (!wp.data.select('core/editor').isSavingPost() || $('div.edit-post-header button.is-saved').length) {
                         clearInterval(redirectCheckSaveDoneInterval);
-                        approveCheckSaveInterval = false;
 
                         if (rvyRedirectURL != '') {
                             setTimeout(
@@ -292,6 +297,9 @@ jQuery(document).ready(function ($) {
             rvyDoApproval();
         }
 
+        isApproval = null;
+        isSubmission = null;
+
 		return false;
 	});
 	
@@ -316,18 +324,14 @@ jQuery(document).ready(function ($) {
             $('a.revision-edit').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedEditURL']).show();
         }
 		
-		var revisionaryCreateError = function (data, txtStatus) {
-            $('div.rvy-creation-ui').html(rvyObjEdit[rvyObjEdit.currentStatus + 'ErrorCaption']);
-        }
-		
-		var data = {'rvy_ajax_field': rvyObjEdit[rvyObjEdit.currentStatus + 'AjaxField'], 'rvy_ajax_value': wp.data.select('core/editor').getCurrentPostId(), 'nc': RvyGetRandomInt(99999999)};
-		
         $.ajax({
             url: rvyObjEdit.ajaxurl,
-            data: data,
+            data: {'rvy_ajax_field': rvyObjEdit[rvyObjEdit.currentStatus + 'AjaxField'], 'rvy_ajax_value': wp.data.select('core/editor').getCurrentPostId(), 'nc': RvyGetRandomInt(99999999)},
             dataType: "html",
             success: revisionaryCreateDone,
-            error: revisionaryCreateError
+            error: function (data, txtStatus) {
+                $('div.rvy-creation-ui').html(rvyObjEdit[rvyObjEdit.currentStatus + 'ErrorCaption']);
+            }
         });
     }
     var RvyRecaptionSaveDraft = function () {
@@ -337,8 +341,10 @@ jQuery(document).ready(function ($) {
             $('button.editor-post-save-draft:not(.rvy-recaption)').addClass('rvy-recaption').removeClass('is-tertiary').addClass('is-primary').addClass('ppr-purple-button');
 		}
 		
+        var newPreviewItem = '';
+		
         if (rvyObjEdit.viewTitleExtra) {
-            var newPreviewItem = '<div class="components-menu-group"><div role="group"><div class="edit-post-header-preview__grouping-external">'
+            newPreviewItem = '<div class="components-menu-group"><div role="group"><div class="edit-post-header-preview__grouping-external">'
                 + '<a href="' + rvyObjEdit.viewURL + '" target="pp_revisions_copy" role="menuitem" class="ppr-purple-button components-button is-primary edit-post-header-preview__button-external">'
                 + rvyObjEdit.viewTitle + '</a></div></div></div>';
 
@@ -352,11 +358,12 @@ jQuery(document).ready(function ($) {
         if (($('div.edit-post-header__settings a.editor-post-preview:visible').length || $('div.block-editor-post-preview__dropdown button.block-editor-post-preview__button-toggle:visible').length) && !$('a.rvy-post-preview').length) {
             if (rvyObjEdit.viewURL && $('.block-editor-post-preview__button-toggle').length) {
                 if ($('div.edit-post-header-preview__grouping-external').length == 1) {
-					var elemTemp = $('div.edit-post-header-preview__grouping-external a svg').clone();
+					//var elemTemp = $('div.edit-post-header-preview__grouping-external a svg').clone();
                     
-                    if (typeof elemTemp[0] != 'undefined') {
-                        var svgElem = elemTemp[0].outerHTML;
+                    //if (typeof elemTemp[0] != 'undefined') {
+                        //var svgElem = elemTemp[0].outerHTML;
 					
+                    if ($('div.edit-post-header-preview__grouping-external a svg').length) {
 					    $('div.edit-post-header-preview__grouping-external').after(newPreviewItem);
                     }
 				}
@@ -373,7 +380,7 @@ jQuery(document).ready(function ($) {
         } else {
 			if (!rvyObjEdit.multiPreviewActive) { // WP < 5.5
                 if (!$('a.editor-post-preview').next('a.rvy-post-preview').length) {
-                    original = $('div.edit-post-header__settings a.editor-post-preview');
+                    var original = $('div.edit-post-header__settings a.editor-post-preview');
                     $(original).after(original.clone().attr('href', rvyObjEdit.viewURL).attr('target', '_blank').removeClass('editor-post-preview').addClass('rvy-post-preview').css('margin', '0 10px 0 10px'));
 					
 					if (rvyObjEdit.viewCaption) {
@@ -383,6 +390,8 @@ jQuery(document).ready(function ($) {
 					if (rvyObjEdit.viewTitle) {
                         $('div.edit-post-header__settings a.rvy-post-preview').attr('title', rvyObjEdit.viewTitle);
                     }
+
+                    original = null;
                 }
                 if (rvyObjEdit.previewTitle && !$('a.editor-post-preview').attr('title')) {
                     $('div.edit-post-header__settings a.editor-post-preview').attr('title', rvyObjEdit.previewTitle);
@@ -393,6 +402,8 @@ jQuery(document).ready(function ($) {
             $('div.edit-post-sidebar a.editor-post-last-revision__title').html(rvyObjEdit.revisionEdits);
             $('div.edit-post-sidebar a.editor-post-last-revision__title').addClass('rvy-recaption');
         }
+
+        newPreviewItem = null;
     }
     var RvyRecaptionSaveDraftInterval = setInterval(RvyRecaptionSaveDraft, 100);
 });

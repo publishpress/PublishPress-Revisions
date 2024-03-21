@@ -16,6 +16,7 @@ class RevisionaryFront {
 		add_filter('body_class', [$this, 'fltBodyClass'], 20, 2);
 
 		add_filter('acf/load_value', [$this, 'fltACFLoadValue'], 10, 3);
+		add_filter('get_post_metadata', [$this, 'fltGetPostMeta'], 10, 5);
 
 		if ( ! defined('RVY_CONTENT_ROLES') || !$revisionary->content_roles->is_direct_file_access() ) {
 			add_filter('posts_request', [$this, 'flt_view_revision'] );
@@ -38,9 +39,39 @@ class RevisionaryFront {
 		do_action('revisionary_front_init');
 	}
 
-	function fltACFLoadValue($value, $post_id, $field) {
-		if ((null === $value) && rvy_in_revision_workflow($post_id) && function_exists('acf_get_value')) {
+	function fltGetPostMeta($meta_val, $object_id, $meta_key, $single, $meta_type) {
+		static $busy;
 
+		if (!empty($busy) || ('post' != $meta_type)) {
+			return $meta_val;
+		}
+
+		$busy = true;
+
+		if (wp_is_post_revision($object_id)) {
+			$unfiltered_meta_val = get_post_meta($object_id, $meta_key, $single);
+
+			if (in_array($unfiltered_meta_val, [null, []])) {
+				if ($published_post_id = get_post_field('post_parent', $object_id)) {
+					$published_meta_val = get_post_meta($published_post_id, $meta_key, $single);
+
+					if (null !== $published_meta_val) {
+						$meta_val = $published_meta_val;
+					}
+				}
+			}
+		}
+
+		$busy = false;
+
+		return $meta_val;
+	}
+
+	function fltACFLoadValue($value, $post_id, $field) {
+		if ((null === $value) 
+		&& (rvy_in_revision_workflow($post_id) || wp_is_post_revision($post_id))
+		&& function_exists('acf_get_value')
+		) {
 			if ($published_post_id = rvy_post_id($post_id)) {
 
 				if (($published_post_id != $post_id) && !rvy_in_revision_workflow($published_post_id)) {
@@ -74,7 +105,7 @@ class RevisionaryFront {
 
 	function actSetQueriedObject(&$query) {
 		if ($post_id = rvy_detect_post_id()) {
-			if (rvy_in_revision_workflow($post_id)) {
+			if (rvy_in_revision_workflow($post_id) || wp_is_post_revision($post_id)) {
 				$query->queried_object = get_post($post_id);
 				$query->queried_object_id = $post_id;
 			}
@@ -82,8 +113,20 @@ class RevisionaryFront {
 	}
 
     function actFlagHomeRevision(&$query) {
-		if ($this->isHomeRevision()) {
-			$query->is_home = true;
+		if ($this->isHomeRevision() 
+		&& (
+			!defined('ELEMENTOR_VERSION') 
+			|| (
+				(empty($_REQUEST['action']) || ('elementor' != $_REQUEST['actions']))
+				&& empty($_REQUEST['elementor-preview'])
+				&& empty($_REQUEST['elementor_ajax'])
+				)
+			) 
+		) {
+			if (rvy_get_option('home_preview_set_home_flag')) {
+				$query->is_home = true;
+			}
+
 			$query->is_front_page = true;
 		}
 	}
@@ -121,7 +164,7 @@ class RevisionaryFront {
 
 	public function fltAuthor($display_name) {
 		if ($_post = get_post(rvy_detect_post_id())) {
-			if (rvy_in_revision_workflow($_post)) {
+			if (rvy_in_revision_workflow($_post) || wp_is_post_revision($_post)) {
 				// we only need this workaround when multiple authors were not successfully stored
 				if ($authors = get_multiple_authors($_post->ID, false)) {
 					return $display_name;
@@ -295,7 +338,9 @@ class RevisionaryFront {
 					revisionary_copy_terms($published_post_id, $revision_id, ['empty_target_only' => true]);
 				}
 
-				if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && !defined('REVISIONARY_DISABLE_MA_PREVIEW_CORRECTION') && rvy_in_revision_workflow($post)) {
+				if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && !defined('REVISIONARY_DISABLE_MA_PREVIEW_CORRECTION') 
+				&& (rvy_in_revision_workflow($post) || wp_is_post_revision($post))
+				) {
 					$_authors = get_multiple_authors($revision_id);
 
 					if (count($_authors) == 1) {
@@ -457,6 +502,13 @@ class RevisionaryFront {
 				case 'pending-revision' :
 					$approve_caption = esc_html__( 'Approve', 'revisionary' );
 
+					if ($can_publish && !defined('REVISIONARY_PREVIEW_NO_DECLINE_BUTTON')) {
+						$decline_url = wp_nonce_url(admin_url("post.php?post=$revision_id&action=decline_revision"), 'decline-revision');
+						$decline_button = ($can_publish) ? '<a href="' . $decline_url . '" class="button button-secondary">' . esc_html__('Decline', 'revisionary') . '</a>' : '';
+					} else {
+						$decline_button = '';
+					}
+
 					if ( strtotime( $post->post_date_gmt ) > agp_time_gmt() ) {
 						$class = 'pending_future';
 						$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-primary rvy-approve-revision">' . $approve_caption . '</a>' : '';
@@ -464,7 +516,7 @@ class RevisionaryFront {
 						if (!empty($_REQUEST['elementor-preview'])) {
 							$message = sprintf( esc_html__('This is a %s (requested publish date: %s). %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $date, '', '', '');
 						} else {
-							$message = sprintf( esc_html__('This is a %s (requested publish date: %s). %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $date, $view_published, $edit_button, $publish_button );
+							$message = sprintf( esc_html__('This is a %s (requested publish date: %s). %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $date, $view_published, $edit_button, $publish_button . $decline_button );
 						}
 					} else {
 						$class = 'pending';
@@ -475,7 +527,7 @@ class RevisionaryFront {
 						if (!empty($_REQUEST['elementor-preview'])) {
 							$message = sprintf( esc_html__('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), '', '', '' );
 						} else {
-							$message = sprintf( esc_html__('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $view_published, $edit_button, $publish_button );
+							$message = sprintf( esc_html__('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label('pending-revision', 'name'), $view_published, $edit_button, $publish_button . $decline_button );
 						}
 					}
 
@@ -514,7 +566,13 @@ class RevisionaryFront {
 						if ( current_user_can('edit_post', $revision_id ) ) {
 							$class = 'past';
 							$date = agp_date_i18n( $datef, strtotime( $post->post_modified ) );
-							$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-secondary">' . esc_html__( 'Restore', 'revisionary' ) . '</a>' : '';
+
+							if (rvy_get_option('revision_restore_require_cap') 
+							&& !current_user_can('administrator') && !is_super_admin() && !current_user_can('restore_revisions')) {
+								$publish_button = '';
+							} else {
+								$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-secondary">' . esc_html__( 'Restore', 'revisionary' ) . '</a>' : '';
+							}
 							
 							if (!empty($_REQUEST['elementor-preview'])) {
 								$message = sprintf( esc_html__('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, '', '' );
