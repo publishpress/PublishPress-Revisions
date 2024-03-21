@@ -239,7 +239,17 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.5.6 - 2 Jan 2024 =
+= 3.5.7 - 21 Mar 2024 =
+* Feature : Decline link in Revision Queue row, Revision Preview top bar
+* Feature : Option to require a "restore_revisions" capability for non-Administrators to perform that action from the Compare Revisions / Revision Archive screen
+* Fixed : Preview of front page revision was not displayed correctly
+* Fixed : Previews of archived revisions did not display custom fields, multiple authors
+* Fixed : WP-defined revision limit (for past revisions) was not imposed when saving current content as a past revision at pending / scheduled revision publication
+* Fixed : If "Limit to one active revision per post" setting is enabled, deleting a revision on a cached site did not restore ability to create a new revision to replace it
+* Fixed : Possible memory leaks in javascript on Revision edit with Gutenberg editor
+* API : New filter "revisionary_preview_link_type"
+
+= 3.5.6 - 4 Jan 2024 =
 * Feature : New setting Revisions > Settings > Preview > "Modify preview link for better theme compatibility". Some themes require one setting, some require the other.
 * Fixed : ACF - Revision update, preview fails if ACF plugin is active
 * Fixed : Edit Revision - Approve, Submit buttons missing in Gutenberg 17
