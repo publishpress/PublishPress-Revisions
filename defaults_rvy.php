@@ -58,6 +58,7 @@ function rvy_default_options_sitewide() {
 		'rev_publication_delete_ed_comments' => true,
 		'deletion_queue' => true,
 		'revision_archive_deletion' => true,
+		'revision_restore_require_cap' => true,
 		'revision_limit_per_post' => true,
 	);
 
@@ -116,6 +117,7 @@ function rvy_default_options() {
 		'rev_publication_delete_ed_comments' => 0,
 		'deletion_queue' => 0,
 		'revision_archive_deletion' => 0,
+		'revision_restore_require_cap' => 0,
 		'revision_limit_per_post' => 0,
 	);
 
