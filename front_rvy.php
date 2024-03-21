@@ -83,7 +83,10 @@ class RevisionaryFront {
 
     function actFlagHomeRevision(&$query) {
 		if ($this->isHomeRevision()) {
-			$query->is_home = true;
+			if (rvy_get_option('home_preview_set_home_flag')) {
+				$query->is_home = true;
+			}
+
 			$query->is_front_page = true;
 		}
 	}
