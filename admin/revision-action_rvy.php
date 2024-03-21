@@ -861,6 +861,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 				],
 				['ID' => $revision_id]
 			);
+
+			Revisionary::applyRevisionLimit($published);
 		} else {
 			wp_delete_post($revision_id, true);
 		}
