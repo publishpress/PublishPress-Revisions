@@ -652,7 +652,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 	<?php
-	$hint = esc_html__('For themes that block revision preview, hide preview links from non-Administrators', 'revisionary');
+	$hint = esc_html__('For themes that block revision preview, hide preview links from non-Administrators.', 'revisionary');
 	$this->option_checkbox( 'revision_preview_links', $tab, $section, $hint, '' );
 
 	$id = 'preview_link_type';
