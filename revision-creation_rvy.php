@@ -194,7 +194,7 @@ class RevisionCreation {
 			}
 		}
 
-		if (!empty($args['meta_post_id'])) {
+		if (!empty($args['meta_post_id']) && apply_filters('revisionary_use_autodraft_meta', true, $data)) {
 			revisionary_copy_terms($args['meta_post_id'], $revision_id);
 			revisionary_copy_postmeta($args['meta_post_id'], $revision_id);
 
