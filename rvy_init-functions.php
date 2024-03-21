@@ -752,8 +752,9 @@ function revisionary_refresh_revision_flags($published_post_id = 0, $args = []) 
 	$have_revisions = implode("','", array_map('intval', array_unique($arr_have_revisions)));
 
 	if ($ids = $wpdb->get_col("SELECT meta_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_has_revisions' AND post_id NOT IN ('$have_revisions')")) {
-		$id_csv = implode("','", array_map('intval', $ids));
-		$wpdb->query("DELETE FROM $wpdb->postmeta WHERE meta_id IN ('$id_csv')");
+		foreach ($ids as $post_id) {
+			rvy_delete_post_meta($post_id, '_rvy_has_revisions');
+		}
 	}
 
 	$query = "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_has_revisions'";
