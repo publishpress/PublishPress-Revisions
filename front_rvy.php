@@ -514,7 +514,13 @@ class RevisionaryFront {
 						if ( current_user_can('edit_post', $revision_id ) ) {
 							$class = 'past';
 							$date = agp_date_i18n( $datef, strtotime( $post->post_modified ) );
-							$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-secondary">' . esc_html__( 'Restore', 'revisionary' ) . '</a>' : '';
+
+							if (rvy_get_option('revision_restore_require_cap') 
+							&& !current_user_can('administrator') && !is_super_admin() && !current_user_can('restore_revisions')) {
+								$publish_button = '';
+							} else {
+								$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-secondary">' . esc_html__( 'Restore', 'revisionary' ) . '</a>' : '';
+							}
 							
 							if (!empty($_REQUEST['elementor-preview'])) {
 								$message = sprintf( esc_html__('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, '', '' );
