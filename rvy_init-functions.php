@@ -1381,7 +1381,11 @@ function rvy_preview_url($revision, $args = []) {
 	}
 	$post_type = sanitize_key($post_type);
 
-	$link_type = rvy_get_option('preview_link_type');
+	$link_type = apply_filters(
+		'revisionary_preview_link_type',
+		rvy_get_option('preview_link_type'),
+		$revision
+	);
 
 	$status_obj = get_post_status_object(get_post_field('post_status', rvy_post_id($revision->ID)));
 	$post_is_published = $status_obj && (!empty($status_obj->public) || !empty($status_obj->private));
