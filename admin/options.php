@@ -148,6 +148,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'revision_preview_links' => 				esc_html__('Show Preview Links', 'revisionary'),
 	'preview_link_type' => 						esc_html__('Preview Link Type', 'revisionary'),
 	'preview_link_alternate_preview_arg' =>		esc_html__('Modify preview link for better theme compatibility', 'revisionary'),
+	'home_preview_set_home_flag' =>				esc_html__('Theme Compat: For front page revision preview, set home flag', 'revisionary'),
 	'compare_revisions_direct_approval' => 		esc_html__('Approve Button on Compare Revisions screen', 'revisionary'),
 	'copy_revision_comments_to_post' => 		esc_html__('Copy revision comments to published post', 'revisionary'),
 	'past_revisions_order_by' =>				esc_html__('Compare Past Revisions ordering:'), 
@@ -181,7 +182,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'scheduled_revisions' => ['scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'wp_cron_usage_detected', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date'],
 	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions'],
-	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'compare_revisions_direct_approval'],
+	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'home_preview_set_home_flag', 'compare_revisions_direct_approval'],
 	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'rev_publication_delete_ed_comments', 'deletion_queue', 'revision_archive_deletion', 'revision_restore_require_cap', 'display_hints'],
 	'notification'	=>		 ['pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 ]
@@ -699,7 +700,13 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		<?php
 	}
 
-	$hint = esc_html__('If disabled, Compare screen links to Revision Preview for approval', 'revisionary');
+	$hint = esc_html__('Some themes may require this setting for correct revision preview display.', 'revisionary');
+	$this->option_checkbox( 'home_preview_set_home_flag', $tab, $section, $hint, '' );
+	?>
+	<br />
+
+	<?php
+	$hint = esc_html__('If disabled, Compare screen links to Revision Preview for approval.', 'revisionary');
 	$this->option_checkbox( 'compare_revisions_direct_approval', $tab, $section, $hint, '' );
 	?>
 	</td></tr></table>
