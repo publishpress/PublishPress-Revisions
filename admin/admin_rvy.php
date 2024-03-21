@@ -344,6 +344,11 @@ class RevisionaryAdmin
 
 	public function fltPublishPressCapsSection($section_caps) {
 		$section_caps['PublishPress Revisions'] = ['edit_others_drafts', 'edit_others_revisions', 'list_others_revisions', 'manage_unsubmitted_revisions'];
+
+		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && rvy_get_option('revision_restore_require_cap')) {
+			$section_caps['PublishPress Revisions'] []= 'restore_revisions';
+		}
+
 		return $section_caps;
 	}
 

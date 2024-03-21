@@ -155,6 +155,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'rev_publication_delete_ed_comments' =>		esc_html__('On Revision publication, delete Editorial Comments', 'revisionary'),
 	'deletion_queue' => 						esc_html__('Enable deletion queue', 'revisionary'),
 	'revision_archive_deletion' => 				esc_html__('Enable deletion in Revision Archive', 'revisionary'),
+	'revision_restore_require_cap' =>			esc_html__('Revision Restore: Non-Administrators need capability', 'revisionary'),
 	]
 );
 
@@ -181,7 +182,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'compare_revisions_direct_approval'],
-	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'rev_publication_delete_ed_comments', 'deletion_queue', 'revision_archive_deletion', 'display_hints'],
+	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'rev_publication_delete_ed_comments', 'deletion_queue', 'revision_archive_deletion', 'revision_restore_require_cap', 'display_hints'],
 	'notification'	=>		 ['pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 ]
 ]);
@@ -771,6 +772,11 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 
 		$hint = '';
 		$this->option_checkbox( 'revision_archive_deletion', $tab, $section, $hint, '' );
+
+		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
+			$hint = esc_html__('Non-Administrators cannot restore a revision without the restore_revisions capability', 'revisionary');
+			$this->option_checkbox( 'revision_restore_require_cap', $tab, $section, $hint, '' );
+		}
 		?>
 
 		</td></tr></table>
