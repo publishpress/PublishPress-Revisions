@@ -583,7 +583,11 @@ class RevisionaryFront {
 					}
 				}
 
-				add_action('wp_head', [$this, 'rvyFrontCSS']);
+				if (defined('REVISIONARY_LEGACY_PREVIEW_OUTPUT')) {
+					add_action('wp_head', [$this, 'rvyFrontCSS']);
+				} else {
+					add_action('wp_print_scripts', [$this, 'rvyFrontCSS'], 5);
+				}
 
 				add_action('wp_enqueue_scripts', [$this, 'rvyEnqueuePreviewJS']);
 
@@ -596,7 +600,11 @@ class RevisionaryFront {
 				$html = '<div id="pp_revisions_top_bar" class="' . esc_attr("rvy_view_revision rvy_view_" . $class) . '">' .
 						'<div class="rvy_preview_msgspan">' . $message . '</div></div>';
 
-				new RvyScheduledHtml( $html, 'wp_head', 99 );  // this should be inserted at the top of <body> instead, but currently no way to do it
+				if (defined('REVISIONARY_LEGACY_PREVIEW_OUTPUT')) {
+					new RvyScheduledHtml( $html, 'wp_head', 99 );  // this should be inserted at the top of <body> instead, but currently no way to do it
+				} else {
+					new RvyScheduledHtml( $html, 'wp_print_scripts', 99 );
+				}
 			}
 		}
 	}
