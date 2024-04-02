@@ -241,7 +241,6 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 = 3.5.7 - 21 Mar 2024 =
 * Feature : Decline link in Revision Queue row, Revision Preview top bar
-* Feature : Option to require a "restore_revisions" capability for non-Administrators to perform that action from the Compare Revisions / Revision Archive screen
 * Fixed : Preview of front page revision was not displayed correctly
 * Fixed : Previews of archived revisions did not display custom fields, multiple authors
 * Fixed : WP-defined revision limit (for past revisions) was not imposed when saving current content as a past revision at pending / scheduled revision publication
