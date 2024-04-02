@@ -13,6 +13,7 @@ class RevisionaryFront {
 
 		add_action('parse_query', [$this, 'actSetQueriedObject'], 20);
 		add_action('parse_query', [$this, 'actFlagHomeRevision'], 20);
+
 		add_filter('body_class', [$this, 'fltBodyClass'], 20, 2);
 
 		add_filter('acf/load_value', [$this, 'fltACFLoadValue'], 10, 3);
@@ -89,7 +90,7 @@ class RevisionaryFront {
 		// extra caution and perf optimization for front end execution
 		if (!empty($post) && is_object($post) && rvy_in_revision_workflow($post) && ($post->comment_count == $front_page_id)) {
 			return $post->ID;
-		} 
+		}
 
 		return $front_page_id;
 	}
@@ -573,7 +574,7 @@ class RevisionaryFront {
 							} else {
 								$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-secondary">' . esc_html__( 'Restore', 'revisionary' ) . '</a>' : '';
 							}
-							
+
 							if (!empty($_REQUEST['elementor-preview'])) {
 								$message = sprintf( esc_html__('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, '', '' );
 							} else {
