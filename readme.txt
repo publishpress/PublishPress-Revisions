@@ -239,7 +239,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.5.7 - 21 Mar 2024 =
+= 3.5.7 - 3 Apr 2024 =
 * Feature : Decline link in Revision Queue row, Revision Preview top bar
 * Fixed : Preview of front page revision was not displayed correctly
 * Fixed : Previews of archived revisions did not display custom fields, multiple authors
