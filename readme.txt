@@ -239,11 +239,13 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.5.7 - 3 Apr 2024 =
+= 3.5.7 - 4 Apr 2024 =
+* Compat : WordPress 6.5 - Revision editor sidebar did not display date, template UI
 * Feature : Decline link in Revision Queue row, Revision Preview top bar
 * Fixed : Preview of front page revision was not displayed correctly
 * Fixed : Previews of archived revisions did not display custom fields, multiple authors
 * Fixed : Revision preview styling broke third party javascript on some installations
+* Fixed : Classic Editor - Custom Fields metabox was unavailable while editing a revision
 * Fixed : WP-defined revision limit (for past revisions) was not imposed when saving current content as a past revision at pending / scheduled revision publication
 * Fixed : If "Limit to one active revision per post" setting is enabled, deleting a revision on a cached site did not restore ability to create a new revision to replace it
 * Fixed : Possible memory leaks in javascript on Revision edit with Gutenberg editor
