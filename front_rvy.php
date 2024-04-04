@@ -13,6 +13,7 @@ class RevisionaryFront {
 
 		add_action('parse_query', [$this, 'actSetQueriedObject'], 20);
 		add_action('parse_query', [$this, 'actFlagHomeRevision'], 20);
+
 		add_filter('body_class', [$this, 'fltBodyClass'], 20, 2);
 
 		add_filter('acf/load_value', [$this, 'fltACFLoadValue'], 10, 3);
@@ -89,7 +90,7 @@ class RevisionaryFront {
 		// extra caution and perf optimization for front end execution
 		if (!empty($post) && is_object($post) && rvy_in_revision_workflow($post) && ($post->comment_count == $front_page_id)) {
 			return $post->ID;
-		} 
+		}
 
 		return $front_page_id;
 	}
@@ -573,7 +574,7 @@ class RevisionaryFront {
 							} else {
 								$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-secondary">' . esc_html__( 'Restore', 'revisionary' ) . '</a>' : '';
 							}
-							
+
 							if (!empty($_REQUEST['elementor-preview'])) {
 								$message = sprintf( esc_html__('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, '', '' );
 							} else {
@@ -583,7 +584,11 @@ class RevisionaryFront {
 					}
 				}
 
-				add_action('wp_head', [$this, 'rvyFrontCSS']);
+				if (defined('REVISIONARY_LEGACY_PREVIEW_OUTPUT')) {
+					add_action('wp_head', [$this, 'rvyFrontCSS']);
+				} else {
+					add_action('wp_print_scripts', [$this, 'rvyFrontCSS'], 5);
+				}
 
 				add_action('wp_enqueue_scripts', [$this, 'rvyEnqueuePreviewJS']);
 
@@ -596,7 +601,11 @@ class RevisionaryFront {
 				$html = '<div id="pp_revisions_top_bar" class="' . esc_attr("rvy_view_revision rvy_view_" . $class) . '">' .
 						'<div class="rvy_preview_msgspan">' . $message . '</div></div>';
 
-				new RvyScheduledHtml( $html, 'wp_head', 99 );  // this should be inserted at the top of <body> instead, but currently no way to do it
+				if (defined('REVISIONARY_LEGACY_PREVIEW_OUTPUT')) {
+					new RvyScheduledHtml( $html, 'wp_head', 99 );  // this should be inserted at the top of <body> instead, but currently no way to do it
+				} else {
+					new RvyScheduledHtml( $html, 'wp_print_scripts', 99 );
+				}
 			}
 		}
 	}

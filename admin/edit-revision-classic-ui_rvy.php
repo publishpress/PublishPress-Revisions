@@ -26,7 +26,7 @@ class RevisionaryEditRevisionClassicUI {
 
 			$object_type = (!empty($post->post_type)) ? $post->post_type : awp_post_type_from_uri();
 
-			$unrevisable_css_ids = apply_filters('rvy_hidden_meta_boxes', ['authordiv', 'visibility', 'postcustom', 'pagecustom']);
+			$unrevisable_css_ids = apply_filters('rvy_hidden_meta_boxes', ['authordiv', 'visibility']);
 
 			if (rvy_in_revision_workflow($post)) {
 				$unrevisable_css_ids = array_merge($unrevisable_css_ids, ['publish', 'slugdiv', 'edit-slug-box']);
