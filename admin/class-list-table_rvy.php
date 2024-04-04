@@ -1332,6 +1332,14 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			);
 		}
 
+		if ($can_edit_post && ('pending-revision' == $post->post_mime_type)) {
+			$actions['decline'] = sprintf(
+				'<a href="%1$s" class="" target="_revision_diff">%2$s</a>',
+				wp_nonce_url(admin_url("post.php?post=$post->ID&action=decline_revision"), 'decline-revision'),
+				_x( 'Decline', 'revisions', 'revisionary' )
+			);
+		}
+
 		$actions = apply_filters('revisionary_queue_row_actions', $actions, $post);
 
 		return $this->row_actions( $actions );

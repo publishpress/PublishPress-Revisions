@@ -194,7 +194,7 @@ class RevisionCreation {
 			}
 		}
 
-		if (!empty($args['meta_post_id'])) {
+		if (!empty($args['meta_post_id']) && apply_filters('revisionary_use_autodraft_meta', true, $data)) {
 			revisionary_copy_terms($args['meta_post_id'], $revision_id);
 			revisionary_copy_postmeta($args['meta_post_id'], $revision_id);
 
@@ -208,7 +208,10 @@ class RevisionCreation {
 		}
 
 		rvy_update_post_meta($revision_id, '_rvy_base_post_id', $base_post_id);
-		rvy_update_post_meta($base_post_id, '_rvy_has_revisions', true);
+
+		if (!defined('REVISIONARY_LIMIT_IGNORE_UNSUBMITTED')) {
+			rvy_update_post_meta($base_post_id, '_rvy_has_revisions', true);
+		}
 	
 		// Set GUID.  @todo: still needed?
 		if ( '' == get_post_field( 'guid', $revision_id ) ) {

@@ -7,7 +7,7 @@ add_action( '_wp_put_post_revision', 'rvy_review_revision' );
 /**
  * @package     PublishPress\Revisions\RevisionaryAction
  * @author      PublishPress <help@publishpress.com>
- * @copyright   Copyright (c) 2023 PublishPress. All rights reserved.
+ * @copyright   Copyright (c) 2024 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
  */
@@ -99,6 +99,10 @@ function rvy_revision_submit($revision_id = 0) {
 		// safeguard: make sure this hasn't already been published
 		if ( empty($status_obj->public) && empty($status_obj->private) ) {
 			$wpdb->update($wpdb->posts, ['post_status' => 'pending', 'post_mime_type' => 'pending-revision'], ['ID' => $revision_id]);
+
+			if (defined('REVISIONARY_LIMIT_IGNORE_UNSUBMITTED')) {
+				rvy_update_post_meta($published_id, '_rvy_has_revisions', true);
+			}
 
 			clean_post_cache($revision_id);
 
@@ -342,6 +346,7 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 					clean_post_cache( $revision->ID );
 				} else {
 					$_result = rvy_apply_revision($revision->ID, $revision->post_mime_type);
+
 					if (!$_result || is_wp_error($_result)) {
 						// Go ahead with the normal redirect because the revision may have been approved / published already.
 						// If revision does not exist, preview's Not Found will prevent false impression of success.
@@ -861,6 +866,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 				],
 				['ID' => $revision_id]
 			);
+
+			Revisionary::applyRevisionLimit($published);
 		} else {
 			wp_delete_post($revision_id, true);
 		}
