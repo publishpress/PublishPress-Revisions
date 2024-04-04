@@ -35,15 +35,28 @@ class RevisionaryEditRevisionUI {
 		if (!class_exists('DS_Public_Post_Preview')) {
 			?>
 			<style>
-			div.edit-post-post-visibility, div.edit-post-post-status div {
-				display: none;
-			}
+			<?php
+			global $wp_version;
 
-			div.edit-post-post-status div.rvy-creation-ui,
-			div.edit-post-post-status div.rvy-creation-ui div
-			{
-				display: inline;
-			}
+			if (!empty($wp_version) && version_compare($wp_version, '6.5-beta', '>=')) :?>
+				div.edit-post-post-status div.rvy-current-status {
+					padding-left: 20px;
+				}
+
+				button.edit-post-post-visibility__toggle, div.editor-post-url__panel-dropdown, div.components-checkbox-control {
+					display: none;
+				}
+			<?php else:?>
+				div.edit-post-post-visibility, div.edit-post-post-status div {
+					display: none;
+				}
+
+				div.edit-post-post-status div.rvy-creation-ui,
+				div.edit-post-post-status div.rvy-creation-ui div
+				{
+					display: inline;
+				}
+			<?php endif;?>
 
 			div.edit-post-post-status div.rvy-creation-ui div.revision-created {
 				display: block;
