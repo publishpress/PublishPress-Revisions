@@ -117,10 +117,10 @@ jQuery(document).ready(function ($) {
         if ('future' == rvyObjEdit.currentStatus) {
             $('button.editor-post-publish-button').show();
 		
-        } else {
-            if ($('button.editor-post-publish-button').length && ($('button.editor-post-save-draft:visible').length || $('button.editor-post-saved-stated:visible').length)) {
-                $('button.editor-post-publish-button').hide();
-            }
+        } else {            
+        	if ($('button.editor-post-publish-button').length && ($('button.editor-post-save-draft:visible').length || $('button.editor-post-saved-stated:visible').length)) {                
+        		$('button.editor-post-publish-button').hide();
+        	}
         }
         if (($('button.editor-post-publish-button').length || $('button.editor-post-publish-panel__toggle').length) 
         && ($('button.editor-post-save-draft').filter(':visible').length || $('.is-saved').filter(':visible').length)
@@ -140,25 +140,52 @@ jQuery(document).ready(function ($) {
 	var RvyHideInterval = setInterval(RvyHideElements, 50);
 	
     var RvySubmissionUI = function () {
-		// @todo: use .edit-post-post-visibility if edit-post-post-schedule not available
-        if ($('div.edit-post-post-schedule').length) {
-            var refSelector = 'div.edit-post-post-schedule';
-        } else {
-            var refSelector = 'div.edit-post-post-visibility';
+        $('button.edit-post-post-visibility__toggle, div.editor-post-url__panel-dropdown, div.components-checkbox-control').closest("div.editor-post-panel__row").hide();
 
-            if (!$(refSelector).length) {
-                refSelector = 'div.edit-post-post-status h2';
-            }
+        if ($('div.edit-post-sidebar div.edit-post-post-status div.editor-post-panel__row:last').length) {
+            var refSelector = 'div.edit-post-sidebar div.edit-post-post-status div.editor-post-panel__row:last';
+        } else {
+            if ($('div.edit-post-post-schedule').length) {
+                var refSelector = 'div.edit-post-post-schedule';
+	        } else {
+	            var refSelector = 'div.edit-post-post-visibility';
+	
+	            if (!$(refSelector).length) {
+	                refSelector = 'div.edit-post-post-status h2';
+	            }
+	        }
         }
 
         if (rvyObjEdit.ajaxurl && !$('div.edit-post-revision-status').length && $(refSelector).length) {
-			$(refSelector).before(
-				'<div class="components-panel__row rvy-creation-ui edit-post-revision-status">'
-                 + '<span>' + rvyObjEdit.statusLabel + '</span>'
-                 + '<div class="components-dropdown rvy-current-status">'
-                 + rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']
-                 + '</div>'
-				+ '</div>'
+            if ($('div.editor-post-panel__row-label').length) {
+                var labelOpen = '<div class="editor-post-panel__row-label">';
+                var labelClose = '</div>';
+                var statusWrapperClass = 'editor-post-panel__row-control';
+            } else {
+                var labelOpen = '<span>';
+                var labelClose = '</span>';
+                var statusWrapperClass = '';
+            }
+            
+            var rvyUI = '<div class="components-panel__row rvy-creation-ui edit-post-revision-status">'
+            + labelOpen + rvyObjEdit.statusLabel + labelClose;
+
+            if (statusWrapperClass) {
+                rvyUI += '<div class="' + statusWrapperClass + '">';
+            }
+
+            rvyUI += '<div class="components-dropdown rvy-current-status">'
+            + rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']
+            + '</div>';
+
+            if (statusWrapperClass) {
+                rvyUI += '</div>';
+            }
+
+            rvyUI += '</div>';
+
+            $(refSelector).before(
+				rvyUI
 			);
 			
             if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL']) {
@@ -340,7 +367,7 @@ jQuery(document).ready(function ($) {
 			
             $('button.editor-post-save-draft:not(.rvy-recaption)').addClass('rvy-recaption').removeClass('is-tertiary').addClass('is-primary').addClass('ppr-purple-button');
 		}
-		
+
         var newPreviewItem = '';
 		
         if (rvyObjEdit.viewTitleExtra) {
@@ -393,11 +420,13 @@ jQuery(document).ready(function ($) {
 
                     original = null;
                 }
+
                 if (rvyObjEdit.previewTitle && !$('a.editor-post-preview').attr('title')) {
                     $('div.edit-post-header__settings a.editor-post-preview').attr('title', rvyObjEdit.previewTitle);
                 }
             }
         }
+        
         if (rvyObjEdit.revisionEdits && $('div.edit-post-sidebar a.editor-post-last-revision__title:visible').length && !$('div.edit-post-sidebar a.editor-post-last-revision__title.rvy-recaption').length) {
             $('div.edit-post-sidebar a.editor-post-last-revision__title').html(rvyObjEdit.revisionEdits);
             $('div.edit-post-sidebar a.editor-post-last-revision__title').addClass('rvy-recaption');
