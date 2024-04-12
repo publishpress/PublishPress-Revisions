@@ -39,6 +39,11 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		// Gutenberg will not allow immediate deletion of revisions from within editor
+		
+		// Ensure deletion of trashed revisions through redundant triggering:
+		// * Revision and Post IDs stored to options array on trashed_post action
+		// * Revision IDs in redirect URL
+		
 		if ($triggered_deletions = (array) get_option('_rvy_trigger_deletion')) {
 			$clear_trigger_option = true;
 		}
@@ -47,8 +52,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			
 			$delete_id = (int) $_REQUEST['pp_revisions_deleted'];
 
-			if (('trash' == get_post_field('post_status', $delete_id)) && (get_post_field('post_author', $delete_id) == $current_user->ID)) {
-				wp_delete_post($delete_id, true);
+			if (('trash' == get_post_field('post_status', $delete_id))) {
+				$revision = get_post($delete_id);
+				
+				if (!empty($revision->comment_count)) {
+					$triggered_deletions[$delete_id] = $revision->comment_count;
+				}
 			}
 		}
 	
