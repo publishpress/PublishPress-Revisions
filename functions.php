@@ -391,7 +391,32 @@ function pp_revisions_plugin_activation() {
     global $wpdb;
     $revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
-    $wpdb->query("DELETE FROM $wpdb->posts WHERE post_mime_type IN ('draft-revision', 'pending-revision', 'future-revision') AND post_status = 'trash'");
+    if (!defined('REVISIONARY_DISABLE_ACTIVATION_TRASH_QUERY')) {
+        $results = $wpdb->get_results("SELECT ID, comment_count FROM $wpdb->posts WHERE post_mime_type IN ('draft-revision', 'pending-revision', 'future-revision') AND post_status = 'trash'");
+
+        $trashed_ids = [];
+
+        foreach ($results as $row) {
+            $trashed_ids[$row->comment_count] = $row->ID;
+        }
+
+        $revision_post_ids = $wpdb->get_col("SELECT comment_count FROM $wpdb->posts WHERE post_mime_type IN ('draft-revision', 'pending-revision', 'future-revision')");
+
+        $id_csv = implode("','", $revision_post_ids);
+        $deleted_ids = $wpdb->get_col("SELECT post_id FROM $wpdb->postmeta WHERE post_id NOT IN ('" . $id_csv . "') AND meta_key = '_rvy_base_post_id'");
+
+        foreach (array_merge($trashed_ids, $deleted_ids) as $revision_id) {
+            delete_post_meta($revision_id, '_rvy_base_post_id', true);
+        }
+
+        if (get_option('rvy_revision_limit_per_post')) {
+            foreach (array_keys($trashed_ids) as $post_id) {
+                if ($post_id) {
+                    revisionary_refresh_postmeta($post_id);
+                }
+            }
+        }
+    }
 
     $wpdb->query("UPDATE $wpdb->posts SET post_mime_type = post_status WHERE post_status IN ('$revision_status_csv')");
     $wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft', post_mime_type = 'draft-revision' WHERE post_status IN ('draft-revision')");
