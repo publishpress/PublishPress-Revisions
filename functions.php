@@ -5,7 +5,16 @@ function revisionary() {
 
 function revisionary_unrevisioned_postmeta() {
 	$exclude = array_fill_keys( array( '_rvy_base_post_id', '_rvy_has_revisions', '_rvy_published_gmt', '_pp_is_autodraft', '_pp_last_parent', '_edit_lock', '_edit_last', '_wp_old_slug', '_wp_attached_file', '_menu_item_classes', '_menu_item_menu_item_parent', '_menu_item_object', '_menu_item_object_id', '_menu_item_target', '_menu_item_type', '_menu_item_url', '_menu_item_xfn', '_rs_file_key', '_scoper_custom', '_scoper_last_parent', '_wp_attachment_backup_sizes', '_wp_attachment_metadata', '_wp_trash_meta_status', '_wp_trash_meta_time', '_last_attachment_ids', '_last_category_ids', '_encloseme', '_pingme' ), true );
-	return apply_filters( 'revisionary_unrevisioned_postmeta', $exclude );
+	$exclude = apply_filters( 'revisionary_unrevisioned_postmeta', $exclude );
+	$exclude = array_merge(
+		$exclude, 
+		array_fill_keys(  // These cannot be revisioned without breaking plugin functionality
+			['_rvy_base_post_id', '_rvy_has_revisions', '_rvy_published_gmt', '_pp_is_autodraft'],
+			true
+		)
+	);
+	
+	return array_keys(array_filter($exclude));
 }
 
 /**
@@ -138,7 +147,9 @@ function revisionary_copy_postmeta($from_post, $to_post_id, $args = []) {
 
         $meta_keys = [];
         foreach ( $source_meta_keys as $meta_key ) {
-            if ( ! preg_match( '#^' . $meta_excludelist_string . '$#', $meta_key ) ) {
+            if (!in_array($meta_key, $meta_excludelist)
+            && !preg_match( '#^' . $meta_excludelist_string . '$#', $meta_key ) 
+            ) {
                 $meta_keys[] = $meta_key;
             }
         }
@@ -240,7 +251,7 @@ function rvy_is_revision_status($post_status) {
 	return in_array($post_status, rvy_revision_statuses());
 }
 
-function rvy_in_revision_workflow($post) {
+function rvy_in_revision_workflow($post, $args = []) {
 	if (!empty($post) && is_numeric($post)) {
 		$post = get_post($post);
 	}
@@ -249,7 +260,13 @@ function rvy_in_revision_workflow($post) {
 		return false;
 	}
 
-    return rvy_is_revision_status($post->post_mime_type) && in_array($post->post_status, rvy_revision_base_statuses()) ? $post->post_mime_type : false;
+    $base_statuses = rvy_revision_base_statuses();
+
+    if (!empty($args['include_trash'])) {
+        $base_statuses []= 'trash';
+    }
+
+    return rvy_is_revision_status($post->post_mime_type) && in_array($post->post_status, $base_statuses) ? $post->post_mime_type : false;
 }
 
 function rvy_post_id($revision_id) {
@@ -374,7 +391,32 @@ function pp_revisions_plugin_activation() {
     global $wpdb;
     $revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
-    $wpdb->query("DELETE FROM $wpdb->posts WHERE post_mime_type IN ('draft-revision', 'pending-revision', 'future-revision') AND post_status = 'trash'");
+    if (!defined('REVISIONARY_DISABLE_ACTIVATION_TRASH_QUERY')) {
+        $results = $wpdb->get_results("SELECT ID, comment_count FROM $wpdb->posts WHERE post_mime_type IN ('draft-revision', 'pending-revision', 'future-revision') AND post_status = 'trash'");
+
+        $trashed_ids = [];
+
+        foreach ($results as $row) {
+            $trashed_ids[$row->comment_count] = $row->ID;
+        }
+
+        $revision_post_ids = $wpdb->get_col("SELECT comment_count FROM $wpdb->posts WHERE post_mime_type IN ('draft-revision', 'pending-revision', 'future-revision')");
+
+        $id_csv = implode("','", $revision_post_ids);
+        $deleted_ids = $wpdb->get_col("SELECT post_id FROM $wpdb->postmeta WHERE post_id NOT IN ('" . $id_csv . "') AND meta_key = '_rvy_base_post_id'");
+
+        foreach (array_merge($trashed_ids, $deleted_ids) as $revision_id) {
+            delete_post_meta($revision_id, '_rvy_base_post_id', true);
+        }
+
+        if (get_option('rvy_revision_limit_per_post')) {
+            foreach (array_keys($trashed_ids) as $post_id) {
+                if ($post_id) {
+                    revisionary_refresh_postmeta($post_id);
+                }
+            }
+        }
+    }
 
     $wpdb->query("UPDATE $wpdb->posts SET post_mime_type = post_status WHERE post_status IN ('$revision_status_csv')");
     $wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft', post_mime_type = 'draft-revision' WHERE post_status IN ('draft-revision')");

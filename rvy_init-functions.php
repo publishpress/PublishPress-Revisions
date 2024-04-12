@@ -705,7 +705,9 @@ function revisionary_refresh_postmeta($post_id, $args = []) {
 
 	$set_value = !empty($has_revisions);
 
-	if ($set_value) {
+	$_post = get_post($post_id);
+
+	if ($set_value && (empty($_post) || empty($_post->post_mime_type) || !in_array($_post->post_mime_type, ['draft-revision', 'pending-revision', 'future-revision']))) {
 		rvy_update_post_meta($post_id, '_rvy_has_revisions', $set_value);
 	} else {
 		delete_post_meta($post_id, '_rvy_has_revisions');
@@ -747,7 +749,8 @@ function revisionary_refresh_revision_flags($published_post_id = 0, $args = []) 
 	$revision_status_csv = implode("','", array_map('sanitize_key', $revision_statuses));
 
 	$query = "SELECT r.comment_count FROM $wpdb->posts r INNER JOIN $wpdb->posts p ON r.comment_count = p.ID"
-	. " WHERE p.post_status IN ('$status_csv') AND r.post_status IN ('$revision_base_status_csv') AND r.post_mime_type IN ('$revision_status_csv')";
+	. " WHERE p.post_status IN ('$status_csv') AND r.post_status IN ('$revision_base_status_csv')"
+	. " AND r.post_mime_type IN ('$revision_status_csv') AND p.post_mime_type NOT IN ('$revision_status_csv')";
 
 	if ($published_post_id) {
 		$query = $wpdb->prepare("$query AND p.ID = %d", $published_post_id);

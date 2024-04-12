@@ -153,6 +153,15 @@ class RevisionCreation {
 
 		$main_post_id = (!empty($args['main_post_id'])) ? $args['main_post_id'] : $base_post_id;
 
+		$base_post = get_post($main_post_id);
+		
+		if (!empty($base_post) && !empty($base_post->post_status) && ('revision' == $base_post->post_type)) {
+			$main_post_id = $base_post->post_parent;
+
+		} elseif (!empty($base_post) && !empty($base_post->post_mime_type) && in_array($base_post->post_mime_type, ['draft-revision', 'pending-revision', 'future-revision'])) {
+			$main_post_id = $base_post->comment_count;
+		}
+
 		$data['comment_count'] = $main_post_id; 	// buffer this value in posts table for query efficiency (actual comment count stored for published post will not be overwritten)
 
 		$data['post_author'] = $current_user->ID;		// store current user as revision author (but will retain current post_author on restoration)
