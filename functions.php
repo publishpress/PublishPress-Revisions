@@ -147,7 +147,9 @@ function revisionary_copy_postmeta($from_post, $to_post_id, $args = []) {
 
         $meta_keys = [];
         foreach ( $source_meta_keys as $meta_key ) {
-            if ( ! preg_match( '#^' . $meta_excludelist_string . '$#', $meta_key ) ) {
+            if (!in_array($meta_key, $meta_excludelist)
+            && !preg_match( '#^' . $meta_excludelist_string . '$#', $meta_key ) 
+            ) {
                 $meta_keys[] = $meta_key;
             }
         }
