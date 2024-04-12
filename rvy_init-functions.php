@@ -705,7 +705,9 @@ function revisionary_refresh_postmeta($post_id, $args = []) {
 
 	$set_value = !empty($has_revisions);
 
-	if ($set_value) {
+	$_post = get_post($post_id);
+
+	if ($set_value && (empty($_post) || empty($_post->post_mime_type) || !in_array($_post->post_mime_type, ['draft-revision', 'pending-revision', 'future-revision']))) {
 		rvy_update_post_meta($post_id, '_rvy_has_revisions', $set_value);
 	} else {
 		delete_post_meta($post_id, '_rvy_has_revisions');
