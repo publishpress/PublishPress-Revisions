@@ -239,6 +239,16 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.5.8 - 11 Apr 2024 =
+* Fixed : Revision Editor hid category selection checkboxes
+* Fixed : New Revision button was missing from Revision Editor sidebar
+* Fixed : Revision Editor did not display Preview Revision button
+* Fixed : Revision Preview top bar styling broken by external CSS on some sites
+* Fixed : Revision Preview top bar styling stuck in cache on some sites
+* Fixed : If limiting to one active revision per post, deleting that revision did not restore ability to create a new one
+* Fixed : Revision Queue - Bulk Decline failed with "link expired" message
+* Fixed : New revisions could become orphaned from main post on WordPress VIP
+
 = 3.5.7 - 4 Apr 2024 =
 * Compat : WordPress 6.5 - Revision editor sidebar did not display date, template UI
 * Feature : Decline link in Revision Queue row, Revision Preview top bar
