@@ -83,7 +83,13 @@ jQuery(document).ready( function($) {
 
 			html += '</div>';
 
-			$('div.edit-post-post-schedule').after(html);
+			var elem = $('div.editor-post-schedule__panel-dropdown').closest('div.editor-post-panel__row');
+
+			if (!$(elem).length) {
+				elem = $('div.edit-post-post-schedule');
+			}
+
+			$(elem).first().after(html);
 
 			if (rvyCreationDisabled) {
 				$('button.revision-approve').prop('disabled', 'disabled');
