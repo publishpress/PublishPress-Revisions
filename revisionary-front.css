@@ -139,6 +139,7 @@ span.rvy_preview_linkspan a, span.rvy_preview_linkspan a:visited, span.rvy_previ
 #pp_revisions_top_bar .button-primary,
 #pp_revisions_top_bar .button-secondary {
   display: inline-block;
+  max-width: 220px !important;
   text-decoration: none;
   font-size: 13px;
   line-height: 2.15384615;
