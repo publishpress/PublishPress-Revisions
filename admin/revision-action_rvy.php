@@ -346,6 +346,7 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 					clean_post_cache( $revision->ID );
 				} else {
 					$_result = rvy_apply_revision($revision->ID, $revision->post_mime_type);
+
 					if (!$_result || is_wp_error($_result)) {
 						// Go ahead with the normal redirect because the revision may have been approved / published already.
 						// If revision does not exist, preview's Not Found will prevent false impression of success.
