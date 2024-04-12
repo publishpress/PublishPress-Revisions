@@ -240,7 +240,7 @@ function rvy_is_revision_status($post_status) {
 	return in_array($post_status, rvy_revision_statuses());
 }
 
-function rvy_in_revision_workflow($post) {
+function rvy_in_revision_workflow($post, $args = []) {
 	if (!empty($post) && is_numeric($post)) {
 		$post = get_post($post);
 	}
@@ -249,7 +249,13 @@ function rvy_in_revision_workflow($post) {
 		return false;
 	}
 
-    return rvy_is_revision_status($post->post_mime_type) && in_array($post->post_status, rvy_revision_base_statuses()) ? $post->post_mime_type : false;
+    $base_statuses = rvy_revision_base_statuses();
+
+    if (!empty($args['include_trash'])) {
+        $base_statuses []= 'trash';
+    }
+
+    return rvy_is_revision_status($post->post_mime_type) && in_array($post->post_status, $base_statuses) ? $post->post_mime_type : false;
 }
 
 function rvy_post_id($revision_id) {

@@ -39,6 +39,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		// Gutenberg will not allow immediate deletion of revisions from within editor
+		if ($triggered_deletions = (array) get_option('_rvy_trigger_deletion')) {
+			$clear_trigger_option = true;
+		}
 		if (!empty($_REQUEST['pp_revisions_deleted'])) {
 			global $current_user;
 			
@@ -47,6 +50,20 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			if (('trash' == get_post_field('post_status', $delete_id)) && (get_post_field('post_author', $delete_id) == $current_user->ID)) {
 				wp_delete_post($delete_id, true);
 			}
+		}
+	
+		foreach ($triggered_deletions as $revision_id => $post_id) {
+			if ($revision_id) {
+				wp_delete_post($revision_id, true);
+			}
+
+			if ($post_id) {
+				revisionary_refresh_postmeta($post_id);
+			}
+		}
+
+		if ($clear_trigger_option) {
+			delete_option('_rvy_trigger_deletion');
 		}
 
 		$this->correctCommentCounts();
