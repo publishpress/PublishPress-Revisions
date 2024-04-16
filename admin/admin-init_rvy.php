@@ -137,8 +137,6 @@ function rvy_admin_init() {
 		$doaction = (!empty($_REQUEST['action']) && !is_numeric($_REQUEST['action'])) ? sanitize_key($_REQUEST['action']) : sanitize_key($_REQUEST['action2']);
 
 		if (isset($_REQUEST['action']) && in_array($_REQUEST['action'], ['decline_revision'])) {
-			check_admin_referer('decline-revision');
-		} else {
 			check_admin_referer('bulk-revision-queue');
 		}
 

@@ -119,6 +119,8 @@ class Revisionary
 		
 		add_action( 'wpmu_new_blog', array( $this, 'act_new_blog'), 10, 2 );
 		
+		add_action('trashed_post', [$this, 'actTrashedPost']);
+		
 		add_action( 'deleted_post', [$this, 'actDeletedPost']);
 
 		if ( rvy_get_option('scheduled_revisions') ) {
@@ -471,6 +473,20 @@ class Revisionary
 
 			$last_result[$post->ID] = $return;
 			return $return;
+		}
+	}
+
+	function actTrashedPost($revision_id) {
+		if (rvy_in_revision_workflow($revision_id, ['include_trash' => true])) {
+			$post_id = rvy_post_id($revision_id);
+
+			if (!$triggered_deletions = get_option('_rvy_trigger_deletion')) {
+				$triggered_deletions = [];
+			}
+
+			$triggered_deletions[$revision_id] = $post_id;
+
+			update_option('_rvy_trigger_deletion', $triggered_deletions);
 		}
 	}
 

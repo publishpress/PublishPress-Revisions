@@ -43,7 +43,7 @@ class RevisionaryEditRevisionUI {
 					padding-left: 20px;
 				}
 
-				button.edit-post-post-visibility__toggle, div.editor-post-url__panel-dropdown, div.components-checkbox-control {
+				button.edit-post-post-visibility__toggle, div.editor-post-url__panel-dropdown, div.edit-post-post-status div.components-checkbox-control {
 					display: none;
 				}
 			<?php else:?>

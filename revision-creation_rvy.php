@@ -153,6 +153,15 @@ class RevisionCreation {
 
 		$main_post_id = (!empty($args['main_post_id'])) ? $args['main_post_id'] : $base_post_id;
 
+		$base_post = get_post($main_post_id);
+		
+		if (!empty($base_post) && !empty($base_post->post_status) && ('revision' == $base_post->post_type)) {
+			$main_post_id = $base_post->post_parent;
+
+		} elseif (!empty($base_post) && !empty($base_post->post_mime_type) && in_array($base_post->post_mime_type, ['draft-revision', 'pending-revision', 'future-revision'])) {
+			$main_post_id = $base_post->comment_count;
+		}
+
 		$data['comment_count'] = $main_post_id; 	// buffer this value in posts table for query efficiency (actual comment count stored for published post will not be overwritten)
 
 		$data['post_author'] = $current_user->ID;		// store current user as revision author (but will retain current post_author on restoration)
@@ -181,6 +190,34 @@ class RevisionCreation {
 		: ['comment_count' => $main_post_id];
 
 		$wpdb->update($wpdb->posts, $update_data, ['ID' => $revision_id]);
+
+		/**
+		 * Fired when a new revision is being inserted into the database.
+		 *
+		 * @param int   $revision_id  The ID of the inserted revision.
+		 * @param int   $main_post_id The ID of the published post for this revision.
+		 * @param array $data         The post data used to create this revision.
+		 */
+		do_action( 'revisionary_new_revision_inserting', $revision_id, $main_post_id, $data );
+
+		if (!defined('REVISONARY_CREATE_REVISION_NO_COMMENT_COUNT_UPDATE')) {
+			// Hack WP into updating the comment count to store the main post ID in the comment_count field.
+			add_filter(
+				'pre_wp_update_comment_count_now',
+				function( $new, $old, $post_id ) use ( $revision_id, $main_post_id ) {
+					if ( (int) $revision_id === (int) $post_id ) {
+						return $main_post_id;
+					}
+
+					return $new;
+				},
+				10,
+				3
+			);
+
+			// Update the comment count.
+			wp_update_comment_count_now( $revision_id );
+		}
 
 		// Use the newly generated $post_ID.
 		$where = array( 'ID' => $revision_id );
