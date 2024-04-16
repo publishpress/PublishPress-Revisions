@@ -550,7 +550,14 @@ class Revisionary
 				)
 			);
 
-			revisionary_refresh_postmeta(rvy_post_id($post->ID), ['ignore_revisions' => [$post->ID]]);
+			$meta_args = ['ignore_revisions' => [$post->ID]];
+
+			if (rvy_get_option('revision_limit_per_post')) {
+				delete_post_meta(rvy_post_id($post->ID), '_rvy_has_revisions');
+				$meta_args['insert_only'] = true;
+			}
+
+			revisionary_refresh_postmeta(rvy_post_id($post->ID), $meta_args);
 		}
 	}
 
