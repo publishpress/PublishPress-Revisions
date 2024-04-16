@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.5
-Stable tag: 3.5.8
+Stable tag: 3.5.8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -239,7 +239,10 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.5.8 - 11 Apr 2024 =
+= 3.5.8.1 - 16 Apr 2024 =
+* Fixed :  If limiting to one active revision per post, deleting a revision before saving it did not restore creation ability on some sites
+
+= 3.5.8 - 12 Apr 2024 =
 * Fixed : Revision Editor hid category selection checkboxes
 * Fixed : New Revision button was missing from Revision Editor sidebar
 * Fixed : Revision Editor did not display Preview Revision button
