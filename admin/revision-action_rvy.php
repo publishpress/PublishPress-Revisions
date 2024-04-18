@@ -187,7 +187,7 @@ function rvy_revision_decline($revision_id = 0) {
 		}
 
 		if (!$batch_process) {
-			check_admin_referer( "submit-post_$post->ID|$revision->ID" );
+			check_admin_referer('decline-revision');
 		}
 
 		$status_obj = get_post_status_object( $revision->post_mime_type );
