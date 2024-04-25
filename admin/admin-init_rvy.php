@@ -336,6 +336,15 @@ function rvy_admin_init() {
 						}
 					} 
 	
+					// Work around Nested Pages plugin assuming get_current_screen() function declaration
+					if (class_exists('NestedPages')) {
+						if (!function_exists('get_current_screen')) {
+							function get_current_screen() {
+								return false;
+							}
+						}
+					}
+
 					if ( !wp_delete_post($post_id, true) )
 						wp_die( esc_html__('Error in deleting.') );
 	
