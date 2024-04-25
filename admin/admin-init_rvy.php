@@ -142,7 +142,7 @@ function rvy_admin_init() {
 			$url = admin_url("admin.php?page=revisionary-q");
 		}
 
-		$sendback = remove_query_arg( array('trashed', 'untrashed', 'submitted_count', 'declined_count', 'approved_count', 'published_count', 'deleted', 'locked', 'ids', 'posts', '_wp_nonce', '_wp_http_referer'), $url);
+		$sendback = remove_query_arg( array('trashed', 'untrashed', 'submitted_count', 'declined_count', 'approved_count', 'published_count', 'scheduled_count', 'unscheduled_count', 'deleted', 'locked', 'ids', 'posts', '_wp_nonce', '_wp_http_referer'), $url);
 	
 		if ( 'delete_all' == $doaction ) {
 			// Prepare for deletion of all posts with a specified post status (i.e. Empty trash).
