@@ -1196,7 +1196,7 @@ class Revisionary
 		$delete = count( $revisions ) - $revisions_to_keep;
 
 		if ( $delete < 1 ) {
-			return $return;
+			return;
 		}
 
 		$revisions = array_slice( $revisions, 0, $delete );
