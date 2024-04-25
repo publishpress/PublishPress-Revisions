@@ -137,11 +137,11 @@ class Revisionary
 
 		// This is needed, implemented for pending revisions only
 		if (!empty($_REQUEST['get_new_revision'])) {
-			add_action('template_redirect', array($this, 'act_new_revision_redirect'));
+			add_action('admin_enqueue_scripts', array($this, 'act_new_revision_redirect'));
 		}
 
 		if (!empty($_REQUEST['edit_new_revision'])) {
-			add_action('template_redirect', array($this, 'act_edit_revision_redirect'));
+			add_action('admin_enqueue_scripts', array($this, 'act_edit_revision_redirect'));
 		}
 
 		add_filter('get_comments_number', array($this, 'flt_get_comments_number'), 10, 2);
@@ -628,13 +628,12 @@ class Revisionary
 	function act_new_revision_redirect() {
 		global $current_user, $post;
 
-		if (is_admin() || empty($post) || empty($_REQUEST['get_new_revision'])) {
+		if (empty($_REQUEST['get_new_revision'])) {
 			return;
 		}
 
-		$last_user_revision_id = (int) $_REQUEST['get_new_revision'];
+		$published_post_id = (int) $_REQUEST['get_new_revision'];
 
-		$published_post_id = rvy_post_id($post->ID);
 		$published_url = get_permalink($published_post_id);
 
 		$revision = $this->get_last_revision($published_post_id, $current_user->ID);
@@ -645,9 +644,10 @@ class Revisionary
 				$args['nc'] = sanitize_key($_REQUEST['nc']);
 			}
 
-			$type_obj = get_post_type_object($post->post_type);
+			$type_obj = get_post_type_object(get_post_field('post_type', $published_post_id));
 
-			$preview_link = (!empty($type_obj->public)) ? rvy_preview_url($revision, $args) : admin_url("post.php?post={$post->ID}&action=edit");
+			$preview_link = (!empty($type_obj) && !empty($type_obj->public)) ? rvy_preview_url($revision, $args) : admin_url("post.php?post={$published_post_id}&action=edit");
+
 			wp_redirect($preview_link);
 			exit;
 		}
@@ -660,7 +660,7 @@ class Revisionary
 	function act_edit_revision_redirect() {
 		global $current_user, $post;
 
-		if (is_admin() || (empty($post) && empty($_REQUEST['edit_new_revision']))) {
+		if (empty($_REQUEST['edit_new_revision'])) {
 			return;
 		}
 
