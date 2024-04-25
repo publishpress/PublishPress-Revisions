@@ -1068,7 +1068,7 @@ class Revisionary
 
 			// don't interfere with scheduling of unpublished drafts
 			if ( $stored_status = get_post_field ( 'post_status', rvy_detect_post_id() ) ) {
-				if ( rvy_is_status_published( $stored_status ) ) {
+				if ( rvy_is_status_published($stored_status) && !rvy_is_status_published($data['post_status']) && ('future' != $data['post_status']) ) {
 					$data['post_status'] = $postarr['post_status'];
 				}
 			}
