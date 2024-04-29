@@ -136,7 +136,11 @@ function rvy_admin_init() {
 	) {
 		$doaction = (!empty($_REQUEST['action']) && !is_numeric($_REQUEST['action'])) ? sanitize_key($_REQUEST['action']) : sanitize_key($_REQUEST['action2']);
 		
-		check_admin_referer('bulk-revision-queue');
+		if (empty($_POST) && in_array($_REQUEST['action'], ['decline_revision'])) {
+			check_admin_referer('decline-revision');
+		} else {
+			check_admin_referer('bulk-revision-queue');
+		}
 
 		if (!$url = str_replace('#038;', '&', wp_get_referer())) {
 			$url = admin_url("admin.php?page=revisionary-q");
