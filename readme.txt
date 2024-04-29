@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.5
-Stable tag: 3.5.8.1
+Stable tag: 3.5.8.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -238,6 +238,12 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
 == Changelog ==
+
+= 3.5.8.2 =
+* Fixed : Nonce failure on revision decline attempts
+* Fixed : Saving with a future date in Classic Editor saves post as Published instead of Scheduled under some conditions
+* Fixed : Revision Queue - If multiple bulk actions are applied, confirmation notice from previous actions is repeated
+* Compat : Nested Pages - Fatal error on bulk deletion of revisions
 
 = 3.5.8.1 - 16 Apr 2024 =
 * Fixed :  If limiting to one active revision per post, deleting a revision before saving it did not restore creation ability on some sites
