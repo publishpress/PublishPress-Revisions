@@ -160,7 +160,7 @@ class Revisionary
 
 		add_filter('wp_dropdown_pages', [$this, 'fltDropdownPages'], 10, 3);
 
-		if (defined('REVISIONARY_RVY_INIT_ACTION')) {
+		if (!defined('REVISIONARY_DISABLE_RVY_INIT_ACTION')) {
 			do_action( 'rvy_init', $this );
 		}
 	}
