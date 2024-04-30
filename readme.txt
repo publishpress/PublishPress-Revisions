@@ -239,8 +239,9 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.5.8.3 - 26 Apr 2024 =
+= 3.5.9 - 30 Apr 2024 =
 * Fixed : Revision Queue: Decline link nonce failure ("link expired")
+* Compat : PublishPress Authors - Revisors could not submit revisions correctly if role has ppma_edit_post_authors capability
 
 = 3.5.8.2 - 25 Apr 2024 =
 * Fixed : Nonce failure on revision decline attempts
