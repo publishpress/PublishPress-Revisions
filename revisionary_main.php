@@ -137,11 +137,11 @@ class Revisionary
 
 		// This is needed, implemented for pending revisions only
 		if (!empty($_REQUEST['get_new_revision'])) {
-			add_action('admin_enqueue_scripts', array($this, 'act_new_revision_redirect'));
+			add_action('init', array($this, 'act_new_revision_redirect'));
 		}
 
 		if (!empty($_REQUEST['edit_new_revision'])) {
-			add_action('admin_enqueue_scripts', array($this, 'act_edit_revision_redirect'));
+			add_action('template_redirect', array($this, 'act_edit_revision_redirect'));
 		}
 
 		add_filter('get_comments_number', array($this, 'flt_get_comments_number'), 10, 2);
