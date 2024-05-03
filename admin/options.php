@@ -1124,8 +1124,8 @@ echo "<input type='hidden' name='all_options' value='" . esc_attr($this->all_opt
 echo "<input type='hidden' name='rvy_submission_topic' value='options' />";
 ?>
 <p class="submit">
-<input type="submit" name="rvy_submit" class="button button-primary" value="<?php echo esc_attr('Save Changes', 'revisionary');?>" />
-<input type="submit" name="rvy_defaults" class="button button-secondary" value="<?php echo esc_attr('Revert to Defaults', 'revisionary') ?>" onclick="<?php 
+<input type="submit" name="rvy_submit" class="button button-primary" value="<?php echo esc_attr__('Save Changes', 'revisionary');?>" />
+<input type="submit" name="rvy_defaults" class="button button-secondary" value="<?php echo esc_attr__('Revert to Defaults', 'revisionary') ?>" onclick="<?php 
 echo "javascript:if (confirm('" 
 . esc_html__( "All settings in this form (including those on unselected tabs) will be reset to DEFAULTS.  Are you sure?", 'revisionary' ) 
 . "')) {return true;} else {return false;}";
