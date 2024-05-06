@@ -93,6 +93,13 @@ jQuery(document).ready( function($) {
     $(document).on('click', 'div.postbox-container', function() {
 		$('a.revision-approve').attr('disabled', 'disabled');
 	});
+	var rvyThumbnail = $('#set-post-thumbnail img').attr('src');
+
+    setInterval(function() {
+        if ($('#set-post-thumbnail img').attr('src') != rvyThumbnail) {
+            $('a.revision-approve, a.rvy-direct-approve').attr('disabled', 'disabled');
+        }
+     }, 500);
 
 	$(document).on('click', 'a.revision-approve', function() {
         if ($('a.revision-approve').attr('disabled')) {
