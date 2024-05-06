@@ -134,7 +134,8 @@ function rvy_revision_submit($revision_id = 0) {
 	}
 
 	if (empty($approval_error)) {
-		do_action( 'revision_submitted', $post->ID, $revision->ID );
+		$published_id = rvy_post_id($revision_id);
+		do_action( 'revision_submitted', $published_id, $revision_id );
 	}
 
 	if (!$batch_process) {
