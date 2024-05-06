@@ -86,7 +86,7 @@ if (rvy_get_option('revision_archive_deletion')) {
 	<?php $wp_list_table->views(); ?>
 	<form method="get">
 		<?php
-		$wp_list_table->search_box( 'Search Revisions', 'revision' );
+		$wp_list_table->search_box( __( 'Search Revisions', 'revisionary' ), 'revision' );
 		$wp_list_table->hidden_input();
 		$wp_list_table->display();
 		?>
