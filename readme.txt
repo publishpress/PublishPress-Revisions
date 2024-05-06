@@ -239,9 +239,15 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.5.9 - 30 Apr 2024 =
+= 3.5.9 - 6 May 2024 =
+* Fixed : After new revision creation in post editor, View / Edit links fail with PHP warnings on some installations
+* Fixed : Classic Editor - When editing a published post, future date selection followed by "Schedule Revision" button click failed to schedule revision
+* Fixed : Classic Editor (Revision) - Changing Category, Tag, Featured Image or other Meta box did not disable Approve button
+* Fixed : Classic Editor (Revision) - Changing or removing Featured Image did not disable Submit, Approve button
 * Fixed : Revision Queue: Decline link nonce failure ("link expired")
+* Fixed : PHP Warning on revision submission if published page is the child of a parent that has been trashed
 * Compat : PublishPress Authors - Revisors could not submit revisions correctly if role has ppma_edit_post_authors capability
+* Lang : Various plugin settings captions and one error message were not translated
 
 = 3.5.8.2 - 25 Apr 2024 =
 * Fixed : Nonce failure on revision decline attempts
