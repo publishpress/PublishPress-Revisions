@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the PublishPress Revisions plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: PublishPress Revisions 3.5.8.2\n"
+"Project-Id-Version: PublishPress Revisions 3.5.9-rc4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/project\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-04-25T15:59:38+00:00\n"
+"POT-Creation-Date: 2024-05-06T18:39:50+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: revisionary\n"
@@ -35,20 +35,20 @@ msgid "https://publishpress.com"
 msgstr ""
 
 #: admin/admin-init_rvy.php:105
-#: admin/admin-init_rvy.php:335
+#: admin/admin-init_rvy.php:339
 msgid "Sorry, you are not allowed to delete this revision."
 msgstr ""
 
-#: admin/admin-init_rvy.php:192
-#: admin/admin-init_rvy.php:306
+#: admin/admin-init_rvy.php:196
+#: admin/admin-init_rvy.php:310
 msgid "Sorry, you are not allowed to approve this revision."
 msgstr ""
 
-#: admin/admin-init_rvy.php:233
+#: admin/admin-init_rvy.php:237
 msgid "Sorry, you are not allowed to submit this revision."
 msgstr ""
 
-#: admin/admin-init_rvy.php:271
+#: admin/admin-init_rvy.php:275
 msgid "Sorry, you are not allowed to decline this revision."
 msgstr ""
 
@@ -401,7 +401,7 @@ msgid "Compare %s of \"%s\""
 msgstr ""
 
 #: admin/history_rvy.php:535
-#: admin/options.php:767
+#: admin/options.php:769
 msgid "Post Date"
 msgstr ""
 
@@ -860,133 +860,133 @@ msgstr ""
 msgid "Some themes or plugins may require Revision Slug or Revision ID link type for proper template loading and field display."
 msgstr ""
 
-#: admin/options.php:688
+#: admin/options.php:690
 msgid "The revision preview argument is configured by constant definition: %s"
 msgstr ""
 
-#: admin/options.php:695
+#: admin/options.php:697
 msgid "Adjust preview links to use \"rv_preview\" argument instead of \"preview\". Experiment to see which works best with your theme."
 msgstr ""
 
-#: admin/options.php:704
+#: admin/options.php:706
 msgid "Some themes may require this setting for correct revision preview display."
 msgstr ""
 
-#: admin/options.php:710
+#: admin/options.php:712
 msgid "If disabled, Compare screen links to Revision Preview for approval."
 msgstr ""
 
-#: admin/options.php:738
+#: admin/options.php:740
 msgid "For compatibility with Advanced Custom Fields, Beaver Builder and WPML, upgrade to %sPublishPress Revisions Pro%s."
 msgstr ""
 
-#: admin/options.php:748
+#: admin/options.php:750
 msgid "This may improve compatibility with some plugins."
 msgstr ""
 
-#: admin/options.php:767
+#: admin/options.php:769
 msgid "Modification Date"
 msgstr ""
 
-#: admin/options.php:777
+#: admin/options.php:779
 msgid "Show descriptive captions for PublishPress Revisions settings"
 msgstr ""
 
-#: admin/options.php:791
+#: admin/options.php:793
 msgid "Non-Administrators cannot restore a revision without the restore_revisions capability"
 msgstr ""
 
-#: admin/options.php:813
-#: admin/options.php:834
+#: admin/options.php:815
+#: admin/options.php:836
 msgid "Never"
 msgstr ""
 
-#: admin/options.php:813
-#: admin/options.php:834
+#: admin/options.php:815
+#: admin/options.php:836
 msgid "By default"
 msgstr ""
 
-#: admin/options.php:813
-#: admin/options.php:834
+#: admin/options.php:815
+#: admin/options.php:836
 msgid "Always"
 msgstr ""
 
-#: admin/options.php:823
-#: admin/options.php:869
+#: admin/options.php:825
+#: admin/options.php:871
 msgid "select recipients"
 msgstr ""
 
-#: admin/options.php:883
+#: admin/options.php:885
 msgid "To avoid notification failures, buffer emails for delayed sending once minute, hour or day limits are exceeded"
 msgstr ""
 
-#: admin/options.php:904
+#: admin/options.php:906
 msgid "Notification Buffer"
 msgstr ""
 
-#: admin/options.php:932
+#: admin/options.php:934
 msgid "Notification Log"
 msgstr ""
 
-#: admin/options.php:961
+#: admin/options.php:963
 msgid "Purge Notification Buffer"
 msgstr ""
 
-#: admin/options.php:967
+#: admin/options.php:969
 msgid "Truncate Notification Log"
 msgstr ""
 
-#: admin/options.php:973
+#: admin/options.php:975
 msgid "Sent in last minute: %d / %d"
 msgstr ""
 
-#: admin/options.php:974
+#: admin/options.php:976
 msgid "Sent in last hour: %d / %d"
 msgstr ""
 
-#: admin/options.php:975
+#: admin/options.php:977
 msgid "Sent in last day: %d / %d"
 msgstr ""
 
-#: admin/options.php:982
+#: admin/options.php:984
 msgid "Seconds until next buffer processing time: %d"
 msgstr ""
 
-#: admin/options.php:992
+#: admin/options.php:994
 msgid "Show Notification Log / Buffer"
 msgstr ""
 
-#: admin/options.php:994
+#: admin/options.php:996
 msgid "Show with message content"
 msgstr ""
 
-#: admin/options.php:1005
+#: admin/options.php:1007
 #: includes/CoreAdmin.php:88
 msgid "WPML Translation Management"
 msgstr ""
 
-#: admin/options.php:1012
+#: admin/options.php:1014
 msgid "Sync \"Needs Update\" flags"
 msgstr ""
 
-#: admin/options.php:1016
+#: admin/options.php:1018
 msgid "Set \"Needs Update\" for any post with translations which was updated (possibly by revision approval) more recently than its translations."
 msgstr ""
 
-#: admin/options.php:1054
+#: admin/options.php:1056
 msgid "Specify which PublishPress Revisions Settings to control network-wide. Unselected settings are controlled separately on each site."
 msgstr ""
 
-#: admin/options.php:1064
+#: admin/options.php:1066
 msgctxt "opentag option_tabname closetag (explanatory note)"
 msgid "%1$s%2$s%3$s (%4$s)"
 msgstr ""
 
-#: admin/options.php:1100
+#: admin/options.php:1102
 msgid "network-wide control of \"%s\""
 msgstr ""
 
-#: admin/options.php:1130
+#: admin/options.php:1132
 msgid "All settings in this form (including those on unselected tabs) will be reset to DEFAULTS.  Are you sure?"
 msgstr ""
 
@@ -1095,56 +1095,56 @@ msgstr ""
 msgid "View / moderate saved revision"
 msgstr ""
 
-#: admin/revision-action_rvy.php:421
-#: admin/revision-action_rvy.php:507
+#: admin/revision-action_rvy.php:422
+#: admin/revision-action_rvy.php:508
 msgid "[%s] Revision Approval Notice"
 msgstr ""
 
-#: admin/revision-action_rvy.php:422
+#: admin/revision-action_rvy.php:423
 msgid "A revision to the %1$s \"%2$s\" has been approved."
 msgstr ""
 
-#: admin/revision-action_rvy.php:426
+#: admin/revision-action_rvy.php:427
 msgid "The submitter was %1$s."
 msgstr ""
 
-#: admin/revision-action_rvy.php:430
-#: admin/revision-action_rvy.php:512
+#: admin/revision-action_rvy.php:431
+#: admin/revision-action_rvy.php:513
 msgid "It will be published on %s"
 msgstr ""
 
-#: admin/revision-action_rvy.php:434
-#: admin/revision-action_rvy.php:516
+#: admin/revision-action_rvy.php:435
+#: admin/revision-action_rvy.php:517
 msgid "Preview it here: "
 msgstr ""
 
-#: admin/revision-action_rvy.php:437
-#: admin/revision-action_rvy.php:519
+#: admin/revision-action_rvy.php:438
+#: admin/revision-action_rvy.php:520
 msgid "Editor: "
 msgstr ""
 
-#: admin/revision-action_rvy.php:439
-#: admin/revision-action_rvy.php:521
-#: admin/revision-action_rvy.php:1352
-#: admin/revision-action_rvy.php:1377
-#: admin/revision-action_rvy.php:1439
+#: admin/revision-action_rvy.php:440
+#: admin/revision-action_rvy.php:522
+#: admin/revision-action_rvy.php:1353
+#: admin/revision-action_rvy.php:1378
+#: admin/revision-action_rvy.php:1440
 msgid "View it online: "
 msgstr ""
 
-#: admin/revision-action_rvy.php:508
+#: admin/revision-action_rvy.php:509
 msgid "The revision you submitted for the %1$s \"%2$s\" has been approved."
 msgstr ""
 
-#: admin/revision-action_rvy.php:1348
-#: admin/revision-action_rvy.php:1370
+#: admin/revision-action_rvy.php:1349
+#: admin/revision-action_rvy.php:1371
 msgid "[%s] %s Publication Notice"
 msgstr ""
 
-#: admin/revision-action_rvy.php:1349
+#: admin/revision-action_rvy.php:1350
 msgid "The scheduled revision you submitted for the %1$s \"%2$s\" has been published."
 msgstr ""
 
-#: admin/revision-action_rvy.php:1371
+#: admin/revision-action_rvy.php:1372
 msgid "A scheduled revision to your %1$s \"%2$s\" has been published."
 msgstr ""
 
@@ -1359,6 +1359,10 @@ msgstr ""
 #: front_rvy.php:579
 #: front_rvy.php:581
 msgid "This is a Past Revision (from %s). %s %s"
+msgstr ""
+
+#: includes/CoreAdmin.php:13
+msgid "You're using PublishPress Revisions Free. The Pro version has more features and support. %sUpgrade to Pro%s"
 msgstr ""
 
 #: includes/CoreAdmin.php:73
