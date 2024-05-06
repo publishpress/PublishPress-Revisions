@@ -3,7 +3,7 @@
 *
 * By Kevin Behrens
 *
-* Copyright 2021, PublishPress
+* Copyright 2024, PublishPress
 */
 jQuery(document).ready( function($) {
 	var rvyIsPublished = false;
@@ -123,25 +123,7 @@ jQuery(document).ready( function($) {
 		});
 	}
 
-	$(document).on('click', '#normal-sortables input, #normal-sortables select', function() {
-		$('a.revision-create').attr('disabled', 'disabled');
-		$('a.revision-schedule').attr('disabled', 'disabled');
-	});
-
-	$(document).on('click', 'a.revision-schedule', function() {
-		if ($('a.revision-schedule').attr('disabled')) {
-			return;
-		}
-
-        $('a.revision-schedule').attr('disabled', 'disabled');
-
-        if (wp.autosave.server.postChanged()) {
-            wp.autosave.server.triggerSave();
-            var approvalDelay = 250;
-        } else {
-            var approvalDelay = 1;
-        }
-        
+	function rvySchedulePost() {
         var revisionaryScheduleDone = function () {
 			$('.revision-schedule').hide();
 			$('.revision-scheduled-wrapper').show();
@@ -156,8 +138,6 @@ jQuery(document).ready( function($) {
 			$('div.rvy-creation-ui').html(rvyObjEdit.errorCaption);
 		}
 
-        var tmoSubmit = setInterval(function() {
-            if (!wp.autosave.server.postChanged()) {
                 var data = {'rvy_ajax_field': 'create_scheduled_revision', 'rvy_ajax_value': rvyObjEdit.postID, 'rvy_date_selection': RvyTimeSelection, 'nc': RvyGetRandomInt(99999999)};
 
                 $.ajax({
@@ -167,10 +147,35 @@ jQuery(document).ready( function($) {
                     success: revisionaryScheduleDone,
                     error: revisionaryScheduleError
                 });
+	}
 
-                clearInterval(tmoSubmit);
+	$(document).on('click', '#normal-sortables input, #normal-sortables select', function() {
+		$('a.revision-create').attr('disabled', 'disabled');
+		$('a.revision-schedule').attr('disabled', 'disabled');
+	});
+
+	$(document).on('click', 'a.revision-schedule', function() {
+		if ($('a.revision-schedule').attr('disabled')) {
+			return;
+		}
+
+        $('a.revision-schedule').attr('disabled', 'disabled');
+
+		if (wp.autosave && wp.autosave.server.postChanged()) {
+			var tmoRevisionSchedule = setTimeout(rvySchedulePost, 5000);  // @todo: review
+
+			var intRevisionSchedule = setInterval(function() {
+				if (!wp.autosave.server.postChanged()) {
+					clearTimeout(tmoRevisionSchedule);
+					clearInterval(intRevisionSchedule);
+					rvySchedulePost();
+				}
+			}, 250);
+
+            wp.autosave.server.triggerSave();
+        } else {
+			rvySchedulePost();
             }
-        }, approvalDelay);
 	});
     
     $(document).on('click', '#post-body-content *, #content_ifr *, #wp-content-editor-container *, #tinymce *, #submitpost, span.revision-created', function() {
