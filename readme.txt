@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, duplicate page, revisions, appro
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.5
-Stable tag: 3.5.8.2
+Stable tag: 3.5.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -239,10 +239,16 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.5.8.2 =
+= 3.5.9 - 30 Apr 2024 =
+* Fixed : Revision Queue: Decline link nonce failure ("link expired")
+* Compat : PublishPress Authors - Revisors could not submit revisions correctly if role has ppma_edit_post_authors capability
+
+= 3.5.8.2 - 25 Apr 2024 =
 * Fixed : Nonce failure on revision decline attempts
-* Fixed : Saving with a future date in Classic Editor saves post as Published instead of Scheduled under some conditions
+* Fixed : Saving with a future date in Classic Editor saves post as Published instead of Scheduled, under some conditions
+* Fixed : With Limit to One Revision option enabled, approving a revision caused a fatal error, under some conditions
 * Fixed : Revision Queue - If multiple bulk actions are applied, confirmation notice from previous actions is repeated
+* Compat : Some plugins conflicted with Edit / Preview links for newly created revision
 * Compat : Nested Pages - Fatal error on bulk deletion of revisions
 
 = 3.5.8.1 - 16 Apr 2024 =
