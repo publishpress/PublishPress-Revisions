@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the PublishPress Revisions plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: PublishPress Revisions 3.5.9-rc4\n"
+"Project-Id-Version: PublishPress Revisions 3.5.9\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/project\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-05-06T18:39:50+00:00\n"
+"POT-Creation-Date: 2024-05-06T19:52:01+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: revisionary\n"
@@ -546,12 +546,20 @@ msgstr ""
 msgid "Use alternate labeling: \"Working Copy\" > \"Change Request\" > \"Scheduled Change\""
 msgstr ""
 
+#: admin/options.php:118
+msgid "Additional role capability required to manage %s"
+msgstr ""
+
 #: admin/options.php:119
 msgid "Additional role capability required to create a Working Copy"
 msgstr ""
 
 #: admin/options.php:119
 msgid "Additional role capability required to create a new revision"
+msgstr ""
+
+#: admin/options.php:120
+msgid "Posts / Pages list: Use \"Edit\" caption for %s link"
 msgstr ""
 
 #: admin/options.php:121
@@ -653,6 +661,10 @@ msgstr ""
 msgid "Prevent Revisors from editing other user's drafts"
 msgstr ""
 
+#: admin/options.php:147
+msgid "Display Hints"
+msgstr ""
+
 #: admin/options.php:148
 msgid "Show Preview Links"
 msgstr ""
@@ -679,6 +691,10 @@ msgstr ""
 
 #: admin/options.php:154
 msgid "Copy revision comments to published post"
+msgstr ""
+
+#: admin/options.php:155
+msgid "Compare Past Revisions ordering:"
 msgstr ""
 
 #: admin/options.php:156
@@ -986,6 +1002,14 @@ msgstr ""
 msgid "network-wide control of \"%s\""
 msgstr ""
 
+#: admin/options.php:1129
+msgid "Save Changes"
+msgstr ""
+
+#: admin/options.php:1130
+msgid "Revert to Defaults"
+msgstr ""
+
 #: admin/options.php:1132
 msgid "All settings in this form (including those on unselected tabs) will be reset to DEFAULTS.  Are you sure?"
 msgstr ""
@@ -1150,6 +1174,10 @@ msgstr ""
 
 #: admin/revision-archive_rvy.php:11
 msgid "Revision for:"
+msgstr ""
+
+#: admin/revision-archive_rvy.php:89
+msgid "Search Revisions"
 msgstr ""
 
 #: admin/revision-queue_rvy.php:9
