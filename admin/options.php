@@ -115,9 +115,9 @@ $future_revision_singular = pp_revisions_status_label('future-revision', 'name')
 $this->option_captions = apply_filters('revisionary_option_captions',
 	[
 	'revision_statuses_noun_labels' =>			esc_html__('Use alternate labeling: "Working Copy" > "Change Request" > "Scheduled Change"', 'revisionary'),
-	'manage_unsubmitted_capability' =>			sprintf(esc_html__('Additional role capability required to manage %s'), pp_revisions_status_label('draft-revision', 'plural')),
+	'manage_unsubmitted_capability' =>			sprintf(esc_html__('Additional role capability required to manage %s', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
 	'copy_posts_capability' =>					rvy_get_option('revision_statuses_noun_labels') ? esc_html__("Additional role capability required to create a Working Copy", 'revisionary') : esc_html__("Additional role capability required to create a new revision", 'revisionary'),
-	'caption_copy_as_edit' =>					sprintf(esc_html__('Posts / Pages list: Use "Edit" caption for %s link'), pp_revisions_status_label('draft-revision', 'submit_short')),
+	'caption_copy_as_edit' =>					sprintf(esc_html__('Posts / Pages list: Use "Edit" caption for %s link', 'revisionary'), pp_revisions_status_label('draft-revision', 'submit_short')),
 	'pending_revisions' => 						sprintf(esc_html__('Enable %s', 'revisionary'), $pending_revision_plural),
 	'revision_limit_per_post' =>				esc_html__("Limit to one active revision per post", 'revisionary'),
 	'auto_submit_revisions' =>					esc_html__("Auto-submit revisions created by a user with publishing capability", 'revisionary'),
@@ -144,7 +144,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'use_notification_buffer' => 				esc_html__('Enable notification buffer', 'revisionary'),
 	'revisor_role_add_custom_rolecaps' => 		esc_html__('All custom post types available to Revisors', 'revisionary' ),
 	'require_edit_others_drafts' => 			esc_html__("Prevent Revisors from editing other user's drafts", 'revisionary' ),
-	'display_hints' => 							esc_html__('Display Hints'),
+	'display_hints' => 							esc_html__('Display Hints', 'revisionary'),
 	'revision_preview_links' => 				esc_html__('Show Preview Links', 'revisionary'),
 	'preview_link_type' => 						esc_html__('Preview Link Type', 'revisionary'),
 	'preview_link_alternate_preview_arg' =>		esc_html__('Modify preview link for better theme compatibility', 'revisionary'),
@@ -152,7 +152,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'home_preview_set_home_flag' =>				esc_html__('Theme Compat: For front page revision preview, set home flag', 'revisionary'),
 	'compare_revisions_direct_approval' => 		esc_html__('Approve Button on Compare Revisions screen', 'revisionary'),
 	'copy_revision_comments_to_post' => 		esc_html__('Copy revision comments to published post', 'revisionary'),
-	'past_revisions_order_by' =>				esc_html__('Compare Past Revisions ordering:'), 
+	'past_revisions_order_by' =>				esc_html__('Compare Past Revisions ordering:', 'revisionary'), 
 	'list_unsubmitted_revisions' => 			sprintf(esc_html__('Include %s in My Activity, Revisions to My Posts views', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
 	'rev_publication_delete_ed_comments' =>		esc_html__('On Revision publication, delete Editorial Comments', 'revisionary'),
 	'deletion_queue' => 						esc_html__('Enable deletion queue', 'revisionary'),
@@ -681,6 +681,8 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			</div>
 		<?php endif;
 
+		do_action('revisionary_option_ui_preview_options', $this);
+
 		echo '<br />';
 		
 		if (defined('RVY_PREVIEW_ARG_LOCKED') && defined('RVY_PREVIEW_ARG')) {
@@ -1124,8 +1126,8 @@ echo "<input type='hidden' name='all_options' value='" . esc_attr($this->all_opt
 echo "<input type='hidden' name='rvy_submission_topic' value='options' />";
 ?>
 <p class="submit">
-<input type="submit" name="rvy_submit" class="button button-primary" value="<?php echo esc_attr('Save Changes', 'revisionary');?>" />
-<input type="submit" name="rvy_defaults" class="button button-secondary" value="<?php echo esc_attr('Revert to Defaults', 'revisionary') ?>" onclick="<?php 
+<input type="submit" name="rvy_submit" class="button button-primary" value="<?php echo esc_attr__('Save Changes', 'revisionary');?>" />
+<input type="submit" name="rvy_defaults" class="button button-secondary" value="<?php echo esc_attr__('Revert to Defaults', 'revisionary') ?>" onclick="<?php 
 echo "javascript:if (confirm('" 
 . esc_html__( "All settings in this form (including those on unselected tabs) will be reset to DEFAULTS.  Are you sure?", 'revisionary' ) 
 . "')) {return true;} else {return false;}";
