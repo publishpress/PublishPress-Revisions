@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-05-06T19:52:01+00:00\n"
+"POT-Creation-Date: 2024-05-07T18:20:20+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: revisionary\n"
@@ -181,8 +181,8 @@ msgid "Search results for \"%s\""
 msgstr ""
 
 #: admin/class-list-table-archive.php:385
-#: admin/class-list-table_rvy.php:1050
-#: admin/class-list-table_rvy.php:1317
+#: admin/class-list-table_rvy.php:1058
+#: admin/class-list-table_rvy.php:1325
 #: admin/post-edit-block-ui_rvy.php:94
 #: admin/post-edit_rvy.php:52
 #: admin/RevisionEditSubmitMetabox.php:62
@@ -194,7 +194,7 @@ msgid "Count"
 msgstr ""
 
 #: admin/class-list-table-archive.php:427
-#: admin/class-list-table_rvy.php:548
+#: admin/class-list-table_rvy.php:556
 msgid "Post Type"
 msgstr ""
 
@@ -270,7 +270,7 @@ msgid "Compare Changes in %s"
 msgstr ""
 
 #: admin/class-list-table-archive.php:756
-#: admin/class-list-table_rvy.php:1358
+#: admin/class-list-table_rvy.php:1366
 #: admin/edit-revision-classic-ui_rvy.php:92
 #: admin/post-edit_rvy.php:178
 #: admin/post-edit_rvy.php:192
@@ -280,7 +280,7 @@ msgstr ""
 
 #. translators: %s: post title
 #: admin/class-list-table-archive.php:771
-#: admin/class-list-table_rvy.php:1342
+#: admin/class-list-table_rvy.php:1350
 #: admin/post-editor-workflow-ui_rvy.php:199
 msgid "Preview Revision"
 msgstr ""
@@ -301,69 +301,69 @@ msgstr ""
 msgid "No revisions found."
 msgstr ""
 
-#: admin/class-list-table_rvy.php:547
+#: admin/class-list-table_rvy.php:555
 #: admin/post-editor-workflow-ui_rvy.php:31
 msgid "Status"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:601
-#: admin/class-list-table_rvy.php:1224
+#: admin/class-list-table_rvy.php:609
+#: admin/class-list-table_rvy.php:1232
 msgid "Y/m/d g:i:s a"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:611
-#: admin/class-list-table_rvy.php:1232
+#: admin/class-list-table_rvy.php:619
+#: admin/class-list-table_rvy.php:1240
 msgid "Y/m/d g:i a"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:618
+#: admin/class-list-table_rvy.php:626
 msgid "Scheduled publication: %s"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:621
+#: admin/class-list-table_rvy.php:629
 msgid "Requested publication: %s"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:666
+#: admin/class-list-table_rvy.php:674
 #: admin/history_rvy.php:786
 msgid "No author"
 msgstr ""
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:708
+#: admin/class-list-table_rvy.php:716
 msgid "View only revisions of %s"
 msgstr ""
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:720
 #: admin/class-list-table_rvy.php:728
+#: admin/class-list-table_rvy.php:736
 msgid "View published post"
 msgstr ""
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:752
+#: admin/class-list-table_rvy.php:760
 msgid "Compare Past Revisions"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:753
+#: admin/class-list-table_rvy.php:761
 msgid "History"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:1006
+#: admin/class-list-table_rvy.php:1014
 msgid "My Activity"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:1014
+#: admin/class-list-table_rvy.php:1022
 msgid "All %s"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:1046
+#: admin/class-list-table_rvy.php:1054
 msgid "Unschedule"
 msgstr ""
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:1050
-#: admin/class-list-table_rvy.php:1313
+#: admin/class-list-table_rvy.php:1058
+#: admin/class-list-table_rvy.php:1321
 #: admin/post-edit-block-ui_rvy.php:94
 #: admin/post-edit_rvy.php:52
 #: admin/RevisionEditSubmitMetabox.php:62
@@ -371,11 +371,11 @@ msgid "Discard Revision"
 msgstr ""
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:1357
+#: admin/class-list-table_rvy.php:1365
 msgid "Compare Changes"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:1366
+#: admin/class-list-table_rvy.php:1374
 msgctxt "revisions"
 msgid "Decline"
 msgstr ""
