@@ -182,6 +182,14 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		do_action('revisionary_queue_pre_query');
 		add_filter($filter_name, [$this, 'pre_query_filter'], 5, 2);
 		add_filter($filter_name, [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
+
+		add_filter('presspermit_posts_where_extra_exception_ops', 
+			function($exception_ops, $args) {
+				$exception_ops []= 'revise';
+				return $exception_ops;
+			}, 10, 2
+		);
+
 		$pre_query = new WP_Query( $qp );
 
 		// workaround for unidentified plugin conflict inserting inappropriate clauses into our query

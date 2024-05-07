@@ -10,7 +10,7 @@ class CoreAdmin {
 
         add_filter(\PPVersionNotices\Module\TopNotice\Module::SETTINGS_FILTER, function ($settings) {
             $settings['revisionary'] = [
-                'message' => 'You\'re using PublishPress Revisions Free. The Pro version has more features and support. %sUpgrade to Pro%s',
+                'message' => esc_html__("You're using PublishPress Revisions Free. The Pro version has more features and support. %sUpgrade to Pro%s", 'revisionary'),
                 'link'    => 'https://publishpress.com/links/revisions-banner',
                 'screens' => [
                     ['base' => 'toplevel_page_revisionary-q'],

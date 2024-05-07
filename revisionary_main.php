@@ -137,11 +137,11 @@ class Revisionary
 
 		// This is needed, implemented for pending revisions only
 		if (!empty($_REQUEST['get_new_revision'])) {
-			add_action('admin_enqueue_scripts', array($this, 'act_new_revision_redirect'));
+			add_action('wp_default_scripts', array($this, 'act_new_revision_redirect'), 1);
 		}
 
 		if (!empty($_REQUEST['edit_new_revision'])) {
-			add_action('admin_enqueue_scripts', array($this, 'act_edit_revision_redirect'));
+			add_action('wp_default_scripts', array($this, 'act_edit_revision_redirect'), 1);
 		}
 
 		add_filter('get_comments_number', array($this, 'flt_get_comments_number'), 10, 2);
@@ -160,7 +160,7 @@ class Revisionary
 
 		add_filter('wp_dropdown_pages', [$this, 'fltDropdownPages'], 10, 3);
 
-		if (defined('REVISIONARY_RVY_INIT_ACTION')) {
+		if (!defined('REVISIONARY_DISABLE_RVY_INIT_ACTION')) {
 			do_action( 'rvy_init', $this );
 		}
 	}

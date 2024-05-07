@@ -681,6 +681,8 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			</div>
 		<?php endif;
 
+		do_action('revisionary_option_ui_preview_options', $this);
+
 		echo '<br />';
 		
 		if (defined('RVY_PREVIEW_ARG_LOCKED') && defined('RVY_PREVIEW_ARG')) {
