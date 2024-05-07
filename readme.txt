@@ -247,6 +247,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 * Fixed : Revision Queue: Decline link nonce failure ("link expired")
 * Fixed : PHP Warning on revision submission if published page is the child of a parent that has been trashed
 * Compat : PublishPress Authors - Revisors could not submit revisions correctly if role has ppma_edit_post_authors capability
+* Compat : PublishPress Permissions - API to apply Specific Permissions to Revision Queue listing
 * Lang : Various plugin settings captions and one error message were not translated
 
 = 3.5.8.2 - 25 Apr 2024 =
