@@ -1225,7 +1225,7 @@ function rvy_init() {
 	if ( is_admin() ) {
 		require_once(dirname(__FILE__).'/admin/admin-init_rvy.php');
 
-		if (defined('REVISIONARY_BULK_ACTION_EARLY_EXECUTION') || !isset($_REQUEST['action2'])) {
+		if (defined('REVISIONARY_BULK_ACTION_EARLY_EXECUTION') || (!isset($_REQUEST['action2']) && (empty($_REQUEST['action']) || ('decline_revision' != $_REQUEST['action'])))) {
 			rvy_admin_init();
 		} else {
 			// bulk approval fails on some sites due to post types not registered early enough
