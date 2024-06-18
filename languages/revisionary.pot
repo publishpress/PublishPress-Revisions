@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the PublishPress Revisions plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: PublishPress Revisions 3.5.9\n"
+"Project-Id-Version: PublishPress Revisions 3.5.10\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/project\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-05-07T18:20:20+00:00\n"
+"POT-Creation-Date: 2024-06-18T17:27:24+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: revisionary\n"
@@ -34,21 +34,21 @@ msgstr ""
 msgid "https://publishpress.com"
 msgstr ""
 
-#: admin/admin-init_rvy.php:105
-#: admin/admin-init_rvy.php:339
+#: admin/admin-init_rvy.php:112
+#: admin/admin-init_rvy.php:346
 msgid "Sorry, you are not allowed to delete this revision."
 msgstr ""
 
-#: admin/admin-init_rvy.php:196
-#: admin/admin-init_rvy.php:310
+#: admin/admin-init_rvy.php:203
+#: admin/admin-init_rvy.php:317
 msgid "Sorry, you are not allowed to approve this revision."
 msgstr ""
 
-#: admin/admin-init_rvy.php:237
+#: admin/admin-init_rvy.php:244
 msgid "Sorry, you are not allowed to submit this revision."
 msgstr ""
 
-#: admin/admin-init_rvy.php:275
+#: admin/admin-init_rvy.php:282
 msgid "Sorry, you are not allowed to decline this revision."
 msgstr ""
 
@@ -181,8 +181,8 @@ msgid "Search results for \"%s\""
 msgstr ""
 
 #: admin/class-list-table-archive.php:385
-#: admin/class-list-table_rvy.php:1058
-#: admin/class-list-table_rvy.php:1325
+#: admin/class-list-table_rvy.php:1064
+#: admin/class-list-table_rvy.php:1331
 #: admin/post-edit-block-ui_rvy.php:94
 #: admin/post-edit_rvy.php:52
 #: admin/RevisionEditSubmitMetabox.php:62
@@ -270,7 +270,7 @@ msgid "Compare Changes in %s"
 msgstr ""
 
 #: admin/class-list-table-archive.php:756
-#: admin/class-list-table_rvy.php:1366
+#: admin/class-list-table_rvy.php:1372
 #: admin/edit-revision-classic-ui_rvy.php:92
 #: admin/post-edit_rvy.php:178
 #: admin/post-edit_rvy.php:192
@@ -280,7 +280,7 @@ msgstr ""
 
 #. translators: %s: post title
 #: admin/class-list-table-archive.php:771
-#: admin/class-list-table_rvy.php:1350
+#: admin/class-list-table_rvy.php:1356
 #: admin/post-editor-workflow-ui_rvy.php:199
 msgid "Preview Revision"
 msgstr ""
@@ -307,12 +307,12 @@ msgid "Status"
 msgstr ""
 
 #: admin/class-list-table_rvy.php:609
-#: admin/class-list-table_rvy.php:1232
+#: admin/class-list-table_rvy.php:1238
 msgid "Y/m/d g:i:s a"
 msgstr ""
 
 #: admin/class-list-table_rvy.php:619
-#: admin/class-list-table_rvy.php:1240
+#: admin/class-list-table_rvy.php:1246
 msgid "Y/m/d g:i a"
 msgstr ""
 
@@ -330,40 +330,40 @@ msgid "No author"
 msgstr ""
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:716
+#: admin/class-list-table_rvy.php:722
 msgid "View only revisions of %s"
 msgstr ""
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:728
-#: admin/class-list-table_rvy.php:736
+#: admin/class-list-table_rvy.php:734
+#: admin/class-list-table_rvy.php:742
 msgid "View published post"
 msgstr ""
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:760
+#: admin/class-list-table_rvy.php:766
 msgid "Compare Past Revisions"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:761
+#: admin/class-list-table_rvy.php:767
 msgid "History"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:1014
+#: admin/class-list-table_rvy.php:1020
 msgid "My Activity"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:1022
+#: admin/class-list-table_rvy.php:1028
 msgid "All %s"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:1054
+#: admin/class-list-table_rvy.php:1060
 msgid "Unschedule"
 msgstr ""
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:1058
-#: admin/class-list-table_rvy.php:1321
+#: admin/class-list-table_rvy.php:1064
+#: admin/class-list-table_rvy.php:1327
 #: admin/post-edit-block-ui_rvy.php:94
 #: admin/post-edit_rvy.php:52
 #: admin/RevisionEditSubmitMetabox.php:62
@@ -371,11 +371,11 @@ msgid "Discard Revision"
 msgstr ""
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:1365
+#: admin/class-list-table_rvy.php:1371
 msgid "Compare Changes"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:1374
+#: admin/class-list-table_rvy.php:1380
 msgctxt "revisions"
 msgid "Decline"
 msgstr ""
@@ -467,8 +467,8 @@ msgid "j M @ H:i"
 msgstr ""
 
 #: admin/history_rvy.php:1072
-#: front_rvy.php:479
-#: front_rvy.php:504
+#: front_rvy.php:525
+#: front_rvy.php:550
 #: rvy_init-functions.php:260
 #: rvy_init-functions.php:278
 #: rvy_init-functions.php:317
@@ -1014,7 +1014,7 @@ msgstr ""
 msgid "All settings in this form (including those on unselected tabs) will be reset to DEFAULTS.  Are you sure?"
 msgstr ""
 
-#: admin/post-edit-block-ui_rvy.php:149
+#: admin/post-edit-block-ui_rvy.php:157
 #: admin/post-edit_rvy.php:263
 msgid "Author"
 msgstr ""
@@ -1066,7 +1066,7 @@ msgstr ""
 
 #: admin/post-editor-workflow-ui_rvy.php:108
 #: admin/post-editor-workflow-ui_rvy.php:200
-#: front_rvy.php:437
+#: front_rvy.php:483
 msgid "Edit"
 msgstr ""
 
@@ -1149,9 +1149,9 @@ msgstr ""
 
 #: admin/revision-action_rvy.php:440
 #: admin/revision-action_rvy.php:522
-#: admin/revision-action_rvy.php:1353
-#: admin/revision-action_rvy.php:1378
-#: admin/revision-action_rvy.php:1440
+#: admin/revision-action_rvy.php:1357
+#: admin/revision-action_rvy.php:1382
+#: admin/revision-action_rvy.php:1444
 msgid "View it online: "
 msgstr ""
 
@@ -1159,16 +1159,16 @@ msgstr ""
 msgid "The revision you submitted for the %1$s \"%2$s\" has been approved."
 msgstr ""
 
-#: admin/revision-action_rvy.php:1349
-#: admin/revision-action_rvy.php:1371
+#: admin/revision-action_rvy.php:1353
+#: admin/revision-action_rvy.php:1375
 msgid "[%s] %s Publication Notice"
 msgstr ""
 
-#: admin/revision-action_rvy.php:1350
+#: admin/revision-action_rvy.php:1354
 msgid "The scheduled revision you submitted for the %1$s \"%2$s\" has been published."
 msgstr ""
 
-#: admin/revision-action_rvy.php:1372
+#: admin/revision-action_rvy.php:1376
 msgid "A scheduled revision to your %1$s \"%2$s\" has been published."
 msgstr ""
 
@@ -1188,57 +1188,57 @@ msgstr ""
 msgid "%s and %s are both disabled. See Revisions > Settings."
 msgstr ""
 
-#: admin/revision-queue_rvy.php:46
+#: admin/revision-queue_rvy.php:49
 msgid "%s revision submitted."
 msgid_plural "%s revisions submitted."
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/revision-queue_rvy.php:47
+#: admin/revision-queue_rvy.php:50
 msgid "%s revision declined."
 msgid_plural "%s revisions declined."
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/revision-queue_rvy.php:48
+#: admin/revision-queue_rvy.php:51
 msgid "%s revision approved."
 msgid_plural "%s revisions approved."
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/revision-queue_rvy.php:49
+#: admin/revision-queue_rvy.php:52
 msgid "%s revision unscheduled."
 msgid_plural "%s revisions unscheduled."
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/revision-queue_rvy.php:50
+#: admin/revision-queue_rvy.php:53
 msgid "%s revision published."
 msgid_plural "%s revisions published."
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/revision-queue_rvy.php:93
+#: admin/revision-queue_rvy.php:96
 msgctxt "Author Name"
 msgid "%s: "
 msgstr ""
 
-#: admin/revision-queue_rvy.php:106
+#: admin/revision-queue_rvy.php:109
 msgctxt "Posts / Pages / etc."
 msgid "of %s"
 msgstr ""
 
-#: admin/revision-queue_rvy.php:113
-#: admin/revision-queue_rvy.php:114
+#: admin/revision-queue_rvy.php:116
+#: admin/revision-queue_rvy.php:117
 msgid "%sPost Author: %s"
 msgstr ""
 
-#: admin/revision-queue_rvy.php:121
+#: admin/revision-queue_rvy.php:124
 msgctxt "PublishedPostName (other filter captions)"
 msgid "Revision Queue for \"%s\"%s"
 msgstr ""
 
-#: admin/revision-queue_rvy.php:123
+#: admin/revision-queue_rvy.php:126
 msgid "Revision Queue %s"
 msgstr ""
 
@@ -1330,62 +1330,62 @@ msgstr ""
 msgid "no %s revisions available."
 msgstr ""
 
-#: front_rvy.php:403
+#: front_rvy.php:449
 msgid "%sView Queue%s"
 msgstr ""
 
-#: front_rvy.php:412
+#: front_rvy.php:458
 msgid "%sCompare%s%sView Published Post%s"
 msgstr ""
 
-#: front_rvy.php:426
+#: front_rvy.php:472
 msgid "%sView Published Post%s"
 msgstr ""
 
-#: front_rvy.php:482
+#: front_rvy.php:528
 #: rvy_init-functions.php:274
 #: rvy_init-functions.php:330
 msgid "Submit"
 msgstr ""
 
-#: front_rvy.php:489
-#: front_rvy.php:525
-#: front_rvy.php:541
+#: front_rvy.php:535
+#: front_rvy.php:571
+#: front_rvy.php:587
 msgid "Publish now"
 msgstr ""
 
-#: front_rvy.php:494
-#: front_rvy.php:496
-#: front_rvy.php:529
-#: front_rvy.php:531
+#: front_rvy.php:540
+#: front_rvy.php:542
+#: front_rvy.php:575
+#: front_rvy.php:577
 msgid "This is a %s. %s %s %s"
 msgstr ""
 
-#: front_rvy.php:508
+#: front_rvy.php:554
 msgid "Decline"
 msgstr ""
 
-#: front_rvy.php:518
-#: front_rvy.php:520
+#: front_rvy.php:564
+#: front_rvy.php:566
 msgid "This is a %s (requested publish date: %s). %s %s %s"
 msgstr ""
 
-#: front_rvy.php:544
-#: front_rvy.php:546
+#: front_rvy.php:590
+#: front_rvy.php:592
 msgid "This is a %s (for publication on %s). %s %s %s"
 msgstr ""
 
-#: front_rvy.php:561
-#: front_rvy.php:563
+#: front_rvy.php:607
+#: front_rvy.php:609
 msgid "This is the Current Revision. %s"
 msgstr ""
 
-#: front_rvy.php:575
+#: front_rvy.php:621
 msgid "Restore"
 msgstr ""
 
-#: front_rvy.php:579
-#: front_rvy.php:581
+#: front_rvy.php:625
+#: front_rvy.php:627
 msgid "This is a Past Revision (from %s). %s %s"
 msgstr ""
 
