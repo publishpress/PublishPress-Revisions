@@ -240,9 +240,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 == Changelog ==
 
 = 3.5.10 - 18 Jun 2024 =
-* Fixed : Plugin setting for unfiltered preview links caused fatal error on revision creation on some sites
 * Fixed : With plugin option to limit to one revision per post, revision submission could be inappropriately blocked under some conditions
-* Fixed : Plugin setting to use unfiltered preview links could cause access errors under some configurations
 * Fixed : Edit Revision screen - Delete Revision button functions incorrectly after toggling from Block panel back to publishing panel
 * Fixed : Non-Administrators could not decline revisions
 * Fixed : Block / Classic Editor usage was not correctly detected under some conditions
