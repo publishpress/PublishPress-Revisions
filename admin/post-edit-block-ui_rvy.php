@@ -151,14 +151,16 @@ class RVY_PostBlockEditUI {
         /* <![CDATA[ */
 		jQuery(document).ready( function($) {
             $(document).on('loaded-ui', 'div.rvy-submission-div', function() {
-                $('div.rvy-submission-div').append(
-                    "<br /><div class='rvy-author-selection'>"
-                    + '<label>' + '<?php _e("Author", 'revisionary');?>&nbsp;</label>'
-                    + '</div>'
-                    + "<br /><div class='rvy-author-selection'>"
-                    + "<?php echo $select_html;?>"
-                    + '</div>'
-                );
+                if (!$('div.rvy-author-selection').length) {
+                    $('div.rvy-submission-div').append(
+                        "<br /><div class='rvy-author-selection'>"
+                        + '<label>' + '<?php _e("Author", 'revisionary');?>&nbsp;</label>'
+                        + '</div>'
+                        + "<br /><div class='rvy-author-selection'>"
+                        + "<?php echo $select_html;?>"
+                        + '</div>'
+                    );
+                }
             });
 
             $(document).on('change', 'div.rvy-author-selection select', function(e) {
