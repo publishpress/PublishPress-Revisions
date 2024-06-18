@@ -108,6 +108,13 @@ class RVY_PostBlockEditUI {
             $args = \PublishPress\Revisions\PostEditorWorkflowUI::postLinkParams(compact('post', 'do_pending_revisions', 'do_scheduled_revisions'));
         }
 
+        $wp_timezone = wp_timezone();
+        $utc_timezone = new DateTimeZone('UTC');
+        $wp_time = new DateTime("now", $wp_timezone);
+        $utc_time = new DateTime("now", new DateTimeZone('UTC'));
+
+        $args['timezoneOffset'] = 0 - $wp_timezone->getOffset($utc_time);
+
         wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
     }
 
