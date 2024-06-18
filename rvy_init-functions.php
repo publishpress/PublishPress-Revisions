@@ -698,7 +698,7 @@ function revisionary_refresh_postmeta($post_id, $args = []) {
 	$has_revisions = $wpdb->get_var(
 		// account for post deletion
 		$wpdb->prepare(
-			"SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ('$revision_status_csv') $ignore_clause AND comment_count = %d LIMIT 1",
+			"SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ('$revision_status_csv') $ignore_clause AND post_status != 'trash' AND comment_count = %d LIMIT 1",
 			$post_id
 		)
 	);
