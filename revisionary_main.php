@@ -137,7 +137,11 @@ class Revisionary
 
 		// This is needed, implemented for pending revisions only
 		if (!empty($_REQUEST['get_new_revision'])) {
-			add_action('wp_default_scripts', array($this, 'act_new_revision_redirect'), 1);
+			if (did_action('wp_default_scripts')) {
+				$this->act_new_revision_redirect();
+			} else {
+				add_action('wp_default_scripts', array($this, 'act_new_revision_redirect'), 1);
+			}
 		}
 
 		if (!empty($_REQUEST['edit_new_revision'])) {
