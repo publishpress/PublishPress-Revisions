@@ -263,13 +263,18 @@ jQuery(document).ready( function($) {
 		var selectedDateHTML = $('button.edit-post-post-schedule__toggle').html();
 
 		if (! /\d/.test(selectedDateHTML) || !rvyIsPublished) {
-			RvyTimeSelection = '';
-			$('.rvy-creation-ui .revision-schedule').hide();
-			$('.rvy-creation-ui .revision-scheduled').hide();
-			$('.rvy-creation-ui .revision-creating').hide();
-			$('.rvy-creation-ui .revision-created').hide();
-			$('.rvy-creation-ui .revision-create').show();
-			return;
+
+			selectedDateHTML = $('button.editor-post-schedule__dialog-toggle').html();
+
+			if (! /\d/.test(selectedDateHTML) || !rvyIsPublished) {
+				RvyTimeSelection = '';
+				$('.rvy-creation-ui .revision-schedule').hide();
+				$('.rvy-creation-ui .revision-scheduled').hide();
+				$('.rvy-creation-ui .revision-creating').hide();
+				$('.rvy-creation-ui .revision-created').hide();
+				$('.rvy-creation-ui .revision-create').show();
+				return;
+			}
 		}
 
 		selectedDateHTML = wp.data.select('core/editor').getEditedPostAttribute('date');
@@ -317,6 +322,20 @@ jQuery(document).ready( function($) {
 
 			var RvyDetectPublishOptionsClosure = function() {
 				if ( ! $('div.edit-post-post-schedule__dialog').length ) {
+					clearInterval(RvyDetectPublishOptionsDivClosureInterval);
+					RvyDetectPublishOptionsDivInterval = setInterval(RvyDetectPublishOptionsDiv, 500);
+
+					RvyRefreshScheduleButton();
+				}
+			}
+			RvyDetectPublishOptionsDivClosureInterval = setInterval(RvyDetectPublishOptionsClosure, 200);
+		}
+
+		if ( $('div.editor-post-schedule__dialog').length ) {
+			clearInterval( RvyDetectPublishOptionsDivInterval );
+
+			var RvyDetectPublishOptionsClosure = function() {
+				if ( ! $('div.editor-post-schedule__dialog').length ) {
 					clearInterval(RvyDetectPublishOptionsDivClosureInterval);
 					RvyDetectPublishOptionsDivInterval = setInterval(RvyDetectPublishOptionsDiv, 500);
 
