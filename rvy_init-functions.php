@@ -686,7 +686,6 @@ function revisionary_refresh_postmeta($post_id, $args = []) {
 	global $wpdb;
 
 	$ignore_revisions = (!empty($args['ignore_revisions'])) ? $args['ignore_revisions'] : [];
-
 	$ignore_clause = ($ignore_revisions) ? " AND ID NOT IN (" . implode(",", array_map('intval', $ignore_revisions)) . ")" : '';
 
 	if (defined('REVISIONARY_LIMIT_IGNORE_UNSUBMITTED')) {
@@ -1069,7 +1068,9 @@ function rvy_mail( $address, $title, $message, $args ) {
 	 * 	 - If sending, add current timestamp to wp_option array revisionary_sent_mail
 	 */
 	
-	$send = apply_filters('revisionary_mail', compact('address', 'title', 'message'), $args);
+	$headers = '';
+
+	$send = apply_filters('revisionary_mail', compact('address', 'title', 'message', 'headers'), $args);
 
 	if (empty($send['address'])) {
 		return;
@@ -1092,9 +1093,9 @@ function rvy_mail( $address, $title, $message, $args ) {
 	}
 
 	if ( defined( 'RS_DEBUG' ) )
-		$success = wp_mail( $new_msg['address'], $new_msg['title'], $new_msg['message'] );
+		$success = wp_mail( $new_msg['address'], $new_msg['title'], $new_msg['message'], $new_msg['headers'] );
 	else
-		$success = @wp_mail( $new_msg['address'], $new_msg['title'], $new_msg['message'] );
+		$success = @wp_mail( $new_msg['address'], $new_msg['title'], $new_msg['message'], $new_msg['headers'] );
 
 	if ($success || !defined('REVISIONARY_MAIL_RETRY')) {
 		if (!defined('REVISIONARY_DISABLE_MAIL_LOG')) {
