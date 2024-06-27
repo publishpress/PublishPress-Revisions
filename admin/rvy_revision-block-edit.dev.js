@@ -140,7 +140,7 @@ jQuery(document).ready(function ($) {
 	var RvyHideInterval = setInterval(RvyHideElements, 50);
 	
     var RvySubmissionUI = function () {
-        if (!$('div.editor-post-status:visible').length) {
+        if (!$('div.editor-post-schedule__panel-dropdown:visible').length) {
             $('.rvy-creation-ui').remove();
         }
 
