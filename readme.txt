@@ -239,7 +239,25 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.5.9 - 6 May 2024 =
+= 3.5.11 - 26 Jun 2024 =
+* Compat : PublishPress Permissions - Revision Queue listed some editable posts without edit link
+* API : Filter revisionary_mail supports headers customization
+
+= 3.5.10 - 18 Jun 2024 =
+* Fixed : With plugin option to limit to one revision per post, revision submission could be inappropriately blocked under some conditions
+* Fixed : Edit Revision screen - Delete Revision button functions incorrectly after toggling from Block panel back to publishing panel
+* Fixed : Non-Administrators could not decline revisions
+* Fixed : Block / Classic Editor usage was not correctly detected under some conditions
+* Fixed : Post Editor - "Schedule Revision" button captioning following date selection did not account for time zone difference between site and editing user
+* Fixed : Post Editor - "Schedule Revision" button captioning following date selection was not applied with recent Gutenberg versions
+* Compat : Gutenberg 18.5 - Revision UI was not correctly displayed for revision edit
+* Compat : Disable Gutenberg - Classic Editor mode was not detected under some configurations
+* Compat : WooCommerce - After revision creation in post editor, preview button redirected to dashboard
+* Compat : WP Rocket - Clean post cache on revision publication
+* API : New action hook to support custom columns in Revision Queue table
+* Lang : Removed obsolete German translation, which caused errors on some pages
+
+= 3.5.9 - 7 May 2024 =
 * Fixed : After new revision creation in post editor, View / Edit links fail with PHP warnings on some installations
 * Fixed : Classic Editor - When editing a published post, future date selection followed by "Schedule Revision" button click failed to schedule revision
 * Fixed : Classic Editor (Revision) - Changing Category, Tag, Featured Image or other Meta box did not disable Approve button
