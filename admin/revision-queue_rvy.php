@@ -20,7 +20,10 @@ if (!rvy_get_option('pending_revisions') && !rvy_get_option('scheduled_revisions
 set_current_screen( 'revisionary-q' );
 
 require_once( dirname(__FILE__).'/class-list-table_rvy.php');
-$wp_list_table = new Revisionary_List_Table(['screen' => 'revisionary-q', 'post_types' => $post_types]);
+
+$list_table_class = apply_filters('revisionary_list_table_class', 'Revisionary_List_Table');
+
+$wp_list_table = new $list_table_class(['screen' => 'revisionary-q', 'post_types' => $post_types]);
 $pagenum = $wp_list_table->get_pagenum();
 
 $parent_file = 'admin.php?page=revisionary-q';

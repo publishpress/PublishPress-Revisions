@@ -108,6 +108,13 @@ class RVY_PostBlockEditUI {
             $args = \PublishPress\Revisions\PostEditorWorkflowUI::postLinkParams(compact('post', 'do_pending_revisions', 'do_scheduled_revisions'));
         }
 
+        $wp_timezone = wp_timezone();
+        $utc_timezone = new DateTimeZone('UTC');
+        $wp_time = new DateTime("now", $wp_timezone);
+        $utc_time = new DateTime("now", new DateTimeZone('UTC'));
+
+        $args['timezoneOffset'] = 0 - $wp_timezone->getOffset($utc_time);
+
         wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
     }
 
@@ -144,14 +151,16 @@ class RVY_PostBlockEditUI {
         /* <![CDATA[ */
 		jQuery(document).ready( function($) {
             $(document).on('loaded-ui', 'div.rvy-submission-div', function() {
-                $('div.rvy-submission-div').append(
-                    "<br /><div class='rvy-author-selection'>"
-                    + '<label>' + '<?php _e("Author", 'revisionary');?>&nbsp;</label>'
-                    + '</div>'
-                    + "<br /><div class='rvy-author-selection'>"
-                    + "<?php echo $select_html;?>"
-                    + '</div>'
-                );
+                if (!$('div.rvy-author-selection').length) {
+                    $('div.rvy-submission-div').append(
+                        "<br /><div class='rvy-author-selection'>"
+                        + '<label>' + '<?php _e("Author", 'revisionary');?>&nbsp;</label>'
+                        + '</div>'
+                        + "<br /><div class='rvy-author-selection'>"
+                        + "<?php echo $select_html;?>"
+                        + '</div>'
+                    );
+                }
             });
 
             $(document).on('change', 'div.rvy-author-selection select', function(e) {

@@ -140,6 +140,14 @@ jQuery(document).ready(function ($) {
 	var RvyHideInterval = setInterval(RvyHideElements, 50);
 	
     var RvySubmissionUI = function () {
+        if (!$('div.editor-post-schedule__panel-dropdown:visible').length) {
+            $('.rvy-creation-ui').remove();
+        }
+
+        if ($('.rvy-creation-ui').length) {
+            return;
+        }
+
         $('button.edit-post-post-visibility__toggle, div.editor-post-url__panel-dropdown, div.components-checkbox-control').closest("div.editor-post-panel__row").hide();
 
         if ($('div.edit-post-sidebar div.edit-post-post-status div.editor-post-panel__row:last').length) {
@@ -151,7 +159,12 @@ jQuery(document).ready(function ($) {
 	            var refSelector = 'div.edit-post-post-visibility';
 	
 	            if (!$(refSelector).length) {
-	                refSelector = 'div.edit-post-post-status h2';
+                    // Gutenberg 18.5
+                    if ($('div.editor-post-panel__section').length) {
+                        refSelector = 'div.editor-post-panel__section';
+                    } else {
+	                    refSelector = 'div.edit-post-post-status h2';
+                    }
 	            }
 	        }
         }
@@ -166,27 +179,49 @@ jQuery(document).ready(function ($) {
                 var labelClose = '</span>';
                 var statusWrapperClass = '';
             }
-            
-            var rvyUI = '<div class="components-panel__row rvy-creation-ui edit-post-revision-status">'
-            + labelOpen + rvyObjEdit.statusLabel + labelClose;
 
-            if (statusWrapperClass) {
-                rvyUI += '<div class="' + statusWrapperClass + '">';
-            }
+            if (refSelector == 'div.editor-post-panel__section') {
+                var rvyUI = '';
 
-            rvyUI += '<div class="components-dropdown rvy-current-status">'
-            + rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']
-            + '</div>';
+                if (statusWrapperClass) {
+                    statusWrapperClass += ' gutenberg-18-5';
 
-            if (statusWrapperClass) {
+                    rvyUI += '<div class="' + statusWrapperClass + '">';
+                }
+
+                rvyUI += '<div class="components-dropdown rvy-current-status">'
+                + rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']
+                + '</div>';
+
+                if (statusWrapperClass) {
+                    rvyUI += '</div>';
+                }
+
+                $('div.editor-post-panel__row-control div.editor-post-status').html(
+                    rvyUI
+                );
+            } else {
+                var rvyUI = '<div class="components-panel__row rvy-creation-ui edit-post-revision-status">'
+                + labelOpen + rvyObjEdit.statusLabel + labelClose;
+
+                if (statusWrapperClass) {
+                    rvyUI += '<div class="' + statusWrapperClass + '">';
+                }
+
+                rvyUI += '<div class="components-dropdown rvy-current-status">'
+                + rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']
+                + '</div>';
+
+                if (statusWrapperClass) {
+                    rvyUI += '</div>';
+                }
+
                 rvyUI += '</div>';
+
+                $(refSelector).before(
+                    rvyUI
+                );
             }
-
-            rvyUI += '</div>';
-
-            $(refSelector).before(
-				rvyUI
-			);
 			
             if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL']) {
                 var url = rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL'];
@@ -219,8 +254,14 @@ jQuery(document).ready(function ($) {
                     rvyPreviewLink = '<br /><a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL'] + '" class="revision-approve revision-preview components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
                         + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a>';
 				}
+
+                if (refSelector == 'div.editor-post-panel__section') {
+                    divClass = ' gutenberg-18-5';
+                } else {
+                    divClass = '';
+                }
 				
-                $(refSelector).after('<div class="rvy-creation-ui rvy-submission-div"><a href="' + url + '" class="revision-approve">'
+                $(refSelector).after('<div class="rvy-creation-ui rvy-submission-div' + divClass + '"><a href="' + url + '" class="revision-approve">'
                     + '<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button">'
                     + '<span class="dashicons ' + mainDashicon + '"></span>'
                     + rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</button></a>'
@@ -242,10 +283,6 @@ jQuery(document).ready(function ($) {
             }
 
 			$('.edit-post-post-schedule__toggle').after('<button class="components-button is-tertiary post-schedule-footnote" disabled>' + rvyObjEdit.onApprovalCaption + '</button>');
-			
-            if (rvyObjEdit[rvyObjEdit.currentStatus + 'DeletionURL']) {
-                $('button.editor-post-trash').wrap('<a href="' + rvyObjEdit[rvyObjEdit.currentStatus + 'DeletionURL'] + '" style="text-decoration:none"></a>');
-            }
         }
 
         refSelector = null;

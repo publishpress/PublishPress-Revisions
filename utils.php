@@ -45,15 +45,60 @@ class Utils {
 	 *
 	 * @return bool
 	 */
-	public static function isBlockEditorActive($postType = false) {
-		global $wp_version;
+	public static function isBlockEditorActive($post_type = '', $args = []) {
+		global $current_user, $wp_version;
 
-		// Check if PP Custom Post Statuses lower than v2.4 is installed. It disables Gutenberg.
-		if ( defined('PPS_VERSION') && version_compare(PPS_VERSION, '2.4-beta', '<') ) {
+        $defaults = ['force' => false, 'suppress_filter' => false, 'force_refresh' => false];
+        $args = array_merge($defaults, $args);
+        $suppress_filter = $args['suppress_filter'];
+
+        if (isset($args['force'])) {
+            if ('classic' === $args['force']) {
+                return false;
+            }
+
+            if ('gutenberg' === $args['force']) {
+                return true;
+            }
+        }
+
+        // If the editor is being accessed in this request, we have an easy and reliable test
+        if ((did_action('load-post.php') || did_action('load-post-new.php')) && did_action('admin_enqueue_scripts')) {
+            if (did_action('enqueue_block_editor_assets')) {
+                return true;
+            }
+
+			$is_gutenberg_edit = true;
+        }
+
+        // For other requests (or if the decision needs to be made prior to admin_enqueue_scripts action), proceed with other logic...
+
+        static $buffer;
+        if (!isset($buffer)) {
+            $buffer = [];
+        }
+
+        if (!$post_type) {
+            if (!$post_type = rvy_detect_post_type()) {
+                $post_type = 'page';
+            }
+        }
+
+        if ($post_type_obj = get_post_type_object($post_type)) {
+            if (!$post_type_obj->show_in_rest) {
+                return false;
+            }
+        }
+
+		if (empty($is_gutenberg_edit) && class_exists('acf_pro') && empty($post_type_obj->_builtin) && !post_type_supports($post_type, 'editor') && !defined('REVISIONARY_STANDARD_CLASSIC_EDITOR_DETECTION')) {
 			return false;
 		}
 
-		if (class_exists('Classic_Editor')) {
+        if (isset($buffer[$post_type]) && empty($args['force_refresh']) && !$suppress_filter) {
+            return $buffer[$post_type];
+        }
+
+        if (class_exists('Classic_Editor')) {
 			if (isset($_REQUEST['classic-editor__forget']) && (isset($_REQUEST['classic']) || isset($_REQUEST['classic-editor']))) {
 				return false;
 			} elseif (isset($_REQUEST['classic-editor__forget']) && !isset($_REQUEST['classic']) && !isset($_REQUEST['classic-editor'])) {
@@ -67,29 +112,46 @@ class Utils {
 					} elseif ('classic-editor' == $which) {
 						return false;
 					}
+				
+				} else {
+                    $use_block = ('block' == get_user_meta($current_user->ID, 'wp_classic-editor-settings'));
+
+                    if (version_compare($wp_version, '5.9-beta', '>=')) {
+                    	if ($has_nav_action = has_action('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type')) {
+                    		remove_action('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type');
+                    	}
+                    	
+                    	if ($has_nav_filter = has_filter('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type')) {
+                    		remove_filter('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type');
+                    	}
+                    }
+
+                    $use_block = $use_block && apply_filters('use_block_editor_for_post_type', $use_block, $post_type, PHP_INT_MAX);
+
+                    if (version_compare($wp_version, '5.9-beta', '>=') && !empty($has_nav_filter)) {
+                        add_filter('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type', 10, 2 );
+                    }
+
+                    return $use_block;
 				}
 			}
+		}
+
+		// Divi: Classic Editor option
+		if (function_exists('et_get_option') && ( 'on' == et_get_option( 'et_enable_classic_editor', 'off' ))) {
+			return false;
 		}
 
 		$pluginsState = array(
 			'classic-editor' => class_exists( 'Classic_Editor' ),
 			'gutenberg'      => function_exists( 'the_gutenberg_project' ),
 			'gutenberg-ramp' => class_exists('Gutenberg_Ramp'),
+			'disable-gutenberg' => class_exists('DisableGutenberg'),
 		);
-
-		if (!$postType) {
-			if ( ! $postType = rvy_detect_post_type() ) {
-				$postType = 'page';
-			}
-		}
 		
-		if ( $post_type_obj = get_post_type_object( $postType ) ) {
-			if ( empty( $post_type_obj->show_in_rest ) ) {
-				return false;
-			}
-		}
+		$conditions = [];
 
-		$conditions = array();
+        if ($suppress_filter) remove_filter('use_block_editor_for_post_type', $suppress_filter, 10, 2);
 
 		/**
 		 * 5.0:
@@ -98,56 +160,88 @@ class Utils {
 		 * It's a hairy conditional :(
 		 */
 
-		if (version_compare($wp_version, '5.9-beta', '>=')) {
-            remove_action('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type', 10, 2);
-            remove_filter('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type', 10, 2);
+        if (version_compare($wp_version, '5.9-beta', '>=')) {
+            if ($has_nav_action = has_action('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type')) {
+        		remove_action('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type');
+        	}
+        	
+        	if ($has_nav_filter = has_filter('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type')) {
+        		remove_filter('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type');
+        	}
         }
 
-		// Divi: Classic Editor option
-		if (function_exists('et_get_option') && ( 'on' == et_get_option( 'et_enable_classic_editor', 'off' ))) {
-			return false;
-		}
-
-		// phpcs:ignore WordPress.VIP.SuperGlobalInputUsage.AccessDetected, WordPress.Security.NonceVerification.NoNonceVerification
-		
-		$_post = get_post(rvy_detect_post_id());
-		
-		if (!empty($_post)) {
-			$conditions[] = (self::isWp5() || $pluginsState['gutenberg'])
-							&& ! $pluginsState['classic-editor']
-							&& ! $pluginsState['gutenberg-ramp']
-							&& apply_filters('use_block_editor_for_post_type', true, $postType)
-							&& apply_filters('use_block_editor_for_post', true, $_post);
-		}
+        $conditions[] = (self::isWp5() || $pluginsState['gutenberg'])
+						&& ! $pluginsState['classic-editor']
+						&& ! $pluginsState['gutenberg-ramp']
+						&& ! $pluginsState['disable-gutenberg']
+                        && apply_filters('use_block_editor_for_post_type', true, $post_type, PHP_INT_MAX)
+                        && apply_filters('use_block_editor_for_post', true, get_post(rvy_detect_post_id()), PHP_INT_MAX);
 
 		$conditions[] = self::isWp5()
                         && $pluginsState['classic-editor']
                         && (get_option('classic-editor-replace') === 'block'
-                            && ! isset($_GET['classic-editor__forget']));
+							&& ! isset($_GET['classic-editor__forget']));
 
         $conditions[] = self::isWp5()
                         && $pluginsState['classic-editor']
                         && (get_option('classic-editor-replace') === 'classic'
-                            && isset($_GET['classic-editor__forget']));
+							&& isset($_GET['classic-editor__forget']));
 
-		if (!empty($_post)) {
-			$conditions[] = $pluginsState['gutenberg-ramp'] 
-							&& apply_filters('use_block_editor_for_post', true, $_post);
-		}
+        $conditions[] = $pluginsState['gutenberg-ramp'] 
+                        && apply_filters('use_block_editor_for_post', true, get_post(rvy_detect_post_id()), PHP_INT_MAX);
 
-		if (defined('PP_CAPABILITIES_RESTORE_NAV_TYPE_BLOCK_EDITOR_DISABLE') && version_compare($wp_version, '5.9-beta', '>=')) {
-			add_filter('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type', 10, 2 );
-		}
+		$conditions[] = $pluginsState['disable-gutenberg'] 
+                        && !self::disableGutenberg(rvy_detect_post_id());
+
+		//if (defined('PP_CAPABILITIES_RESTORE_NAV_TYPE_BLOCK_EDITOR_DISABLE') && version_compare($wp_version, '5.9-beta', '>=')) {
+        if (version_compare($wp_version, '5.9-beta', '>=') && !empty($has_nav_filter)) {
+            add_filter('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type', 10, 2 );
+        }
 
 		// Returns true if at least one condition is true.
-		return count(
+		$result = count(
 				   array_filter($conditions,
 					   function ($c) {
 						   return (bool)$c;
 					   }
 				   )
-			   ) > 0;
+               ) > 0;
+        
+        if (!$suppress_filter) {
+            $buffer[$post_type] = $result;
+        }
+
+        // Returns true if at least one condition is true.
+        return $result;
 	}
+	
+	// Port function from Disable Gutenberg plugin due to problematic early is_plugin_active() function call
+    private static function disableGutenberg($post_id = false) {
+
+        if (function_exists('disable_gutenberg_whitelist_id') && disable_gutenberg_whitelist_id($post_id)) return false;
+        
+        if (function_exists('disable_gutenberg_whitelist_slug') && disable_gutenberg_whitelist_slug($post_id)) return false;
+        
+        if (function_exists('disable_gutenberg_whitelist_title') && disable_gutenberg_whitelist_title($post_id)) return false;
+
+        if (isset($_GET['block-editor'])) return false;
+        
+        if (isset($_GET['classic-editor'])) return true;
+        
+        if (isset($_POST['classic-editor'])) return true;
+        
+        if (function_exists('disable_gutenberg_disable_all') && disable_gutenberg_disable_all()) return true;
+        
+        if (function_exists('disable_gutenberg_disable_user_role') && disable_gutenberg_disable_user_role()) return true;
+        
+        if (function_exists('disable_gutenberg_disable_post_type') && disable_gutenberg_disable_post_type()) return true;
+        
+        if (function_exists('disable_gutenberg_disable_templates') && disable_gutenberg_disable_templates()) return true;
+        
+        if (function_exists('disable_gutenberg_disable_ids') && disable_gutenberg_disable_ids($post_id)) return true;
+
+        return false;
+    }
 
 	/**
 	 * Adds slashes only to strings.

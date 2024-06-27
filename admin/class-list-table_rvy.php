@@ -183,12 +183,14 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		add_filter($filter_name, [$this, 'pre_query_filter'], 5, 2);
 		add_filter($filter_name, [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
 
-		add_filter('presspermit_posts_where_extra_exception_ops', 
-			function($exception_ops, $args) {
-				$exception_ops []= 'revise';
-				return $exception_ops;
-			}, 10, 2
-		);
+		if (defined('REVISIONARY_USE_QUEUE_EXCEPTIONS_FILTER')) {  // @todo: confirm this is obsolete
+			add_filter('presspermit_posts_where_extra_exception_ops', 
+				function($exception_ops, $args) {
+					$exception_ops []= 'revise';
+					return $exception_ops;
+				}, 10, 2
+			);
+		}
 
 		$pre_query = new WP_Query( $qp );
 
@@ -569,7 +571,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$arr['post_author'] = pp_revisions_label('queue_col_post_author');
 
-		return $arr;
+		return apply_filters('revisionary_list_table_columns', $arr);
 	}
 
 	function rvy_pending_custom_col( $column_name, $post_id ) {
@@ -679,6 +681,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					$author_caption = get_the_author_meta('display_name', $parent_post->post_author);
 					$this->apply_edit_link(add_query_arg('post_author', $parent_post->post_author, $request_url), $author_caption);
 				}
+
+				break;
+
+			default:
+				do_action('revisionary_list_table_custom_col', $column_name, $post);
+
 		} // end switch
 	}
 

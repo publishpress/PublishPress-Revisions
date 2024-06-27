@@ -10,6 +10,13 @@ function _rvy_post_edit_ui() {
 		if ($pagenow == 'post.php') {
 			require_once( dirname(__FILE__).'/post-editor-workflow-ui_rvy.php' );
 
+			add_action('init', function() {
+				if (rvy_get_option('revision_limit_per_post')) {
+					$post_id = rvy_detect_post_id();
+					revisionary_refresh_postmeta($post_id);
+				}
+			});
+
 			if (\PublishPress\Revisions\Utils::isBlockEditorActive()) {
 				require_once( dirname(__FILE__).'/post-edit-block-ui_rvy.php' );
 			} else {

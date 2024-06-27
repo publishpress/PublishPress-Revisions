@@ -988,6 +988,10 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		do_action('litespeed_purge_post', $published->ID);
 	}
 
+	if (function_exists('rocket_clean_post') && !defined('REVISIONARY_DISABLE_ROCKET_CLEAN')) {
+		rocket_clean_post($published->ID);
+	}
+
 	// Passing ignore_revision_ids is not theoretically necessary here since this call occurs after deletion, but avoid any cache clearance timing issues.
 	revisionary_refresh_revision_flags($published->ID, ['ignore_revision_ids' => $revision_id]);
 
