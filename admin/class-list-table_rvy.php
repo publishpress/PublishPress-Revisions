@@ -60,7 +60,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				}
 			}
 		}
-	
+
 		foreach ($triggered_deletions as $revision_id => $post_id) {
 			if ($revision_id) {
 				wp_delete_post($revision_id, true);

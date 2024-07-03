@@ -55,12 +55,12 @@ class RevisionaryHistory
                 || (rvy_get_option('revision_restore_require_cap') && !current_user_can('administrator') && !is_super_admin() && !current_user_can('restore_revisions'))
                 ) :
         ?>
-						<style type='text/css'>
-				        input.restore-revision {display:none !important;}
-				        </style>
-				        <?php
+                    <style type='text/css'>
+                    input.restore-revision {display:none !important;}
+                    </style>
+                    <?php
 
-                    endif;
+                endif;
             }
         }
     }

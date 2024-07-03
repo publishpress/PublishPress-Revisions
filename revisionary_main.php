@@ -118,7 +118,7 @@ class Revisionary
 		}
 		
 		add_action( 'wpmu_new_blog', array( $this, 'act_new_blog'), 10, 2 );
-		
+
 		add_action('trashed_post', [$this, 'actTrashedPost']);
 		
 		add_action( 'deleted_post', [$this, 'actDeletedPost']);

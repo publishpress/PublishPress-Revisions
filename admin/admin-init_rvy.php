@@ -142,7 +142,7 @@ function rvy_admin_init() {
 		|| (isset($_REQUEST['action']) && in_array($_REQUEST['action'], ['decline_revision']))
 	) {
 		$doaction = (!empty($_REQUEST['action']) && !is_numeric($_REQUEST['action'])) ? sanitize_key($_REQUEST['action']) : sanitize_key($_REQUEST['action2']);
-		
+
 		if (empty($_POST) && in_array($_REQUEST['action'], ['decline_revision'])) {
 			check_admin_referer('decline-revision');
 		} else {

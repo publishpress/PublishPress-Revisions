@@ -120,6 +120,14 @@ class RevisionCreation {
 
 		$post = get_post($revision_id);
 
+		if (('pending-revision' == $revision_status) && !defined('REVISONARY_AUTO_SUBMIT_NO_NOTIFICATION')) {
+			require_once( dirname(REVISIONARY_FILE).'/revision-workflow_rvy.php' );
+			$rvy_workflow_ui = new \Rvy_Revision_Workflow_UI();
+
+			$args = ['revision_id' => $revision_id, 'published_post' => $published_post, 'object_type' => $published_post->post_type];
+			$rvy_workflow_ui->do_notifications('pending-revision', 'pending-revision', (array) $published_post, $args );
+		}
+
 		$url = apply_filters('revisionary_create_revision_redirect', rvy_admin_url("post.php?post=$revision_id&action=edit"), $revision_id);
 
 		if (!empty($args['suppress_redirect'])) {

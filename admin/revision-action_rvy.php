@@ -32,7 +32,9 @@ function rvy_revision_create($post_id = 0, $args = []) {
 	if (!empty($args['force']) || current_user_can('copy_post', $main_post_id)) {
 		require_once( dirname(REVISIONARY_FILE).'/revision-creation_rvy.php' );
 		$rvy_creation = new PublishPress\Revisions\RevisionCreation();
-		$revision_id = $rvy_creation->createRevision($post_id, 'draft-revision', $args);
+
+		$revision_status = (rvy_get_option('auto_submit_revisions') && current_user_can('edit_post', $main_post_id)) ? 'pending-revision' : 'draft-revision';
+		$revision_id = $rvy_creation->createRevision($post_id, $revision_status, $args);
 	} else {
 		$revision_id = 0;
 	}

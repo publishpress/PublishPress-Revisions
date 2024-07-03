@@ -124,7 +124,7 @@ jQuery(document).ready( function($) {
 	}
 
 	function rvySchedulePost() {
-        var revisionaryScheduleDone = function () {
+		var revisionaryScheduleDone = function () {
 			$('.revision-schedule').hide();
 			$('.revision-scheduled-wrapper').show();
 
@@ -138,15 +138,15 @@ jQuery(document).ready( function($) {
 			$('div.rvy-creation-ui').html(rvyObjEdit.errorCaption);
 		}
 
-                var data = {'rvy_ajax_field': 'create_scheduled_revision', 'rvy_ajax_value': rvyObjEdit.postID, 'rvy_date_selection': RvyTimeSelection, 'nc': RvyGetRandomInt(99999999)};
+		var data = {'rvy_ajax_field': 'create_scheduled_revision', 'rvy_ajax_value': rvyObjEdit.postID, 'rvy_date_selection': RvyTimeSelection, 'nc': RvyGetRandomInt(99999999)};
 
-                $.ajax({
-                    url: rvyObjEdit.ajaxurl,
-                    data: data,
-                    dataType: "html",
-                    success: revisionaryScheduleDone,
-                    error: revisionaryScheduleError
-                });
+		$.ajax({
+			url: rvyObjEdit.ajaxurl,
+			data: data,
+			dataType: "html",
+			success: revisionaryScheduleDone,
+			error: revisionaryScheduleError
+		});
 	}
 
 	$(document).on('click', '#normal-sortables input, #normal-sortables select', function() {
@@ -175,7 +175,7 @@ jQuery(document).ready( function($) {
             wp.autosave.server.triggerSave();
         } else {
 			rvySchedulePost();
-            }
+        }
 	});
     
     $(document).on('click', '#post-body-content *, #content_ifr *, #wp-content-editor-container *, #tinymce *, #submitpost, span.revision-created', function() {
