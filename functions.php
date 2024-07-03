@@ -215,7 +215,7 @@ function rvy_revision_base_statuses($args = []) {
 	$arr = array_map('sanitize_key', (array) apply_filters('rvy_revision_base_statuses', ['draft', 'pending', 'future']));
 
 	if ('object' == $output) {
-		$status_keys = array_value($arr);
+		$status_keys = array_values($arr);
 		$arr = [];
 
 		foreach($status_keys as $k) {
@@ -236,7 +236,7 @@ function rvy_revision_statuses($args = []) {
 	$arr = array_map('sanitize_key', (array) apply_filters('rvy_revision_statuses', ['draft-revision', 'pending-revision', 'future-revision']));
 
 	if ('object' == $output) {
-		$status_keys = array_value($arr);
+		$status_keys = array_values($arr);
 		$arr = [];
 
 		foreach($status_keys as $k) {
