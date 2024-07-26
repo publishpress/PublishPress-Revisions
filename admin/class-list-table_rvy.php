@@ -515,6 +515,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$where_append .= " AND $p.comment_count IN (SELECT ID FROM $wpdb->posts WHERE post_status IN ('$status_csv'))";
 		}
 
+		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
+		$where_append .= " AND $p.post_mime_type IN ('$revision_status_csv')";
+
 		$where .= " AND $where_append";
 
 		return $where;
