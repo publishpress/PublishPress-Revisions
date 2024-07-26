@@ -17,9 +17,11 @@ jQuery(document).ready( function($) {
             var refSelector = '#submitdiv div.curtime';
         }
 
-        if (rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption'] && (rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption'] != $('#post-status-display').html())) {
-            $('#post-status-display').html(rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']);
-        }
+		if (typeof rvyObjEdit.updateCaption != 'undefined') {
+	        if (rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption'] && (rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption'] != $('#post-status-display').html())) {
+	            $('#post-status-display').html(rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']);
+	        }
+	 	}
 
 		if (rvyObjEdit.ajaxurl && !$('div.rvy-creation-ui').length && $(refSelector).length) {
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL']) {
@@ -67,8 +69,10 @@ jQuery(document).ready( function($) {
 				$('a.submitdelete').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'DeletionURL']);
             }
             
-            $('#publish').hide();
-            $('#save-post').val(rvyObjEdit.updateCaption);
+            if (typeof rvyObjEdit.updateCaption != 'undefined') {
+            	$('#publish').hide();
+            	$('#save-post').val(rvyObjEdit.updateCaption);
+            }
 
             if (rvyObjEdit.deleteCaption) {
                 $('#submitdiv #submitpost #delete-action a.submitdelete').html(rvyObjEdit.deleteCaption).show();
@@ -78,7 +82,10 @@ jQuery(document).ready( function($) {
 	var RvyUIInterval = setInterval(RvySubmissionUI, 100);
 
     $('a.save-timestamp').click(function() {
-        $('#save-post').val(rvyObjEdit.updateCaption);
+        if (typeof rvyObjEdit.updateCaption != 'undefined') {
+        	$('#save-post').val(rvyObjEdit.updateCaption);
+        }
+
         $('a.revision-approve, a.rvy-direct-approve').attr('disabled', 'disabled');
     });
 
