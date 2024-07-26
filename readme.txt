@@ -239,6 +239,11 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.5.12 - 29 Jul 2024 =
+* Fixed : Classic Editor - Schedule Revision / New Revision button captioning did not account for time zone difference between server and site
+* Fixed : Notifications were not sent for auto-submitted revisions
+* Fixed : Fatal error if function rvy_revision_statuses() or rvy_revision_base_statuses() is called with non-standard arguments by third party code
+
 = 3.5.11 - 26 Jun 2024 =
 * Compat : PublishPress Permissions - Revision Queue listed some editable posts without edit link
 * API : Filter revisionary_mail supports headers customization
