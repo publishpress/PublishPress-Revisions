@@ -433,6 +433,10 @@ function pp_revisions_status_label($status_name, $label_property) {
 
 	if (!empty($wp_post_statuses[$status_name]) && !empty($wp_post_statuses[$status_name]->labels->$label_property)) {
 		return $wp_post_statuses[$status_name]->labels->$label_property;
+	
+	} elseif (!empty($wp_post_statuses[$status_name]) && !empty($wp_post_statuses[$status_name]->label)) {
+		return $wp_post_statuses[$status_name]->label;
+	
 	} else {
 		return '';
 	}
