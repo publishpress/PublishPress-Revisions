@@ -300,7 +300,7 @@ function rvy_status_registrations() {
 				'update' => esc_html__('Update Revision', 'revisionary'), 
 				'plural' => esc_html__('Scheduled Changes', 'revisionary'), 
 				'short' => esc_html__('Scheduled Change', 'revisionary'),
-				'count' => _n_noop('Scheduled Changes <span class="count">(%d)</span>', 'Scheduled Changes <span class="count">(%d)</span>', 'revisionary'),
+				'count' => _n_noop('Scheduled <span class="count">(%d)</span>', 'Scheduled <span class="count">(%d)</span>', 'revisionary'),
 				'basic' => 'Scheduled Change',
 			],
 		]
@@ -320,7 +320,7 @@ function rvy_status_registrations() {
 				'update' => esc_html__('Update Revision', 'revisionary'), 
 				'plural' => esc_html__('Unsubmitted Revisions', 'revisionary'), 
 				'short' => esc_html__('Not Submitted', 'revisionary'),
-				'count' => _n_noop('Not Submitted for Approval <span class="count">(%s)</span>', 'Not Submitted for Approval <span class="count">(%s)</span>', 'revisionary'),   // @todo: confirm API will support a fixed string
+				'count' => _n_noop('Not Submitted <span class="count">(%s)</span>', 'Not Submitted <span class="count">(%s)</span>', 'revisionary'),   // @todo: confirm API will support a fixed string
 				'basic' => 'Revision',
 			],
 		
@@ -337,7 +337,7 @@ function rvy_status_registrations() {
 				'update' => esc_html__('Update Revision', 'revisionary'), 
 				'plural' => esc_html__('Submitted Revisions', 'revisionary'), 
 				'short' => esc_html__('Submitted', 'revisionary'),
-				'count' => _n_noop('Submitted for Approval <span class="count">(%s)</span>', 'Submitted for Approval <span class="count">(%s)</span>', 'revisionary'),
+				'count' => _n_noop('Submitted <span class="count">(%s)</span>', 'Submitted <span class="count">(%s)</span>', 'revisionary'),
 				'basic' => 'Revision',
 			],
 
@@ -354,7 +354,7 @@ function rvy_status_registrations() {
 				'update' => esc_html__('Update Revision', 'revisionary'), 
 				'plural' => esc_html__('Scheduled Revisions', 'revisionary'), 
 				'short' => esc_html__('Scheduled', 'revisionary'),
-				'count' => _n_noop('Scheduled Revision <span class="count">(%s)</span>', 'Scheduled Revisions <span class="count">(%s)</span>', 'revisionary'),
+				'count' => _n_noop('Scheduled <span class="count">(%s)</span>', 'Scheduled <span class="count">(%s)</span>', 'revisionary'),
 				'basic' => 'Scheduled Revision',
 			],
 		]
