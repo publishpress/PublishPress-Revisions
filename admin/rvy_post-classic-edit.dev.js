@@ -211,8 +211,10 @@ jQuery(document).ready( function($) {
         var dateStr = $('#mm').val() + '/' + $('#jj').val() + '/' + $('#aa').val() + ' ' +  $('#hh').val() + ':' + $('#mn').val() + ':00';
 		var selectedDate = new Date( dateStr );
         
-		RvyTimeSelection = selectedDate.getTime();
-		var tdiff = RvyTimeSelection - Date.now();
+		var currentDate = new Date();
+
+		RvyTimeSelection = selectedDate.getTime() - ((currentDate.getTimezoneOffset() * 60 - rvyObjEdit.timezoneOffset) * 1000);
+		var tdiff = RvyTimeSelection - currentDate.getTime();
 
 		RvyTimeSelection = RvyTimeSelection / 1000; // pass seconds to server
 
