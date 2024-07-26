@@ -479,7 +479,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 		?>
 
 		<?php
-		$hint = esc_html__('If checked, the edit_others_drafts capability will be required for users lacking site-wide publishing capabilities', 'revisionary');
+		$hint = esc_html__( 'If checked, users lacking site-wide publishing capabilities will also be checked for the edit_others_drafts capability', 'revisionary' );
 		$this->option_checkbox( 'require_edit_others_drafts', $tab, $section, $hint, '' );
 		?>
 
