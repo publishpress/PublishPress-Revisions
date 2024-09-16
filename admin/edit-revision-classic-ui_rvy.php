@@ -16,6 +16,8 @@ class RevisionaryEditRevisionClassicUI {
 
 		add_filter('presspermit_editor_ui_status', [$this, 'fltEditorUIstatus'], 10, 3);
 		add_filter('presspermit_post_editor_immediate_caption', [$this, 'fltImmediateCaption'], 10, 2);
+
+		add_action('post_submitbox_misc_actions', [$this, 'actSubmitboxActions'], 1);
 	}
 
 	function hide_admin_divs() {
@@ -113,5 +115,76 @@ class RevisionaryEditRevisionClassicUI {
 		$messages[$post->post_type][1] = $preview_msg;
 
         return $messages;
+	}
+
+	function actSubmitboxActions($post) {
+		global $action;
+
+		$post_type_object = get_post_type_object($post->post_type);
+
+		if ($post_type_object && !current_user_can($post_type_object->cap->publish_posts)) : // Contributors don't get to choose the date of publish.
+			/* translators: Publish box date string. 1: Date, 2: Time. See https://www.php.net/manual/datetime.format.php */
+			$date_string = __( '%1$s at %2$s' );
+			/* translators: Publish box date format, see https://www.php.net/manual/datetime.format.php */
+			$date_format = _x( 'M j, Y', 'publish box date format' );
+			/* translators: Publish box time format, see https://www.php.net/manual/datetime.format.php */
+			$time_format = _x( 'H:i', 'publish box time format' );
+
+			if ( 0 !== $post->ID ) {
+				if ( 'future' === $post->post_status ) { // Scheduled for publishing at a future date.
+					/* translators: Post date information. %s: Date on which the post is currently scheduled to be published. */
+					$stamp = __( 'Scheduled for: %s' );
+				} elseif ( 'publish' === $post->post_status || 'private' === $post->post_status ) { // Already published.
+					/* translators: Post date information. %s: Date on which the post was published. */
+					$stamp = __( 'Published on: %s' );
+				} elseif ( '0000-00-00 00:00:00' === $post->post_date_gmt ) { // Draft, 1 or more saves, no date specified.
+					$stamp = __( 'Publish <b>immediately</b>' );
+				} elseif ( time() < strtotime( $post->post_date_gmt . ' +0000' ) ) { // Draft, 1 or more saves, future date specified.
+					/* translators: Post date information. %s: Date on which the post is to be published. */
+					$stamp = __( 'Schedule for: %s' );
+				} else { // Draft, 1 or more saves, date specified.
+					/* translators: Post date information. %s: Date on which the post is to be published. */
+					$stamp = __( 'Publish on: %s' );
+				}
+				$date = sprintf(
+					$date_string,
+					date_i18n( $date_format, strtotime( $post->post_date ) ),
+					date_i18n( $time_format, strtotime( $post->post_date ) )
+				);
+			} else { // Draft (no saves, and thus no date specified).
+				$stamp = __( 'Publish <b>immediately</b>' );
+				$date  = sprintf(
+					$date_string,
+					date_i18n( $date_format, strtotime( current_time( 'mysql' ) ) ),
+					date_i18n( $time_format, strtotime( current_time( 'mysql' ) ) )
+				);
+			}
+			
+			?>
+			<div class="misc-pub-section curtime misc-pub-curtime">
+				<span id="timestamp">
+					<?php printf( $stamp, '<b>' . $date . '</b>' ); ?>
+				</span>
+				<a href="#edit_timestamp" class="edit-timestamp hide-if-no-js" role="button">
+					<span aria-hidden="true"><?php _e( 'Edit' ); ?></span>
+					<span class="screen-reader-text">
+						<?php
+						/* translators: Hidden accessibility text. */
+						_e( 'Edit date and time' );
+						?>
+					</span>
+				</a>
+				<fieldset id="timestampdiv" class="hide-if-js">
+					<legend class="screen-reader-text">
+						<?php
+						/* translators: Hidden accessibility text. */
+						_e( 'Date and time' );
+						?>
+					</legend>
+					<?php touch_time( ( 'edit' === $action ), 1 ); ?>
+				</fieldset>
+			</div>
+			<?php
+		endif;
 	}
 }
