@@ -3,7 +3,7 @@
 Contributors: publishpress, kevinB, stevejburge, andergmartins
 Author: PublishPress
 Author URI: https://publishpress.com
-Tags: revision, submit changes, duplicate post, duplicate page, revisions, approve changes, scheduled changes
+Tags: revision, submit changes, duplicate post, approve changes, scheduled changes
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.5
@@ -11,7 +11,7 @@ Stable tag: 3.5.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-PublishPress Revisions gives you control over updating published content. Users can duplicate posts and submit changes. You can approve, reject or schedule them.
+Control how published content is updated. Users can duplicate posts and submit changes. Then editors can approve, reject or schedule those changes.
 
 == Description ==
 
@@ -239,7 +239,11 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.5.12 - 29 Jul 2024 =
+= 3.5.13 - 17 Sep 2024 =
+* Fixed : Classic Editor - Revisors editing a revision could not select a future date
+* Fixed : Revision approval in "Publish by Revision" mode caused page to be published without a URL
+
+= 3.5.12 - unreleased =
 * Fixed : Classic Editor - Schedule Revision / New Revision button captioning did not account for time zone difference between server and site
 * Fixed : Notifications were not sent for auto-submitted revisions
 * Fixed : Fatal error if function rvy_revision_statuses() or rvy_revision_base_statuses() is called with non-standard arguments by third party code
