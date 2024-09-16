@@ -322,6 +322,17 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 		}
 
 		clean_post_cache($post->ID);
+
+		if ($post && rvy_get_option('publish_by_revision')) {
+			if (empty($post->post_name)) {
+				$data = [];
+				$data['post_name'] = wp_unique_post_slug(sanitize_title($post->post_title, $post->ID), $post->ID, 'publish', $post->post_type, $post->post_parent);
+
+				$wpdb->update($wpdb->posts, ['post_name' => $data['post_name']], ['ID' => $post->ID]);
+				clean_post_cache($post->ID);
+			}
+		}
+
 		$published_url = get_permalink($post->ID);
 
 		$db_action = false;
