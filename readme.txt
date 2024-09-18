@@ -242,6 +242,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 = 3.5.13 - 17 Sep 2024 =
 * Fixed : Classic Editor - Revisors editing a revision could not select a future date
 * Fixed : Revision approval in "Publish by Revision" mode caused page to be published without a URL
+* Fixed : Revision History - PHP Warning for preg_replace parameter
 
 = 3.5.12 - unreleased =
 * Fixed : Classic Editor - Schedule Revision / New Revision button captioning did not account for time zone difference between server and site
