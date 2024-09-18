@@ -70,7 +70,7 @@ class RevisionaryHistory
     }
 
     public function actLoadRevision() {
-        global $wpdb, $post;
+        global $wpdb, $post, $title;
 
         if (!empty($_REQUEST['revision']) && is_scalar($_REQUEST['revision']) && !empty($_REQUEST['post_id']) && !is_numeric($_REQUEST['revision']) && rvy_is_revision_status(sanitize_key($_REQUEST['revision']))) {
             $revision_status = sanitize_key($_REQUEST['revision']);
