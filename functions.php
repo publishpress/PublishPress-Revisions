@@ -159,7 +159,10 @@ function revisionary_copy_postmeta($from_post, $to_post_id, $args = []) {
 
     $target_meta_keys = (array) \get_post_custom_keys( $to_post_id );
 
-    $meta_keys = apply_filters('revisionary_create_revision_meta_keys', $meta_keys);
+    $meta_keys = apply_filters(
+        'revisionary_create_revision_meta_keys',    // Bypass problematic Link Whisper plugin postmeta by default
+        array_diff($meta_keys, ['wpil_links_outbound_external_count_data', 'wpil_links_outbound_internal_count_data', 'wpil_links_outbound_external_count'])
+    );
 
     foreach ( $meta_keys as $meta_key ) {
         if ($empty_target_only && !empty($target_meta_keys) && is_array($target_meta_keys)) {
