@@ -243,6 +243,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 * Fixed : Classic Editor - Revisors editing a revision could not select a future date
 * Fixed : Revision approval in "Publish by Revision" mode caused page to be published without a URL
 * Fixed : Revision History - PHP Warning for preg_replace parameter
+* Fixed : Link Whisper plugin postmeta data caused fatal error on revision creation
 
 = 3.5.12 - unreleased =
 * Fixed : Classic Editor - Schedule Revision / New Revision button captioning did not account for time zone difference between server and site
