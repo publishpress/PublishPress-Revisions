@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-09-16T21:35:28+00:00\n"
+"POT-Creation-Date: 2024-09-23T21:07:03+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: revisionary\n"
@@ -271,7 +271,7 @@ msgstr ""
 
 #: admin/class-list-table-archive.php:756
 #: admin/class-list-table_rvy.php:1380
-#: admin/edit-revision-classic-ui_rvy.php:94
+#: admin/edit-revision-classic-ui_rvy.php:118
 #: admin/post-edit_rvy.php:186
 #: admin/post-edit_rvy.php:200
 msgctxt "revisions"
@@ -380,19 +380,19 @@ msgctxt "revisions"
 msgid "Decline"
 msgstr ""
 
-#: admin/edit-revision-classic-ui_rvy.php:65
+#: admin/edit-revision-classic-ui_rvy.php:89
 msgid "Publish <b>on approval</b>"
 msgstr ""
 
-#: admin/edit-revision-classic-ui_rvy.php:95
+#: admin/edit-revision-classic-ui_rvy.php:119
 msgid "Compare this revision to published copy, or to other revisions"
 msgstr ""
 
-#: admin/edit-revision-classic-ui_rvy.php:108
+#: admin/edit-revision-classic-ui_rvy.php:132
 msgid "Revision updated. %sView Preview%s"
 msgstr ""
 
-#: admin/edit-revision-classic-ui_rvy.php:110
+#: admin/edit-revision-classic-ui_rvy.php:134
 msgid "Revision updated."
 msgstr ""
 
