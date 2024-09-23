@@ -8,6 +8,7 @@ if (isset($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url
 class RevisionaryEditRevisionClassicUI {
 	function __construct () {
 		add_action('admin_head', [$this, 'hide_admin_divs']);
+		add_action('admin_head', [$this, 'actDeleteDuplicateRevision']);
 
 		add_filter('post_updated_messages', [$this, 'fltPostUpdatedMessage']);
 
@@ -18,6 +19,29 @@ class RevisionaryEditRevisionClassicUI {
 		add_filter('presspermit_post_editor_immediate_caption', [$this, 'fltImmediateCaption'], 10, 2);
 
 		add_action('post_submitbox_misc_actions', [$this, 'actSubmitboxActions'], 1);
+	}
+
+	function actDeleteDuplicateRevision() {
+		global $wpdb, $post;
+
+		if ($post) {
+			$last_id = $post->ID - 1;
+
+			$last_post = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM $wpdb->posts WHERE ID = %d",
+					$last_id
+				)
+			);
+			
+			if ($last_post 
+			&& ($last_post->post_author == $post->post_author) 
+			&& in_array($last_post->post_mime_type, ['draft-revision', 'pending-revision', 'future-revision']) 
+			&& ($last_post->comment_count == $post->comment_count)
+			) {
+				wp_delete_post($last_id);
+			}
+		}
 	}
 
 	function hide_admin_divs() {
