@@ -718,18 +718,48 @@ function revisionary_refresh_postmeta($post_id, $args = []) {
 	}
 }
 
-function rvy_post_revision_supported($post) {
-	$post_id = (is_scalar($post)) ? $post : $post->ID;
-
-	if ($post_id) {
-		if (1 === intval(rvy_get_option('revision_limit_per_post'))) {
-			if (rvy_get_post_meta($post_id, '_rvy_has_revisions')) {
-				return false;
-			}
+function rvy_post_revision_supported($post, $args = []) {
+	if ($post) {
+		if (rvy_post_revision_blocked($post, $args)) {
+			return false;
 		}
 	}
 
 	return true;
+}
+
+function rvy_post_revision_blocked($post, $args = []) {
+	static $unfiltered_html;
+
+	if (!isset($unfiltered_html)) {
+		$unfiltered_html = current_user_can('unfiltered_html');
+	}
+
+	$post_id = (is_scalar($post)) ? $post : $post->ID;
+
+	if (1 === intval(rvy_get_option('revision_limit_per_post'))) {
+		if (rvy_get_post_meta($post_id, '_rvy_has_revisions')) {
+			return [
+				'code' => 'blocked_revision_limit',
+				'description' => __('The post already has a revision in process.', 'revisionary')
+			];
+		}
+	}
+
+	if (!$unfiltered_html && (empty($args['context']) || ('admin_posts' != $args['context']))) {
+		if (is_scalar($post)) {
+			$post = get_post($post);
+		}
+
+		if (!empty($post) && is_object($post) && !empty($post->post_content && (wp_filter_post_kses($post->post_content) != $post->post_content))) {
+			return [
+				'code' => 'blocked_unfiltered',
+				'description' => __('The unfiltered_html capability is required to create a revision of this post.', 'revisionary')
+			];
+		}
+	}
+
+	return false;
 }
 
 if (!empty($_REQUEST['rvy_flush_flags'])) {
