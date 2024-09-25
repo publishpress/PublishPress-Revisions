@@ -114,7 +114,7 @@ jQuery(document).ready( function($) {
 
 	var rvyCreationDisabled = false;
 
-	$(document).on('click', 'div.postbox-container', function() {
+	$(document).on('click', 'div.postbox-container,div.acf-postbox', function() {
 		rvyCreationDisabled = true;
 		$('button.revision-approve').prop('disabled', 'disabled');
 		$('button.revision-schedule').prop('disabled', 'disabled');
@@ -122,12 +122,24 @@ jQuery(document).ready( function($) {
 		$('a.revision-schedule').attr('title', rvyObjEdit.scheduleDisabledTitle);
 	});
 
-	$(document).on('click', 'button.editor-post-publish-button', function() {
-		rvyCreationDisabled = false;
-		$('button.revision-approve').prop('disabled', false);
-		$('button.revision-schedule').prop('disabled', false);
-		$('a.revision-approve').attr('title', rvyObjEdit.actionTitle);
-		$('a.revision-schedule').attr('title', rvyObjEdit.scheduleTitle);
+	var intSaveWatch = setInterval(() => {
+		if (wp.data.select('core/editor').isSavingPost()) {
+			rvyCreationDisabled = false;
+			$('button.revision-approve').prop('disabled', false);
+			$('button.revision-schedule').prop('disabled', false);
+			$('a.revision-approve').attr('title', rvyObjEdit.actionTitle);
+			$('a.revision-schedule').attr('title', rvyObjEdit.scheduleTitle);
+		}
+	}, 5000);
+
+	$(document).on('click', 'button.editor-post-publish-button,button.editor-post-save-draft', function() {
+		setInterval(() => {
+			rvyCreationDisabled = false;
+			$('button.revision-approve').prop('disabled', false);
+			$('button.revision-schedule').prop('disabled', false);
+			$('a.revision-approve').attr('title', rvyObjEdit.actionTitle);
+			$('a.revision-schedule').attr('title', rvyObjEdit.scheduleTitle);
+		}, 2000);
 	});
 
 	var rvyIsAutosaveStarted = false;
