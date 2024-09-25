@@ -397,6 +397,19 @@ function rvy_admin_init() {
 				add_action( 'wp_loaded', 'rvy_revision_delete' );
 				
 			} elseif ( ! empty($_GET['action']) && ('revise' == $_GET['action']) ) {
+				if (!empty($_REQUEST['post'])) {
+					$post_id = intval($_REQUEST['post']);
+					$arr = rvy_post_revision_blocked($post_id);
+				}
+		
+				if (!empty($arr) && is_array($arr) && !empty($arr['code'])) {
+					if (!empty($_REQUEST['referer'])) {
+						$url = add_query_arg('revision_action', $arr['code'], $_REQUEST['referer']);
+						wp_redirect($url);
+						exit;
+					}
+				}
+
 				require_once( dirname(__FILE__).'/revision-action_rvy.php');	
 				add_action( 'wp_loaded', 'rvy_revision_create' );
 

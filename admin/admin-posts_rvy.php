@@ -52,17 +52,27 @@ class RevisionaryAdminPosts {
     function revision_action_notice() {
 		if ( ! empty($_GET['restored_post'] ) ) {
 			?>
-			<div class='updated'><?php esc_html_e('The revision was restored.', 'revisionary');?>
+			<div class='updated' style="padding-top: 10px; padding-bottom: 10px"><?php esc_html_e('The revision was restored.', 'revisionary');?>
 			</div>
 			<?php
 		} elseif ( ! empty($_GET['scheduled'] ) ) {
 			?>
-			<div class='updated'><?php esc_html_e('The revision was scheduled for publication.', 'revisionary');?>
+			<div class='updated' style="padding-top: 10px; padding-bottom: 10px"><?php esc_html_e('The revision was scheduled for publication.', 'revisionary');?>
 			</div>
 			<?php
 		} elseif ( ! empty($_GET['published_post'] ) ) {
 			?>
-			<div class='updated'><?php esc_html_e('The revision was published.', 'revisionary');?>
+			<div class='updated' style="padding-top: 10px; padding-bottom: 10px"><?php esc_html_e('The revision was published.', 'revisionary');?>
+			</div>
+			<?php	
+    	} elseif ( !empty($_GET['revision_action']) && ('blocked_unfiltered' == $_GET['revision_action'] ) ) {
+			?>
+			<div class='error' style="padding-top: 10px; padding-bottom: 10px"><?php printf(esc_html__('The unfiltered_html capability is required to create a revision of this post. See %sdocumentation%s.', 'revisionary'), '<a href="https://publishpress.com/knowledge-base/troubleshooting-revisionary/" target="_blank">', '</a>');?>
+			</div>
+			<?php	
+    	} elseif ( !empty($_GET['revision_action']) && ('blocked_revision_limit' == $_GET['revision_action'] ) ) {
+			?>
+			<div class='error' style="padding-top: 10px; padding-bottom: 10px"><?php esc_html_e('The post already has a revision in process.', 'revisionary');?>
 			</div>
 			<?php	
     	}
@@ -177,17 +187,14 @@ class RevisionaryAdminPosts {
 		
 		$status_obj = get_post_status_object($post->post_status);
 
-		if (empty($actions['view'])) {
-
-		}
-
 		if (!empty($status_obj->public) || !empty($status_obj->private) || rvy_get_option('pending_revision_unpublished')) {
-			if (rvy_get_option('pending_revisions') && current_user_can('copy_post', $post->ID) && rvy_post_revision_supported($post)) {
+			if (rvy_get_option('pending_revisions') && current_user_can('copy_post', $post->ID) && rvy_post_revision_supported($post, ['context' => 'admin_posts'])) {
+				$referer_arg = '&referer=' . esc_url_raw($_SERVER['REQUEST_URI']);
+
 				$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
-				$url = rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg");
+				$url = rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise{$referer_arg}$redirect_arg");
 				
 				$caption = (isset($actions['edit']) || !rvy_get_option('caption_copy_as_edit')) ? pp_revisions_status_label('draft-revision', 'submit') : esc_html__('Edit');
-
 				$caption = str_replace(' ', '&nbsp;', $caption);
 
 				$actions['create_revision'] = "<a href='$url'>" . $caption . '</a>';

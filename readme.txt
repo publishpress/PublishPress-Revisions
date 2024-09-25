@@ -239,7 +239,8 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.5.13 - 24 Sep 2024 =
+= 3.5.13 - 25 Sep 2024 =
+* Fixed : Revision creation by a user with default Revisor capabilities caused custom html tags to be stripped out of post content. Now prevent revision, requiring unfiltered_html capability. 
 * Fixed : Classic Editor - Revisors editing a revision could not select a future date
 * Fixed : Revision approval in "Publish by Revision" mode caused page to be published without a URL
 * Fixed : Revision History - PHP Warning for preg_replace parameter
