@@ -329,6 +329,24 @@ jQuery(document).ready(function ($) {
         );
 	}
 
+    $(document).on('click', 'div.postbox-container,div.acf-postbox', function() {
+		rvyCreationDisabled = true;
+		$('button.revision-approve').prop('disabled', 'disabled');
+		$('button.revision-schedule').prop('disabled', 'disabled');
+		$('a.revision-approve').attr('title', rvyObjEdit.actionDisabledTitle);
+		$('a.revision-schedule').attr('title', rvyObjEdit.scheduleDisabledTitle);
+	});
+
+    var intSaveWatch = setInterval(() => {
+		if (wp.data.select('core/editor').isSavingPost()) {
+			rvyCreationDisabled = false;
+            $('button.revision-approve').prop('disabled', false);
+            $('button.revision-schedule').prop('disabled', false);
+            $('a.revision-approve').attr('title', rvyObjEdit.actionTitle);
+            $('a.revision-schedule').attr('title', rvyObjEdit.scheduleTitle);
+		}
+	}, 5000);
+
 	var rvyRedirectURL = '';
 
     $(document).on('click', 'button.revision-approve', function () {
