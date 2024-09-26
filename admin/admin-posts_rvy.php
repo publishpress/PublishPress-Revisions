@@ -194,6 +194,8 @@ class RevisionaryAdminPosts {
 				$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
 				$url = rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise{$referer_arg}$redirect_arg");
 				
+				$url = remove_query_arg(['post_status', 'action', 'cat', 'seo-filter', 'schema-filter', 'paged', 'action2'], $url);
+
 				$caption = (isset($actions['edit']) || !rvy_get_option('caption_copy_as_edit')) ? pp_revisions_status_label('draft-revision', 'submit') : esc_html__('Edit');
 				$caption = str_replace(' ', '&nbsp;', $caption);
 
