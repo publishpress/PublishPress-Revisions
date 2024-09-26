@@ -120,6 +120,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'caption_copy_as_edit' =>					sprintf(esc_html__('Posts / Pages list: Use "Edit" caption for %s link', 'revisionary'), pp_revisions_status_label('draft-revision', 'submit_short')),
 	'pending_revisions' => 						sprintf(esc_html__('Enable %s', 'revisionary'), $pending_revision_plural),
 	'revision_limit_per_post' =>				esc_html__("Limit to one active revision per post", 'revisionary'),
+	'revision_unfiltered_html_check' =>			esc_html__("If post contains custom html, require unfiltered_html capability", 'revisionary'),
 	'auto_submit_revisions' =>					esc_html__("Auto-submit revisions created by a user with publishing capability", 'revisionary'),
 	'scheduled_revisions' => 					sprintf(esc_html__('Enable %s', 'revisionary'), pp_revisions_status_label('future-revision', 'plural')),
 	'revise_posts_capability' =>				rvy_get_option('revision_statuses_noun_labels') ? esc_html__("Additional role capability required to submit a Change Request", 'revisionary') : esc_html__("Additional role capability required to submit a revision", 'revisionary'),
@@ -179,7 +180,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'post_types' =>			 ['enabled_post_types'],
 	'role_definition' => 	 ['revisor_role_add_custom_rolecaps', 'require_edit_others_drafts'],
 	'revision_statuses' =>	 ['revision_statuses_noun_labels'],
-	'working_copy' =>		 ['manage_unsubmitted_capability', 'copy_posts_capability', 'revision_limit_per_post', 'auto_submit_revisions', 'caption_copy_as_edit'],
+	'working_copy' =>		 ['manage_unsubmitted_capability', 'copy_posts_capability', 'revision_limit_per_post', 'revision_unfiltered_html_check', 'auto_submit_revisions', 'caption_copy_as_edit'],
 	'scheduled_revisions' => ['scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'wp_cron_usage_detected', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date'],
 	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions'],
@@ -524,6 +525,12 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	<br />
 	<?php
 	$this->option_checkbox( 'revision_limit_per_post', $tab, $section, '', '' );
+
+	?>
+	<br />
+	<?php
+	$hint = esc_html__('If disabled, revision by a user who does not have the unfiltered_html capability will cause all custom html tags to be stripped out.', 'revisionary');
+	$this->option_checkbox( 'revision_unfiltered_html_check', $tab, $section, $hint, '' );
 	?>
 
 	<br />
