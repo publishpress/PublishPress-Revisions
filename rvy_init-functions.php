@@ -731,7 +731,9 @@ function rvy_post_revision_supported($post, $args = []) {
 function rvy_post_revision_blocked($post, $args = []) {
 	static $unfiltered_html;
 
-	if (!isset($unfiltered_html)) {
+	$revision_unfiltered_html_check = rvy_get_option('revision_unfiltered_html_check');
+
+	if ($revision_unfiltered_html_check && !isset($unfiltered_html)) {
 		$unfiltered_html = current_user_can('unfiltered_html');
 	}
 
@@ -746,7 +748,7 @@ function rvy_post_revision_blocked($post, $args = []) {
 		}
 	}
 
-	if (!$unfiltered_html && (empty($args['context']) || ('admin_posts' != $args['context']))) {
+	if ($revision_unfiltered_html_check && !$unfiltered_html && (empty($args['context']) || ('admin_posts' != $args['context']))) {
 		if (is_scalar($post)) {
 			$post = get_post($post);
 		}
