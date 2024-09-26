@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, approve changes, scheduled chang
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.6
-Stable tag: 3.5.13
+Stable tag: 3.5.14
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -239,13 +239,18 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.5.13 - 25 Sep 2024 =
+= 3.5.14 - 26 Sep 2024 =
+* Fixed : New Revision link on Posts screen failed due to plugin conflict on some sites
+* Change : New setting (with disclaimer) to disable new unfiltered_html check. Useful on sites where any custom html is unintended and can be stripped out.
+
+= 3.5.13 - 26 Sep 2024 =
 * Fixed : Revision creation by a user with default Revisor capabilities caused custom html tags to be stripped out of post content. Now prevent revision, requiring unfiltered_html capability. 
 * Fixed : Classic Editor - Revisors editing a revision could not select a future date
 * Fixed : Revision approval in "Publish by Revision" mode caused page to be published without a URL
 * Fixed : Revision History - PHP Warning for preg_replace parameter
 * Fixed : Link Whisper plugin postmeta data caused fatal error on revision creation
 * Fixed : Duplicate revision creation on some sites
+* Change : When user clicks into a custom field in Post / Revision editor, disable Submit / Approve / Schedule Revision button until changes are saved 
 
 = 3.5.12 - unreleased =
 * Fixed : Classic Editor - Schedule Revision / New Revision button captioning did not account for time zone difference between server and site
