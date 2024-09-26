@@ -322,7 +322,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	}
 
 	function fltFixMimeTypeClause($where) {
-		return str_replace("-revision/%'", "-revision'", $where);
+		$where = str_replace("-revision/%'", "-revision'", $where);
+		$where = preg_replace("#post_mime_type LIKE '([a-z0-9_\-]*)/%'#", "post_mime_type LIKE '$1'", $where);
+
+		return $where;
 	}
 
 	function flt_presspermit_posts_clauses_intercept( $intercept, $clauses, $_wp_query, $args) {
@@ -514,6 +517,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 			$where_append .= " AND $p.comment_count IN (SELECT ID FROM $wpdb->posts WHERE post_status IN ('$status_csv'))";
 		}
+
+		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
+		$where_append .= " AND $p.post_mime_type IN ('$revision_status_csv')";
 
 		$where .= " AND $where_append";
 

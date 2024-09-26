@@ -3,15 +3,15 @@
 Contributors: publishpress, kevinB, stevejburge, andergmartins
 Author: PublishPress
 Author URI: https://publishpress.com
-Tags: revision, submit changes, duplicate post, duplicate page, revisions, approve changes, scheduled changes
+Tags: revision, submit changes, duplicate post, approve changes, scheduled changes
 Requires at least: 5.5
 Requires PHP: 7.2.5
-Tested up to: 6.5
-Stable tag: 3.5.11
+Tested up to: 6.6
+Stable tag: 3.5.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-PublishPress Revisions gives you control over updating published content. Users can duplicate posts and submit changes. You can approve, reject or schedule them.
+Control how published content is updated. Users can duplicate posts and submit changes. Then editors can approve, reject or schedule those changes.
 
 == Description ==
 
@@ -238,6 +238,19 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
 == Changelog ==
+
+= 3.5.13 - 25 Sep 2024 =
+* Fixed : Revision creation by a user with default Revisor capabilities caused custom html tags to be stripped out of post content. Now prevent revision, requiring unfiltered_html capability. 
+* Fixed : Classic Editor - Revisors editing a revision could not select a future date
+* Fixed : Revision approval in "Publish by Revision" mode caused page to be published without a URL
+* Fixed : Revision History - PHP Warning for preg_replace parameter
+* Fixed : Link Whisper plugin postmeta data caused fatal error on revision creation
+* Fixed : Duplicate revision creation on some sites
+
+= 3.5.12 - unreleased =
+* Fixed : Classic Editor - Schedule Revision / New Revision button captioning did not account for time zone difference between server and site
+* Fixed : Notifications were not sent for auto-submitted revisions
+* Fixed : Fatal error if function rvy_revision_statuses() or rvy_revision_base_statuses() is called with non-standard arguments by third party code
 
 = 3.5.11 - 26 Jun 2024 =
 * Compat : PublishPress Permissions - Revision Queue listed some editable posts without edit link

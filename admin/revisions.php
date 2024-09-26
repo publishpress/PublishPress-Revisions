@@ -47,7 +47,23 @@ if ( ! empty($_GET['restored_post'] ) ) {
 
 if ( empty($revision_id) && ! $left && ! $right ) {
 	echo( '<div><br />' );
-	esc_html_e( 'No revision specified.', 'revisionary');
+
+	if (!empty($_REQUEST['action']) && ('revise' == $_REQUEST['action'])) {
+		// Fallback error message, in case redirect is missed
+		if (!empty($_REQUEST['post'])) {
+			$post_id = intval($_REQUEST['post']);
+			$arr = rvy_post_revision_blocked($post_id);
+		}
+
+		if (!empty($arr) && is_array($arr) && !empty($arr['description'])) {
+			echo $arr['description'];
+		} else {
+			esc_html_e( 'Revision of this post is not allowed.', 'revisionary');
+		}
+	} else {
+		esc_html_e( 'No revision specified.', 'revisionary');
+	}
+
 	echo( '</div>' );
 	return;
 }

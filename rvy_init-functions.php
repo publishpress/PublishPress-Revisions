@@ -300,7 +300,7 @@ function rvy_status_registrations() {
 				'update' => esc_html__('Update Revision', 'revisionary'), 
 				'plural' => esc_html__('Scheduled Changes', 'revisionary'), 
 				'short' => esc_html__('Scheduled Change', 'revisionary'),
-				'count' => _n_noop('Scheduled Changes <span class="count">(%d)</span>', 'Scheduled Changes <span class="count">(%d)</span>', 'revisionary'),
+				'count' => _n_noop('Scheduled <span class="count">(%d)</span>', 'Scheduled <span class="count">(%d)</span>', 'revisionary'),
 				'basic' => 'Scheduled Change',
 			],
 		]
@@ -320,7 +320,7 @@ function rvy_status_registrations() {
 				'update' => esc_html__('Update Revision', 'revisionary'), 
 				'plural' => esc_html__('Unsubmitted Revisions', 'revisionary'), 
 				'short' => esc_html__('Not Submitted', 'revisionary'),
-				'count' => _n_noop('Not Submitted for Approval <span class="count">(%s)</span>', 'Not Submitted for Approval <span class="count">(%s)</span>', 'revisionary'),   // @todo: confirm API will support a fixed string
+				'count' => _n_noop('Not Submitted <span class="count">(%s)</span>', 'Not Submitted <span class="count">(%s)</span>', 'revisionary'),   // @todo: confirm API will support a fixed string
 				'basic' => 'Revision',
 			],
 		
@@ -337,7 +337,7 @@ function rvy_status_registrations() {
 				'update' => esc_html__('Update Revision', 'revisionary'), 
 				'plural' => esc_html__('Submitted Revisions', 'revisionary'), 
 				'short' => esc_html__('Submitted', 'revisionary'),
-				'count' => _n_noop('Submitted for Approval <span class="count">(%s)</span>', 'Submitted for Approval <span class="count">(%s)</span>', 'revisionary'),
+				'count' => _n_noop('Submitted <span class="count">(%s)</span>', 'Submitted <span class="count">(%s)</span>', 'revisionary'),
 				'basic' => 'Revision',
 			],
 
@@ -354,7 +354,7 @@ function rvy_status_registrations() {
 				'update' => esc_html__('Update Revision', 'revisionary'), 
 				'plural' => esc_html__('Scheduled Revisions', 'revisionary'), 
 				'short' => esc_html__('Scheduled', 'revisionary'),
-				'count' => _n_noop('Scheduled Revision <span class="count">(%s)</span>', 'Scheduled Revisions <span class="count">(%s)</span>', 'revisionary'),
+				'count' => _n_noop('Scheduled <span class="count">(%s)</span>', 'Scheduled <span class="count">(%s)</span>', 'revisionary'),
 				'basic' => 'Scheduled Revision',
 			],
 		]
@@ -433,6 +433,10 @@ function pp_revisions_status_label($status_name, $label_property) {
 
 	if (!empty($wp_post_statuses[$status_name]) && !empty($wp_post_statuses[$status_name]->labels->$label_property)) {
 		return $wp_post_statuses[$status_name]->labels->$label_property;
+	
+	} elseif (!empty($wp_post_statuses[$status_name]) && !empty($wp_post_statuses[$status_name]->label)) {
+		return $wp_post_statuses[$status_name]->label;
+	
 	} else {
 		return '';
 	}
@@ -714,18 +718,48 @@ function revisionary_refresh_postmeta($post_id, $args = []) {
 	}
 }
 
-function rvy_post_revision_supported($post) {
-	$post_id = (is_scalar($post)) ? $post : $post->ID;
-
-	if ($post_id) {
-		if (1 === intval(rvy_get_option('revision_limit_per_post'))) {
-			if (rvy_get_post_meta($post_id, '_rvy_has_revisions')) {
-				return false;
-			}
+function rvy_post_revision_supported($post, $args = []) {
+	if ($post) {
+		if (rvy_post_revision_blocked($post, $args)) {
+			return false;
 		}
 	}
 
 	return true;
+}
+
+function rvy_post_revision_blocked($post, $args = []) {
+	static $unfiltered_html;
+
+	if (!isset($unfiltered_html)) {
+		$unfiltered_html = current_user_can('unfiltered_html');
+	}
+
+	$post_id = (is_scalar($post)) ? $post : $post->ID;
+
+	if (1 === intval(rvy_get_option('revision_limit_per_post'))) {
+		if (rvy_get_post_meta($post_id, '_rvy_has_revisions')) {
+			return [
+				'code' => 'blocked_revision_limit',
+				'description' => __('The post already has a revision in process.', 'revisionary')
+			];
+		}
+	}
+
+	if (!$unfiltered_html && (empty($args['context']) || ('admin_posts' != $args['context']))) {
+		if (is_scalar($post)) {
+			$post = get_post($post);
+		}
+
+		if (!empty($post) && is_object($post) && !empty($post->post_content && (wp_filter_post_kses($post->post_content) != $post->post_content))) {
+			return [
+				'code' => 'blocked_unfiltered',
+				'description' => __('The unfiltered_html capability is required to create a revision of this post.', 'revisionary')
+			];
+		}
+	}
+
+	return false;
 }
 
 if (!empty($_REQUEST['rvy_flush_flags'])) {

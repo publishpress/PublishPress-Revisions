@@ -141,8 +141,10 @@ class PostEditorWorkflowUI {
         if ($block_editor) {
             $vars['updateCaption'] =  esc_html__('Update Revision', 'revisionary');
         } else {
-            if (!$vars['updateCaption'] = pp_revisions_status_label($post->post_mime_type, 'update')) {
-                $vars['updateCaption'] = pp_revisions_label('update_revision');
+            if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
+            	if (!$vars['updateCaption'] = pp_revisions_status_label($post->post_mime_type, 'update')) {
+                	$vars['updateCaption'] = pp_revisions_label('update_revision');
+                }
             }
         }
 

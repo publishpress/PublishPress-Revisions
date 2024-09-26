@@ -170,12 +170,19 @@ class Utils {
         	}
         }
 
-        $conditions[] = (self::isWp5() || $pluginsState['gutenberg'])
-						&& ! $pluginsState['classic-editor']
-						&& ! $pluginsState['gutenberg-ramp']
-						&& ! $pluginsState['disable-gutenberg']
-                        && apply_filters('use_block_editor_for_post_type', true, $post_type, PHP_INT_MAX)
-                        && apply_filters('use_block_editor_for_post', true, get_post(rvy_detect_post_id()), PHP_INT_MAX);
+		if ($val = (self::isWp5() || $pluginsState['gutenberg'])
+		&& ! $pluginsState['classic-editor']
+		&& ! $pluginsState['gutenberg-ramp']
+		&& ! $pluginsState['disable-gutenberg']
+		&& apply_filters('use_block_editor_for_post_type', true, $post_type, PHP_INT_MAX)) {
+			$_post = get_post(rvy_detect_post_id());
+
+			if (!empty($_post) && !is_null($_post)) {
+				$val = $val && apply_filters('use_block_editor_for_post', true, $_post, PHP_INT_MAX);
+			}
+		}
+
+		$conditions[] = $val;
 
 		$conditions[] = self::isWp5()
                         && $pluginsState['classic-editor']
@@ -187,8 +194,15 @@ class Utils {
                         && (get_option('classic-editor-replace') === 'classic'
 							&& isset($_GET['classic-editor__forget']));
 
-        $conditions[] = $pluginsState['gutenberg-ramp'] 
-                        && apply_filters('use_block_editor_for_post', true, get_post(rvy_detect_post_id()), PHP_INT_MAX);
+		if ($val = $pluginsState['gutenberg-ramp']) {
+			$_post = get_post(rvy_detect_post_id());
+
+			if (!empty($_post) && !is_null($_post)) {
+				$val = $val && apply_filters('use_block_editor_for_post', true, $_post, PHP_INT_MAX);
+			}
+		}
+
+        $conditions[] = $val;
 
 		$conditions[] = $pluginsState['disable-gutenberg'] 
                         && !self::disableGutenberg(rvy_detect_post_id());

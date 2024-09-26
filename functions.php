@@ -159,7 +159,10 @@ function revisionary_copy_postmeta($from_post, $to_post_id, $args = []) {
 
     $target_meta_keys = (array) \get_post_custom_keys( $to_post_id );
 
-    $meta_keys = apply_filters('revisionary_create_revision_meta_keys', $meta_keys);
+    $meta_keys = apply_filters(
+        'revisionary_create_revision_meta_keys',    // Bypass problematic Link Whisper plugin postmeta by default
+        array_diff($meta_keys, ['wpil_links_outbound_external_count_data', 'wpil_links_outbound_internal_count_data', 'wpil_links_outbound_external_count'])
+    );
 
     foreach ( $meta_keys as $meta_key ) {
         if ($empty_target_only && !empty($target_meta_keys) && is_array($target_meta_keys)) {
@@ -170,17 +173,19 @@ function revisionary_copy_postmeta($from_post, $to_post_id, $args = []) {
 
         $meta_values = \get_post_custom_values( $meta_key, $from_post->ID );
 
-        if (count($meta_values) > 1) {
-            delete_post_meta($to_post_id, $meta_key);
+        if (!empty($meta_values)) {
+            if (count($meta_values) > 1) {
+                delete_post_meta($to_post_id, $meta_key);
 
-            foreach ( $meta_values as $meta_value ) {
-                $meta_value = maybe_unserialize( $meta_value );
-                add_post_meta( $to_post_id, $meta_key, \PublishPress\Revisions\Utils::recursively_slash_strings( $meta_value ) );
-            }
-        } else {
-            foreach ( $meta_values as $meta_value ) {
-                $meta_value = maybe_unserialize( $meta_value );
-                update_post_meta( $to_post_id, $meta_key, \PublishPress\Revisions\Utils::recursively_slash_strings( $meta_value ) );
+                foreach ( $meta_values as $meta_value ) {
+                    $meta_value = maybe_unserialize( $meta_value );
+                    add_post_meta( $to_post_id, $meta_key, \PublishPress\Revisions\Utils::recursively_slash_strings( $meta_value ) );
+                }
+            } else {
+                foreach ( $meta_values as $meta_value ) {
+                    $meta_value = maybe_unserialize( $meta_value );
+                    update_post_meta( $to_post_id, $meta_key, \PublishPress\Revisions\Utils::recursively_slash_strings( $meta_value ) );
+                }
             }
         }
     }
