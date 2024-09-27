@@ -188,7 +188,14 @@ class RevisionaryAdminPosts {
 		$status_obj = get_post_status_object($post->post_status);
 
 		if (!empty($status_obj->public) || !empty($status_obj->private) || rvy_get_option('pending_revision_unpublished')) {
-			if (rvy_get_option('pending_revisions') && current_user_can('copy_post', $post->ID) && rvy_post_revision_supported($post, ['context' => 'admin_posts'])) {
+			if ($revision_blocked = rvy_post_revision_blocked($post, ['context' => 'admin_posts'])) {
+				if (('blocked_revision_limit' == $revision_blocked['code']) && rvy_get_option('revision_limit_compat_mode')) {
+					revisionary_refresh_postmeta($post->ID);
+					$revision_blocked = rvy_post_revision_blocked($post, ['context' => 'admin_posts']);
+				}
+			}
+
+			if (rvy_get_option('pending_revisions') && current_user_can('copy_post', $post->ID) && !$revision_blocked) {
 				$referer_arg = '&referer=' . esc_url_raw($_SERVER['REQUEST_URI']);
 
 				$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
