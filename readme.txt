@@ -239,6 +239,10 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.5.15 =
+* Fixed : Editing a post did not refresh its "Has Revisions" flag
+* Change : Setting to work around cache plugin conflicts by refreshing "Has Revisions" flag before suppressing a "New Revision" link on Posts / Pages screen
+
 = 3.5.14 - 26 Sep 2024 =
 * Fixed : New Revision link on Posts screen failed due to plugin conflict on some sites
 * Change : New setting (with disclaimer) to disable new unfiltered_html check. Useful on sites where any custom html is unintended and can be stripped out.
