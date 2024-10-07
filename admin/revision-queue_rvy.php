@@ -23,23 +23,23 @@ require_once( dirname(__FILE__).'/class-list-table_rvy.php');
 
 $list_table_class = apply_filters('revisionary_list_table_class', 'Revisionary_List_Table');
 
-$wp_list_table = new $list_table_class(['screen' => 'revisionary-q', 'post_types' => $post_types]);
+$wp_list_table = new $list_table_class(['screen' => 'revisionary-q', 'post_types' => $post_types]);					// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 $pagenum = $wp_list_table->get_pagenum();
 
-$parent_file = 'admin.php?page=revisionary-q';
-$submenu_file = 'admin.php?page=revisionary-q';
+$parent_file = 'admin.php?page=revisionary-q';																		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+$submenu_file = 'admin.php?page=revisionary-q';																		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
 $wp_list_table->prepare_items();
 
 $bulk_counts = array(
-	'deleted'   => isset( $_REQUEST['deleted'] )   ? absint( $_REQUEST['deleted'] )   : 0,
+	'deleted'   => isset( $_REQUEST['deleted'] )   ? absint( $_REQUEST['deleted'] )   : 0,							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	'updated' => 0,
 	'locked' => 0,
-	'submitted_count' => isset( $_REQUEST['submitted_count'] ) ? absint( $_REQUEST['submitted_count'] ) : 0,
-	'declined_count' => isset( $_REQUEST['declined_count'] ) ? absint( $_REQUEST['declined_count'] ) : 0,
-	'approved_count' => isset( $_REQUEST['approved_count'] ) ? absint( $_REQUEST['approved_count'] ) : 0,
-	'unscheduled_count' => isset( $_REQUEST['unscheduled_count'] ) ? absint( $_REQUEST['unscheduled_count'] ) : 0,
-	'published_count' => isset( $_REQUEST['published_count'] ) ? absint( $_REQUEST['published_count'] ) : 0,
+	'submitted_count' => isset( $_REQUEST['submitted_count'] ) ? absint( $_REQUEST['submitted_count'] ) : 0,		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	'declined_count' => isset( $_REQUEST['declined_count'] ) ? absint( $_REQUEST['declined_count'] ) : 0,			//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	'approved_count' => isset( $_REQUEST['approved_count'] ) ? absint( $_REQUEST['approved_count'] ) : 0,			//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	'unscheduled_count' => isset( $_REQUEST['unscheduled_count'] ) ? absint( $_REQUEST['unscheduled_count'] ) : 0, 	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	'published_count' => isset( $_REQUEST['published_count'] ) ? absint( $_REQUEST['published_count'] ) : 0,		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	'trashed' => 0,
 	'untrashed' => 0,
 );
@@ -78,41 +78,41 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 
 echo '<span class="dashicons dashicons-backup"></span>&nbsp;';
 
-if ( ! empty( $_REQUEST['post_type'] ) ) {
-	$type_obj = get_post_type_object(sanitize_key($_REQUEST['post_type']));
+if ( ! empty( $_REQUEST['post_type'] ) ) {												//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$type_obj = get_post_type_object(sanitize_key($_REQUEST['post_type']));				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 }
 
-if (!empty($_REQUEST['published_post'])) {
-	if ($_post = get_post((int) $_REQUEST['published_post'])) {
+if (!empty($_REQUEST['published_post'])) {												//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ($_post = get_post((int) $_REQUEST['published_post'])) {							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$published_title = $_post->post_title;
 	}
 }
 
 $filters = [];
 
-if (!empty($_REQUEST['author'])) {
-	if ($_user = new WP_User((int) $_REQUEST['author'])) {
-		$filters['author'] = (!empty($_REQUEST['post_status']) || !empty($_REQUEST['post_status'])) 
+if (!empty($_REQUEST['author'])) {																	 //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ($_user = new WP_User((int) $_REQUEST['author'])) {											 //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$filters['author'] = (!empty($_REQUEST['post_status']) || !empty($_REQUEST['post_status']))  //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		? sprintf(_x('%s: ', 'Author Name', 'revisionary'), $_user->display_name)
 		: $_user->display_name;
 	}
 }
 
-if (!empty($_REQUEST['post_status'])) {
-	if ($status_obj = get_post_status_object(sanitize_key($_REQUEST['post_status']))) {
+if (!empty($_REQUEST['post_status'])) {																//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ($status_obj = get_post_status_object(sanitize_key($_REQUEST['post_status']))) {				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$filters['post_status'] = (!empty($status_obj->labels->plural)) ? $status_obj->labels->plural : $status_obj->label;
 	}
 }
 
-if (!empty($_REQUEST['post_type']) && empty($published_title)) {
-	$filters['post_type'] = (!empty($_REQUEST['post_status'])) 
+if (!empty($_REQUEST['post_type']) && empty($published_title)) {									//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$filters['post_type'] = (!empty($_REQUEST['post_status'])) 										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	? sprintf(_x('of %s', 'Posts / Pages / etc.', 'revisionary'), $type_obj->labels->name) 
 	: $type_obj->labels->name;
 }
 
-if (!empty($_REQUEST['post_author']) && empty($published_title)) {
-	if ($_user = new WP_User((int) $_REQUEST['post_author'])) {
-		$filters['post_author'] = $filters 
+if (!empty($_REQUEST['post_author']) && empty($published_title)) {									//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ($_user = new WP_User((int) $_REQUEST['post_author'])) {										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$filters['post_author'] = $filters 															//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		? sprintf(esc_html__('%sPost Author: %s', 'revisionary'), ' - ', $_user->display_name) 
 		: sprintf(esc_html__('%sPost Author: %s', 'revisionary'), '', $_user->display_name);
 	}
@@ -127,9 +127,12 @@ if (!empty($published_title)) {
 ?></h1>
 
 <?php
-if ( isset( $_REQUEST['s'] ) && strlen( sanitize_text_field($_REQUEST['s']) ) ) {
-	/* translators: %s: search keywords */
-	printf( ' <span class="subtitle">' . esc_html__( 'Search results for "%s"' ) . '</span>', esc_html(wp_strip_all_tags(sanitize_text_field($_REQUEST['s']))) );
+if ( isset( $_REQUEST['s'] ) && strlen( sanitize_text_field($_REQUEST['s']) ) ) {					//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	/* translators: %s: search keywords */															//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	printf( 
+		' <span class="subtitle">' . esc_html__( 'Search results for "%s"' ) . '</span>', 
+		esc_html(wp_strip_all_tags(sanitize_text_field($_REQUEST['s']))) 							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	);
 }
 ?>
 
@@ -141,7 +144,7 @@ if ( isset( $_REQUEST['s'] ) && strlen( sanitize_text_field($_REQUEST['s']) ) ) 
 $messages = array();
 
 foreach ( $bulk_counts as $message => $count ) {
-	if ( $message == 'trashed' && isset( $_REQUEST['ids'] ) ) {
+	if ( $message == 'trashed' && isset( $_REQUEST['ids'] ) ) {										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$any_messages = true;
 		break;
 	} elseif (!empty($bulk_messages['post'][$message])) {
@@ -155,8 +158,9 @@ if (!empty($any_messages)) {
 }
 
 foreach ( $bulk_counts as $message => $count ) {
-	if ( $message == 'trashed' && isset( $_REQUEST['ids'] ) ) {
-		$ids = preg_replace( '/[^0-9,]/', '', sanitize_text_field($_REQUEST['ids']));
+	if ( $message == 'trashed' && isset( $_REQUEST['ids'] ) ) {										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$ids = preg_replace( '/[^0-9,]/', '', sanitize_text_field($_REQUEST['ids']));				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
 		echo '<a href="' . esc_url( wp_nonce_url( "edit.php?post_type=$post_type&doaction=undo&action=untrash&ids=$ids", "bulk-revision-queue" ) ) . '">' . esc_html__('Undo') . '</a> ';
 	
 	} elseif (!empty($bulk_messages['post'][$message])) {
@@ -170,7 +174,10 @@ if (!empty($any_messages)) {
 unset( $messages );
 
 if (!empty($_SERVER['REQUEST_URI'])) {
-	$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'locked', 'skipped', 'updated', 'approved_count', 'published_count', 'deleted', 'trashed', 'untrashed' ), esc_url(esc_url_raw($_SERVER['REQUEST_URI'])) );
+	$_SERVER['REQUEST_URI'] = remove_query_arg( 
+		array( 'locked', 'skipped', 'updated', 'approved_count', 'published_count', 'deleted', 'trashed', 'untrashed' ), 
+		esc_url(esc_url_raw($_SERVER['REQUEST_URI'])) 												//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	);
 }
 ?>
 
@@ -181,9 +188,12 @@ if (!empty($_SERVER['REQUEST_URI'])) {
 <?php $wp_list_table->search_box( 'Search', 'post' ); ?>
 
 <input type="hidden" name="page" class="post_status_page" value="revisionary-q" />
+
+																								<?php //phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
 <input type="hidden" name="post_status" class="post_status_page" value="<?php echo !empty($_REQUEST['post_status']) ? esc_attr(sanitize_key($_REQUEST['post_status'])) : 'all'; ?>" />
 
-<?php if ( ! empty( $_REQUEST['show_sticky'] ) ) { ?>
+<?php if ( ! empty( $_REQUEST['show_sticky'] ) ) { 													  //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+?>
 <input type="hidden" name="show_sticky" value="1" />
 <?php } ?>
 

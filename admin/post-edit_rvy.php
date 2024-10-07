@@ -271,7 +271,7 @@ class RvyPostEdit {
                     + '<label>' + '<?php _e("Author", 'revisionary');?>&nbsp;</label>'
                     + '</div>'
                     + "<div class='rvy-author-selection'>"
-                    + "<?php echo $select_html;?>"
+                    + "<?php echo $select_html;     // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>"
                     + '</div></div>'
                 );
             //});

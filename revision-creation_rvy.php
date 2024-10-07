@@ -106,6 +106,7 @@ class RevisionCreation {
 		$revision_id = $this->insert_revision($data, $source_post->ID, $revision_status, $args);
 
 		if (!empty($use_autosave)) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->delete($wpdb->posts, ['ID' => $autosave_post->ID]);
 		}
 
@@ -197,6 +198,7 @@ class RevisionCreation {
 		? ['comment_count' => $main_post_id, 'post_modified_gmt' => $data['post_modified_gmt'], 'post_modified' => $data['post_modified']]
 		: ['comment_count' => $main_post_id];
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update($wpdb->posts, $update_data, ['ID' => $revision_id]);
 
 		/**
@@ -261,6 +263,8 @@ class RevisionCreation {
 		// Set GUID.  @todo: still needed?
 		if ( '' == get_post_field( 'guid', $revision_id ) ) {
 			// need to give revision a guid for 3rd party editor compat (post_ID is ID of revision)
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->update( $wpdb->posts, array( 'guid' => get_permalink( $revision_id ) ), $where );
 		}
 	

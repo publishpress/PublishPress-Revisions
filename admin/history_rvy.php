@@ -38,10 +38,10 @@ class RevisionaryHistory
     function actCompareRevisionsTweakUI() {
         global $revisionary;
 
-        if (!empty($_REQUEST['revision'])) {
-            $revision_id = (int) $_REQUEST['revision'];
-        } elseif (isset($_REQUEST['to'])) {
-            $revision_id = (int) $_REQUEST['to'];
+        if (!empty($_REQUEST['revision'])) {                                            //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $revision_id = (int) $_REQUEST['revision'];                                 //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        } elseif (isset($_REQUEST['to'])) {                                             //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $revision_id = (int) $_REQUEST['to'];                                       //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         } else {
             return;
         }
@@ -72,22 +72,30 @@ class RevisionaryHistory
     public function actLoadRevision() {
         global $wpdb, $post, $title;
 
+        //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if (!empty($_REQUEST['revision']) && is_scalar($_REQUEST['revision']) && !empty($_REQUEST['post_id']) && !is_numeric($_REQUEST['revision']) && rvy_is_revision_status(sanitize_key($_REQUEST['revision']))) {
-            $revision_status = sanitize_key($_REQUEST['revision']);
+            
+            $revision_status = sanitize_key($_REQUEST['revision']);                     //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
             $orderby = ('future-revision' == $revision_status) ? 'post_date' : 'ID';
             $order =   ('future-revision' == $revision_status) ? 'DESC' : 'ASC';
 
-            $_revisions = rvy_get_post_revisions(intval($_REQUEST['post_id']), $revision_status, ['orderby' => $orderby, 'order' => $order]);
+            $_revisions = rvy_get_post_revisions(
+                intval($_REQUEST['post_id']),                                           //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                $revision_status, 
+                ['orderby' => $orderby, 'order' => $order]
+            );
+
+            // phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInTernaryCondition
             $revision_id = ($revision = array_pop($_revisions)) ? $revision->ID : 0;
 
             $_REQUEST['revision'] = $revision_id;
         } else {
-            $revision_id = (isset($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : '';
+            $revision_id = (isset($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : '';   //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         }
 
-        $from = (isset($_REQUEST['from'])) ? (int) $_REQUEST['from'] : '';
-        $to = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : '';
+        $from = (isset($_REQUEST['from'])) ? (int) $_REQUEST['from'] : '';              //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $to = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : '';                    //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
         $from = is_numeric( $from ) ? absint( $from ) : null;
         if ( ! $revision_id ) {
@@ -113,7 +121,7 @@ class RevisionaryHistory
                 }
 
                 // global variable used by WP core
-                $post = $revision;
+                $post = $revision;                                                          // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
                 if (rvy_in_revision_workflow($revision)) {
                     if ( ! $published_post = get_post( rvy_post_id($revision->ID) ) ) {
@@ -160,7 +168,7 @@ class RevisionaryHistory
                 $post_title     = '<a href="' . $post_edit_link . '">' . _draft_or_post_title($published_post) . '</a>';
                 /* translators: %s: post title */
                 $do_h1 = true;
-                $title          = $status_obj->labels->plural;
+                $title          = $status_obj->labels->plural;                              // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
                 $redirect = false;
                 break;
@@ -245,9 +253,9 @@ class RevisionaryHistory
             return;
         }
 
-        $revision_id = (isset($_REQUEST['revision'])) ? absint($_REQUEST['revision']) : '';
-        $from = (isset($_REQUEST['from'])) ? (int) $_REQUEST['from'] : '';
-        $to = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : '';
+        $revision_id = (isset($_REQUEST['revision'])) ? absint($_REQUEST['revision']) : '';     //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $from = (isset($_REQUEST['from'])) ? (int) $_REQUEST['from'] : '';                      //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $to = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : '';                            //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
         $from = is_numeric( $from ) ? absint( $from ) : null;
         if ( ! $revision_id ) {
@@ -310,11 +318,11 @@ class RevisionaryHistory
 
     // port wp_ajax_get_revision_diffs() to support pending, scheduled revisions
     public function actAjaxRevisionDiffs() {
-        if (!isset($_REQUEST['post_id'])) {
+        if (!isset($_REQUEST['post_id'])) {                                                     //phpcs:ignore WordPress.Security.NonceVerification.Recommended
             return; 
         }
 
-        if ( ! $post = get_post( (int) $_REQUEST['post_id'] ) ) {
+        if ( ! $post = get_post( (int) $_REQUEST['post_id'] ) ) {                               //phpcs:ignore WordPress.Security.NonceVerification.Recommended
             return;
         }
 
@@ -322,15 +330,15 @@ class RevisionaryHistory
             return;
         }
 
-        $revision_id = (isset($_REQUEST['revision'])) ? absint($_REQUEST['revision']) : '';
-        $from = (isset($_REQUEST['from'])) ? (int) $_REQUEST['from'] : '';
-        $to = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : '';
+        $revision_id = (isset($_REQUEST['revision'])) ? absint($_REQUEST['revision']) : '';     //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $from = (isset($_REQUEST['from'])) ? (int) $_REQUEST['from'] : '';                      //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $to = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : '';                            //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-        if (!$revision_id && !$to && !empty($_REQUEST['compare'])) {
+        if (!$revision_id && !$to && !empty($_REQUEST['compare'])) {                            //phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $compare = sanitize_text_field(
-                is_array($_REQUEST['compare'])
-                ? reset($_REQUEST['compare'])
-                : $_REQUEST['compare']
+                is_array($_REQUEST['compare'])                                                  //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                ? (int) reset($_REQUEST['compare'])    //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+                : $_REQUEST['compare']                                                          //phpcs:ignore WordPress.Security.NonceVerification.Recommended
             );
             
             list( $from, $to ) = explode( ':', $compare); // from:to
@@ -892,6 +900,8 @@ class RevisionaryHistory
 
                     // For non-public types, force direct approval because preview is not available
 	                if ((($type_obj && !is_post_type_viewable($type_obj)) || rvy_get_option('compare_revisions_direct_approval')) && current_user_can( 'edit_post', $published_post_id) ) {
+                        
+                                                                                                    //phpcs:ignore WordPress.Security.NonceVerification.Recommended
                         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
 
                         if (in_array($revision->post_mime_type, ['draft-revision', 'pending-revision'])) {
@@ -1049,9 +1059,9 @@ class RevisionaryHistory
             return;
         }
 
-        $post_id = (isset($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : 0;
+        $post_id = (isset($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : 0;    //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if (!$post_id) {
-            $post_id = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : 0;
+            $post_id = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : 0;            //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         }
 
         if ($post_type = get_post_field('post_type', $post_id)) {
@@ -1137,9 +1147,9 @@ class RevisionaryHistory
             return;
         }
 
-        $post_id = (isset($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : 0;
+        $post_id = (isset($_REQUEST['revision'])) ? (int) $_REQUEST['revision'] : 0;    //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if (!$post_id) {
-            $post_id = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : 0;
+            $post_id = (isset($_REQUEST['to'])) ? (int) $_REQUEST['to'] : 0;            //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         }
 
         if ($post = get_post($post_id)) {

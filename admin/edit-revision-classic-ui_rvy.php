@@ -27,6 +27,7 @@ class RevisionaryEditRevisionClassicUI {
 		if ($post) {
 			$last_id = $post->ID - 1;
 
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$last_post = $wpdb->get_row(
 				$wpdb->prepare(
 					"SELECT * FROM $wpdb->posts WHERE ID = %d",
@@ -106,6 +107,7 @@ class RevisionaryEditRevisionClassicUI {
 
         if ('attachment' != $post_type) {
             if (!empty($wp_meta_boxes[$post_type]['side']['core']['submitdiv'])) {
+				// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 				$wp_meta_boxes[$post_type]['side']['core']['submitdiv']['callback'] = [$this, 'post_submit_meta_box'];
             }
         }
@@ -187,7 +189,7 @@ class RevisionaryEditRevisionClassicUI {
 			?>
 			<div class="misc-pub-section curtime misc-pub-curtime">
 				<span id="timestamp">
-					<?php printf( $stamp, '<b>' . $date . '</b>' ); ?>
+					<?php printf( $stamp, '<b>' . $date . '</b>' );		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</span>
 				<a href="#edit_timestamp" class="edit-timestamp hide-if-no-js" role="button">
 					<span aria-hidden="true"><?php _e( 'Edit' ); ?></span>

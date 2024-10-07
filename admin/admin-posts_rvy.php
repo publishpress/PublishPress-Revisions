@@ -4,7 +4,7 @@ class RevisionaryAdminPosts {
 	private $trashed_revisions;
 
     function __construct() {
-        if ( ! empty( $_REQUEST['revision_action'] ) ) {
+        if ( ! empty( $_REQUEST['revision_action'] ) ) {								//phpcs:ignore WordPress.Security.NonceVerification.Recommended
             add_action( 'all_admin_notices', [$this, 'revision_action_notice']);
         }
 
@@ -13,18 +13,20 @@ class RevisionaryAdminPosts {
         add_filter('display_post_states', [$this, 'flt_display_post_states'], 50, 2);
 		add_filter('page_row_actions', [$this, 'revisions_row_action_link']);
 		add_filter('post_row_actions', [$this, 'revisions_row_action_link']);
-
+																						//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if (!empty($_REQUEST['post_status']) && ('trash' == sanitize_key($_REQUEST['post_status']))) {
 			add_filter('display_post_states', [$this, 'fltTrashedPostState'], 20, 2 );
 			add_filter('get_comments_number', [$this, 'fltCommentsNumber'], 20, 2);
 		}
 
 		// If a revision was just deleted from within post editor, redirect to Revision Queue
+																						//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if (!empty($_REQUEST['trashed']) && !empty($_REQUEST['post_type']) && !empty($_REQUEST['ids']) && is_scalar($_REQUEST['ids'])) {
-			$post_type = sanitize_key($_REQUEST['post_type']);
+		
+			$post_type = sanitize_key($_REQUEST['post_type']);							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			if (in_array($post_type, rvy_get_manageable_types())) {
-				$deleted_id = (int) $_REQUEST['ids'];
+				$deleted_id = (int) $_REQUEST['ids'];									//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 				if (!empty($_SERVER['HTTP_REFERER']) && (
 					(false !== strpos(esc_url_raw($_SERVER['HTTP_REFERER']), admin_url("post.php?post={$deleted_id}&action=edit")))
@@ -50,26 +52,26 @@ class RevisionaryAdminPosts {
     }
     
     function revision_action_notice() {
-		if ( ! empty($_GET['restored_post'] ) ) {
+		if ( ! empty($_GET['restored_post'] ) ) {										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			?>
 			<div class='updated' style="padding-top: 10px; padding-bottom: 10px"><?php esc_html_e('The revision was restored.', 'revisionary');?>
 			</div>
 			<?php
-		} elseif ( ! empty($_GET['scheduled'] ) ) {
+		} elseif ( ! empty($_GET['scheduled'] ) ) {										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			?>
 			<div class='updated' style="padding-top: 10px; padding-bottom: 10px"><?php esc_html_e('The revision was scheduled for publication.', 'revisionary');?>
 			</div>
 			<?php
-		} elseif ( ! empty($_GET['published_post'] ) ) {
+		} elseif ( ! empty($_GET['published_post'] ) ) {								//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			?>
 			<div class='updated' style="padding-top: 10px; padding-bottom: 10px"><?php esc_html_e('The revision was published.', 'revisionary');?>
 			</div>
-			<?php	
+			<?php																		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
     	} elseif ( !empty($_GET['revision_action']) && ('blocked_unfiltered' == $_GET['revision_action'] ) ) {
 			?>
 			<div class='error' style="padding-top: 10px; padding-bottom: 10px"><?php printf(esc_html__('The unfiltered_html capability is required to create a revision of this post. See %sdocumentation%s.', 'revisionary'), '<a href="https://publishpress.com/knowledge-base/troubleshooting-revisionary/" target="_blank">', '</a>');?>
 			</div>
-			<?php	
+			<?php																		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
     	} elseif ( !empty($_GET['revision_action']) && ('blocked_revision_limit' == $_GET['revision_action'] ) ) {
 			?>
 			<div class='error' style="padding-top: 10px; padding-bottom: 10px"><?php esc_html_e('The post already has a revision in process.', 'revisionary');?>
@@ -100,8 +102,11 @@ class RevisionaryAdminPosts {
 			$revision_base_statuses = array_map('sanitize_key', rvy_revision_base_statuses());
 			$revision_base_status_csv = implode("','", $revision_base_statuses);
 
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$results = $wpdb->get_results(
-				"SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts WHERE comment_count IN ('$id_csv') AND post_status IN ('$revision_base_status_csv') AND post_mime_type IN ('$revision_status_csv') AND post_type != '' GROUP BY comment_count"
+				"SELECT comment_count AS published_post, COUNT(comment_count) AS num_revisions FROM $wpdb->posts"
+				. " WHERE comment_count IN ('$id_csv') AND post_status IN ('$revision_base_status_csv')"			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				. " AND post_mime_type IN ('$revision_status_csv') AND post_type != '' GROUP BY comment_count"		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			);
 			
 			foreach($results as $row) {
@@ -121,6 +126,8 @@ class RevisionaryAdminPosts {
 			}
 
 			$listed_post_csv = implode("','", array_map('intval', $listed_ids));
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$this->trashed_revisions = $wpdb->get_col("SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_base_post_id' AND post_id IN ('$listed_post_csv')");
 		} else {
 			$this->trashed_revisions = [];
@@ -198,6 +205,7 @@ class RevisionaryAdminPosts {
 			if (rvy_get_option('pending_revisions') && current_user_can('copy_post', $post->ID) && !$revision_blocked) {
 				$referer_arg = '&referer=' . esc_url_raw($_SERVER['REQUEST_URI']);
 
+				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
 				$url = rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise{$referer_arg}$redirect_arg");
 				

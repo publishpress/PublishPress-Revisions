@@ -26,7 +26,10 @@ class RvyError {
 		foreach( $this->notices as $msg ) {
 			$style = ( ! empty( $msg->style ) ) ? $msg->style : "color:black";
 			$class = ( ! empty( $msg->class ) ) ? $msg->class : '';
-			echo "<div id='message' class='error fade' style='" . esc_attr($style) . "' class='" . esc_attr($class) . "'>" . $msg->body . '</div>';
+
+			echo "<div id='message' class='error fade' style='" . esc_attr($style) . "' class='" . esc_attr($class) . "'>" 
+			. $msg->body 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			. '</div>';
 		}
 	}
 } // end class

@@ -1,4 +1,11 @@
 <?php
+/**
+ * @phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_error_log, WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace
+ * @phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_var_dump, PublishPressStandards.Debug.DisallowDebugFunctions.FoundVarDumpFunction
+ * @phpcs:disable PublishPressStandards.Debug.DisallowDebugFunctions.FoundDumpFunction
+ * @phpcs:disable WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_is_writable
+ */
+
 if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw($_SERVER['SCRIPT_FILENAME'])) )
 	die();
 	

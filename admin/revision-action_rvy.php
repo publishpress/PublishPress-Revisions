@@ -16,8 +16,8 @@ function rvy_revision_diff() {
 
 function rvy_revision_create($post_id = 0, $args = []) {
 	if (!$post_id) {
-		if (isset($_REQUEST['post'])) {
-			$post_id = (int) $_REQUEST['post'];
+		if (isset($_REQUEST['post'])) {									//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$post_id = (int) $_REQUEST['post'];							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		} else {
 			return;
 		}
@@ -100,6 +100,7 @@ function rvy_revision_submit($revision_id = 0) {
 
 		// safeguard: make sure this hasn't already been published
 		if ( empty($status_obj->public) && empty($status_obj->private) ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->update($wpdb->posts, ['post_status' => 'pending', 'post_mime_type' => 'pending-revision'], ['ID' => $revision_id]);
 
 			if (defined('REVISIONARY_LIMIT_IGNORE_UNSUBMITTED')) {
@@ -195,12 +196,14 @@ function rvy_revision_decline($revision_id = 0) {
 
 		$status_obj = get_post_status_object( $revision->post_mime_type );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update($wpdb->posts, ['post_status' => 'draft', 'post_mime_type' => 'draft-revision'], ['ID' => $revision_id]);
 
 		clean_post_cache($revision_id);
 
 		// @todo: notifications for revision decline
 
+		// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 		/*
 		require_once( dirname(REVISIONARY_FILE).'/revision-workflow_rvy.php' );
 		$rvy_workflow_ui = new Rvy_Revision_Workflow_UI();
@@ -312,9 +315,11 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 						}
 	
 						if ($update_data) {
+							// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 							$wpdb->update($wpdb->posts, $update_data, ['ID' => $revision_id]);
 						}
 	
+						// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 						$wpdb->delete($wpdb->posts, ['ID' => $autosave_post->ID]);
 					}
 				}
@@ -328,6 +333,7 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 				$data = [];
 				$data['post_name'] = wp_unique_post_slug(sanitize_title($post->post_title, $post->ID), $post->ID, 'publish', $post->post_type, $post->post_parent);
 
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->update($wpdb->posts, ['post_name' => $data['post_name']], ['ID' => $post->ID]);
 				clean_post_cache($post->ID);
 			}
@@ -351,6 +357,7 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 					if ( class_exists('WPCom_Markdown') && ! defined( 'RVY_DISABLE_MARKDOWN_WORKAROUND' ) )
 						$data['post_content_filtered'] = $revision->post_content;
 					
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 					$wpdb->update( $wpdb->posts, $data, array( 'ID' => $revision->ID ) );
 					
 					wp_restore_post_revision( $revision->ID, array( 'post_content', 'post_title', 'post_date', 'post_date_gmt', 'post_modified', 'post_modified_gmt' ) );
@@ -369,6 +376,7 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 					}
 
 					if (!empty($update_data)) {
+						// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 						$wpdb->update($wpdb->posts, $update_data, ['ID' => $published_id]);
 					}
 
@@ -384,6 +392,7 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 		// If requested publish date is in the future, schedule the revision
 		} else {
 			if ( 'future-revision' != $revision->post_mime_type ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->update( $wpdb->posts, array( 'post_mime_type' => 'future-revision' ), array( 'ID' => $revision->ID ) );
 				
 				rvy_update_next_publish_date(['revision_id' => $revision_id]);
@@ -626,6 +635,7 @@ function rvy_revision_restore() {
 		if ( class_exists('WPCom_Markdown') && ! defined( 'RVY_DISABLE_MARKDOWN_WORKAROUND' ) )
 			$data['post_content_filtered'] = $revision->post_content;
 		
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update($wpdb->posts, $data, array('ID' => $revision->ID));
 		
 		wp_restore_post_revision( $revision->ID, array( 'post_content', 'post_title', 'post_date', 'post_date_gmt', 'post_modified', 'post_modified_gmt' ) );
@@ -687,6 +697,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	$update = (array) $revision;
 
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	$published = $wpdb->get_row(
 		$wpdb->prepare("SELECT * FROM $wpdb->posts WHERE ID = %d", $published_id)
 	);
@@ -839,6 +850,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 	}
 
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	$wpdb->update($wpdb->posts, $update_fields, ['ID' => $post_id]);
 
 	// also copy all stored postmeta from revision
@@ -868,6 +880,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	if ($published_id != $revision_id) {
 		if (!defined('REVISIONARY_NO_SCHEDULED_REVISION_ARCHIVE')) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->update(
 				$wpdb->posts, 
 				['post_type' => 'revision', 
@@ -887,6 +900,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 
 		// todo: save change as past revision?
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
 	}
 	
@@ -913,6 +928,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	if (defined('POLYLANG_VERSION')) {
 		if (!empty($lang_descripts)) {
 			foreach($lang_descripts as $tt_id => $descript) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->update($wpdb->term_taxonomy, ['description' => $descript], ['term_taxonomy_id' => $tt_id]);
 			}
 		}
@@ -974,9 +990,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	}
 
 	if (defined('PUBLISHPRESS_VERSION') && rvy_get_option('rev_publication_delete_ed_comments')) {
-		global $wpdb;
-
-		$wpdb->query(
+		$wpdb->query(											// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
 				"DELETE FROM $wpdb->comments WHERE comment_approved = 'editorial-comment' AND (comment_post_ID = %d OR comment_post_ID = %d)",
 				$revision_id,
@@ -1022,7 +1036,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 function rvy_delete_redundant_revisions($revision) {
 	global $wpdb, $current_user;
 
-	$wpdb->query(
+	$wpdb->query(												// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->prepare(
 			"DELETE FROM $wpdb->posts WHERE post_type = %s AND post_status = %s AND post_author = %d AND post_parent = %d AND ID > %d",
 			'revision',
@@ -1050,9 +1064,13 @@ function rvy_do_revision_restore( $revision_id, $actual_revision_status = '' ) {
 		wp_restore_post_revision( $revision_id );
 
 		// @todo: why do revision post_date, post_date_gmt get changed?
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->posts SET post_date = %s, post_date_gmt = %s WHERE ID = %d", $revision_date, $revision_date_gmt, $revision->ID ) );
 
 		// @todo: why does a redundant revision with post_author = 0 get created at revision publication?
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->posts WHERE post_type = 'revision' AND post_author = 0 AND post_parent = %d", $revision->post_parent ) );
 	}
 
@@ -1210,6 +1228,7 @@ function rvy_revision_unschedule($revision_id) {
 			break;
 		}
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update( $wpdb->posts, ['post_status' => 'draft', 'post_mime_type' => 'draft-revision'], ['ID' => $revision->ID] );
 		
 		clean_post_cache($revision->ID);
@@ -1315,11 +1334,12 @@ function rvy_publish_scheduled_revisions($args = []) {
 
 	$revised_uris = array();
 
-	if (defined('WP_DEBUG') && WP_DEBUG && !empty($_GET['rs_debug'])) {
+	if (defined('WP_DEBUG') && WP_DEBUG && !empty($_GET['rs_debug'])) {						//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		echo "current time: " . esc_html($time_gmt);
 	}
 
 	if (!empty($args['revision_id']) && is_scalar($args['revision_id'])) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$results = $wpdb->get_results( 
 			$wpdb->prepare( 
 				"SELECT * FROM $wpdb->posts WHERE post_type != 'revision' AND post_status != 'inherit' AND post_mime_type = 'future-revision' AND ID = %d",
@@ -1327,6 +1347,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 			)
 		);
 	} else {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$results = $wpdb->get_results( 
 			$wpdb->prepare(
 				"SELECT * FROM $wpdb->posts WHERE post_type != 'revision' AND post_status != 'inherit' AND post_mime_type = 'future-revision' AND post_date_gmt <= %s ORDER BY post_date_gmt DESC",
@@ -1351,7 +1372,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 					continue;
 				}
 
-				if (defined('WP_DEBUG') && WP_DEBUG && ! empty( $_GET['rs_debug'] ) ) {
+				if (defined('WP_DEBUG') && WP_DEBUG && ! empty( $_GET['rs_debug'] ) ) {		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					echo '<br />' . "publishing revision " . esc_html($row->ID);
 				}
 
@@ -1547,6 +1568,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 								) 
 						. "')";
 
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$wpdb->query( "UPDATE $wpdb->posts SET post_type = 'revision', post_status = 'inherit' WHERE post_mime_type = 'future-revision' $id_clause" );
 		}
 	}
@@ -1556,7 +1578,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 	}
 
 	// if this was initiated by an asynchronous remote call, we're done.
-	if ( ! empty( $_GET['action']) && ( 'publish_scheduled_revisions' == $_GET['action'] ) ) {
+	if ( ! empty( $_GET['action']) && ( 'publish_scheduled_revisions' == $_GET['action'] ) ) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		exit( 0 );
 	} elseif (!empty($_SERVER['REQUEST_URI'])) {
 		if ( in_array( esc_url_raw($_SERVER['REQUEST_URI']), $revised_uris ) ) {
@@ -1575,6 +1597,7 @@ function rvy_update_next_publish_date($args = []) {
 		}
 	}
 
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	if ( $next_publish_date_gmt = $wpdb->get_var( "SELECT post_date_gmt FROM $wpdb->posts WHERE post_mime_type = 'future-revision' ORDER BY post_date_gmt ASC LIMIT 1" ) ) {
 
 	} else {
@@ -1591,6 +1614,8 @@ function rvy_review_revision( $revision_id ) {
 		if ( ! $revision->post_content_filtered ) {
 			if ( $post = get_post( $revision->post_parent ) ) {
 				global $wpdb;
+
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->update( $wpdb->posts, array( 'post_content_filtered' => $post->post_content_filtered ), array( 'ID' => $revision_id ) );
 			}
 		}
@@ -1600,14 +1625,17 @@ function rvy_review_revision( $revision_id ) {
 function rvy_delete_past_revisions($post_id) {
 	global $wpdb;
 
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	$revision_ids = $wpdb->get_col($wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_type = 'revision' AND post_status = 'inherit' AND post_parent = %d", $post_id));
 
 	// delete any associated "inherit" copies that were generated due to revision editing
 	foreach($revision_ids as $_revision_id) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->delete($wpdb->postmeta, array('post_id' => $_revision_id));
 	}
 
 	if ($revision_ids) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->delete($wpdb->posts, array('post_type' => 'revision', 'post_status' => 'inherit', 'post_parent' => $post_id));
 	}
 }
@@ -1637,6 +1665,8 @@ function rvy_format_content( $content, $content_filtered, $post_id, $args = arra
 			
 			if ( $update_db ) {
 				global $wpdb;
+
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->update( $wpdb->posts, array( 'post_content' => $formatted_content, 'post_content_filtered' => $content_filtered ), array( 'ID' => $post_id ) );
 			}
 		}
@@ -1718,6 +1748,7 @@ function rvy_update_post($postarr = []) {
 	$data  = wp_unslash( $data );
 	$where = array( 'ID' => $postarr['ID'] );
 
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	if ( false === $wpdb->update( $wpdb->posts, $data, $where ) ) {
 		return 0;
 	}

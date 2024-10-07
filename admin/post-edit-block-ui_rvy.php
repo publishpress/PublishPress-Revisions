@@ -24,6 +24,8 @@ if ($_post_id = rvy_detect_post_id()) {
 
                 $_post->post_modified_gmt = gmdate('Y/m/d H:i:s', strtotime($_post->post_modified_gmt) - 1);
                 $_post->post_modified = gmdate('Y/m/d H:i:s', strtotime($_post->post_modified) - 1);
+
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
                 $wpdb->update($wpdb->posts, ['post_modified_gmt' => $_post->post_modified_gmt, 'post_modified' => $_post->post_modified], ['ID' => $_post->ID]);
 
                 if (!get_transient("revisionary-post-edit-redirect-{$_post_id}")) {

@@ -95,6 +95,7 @@ class PluginCompat {
 		if ($comment && !empty($comment->comment_post_ID)) {
 			if ($_post = get_post($comment->comment_post_ID)) {
 				if (rvy_in_revision_workflow($_post)) {
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 					$wpdb->update(
 						$wpdb->posts, 
 						['comment_count' => rvy_post_id($comment->comment_post_ID)], 

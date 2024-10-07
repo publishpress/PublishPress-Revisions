@@ -38,9 +38,9 @@ class RevisionaryPostEditorMetaboxes {
 		if ( ! empty( $this->$property_name ) ) {
 			echo esc_html($this->$property_name);
 		
-		} elseif ( ! empty( $_GET['post'] ) ) {
+		} elseif ( ! empty( $_GET['post'] ) ) {									//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$args = array( 'format' => 'list', 'parent' => false );
-			rvy_list_post_revisions( (int) $_GET['post'], $status, $args );
+			rvy_list_post_revisions( (int) $_GET['post'], $status, $args );		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
 	}
 	
@@ -110,8 +110,8 @@ class RevisionaryPostEditorMetaboxes {
         // prevent PHP Notice from Multiple Authors code:
         // Notice: Trying to get property of non-object in F:\www\wp50\wp-content\plugins\publishpress-multiple-authors\core\Classes\Utils.php on line 309
         // @todo: address within MA
-        if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && !empty($_REQUEST['post'])) {
-            $post = get_post((int) $_REQUEST['post']);
+        if (defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION') && !empty($_REQUEST['post'])) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$post = get_post((int) $_REQUEST['post']);											//phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited, WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
         }
     }
 

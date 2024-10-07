@@ -84,7 +84,7 @@ class PostEditorWorkflowUI {
         } else {
             $vars['revisionEdits'] = '';
         }
-
+                                                                                                        //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
 
         $draft_obj = get_post_status_object('draft-revision');
@@ -193,7 +193,7 @@ class PostEditorWorkflowUI {
         } else {
             $vars['scheduledRevisionsURL'] = '';
         }
-
+                                                                                                //phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
         $published_post_id = rvy_post_id($post->ID);
 

@@ -16,13 +16,14 @@ class Revisionary_Submittee {
 		if ( $customize_defaults )
 			$sitewide = true;		// default customization is only for per-site options, but is network-wide in terms of DB storage in sitemeta table
 		
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 		if (isset($_GET["page"]) && false === strpos( sanitize_key($_GET["page"]), 'revisionary-' ) && false === strpos( sanitize_key($_GET["page"]), 'rvy-' ) )
 			return;
 		
-		if ( empty($_POST['rvy_submission_topic']) )
+		if ( empty($_POST['rvy_submission_topic']) )			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 			return;
 		
-		if ( 'options' == $_POST['rvy_submission_topic'] ) {
+		if ( 'options' == $_POST['rvy_submission_topic'] ) {	// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 			rvy_refresh_default_options();
 
 			$method = "{$action}_options";
@@ -64,6 +65,7 @@ class Revisionary_Submittee {
 	function update_sitewide() {
 		check_admin_referer( 'rvy-update-options' );
 		
+		//phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$reviewed_options = isset($_POST['rvy_all_movable_options']) ? array_map('sanitize_key', explode(',', $_POST['rvy_all_movable_options'])) : array();
 		
 		$options_sitewide = isset($_POST['rvy_options_sitewide']) ? array_map('sanitize_key', (array) $_POST['rvy_options_sitewide']) : array();

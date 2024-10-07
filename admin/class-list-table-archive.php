@@ -29,24 +29,24 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
     public function prepare_items() {
 		global $wpdb, $per_page, $current_user;
 
-		$per_page 		= $this->get_items_per_page( 'revision_archive_per_page' );
-		$paged 			= isset( $_REQUEST['paged'] ) ? max( 0, intval( $_REQUEST['paged'] ) - 1 ) : 0;
+		$per_page 		= $this->get_items_per_page( 'revision_archive_per_page' );						//phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		$paged 			= isset( $_REQUEST['paged'] ) ? max( 0, intval( $_REQUEST['paged'] ) - 1 ) : 0;	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$offset 		= $paged * $per_page;
-		$orderby		= isset( $_REQUEST['orderby'] )
-			&& ! empty( $_REQUEST['orderby'] )
+		$orderby		= isset( $_REQUEST['orderby'] )													//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			&& ! empty( $_REQUEST['orderby'] )															//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			&& in_array(
-				$_REQUEST['orderby'],
+				$_REQUEST['orderby'],																	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				[
 					'origin_post_date',
 					'post_date',
 					'post_count'
 				]
 			)
-			? sanitize_key( $_REQUEST['orderby'] )
+			? sanitize_key( $_REQUEST['orderby'] )														//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			: 'post_date';
-
-		$order			= isset( $_REQUEST['order'] ) && ! empty( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], ['asc', 'desc'] )
-			? sanitize_key( strtoupper( $_REQUEST['order'] ) )
+																										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$order = isset( $_REQUEST['order'] ) && ! empty( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], ['asc', 'desc'] )
+			? strtoupper(sanitize_key($_REQUEST['order']))												//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			: 'DESC';
 
 		// Filters
@@ -54,37 +54,39 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			'orderby' 	=> $orderby,
 			'order'		=> $order
 		];
-		if( isset( $_REQUEST['s'] ) && ! empty( trim( $_REQUEST['s'] ) ) ) {
-			$args['s'] = strtolower( sanitize_text_field( trim( $_REQUEST['s'] ) ) );
+		if( isset( $_REQUEST['s'] ) && ! empty( trim( sanitize_text_field($_REQUEST['s']) ) ) ) {							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$args['s'] = strtolower( sanitize_text_field( trim( sanitize_text_field($_REQUEST['s']) ) ) );					//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
-		if( isset( $_REQUEST['origin_post'] ) && ! empty( $_REQUEST['origin_post'] ) ) {
-			$args['origin_post'] = (int) $_REQUEST['origin_post'];
+		if( isset( $_REQUEST['origin_post'] ) && ! empty( $_REQUEST['origin_post'] ) ) {				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$args['origin_post'] = (int) $_REQUEST['origin_post'];										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
-		if( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) ) {
-			$args['origin_post_author'] = (int) $_REQUEST['origin_post_author'];
+		if( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) ) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$args['origin_post_author'] = (int) $_REQUEST['origin_post_author'];						//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
-		if( isset( $_REQUEST['post_author'] ) && ! empty( $_REQUEST['post_author'] ) ) {
-			$args['post_author'] = (int) $_REQUEST['post_author'];
+		if( isset( $_REQUEST['post_author'] ) && ! empty( $_REQUEST['post_author'] ) ) {				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$args['post_author'] = (int) $_REQUEST['post_author'];										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
-		if( isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] ) ) {
-			$args['origin_post_type'] = sanitize_text_field( $_REQUEST['origin_post_type'] );
+		if( isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] ) ) {		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$args['origin_post_type'] = sanitize_text_field( $_REQUEST['origin_post_type'] );			//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
-		if( isset( $_REQUEST['post_parent'] ) && ! empty( $_REQUEST['post_parent'] ) ) {
-			$args['post_parent'] = (int) $_REQUEST['post_parent'];
+		if( isset( $_REQUEST['post_parent'] ) && ! empty( $_REQUEST['post_parent'] ) ) {				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$args['post_parent'] = (int) $_REQUEST['post_parent'];										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
 
 		$base_query = $this->do_query( $args );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
-				"{$base_query} LIMIT %d,%d",
+				"{$base_query} LIMIT %d,%d",															// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$offset,
 				$per_page
 			)
 		);
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$total_items = $wpdb->get_var(
-			$this->count_query( 'total_items', $base_query )
+			"SELECT COUNT(*) as total_items FROM ($base_query) as total_items_subquery"					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		);
 
 		$this->set_pagination_args( [
@@ -97,8 +99,9 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		// @todo: determine if any items have an approved_by postmeta row
 		$post_id_csv = implode("','", wp_list_pluck($results, 'ID'));
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$this->show_approved_by_col = $wpdb->get_var(
-			"SELECT meta_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_approved_by' AND meta_value > 0 AND post_id IN ('$post_id_csv') LIMIT 1"
+			"SELECT meta_id FROM $wpdb->postmeta WHERE meta_key = '_rvy_approved_by' AND meta_value > 0 AND post_id IN ('$post_id_csv') LIMIT 1"  // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		);
 
 		// 'All Revisions' link with count
@@ -131,19 +134,19 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$count = 0;
 
 		// Post title
-		if( isset( $_REQUEST['origin_post'] ) && ! empty( $_REQUEST['origin_post'] )
+		if( isset( $_REQUEST['origin_post'] ) && ! empty( $_REQUEST['origin_post'] )				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		) {
-			if ($post_title = get_post_field('post_title', (int) $_REQUEST['origin_post'])) {
+			if ($post_title = get_post_field('post_title', (int) $_REQUEST['origin_post'])) {		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$heading .= $this->heading_spacing( $count );
 				$heading .= $post_title;
 				$count++;
 			}
 		} else {
 			// Post type
-			if( isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] )
-				&& in_array( $_REQUEST['origin_post_type'], $this->post_types )
+			if( isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] )	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				&& in_array( $_REQUEST['origin_post_type'], $this->post_types )						//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			) {
-				$obj = get_post_type_object( sanitize_key( $_REQUEST['origin_post_type'] ) );
+				$obj = get_post_type_object( sanitize_key( $_REQUEST['origin_post_type'] ) );		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$heading .= $this->heading_spacing( $count );
 				$heading .= $obj->labels->name;
 				$count++;
@@ -151,7 +154,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		}
 
 		// Revision post author
-		if( isset( $_REQUEST['post_author'] ) && ! empty( $_REQUEST['post_author'] ) ) {
+		if( isset( $_REQUEST['post_author'] ) && ! empty( $_REQUEST['post_author'] ) ) {			//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$heading .= $this->heading_spacing( $count );
 			$heading .= sprintf(
 				__( 'Revision Author: %s' ,'revisionary' ),
@@ -161,14 +164,14 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		}
 
 		// Revision post parent
-		if( isset( $_REQUEST['post_parent'] ) && ! empty( $_REQUEST['post_parent'] ) ) {
+		if( isset( $_REQUEST['post_parent'] ) && ! empty( $_REQUEST['post_parent'] ) ) {			//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$heading .= $this->heading_spacing( $count );
 			$heading .= '"' . get_the_title( (int) $_REQUEST['post_parent'] ) . '"';
 			$count++;
 		}
 
 		// Origin post author
-		if( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) ) {
+		if( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) ) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$heading .= $this->heading_spacing( $count );
 			$heading .= sprintf(
 				__( 'Post Author: %s' ,'revisionary' ),
@@ -192,7 +195,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	public function search_in_heading() {
 		$heading = '';
 
-		if( isset( $_REQUEST['s'] ) && ! empty( trim( $_REQUEST['s'] ) ) ) {
+		if( isset( $_REQUEST['s'] ) && ! empty( trim( sanitize_text_field($_REQUEST['s']) ) ) ) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$heading .= sprintf(
 				__( 'Search results for "%s"', 'revisionary' ),
 				strtolower(
@@ -285,7 +288,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		// Filter by origin_post_author
 		if( isset( $args['origin_post'] ) ) {
 			$query .= $wpdb->prepare(
-				"{$this->having_and( $count )} post_parent = %d",
+				"{$this->having_and( $count )} post_parent = %d",						// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$args['origin_post']
 			);
 			$count++;
@@ -294,7 +297,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		// Filter by origin_post_author
 		if( isset( $args['origin_post_author'] ) ) {
 			$query .= $wpdb->prepare(
-				"{$this->having_and( $count )} origin_post_author LIKE %d",
+				"{$this->having_and( $count )} origin_post_author LIKE %d",				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$wpdb->esc_like( $args['origin_post_author'] )
 			);
 			$count++;
@@ -303,7 +306,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		// Filter by post_author
 		if( isset( $args['post_author'] ) ) {
 			$query .= $wpdb->prepare(
-				"{$this->having_and( $count )} post_author LIKE %d",
+				"{$this->having_and( $count )} post_author LIKE %d",					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$wpdb->esc_like( $args['post_author'] )
 			);
 			$count++;
@@ -312,7 +315,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		// Filter by post_parent
 		if( isset( $args['post_parent'] ) ) {
 			$query .= $wpdb->prepare(
-				"{$this->having_and( $count )} post_parent LIKE %d",
+				"{$this->having_and( $count )} post_parent LIKE %d",					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$wpdb->esc_like( $args['post_parent'] )
 			);
 			$count++;
@@ -321,7 +324,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		// Filter by origin_post_type
 		if( isset( $args['origin_post_type'] ) ) {
 			$query .= $wpdb->prepare(
-				"{$this->having_and( $count )} origin_post_type LIKE %s",
+				"{$this->having_and( $count )} origin_post_type LIKE %s",				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$wpdb->esc_like( $args['origin_post_type'] )
 			);
 			$count++;
@@ -627,7 +630,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				submit_button( __( 'Filter' ), '', 'filter_action', false, array( 'id' => 'post-query-submit' ) );
 			}
 
-			if( count( $_REQUEST ) > 1 ) :
+			if( count( $_REQUEST ) > 1 ) :		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				?>
 				<a href="<?php echo add_query_arg( ['page' => 'revisionary-archive'], admin_url( 'admin.php' ) ) ?>"
 					class="button">
@@ -738,6 +741,8 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$actions 			= [];
 		$can_read_post		= !empty($post_status_obj) && current_user_can( 'read_post', $item->ID );
 		$can_edit_post		= $is_administrator || (!empty($post_status_obj && current_user_can('edit_post', $item->post_parent)));
+		
+		// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 		//$can_delete_post	= current_user_can( 'delete_post', $item->ID );
 		$post_type_object 	= get_post_type_object( $item->origin_post_type );
 		$post_object 		= get_post( $item->post_parent );
@@ -825,7 +830,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	 * @return html
 	 */
 	public function single_hidden_input( $field, $integer = false ) {
-		if( isset( $_REQUEST[$field] ) && ! empty( $_REQUEST[$field] ) ) :
+		if( isset( $_REQUEST[$field] ) && ! empty( $_REQUEST[$field] ) ) :				  //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			?>
 			<input type="hidden"
 				name="<?php echo $field ?>"
@@ -849,10 +854,10 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	public function build_filter_link( $label, $args, $count = null, $url_args = true ) {
 		foreach (['origin_post', 'origin_post_type', 'post_author', 'origin_post_author'] as $var) {
 			// Include origin_post_type filter if enabled and exists
-			if( $url_args && isset( $_REQUEST[$var] ) ) {
+			if( $url_args && isset( $_REQUEST[$var] ) ) {								//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$args = array_merge(
 					[
-						$var => sanitize_key( $_REQUEST[$var] )
+						$var => sanitize_key( $_REQUEST[$var] )							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					],
 					$args
 				);
@@ -864,8 +869,8 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		// Check if $args['v'] exists and is current page
 		$v = '';
 		if( array_key_exists( 'v', $args )
-			&& isset( $_REQUEST['v'] )
-			&& sanitize_key( $_REQUEST['v'] ) === $args['v']
+			&& isset( $_REQUEST['v'] )													//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			&& sanitize_key( $_REQUEST['v'] ) === $args['v']							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		) {
 			$v = ' class="current"';
 		}

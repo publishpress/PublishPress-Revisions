@@ -55,7 +55,7 @@ class RevisionaryAdmin
 
 		if (in_array($pagenow, array('post.php', 'post-new.php'))) {
 			if (empty($post)) {
-				$post = get_post(rvy_detect_post_id());
+				$post = get_post(rvy_detect_post_id());		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 			}
 
 			if ($post && rvy_is_supported_post_type($post->post_type)) {
@@ -96,7 +96,7 @@ class RevisionaryAdmin
 			add_filter('dashboard_recent_posts_query_args', [$this, 'flt_dashboard_recent_posts_query_args']);
 		}
 
-		if (!empty($_REQUEST['page']) && ('cms-tpv-page-page' == $_REQUEST['page'])) {
+		if (!empty($_REQUEST['page']) && ('cms-tpv-page-page' == $_REQUEST['page'])) {						//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			add_action('pre_get_posts', [$this, 'cmstpv_compat_get_posts']);
 		}
 
@@ -109,7 +109,9 @@ class RevisionaryAdmin
 		add_action('init', function() { // late execution avoids clash with autoloaders in other plugins
 			global $pagenow;
 		
-			if (($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-deletion', 'revisionary-settings'])
+			if (
+			($pagenow == 'admin.php') && isset($_GET['page']) 												//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			&& in_array($_GET['page'], ['revisionary-q', 'revisionary-deletion', 'revisionary-settings'])	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			) {
 				global $wp_version;
 
@@ -126,9 +128,17 @@ class RevisionaryAdmin
 				}
 			}
 
-			if ((($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-settings'])
-			|| (defined('DOING_AJAX') && DOING_AJAX && !empty($_REQUEST['action']) && (false !== strpos(sanitize_key($_REQUEST['action']), 'revisionary')))
-			) && !defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
+			if ((
+			($pagenow == 'admin.php') 
+			&& isset($_GET['page']) 																		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			&& in_array($_GET['page'], ['revisionary-q', 'revisionary-settings'])							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			|| (
+				defined('DOING_AJAX') && DOING_AJAX && !empty($_REQUEST['action']) 							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				&& (false !== strpos(sanitize_key($_REQUEST['action']), 'revisionary'))						//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				)
+			) 
+			&& !defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')
+			) {
 				if (!class_exists('\PublishPress\WordPressReviews\ReviewsController')) {
 					include_once RVY_ABSPATH . '/lib/vendor/publishpress/wordpress-reviews/ReviewsController.php';
 				}
@@ -162,19 +172,23 @@ class RevisionaryAdmin
 	function admin_scripts() {
 		global $pagenow;
 
-		if (in_array($pagenow, ['post.php', 'post-new.php', 'revision.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion', 'revisionary-archive']))) {
+		if (
+			in_array($pagenow, ['post.php', 'post-new.php', 'revision.php'])
+			|| (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion', 'revisionary-archive']))  //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		) {
 			wp_enqueue_style('revisionary', RVY_URLPATH . '/admin/revisionary.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
 
-		if (in_array($pagenow, ['post.php', 'post-new.php']) || (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion', 'revisionary-archive']))) {
+		if (in_array($pagenow, ['post.php', 'post-new.php']) 						
+		|| (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion', 'revisionary-archive']))) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			wp_enqueue_style('revisionary-admin-common', RVY_URLPATH . '/common/css/pressshack-admin.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
-
-		if ((!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options']))) {
+		
+		if ((!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options']))) {		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			wp_enqueue_script('revisionary-settings', RVY_URLPATH . '/admin/settings.js', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
-
-		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && ('admin.php' == $pagenow) && !empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options']) ) {
+		
+		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && ('admin.php' == $pagenow) && !empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options']) ) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			wp_enqueue_style('revisionary-settings', plugins_url('', REVISIONARY_PRO_FILE) . '/includes-pro/settings-pro.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
  	}
@@ -192,13 +206,14 @@ class RevisionaryAdmin
 			wp_enqueue_script( 'rvy', RVY_URLPATH . "/admin/revisionary.js", array('jquery'), PUBLISHPRESS_REVISIONS_VERSION, true );
 		}
 
+		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if (($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-archive'])) {
 			add_screen_option(
 				'per_page',
 				
 				['label' => _x('Revisions', 'groups per page (screen options)', 'revisionary'), 
 				'default' => 20, 
-				'option' => ('revisionary-archive' == $_GET['page']) ? 'revision_archive_per_page' : 'revisions_per_page'
+				'option' => ('revisionary-archive' == $_GET['page']) ? 'revision_archive_per_page' : 'revisions_per_page'	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				]
 			);
 		}
@@ -207,6 +222,7 @@ class RevisionaryAdmin
 	public function shouldDisplayBanner() {
 		global $pagenow;
 
+		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		return ($pagenow == 'admin.php') && isset($_GET['page']) && in_array($_GET['page'], ['revisionary-q', 'revisionary-deletion', 'revisionary-settings']);
 	}
 
@@ -418,7 +434,7 @@ class RevisionaryAdmin
 
 	function hideAdminMenuToolbar() {
         $current_screen = get_current_screen();
-        if ( $current_screen->id === 'revision' && isset( $_GET['rvy-popup'] ) && $_GET['rvy-popup'] === 'true' ) {
+        if ( $current_screen->id === 'revision' && isset( $_GET['rvy-popup'] ) && $_GET['rvy-popup'] === 'true' ) {		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
             ?>
             <style type="text/css">
             #wpadminbar,

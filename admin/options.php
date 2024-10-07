@@ -66,7 +66,7 @@ class RvyOptionUI {
 				echo "<div class='rs-subtext'>" . esc_html($hint_text) . "</div>";
 
 			if ( ! empty($args['subcaption']) )
-				echo $args['subcaption'];
+				echo $args['subcaption'];		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 			echo "</div>";
 
@@ -344,8 +344,8 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 
 <ul id="publishpress-revisions-settings-tabs" class="nav-tab-wrapper">
 	<?php
-	if (!empty($_REQUEST['ppr_tab'])) {
-		$setActiveTab = str_replace('ppr-tab-', '', sanitize_key($_REQUEST['ppr_tab']));
+	if (!empty($_REQUEST['ppr_tab'])) {															//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$setActiveTab = str_replace('ppr-tab-', '', sanitize_key($_REQUEST['ppr_tab']));		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	} else {
 		// Set first tab and content as active
 		$setActiveTab = '';
@@ -916,11 +916,11 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		$hint = esc_html__('To avoid notification failures, buffer emails for delayed sending once minute, hour or day limits are exceeded', 'revisionary');
 		$this->option_checkbox( 'use_notification_buffer', $tab, $section, $hint, '' );
 
-		if (!empty($_REQUEST['truncate_mail_log'])) {
+		if (!empty($_REQUEST['truncate_mail_log'])) {										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			delete_option('revisionary_sent_mail');
 		}
 
-		if (!empty($_REQUEST['clear_mail_buffer'])) {
+		if (!empty($_REQUEST['clear_mail_buffer'])) {										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			delete_option('revisionary_mail_buffer');
 		}
 
@@ -930,8 +930,8 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			$uri = '';
 		}
 
-		if (!empty($_REQUEST['mailinfo'])) {
-			$verbose = !empty($_REQUEST['verbose']);
+		if (!empty($_REQUEST['mailinfo'])) {												//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$verbose = !empty($_REQUEST['verbose']);										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			if ($q = get_option('revisionary_mail_buffer')) {
 				echo '<h3>' . esc_html__('Notification Buffer', 'revisionary') . '</h3>';
@@ -1018,7 +1018,8 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			}
 		}
 
-		if (empty($_REQUEST['mailinfo'])):?>
+		if (empty($_REQUEST['mailinfo'])):							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		?>
 			<br />
 			<div style="padding-left:22px">
 
