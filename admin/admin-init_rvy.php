@@ -403,7 +403,7 @@ function rvy_admin_init() {
 		
 				if (!empty($arr) && is_array($arr) && !empty($arr['code'])) {
 					if (!empty($_REQUEST['referer'])) {
-						$url = add_query_arg('revision_action', $arr['code'], $_REQUEST['referer']);
+						$url = add_query_arg('revision_action', $arr['code'], esc_url_raw($_REQUEST['referer']));
 						wp_redirect($url);
 						exit;
 					}

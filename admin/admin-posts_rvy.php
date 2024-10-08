@@ -36,7 +36,7 @@ class RevisionaryAdminPosts {
 
 					if (!$_post || (('trash' == $_post->post_status) && in_array($_post->post_mime_type, rvy_revision_statuses()))) {
 						if (apply_filters('revisionary_deletion_redirect_to_queue', true, $deleted_id, $post_type)) {
-							$url = admin_url("admin.php?page=revisionary-q&pp_revisions_deleted={$deleted_id}");
+							$url = wp_nonce_url(admin_url("admin.php?page=revisionary-q&pp_revisions_deleted={$deleted_id}"), 'revisions-deleted');
 							
 							if (!empty($_SERVER['REQUEST_URI']) && false === strpos(esc_url_raw($_SERVER['REQUEST_URI']), $url)) {
 								wp_redirect($url);
@@ -203,7 +203,8 @@ class RevisionaryAdminPosts {
 			}
 
 			if (rvy_get_option('pending_revisions') && current_user_can('copy_post', $post->ID) && !$revision_blocked) {
-				$referer_arg = '&referer=' . esc_url_raw($_SERVER['REQUEST_URI']);
+				$uri = isset($_SERVER['REQUEST_URI']) ? esc_url_raw($_SERVER['REQUEST_URI']) : '';
+				$referer_arg = '&referer=' . $uri;
 
 				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
@@ -214,7 +215,7 @@ class RevisionaryAdminPosts {
 				$caption = (isset($actions['edit']) || !rvy_get_option('caption_copy_as_edit')) ? pp_revisions_status_label('draft-revision', 'submit') : esc_html__('Edit');
 				$caption = str_replace(' ', '&nbsp;', $caption);
 
-				$actions['create_revision'] = "<a href='$url'>" . $caption . '</a>';
+				$actions['create_revision'] = "<a href='" . esc_url($url) . "'>" . $caption . '</a>';
 			}
 		}
 

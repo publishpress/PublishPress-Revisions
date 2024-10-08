@@ -6,7 +6,7 @@ class CoreAdmin {
         add_action('admin_print_scripts', [$this, 'setUpgradeMenuLink'], 50);
 
         add_action('publishpress_revisions_settings_sidebar', [$this, 'settingsSidebar']);
-        add_filter('publishpress_revisions_settings_sidebar', function($class) {return 'has-right-sidebar';});
+        add_filter('publishpress_revisions_settings_sidebar_class', function($class) {return 'has-right-sidebar';});
 
         add_filter(\PPVersionNotices\Module\TopNotice\Module::SETTINGS_FILTER, function ($settings) {
             $settings['revisionary'] = [
@@ -38,8 +38,8 @@ class CoreAdmin {
 
 		<script type="text/javascript">
             jQuery(document).ready(function($) {
-                $('#toplevel_page_revisionary-q ul li:last a').attr('href', '<?php echo $url;?>').attr('target', '_blank').css('font-weight', 'bold').css('color', '#FEB123');
-                $('#toplevel_page_revisionary-archive ul li:last a').attr('href', '<?php echo $url;?>').attr('target', '_blank').css('font-weight', 'bold').css('color', '#FEB123');
+                $('#toplevel_page_revisionary-q ul li:last a').attr('href', '<?php echo esc_url($url);?>').attr('target', '_blank').css('font-weight', 'bold').css('color', '#FEB123');
+                $('#toplevel_page_revisionary-archive ul li:last a').attr('href', '<?php echo esc_url($url);?>').attr('target', '_blank').css('font-weight', 'bold').css('color', '#FEB123');
             });
         </script>
 		<?php

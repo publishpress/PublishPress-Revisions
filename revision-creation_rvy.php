@@ -180,8 +180,8 @@ class RevisionCreation {
 
 		if ( $future_date = ! empty($data['post_date']) && ( strtotime($data['post_date_gmt'] ) > agp_time_gmt() ) ) {  // in past versions, $future_date was also passed to get_revision_msg()
 			// round down to zero seconds
-			$data['post_date_gmt'] = date( 'Y-m-d H:i:00', strtotime( $data['post_date_gmt'] ) );
-			$data['post_date'] = date( 'Y-m-d H:i:00', strtotime( $data['post_date'] ) );
+			$data['post_date_gmt'] = gmdate( 'Y-m-d H:i:00', strtotime( $data['post_date_gmt'] ) );
+			$data['post_date'] = gmdate( 'Y-m-d H:i:00', strtotime( $data['post_date'] ) );
 		}
 
 		// @todo: confirm this is still needed

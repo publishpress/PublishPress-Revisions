@@ -105,21 +105,23 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		);
 
 		// 'All Revisions' link with count
+
+		$base_query = $this->do_query();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$this->all_revisions_count = $wpdb->get_var(
-			$this->count_query(
-				'all_items',
-				$this->do_query()
-			)
+			"SELECT COUNT(*) as all_items FROM ($base_query) as all_items_subquery"						// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		);
 
 		// 'My Revisions' link with count
+
+		$base_query = $this->do_query( [
+			'post_author' => $current_user->ID
+		] );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$this->my_revisions_count = $wpdb->get_var(
-			$this->count_query(
-				'my_items',
-				$this->do_query( [
-					'post_author' => $current_user->ID
-				] )
-			)
+			"SELECT COUNT(*) as my_items FROM ($base_query) as my_items_subquery"						// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		);
     }
 
@@ -129,16 +131,25 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	 * @return string
 	 */
 	public function filters_in_heading() {
-		$heading = '';
-
 		$count = 0;
+
+		$any_filters = ( isset( $_REQUEST['origin_post'] ) && ! empty( $_REQUEST['origin_post'] )		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		|| ( isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] ) )		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		|| ( isset( $_REQUEST['post_author'] ) && ! empty( $_REQUEST['post_author'] ) )					//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		|| ( isset( $_REQUEST['post_parent'] ) && ! empty( $_REQUEST['post_parent'] ) )					//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		|| ( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) )	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		);
+
+		if ($any_filters) {
+			echo ' (';
+		}
 
 		// Post title
 		if( isset( $_REQUEST['origin_post'] ) && ! empty( $_REQUEST['origin_post'] )				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		) {
 			if ($post_title = get_post_field('post_title', (int) $_REQUEST['origin_post'])) {		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$heading .= $this->heading_spacing( $count );
-				$heading .= $post_title;
+				$this->heading_spacing( $count );
+				echo esc_html($post_title);
 				$count++;
 			}
 		} else {
@@ -147,44 +158,44 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				&& in_array( $_REQUEST['origin_post_type'], $this->post_types )						//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			) {
 				$obj = get_post_type_object( sanitize_key( $_REQUEST['origin_post_type'] ) );		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$heading .= $this->heading_spacing( $count );
-				$heading .= $obj->labels->name;
+				$this->heading_spacing( $count );
+				echo esc_html($obj->labels->name);
 				$count++;
 			}
 		}
 
 		// Revision post author
 		if( isset( $_REQUEST['post_author'] ) && ! empty( $_REQUEST['post_author'] ) ) {			//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$heading .= $this->heading_spacing( $count );
-			$heading .= sprintf(
-				__( 'Revision Author: %s' ,'revisionary' ),
-				get_the_author_meta( 'display_name', (int) $_REQUEST['post_author'] )
+			$this->heading_spacing( $count );
+			printf(
+				esc_html__( 'Revision Author: %s' ,'revisionary' ),
+				get_the_author_meta( 'display_name', (int) $_REQUEST['post_author'] )				//phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 			);
 			$count++;
 		}
 
 		// Revision post parent
 		if( isset( $_REQUEST['post_parent'] ) && ! empty( $_REQUEST['post_parent'] ) ) {			//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$heading .= $this->heading_spacing( $count );
-			$heading .= '"' . get_the_title( (int) $_REQUEST['post_parent'] ) . '"';
+			$this->heading_spacing( $count );
+			echo '"';
+			the_title( (int) $_REQUEST['post_parent'] );											//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			echo '"';				
 			$count++;
 		}
 
 		// Origin post author
 		if( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) ) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$heading .= $this->heading_spacing( $count );
-			$heading .= sprintf(
-				__( 'Post Author: %s' ,'revisionary' ),
-				get_the_author_meta( 'display_name', (int) $_REQUEST['origin_post_author'] )
+			$this->heading_spacing( $count );
+			printf(
+				esc_html__( 'Post Author: %s' ,'revisionary' ),
+				get_the_author_meta( 'display_name', (int) $_REQUEST['origin_post_author'] )		//phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 			);
 			$count++;
 		}
 
-		if( ! empty( $heading ) ) {
-			$heading = ' (' . $heading . ')';
+		if($any_filters) {
+			echo ')';
 		}
-
-		return $heading;
 	}
 
 	/**
@@ -193,23 +204,20 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	 * @return string
 	 */
 	public function search_in_heading() {
-		$heading = '';
-
 		if( isset( $_REQUEST['s'] ) && ! empty( trim( sanitize_text_field($_REQUEST['s']) ) ) ) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$heading .= sprintf(
-				__( 'Search results for "%s"', 'revisionary' ),
-				strtolower(
-					sanitize_text_field(
-						trim( $_REQUEST['s'] )
+			echo '<span class="subtitle">';
+			
+			printf(
+				esc_html__( 'Search results for "%s"', 'revisionary' ),
+				esc_html(strtolower(
+					trim(
+						sanitize_text_field( $_REQUEST['s'] )										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					)
-				)
+				))
 			);
-		}
 
-		return sprintf(
-			'<span class="subtitle">%s</span>',
-			$heading
-		);
+			echo '</span>';
+		}
 	}
 
 	/**
@@ -378,7 +386,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	 * @return string
 	 */
 	private function heading_spacing( $count ) {
-		return $count > 0 ? ', ' : '';
+		echo $count > 0 ? ', ' : '';
 	}
 
 	protected function get_bulk_actions() {
@@ -449,11 +457,6 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	 * @return html
 	 */
 	public function friendly_date( $time ) {
-		$timezone = get_option( 'timezone_string' );
-		if ( $timezone ) {
-			date_default_timezone_set( $timezone );
-		}
-
 		$timestamp 		= strtotime( $time );
 		$current_time 	= time();
 		$time_diff		= $current_time - $timestamp;
@@ -472,16 +475,11 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				esc_html__( '%s hours ago', 'revisionary' ),
 				floor( $time_diff / 3600 )
 			);
-		} /*elseif ( $time_diff < 2592000 ) {
-			$result = sprintf(
-				esc_html__( '%s days ago', 'revisionary' ),
-				floor( $time_diff / 86400 )
-			);
-		}*/ else {
+		} else {
 			$result = date_i18n( "$date_format @ $time_format", $timestamp );
 		}
 
-		$saved_time = date( 'Y/m/d H:i:s', $timestamp );
+		$saved_time = gmdate( 'Y/m/d H:i:s', $timestamp );
 
 		return '<abbr title="' . esc_attr( $saved_time ) . '">' . $result . '</abbr>';
 	}
@@ -501,18 +499,18 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 						'<strong><a class="row-title rvy-open-popup" href="%s" data-label="%s">%s</a></strong>',
 						esc_url_raw( get_edit_post_link( $item->ID ) . '&width=900&height=600&rvy-popup=true&TB_iframe=1' ),
 						esc_attr( $item->$column_name ),
-						$item->$column_name
+						esc_html($item->$column_name)
 					);
 				} else {
 					// Show title WITHOUT link
 					printf(
 						'<strong>%s</strong> %s',
-						$item->$column_name,
+						esc_html($item->$column_name),
 						sprintf(
 							'<span class="dashicons dashicons-info" title="%s"></span>',
 							sprintf(
 								esc_attr__( 'Revisions are disabled for %s post type', 'revisionary' ),
-								$item->origin_post_type
+								esc_attr($item->origin_post_type)
 							)
 						)
 					);
@@ -524,7 +522,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				$type_obj = get_post_type_object($item->$column_name);
 				$type_label = (!empty($type_obj)) ? $type_obj->labels->singular_name : $item->$column_name;
 
-				echo $this->build_filter_link(
+				$this->echo_filter_link(
 					$type_label,
 					[
 						'origin_post_type' => sanitize_key( $item->$column_name )
@@ -538,7 +536,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				break;
 
 			case 'origin_post_author':
-				echo $this->build_filter_link(
+				$this->echo_filter_link(
 					get_the_author_meta( 'display_name', $item->$column_name ),
 					[
 						'origin_post_author' => (int) $item->$column_name
@@ -547,7 +545,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				break;
 
 			case 'post_author':
-				echo $this->build_filter_link(
+				$this->echo_filter_link(
 					get_the_author_meta( 'display_name', $item->$column_name ),
 					[
 						'post_author' => (int) $item->$column_name
@@ -561,19 +559,19 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 				switch ($prev_revision_status) {
 					case 'future-revision':
-						printf(__('Scheduled Rev.'));
+						esc_html_e('Scheduled Rev.', 'revisionary');
 						break;
 
 					case 'pending-revision':
 					case 'draft-revision':
-						printf(__('Submitted Rev.', 'revisionary'));
+						esc_html_e('Submitted Rev.', 'revisionary');
 						break;
 
 					default:
 						if (!empty($revision_publication)) {
-							printf(__('Submitted Rev.', 'revisionary'));
+							esc_html_e('Submitted Rev.', 'revisionary');
 						} else {
-							printf(__('Direct Edit', 'revisionary'));
+							esc_html_e('Direct Edit', 'revisionary');
 						}
 				}
 
@@ -582,14 +580,14 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			case 'approved_by':
 				if ($approver_id = get_post_meta($item->ID, '_rvy_approved_by', true)) {
 					if ($user = new WP_User($approver_id)) {
-						echo $user->display_name;
+						echo esc_html($user->display_name);
 					}
 				}
 
 				break;
 
 			case 'post_count':
-				echo $this->build_filter_link(
+				$this->echo_filter_link(
 					(int) $item->$column_name,
 					[
 						'post_parent' => (int) $item->post_parent
@@ -619,20 +617,31 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		<div class="alignleft actions">
 		<?php
 		if ( 'top' === $which ) {
-			ob_start();
+			$current_option = isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] )	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			? sanitize_key( $_REQUEST['origin_post_type'] )															//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			: '';
+			?>
+			<select name="origin_post_type" class="postform">
+				<option <?php echo $current_option === '' ? 'selected' : '' ?>
+					value="">
+					<?php esc_html_e( 'All post types', 'revisionary' ) ?>
+				</option>
+				<?php foreach( $this->post_types as $type ) :
+					$type_obj = get_post_type_object( $type );
+					?>
+					<option <?php echo $current_option === $type ? 'selected' : '' ?>
+						value="<?php echo esc_attr($type) ?>">
+						<?php echo esc_html($type_obj->labels->singular_name); ?>
+					</option>
+				<?php endforeach; ?>
+			</select>
+			<?php
 
-			$this->post_types_dropdown();
-
-			$output = ob_get_clean();
-
-			if ( ! empty( $output ) ) {
-				echo $output;
-				submit_button( __( 'Filter' ), '', 'filter_action', false, array( 'id' => 'post-query-submit' ) );
-			}
+			submit_button( __( 'Filter' ), '', 'filter_action', false, array( 'id' => 'post-query-submit' ) );
 
 			if( count( $_REQUEST ) > 1 ) :		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				?>
-				<a href="<?php echo add_query_arg( ['page' => 'revisionary-archive'], admin_url( 'admin.php' ) ) ?>"
+				<a href="<?php echo esc_url_raw(add_query_arg( ['page' => 'revisionary-archive'], admin_url( 'admin.php' ) ) ) ?>"
 					class="button">
 					<?php esc_html_e( 'Reset Filters', 'revisionary' ) ?>
 				</a>
@@ -641,33 +650,6 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		}
 		?>
 		</div>
-		<?php
-	}
-
-	/**
-	 * Create dropdown to list and switch post types filter
-	 *
-	 * @return html
-	 */
-	protected function post_types_dropdown() {
-		$current_option = isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] )
-			? sanitize_key( $_REQUEST['origin_post_type'] )
-			: '';
-		?>
-		<select name="origin_post_type" class="postform">
-			<option <?php echo $current_option === '' ? 'selected' : '' ?>
-				value="">
-				<?php esc_html_e( 'All post types', 'revisionary' ) ?>
-			</option>
-			<?php foreach( $this->post_types as $type ) :
-				$type_obj = get_post_type_object( $type );
-				?>
-				<option <?php echo $current_option === $type ? 'selected' : '' ?>
-					value="<?php echo $type ?>">
-					<?php echo $type_obj->labels->singular_name; ?>
-				</option>
-			<?php endforeach; ?>
-		</select>
 		<?php
 	}
 
@@ -692,7 +674,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			<?php if( $this->all_revisions_count ) : ?>
 				<li>
 					<?php
-					echo $this->build_filter_link(
+					$this->echo_filter_link(
 						__( 'All', 'revisionary' ),
 						[
 							'v' => 'all'
@@ -706,7 +688,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			<?php if( $this->my_revisions_count ) : ?>
 				<?php if( $this->all_revisions_count ) : ?> | <?php endif;?><li class="mine">
 					<?php
-					echo $this->build_filter_link(
+					$this->echo_filter_link(
 						__( 'My Revisions', 'revisionary' ),
 						[
 							'post_author' => $current_user->ID,
@@ -744,6 +726,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		
 		// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 		//$can_delete_post	= current_user_can( 'delete_post', $item->ID );
+
 		$post_type_object 	= get_post_type_object( $item->origin_post_type );
 		$post_object 		= get_post( $item->post_parent );
 		$revisions_enabled	= wp_revisions_enabled( $post_object );
@@ -782,9 +765,11 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			}
 		}
 
+		$uri = (isset($_SERVER['REQUEST_URI'])) ? add_query_arg($_REQUEST, esc_url_raw($_SERVER['REQUEST_URI'])) : '';	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
 		$actions['post_filter'] = sprintf(
 			'<a href="%1$s" rel="bookmark" title="%2$s" aria-label="%2$s">%3$s</a>',
-			add_query_arg('origin_post', $item->post_parent, untrailingslashit(site_url('')) . esc_url_raw( $_SERVER['REQUEST_URI'] )),
+			add_query_arg('origin_post', $item->post_parent, esc_url(untrailingslashit(site_url('')) . $uri )),
 			esc_attr( esc_html__( 'List Revisions of this Post', 'revisionary' ) ),
 			esc_html__( 'Filter', 'revisionary' )
 		);
@@ -833,8 +818,9 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		if( isset( $_REQUEST[$field] ) && ! empty( $_REQUEST[$field] ) ) :				  //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			?>
 			<input type="hidden"
-				name="<?php echo $field ?>"
-				value="<?php echo $integer ? (int) $_REQUEST[$field] : sanitize_key( $_REQUEST[$field] ) ?>" />
+				name="<?php echo esc_attr($field) ?>" 
+				value="<?php if ($integer) echo (int) $_REQUEST[$field]; else echo esc_attr(sanitize_key( $_REQUEST[$field])); //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				?>" />
 			<?php
 		endif;
 	}
@@ -851,7 +837,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	 *
 	 * @return html
 	 */
-	public function build_filter_link( $label, $args, $count = null, $url_args = true ) {
+	public function echo_filter_link( $label, $args, $count = null, $url_args = true ) {
 		foreach (['origin_post', 'origin_post_type', 'post_author', 'origin_post_author'] as $var) {
 			// Include origin_post_type filter if enabled and exists
 			if( $url_args && isset( $_REQUEST[$var] ) ) {								//phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -864,20 +850,21 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			}
 		}
 
-		$count = $count ==! null ? ' <span class="count">(' . $count . ')</span>' : '';
-
 		// Check if $args['v'] exists and is current page
 		$v = '';
 		if( array_key_exists( 'v', $args )
 			&& isset( $_REQUEST['v'] )													//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			&& sanitize_key( $_REQUEST['v'] ) === $args['v']							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		) {
-			$v = ' class="current"';
+			$v = 'current';
 		}
 
-		return '<a href="' . add_query_arg( $args, admin_url( 'admin.php?page=revisionary-archive' ) ) . '"' . $v . '>'
-		. sanitize_text_field( $label ) . $count
-		. '</a>';
+		echo '<a href="' . esc_url(add_query_arg( $args, admin_url( 'admin.php?page=revisionary-archive' ) ) ) . '" class="' . esc_attr($v) . '">'
+		. $label;																		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+		if ($count ==! null) echo ' <span class="count">(' . esc_html($count) . ')</span>';
+		
+		echo '</a>';
 	}
 
 	/**

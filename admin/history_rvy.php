@@ -164,8 +164,6 @@ class RevisionaryHistory
 
                 $status_obj = get_post_status_object($revision->post_mime_type);
 
-                $post_edit_link = get_edit_post_link($published_post);
-                $post_title     = '<a href="' . $post_edit_link . '">' . _draft_or_post_title($published_post) . '</a>';
                 /* translators: %s: post title */
                 $do_h1 = true;
                 $title          = $status_obj->labels->plural;                              // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
@@ -196,13 +194,17 @@ class RevisionaryHistory
         <div class="wrap">
             <h1 class="long-header"><?php 
             if (!empty($do_h1)) {
-                printf( esc_html__( 'Compare %s of "%s"', 'revisionary' ), $status_obj->labels->plural, $post_title );
+                printf( 
+                    esc_html__( 'Compare %s of "%s"', 'revisionary' ), 
+                    esc_html($status_obj->labels->plural), 
+                    '<a href="' . esc_url(get_edit_post_link($published_post)) . '">' . esc_html(_draft_or_post_title($published_post)) . '</a>'
+                );
             }
             ?>
             </h1>
             <?php
-            if (!empty($post_edit_link)) {
-                echo '<a href="' . esc_url($post_edit_link) . '">' . esc_html__( 'Return to editor' ) . '</a>';
+            if (get_edit_post_link($published_post)) {
+                echo '<a href="' . esc_url(get_edit_post_link($published_post)) . '">' . esc_html__( 'Return to editor' ) . '</a>';
             }
             ?>
         </div>

@@ -257,10 +257,10 @@ else
 </header>
 
 <?php
-$div_class = apply_filters('publishpress_revisions_settings_sidebar', '');
+$div_class = apply_filters('publishpress_revisions_settings_sidebar_class', '');
 ?>
 
-<div id="poststuff" class="metabox-holder <?php echo $div_class;?>">
+<div id="poststuff" class="metabox-holder <?php echo esc_attr($div_class);?>">
 
 	<?php do_action('publishpress_revisions_settings_sidebar');?>
 
@@ -669,7 +669,7 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 
 		<?php if (!empty($_SERVER['REQUEST_URI'])):?>
 		<p style="padding-left:22px; margin-top:25px">
-		<a href="<?php echo esc_url(add_query_arg('rvy_flush_flags', 1, esc_url(esc_url_raw($_SERVER['REQUEST_URI']))))?>"><?php esc_html_e('Regenerate "post has revision" flags', 'revisionary');?></a>
+		<a href="<?php echo esc_url(wp_nonce_url(add_query_arg('rvy_flush_flags', 1, esc_url(esc_url_raw($_SERVER['REQUEST_URI']))), 'flush-flags') )?>"><?php esc_html_e('Regenerate "post has revision" flags', 'revisionary');?></a>
 		</p>
 		<?php endif;?>
 
@@ -722,7 +722,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 					'The revision preview argument is configured by constant definition: %s',
 					'revisionary'
 				),
-				RVY_PREVIEW_ARG
+				esc_html(RVY_PREVIEW_ARG)
 			);
 		} else {
 			$hint = esc_html__('Adjust preview links to use "rv_preview" argument instead of "preview". Experiment to see which works best with your theme.', 'revisionary');
@@ -852,8 +852,9 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 
 				echo esc_html($this->option_captions[$id]);
 
+				// phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInTernaryCondition
 				echo ( defined('RVY_CONTENT_ROLES') && $group_link = $revisionary->content_roles->get_metagroup_edit_link( 'Pending Revision Monitors' ) ) ?
-				sprintf( " &bull;&nbsp;<a href='%s'>" . esc_html__('select recipients', 'revisionary') . "</a>", $group_link ) : '';
+				sprintf( " &bull;&nbsp;<a href='%s'>" . esc_html__('select recipients', 'revisionary') . "</a>", esc_url($group_link) ) : '';
 
 				echo "<br />";
 			}

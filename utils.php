@@ -210,7 +210,6 @@ class Utils {
 		$conditions[] = $pluginsState['disable-gutenberg'] 
                         && !self::disableGutenberg(rvy_detect_post_id());
 
-		//if (defined('PP_CAPABILITIES_RESTORE_NAV_TYPE_BLOCK_EDITOR_DISABLE') && version_compare($wp_version, '5.9-beta', '>=')) {
         if (version_compare($wp_version, '5.9-beta', '>=') && !empty($has_nav_filter)) {
             add_filter('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type', 10, 2 );
         }

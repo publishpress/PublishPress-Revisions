@@ -41,12 +41,33 @@ class Revisionary_Submittee {
 	}
 	
 	function update_options( $sitewide = false, $customize_defaults = false ) {
-		check_admin_referer( 'rvy-update-options' );
-	
-		$this->update_page_options( $sitewide, $customize_defaults );
-		
 		global $wpdb;
-		$wpdb->query( "UPDATE $wpdb->options SET autoload = 'no' WHERE (option_name LIKE 'rvy_%' OR option_name LIKE 'revisionary_%') AND option_name != 'rvy_next_rev_publish_gmt'" );
+		
+		check_admin_referer( 'rvy-update-options' );
+
+		$default_prefix = ( $customize_defaults ) ? 'default_' : '';
+		
+		if (!empty($_POST['all_options'])) {
+			$reviewed_options = array_map('sanitize_key', explode(',', sanitize_text_field($_POST['all_options'])));
+
+			foreach ( $reviewed_options as $option_basename ) {
+				if (isset($_POST[$option_basename])) {
+					if (is_array($_POST[$option_basename])) {
+						$value = array_map('sanitize_key', $_POST[$option_basename]);
+					} else {
+						$value = sanitize_key($_POST[$option_basename]);
+					}
+				} else {
+					$value = '';
+				}
+
+				rvy_update_option( $default_prefix . $option_basename, $value, $sitewide );
+			}
+		}
+
+		$wpdb->query( 											// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			"UPDATE $wpdb->options SET autoload = 'no' WHERE (option_name LIKE 'rvy_%' OR option_name LIKE 'revisionary_%') AND option_name != 'rvy_next_rev_publish_gmt'" 
+		);
 	}
 	
 	function default_options( $sitewide = false, $customize_defaults = false ) {
@@ -68,6 +89,7 @@ class Revisionary_Submittee {
 		//phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$reviewed_options = isset($_POST['rvy_all_movable_options']) ? array_map('sanitize_key', explode(',', $_POST['rvy_all_movable_options'])) : array();
 		
+
 		$options_sitewide = isset($_POST['rvy_options_sitewide']) ? array_map('sanitize_key', (array) $_POST['rvy_options_sitewide']) : array();
 
 		update_site_option( "rvy_options_sitewide_reviewed", $reviewed_options );
@@ -82,24 +104,6 @@ class Revisionary_Submittee {
 	}
 	
 	function update_page_options( $sitewide = false, $customize_defaults = false ) {
-		$default_prefix = ( $customize_defaults ) ? 'default_' : '';
-		
-		if (!empty($_POST['all_options'])) {
-			$reviewed_options = array_map('sanitize_key', explode(',', sanitize_text_field($_POST['all_options'])));
-
-			foreach ( $reviewed_options as $option_basename ) {
-				if (isset($_POST[$option_basename])) {
-					if (is_array($_POST[$option_basename])) {
-						$value = array_map('sanitize_key', $_POST[$option_basename]);
-					} else {
-						$value = sanitize_key($_POST[$option_basename]);
-					}
-				} else {
-					$value = '';
-				}
-
-				rvy_update_option( $default_prefix . $option_basename, $value, $sitewide );
-			}
-		}
+		// deprecated (moved into calling function)
 	}
 }

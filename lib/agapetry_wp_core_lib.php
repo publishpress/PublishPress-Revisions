@@ -27,7 +27,7 @@ function agp_date_i18n( $datef, $timestamp ) {
 	if ( $timestamp >= 0 )
 		return date_i18n( $datef, $timestamp );
 	else
-		return date( $datef, $timestamp );
+		return gmdate( $datef, $timestamp );
 }
 }
 

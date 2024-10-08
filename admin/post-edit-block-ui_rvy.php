@@ -29,8 +29,10 @@ if ($_post_id = rvy_detect_post_id()) {
                 $wpdb->update($wpdb->posts, ['post_modified_gmt' => $_post->post_modified_gmt, 'post_modified' => $_post->post_modified], ['ID' => $_post->ID]);
 
                 if (!get_transient("revisionary-post-edit-redirect-{$_post_id}")) {
+                    $uri = (isset($_SERVER['REQUEST_URI'])) ? esc_url_raw($_SERVER['REQUEST_URI']) : '';
+
                     set_transient("revisionary-post-edit-redirect-{$_post_id}", true, 30);
-                    wp_redirect(esc_url_raw($_SERVER['REQUEST_URI']));
+                    wp_redirect(esc_url_raw($uri));
                     exit;
                 }
             }
@@ -166,7 +168,7 @@ class RVY_PostBlockEditUI {
             });
 
             $(document).on('change', 'div.rvy-author-selection select', function(e) {
-                var data = {'rvy_ajax_field': 'author_select', 'rvy_ajax_value': <?php echo $post->ID;?>, 'rvy_selection': $('div.rvy-author-selection select').val(), 'nc': Math.floor(Math.random() * 99999999)};
+                var data = {'rvy_ajax_field': 'author_select', 'rvy_ajax_value': <?php echo esc_attr($post->ID);?>, 'rvy_selection': $('div.rvy-author-selection select').val(), 'nc': Math.floor(Math.random() * 99999999)};
 
                 $('div.rvy-author-selection select').attr('disabled', 'disabled');
 
