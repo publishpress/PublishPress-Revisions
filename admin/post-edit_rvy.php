@@ -163,7 +163,7 @@ class RvyPostEdit {
 
         ?>
         <a class="preview button" href="<?php echo esc_url($preview_link); ?>" target="revision-preview" id="revision-preview"
-           tabindex="4" title="<?php echo esc_html($preview_title);?>"><?php echo esc_html($preview_button); ?></a>
+           tabindex="4" title="<?php echo esc_attr($preview_title);?>"><?php echo esc_html($preview_button); ?></a>
         <?php
     }
 
@@ -277,7 +277,7 @@ class RvyPostEdit {
             //});
 
             $(document).on('change', 'div.rvy-author-selection select', function(e) {
-                var data = {'rvy_ajax_field': 'author_select', 'rvy_ajax_value': <?php echo $post->ID;?>, 'rvy_selection': $('div.rvy-author-selection select').val(), 'nc': Math.floor(Math.random() * 99999999)};
+                var data = {'rvy_ajax_field': 'author_select', 'rvy_ajax_value': <?php echo esc_attr($post->ID);?>, 'rvy_selection': $('div.rvy-author-selection select').val(), 'nc': Math.floor(Math.random() * 99999999)};
 
                 $('div.rvy-author-selection select').attr('disabled', 'disabled');
 

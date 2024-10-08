@@ -177,7 +177,7 @@ function rvy_ajax_handler() {
 				case 'author_select':
 					if (!empty($_REQUEST['rvy_selection'])) {							// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 						if (current_user_can('edit_post', $post_id)) {
-							update_post_meta($post_id, '_rvy_author_selection', $_REQUEST['rvy_selection']);
+							update_post_meta($post_id, '_rvy_author_selection', (int) $_REQUEST['rvy_selection']);  // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 						}
 					}
 
@@ -772,6 +772,7 @@ function rvy_post_revision_blocked($post, $args = []) {
 }
 
 if (!empty($_REQUEST['rvy_flush_flags'])) {
+	check_admin_referer('flush-flags');
 	revisionary_refresh_revision_flags();
 }
 
@@ -1305,6 +1306,7 @@ function rvy_init() {
 		// Is this an asynchronous request to publish scheduled revisions?
 		} elseif (!empty($_GET['action']) && ('publish_scheduled_revisions' == $_GET['action']) && rvy_get_option('scheduled_revisions') 
 		&& !rvy_get_option('scheduled_publish_cron')) {
+			check_admin_referer('publish-scheduled-revisions');
 			require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
 			add_action( 'rvy_init', '_rvy_publish_scheduled_revisions' );
 		}
@@ -1338,8 +1340,8 @@ function rvy_init() {
 				if ( ini_get( 'allow_url_fopen' ) && rvy_get_option('async_scheduled_publish') ) {
 					// asynchronous secondary site call to avoid delays // TODO: pass site key here
 					rvy_log_async_request('publish_scheduled_revisions');
-					$url = site_url( 'index.php?action=publish_scheduled_revisions' );
-					wp_remote_post( $url, array('timeout' => 5, 'blocking' => false, 'sslverify' => apply_filters('https_local_ssl_verify', true)) );
+					$url = wp_nonce_url(site_url( 'index.php?action=publish_scheduled_revisions' ), 'publish_scheduled_revisions');
+					wp_remote_post( $url, array('blocking' => false, 'sslverify' => apply_filters('https_local_ssl_verify', true)) );
 				} else {
 					// publish scheduled revision now
 					if ( ! defined('DOING_CRON') ) {
@@ -1559,7 +1561,7 @@ add_filter('wp_rest_cache/skip_caching', 'rvy_rest_cache_skip');
 
 function rvy_rest_cache_skip($skip) {
 	if (!isset($_SERVER['REQUEST_URI'])) {
-		return;
+		return $skip;
 	}
 
 	$uri = esc_url_raw($_SERVER['REQUEST_URI']);

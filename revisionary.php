@@ -58,7 +58,7 @@ if (is_admin() && $invalid_php_version) {
                 echo '<div class="notice notice-error"><p>';
                 printf(
                     'PublishPress Revisions requires PHP version %s or higher.',
-                    $min_php_version
+                    esc_html($min_php_version)
                 );
                 echo '</p></div>';
             }
@@ -75,7 +75,7 @@ if (is_admin() && $invalid_wp_version) {
                 echo '<div class="notice notice-error"><p>';
                 printf(
                     'PublishPress Revisions requires WordPress version %s or higher.',
-                    $min_wp_version
+                    esc_html($min_wp_version)
                 );
                 echo '</p></div>';
             }

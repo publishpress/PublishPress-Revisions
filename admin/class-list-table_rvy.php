@@ -48,7 +48,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if ($triggered_deletions = (array) get_option('_rvy_trigger_deletion')) {
 			$clear_trigger_option = true;
 		}
+
 		if (!empty($_REQUEST['pp_revisions_deleted'])) {
+			check_admin_referer('revisions-deleted');
+
 			global $current_user;
 			
 			$delete_id = (int) $_REQUEST['pp_revisions_deleted'];
@@ -609,7 +612,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				$post_type = get_post_field('post_type', $post_id);
 
 				if ( $type_obj = get_post_type_object( $post_type ) ) {
-					$link = add_query_arg('post_type', $type_obj->name, $request_url);
+					$link = add_query_arg('post_type', $type_obj->name, esc_url($request_url));
 					echo "<a href='" . esc_url($link) . "'>" . esc_html($type_obj->labels->singular_name) . "</a>";
 				} else {
 					echo esc_html("($post_type)");
@@ -624,7 +627,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					$label = ucwords($post->post_mime_type);
 				}
 
-				$link = add_query_arg('post_status', $post->post_mime_type, $request_url);
+				$link = add_query_arg('post_status', $post->post_mime_type, esc_url($request_url));
 				echo "<a href='" . esc_url($link) . "'>" . esc_html($label) . "</a>";
 
 				break;
@@ -691,7 +694,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					$authors_str = [];
 					foreach ($authors as $author) {
 						if (is_object($author)) {
-							$url           = add_query_arg('post_author', $author->ID, $request_url);
+							$url           = add_query_arg('post_author', $author->ID, esc_url($request_url));
 							$authors_str[] = '<a href="' . esc_url($url) . '">' . esc_html($author->display_name) . '</a>';
 						}
 					}
@@ -705,7 +708,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					echo implode(', ', $authors_str);  // output variables escaped above
 				} else {
 					$author_caption = get_the_author_meta('display_name', $parent_post->post_author);
-					$this->apply_edit_link(add_query_arg('post_author', $parent_post->post_author, $request_url), $author_caption);
+					$this->apply_edit_link(add_query_arg('post_author', $parent_post->post_author, esc_url($request_url)), $author_caption);
 				}
 
 				break;
@@ -744,7 +747,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$actions['list_filter'] = sprintf(
 			'<a href="%1$s" title="%2$s" aria-label="%2$s">%3$s</a>',
 
-			add_query_arg('published_post', $post->ID, $request_url),
+			add_query_arg('published_post', $post->ID, esc_url($request_url)),
 			/* translators: %s: post title */
 			esc_attr( sprintf( esc_html__( 'View only revisions of %s', 'revisionary' ), '&#8220;' . $post->post_title . '&#8221;' ) ),
 			esc_html__( 'Filter' )
@@ -1250,7 +1253,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			} elseif ('cb' == $column_key) {
 				echo $column_display_name;									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			} else {
-				echo $column_display_name;
+				echo esc_html($column_display_name);	
 			}
 
 			echo "</" . esc_attr($tag) .">";
@@ -1267,7 +1270,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if ( $can_edit_post && $post->post_status != 'trash' && $edit_link = get_edit_post_link( $post->ID )) {
 			printf(
 				'<a class="row-title" href="%s" aria-label="%s">%s%s</a>',
-				$edit_link,
+				esc_url($edit_link),
 				/* translators: %s: post title */
 				esc_attr( sprintf( esc_html__( '&#8220;%s&#8221; (Edit)' ), $title ) ),
 				'',
@@ -1313,7 +1316,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$request_url = add_query_arg($_REQUEST, rvy_admin_url('admin.php?page=revisionary-q'));				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$args = ['author' => get_the_author_meta( 'ID' )];
-		$this->apply_edit_link( add_query_arg('author', $args['author'], $request_url), get_the_author() );
+		$this->apply_edit_link( add_query_arg('author', $args['author'], esc_url($request_url)), get_the_author() );
 	}
 
 	/**

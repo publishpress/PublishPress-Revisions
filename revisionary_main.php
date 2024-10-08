@@ -645,7 +645,9 @@ class Revisionary
 	function act_new_revision_redirect() {
 		global $current_user, $post;
 
-		if (empty($_REQUEST['get_new_revision'])) {
+		if (!empty($_REQUEST['get_new_revision'])) {
+			check_admin_referer('new-revision');
+		} else {
 			return;
 		}
 
@@ -677,11 +679,13 @@ class Revisionary
 	function act_edit_revision_redirect() {
 		global $current_user, $post;
 
-		if (empty($_REQUEST['edit_new_revision'])) {
+		if (!empty($_REQUEST['edit_new_revision'])) {
+			check_admin_referer('edit-new-revision');
+		} else {
 			return;
 		}
 
-		$published_post_id = (!empty($_REQUEST['edit_new_revision'])) ? rvy_post_id($_REQUEST['edit_new_revision']) : rvy_post_id($post->ID);
+		$published_post_id = (!empty($_REQUEST['edit_new_revision'])) ? rvy_post_id((int) $_REQUEST['edit_new_revision']) : rvy_post_id($post->ID);
 		$published_url = get_permalink($published_post_id);
 
 		$revision = $this->get_last_revision($published_post_id, $current_user->ID);

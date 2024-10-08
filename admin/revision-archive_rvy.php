@@ -80,10 +80,10 @@ if (rvy_get_option('revision_archive_deletion')) {
 			<span class="dashicons dashicons-backup"></span>
 			<?php
 			esc_html_e( 'Revision Archive', 'revisionary' );
-			echo $wp_list_table->filters_in_heading();
+			$wp_list_table->filters_in_heading();
 			?>
 		</h1>
-		<?php echo $wp_list_table->search_in_heading(); ?>
+		<?php $wp_list_table->search_in_heading(); ?>
 	</header>
 	<?php $wp_list_table->views(); ?>
 	<form method="get">

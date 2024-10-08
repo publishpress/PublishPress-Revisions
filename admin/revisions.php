@@ -56,7 +56,7 @@ if ( empty($revision_id) && ! $left && ! $right ) {
 		}
 
 		if (!empty($arr) && is_array($arr) && !empty($arr['description'])) {
-			echo $arr['description'];
+			echo esc_html($arr['description']);
 		} else {
 			esc_html_e( 'Revision of this post is not allowed.', 'revisionary');
 		}
@@ -133,7 +133,7 @@ default :
 	<h1>
 	<?php printf(
 			esc_html__('Revisions of %s', 'revisionary'), 
-			"<a href='post.php?action=edit&post=$rvy_post->ID'>" . esc_html($rvy_post->post_title) . "</a>"
+			"<a href='post.php?action=edit&post=" . esc_attr($rvy_post->ID) . "'>" . esc_html($rvy_post->post_title) . "</a>"
 		);
 	?>
 	</h1>
@@ -144,7 +144,7 @@ default :
 
 	if ( $revision ) {
 		$left = $revision_id;
-		$post_title = "<a href='post.php?action=edit&post=$rvy_post->ID'>$rvy_post->post_title</a>";
+		$post_title = "<a href='post.php?action=edit&post=" . esc_attr($rvy_post->ID) . "'>" . esc_html($rvy_post->post_title) . "</a>";
 	} else {
 		$revision = $rvy_post;	
 	}
@@ -247,11 +247,11 @@ foreach ( array_keys($revision_status_captions) as $_revision_status ) {
 		if ($num_revisions->$_revision_status) {
 			echo "<li class='" . esc_attr($class) . "'><a href='" . esc_url($_link) . "' target='" . esc_attr($target) . "'>";
 			
-			$span_style = ('inherit' == $_revision_status) ? ' style="font-weight:bold"' : '';
+			$span_style = ('inherit' == $_revision_status) ? 'font-weight:bold' : '';
 
 			printf( 
 				esc_html__( '%1$s %2$s (%3$s)%4$s', 'revisionary' ), 
-				"<span class='count' $span_style>",
+				"<span class='count' style='" . esc_attr($span_style) . "'>",
 				esc_html($status_caption), 
 				esc_html(number_format_i18n( $num_revisions->$_revision_status )),
 				'</span>'

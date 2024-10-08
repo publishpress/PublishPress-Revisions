@@ -370,13 +370,16 @@ class RevisionaryFront {
 				}
 			}
 		}
+	
+		if (empty($post) || !empty($_REQUEST['mark_current_revision'])) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			global $post;													//phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.VariableRedeclaration
+		}
 
 		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ((!empty($_REQUEST['mark_current_revision']) || rvy_in_revision_workflow($post) || ('revision' == $post->post_type)) && !isset($_REQUEST['fl_builder'])) {
 			add_filter('redirect_canonical', array($this, 'flt_revision_preview_url'), 10, 2);
 
 			if (!empty($_REQUEST['mark_current_revision'])) {										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				global $post;
 				$published_post_id = (!empty($post)) ? $post->ID : 0;
 				$revision_id = $published_post_id;
 			} else {
@@ -421,10 +424,6 @@ class RevisionaryFront {
 				}
 			}
 
-			if (empty($post)) {
-				global $post;
-			}
-			
 			if (empty($post)) {
 				return;
 			}
@@ -645,7 +644,6 @@ class RevisionaryFront {
 				if (defined('REVISIONARY_LEGACY_PREVIEW_OUTPUT')) {
 					add_action('wp_head', [$this, 'rvyFrontCSS']);
 				} else {
-					//add_action('wp_print_scripts', [$this, 'rvyFrontCSS'], 5);
 					add_action('wp_enqueue_scripts', [$this, 'rvyEnqueueStyle'], 50);
 				}
 
