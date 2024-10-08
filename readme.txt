@@ -239,9 +239,11 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
-= 3.5.15 - 2 Oct 2024 =
+= 3.5.15 - 8 Oct 2024 =
 * Fixed : Editing a post did not refresh its "Has Revisions" flag
 * Change : Setting to work around cache plugin conflicts by refreshing "Has Revisions" flag before suppressing a "New Revision" link on Posts / Pages screen
+* Change : Hardened security within wp-admin by adding a few missing nonce checks and output escapes
+* Change : PHP Code Sniffer rule compliance - flagged false positives for meaningful pre-release scans
 
 = 3.5.14 - 26 Sep 2024 =
 * Fixed : New Revision link on Posts screen failed due to plugin conflict on some sites
