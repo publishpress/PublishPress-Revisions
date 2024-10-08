@@ -533,6 +533,7 @@ class Revisionary
 
 		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$any_trashed_posts = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_status = 'trash' AND comment_count > 0 AND post_mime_type IN ('$revision_status_csv') LIMIT 1");
 
 		$trashed_clause = ($any_trashed_posts) 
