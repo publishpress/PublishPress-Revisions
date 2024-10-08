@@ -548,6 +548,7 @@ function rvy_get_post_revisions($post_id, $status = '', $args = '' ) {
 		$order_clause = "ORDER BY $orderby $order";
 
 		if ('inherit' == $status) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$revisions = $wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT * FROM $wpdb->posts WHERE post_type = 'revision' AND post_parent = %d AND post_status = %s $order_clause",	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
