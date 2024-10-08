@@ -898,6 +898,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		if( $scheduled_revisions_available ) {
 			echo '<br />';
 
+			// phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInTernaryCondition
 			$subcaption = ( defined('RVY_CONTENT_ROLES') && $group_link = $revisionary->content_roles->get_metagroup_edit_link( 'Scheduled Revision Monitors' ) ) ?
 				sprintf( " &bull;&nbsp;<a href='%s'>" . esc_html__('select recipients', 'revisionary') . "</a>", $group_link ) : '';
 
