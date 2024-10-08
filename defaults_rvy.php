@@ -125,7 +125,7 @@ function rvy_default_options() {
 		'revision_archive_deletion' => 0,
 		'revision_restore_require_cap' => 0,
 		'revision_limit_per_post' => 0,
-		'revision_unfiltered_html_check' => 1,
+		'revision_unfiltered_html_check' => 0,
 		'revision_limit_compat_mode' => 0,
 	);
 
