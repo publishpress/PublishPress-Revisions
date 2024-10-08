@@ -320,7 +320,7 @@ class RevisionaryFront {
 		global $wp_query, $revisionary;
 		if ($wp_query->is_404) {
 			if (!empty($_REQUEST['base_post'])) {											//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				if ($post = get_post(intval($_REQUEST['base_post']))) {
+				if ($post = get_post(intval($_REQUEST['base_post']))) {						//phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited, WordPress.Security.NonceVerification.Recommended
 					$url = get_permalink((int) $_REQUEST['base_post']);						//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					wp_redirect($url);
 					exit;
@@ -343,7 +343,7 @@ class RevisionaryFront {
 		if ($wp_query->is_404 && !empty($revision_id) && (in_array(get_post_field('post_status', $revision_id), ['future', 'publish']) || defined('REVISIONARY_FORCE_PUBLICATION_REDIRECT'))) {
 			// Work around timing issue when scheduled revision publication is underway
 			if ($published_id = get_post_meta($revision_id, '_rvy_base_post_id', true)) {
-				if ($post = get_post($published_id)) {
+				if ($post = get_post($published_id)) {										// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited)
 					if ($type_obj = get_post_type_object($post->post_type)) {
 						$redirect = ($type_obj && empty($type_obj->public)) ? rvy_admin_url("post.php?action=edit&post=$post->ID") : add_query_arg('mark_current_revision', 1, get_permalink($post->ID)); // published URL
 						wp_redirect($redirect);
@@ -753,7 +753,7 @@ class RvyScheduledHtml {
 	}
 
 	function echo_html() {
-		echo $this->html;
+		echo $this->html;		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		remove_action( $this->action, array( $this, 'echo_html' ), $this->priority );
 	}
 }
