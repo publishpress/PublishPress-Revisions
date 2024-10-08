@@ -106,6 +106,7 @@ class RevisionCreation {
 		$revision_id = $this->insert_revision($data, $source_post->ID, $revision_status, $args);
 
 		if (!empty($use_autosave)) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->delete($wpdb->posts, ['ID' => $autosave_post->ID]);
 		}
 
@@ -179,8 +180,8 @@ class RevisionCreation {
 
 		if ( $future_date = ! empty($data['post_date']) && ( strtotime($data['post_date_gmt'] ) > agp_time_gmt() ) ) {  // in past versions, $future_date was also passed to get_revision_msg()
 			// round down to zero seconds
-			$data['post_date_gmt'] = date( 'Y-m-d H:i:00', strtotime( $data['post_date_gmt'] ) );
-			$data['post_date'] = date( 'Y-m-d H:i:00', strtotime( $data['post_date'] ) );
+			$data['post_date_gmt'] = gmdate( 'Y-m-d H:i:00', strtotime( $data['post_date_gmt'] ) );
+			$data['post_date'] = gmdate( 'Y-m-d H:i:00', strtotime( $data['post_date'] ) );
 		}
 
 		// @todo: confirm this is still needed
@@ -197,6 +198,7 @@ class RevisionCreation {
 		? ['comment_count' => $main_post_id, 'post_modified_gmt' => $data['post_modified_gmt'], 'post_modified' => $data['post_modified']]
 		: ['comment_count' => $main_post_id];
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update($wpdb->posts, $update_data, ['ID' => $revision_id]);
 
 		/**
@@ -261,6 +263,8 @@ class RevisionCreation {
 		// Set GUID.  @todo: still needed?
 		if ( '' == get_post_field( 'guid', $revision_id ) ) {
 			// need to give revision a guid for 3rd party editor compat (post_ID is ID of revision)
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->update( $wpdb->posts, array( 'guid' => get_permalink( $revision_id ) ), $where );
 		}
 	

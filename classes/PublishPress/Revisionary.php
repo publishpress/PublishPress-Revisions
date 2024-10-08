@@ -83,6 +83,7 @@ class Revisions {
             return false;
         }
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $revision_id = $wpdb->get_var(
             $wpdb->prepare(
                 "SELECT ID FROM $wpdb->posts WHERE comment_count = %d AND post_author = %d AND post_status IN ('pending-revision', 'future-revision') ORDER BY ID DESC LIMIT 1",

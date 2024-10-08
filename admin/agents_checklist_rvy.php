@@ -27,6 +27,7 @@ define ('ELIGIBLE_ITEMS_RVY', 'eligible');
 		}
 	}
 	
+	// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 	// stored_assignments[agent_id][inherited_from] = progenitor_assignment_id (note: this function treats progenitor_assignment_id as a boolean)
 	static function _agents_checklist_display( $agents_subset, $role_basis, $all_agents, $id_prefix, $stored_assignments, $args, &$key) {
 		$defaults = array( 

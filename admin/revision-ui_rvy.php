@@ -378,7 +378,8 @@ esc_html_e( 'Modified Date', 'revisionary' );
 <tbody>
 
 <?php 
-echo $rows; // output variables escaped upstream
+// output variables escaped upstream
+echo $rows; 														// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 ?>
 
 </tbody>
@@ -407,7 +408,8 @@ echo $rows; // output variables escaped upstream
 		// return / echo a simple list
 		if ( $echo ) {
 			if ($rows) {
-				echo "<ul class='post-revisions'>\n$rows</ul>"; // output variables escaped upstream
+				// output variables escaped upstream
+				echo "<ul class='post-revisions'>\n$rows</ul>";		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 
 			return $count;	
@@ -417,5 +419,7 @@ echo $rows; // output variables escaped upstream
 			} else {
 				return '';
 			}
+
+		   // phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 	endif; // list or table
 }

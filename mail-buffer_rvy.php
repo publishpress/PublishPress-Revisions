@@ -93,11 +93,11 @@ function _rvy_mail_check_buffer($new_msg = [], $args = []) {
 	}
 
 	if (!empty($first_mail_log) && $sent_mail) {
-		$wpdb->query("UPDATE $wpdb->options SET autoload = 'no' WHERE option_name = 'revisionary_sent_mail'");
+		$wpdb->query("UPDATE $wpdb->options SET autoload = 'no' WHERE option_name = 'revisionary_sent_mail'");			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	if (!empty($first_buffer) && $buffer) {
-		$wpdb->query("UPDATE $wpdb->options SET autoload = 'no' WHERE option_name = 'revisionary_mail_buffer'");
+		$wpdb->query("UPDATE $wpdb->options SET autoload = 'no' WHERE option_name = 'revisionary_mail_buffer'");		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	return (object) compact('buffer', 'sent_mail', 'send_limits', 'sent_counts', 'new_msg_buffered');
@@ -139,9 +139,9 @@ function _rvy_send_buffered_mail() {
 		}
 
 		if (defined('RS_DEBUG')) {
-			$success = wp_mail($next_mail['address'], $next_mail['title'], $next_mail['message']);
+			$success = wp_mail($next_mail['address'], $next_mail['title'], $next_mail['message']);	// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.wp_mail_wp_mail
 		} else {
-			$success = @wp_mail($next_mail['address'], $next_mail['title'], $next_mail['message']);
+			$success = @wp_mail($next_mail['address'], $next_mail['title'], $next_mail['message']);	// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.wp_mail_wp_mail
 		}
 
 		if (!$success && defined('REVISIONARY_MAIL_RETRY')) {

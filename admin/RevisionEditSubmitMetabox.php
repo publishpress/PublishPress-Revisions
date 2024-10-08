@@ -73,7 +73,7 @@ class RvyRevisionEditSubmitMetabox
 
             <?php
             $html = apply_filters('revisionary_submit_revision_metabox_classic', ob_get_clean(), $post);
-            echo $html;
+            echo $html;                 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             ?>
         </div> <?php // submitpost ?>
 

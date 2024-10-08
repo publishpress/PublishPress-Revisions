@@ -21,9 +21,9 @@ if (!defined('RVY_PREVIEW_ARG')) {
 	}
 }
 
-if (('preview' != RVY_PREVIEW_ARG) && !empty($_REQUEST['preview']) && !empty($_REQUEST['nc'])) {
-	$url = sanitize_url($_SERVER['REQUEST_URI']);
-	$arr = parse_url(site_url());
+if (('preview' != RVY_PREVIEW_ARG) && !empty($_REQUEST['preview']) && !empty($_REQUEST['nc'])) {	// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+	$url = (isset($_SERVER['REQUEST_URI'])) ? esc_url_raw($_SERVER['REQUEST_URI']) : '';
+	$arr = wp_parse_url(site_url());
 	$url = $arr['scheme'] . '://' . $arr['host'] . $url;
 
 	$url = str_replace('preview=', RVY_PREVIEW_ARG . '=', $url);
@@ -33,14 +33,14 @@ if (('preview' != RVY_PREVIEW_ARG) && !empty($_REQUEST['preview']) && !empty($_R
 
 $preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';
 
-if (!empty($_REQUEST[$preview_arg]) && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id'])) {
+if (!empty($_REQUEST[$preview_arg]) && !empty($_REQUEST['post_type']) && empty($_REQUEST['preview_id'])) {	// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 	add_filter('redirect_canonical', '_rvy_no_redirect_filter', 10, 2);
 }
 
 /*======== WP-Cron implementation for Email Notification Buffer ========*/
 add_action('init', 'rvy_set_notification_buffer_cron');
 add_action('rvy_mail_buffer_hook', 'rvy_send_buffered_mail' );
-add_filter('cron_schedules', 'rvy_mail_buffer_cron_interval');
+add_filter('cron_schedules', 'rvy_mail_buffer_cron_interval');			// phpcs:ignore WordPress.WP.CronInterval.ChangeDetected
 
 // wp-cron hook
 add_action('publish_revision_rvy', '_revisionary_publish_scheduled_cron');
@@ -125,9 +125,9 @@ if (defined('PP_AUTHORS_VERSION')) {
 	);
 }
 
-if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview']) 
-&& ((empty($_REQUEST['preview_id']) && empty($_REQUEST['thumbnail_id']))
-|| (!empty($_REQUEST['preview_id']) && rvy_in_revision_workflow((int) $_REQUEST['preview_id']))
+if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview']) 										// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+&& ((empty($_REQUEST['preview_id']) && empty($_REQUEST['thumbnail_id']))							// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+|| (!empty($_REQUEST['preview_id']) && rvy_in_revision_workflow((int) $_REQUEST['preview_id']))		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 )
 ) {
 	require_once('compat_rvy.php');

@@ -10,12 +10,10 @@ function _rvy_post_edit_ui() {
 		if ($pagenow == 'post.php') {
 			require_once( dirname(__FILE__).'/post-editor-workflow-ui_rvy.php' );
 
-			add_action('init', function() {
-				if (rvy_get_option('revision_limit_per_post')) {
-					$post_id = rvy_detect_post_id();
-					revisionary_refresh_postmeta($post_id);
-				}
-			});
+			if (rvy_get_option('revision_limit_per_post')) {
+				$post_id = rvy_detect_post_id();
+				revisionary_refresh_postmeta($post_id);
+			}
 
 			if (\PublishPress\Revisions\Utils::isBlockEditorActive()) {
 				require_once( dirname(__FILE__).'/post-edit-block-ui_rvy.php' );
@@ -166,6 +164,7 @@ function rvy_admin_init() {
 
 			// Verify the post status exists.
 			if ( get_post_status_object( $post_status ) ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_type=%s AND post_mime_type = %s", $post_type, $post_status ) );
 			}
 			$doaction = 'delete';
@@ -404,7 +403,7 @@ function rvy_admin_init() {
 		
 				if (!empty($arr) && is_array($arr) && !empty($arr['code'])) {
 					if (!empty($_REQUEST['referer'])) {
-						$url = add_query_arg('revision_action', $arr['code'], $_REQUEST['referer']);
+						$url = add_query_arg('revision_action', $arr['code'], esc_url_raw($_REQUEST['referer']));
 						wp_redirect($url);
 						exit;
 					}
@@ -502,6 +501,7 @@ function rvy_get_post_revisions($post_id, $status = '', $args = '' ) {
 		}
 		
 		if ('inherit' == $status) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$revisions = $wpdb->get_col(
 				$wpdb->prepare(
 					"SELECT ID FROM $wpdb->posts WHERE post_type = 'revision' AND post_parent = %d AND post_status = %s",
@@ -511,15 +511,17 @@ function rvy_get_post_revisions($post_id, $status = '', $args = '' ) {
 			);
 		} else {
 			if (!empty($all_rev_statuses_clause)) { 
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$revisions = $wpdb->get_col(
 					$wpdb->prepare(
 					"SELECT ID FROM $wpdb->posts "
 					. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
-						. " WHERE pm_published.meta_value = %s $all_rev_statuses_clause",
+						. " WHERE pm_published.meta_value = %s $all_rev_statuses_clause",	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 						$post_id
 					)
 				);
 			} else {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$revisions = $wpdb->get_col(
 					$wpdb->prepare(
 					"SELECT ID FROM $wpdb->posts "
@@ -546,29 +548,32 @@ function rvy_get_post_revisions($post_id, $status = '', $args = '' ) {
 		$order_clause = "ORDER BY $orderby $order";
 
 		if ('inherit' == $status) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$revisions = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT * FROM $wpdb->posts WHERE post_type = 'revision' AND post_parent = %d AND post_status = %s $order_clause",
+					"SELECT * FROM $wpdb->posts WHERE post_type = 'revision' AND post_parent = %d AND post_status = %s $order_clause",	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 					$post_id,
 					$status
 				)
 			);
 		} else {
-			if (!empty($all_rev_statuses_clause)) { 
+			if (!empty($all_rev_statuses_clause)) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$revisions = $wpdb->get_results(
 					$wpdb->prepare(
 					"SELECT * FROM $wpdb->posts "
 					. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
-						. " WHERE pm_published.meta_value = %d $all_rev_statuses_clause $order_clause",
+						. " WHERE pm_published.meta_value = %d $all_rev_statuses_clause $order_clause",									// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 						$post_id
 					)
 				);
 			} else {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$revisions = $wpdb->get_results(
 					$wpdb->prepare(
 					"SELECT * FROM $wpdb->posts "
 					. " INNER JOIN $wpdb->postmeta pm_published ON $wpdb->posts.ID = pm_published.post_id AND pm_published.meta_key = '_rvy_base_post_id'"
-						. " WHERE pm_published.meta_value = %d AND post_mime_type = %s $order_clause",
+						. " WHERE pm_published.meta_value = %d AND post_mime_type = %s $order_clause",									// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 						$post_id,
 						$status
 					)

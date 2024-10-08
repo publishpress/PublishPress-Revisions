@@ -21,42 +21,42 @@ if ( defined( 'FV_FCK_NAME' ) && current_user_can('activate_plugins') ) {
 	echo( '</div><br />' );
 }
 
-if ( ! empty($_GET['revision']) )
-	$revision_id = absint($_GET['revision']);
+if ( ! empty($_GET['revision']) )													//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$revision_id = absint($_GET['revision']);										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-if ( ! empty($_GET['left']) )
-	$left = absint($_GET['left']);
+if ( ! empty($_GET['left']) )														//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$left = absint($_GET['left']);													//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 else
 	$left = '';
 
-if ( ! empty($_GET['right']) )
-	$right = absint($_GET['right']);
+if ( ! empty($_GET['right']) )														//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$right = absint($_GET['right']);												//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 else
 	$right = '';
 	
 $revision_status = 'inherit';
 
-if ( ! empty($_GET['action']) )
-	$_action = sanitize_key($_GET['action']);
+if ( ! empty($_GET['action']) )														//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$_action = sanitize_key($_GET['action']);										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 else
 	$_action = '';
 
-if ( ! empty($_GET['restored_post'] ) ) {
-	$revision_id = (int) $_GET['restored_post'];
+if ( ! empty($_GET['restored_post'] ) ) {											//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$revision_id = (int) $_GET['restored_post'];									//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 }
 
 if ( empty($revision_id) && ! $left && ! $right ) {
 	echo( '<div><br />' );
 
-	if (!empty($_REQUEST['action']) && ('revise' == $_REQUEST['action'])) {
+	if (!empty($_REQUEST['action']) && ('revise' == $_REQUEST['action'])) {			//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		// Fallback error message, in case redirect is missed
-		if (!empty($_REQUEST['post'])) {
-			$post_id = intval($_REQUEST['post']);
-			$arr = rvy_post_revision_blocked($post_id);
+		if (!empty($_REQUEST['post'])) {											//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$_post_id = intval($_REQUEST['post']);									//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$arr = rvy_post_revision_blocked($_post_id);
 		}
 
 		if (!empty($arr) && is_array($arr) && !empty($arr['description'])) {
-			echo $arr['description'];
+			echo esc_html($arr['description']);
 		} else {
 			esc_html_e( 'Revision of this post is not allowed.', 'revisionary');
 		}
@@ -133,7 +133,7 @@ default :
 	<h1>
 	<?php printf(
 			esc_html__('Revisions of %s', 'revisionary'), 
-			"<a href='post.php?action=edit&post=$rvy_post->ID'>" . esc_html($rvy_post->post_title) . "</a>"
+			"<a href='post.php?action=edit&post=" . esc_attr($rvy_post->ID) . "'>" . esc_html($rvy_post->post_title) . "</a>"
 		);
 	?>
 	</h1>
@@ -144,7 +144,7 @@ default :
 
 	if ( $revision ) {
 		$left = $revision_id;
-		$post_title = "<a href='post.php?action=edit&post=$rvy_post->ID'>$rvy_post->post_title</a>";
+		$post_title = "<a href='post.php?action=edit&post=" . esc_attr($rvy_post->ID) . "'>" . esc_html($rvy_post->post_title) . "</a>";
 	} else {
 		$revision = $rvy_post;	
 	}
@@ -194,11 +194,13 @@ if ( $is_administrator = is_content_administrator_rvy() ) {
 	$base_status_csv = implode("','", array_merge(rvy_revision_base_statuses(), ['inherit']));
 	$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	$results = $wpdb->get_results( 
 		$wpdb->prepare(
 			"SELECT post_mime_type, COUNT( * ) AS num_posts FROM {$wpdb->posts}"
-			. " WHERE post_status IN ('$base_status_csv')"
-			. " AND ((post_type = 'revision' AND post_status = 'inherit' AND post_parent = %d) OR (post_type != 'revision' AND post_mime_type IN ('$revision_status_csv') AND comment_count = %d))"
+			. " WHERE post_status IN ('$base_status_csv')"																// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			. " AND ((post_type = 'revision' AND post_status = 'inherit' AND post_parent = %d)"
+			. " OR (post_type != 'revision' AND post_mime_type IN ('$revision_status_csv') AND comment_count = %d))"	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			. " GROUP BY post_mime_type",
 			$rvy_post->ID,
 			$rvy_post->ID
@@ -245,11 +247,11 @@ foreach ( array_keys($revision_status_captions) as $_revision_status ) {
 		if ($num_revisions->$_revision_status) {
 			echo "<li class='" . esc_attr($class) . "'><a href='" . esc_url($_link) . "' target='" . esc_attr($target) . "'>";
 			
-			$span_style = ('inherit' == $_revision_status) ? ' style="font-weight:bold"' : '';
+			$span_style = ('inherit' == $_revision_status) ? 'font-weight:bold' : '';
 
 			printf( 
 				esc_html__( '%1$s %2$s (%3$s)%4$s', 'revisionary' ), 
-				"<span class='count' $span_style>",
+				"<span class='count' style='" . esc_attr($span_style) . "'>",
 				esc_html($status_caption), 
 				esc_html(number_format_i18n( $num_revisions->$_revision_status )),
 				'</span>'

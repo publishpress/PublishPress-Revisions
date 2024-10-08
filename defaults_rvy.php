@@ -63,6 +63,7 @@ function rvy_default_options_sitewide() {
 		'revision_restore_require_cap' => true,
 		'revision_limit_per_post' => true,
 		'revision_unfiltered_html_check' => true,
+		'revision_limit_compat_mode' => true,
 	);
 
 	if ( $other_options = array_diff_key( rvy_default_options(), $def ) ) {
@@ -124,7 +125,8 @@ function rvy_default_options() {
 		'revision_archive_deletion' => 0,
 		'revision_restore_require_cap' => 0,
 		'revision_limit_per_post' => 0,
-		'revision_unfiltered_html_check' => 1,
+		'revision_unfiltered_html_check' => 0,
+		'revision_limit_compat_mode' => 0,
 	);
 
 	return $def;

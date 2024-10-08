@@ -99,8 +99,11 @@ class Utils {
         }
 
         if (class_exists('Classic_Editor')) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 			if (isset($_REQUEST['classic-editor__forget']) && (isset($_REQUEST['classic']) || isset($_REQUEST['classic-editor']))) {
 				return false;
+
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 			} elseif (isset($_REQUEST['classic-editor__forget']) && !isset($_REQUEST['classic']) && !isset($_REQUEST['classic-editor'])) {
 				return true;
 			} elseif (get_option('classic-editor-allow-users') === 'allow') {
@@ -187,12 +190,12 @@ class Utils {
 		$conditions[] = self::isWp5()
                         && $pluginsState['classic-editor']
                         && (get_option('classic-editor-replace') === 'block'
-							&& ! isset($_GET['classic-editor__forget']));
+							&& ! isset($_GET['classic-editor__forget']));	// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 
         $conditions[] = self::isWp5()
                         && $pluginsState['classic-editor']
                         && (get_option('classic-editor-replace') === 'classic'
-							&& isset($_GET['classic-editor__forget']));
+							&& isset($_GET['classic-editor__forget']));		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 
 		if ($val = $pluginsState['gutenberg-ramp']) {
 			$_post = get_post(rvy_detect_post_id());
@@ -207,7 +210,6 @@ class Utils {
 		$conditions[] = $pluginsState['disable-gutenberg'] 
                         && !self::disableGutenberg(rvy_detect_post_id());
 
-		//if (defined('PP_CAPABILITIES_RESTORE_NAV_TYPE_BLOCK_EDITOR_DISABLE') && version_compare($wp_version, '5.9-beta', '>=')) {
         if (version_compare($wp_version, '5.9-beta', '>=') && !empty($has_nav_filter)) {
             add_filter('use_block_editor_for_post_type', '_disable_block_editor_for_navigation_post_type', 10, 2 );
         }
@@ -238,11 +240,11 @@ class Utils {
         
         if (function_exists('disable_gutenberg_whitelist_title') && disable_gutenberg_whitelist_title($post_id)) return false;
 
-        if (isset($_GET['block-editor'])) return false;
+        if (isset($_GET['block-editor'])) return false;		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
         
-        if (isset($_GET['classic-editor'])) return true;
+        if (isset($_GET['classic-editor'])) return true;	// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
         
-        if (isset($_POST['classic-editor'])) return true;
+        if (isset($_POST['classic-editor'])) return true;  	// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
         
         if (function_exists('disable_gutenberg_disable_all') && disable_gutenberg_disable_all()) return true;
         
@@ -305,6 +307,7 @@ class Utils {
 	public static function get_post_autosave($post_id, $user_id) {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$autosave = $wpdb->get_row(
 			$wpdb->prepare(
 				"SELECT *

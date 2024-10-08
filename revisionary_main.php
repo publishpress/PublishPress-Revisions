@@ -29,6 +29,7 @@ class Revisionary
 	}
 
 	function init() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 		if (isset($_SERVER['REQUEST_URI']) && is_admin() && (false !== strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'revision.php')) && (!empty($_REQUEST['revision']))) {
 			add_action('init', [$this, 'addFilters'], PHP_INT_MAX);
 		} else {
@@ -45,11 +46,14 @@ class Revisionary
 		// @todo: Correct selective application of filtering downstream so Revisors can use a read-only Compare [Past] Revisions screen
 		//
 		// Note: some filtering is needed to allow users with full editing permissions on the published post to access a Compare Revisions screen with Preview and Manage buttons
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 		if (is_admin() && isset($_SERVER['REQUEST_URI']) && (false !== strpos(esc_url_raw($_SERVER['REQUEST_URI']), 'revision.php')) && (!empty($_REQUEST['revision'])) && !is_content_administrator_rvy()) {
-			if (!empty($_REQUEST['revision'])) {
-				$revision_id = (int) $_REQUEST['revision'];
-			} elseif (isset($_REQUEST['to'])) {
-				$revision_id = (int) $_REQUEST['to'];
+			
+			if (!empty($_REQUEST['revision'])) {				// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+				$revision_id = (int) $_REQUEST['revision'];		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+			} elseif (isset($_REQUEST['to'])) {					// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+				$revision_id = (int) $_REQUEST['to'];			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 			} else {
 				$revision_id = 0;
 			}
@@ -58,7 +62,7 @@ class Revisionary
 				if ($_post = get_post($revision_id)) {
 					if (!rvy_in_revision_workflow($_post)) {
 						if ($parent_post = get_post($_post->post_parent)) {
-							if (!empty($_POST) || (!empty($_REQUEST['action']) && ('restore' == $_REQUEST['action']))) {
+							if (!empty($_POST) || (!empty($_REQUEST['action']) && ('restore' == $_REQUEST['action']))) {	// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 								if (!$this->canEditPost($parent_post, ['simple_cap_check' => true])) {
 									return;
 								}
@@ -87,12 +91,14 @@ class Revisionary
 		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST)) { // preview_id indicates a regular preview via WP core, based on autosave revision
 			$preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';
 			
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 			if ((defined('FL_BUILDER_VERSION') && rvy_in_revision_workflow(rvy_detect_post_id())) || ((!empty($_GET[$preview_arg]) || !empty($_GET['_ppp'])) && empty($_REQUEST['preview_id'])) || !empty($_GET['mark_current_revision'])) {
 				require_once( dirname(__FILE__).'/front_rvy.php' );
 				$this->front = new RevisionaryFront();
 			}
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 		if (!is_admin() && (!defined('REST_REQUEST') || ! REST_REQUEST) && (!empty($_GET['preview']) && !empty($_REQUEST['preview_id']))) {			
 			if (!defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION')) {
 				require_once(dirname(__FILE__).'/classes/PublishPress/Revisions/PostPreview.php');
@@ -135,8 +141,9 @@ class Revisionary
 		// REST logging
 		add_filter( 'rest_pre_dispatch', array( $this, 'rest_pre_dispatch' ), 10, 3 );
 
-		// This is needed, implemented for pending revisions only
-		if (!empty($_REQUEST['get_new_revision'])) {
+		// This is needed, implemented for pending revisions only (check referer downstream)
+		if (!empty($_REQUEST['get_new_revision'])) {							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
 			if (did_action('wp_default_scripts')) {
 				$this->act_new_revision_redirect();
 			} else {
@@ -144,7 +151,8 @@ class Revisionary
 			}
 		}
 
-		if (!empty($_REQUEST['edit_new_revision'])) {
+																				// check referer downstream
+		if (!empty($_REQUEST['edit_new_revision'])) {							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			add_action('wp_default_scripts', array($this, 'act_edit_revision_redirect'), 1);
 		}
 
@@ -180,6 +188,8 @@ class Revisionary
 		$parsed_args['echo'] = 0;
 
 		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$parsed_args['exclude'] = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ('$revision_status_csv') AND post_type !=''");
 		// ---- End PublishPress Modification ---
 
@@ -221,7 +231,7 @@ class Revisionary
 		$html = apply_filters( 'wp_dropdown_pages', $output, $parsed_args, $pages );
 	
 		if ( $parsed_args['echo'] ) {
-			echo $html;
+			echo $html;					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	
 		// PublishPress: restore this filter hook
@@ -523,6 +533,7 @@ class Revisionary
 
 		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$any_trashed_posts = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_status = 'trash' AND comment_count > 0 AND post_mime_type IN ('$revision_status_csv') LIMIT 1");
 
 		$trashed_clause = ($any_trashed_posts) 
@@ -531,9 +542,10 @@ class Revisionary
 			$post_id
 		) : '';
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$post_ids = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT ID FROM $wpdb->posts WHERE (post_mime_type IN ('$revision_status_csv') AND comment_count = %d) $trashed_clause", 
+				"SELECT ID FROM $wpdb->posts WHERE (post_mime_type IN ('$revision_status_csv') AND comment_count = %d) $trashed_clause",  // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$post_id
 			)
 		);
@@ -547,7 +559,7 @@ class Revisionary
 		$post = get_post($post_id);
 
 		if ($post && rvy_in_revision_workflow($post)) {
-			$wpdb->query(
+			$wpdb->query(														// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
 					"DELETE FROM $wpdb->postmeta WHERE post_id = %d", 
 					$post_id
@@ -575,8 +587,9 @@ class Revisionary
 				if (('future-revision' != $revision->post_mime_type) && rvy_get_option('revision_update_notifications')) {
 					$args = ['update' => true, 'revision_id' => $revision->ID, 'published_post' => $published_post, 'object_type' => $published_post->post_type];
 					
-					if ( !empty( $_REQUEST['prev_cc_user'] ) ) {
-						$args['selected_recipients'] = array_map('intval', $_REQUEST['prev_cc_user']);
+					
+					if ( !empty( $_REQUEST['prev_cc_user'] ) ) {											//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+						$args['selected_recipients'] = array_map('intval', $_REQUEST['prev_cc_user']);		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					} else {
 						// If the UI that triggered this notification does not support recipient selection, send to default recipients for this post
 						require_once( dirname(__FILE__) . '/revision-workflow_rvy.php' );
@@ -596,6 +609,7 @@ class Revisionary
 		if (rvy_in_revision_workflow($revision)) {
 			if (empty($revision->comment_count)) {
 				if ($main_post_id = get_post_meta($revision->ID, '_rvy_base_post_id', true)) {
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 					$wpdb->update($wpdb->posts, ['comment_count' => $main_post_id], ['ID' => $revision->ID]);
 				}
 			}
@@ -632,7 +646,9 @@ class Revisionary
 	function act_new_revision_redirect() {
 		global $current_user, $post;
 
-		if (empty($_REQUEST['get_new_revision'])) {
+		if (!empty($_REQUEST['get_new_revision'])) {
+			check_admin_referer('new-revision');
+		} else {
 			return;
 		}
 
@@ -664,11 +680,13 @@ class Revisionary
 	function act_edit_revision_redirect() {
 		global $current_user, $post;
 
-		if (empty($_REQUEST['edit_new_revision'])) {
+		if (!empty($_REQUEST['edit_new_revision'])) {
+			check_admin_referer('edit-new-revision');
+		} else {
 			return;
 		}
 
-		$published_post_id = (!empty($_REQUEST['edit_new_revision'])) ? rvy_post_id($_REQUEST['edit_new_revision']) : rvy_post_id($post->ID);
+		$published_post_id = (!empty($_REQUEST['edit_new_revision'])) ? rvy_post_id((int) $_REQUEST['edit_new_revision']) : rvy_post_id($post->ID);
 		$published_url = get_permalink($published_post_id);
 
 		$revision = $this->get_last_revision($published_post_id, $current_user->ID);
@@ -902,7 +920,12 @@ class Revisionary
 			}
  
 			// allow Revisor to view a preview of their scheduled revision
-			if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST) || empty($_REQUEST['preview']) || !empty($_POST) || did_action('template_redirect')) {
+			
+			if (is_admin() 
+			|| (defined('REST_REQUEST') && REST_REQUEST) 
+			|| empty($_REQUEST['preview']) || !empty($_POST) 						//phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+			|| did_action('template_redirect')
+			) {
 				if ($type_obj = get_post_type_object( $post->post_type )) {
 					if (isset($type_obj->cap->edit_published_posts)) {
 						$check_cap = in_array($cap, ['delete_post', 'delete_page']) ? $type_obj->cap->delete_published_posts : $type_obj->cap->edit_published_posts;
@@ -916,10 +939,15 @@ class Revisionary
 
 		$busy = true;
 
-		$preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';
+		$preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		if (in_array($cap, ['read_post', 'read_page'])	// WP Query imposes edit_post capability requirement for front end viewing of protected statuses 
-			|| ((!empty($_REQUEST[$preview_arg]) || !empty($_GET['preview'])) && in_array($cap, array('edit_post', 'edit_page')) && did_action('posts_selection') && !did_action('template_redirect'))
+			|| (
+				(!empty($_REQUEST[$preview_arg]) || !empty($_GET['preview'])) 		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				&& in_array($cap, array('edit_post', 'edit_page')) 
+				&& did_action('posts_selection') 
+				&& !did_action('template_redirect')
+			)
 		) {
 			if ($post && rvy_in_revision_workflow($post)) {
 				$type_obj = get_post_type_object($post->post_type);
@@ -1025,6 +1053,7 @@ class Revisionary
 			if (('draft-revision' == $post->post_mime_type) && !rvy_is_post_author($post) && rvy_get_option('manage_unsubmitted_capability') && empty($wp_blogcaps['manage_unsubmitted_revisions'])) {
 				unset($wp_blogcaps[$object_type_obj->cap->edit_others_posts]);
 			} else {
+				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				if (defined('DOING_AJAX') && DOING_AJAX && !empty($_REQUEST['action']) && (false !== strpos(sanitize_key($_REQUEST['action']), 'query-attachments'))) {
 					if ('post' == $post->post_type) {
 						return $wp_blogcaps;
@@ -1145,7 +1174,7 @@ class Revisionary
 	}
 
 	function fltIsPreview($is_preview) {
-        if (defined('RVY_PREVIEW_ARG') && RVY_PREVIEW_ARG && !empty($_REQUEST[RVY_PREVIEW_ARG])) {
+        if (defined('RVY_PREVIEW_ARG') && RVY_PREVIEW_ARG && !empty($_REQUEST[RVY_PREVIEW_ARG])) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $is_preview = true;
         }
 
@@ -1156,8 +1185,11 @@ class Revisionary
 	 * PublishPress Permissions: Make query filtering allow for revision previews
 	 */  
 	function fltQueryPostStatuses($statuses, $args) {
-        if (((defined('RVY_PREVIEW_ARG') && RVY_PREVIEW_ARG && !empty($_REQUEST[RVY_PREVIEW_ARG])))
-        && !empty($args['required_operation']) && ('edit' == $args['required_operation']) && function_exists('rvy_revision_base_statuses')) {
+        if (((defined('RVY_PREVIEW_ARG') && RVY_PREVIEW_ARG && !empty($_REQUEST[RVY_PREVIEW_ARG])))	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        && !empty($args['required_operation']) 
+		&& ('edit' == $args['required_operation']) 
+		&& function_exists('rvy_revision_base_statuses')
+		) {
             $statuses = array_merge($statuses, array_fill_keys(rvy_revision_base_statuses(), (object)[]));
         }
 

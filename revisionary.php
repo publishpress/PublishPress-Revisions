@@ -5,7 +5,7 @@
  * Description: Maintain published content with teamwork and precision using the Revisions model to submit, approve and schedule changes.
  * Author: PublishPress
  * Author URI: https://publishpress.com
- * Version: 3.5.14
+ * Version: 3.5.15
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 5.5
@@ -39,7 +39,7 @@
 // Temporary usage within this module only; avoids multiple instances of version string
 global $pp_revisions_version;
 
-$pp_revisions_version = '3.5.14';
+$pp_revisions_version = '3.5.15';
 
 global $wp_version;
 
@@ -58,7 +58,7 @@ if (is_admin() && $invalid_php_version) {
                 echo '<div class="notice notice-error"><p>';
                 printf(
                     'PublishPress Revisions requires PHP version %s or higher.',
-                    $min_php_version
+                    esc_html($min_php_version)
                 );
                 echo '</p></div>';
             }
@@ -75,7 +75,7 @@ if (is_admin() && $invalid_wp_version) {
                 echo '<div class="notice notice-error"><p>';
                 printf(
                     'PublishPress Revisions requires WordPress version %s or higher.',
-                    $min_wp_version
+                    esc_html($min_wp_version)
                 );
                 echo '</p></div>';
             }

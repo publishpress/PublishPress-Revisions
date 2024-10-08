@@ -36,8 +36,13 @@ function _rvy_set_ma_post_authors_custom_field($post_id, $authors)
 			? $multiple_authors_addon->coauthor_taxonomy 
 			: 'author';
 
+			// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 			//$author = Author::get_by_term_id($author);  // this returns an object with term_id property and no name
+
+			// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 			//$author = get_term($author, 'author');	  // 'author' is actually an invalid taxonomy name per WP API
+			
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$author = $wpdb->get_row(
 				$wpdb->prepare(
 					"SELECT * FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON t.term_id = tt.term_id"

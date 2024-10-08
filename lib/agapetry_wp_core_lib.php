@@ -27,7 +27,7 @@ function agp_date_i18n( $datef, $timestamp ) {
 	if ( $timestamp >= 0 )
 		return date_i18n( $datef, $timestamp );
 	else
-		return date( $datef, $timestamp );
+		return gmdate( $datef, $timestamp );
 }
 }
 
@@ -47,10 +47,10 @@ function awp_post_type_from_uri() {
 	}
 	
 	if ( strpos( $script_name, 'post-new.php' ) || strpos( $script_name, 'edit.php' ) ) {
-		$object_type = ! empty( $_GET['post_type'] ) ? sanitize_key($_GET['post_type']) : 'post';
+		$object_type = ! empty( $_GET['post_type'] ) ? sanitize_key($_GET['post_type']) : 'post';	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		
-	} elseif ( ! empty( $_GET['post'] ) ) {	 // post.php
-		if ( $_post = get_post((int) $_GET['post'] ) )
+	} elseif ( ! empty( $_GET['post'] ) ) {	 														//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( $_post = get_post((int) $_GET['post'] ) )												//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$object_type = $_post->post_type;
 	}
 

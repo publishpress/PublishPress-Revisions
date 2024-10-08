@@ -15,12 +15,12 @@ wp_add_inline_script(
 );
 
 require_once( dirname( __FILE__ ) . '/class-list-table-archive.php' );
-$wp_list_table = new Revisionary_Archive_List_Table(['screen' => 'revisionary-archive']);
+$wp_list_table = new Revisionary_Archive_List_Table(['screen' => 'revisionary-archive']);		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 $wp_list_table->prepare_items();
 
 if (rvy_get_option('revision_archive_deletion')) {
 	$bulk_counts = array(
-		'deleted'   => isset( $_REQUEST['deleted'] )   ? absint( $_REQUEST['deleted'] )   : 0,
+		'deleted'   => isset($_REQUEST['deleted']) ? absint( $_REQUEST['deleted'] ) : 0,		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	);
 
 	$bulk_messages = [];
@@ -38,7 +38,7 @@ if (rvy_get_option('revision_archive_deletion')) {
 	$messages = [];
 
 	foreach ( $bulk_counts as $message => $count ) {
-		if ( $message == 'trashed' && isset( $_REQUEST['ids'] ) ) {
+		if ( $message == 'trashed' && isset( $_REQUEST['ids'] ) ) {								//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$any_messages = true;
 			break;
 		} elseif (!empty($bulk_messages['post'][$message])) {
@@ -52,8 +52,10 @@ if (rvy_get_option('revision_archive_deletion')) {
 	}
 
 	foreach ( $bulk_counts as $message => $count ) {
-		if ( $message == 'trashed' && isset( $_REQUEST['ids'] ) ) {
-			$ids = preg_replace( '/[^0-9,]/', '', sanitize_text_field($_REQUEST['ids']));
+		if ( $message == 'trashed' && isset( $_REQUEST['ids'] ) 								//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		) {
+			$ids = preg_replace( '/[^0-9,]/', '', sanitize_text_field($_REQUEST['ids']));		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			
 			echo '<a href="' . esc_url( wp_nonce_url( "edit.php?post_type=$post_type&doaction=undo&action=untrash&ids=$ids", "bulk-revision-queue" ) ) . '">' . esc_html__('Undo') . '</a> ';
 		
 		} elseif (!empty($bulk_messages['post'][$message])) {
@@ -78,10 +80,10 @@ if (rvy_get_option('revision_archive_deletion')) {
 			<span class="dashicons dashicons-backup"></span>
 			<?php
 			esc_html_e( 'Revision Archive', 'revisionary' );
-			echo $wp_list_table->filters_in_heading();
+			$wp_list_table->filters_in_heading();
 			?>
 		</h1>
-		<?php echo $wp_list_table->search_in_heading(); ?>
+		<?php $wp_list_table->search_in_heading(); ?>
 	</header>
 	<?php $wp_list_table->views(); ?>
 	<form method="get">
