@@ -1387,6 +1387,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 				if ( rvy_get_option( 'publish_scheduled_notify_revisor' ) ) {
 					$title = sprintf( esc_html__('[%s] %s Publication Notice', 'revisionary' ), $blogname, pp_revisions_status_label('future-revision', 'name') );
 					$message = sprintf( esc_html__('The scheduled revision you submitted for the %1$s "%2$s" has been published.', 'revisionary' ), $type_caption, $row->post_title ) . "\r\n\r\n";
+					$message = str_replace($message, '&quot;', '"', $message);
 
 					if ( ! empty($post->ID) )
 						$message .= esc_html__( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";
@@ -1409,6 +1410,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 				if ( ( ( $post->post_author != $row->post_author ) || defined( 'RVY_LEGACY_SCHEDULED_REV_POST_AUTHOR_NOTIFY' ) ) && rvy_get_option( 'publish_scheduled_notify_author' ) ) {
 					$title = sprintf( esc_html__('[%s] %s Publication Notice', 'revisionary' ), $blogname, pp_revisions_status_label('future-revision', 'name') );
 					$message = sprintf( esc_html__('A scheduled revision to your %1$s "%2$s" has been published.', 'revisionary' ), $type_caption, $post->post_title ) . "\r\n\r\n";
+					$message = str_replace($message, '&quot;', '"', $message);
 
 					if ( $revisor = new WP_User( $row->post_author ) )
 						$message .= sprintf( esc_html__('It was submitted by %1$s.'), $revisor->display_name ) . "\r\n\r\n";
@@ -1471,7 +1473,8 @@ function rvy_publish_scheduled_revisions($args = []) {
 						$title = sprintf(esc_html__('[%s] %s Publication'), $blogname, pp_revisions_status_label('future-revision', 'name') );
 						
 						$message = sprintf( esc_html__('A scheduled revision to the %1$s "%2$s" has been published.'), $type_caption, $row->post_title ) . "\r\n\r\n";
-	
+						$message = str_replace($message, '&quot;', '"', $message);
+
 						if ( $author = new WP_User( $row->post_author ) )
 							$message .= sprintf( esc_html__('It was submitted by %1$s.'), $author->display_name ) . "\r\n\r\n";
 	
