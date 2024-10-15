@@ -529,6 +529,7 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 			if (($db_action || !empty($args['force_notify'])) && rvy_get_option( 'rev_approval_notify_revisor' ) ) {
 				$title = sprintf(esc_html__('[%s] Revision Approval Notice', 'revisionary' ), $blogname );
 				$message = sprintf( esc_html__('The revision you submitted for the %1$s "%2$s" has been approved.', 'revisionary' ), $type_caption, $revision->post_title ) . "\r\n\r\n";
+				$message = str_replace($message, '&quot;', '"', $message);
 
 				if ( $scheduled ) {
 					$datef = __awp( 'M j, Y @ g:i a' );
