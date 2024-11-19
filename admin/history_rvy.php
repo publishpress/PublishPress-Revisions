@@ -854,7 +854,14 @@ class RevisionaryHistory
 
         $revisions =  [$post->ID => $post] + $revisions;
 
-        foreach ( $revisions as $revision ) {
+        $is_administrator = is_content_administrator_rvy();
+
+        foreach ( $revisions as $k => $revision ) {
+            if (!$is_administrator && !current_user_can('edit_post', $revision->ID) && !current_user_can('read_post', $revision->ID)) {
+                unset($revisions[$k]);
+                continue;
+            }
+
             $modified     = strtotime( $revision->post_modified );
             $modified_gmt = strtotime( $revision->post_modified_gmt . ' +0000' );
 
