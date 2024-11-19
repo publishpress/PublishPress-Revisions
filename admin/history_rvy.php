@@ -365,6 +365,10 @@ class RevisionaryHistory
             return;
         }
 
+        if (!current_user_can('edit_post', $revision_id) && !current_user_can('read_post', $revision_id)) {
+            return;
+        }
+
         $return = array();
         @set_time_limit( 0 );
 
