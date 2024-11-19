@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the PublishPress Revisions plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: PublishPress Revisions 3.5.15\n"
+"Project-Id-Version: PublishPress Revisions 3.5.16\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/project\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-10-08T18:41:57+00:00\n"
+"POT-Creation-Date: 2024-11-15T18:29:47+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: revisionary\n"
@@ -343,7 +343,7 @@ msgid "Requested publication: %s"
 msgstr ""
 
 #: admin/class-list-table_rvy.php:703
-#: admin/history_rvy.php:796
+#: admin/history_rvy.php:800
 msgid "No author"
 msgstr ""
 
@@ -418,73 +418,73 @@ msgstr ""
 msgid "Compare %s of \"%s\""
 msgstr ""
 
-#: admin/history_rvy.php:545
+#: admin/history_rvy.php:549
 #: admin/options.php:800
 msgid "Post Date"
 msgstr ""
 
-#: admin/history_rvy.php:546
+#: admin/history_rvy.php:550
 msgid "Post Parent"
 msgstr ""
 
-#: admin/history_rvy.php:547
+#: admin/history_rvy.php:551
 msgid "Menu Order"
 msgstr ""
 
-#: admin/history_rvy.php:548
+#: admin/history_rvy.php:552
 msgid "Comment Status"
 msgstr ""
 
-#: admin/history_rvy.php:549
+#: admin/history_rvy.php:553
 msgid "Ping Status"
 msgstr ""
 
-#: admin/history_rvy.php:684
+#: admin/history_rvy.php:688
 msgid "Page Template"
 msgstr ""
 
-#: admin/history_rvy.php:687
+#: admin/history_rvy.php:691
 msgid "Featured Image"
 msgstr ""
 
-#: admin/history_rvy.php:691
+#: admin/history_rvy.php:695
 msgid "Beaver Builder Data"
 msgstr ""
 
-#: admin/history_rvy.php:692
+#: admin/history_rvy.php:696
 msgid "Beaver Builder Settings"
 msgstr ""
 
-#: admin/history_rvy.php:926
+#: admin/history_rvy.php:937
 msgid "Scheduled for "
 msgstr ""
 
-#: admin/history_rvy.php:931
+#: admin/history_rvy.php:942
 msgid "Requested for "
 msgstr ""
 
-#: admin/history_rvy.php:936
+#: admin/history_rvy.php:947
 msgid "Modified "
 msgstr ""
 
-#: admin/history_rvy.php:941
+#: admin/history_rvy.php:952
 msgid "%s%s from now"
 msgstr ""
 
-#: admin/history_rvy.php:952
+#: admin/history_rvy.php:963
 msgid "M j, Y @ g:i a"
 msgstr ""
 
-#: admin/history_rvy.php:997
+#: admin/history_rvy.php:1008
 msgid "M j, Y @ H:i"
 msgstr ""
 
-#: admin/history_rvy.php:998
+#: admin/history_rvy.php:1009
 msgctxt "revision date short format"
 msgid "j M @ H:i"
 msgstr ""
 
-#: admin/history_rvy.php:1084
+#: admin/history_rvy.php:1095
 #: front_rvy.php:536
 #: front_rvy.php:561
 #: rvy_init-functions.php:263
@@ -495,11 +495,11 @@ msgstr ""
 msgid "Approve"
 msgstr ""
 
-#: admin/history_rvy.php:1084
+#: admin/history_rvy.php:1095
 msgid "Preview / Approve"
 msgstr ""
 
-#: admin/history_rvy.php:1086
+#: admin/history_rvy.php:1097
 #: admin/post-editor-workflow-ui_rvy.php:53
 #: admin/post-editor-workflow-ui_rvy.php:103
 #: admin/post-editor-workflow-ui_rvy.php:201
@@ -507,15 +507,15 @@ msgstr ""
 msgid "Preview"
 msgstr ""
 
-#: admin/history_rvy.php:1180
+#: admin/history_rvy.php:1191
 msgid "Preview / Restore"
 msgstr ""
 
-#: admin/history_rvy.php:1187
+#: admin/history_rvy.php:1198
 msgid "Manage"
 msgstr ""
 
-#: admin/history_rvy.php:1188
+#: admin/history_rvy.php:1199
 msgid "List"
 msgstr ""
 

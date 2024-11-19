@@ -6,8 +6,8 @@ Author URI: https://publishpress.com
 Tags: revision, submit changes, duplicate post, approve changes, scheduled changes
 Requires at least: 5.5
 Requires PHP: 7.2.5
-Tested up to: 6.6
-Stable tag: 3.5.15
+Tested up to: 6.7
+Stable tag: 3.5.16
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -237,7 +237,17 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 [Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
 
+== Upgrade Notice ==
+
+= 3.5.16 =
+Fixed: Security issue. Please update.
+
 == Changelog ==
+
+= 3.5.16 - 19 Nov 2024 =
+* Security : Under some plugin configurations, Revisors could view other users' revisions (draft, submitted or scheduled) inappropriately
+* Fixed : Revision read capabilities did not limit slider positions on Compare Revisions screen
+* Fixed : WP 6.7 - Avoid early loading of plugin textdomain under some conditions
 
 = 3.5.15 - 8 Oct 2024 =
 * Fixed : Editing a post did not refresh its "Has Revisions" flag

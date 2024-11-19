@@ -32,7 +32,17 @@ function rvy_load_textdomain() {
 	if ( defined('RVY_TEXTDOMAIN_LOADED') )
 		return;
 
-	load_plugin_textdomain('revisionary', false, dirname(plugin_basename(REVISIONARY_FILE)) . '/languages');
+	if (did_action('init')) {
+		load_plugin_textdomain('revisionary', false, dirname(plugin_basename(REVISIONARY_FILE)) . '/languages');
+	} else {
+		add_action(
+			'init',
+			function() {
+				load_plugin_textdomain('revisionary', false, dirname(plugin_basename(REVISIONARY_FILE)) . '/languages');
+			},
+			5
+		);
+	}
 
 	define('RVY_TEXTDOMAIN_LOADED', true);
 }
