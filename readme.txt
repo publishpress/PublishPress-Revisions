@@ -239,6 +239,11 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 
 == Changelog ==
 
+= 3.5.16 - 19 Nov 2024 =
+* Security : Under some plugin configurations, Revisors could view other users' revisions (draft, submitted or scheduled) inappropriately
+* Fixed : Revision read capabilities did not limit slider positions on Compare Revisions screen
+* Fixed : WP 6.7 - Avoid early loading of plugin textdomain under some conditions
+
 = 3.5.15 - 8 Oct 2024 =
 * Fixed : Editing a post did not refresh its "Has Revisions" flag
 * Change : Setting to work around cache plugin conflicts by refreshing "Has Revisions" flag before suppressing a "New Revision" link on Posts / Pages screen
