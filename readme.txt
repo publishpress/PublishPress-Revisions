@@ -244,6 +244,9 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
+= 3.6.0 =
+* Compat : PublishPress Statuses Pro
+
 = 3.5.16 - 19 Nov 2024 =
 * Security : Under some plugin configurations, Revisors could view other users' revisions (draft, submitted or scheduled) inappropriately
 * Fixed : Revision read capabilities did not limit slider positions on Compare Revisions screen

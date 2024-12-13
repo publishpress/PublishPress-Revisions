@@ -37,7 +37,7 @@ class RevisionaryEditRevisionClassicUI {
 			
 			if ($last_post 
 			&& ($last_post->post_author == $post->post_author) 
-			&& in_array($last_post->post_mime_type, ['draft-revision', 'pending-revision', 'future-revision']) 
+			&& rvy_is_revision_status($last_post->post_mime_type) 
 			&& ($last_post->comment_count == $post->comment_count)
 			) {
 				wp_delete_post($last_id);

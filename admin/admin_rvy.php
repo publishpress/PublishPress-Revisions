@@ -74,8 +74,10 @@ class RevisionaryAdmin
 						require_once( dirname(__FILE__).'/edit-revision-block-ui_rvy.php' );
 						new RevisionaryEditRevisionBlockUI();
 					} else {
-						require_once( dirname(__FILE__).'/edit-revision-classic-ui_rvy.php' );
-						new RevisionaryEditRevisionClassicUI();
+						if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
+							require_once( dirname(__FILE__).'/edit-revision-classic-ui_rvy.php' );
+							new RevisionaryEditRevisionClassicUI();
+						}
 					}
 				}
 			}

@@ -38,7 +38,7 @@ class RvyOptionUI {
     }
 
 	function option_checkbox( $option_name, $tab_name, $section_name, $hint_text, $unused_arg = '', $args = '') {
-		$return = array( 'in_scope' => false, 'val' => '', 'subcaption' => '', 'style' => '', 'hide' => false );
+		$return = array( 'in_scope' => false, 'val' => '', 'subcaption' => '', 'style' => '', 'hide' => false, 'no_escape' => false );
 
 		if ( ! is_array($args) )
 			$args = array();
@@ -58,9 +58,15 @@ class RvyOptionUI {
 			
 			echo ">";
 
-			echo "<label for='" . esc_attr($option_name) . "'><input name='" . esc_attr($option_name) . "' type='checkbox' id='" . esc_attr($option_name) . "' value='1' " . checked('1', $return['val'], false) . " /> "
-				. esc_html($this->option_captions[$option_name])
-				. "</label>";
+			echo "<label for='" . esc_attr($option_name) . "'><input name='" . esc_attr($option_name) . "' type='checkbox' id='" . esc_attr($option_name) . "' value='1' " . checked('1', $return['val'], false) . " autocomplete='off' " . " /> ";
+
+			if (!empty($args['no_escape'])) {
+				echo $this->option_captions[$option_name];
+			} else {
+				echo esc_html($this->option_captions[$option_name]);
+			}
+
+			echo "</label>";
 
 			if ( $hint_text && $this->display_hints )
 				echo "<div class='rs-subtext'>" . esc_html($hint_text) . "</div>";
@@ -74,6 +80,12 @@ class RvyOptionUI {
 		}
 
 		return $return;
+	}
+
+	function register_option($option_name) {
+		if (!in_array($option_name, $this->all_options)) {
+			$this->all_options []= $option_name;
+		}
 	}
 
 function options_ui( $sitewide = false, $customize_defaults = false ) {
@@ -118,6 +130,8 @@ $pending_revision_plural = rvy_get_option('revision_statuses_noun_labels') ? pp_
 $pending_revision_basic = pp_revisions_status_label('pending-revision', 'basic');
 $future_revision_singular = pp_revisions_status_label('future-revision', 'name');
 
+$pp_notif_url = admin_url('edit.php?post_type=psppnotif_workflow');
+
 $this->option_captions = apply_filters('revisionary_option_captions',
 	[
 	'revision_statuses_noun_labels' =>			esc_html__('Use alternate labeling: "Working Copy" > "Change Request" > "Scheduled Change"', 'revisionary'),
@@ -144,6 +158,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'pending_revision_update_post_date' => 		esc_html__('Update Publish Date', 'revisionary'),
 	'scheduled_revision_update_modified_date' => esc_html__('Update Modified Date', 'revisionary'),
 	'pending_revision_update_modified_date' => 	esc_html__('Update Modified Date', 'revisionary'),
+	'use_publishpress_notifications' =>			sprintf(__('Use %1$sPlanner Notifications%2$s', 'revisionary'), "<strong><a href='$pp_notif_url'>", '</a></strong>'),
 	'pending_rev_notify_author' => 				sprintf(esc_html__('Email original Author when a %s is submitted', 'revisionary'), $pending_revision_basic),
 	'rev_approval_notify_author' => 			sprintf(esc_html__('Email the original Author when a %s is approved', 'revisionary'), $pending_revision_singular),
 	'rev_approval_notify_revisor' => 			sprintf(esc_html__('Email the Revisor when a %s is approved', 'revisionary'), $pending_revision_singular),
@@ -166,6 +181,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'deletion_queue' => 						esc_html__('Enable deletion queue', 'revisionary'),
 	'revision_archive_deletion' => 				esc_html__('Enable deletion in Revision Archive', 'revisionary'),
 	'revision_restore_require_cap' =>			esc_html__('Revision Restore: Non-Administrators need capability', 'revisionary'),
+	'permissions_compat_mode' => 				esc_html__('Compatibility Mode', 'revisionary-pro'),
 	]
 );
 
@@ -192,8 +208,8 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'home_preview_set_home_flag', 'compare_revisions_direct_approval', 'block_editor_extra_preview_button'],
-	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'rev_publication_delete_ed_comments', 'deletion_queue', 'revision_archive_deletion', 'revision_restore_require_cap', 'display_hints'],
-	'notification'	=>		 ['pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
+	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'rev_publication_delete_ed_comments', 'permissions_compat_mode', 'deletion_queue', 'revision_archive_deletion', 'revision_restore_require_cap', 'display_hints'],
+	'notification'	=>		 ['use_publishpress_notifications', 'pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 ]
 ]);
 
@@ -602,7 +618,7 @@ $pending_revisions_available ) :
 		$hint = sprintf(esc_html__( 'When a %s is published, update post modified date to current time.', 'revisionary' ), pp_revisions_status_label('pending-revision', 'name'));
 		$this->option_checkbox( 'pending_revision_update_modified_date', $tab, $section, $hint, '' );
 
-		do_action('revisionary_option_ui_pending_revisions', $this);
+		do_action('revisionary_option_ui_pending_revisions', $this, $sitewide, $customize_defaults);
 		?>
 		</td></tr></table>
 	<?php endif; // any options accessable in this section
@@ -695,7 +711,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		echo '<div style="padding-left: 25px">';
 		echo "<label for='" . esc_attr($id) . "'>" . esc_html($this->option_captions[$id]) . ': </label>';
 
-		echo " <select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "'>";
+		echo " <select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "' autocomplete='off'>";
 		$captions = array( '' => esc_html__('Published Post Slug', 'revisionary'), 'revision_slug' => esc_html__('Revision Slug', 'revisionary'), 'id_only' => esc_html__('Revision ID only', 'revisionary') );
 		foreach ( $captions as $key => $value) {
 			$selected = ( $current_setting == $key ) ? 'selected' : '';
@@ -712,7 +728,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			</div>
 		<?php endif;
 
-		do_action('revisionary_option_ui_preview_options', $this);
+		do_action('revisionary_option_ui_preview_options', $this, $sitewide, $customize_defaults);
 
 		echo '<br />';
 		
@@ -796,7 +812,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			$this->all_options []= $id;
 			$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
 
-			echo " <select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "'>";
+			echo " <select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "' autocomplete='off'>";
 			$captions = ['' => esc_html__('Post Date', 'revisionary'), 'modified' => esc_html__('Modification Date', 'revisionary')];
 			foreach ( $captions as $key => $value) {
 				$selected = ( $current_setting == $key ) ? 'selected' : '';
@@ -815,7 +831,33 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			$this->option_checkbox( 'rev_publication_delete_ed_comments', $tab, $section, $hint, '' );
 		}
 
-		do_action('revisionary_option_ui_revision_options', $this);
+		echo "<br />";
+        
+        $id = 'permissions_compat_mode';
+        echo esc_html($this->option_captions[$id]);
+
+        $this->register_option($id);
+        $current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
+
+        $standard_caption = (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION'))
+        ? esc_html__('Broadest compat including Elementor, Divi, Beaver Builder', 'revisionary')
+        : esc_html__('Standard storage schema for broadest 3rd party compat', 'revisionary');
+
+        echo " <select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "' autocomplete='off'>";
+        $captions = [
+            '' => $standard_caption, 
+            1 => esc_html__('Enhanced Revision access control with PublishPress plugins', 'revisionary'),
+        ];
+        
+        foreach ( $captions as $key => $value) {
+            $selected = ( $current_setting == $key ) ? 'selected' : '';
+            echo "\n\t<option value='" . esc_attr($key) . "' " . esc_attr($selected) . ">" . esc_html($captions[$key]) . "</option>";
+        }
+        echo '</select>&nbsp;';
+
+        echo "<br />";
+
+		do_action('revisionary_option_ui_revision_options', $this, $sitewide, $customize_defaults);
 
 		$hint = '';
 		$this->option_checkbox( 'revision_archive_deletion', $tab, $section, $hint, '' );
@@ -836,13 +878,41 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 		<?php
+		if (defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') && defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
+			$hint = '';
+			$this->option_checkbox( 'use_publishpress_notifications', $tab, $section, $hint, '', ['no_escape' => true] );
+
+			echo '<br /><h3 style="margin-top:0;';
+			
+			if ($pp_notifications = rvy_get_option('use_publishpress_notifications')) echo 'display:none;';
+
+			echo '">';
+			_e('Legacy Email Notifications:');
+			echo '</h3>';
+		}
+
+		?>
+
+		<script type="text/javascript">
+		/* <![CDATA[ */
+		jQuery(document).ready( function($) {
+			$('#use_publishpress_notifications').on('click', function(e) {
+				$('div.rvy_legacy_email').toggle($(e).prop('checked'));
+			});
+		});
+		/* ]]> */
+		</script>
+
+		<div class="rvy_legacy_email" style="<?php if (!empty($pp_notifications)) echo 'display:none';?>">
+
+		<?php
 		if( $pending_revisions_available ) {
 			$id = 'pending_rev_notify_admin';
 			if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
 				$this->all_options []= $id;
 				$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
 
-				echo "<select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "'>";
+				echo "<select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "' autocomplete='off'>";
 				$captions = array( 0 => esc_html__('Never', 'revisionary'), 1 => esc_html__('By default', 'revisionary'), 'always' => esc_html__('Always', 'revisionary') );
 				foreach ( $captions as $key => $value) {
 					$selected = ( $current_setting == $key ) ? 'selected' : '';
@@ -864,7 +934,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 				$this->all_options []= $id;
 				$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
 
-				echo "<select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "'>";
+				echo "<select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "' autocomplete='off'>";
 				$captions = array( 0 => esc_html__('Never', 'revisionary'), 1 => esc_html__('By default', 'revisionary'), 'always' => esc_html__('Always', 'revisionary') );
 				foreach ( $captions as $key => $value) {
 					$selected = ( $current_setting == $key ) ? 'selected' : '';
@@ -1032,6 +1102,8 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		<?php endif;
 
 		?>
+		</div>
+
 		</td></tr>
 
 		<?php

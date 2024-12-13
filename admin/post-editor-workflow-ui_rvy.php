@@ -30,11 +30,32 @@ class PostEditorWorkflowUI {
             'multiPreviewActive' => version_compare($wp_version, '5.5-beta', '>='),
             'statusLabel' => esc_html__('Status', 'revisionary'),
             'ajaxurl' => rvy_admin_url(''),
-            'currentStatus' => str_replace('-revision', '', $post->post_mime_type),
             'currentPostAuthor' => get_post_field('post_author', $published_post_id),
             'onApprovalCaption' => esc_html__('(on approval)', 'revisionary'),
             'canPublish' => $can_publish
         ];
+
+        if (defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && get_option('rvy_permissions_compat_mode')) {
+            $vars['currentStatus'] = $post->post_mime_type;
+            $vars['pendingStatus'] = 'pending-revision';
+        } else {
+            switch ($post->post_mime_type) {
+                case 'future-revision' :
+                    $vars['currentStatus'] = 'future';
+                    break;
+
+                case 'draft-revision' :
+                    $vars['currentStatus'] = 'draft';
+                    break;
+
+                default :
+                    $vars['currentStatus'] = 'pending';
+            }
+
+            $vars['pendingStatus'] = 'pending';
+        }
+
+        $vars['currentStatus'] = apply_filters('revisionary_post_revision_status', $vars['currentStatus'], $post->post_mime_type, $post->ID);
 
         $vars['disableRecaption'] = version_compare($wp_version, '5.9-beta', '>=') || is_plugin_active('gutenberg/gutenberg.php');
         $vars['viewTitle'] = '';
@@ -111,8 +132,10 @@ class PostEditorWorkflowUI {
             $vars['draftActionCaption'] = '';
         }
 
-        $vars['approveCaption'] = ($can_publish) ? pp_revisions_status_label('pending-revision', 'approve_short') : '';
+        $vars['approveCaption'] = ($can_publish) ? pp_revisions_status_label('pending-revision', 'approve') : '';
         $vars['approvingCaption'] = __('Approving the Revision...', 'revisionary');
+
+        $vars['scheduleCaption'] = ($can_publish) ? pp_revisions_status_label('future-revision', 'submit') : '';
 
         $pending_obj = get_post_status_object('pending-revision');
         $vars['pendingStatusCaption'] = $pending_obj->label;

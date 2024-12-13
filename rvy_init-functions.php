@@ -717,7 +717,7 @@ function revisionary_refresh_postmeta($post_id, $args = []) {
 
 	$_post = get_post($post_id);
 
-	if ($set_value && (empty($_post) || empty($_post->post_mime_type) || !in_array($_post->post_mime_type, ['draft-revision', 'pending-revision', 'future-revision']))) {
+	if ($set_value && (empty($_post) || empty($_post->post_mime_type) || !rvy_is_revision_status($_post->post_mime_type))) {
 		rvy_update_post_meta($post_id, '_rvy_has_revisions', $set_value);
 
 	} elseif (empty($args['insert_only'])) { // avoid redundant deletions
