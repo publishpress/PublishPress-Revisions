@@ -115,6 +115,16 @@ class RevisionCreation {
 			rvy_update_next_publish_date(['revision_id' => $revision_id]);
 		}
 
+		if (('pending-revision' == $revision_status) && !defined('REVISIONARY_NO_INSERT_POST_ACTION')) {
+			$revision = get_post($revision_id);
+			
+			$revision_before = $revision;
+			$revision_before->post_status = apply_filters('revisionary_post_revision_status', 'draft', 'draft-revision', $revision_id);
+			$revision_before->post_mime_type = 'draft-revision';
+			
+			do_action('wp_after_insert_post', $revision_id, $revision, true, $revision_before);
+		}
+
 		if (!$revision_id || !is_scalar($revision_id)) { // update_post_data() returns array or object on update abandon / failure
 			return;
 		}
@@ -160,6 +170,8 @@ class RevisionCreation {
 				$data['post_status'] = 'pending';
 		}
 
+		$data['post_status'] = apply_filters('revisionary_post_revision_status', $data['post_status'], $revision_status, $base_post_id);
+
 		$main_post_id = (!empty($args['main_post_id'])) ? $args['main_post_id'] : $base_post_id;
 
 		$base_post = get_post($main_post_id);
@@ -167,7 +179,7 @@ class RevisionCreation {
 		if (!empty($base_post) && !empty($base_post->post_status) && ('revision' == $base_post->post_type)) {
 			$main_post_id = $base_post->post_parent;
 
-		} elseif (!empty($base_post) && !empty($base_post->post_mime_type) && in_array($base_post->post_mime_type, ['draft-revision', 'pending-revision', 'future-revision'])) {
+		} elseif (!empty($base_post) && !empty($base_post->post_mime_type) && rvy_is_revision_status($base_post->post_mime_type)) {
 			$main_post_id = $base_post->comment_count;
 		}
 

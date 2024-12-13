@@ -160,7 +160,7 @@ class RVY_PostBlockEditUI {
                         "<br /><div class='rvy-author-selection'>"
                         + '<label>' + '<?php _e("Author", 'revisionary');?>&nbsp;</label>'
                         + '</div>'
-                        + "<br /><div class='rvy-author-selection'>"
+                        + "<div class='rvy-author-selection'>"
                         + "<?php echo $select_html;  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>"
                         + '</div>'
                     );

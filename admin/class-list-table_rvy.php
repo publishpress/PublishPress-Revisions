@@ -236,7 +236,9 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$qr['post_type'] = $qp['post_type'];
 
-		$qr['post_status'] = rvy_revision_base_statuses();
+		$permissions_compat_mode = rvy_get_option('permissions_compat_mode');
+
+		$qr['post_status'] = ($permissions_compat_mode) ? rvy_revision_statuses() : rvy_revision_base_statuses();
 
 		if (isset($qr['m']) && strlen($qr['m']) == 6) {
 			$qr['date_query'] = [
@@ -266,18 +268,25 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if ( empty( $qr['posts_per_page'] ) || $qr['posts_per_page'] < 1 )
 			$qr['posts_per_page'] = 20;
 		
+		$status_col = ($permissions_compat_mode) ? 'post_status' : 'post_mime_type';
+
 		if ( isset($q['post_status']) && rvy_is_revision_status( $q['post_status'] ) ) {
-			$qr['post_mime_type'] = [$q['post_status']];
+			$qr[$status_col] = [$q['post_status']];
 		} else {
-			$qr['post_mime_type'] = rvy_revision_statuses();
+			$qr[$status_col] = rvy_revision_statuses();
 		}
 
 		if (!rvy_get_option('pending_revisions')) {
-			$qr['post_mime_type'] = array_diff($qr['post_mime_type'], ['draft-revision', 'pending-revision']);
+			$revision_status_csv = array_diff(
+				implode("','", array_map('sanitize_key', rvy_revision_statuses())),
+				['future-revision']
+			);
+
+			$qr[$status_col] = array_diff($qr[$status_col], $revision_status_csv);
 		}
 
 		if (!rvy_get_option('scheduled_revisions')) {
-			$qr['post_mime_type'] = array_diff($qr['post_mime_type'], ['future-revision']);
+			$qr[$status_col] = array_diff($qr[$status_col], ['future-revision']);
 		}
 
 		global $wp_query;
@@ -324,7 +333,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		remove_filter($filter_name, [$this, 'revisions_filter'], 5, 2);
 		remove_filter($filter_name, [$this, 'restore_revisions_filter'], PHP_INT_MAX - 1, 2);
 
-		return $qr['post_mime_type'];
+		return $qr[$status_col];
 	}
 
 	function fltFixMimeTypeClause($where) {
@@ -428,8 +437,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				}
 			}
 
+			$status_clause = apply_filters('revisionary_require_base_statuses', true) 
+			? "$p.post_status IN ('draft', 'pending') AND " 
+			: '';
+
 			$own_revision_clause = $wpdb->prepare(
-				" OR ($p.post_status IN ('draft', 'pending') AND $p.post_mime_type IN ('$revision_status_csv') AND $p.post_author = %d {$own_revision_and})",  // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				" OR ($status_clause $p.post_mime_type IN ('$revision_status_csv') AND $p.post_author = %d {$own_revision_and})",  // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$current_user->ID
 			);
 		} else {
@@ -961,9 +974,13 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
+		$status_clause = apply_filters('revisionary_require_base_statuses', true) 
+		? "AND $wpdb->posts.post_status IN ('draft', 'pending', 'future')" 
+		: '';
+		
 		$where = $this->revisions_where_filter( 
 			$wpdb->prepare(
-				"$wpdb->posts.post_mime_type IN ('$revision_status_csv') AND $wpdb->posts.post_status IN ('draft', 'pending', 'future') AND $wpdb->posts.post_author = '%d'",   // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"$wpdb->posts.post_mime_type IN ('$revision_status_csv') $status_clause AND $wpdb->posts.post_author = '%d'",   // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$current_user->ID
 			),
 			['status_count' => true]
@@ -1360,8 +1377,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 			$main_post_id = rvy_post_id($post->ID);
 
-			if ($main_post_id && in_array($post->post_status, ['draft', 'pending']) && current_user_can('copy_post', $main_post_id)) {
-
+			if ($main_post_id 
+			&& in_array($post->post_status, array_merge(['draft', 'pending'], rvy_revision_statuses()))
+			&& current_user_can('copy_post', $main_post_id)
+			) {
 				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
 				$url = rvy_admin_url("admin.php?page=rvy-revisions&amp;post={$post->ID}&amp;action=revise$redirect_arg");

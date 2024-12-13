@@ -33,7 +33,7 @@ jQuery(document).ready( function($) {
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']) {
                 var approveButtonHTML = '';
 
-                if (rvyObjEdit.canPublish && ('pending' != rvyObjEdit.currentStatus) && ('future' != rvyObjEdit.currentStatus)) {
+                if (rvyObjEdit.canPublish && (rvyObjEdit.PendingStatus != rvyObjEdit.currentStatus) && ('future' != rvyObjEdit.currentStatus)) {
 					approveButtonHTML = '&nbsp;<a href="' + rvyObjEdit['pendingActionURL'] + '" class="button rvy-direct-approve">'
 					+ rvyObjEdit['approveCaption'] + '</a>'
 				}
@@ -129,7 +129,7 @@ jQuery(document).ready( function($) {
                 $('.revision-created-wrapper, .revision-created').show();
 
 				// @todo: abstract this for other workflows
-				rvyObjEdit.currentStatus = 'pending';
+				rvyObjEdit.currentStatus = rvyObjEdit.PendingStatus;
 
 				$('#post-status-display').html(rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']);
                 $('a.revision-preview').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL']).show();

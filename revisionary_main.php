@@ -832,7 +832,7 @@ class Revisionary
 				$caps = array_diff_key($caps, [$cap => true]);
 			}
 		
-		} elseif ('set_revision_pending-revision' == $cap) {
+		} elseif (0 === strpos($cap, 'set_revision_')) {
 			if (!rvy_get_option('pending_revisions')) {
 				return array_diff_key($caps, [$cap => true]);
 			}
@@ -864,8 +864,10 @@ class Revisionary
 				}
 			}
 
+			$revision_status = substr($cap, strlen('set_revision_') - 1);
+
 			// allow PublishPress Permissions to apply 'revise' exceptions
-			if ($can_submit = apply_filters('revisionary_can_submit', $can_submit, $post_id, 'pending', 'pending-revision', $filter_args)) {
+			if ($can_submit = apply_filters('revisionary_can_submit', $can_submit, $post_id, 'pending', $revision_status, $filter_args)) {
 				$caps = ['read'];
 			}
 		}
@@ -1125,29 +1127,37 @@ class Revisionary
 	// @todo: confirm this is still needed
 	function flt_regulate_revision_status($data, $postarr) {
 		// Revisions are not published by wp_update_post() execution; Prevent setting to a non-revision status
-		if (rvy_get_post_meta($postarr['ID'], '_rvy_base_post_id', true) && ('trash' != $data['post_status'])) {
-			if (!$revision = get_post($postarr['ID'])) {
-				return $data;
-			}
+		if (rvy_get_post_meta($postarr['ID'], '_rvy_base_post_id', true) 
+		&& ('trash' != $data['post_status'])
+		) {
+			if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
+				if (!$revision = get_post($postarr['ID'])) {
+					return $data;
+				}
 
-			if (empty($this->enabled_post_types[$revision->post_type])) {
-				return $data;
-			}
+				if (empty($this->enabled_post_types[$revision->post_type])) {
+					return $data;
+				}
 
-			if (!rvy_is_revision_status($postarr['post_mime_type']) || !in_array($postarr['post_status'], rvy_revision_base_statuses())) {
-				$revert_status = true;
-
-			} elseif ($revision) {
-				if (($data['post_mime_type'] != $revision->post_mime_type) || ($data['post_status'] != $revision->post_status)
-				&& (('future-revision' == $revision->post_mime_type) || ('future-revision' == $postarr['post_mime_type']))
-				) {
+				if (!rvy_is_revision_status($postarr['post_mime_type']) || !in_array($postarr['post_status'], rvy_revision_base_statuses())) {
 					$revert_status = true;
+
+				} elseif ($revision) {
+					if (($data['post_mime_type'] != $revision->post_mime_type) || ($data['post_status'] != $revision->post_status)
+					&& (('future-revision' == $revision->post_mime_type) || ('future-revision' == $postarr['post_mime_type']))
+					) {
+						$revert_status = true;
+					}
+				}
+
+				if (!empty($revert_status) && rvy_in_revision_workflow($revision)) {
+					$data['post_status'] = $revision->post_status;
+					$data['post_mime_type'] = $revision->post_mime_type;
 				}
 			}
 
-			if (!empty($revert_status) && rvy_in_revision_workflow($revision)) {
-				$data['post_status'] = $revision->post_status;
-				$data['post_mime_type'] = $revision->post_mime_type;
+			if (defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && get_option('rvy_permissions_compat_mode') && ('revision' != $data['post_type'])) {
+				$data['post_status'] = $data['post_mime_type'];
 			}
 		}
 
