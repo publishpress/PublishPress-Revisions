@@ -103,6 +103,7 @@ function rvy_revision_submit($revision_id = 0) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$status = (defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && get_option('rvy_permissions_compat_mode')) ? 'pending-revision' : 'pending';
 
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->update($wpdb->posts, ['post_status' => $status, 'post_mime_type' => 'pending-revision'], ['ID' => $revision_id]);
 
 			if (defined('REVISIONARY_LIMIT_IGNORE_UNSUBMITTED')) {
