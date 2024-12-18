@@ -668,7 +668,7 @@ function rvy_revision_restore() {
 			$last_arg = array( 'revision_action' => 1, 'published_post' => $post->ID );
 		}
 
-		if ( empty( $_REQUEST['rvy_redirect'] ) && ! $scheduled ) {
+		if (empty($_REQUEST['rvy_redirect'])) {
 			$redirect = $published_url;
 
 		} elseif ( 'edit' == $_REQUEST['rvy_redirect'] ) {
