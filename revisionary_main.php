@@ -1156,7 +1156,7 @@ class Revisionary
 				}
 			}
 
-			if (defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && get_option('rvy_permissions_compat_mode') && ('revision' != $data['post_type'])) {
+			if (rvy_get_option('permissions_compat_mode') && ('revision' != $data['post_type'])) {
 				$data['post_status'] = $data['post_mime_type'];
 			}
 		}

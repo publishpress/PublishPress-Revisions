@@ -61,7 +61,7 @@ class RvyOptionUI {
 			echo "<label for='" . esc_attr($option_name) . "'><input name='" . esc_attr($option_name) . "' type='checkbox' id='" . esc_attr($option_name) . "' value='1' " . checked('1', $return['val'], false) . " autocomplete='off' " . " /> ";
 
 			if (!empty($args['no_escape'])) {
-				echo $this->option_captions[$option_name];
+				echo $this->option_captions[$option_name];	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			} else {
 				echo esc_html($this->option_captions[$option_name]);
 			}
@@ -832,30 +832,31 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		}
 
 		echo "<br />";
-        
-        $id = 'permissions_compat_mode';
-        echo esc_html($this->option_captions[$id]);
 
-        $this->register_option($id);
-        $current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
+		$id = 'permissions_compat_mode';
 
-        $standard_caption = (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION'))
-        ? esc_html__('Broadest compat including Elementor, Divi, Beaver Builder', 'revisionary')
-        : esc_html__('Standard storage schema for broadest 3rd party compat', 'revisionary');
+		$this->register_option($id);
+		$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
 
-        echo " <select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "' autocomplete='off'>";
-        $captions = [
-            '' => $standard_caption, 
-            1 => esc_html__('Enhanced Revision access control with PublishPress plugins', 'revisionary'),
-        ];
-        
-        foreach ( $captions as $key => $value) {
-            $selected = ( $current_setting == $key ) ? 'selected' : '';
-            echo "\n\t<option value='" . esc_attr($key) . "' " . esc_attr($selected) . ">" . esc_html($captions[$key]) . "</option>";
-        }
-        echo '</select>&nbsp;';
+		echo esc_html($this->option_captions[$id]);
 
-        echo "<br />";
+		$standard_caption = (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION'))
+		? esc_html__('Broadest compat including Elementor, Divi, Beaver Builder', 'revisionary')
+		: esc_html__('Standard storage schema for broadest 3rd party compat', 'revisionary');
+
+		echo " <select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "' autocomplete='off'>";
+		$captions = [
+			'' => $standard_caption, 
+			1 => esc_html__('Enhanced Revision access control with PublishPress plugins', 'revisionary'),
+		];
+
+		foreach ( $captions as $key => $value) {
+			$selected = ( $current_setting == $key ) ? 'selected' : '';
+			echo "\n\t<option value='" . esc_attr($key) . "' " . esc_attr($selected) . ">" . esc_html($captions[$key]) . "</option>";
+		}
+		echo '</select>&nbsp;';
+
+		echo "<br />";
 
 		do_action('revisionary_option_ui_revision_options', $this, $sitewide, $customize_defaults);
 

@@ -62,7 +62,7 @@ class PP_Revisions_Compat {
     }
 
     function fltRequireRevisionBaseStatuses($require_base_statuses) {
-        if (get_option('rvy_permissions_compat_mode') && defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
+        if (rvy_get_option('permissions_compat_mode')) {
             $require_base_statuses = false;
         }
 
@@ -70,7 +70,7 @@ class PP_Revisions_Compat {
     }
 
     function fltNewRevisionStatus($post_status, $revision_status, $base_post_id) {
-        if (get_option('rvy_permissions_compat_mode') && defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
+        if (rvy_get_option('permissions_compat_mode')) {
             $post_status = $revision_status;
         }
 

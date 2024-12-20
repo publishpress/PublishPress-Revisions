@@ -48,7 +48,7 @@ class RevisionaryFront {
 		if ($post_id = rvy_detect_post_id()) {
 			if ($_post = get_post($post_id)) {
 				if (('revision' == $_post->post_type) && rvy_is_revision_status($_post->post_mime_type)) {
-					if (defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && get_option('rvy_permissions_compat_mode')) {
+					if (rvy_get_option('permissions_compat_mode')) {
 						return;
 					}
 					
@@ -495,13 +495,13 @@ class RevisionaryFront {
 				$edit_button = '';
 			}
 
-			if ( in_array( $post->post_mime_type, array( 'draft-revision' ) ) ) {
+			if ( !in_array( $post->post_mime_type, array( 'draft-revision' ) ) ) {
 				if ($can_edit = current_user_can('edit_post', $revision_id)) {
 					$submit_url = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision=$revision_id&action=submit$redirect_arg"), "submit-post_$published_post_id|$revision_id" );
 					$publish_url =  wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision=$revision_id&action=approve$redirect_arg"), "approve-post_$published_post_id|$revision_id" );
 				}
 			} elseif ($can_edit = current_user_can('edit_post', rvy_post_id($revision_id))) {
-				if ( in_array( $post->post_mime_type, array( 'pending-revision' ) ) ) {
+				if ( !in_array( $post->post_mime_type, array( 'future-revision', 'inherit' ) ) ) {
 					$publish_url = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision=$revision_id&action=approve$redirect_arg"), "approve-post_$published_post_id|$revision_id" );
 
 				} elseif ( in_array( $post->post_mime_type, array( 'future-revision' ) ) ) {
@@ -561,6 +561,7 @@ class RevisionaryFront {
 
 					// alternate: no break here; output hidden pending-revision top bar
 
+				// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 				//case 'pending-revision' :
 				default :
 				if ('future-revision' != $post->post_mime_type) {
@@ -613,6 +614,7 @@ class RevisionaryFront {
 
 					break;
 
+				// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 				//case 'future-revision' :
 				} else {
 					$class = 'future';
@@ -629,6 +631,7 @@ class RevisionaryFront {
 					break;
 				}
 
+				// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 				//case '' :
 				//default:
 					if (!empty($_REQUEST['mark_current_revision'])) {												//phpcs:ignore WordPress.Security.NonceVerification.Recommended

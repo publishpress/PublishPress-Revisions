@@ -118,8 +118,7 @@ class Rvy_Revision_Workflow_UI {
         global $revisionary, $current_user;
 
         if (defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') 
-        && defined('PUBLISHPRESS_STATUSES_PRO_VERSION') 
-        && rvy_get_option('use_publishpress_notifications')
+        && defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && rvy_get_option('use_publishpress_notifications')
         ) {
             return;
         }

@@ -45,22 +45,26 @@ jQuery(document).ready( function($) {
                     + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a>';
                 }
 
-				$(refSelector).after(
+                if (-1 !== url.indexOf('action=approve&')) {
+                    approveButtonHTML = '';
+                }
+
+                $(refSelector).after(
                     '<div class="rvy-creation-ui" style="flo-at:left; padding-left:10px; margin-bottom: 10px">'
 
                     + '<a href="' + url + '" class="button revision-approve">'
-					+ rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</a>'
+                    + rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</a>'
                 
                     + approveButtonHTML
 
                     + '<div class="revision-created-wrapper" style="display: none; margin: 8px 0 0 2px">'
-					+ '<span class="revision-approve revision-created" style="color:green">'
-					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
+                    + '<span class="revision-approve revision-created" style="color:green">'
+                    + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
                     + rvyPreviewLink
                     + '</div>'
 
                     + '</div>'
-				);
+                );
             }
             
 			$('.edit-post-post-schedule__toggle').after('<button class="components-button is-tertiary post-schedule-footnote" disabled>' + rvyObjEdit.onApprovalCaption + '</button>');

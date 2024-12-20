@@ -67,17 +67,23 @@ class RevisionaryEditRevisionUI {
 
 		?>
 		<style>
-		div.edit-post-revision-status span {
-			width: 45%;
-			display: inline-block;
-			text-align: left;
-		}
-		div.edit-post-post-status div.rvy-current-status {
-			/*width: 100%;*/
-			display: inline-flex !important;
-			text-align: right;
-			white-space: nowrap;
-		}
+			div.edit-post-revision-status span {
+				width: 45%;
+				display: inline-block;
+				text-align: left;
+			}
+			div.edit-post-post-status div.rvy-current-status {
+				/*width: 100%;*/
+				display: inline-flex !important;
+				text-align: right;
+				white-space: nowrap;
+			}
+
+			<?php if (rvy_get_option('block_editor_extra_preview_button')) :?>
+			div.editor-header__settings {
+				width: 500px !important;
+			}
+			<?php endif;?>
 		</style>
 		<?php
 	}

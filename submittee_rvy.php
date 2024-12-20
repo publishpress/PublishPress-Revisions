@@ -77,7 +77,7 @@ class Revisionary_Submittee {
 
 									if ($value) {
 										// switching to Enhanced Revision access control (store revision status to post_status column)
-										$wpdb->query(
+										$wpdb->query(	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 											$wpdb->prepare(
 												"UPDATE $wpdb->posts SET post_status = %s WHERE (comment_count != 0 AND post_mime_type = %s)",
 												$revision_status,
@@ -86,7 +86,7 @@ class Revisionary_Submittee {
 										);
 									} else {
 										// switching to Broadest Compat mode (store base status to post_status column)
-										$wpdb->query(
+										$wpdb->query(	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 											$wpdb->prepare(
 												"UPDATE $wpdb->posts SET post_status = %s WHERE (comment_count != 0 AND post_mime_type = %s)",
 												$base_status,
