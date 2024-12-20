@@ -100,11 +100,17 @@ function rvy_revision_submit($revision_id = 0) {
 
 		// safeguard: make sure this hasn't already been published
 		if ( empty($status_obj->public) && empty($status_obj->private) ) {
+			$revision_before = (object) (array) $revision;
+			
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$status = (defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && get_option('rvy_permissions_compat_mode')) ? 'pending-revision' : 'pending';
+			$post_mime_type = 'pending-revision';
+			$status = (rvy_get_option('permissions_compat_mode')) ? $post_mime_type : 'pending';
 
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->update($wpdb->posts, ['post_status' => $status, 'post_mime_type' => 'pending-revision'], ['ID' => $revision_id]);
+			$wpdb->update($wpdb->posts, ['post_status' => $status, 'post_mime_type' => $post_mime_type], ['ID' => $revision_id]);
+
+			$revision->post_status = $status;
+			$revision->post_mime_type = $post_mime_type;
 
 			if (defined('REVISIONARY_LIMIT_IGNORE_UNSUBMITTED')) {
 				rvy_update_post_meta($published_id, '_rvy_has_revisions', true);
@@ -141,7 +147,8 @@ function rvy_revision_submit($revision_id = 0) {
 
 	if (empty($approval_error)) {
 		$published_id = rvy_post_id($revision_id);
-		do_action( 'revision_submitted', $published_id, $revision_id );
+		do_action( 'revision_submitted', $published_id, $revision_id, $old_revision_status );
+		do_action( 'revisionary_submitted', $published_id, $revision, $revision_before );
 	}
 
 	if (!$batch_process) {
@@ -197,17 +204,27 @@ function rvy_revision_decline($revision_id = 0) {
 			check_admin_referer('decline-revision');
 		}
 
+		$revision_before = (object) (array) $revision;
+
 		$status_obj = get_post_status_object( $revision->post_mime_type );
+
+		$post_mime_type = 'draft-revision';
+		$status = apply_filters('revisionary_post_revision_status', 'draft', $post_mime_type, $revision_id);
+
+		$status = apply_filters('revisionary_revision_decline_status', $status, $revision_id);
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update(
 			$wpdb->posts, 
 			[
-				'post_status' => apply_filters('revisionary_post_revision_status', 'draft', 'draft-revision', $revision_id), 
-				'post_mime_type' => 'draft-revision'
+				'post_status' => $status, 
+				'post_mime_type' => $post_mime_type
 			], 
 			['ID' => $revision_id]
 		);
+
+		$revision->post_status = $status;
+		$revision->post_mime_type = $post_mime_type;
 
 		clean_post_cache($revision_id);
 
@@ -244,6 +261,7 @@ function rvy_revision_decline($revision_id = 0) {
 
 	if (empty($decline_error)) {
 		do_action( 'revision_declined', $revision->post_parent, $revision->ID );
+		do_action( 'revisionary_declined', $revision->post_parent, $revision, $revision_before );
 	}
 
 	if (!$batch_process) {
@@ -410,6 +428,12 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 				$db_action = true;
 				
 				clean_post_cache( $revision->ID );
+
+				$revision_before = (object) (array) $revision;
+				$revision->post_mime_type = 'future-revision';
+				$revision->status = apply_filters('revisionary_post_revision_status', 'future', 'future-revision', $revision_id);
+
+				do_action('revisionary_scheduled', $post->ID, $revision, $revision_before);
 			} else {
 				// this scheduled revision is already approved, so don't included in reported bulk approval count
 				$approval_error = true;
@@ -693,9 +717,13 @@ function rvy_revision_restore() {
 function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	global $wpdb;
 	
+	error_log('rvy_apply_revision');
+
 	if ( ! $revision = get_post( $revision_id ) ) {
 		return $revision;
 	}
+
+	$original_revision_status = $revision->post_mime_type;
 
 	if (!$published_id = $revision->comment_count) {
 		if (! $published_id = rvy_post_id($revision_id)) {
@@ -1046,6 +1074,14 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	 * @param int $revision_id The revision object.
 	 */
 	do_action( 'revision_applied', $published->ID, $revision );
+
+	error_log('revisionary_revision_published action fired');
+
+	if (empty($revision) || empty($revision->post_mime_type)) {
+		$revision = (object) (array) $published;
+		$revision->post_mime_type = $original_post_status;
+		$revision->ID = $revision_id;
+	}
 
 	do_action('revisionary_revision_published', $published, $revision);
 

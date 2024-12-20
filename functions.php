@@ -266,12 +266,6 @@ function rvy_in_revision_workflow($post, $args = []) {
 		return false;
 	}
 
-    $base_statuses = rvy_revision_base_statuses();
-
-    if (!empty($args['include_trash'])) {
-        $base_statuses []= 'trash';
-    }
-
     return rvy_is_revision_status($post->post_mime_type) ? $post->post_mime_type : false;
 }
 

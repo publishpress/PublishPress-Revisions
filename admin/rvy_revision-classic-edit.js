@@ -6,6 +6,7 @@ if(rvyObjEdit[rvyObjEdit.currentStatus+'ActionCaption']){var approveButtonHTML='
 +rvyObjEdit['approveCaption']+'</a>'}
 var rvyPreviewLink='';if(rvyObjEdit[rvyObjEdit.currentStatus+'CompletedLinkCaption']){rvyPreviewLink='&nbsp; <a href="'+rvyObjEdit[rvyObjEdit.currentStatus+'CompletedURL']+'" class="revision-preview" target="_blank">'
 +rvyObjEdit[rvyObjEdit.currentStatus+'CompletedLinkCaption']+'</a>';}
+if(-1!==url.indexOf('action=approve&')){approveButtonHTML='';}
 $(refSelector).after('<div class="rvy-creation-ui" style="flo-at:left; padding-left:10px; margin-bottom: 10px">'
 +'<a href="'+url+'" class="button revision-approve">'
 +rvyObjEdit[rvyObjEdit.currentStatus+'ActionCaption']+'</a>'

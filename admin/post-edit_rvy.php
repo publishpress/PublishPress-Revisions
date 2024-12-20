@@ -53,6 +53,8 @@ class RvyPostEdit {
 
             $args['submissionDelay'] = (defined('PUBLISHPRESS_VERSION')) ? 2000 : 200;
 
+            $args['isStatusesPro'] = defined('PUBLISHPRESS_STATUSES_PRO_VERSION');
+
             wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
 
             if (defined('PUBLISHPRESS_VERSION')) {

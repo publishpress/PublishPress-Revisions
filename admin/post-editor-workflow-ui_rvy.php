@@ -35,10 +35,12 @@ class PostEditorWorkflowUI {
             'canPublish' => $can_publish
         ];
 
-        if (defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && get_option('rvy_permissions_compat_mode')) {
-            $vars['currentStatus'] = $post->post_mime_type;
-            $vars['pendingStatus'] = 'pending-revision';
-        } else {
+        // @todo: adapt Submit button to custom statuses?
+
+        //if (get_option('rvy_permissions_compat_mode')) {
+        //    $vars['currentStatus'] = $post->post_mime_type;
+        //    $vars['pendingStatus'] = 'pending-revision';
+        //} else {
             switch ($post->post_mime_type) {
                 case 'future-revision' :
                     $vars['currentStatus'] = 'future';
@@ -53,9 +55,9 @@ class PostEditorWorkflowUI {
             }
 
             $vars['pendingStatus'] = 'pending';
-        }
+        //}
 
-        $vars['currentStatus'] = apply_filters('revisionary_post_revision_status', $vars['currentStatus'], $post->post_mime_type, $post->ID);
+        //$vars['currentStatus'] = apply_filters('revisionary_post_revision_status', $vars['currentStatus'], $post->post_mime_type, $post->ID);
 
         $vars['disableRecaption'] = version_compare($wp_version, '5.9-beta', '>=') || is_plugin_active('gutenberg/gutenberg.php');
         $vars['viewTitle'] = '';
@@ -77,7 +79,7 @@ class PostEditorWorkflowUI {
                 }
 
                 if (rvy_get_option('block_editor_extra_preview_button')) {
-                    $vars['viewTitleExtra'] = esc_html__('View saved revision', 'revisionary');
+                    $vars['viewTitleExtra'] = esc_html__('View revision', 'revisionary');
                 }
 
                 $vars['viewTitle'] =  esc_html__('View / Moderate saved revision', 'revisionary');

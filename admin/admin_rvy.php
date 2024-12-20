@@ -158,6 +158,27 @@ class RevisionaryAdmin
 				}
 			}
 		});
+
+		// Planner Notifications integration
+		add_filter('posts_clauses_request', [$this, 'fltPostsClauses'], 50, 2);
+	}
+
+	function fltPostsClauses($clauses, $_wp_query = false, $args = [])
+	{
+		global $pagenow, $typenow, $wpdb;
+
+		// @todo: move these into Planner
+		if (!empty($pagenow) && ('edit.php' == $pagenow) && !empty($typenow) && ('psppnotif_workflow' == $typenow)) {
+			if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION') || !rvy_get_option('use_publishpress_notifications')) {
+				$clauses['where'] .= " AND $wpdb->posts.post_name NOT IN ('revision-scheduled-publication', 'scheduled-revision-published', 'scheduled-revision-is-published', 'revision-scheduled', 'revision-is-scheduled', 'revision-declined', 'revision-deferred-or-rejected', 'revision-submission', 'revision-is-submitted', 'new-revision', 'new-revision-created')";
+			}
+
+			if (!defined('PUBLISHPRESS_STATUSES_VERSION')) {
+				$clauses['where'] .= " AND $wpdb->posts.post_name NOT IN ('post-status-changed', 'post-deferred-or-rejected')";
+			}
+		}
+
+		return $clauses;
 	}
 
 	// Prevent Pending, Scheduled Revisions from inclusion in admin search results

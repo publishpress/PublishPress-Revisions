@@ -119,6 +119,8 @@ class RVY_PostBlockEditUI {
 
         $args['timezoneOffset'] = 0 - $wp_timezone->getOffset($utc_time);
 
+        $args['isStatusesPro'] = defined('PUBLISHPRESS_STATUSES_PRO_VERSION');
+
         wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
     }
 
