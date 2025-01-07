@@ -547,7 +547,14 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				break;
 
 			case 'post_date':
-				return $this->friendly_date($item->post_date, $item->post_date_gmt);
+				$prev_revision_status = get_post_meta($item->ID, '_rvy_prev_revision_status', true);
+
+				if ('future-revision' == $prev_revision_status) {
+					return $this->friendly_date($item->post_modified, $item->post_modified_gmt);
+				} else {
+					return $this->friendly_date($item->post_date, $item->post_date_gmt);
+				}
+
 				break;
 			case 'origin_post_date':
                 return $this->friendly_date($item->origin_post_date, $item->origin_post_date_gmt);
