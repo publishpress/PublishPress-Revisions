@@ -717,8 +717,6 @@ function rvy_revision_restore() {
 function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	global $wpdb;
 	
-	error_log('rvy_apply_revision');
-
 	if ( ! $revision = get_post( $revision_id ) ) {
 		return $revision;
 	}
@@ -1074,8 +1072,6 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	 * @param int $revision_id The revision object.
 	 */
 	do_action( 'revision_applied', $published->ID, $revision );
-
-	error_log('revisionary_revision_published action fired');
 
 	if (empty($revision) || empty($revision->post_mime_type)) {
 		$revision = (object) (array) $published;
