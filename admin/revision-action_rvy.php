@@ -833,7 +833,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	// Apply requested slug, if applicable. 
 	// Otherwise, work around unexplained reversion of editor-modified post slug back to default format on some sites  @todo: identify plugin interaction
-	$update_fields = ['post_name' => $set_slug, 'guid' => $published->guid, 'post_type' => $published->post_type, 'post_status' => $published->post_status, 'post_mime_type' => $published->post_mime_type, 'post_parent' => $published->post_parent];
+	$update_fields = ['post_name' => $set_slug, 'guid' => $published->guid, 'post_type' => $published->post_type, 'post_status' => $published->post_status, 'post_mime_type' => $published->post_mime_type];
 
 	// Prevent wp_insert_post() from stripping inline html styles
 	if (!defined('RVY_DISABLE_REVISION_CONTENT_PASSTHRU')) {
