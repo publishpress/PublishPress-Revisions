@@ -943,6 +943,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 
 		// todo: save change as past revision?
+		$approved_by = get_post_meta($revision_id, '_rvy_approved_by', true);
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
@@ -955,6 +956,9 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	if ('future-revision' != $actual_revision_status) {
 		global $current_user;
 		rvy_update_post_meta($revision_id, '_rvy_approved_by', $current_user->ID);
+
+	} elseif (!empty($approved_by)) {
+		rvy_update_post_meta($revision_id, '_rvy_approved_by', $approved_by);
 	}
 
 	// If published revision was the last remaining pending / scheduled, clear _rvy_has_revisions postmeta flag 
