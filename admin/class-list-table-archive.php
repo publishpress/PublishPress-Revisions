@@ -605,7 +605,11 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			case 'approved_by':
 				if ($approver_id = get_post_meta($item->ID, '_rvy_approved_by', true)) {
 					if ($user = new WP_User($approver_id)) {
-						echo esc_html($user->display_name);
+						if (!empty($user->display_name)) {
+							echo esc_html($user->display_name);
+						} else {
+							echo esc_html($user->user_login);
+						}
 					}
 				}
 
