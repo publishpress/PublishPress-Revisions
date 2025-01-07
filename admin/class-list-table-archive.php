@@ -250,6 +250,9 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			r.post_type AS post_type,
 			r.post_title AS post_title,
 			r.post_date AS post_date,
+			r.post_date_gmt as post_date_gmt,
+			r.post_modified as post_modified,
+			r.post_modified_gmt as post_modified_gmt,
 			r.post_author AS post_author,
 			r.post_parent AS post_parent,
 			(
@@ -272,6 +275,13 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				ORDER BY p2.ID DESC
 				LIMIT 0,1
 			) AS origin_post_date,
+			(
+				SELECT p2.post_date_gmt
+				FROM $wpdb->posts p2
+				WHERE p2.ID = r.post_parent
+				ORDER BY p2.ID DESC
+				LIMIT 0,1
+			) AS origin_post_date_gmt,
 			(
 				SELECT p2.post_type
 				FROM $wpdb->posts p2
@@ -456,25 +466,31 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	 *
 	 * @return html
 	 */
-	public function friendly_date( $time ) {
-		$timestamp 		= strtotime( $time );
+	public function friendly_date( $time, $time_gmt ) {
+		$timestamp_gmt 	= strtotime($time_gmt);
 		$current_time 	= time();
-		$time_diff		= $current_time - $timestamp;
+		$time_diff		= $current_time - $timestamp_gmt;
+		
+		$timestamp 		= strtotime( $time );
 		$date_format 	= sanitize_text_field( get_option( 'date_format' ) );
 		$time_format 	= sanitize_text_field( get_option( 'time_format' ) );
 
 		if ( $time_diff < 60 ) {
 			$result = esc_html__( 'just now', 'revisionary' );
 		} elseif ( $time_diff < 3600 ) {
-			$result = sprintf(
-				esc_html__( '%s minutes ago', 'revisionary' ),
-				floor( $time_diff / 60 )
-			);
+			$diff = floor( $time_diff / 60 );
+			
+			$caption = ($diff > 1) ? esc_html__('%s minutes ago', 'revisionary') : esc_html__('%s minute ago', 'revisionary');
+
+			$result = sprintf($caption, $diff);
+
 		} elseif ( $time_diff < 86400 ) {
-			$result = sprintf(
-				esc_html__( '%s hours ago', 'revisionary' ),
-				floor( $time_diff / 3600 )
-			);
+			$diff = floor( $time_diff / 3600 );
+			
+			$caption = ($diff > 1) ? esc_html__('%s hours ago', 'revisionary') : esc_html__('%s hour ago', 'revisionary');
+
+			$result = sprintf($caption, $diff);
+
 		} else {
 			$result = date_i18n( "$date_format @ $time_format", $timestamp );
 		}
@@ -531,8 +547,10 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				break;
 
 			case 'post_date':
+				return $this->friendly_date($item->post_date, $item->post_date_gmt);
+				break;
 			case 'origin_post_date':
-                return $this->friendly_date( $item->$column_name );
+                return $this->friendly_date($item->origin_post_date, $item->origin_post_date_gmt);
 				break;
 
 			case 'origin_post_author':
