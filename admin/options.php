@@ -182,7 +182,8 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'deletion_queue' => 						esc_html__('Enable deletion queue', 'revisionary'),
 	'revision_archive_deletion' => 				esc_html__('Enable deletion in Revision Archive', 'revisionary'),
 	'revision_restore_require_cap' =>			esc_html__('Revision Restore: Non-Administrators need capability', 'revisionary'),
-	'permissions_compat_mode' => 				esc_html__('Compatibility Mode', 'revisionary-pro'),
+	'permissions_compat_mode' => 				esc_html__('Compatibility Mode', 'revisionary'),
+	'planner_notifications_access_limited' =>	esc_html__('Planner Notifications Access-Limited', 'revisionary'),
 	]
 );
 
@@ -210,7 +211,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'revision_queue' =>		 ['revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'home_preview_set_home_flag', 'compare_revisions_direct_approval', 'block_editor_extra_preview_button'],
 	'revisions'		=>		 ['trigger_post_update_actions', 'copy_revision_comments_to_post', 'diff_display_strip_tags', 'past_revisions_order_by', 'archive_postmeta', 'rev_publication_delete_ed_comments', 'permissions_compat_mode', 'deletion_queue', 'revision_archive_deletion', 'revision_restore_require_cap', 'display_hints'],
-	'notification'	=>		 ['use_publishpress_notifications', 'pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
+	'notification'	=>		 ['use_publishpress_notifications', 'planner_notifications_access_limited', 'pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 ]
 ]);
 
@@ -886,9 +887,17 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			$hint = '';
 			$this->option_checkbox( 'use_publishpress_notifications', $tab, $section, $hint, '', ['no_escape' => true] );
 
+			$pp_notifications = rvy_get_option('use_publishpress_notifications');
+
+			if ($pp_notifications && defined('PRESSPERMIT_VERSION') && defined('RVY_CONTENT_ROLES')) {
+				echo '<br />';
+				$hint = __('Users matching Planner > Notifications configuration get revision notifications only if they can edit the published post', 'revisionary');
+				$this->option_checkbox( 'planner_notifications_access_limited', $tab, $section, $hint, '', ['no_escape' => true] );
+			}
+
 			echo '<br /><h3 style="margin-top:0;';
 			
-			if ($pp_notifications = rvy_get_option('use_publishpress_notifications')) echo 'display:none;';
+			if ($pp_notifications) echo 'display:none;';
 
 			echo '">';
 			_e('Legacy Email Notifications:');
