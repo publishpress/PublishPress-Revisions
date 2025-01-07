@@ -66,6 +66,7 @@ function rvy_default_options_sitewide() {
 		'revision_unfiltered_html_check' => true,
 		'revision_limit_compat_mode' => true,
 		'permissions_compat_mode' => true,
+		'archive_postmeta' => true,
 	);
 
 	if ( $other_options = array_diff_key( rvy_default_options(), $def ) ) {

@@ -942,11 +942,12 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 			wp_delete_post($revision_id, true);
 		}
 
-		// todo: save change as past revision?
-		$approved_by = get_post_meta($revision_id, '_rvy_approved_by', true);
+		if (!rvy_get_option('archive_postmeta')) {
+			$approved_by = get_post_meta($revision_id, '_rvy_approved_by', true);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
+		}
 	}
 	
 	rvy_update_post_meta($revision_id, '_rvy_published_gmt', $post_modified_gmt);
