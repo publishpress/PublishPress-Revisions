@@ -76,6 +76,8 @@ function rvy_revision_submit($revision_id = 0) {
 			break;
 		}
 
+		$old_revision_status = $revision->post_mime_type;
+
 		if (!in_array($revision->post_status, array_merge(['draft', 'pending'], rvy_revision_statuses()))) {
 			break;
 		}
