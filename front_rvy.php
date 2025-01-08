@@ -547,7 +547,7 @@ class RevisionaryFront {
 					}
 
 					if ($can_publish) {
-						$publish_caption = (!empty($status_obj->public) || !empty($status_obj->private)) ? esc_html__('Publish now', 'revisionary') : $approve_caption;
+						$publish_caption = (!empty($status_obj->public) || !empty($status_obj->private)) ? esc_html__('Approve', 'revisionary') : $approve_caption;
 						$publish_button .= ($can_publish) ? '<a href="' . $publish_url . '" class="button button-primary rvy-approve-revision">' . $publish_caption . '</a>' : '';
 					}
 					
@@ -595,7 +595,7 @@ class RevisionaryFront {
 						} else {
 							$class = 'pending';
 							$status_obj = get_post_status_object(get_post_field('post_status', rvy_post_id($revision_id)));
-							$publish_caption = (!empty($status_obj->public) || !empty($status_obj->private)) ? esc_html__('Publish now', 'revisionary') : $approve_caption;
+							$publish_caption = (!empty($status_obj->public) || !empty($status_obj->private)) ? esc_html__('Approve', 'revisionary') : $approve_caption;
 							$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-primary rvy-approve-revision">' . $publish_caption . '</a>' : '';
 							
 							if ('pending-revision' == $post->post_mime_type) {
@@ -621,7 +621,7 @@ class RevisionaryFront {
 						$class = 'future';
 						
 						$edit_url = rvy_admin_url("post.php?action=edit&amp;post=$revision_id");
-						$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-primary">' . esc_html__( 'Publish now', 'revisionary' ) . '</a>' : '';
+						$publish_button = ($can_publish) ? '<a href="' . $publish_url . '" class="button button-primary">' . esc_html__( 'Approve', 'revisionary' ) . '</a>' : '';
 						
 						if (!empty($_REQUEST['elementor-preview'])) {													//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 							$message = sprintf( esc_html__('This is a %s (for publication on %s). %s %s %s', 'revisionary'), pp_revisions_status_label('future-revision', 'name'), $date, '', '', '' );
