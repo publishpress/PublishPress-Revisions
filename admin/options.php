@@ -811,7 +811,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	$hint = '';
 	$this->option_checkbox( 'diff_display_strip_tags', $tab, $section, $hint, '' );
 
-	$hint = esc_html__('If disabled, Compare screen links to Revision Preview for approval.', 'revisionary');
+	$hint = esc_html__('This allows immediate approval within the Compare screen. If disabled, a Preview link is provided instead.', 'revisionary');
 	$this->option_checkbox( 'compare_revisions_direct_approval', $tab, $section, $hint, '' );
 	?>
 	</td></tr></table>
