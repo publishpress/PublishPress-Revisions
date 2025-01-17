@@ -227,10 +227,11 @@ padding: 0;
 .rs-agents_list_29_5 li { width: 29.5em; }
 .rs-agents_list_30_5 li { width: 30.5em; }
 
-.rs-subtext {
+.rvy-subtext {
 color: #777;
 font-style:italic;
-margin-top:2px;
+margin-top:5px;
+margin-bottom:20px;
 }
 
 .rs-warning {

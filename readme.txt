@@ -246,6 +246,11 @@ Fixed: Security issue. Please update.
 
 = 3.6.0 =
 * Compat : PublishPress Statuses Pro
+* Fixed : Page Parent revision was not applied to published page
+* Fixed : Revision Archive - Schedule Revision approver was not recorded
+* Fixed : Revision Archive - Scheduled Revisions did not show scheduling time
+* Fixed : Revision Archive - Recent entries had incorrect time display
+* Feature : Revision Archive - Option to store custom fields from submitted, scheduled revisions
 
 = 3.5.16 - 19 Nov 2024 =
 * Security : Under some plugin configurations, Revisors could view other users' revisions (draft, submitted or scheduled) inappropriately
