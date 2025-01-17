@@ -76,6 +76,8 @@ function rvy_revision_submit($revision_id = 0) {
 			break;
 		}
 
+		$old_revision_status = $revision->post_mime_type;
+
 		if (!in_array($revision->post_status, array_merge(['draft', 'pending'], rvy_revision_statuses()))) {
 			break;
 		}
@@ -470,7 +472,7 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 			}
 		}
 
-		$use_pp_notifications = defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') && defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && rvy_get_option('use_publishpress_notifications');
+		$use_pp_notifications = defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') && rvy_get_option('use_publishpress_notifications');
 
 		// Don't send approval notification on restoration of a past revision
 		if (('revision' != $revision->post_type) && empty($skip_notification) && !$use_pp_notifications) {
@@ -717,8 +719,6 @@ function rvy_revision_restore() {
 function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	global $wpdb;
 	
-	error_log('rvy_apply_revision');
-
 	if ( ! $revision = get_post( $revision_id ) ) {
 		return $revision;
 	}
@@ -835,7 +835,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	// Apply requested slug, if applicable. 
 	// Otherwise, work around unexplained reversion of editor-modified post slug back to default format on some sites  @todo: identify plugin interaction
-	$update_fields = ['post_name' => $set_slug, 'guid' => $published->guid, 'post_type' => $published->post_type, 'post_status' => $published->post_status, 'post_mime_type' => $published->post_mime_type, 'post_parent' => $published->post_parent];
+	$update_fields = ['post_name' => $set_slug, 'guid' => $published->guid, 'post_type' => $published->post_type, 'post_status' => $published->post_status, 'post_mime_type' => $published->post_mime_type];
 
 	// Prevent wp_insert_post() from stripping inline html styles
 	if (!defined('RVY_DISABLE_REVISION_CONTENT_PASSTHRU')) {
@@ -944,10 +944,12 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 			wp_delete_post($revision_id, true);
 		}
 
-		// todo: save change as past revision?
+		if (!rvy_get_option('archive_postmeta')) {
+			$approved_by = get_post_meta($revision_id, '_rvy_approved_by', true);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
+		}
 	}
 	
 	rvy_update_post_meta($revision_id, '_rvy_published_gmt', $post_modified_gmt);
@@ -957,6 +959,9 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	if ('future-revision' != $actual_revision_status) {
 		global $current_user;
 		rvy_update_post_meta($revision_id, '_rvy_approved_by', $current_user->ID);
+
+	} elseif (!empty($approved_by)) {
+		rvy_update_post_meta($revision_id, '_rvy_approved_by', $approved_by);
 	}
 
 	// If published revision was the last remaining pending / scheduled, clear _rvy_has_revisions postmeta flag 
@@ -1074,8 +1079,6 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	 * @param int $revision_id The revision object.
 	 */
 	do_action( 'revision_applied', $published->ID, $revision );
-
-	error_log('revisionary_revision_published action fired');
 
 	if (empty($revision) || empty($revision->post_mime_type)) {
 		$revision = (object) (array) $published;
@@ -1418,7 +1421,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 		);
 	}
 
-	$use_pp_notifications = defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') && defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && rvy_get_option('use_publishpress_notifications');
+	$use_pp_notifications = defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') && rvy_get_option('use_publishpress_notifications');
 
 	if ( $results ) {
 		foreach ( $results as $row ) {
