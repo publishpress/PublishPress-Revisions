@@ -321,6 +321,16 @@ function pp_revisions_plugin_updated($current_version) {
     
     $last_ver = get_option('revisionary_last_version');
 
+    if ($current_version == $last_ver) {
+        return;
+    }
+
+    if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && version_compare($last_ver, '3.6.0-rc6', '<')) {
+        update_option('revisionary_pro_flush_notifications', true);
+        delete_option('_pp_statuses_planner_default_revision_notifications');
+        delete_option('_pp_statuses_default_revision_notifications');
+    }
+
     if (version_compare($last_ver, '3.0.12-rc4', '<')) {
         global $wp_version;
 

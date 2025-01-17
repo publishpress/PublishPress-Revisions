@@ -138,8 +138,10 @@ if (version_compare($last_ver, '3.0-alpha', '>=') && version_compare($last_ver, 
 	}
 }
 
-if (!$last_ver || version_compare($last_ver, '3.6.0-beta', '>=')) {
-	update_option('rvy_use_publishpress_notifications', 1);
+if (-1 === get_option('rvy_use_publishpress_notifications', -1)) {
+	if (!$last_ver || version_compare($last_ver, '3.6.0-beta', '>=')) {
+		update_option('rvy_use_publishpress_notifications', 1);
+	}
 }
 
 // Revision Edit in Gutenberg: Enable non-Editors to set requested publish date

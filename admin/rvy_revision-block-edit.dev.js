@@ -440,6 +440,12 @@ jQuery(document).ready(function ($) {
             $('.rvy-current-status').html(rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']);
             $('a.revision-preview').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL']).show();
             $('a.revision-edit').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedEditURL']).show();
+
+            if ((typeof PPCustomStatuses != 'undefined') && (typeof PPCustomStatuses.statusRestProperty != 'undefined')) {
+                var ret = new Object();
+                ret[PPCustomStatuses.statusRestProperty] = 'pending-revision';
+                dispatch('core/editor').editPost(ret);
+            }
         }
 		
         $.ajax({

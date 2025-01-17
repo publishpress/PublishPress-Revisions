@@ -14,8 +14,7 @@
 function rvy_metabox_notification_list() {
 		global $revisionary;
 
-		if (defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') 
-		&& defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && rvy_get_option('use_publishpress_notifications')
+		if (defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') && rvy_get_option('use_publishpress_notifications')
 		) {
             return;
         }

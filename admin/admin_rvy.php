@@ -169,7 +169,7 @@ class RevisionaryAdmin
 
 		// @todo: move these into Planner
 		if (!empty($pagenow) && ('edit.php' == $pagenow) && !empty($typenow) && ('psppnotif_workflow' == $typenow)) {
-			if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION') || !rvy_get_option('use_publishpress_notifications')) {
+			if (!rvy_get_option('use_publishpress_notifications')) {
 				$clauses['where'] .= " AND $wpdb->posts.post_name NOT IN ('revision-scheduled-publication', 'scheduled-revision-published', 'scheduled-revision-is-published', 'revision-scheduled', 'revision-is-scheduled', 'revision-declined', 'revision-deferred-or-rejected', 'revision-submission', 'revision-is-submitted', 'new-revision', 'new-revision-created')";
 			}
 
@@ -345,7 +345,7 @@ class RevisionaryAdmin
 	            esc_html__('Upgrade to Pro', 'revisionary'),
 	            esc_html__('Upgrade to Pro', 'revisionary'),
 	            'read',
-	            'revisionary-pro',
+	            'revisionary',
 	            'rvy_omit_site_options'
 	        );
     	}

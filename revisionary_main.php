@@ -284,7 +284,13 @@ class Revisionary
             $$var = $args[$var];
         }
 
-		if ($is_revisions_query || !empty($_wp_query->is_revisions_query) || !empty($_wp_query->query['is_revisions_query']) || (!empty($revisionary) && !empty($revisionary->is_revisions_query)) || $_wp_query->is_preview) {
+		if ($is_revisions_query 
+		|| !empty($_wp_query->is_revisions_query) 
+		|| !empty($_wp_query->query['is_revisions_query']) 
+		|| (!empty($revisionary) && !empty($revisionary->is_revisions_query)) 
+		|| $_wp_query->is_preview
+		|| (isset($_wp_query->query_vars) && isset($_wp_query->query_vars['hide_revision']) && !$_wp_query->query_vars['hide_revision'])
+		) {
 			return $clauses;
 		}
 

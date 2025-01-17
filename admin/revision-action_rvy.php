@@ -472,7 +472,7 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 			}
 		}
 
-		$use_pp_notifications = defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') && defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && rvy_get_option('use_publishpress_notifications');
+		$use_pp_notifications = defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') && rvy_get_option('use_publishpress_notifications');
 
 		// Don't send approval notification on restoration of a past revision
 		if (('revision' != $revision->post_type) && empty($skip_notification) && !$use_pp_notifications) {
@@ -1421,7 +1421,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 		);
 	}
 
-	$use_pp_notifications = defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') && defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && rvy_get_option('use_publishpress_notifications');
+	$use_pp_notifications = defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') && rvy_get_option('use_publishpress_notifications');
 
 	if ( $results ) {
 		foreach ( $results as $row ) {

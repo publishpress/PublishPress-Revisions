@@ -433,7 +433,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 		esc_html_e('Enable revision submission for these Post Types:', 'revisionary');
         echo '<br />';
 
-		$hidden_types = ['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true];
+		$hidden_types = ['attachment' => true, 'psppnotif_workflow' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true];
 		$locked_types = [];
 
 		$types = get_post_types(['public' => true, 'show_ui' => true], 'object', 'or');
@@ -509,7 +509,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		<div id="revisions-pro-descript" class="activating" style="margin-bottom: 20px">
 		<?php
 		printf(
-			esc_html__('For custom Revision statuses and enhanced notifications, install %sPublishPress Statuses Pro%s.', 'revisionary'),
+			esc_html__('For custom Revision statuses, install %sPublishPress Statuses Pro%s.', 'revisionary'),
 			'<a href="https://publishpress.com/statuses/" target="_blank">',
 			'</a>'
 		);
@@ -788,7 +788,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		<?php
 	}
 
-	echo '<h4 style="margin-top: 30px; margin-bottom:8px">' . esc_html__('Compare Revisions:', 'revisionary-pro') . '</h4>';
+	echo '<h4 style="margin-top: 30px; margin-bottom:8px">' . esc_html__('Compare Revisions:', 'revisionary') . '</h4>';
 
 	$id = 'past_revisions_order_by';
 	if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
@@ -832,7 +832,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		?>
 
 		<?php
-		echo '<h4 style="margin-top: 30px; margin-bottom:0">' . esc_html__('Revision Publication:', 'revisionary-pro') . '</h4>';
+		echo '<h4 style="margin-top: 30px; margin-bottom:0">' . esc_html__('Revision Publication:', 'revisionary') . '</h4>';
 
 		if (defined('PUBLISHPRESS_VERSION')) {
 			$this->option_checkbox( 'rev_publication_delete_ed_comments', $tab, $section, '', '' );
@@ -843,7 +843,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		$hint = esc_html__('This may improve compatibility with some plugins.', 'revisionary');
 		$this->option_checkbox( 'trigger_post_update_actions', $tab, $section, $hint, '' );
 
-		echo '<h4 style="margin-top: 30px; margin-bottom:0">' . esc_html__('Revision Archive:', 'revisionary-pro') . '</h4>';
+		echo '<h4 style="margin-top: 30px; margin-bottom:0">' . esc_html__('Revision Archive:', 'revisionary') . '</h4>';
 
 		$this->option_checkbox( 'archive_postmeta', $tab, $section, '', '' );
 
@@ -873,18 +873,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 		<?php
-		if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) :
-			?>
-			<div id="revisions-pro-descript" class="activating" style="margin-bottom: 20px">
-			<?php
-			printf(
-				esc_html__('For enhanced notifications, install %sPublishPress Statuses Pro%s.', 'revisionary'),
-				'<a href="https://publishpress.com/statuses/" target="_blank">',
-				'</a>'
-			);
-			?>
-			</div>
-		<?php elseif (!defined('PUBLISHPRESS_VERSION')) :
+		if (!defined('PUBLISHPRESS_VERSION')) :
 			?>
 			<div id="revisions-pro-descript" class="activating" style="margin-bottom: 20px">
 			<?php
@@ -908,7 +897,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			</div>
 		<?php endif;
 
-		if (defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') && defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
+		if (defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=')) {
 			$hint = '';
 			$this->option_checkbox( 'use_publishpress_notifications', $tab, $section, $hint, '', ['no_escape' => true] );
 
