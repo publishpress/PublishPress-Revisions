@@ -74,7 +74,15 @@ class RevisionaryAdmin
 						require_once( dirname(__FILE__).'/edit-revision-block-ui_rvy.php' );
 						new RevisionaryEditRevisionBlockUI();
 					} else {
-						if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
+						if (defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
+							if (class_exists('PublishPress_Statuses')) {
+								$status_revisions_active = in_array($post->post_type, \PublishPress_Statuses::getEnabledPostTypes());
+							}
+						} else {
+							$status_revisions_active = false;
+						}
+
+						if (empty($status_revisions_active)) {
 							require_once( dirname(__FILE__).'/edit-revision-classic-ui_rvy.php' );
 							new RevisionaryEditRevisionClassicUI();
 						}

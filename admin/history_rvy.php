@@ -169,7 +169,10 @@ class RevisionaryHistory
 
                 /* translators: %s: post title */
                 $do_h1 = true;
-                $title          = $status_obj->labels->plural;                              // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+
+                if (isset($status_obj->labels->plural)) {
+                    $title = $status_obj->labels->plural;                             // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+                }
 
                 $redirect = false;
                 break;
@@ -190,6 +193,14 @@ class RevisionaryHistory
 
         $this->actEnqueueScripts();
 
+        if (!isset($title)) {
+            $title = sprintf( 
+                esc_html__( 'Compare %s of "%s"', 'revisionary' ), 
+                __('Revisions'),
+                esc_html(_draft_or_post_title($published_post))
+            );
+        }
+
         require_once( ABSPATH . 'wp-admin/admin-header.php' );
 
         ?>
@@ -197,9 +208,11 @@ class RevisionaryHistory
         <div class="wrap">
             <h1 class="long-header"><?php 
             if (!empty($do_h1)) {
+                $status_plural = (!empty($status_obj->labels->plural)) ? $status_obj->labels->plural : __('Revisions');
+
                 printf( 
                     esc_html__( 'Compare %s of "%s"', 'revisionary' ), 
-                    esc_html($status_obj->labels->plural), 
+                    esc_html($status_plural), 
                     '<a href="' . esc_url(get_edit_post_link($published_post)) . '">' . esc_html(_draft_or_post_title($published_post)) . '</a>'
                 );
             }
@@ -219,7 +232,9 @@ class RevisionaryHistory
     }
 
     public function fltFixMimeTypeClause($where) {
-		return str_replace("-revision/%'", "-revision'", $where);
+		return preg_replace("/post_mime_type LIKE '([a-z0-9_\-]+)\/\%'/", "post_mime_type LIKE '$1'", $where);
+
+
 	}
 
     private function queryRevisions($post, $paged = false) {

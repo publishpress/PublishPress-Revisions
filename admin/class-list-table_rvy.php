@@ -1089,7 +1089,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$links['all'] = "<a href='admin.php?page=revisionary-q&all=1'{$link_class}>" . sprintf( esc_html__('All %s', 'revisionary'), "<span class='count'>($all_count)</span>" ) . '</a>';
 		
-		return $links;
+		return apply_filters('revisionary_queue_view_links', $links);
 	}
 
 	/**
@@ -1399,7 +1399,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 						esc_html__( 'Discard' )
 					);
 				} else {
-					$delete_caption = (defined('RVY_DISCARD_CAPTION')) ? esc_html__( 'Discard Revision', 'revisionary-pro' ) : esc_html__( 'Delete Revision', 'revisionary' );
+					$delete_caption = (defined('RVY_DISCARD_CAPTION')) ? esc_html__( 'Discard Revision', 'revisionary' ) : esc_html__( 'Delete Revision', 'revisionary' );
 
 					$actions['delete'] = sprintf(
 						'<a href="%1$s" class="submitdelete" title="%2$s" aria-label="%2$s">%3$s</a>',
