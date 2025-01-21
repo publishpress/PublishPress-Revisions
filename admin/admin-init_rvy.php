@@ -338,9 +338,12 @@ function rvy_admin_init() {
 				break;
 
 			case 'delete':
-				$revision_status_csv = array_diff(
-					implode("','", array_map('sanitize_key', rvy_revision_statuses())),
-					['future-revision']
+				$revision_status_csv = implode(
+					"','", 
+					array_diff(
+						array_map('sanitize_key', rvy_revision_statuses()),
+						['future-revision']
+					)
 				);
 				
 				$deleted = 0;

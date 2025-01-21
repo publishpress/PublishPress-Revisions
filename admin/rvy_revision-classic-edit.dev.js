@@ -7,7 +7,7 @@
 */
 jQuery(document).ready( function($) {
 	var RvySubmissionUI = function() {
-		var refSelector = '#rvy_compare_button';
+		var refSelector = '.rvy-misc-actions';
 
         if (!$(refSelector).length) {
             var refSelector = '#submitdiv div.misc-pub-section:last';
@@ -50,7 +50,7 @@ jQuery(document).ready( function($) {
                 }
 
                 $(refSelector).after(
-                    '<div class="rvy-creation-ui" style="flo-at:left; padding-left:10px; margin-bottom: 10px">'
+                    '<div class="rvy-creation-ui" style="float:left; padding-left:10px; margin-bottom: 10px">'
 
                     + '<a href="' + url + '" class="button revision-approve">'
                     + rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</a>'
