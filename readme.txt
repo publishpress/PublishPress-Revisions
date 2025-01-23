@@ -245,7 +245,8 @@ Fixed: Security issue. Please update.
 == Changelog ==
 
 = 3.6.0 =
-* Compat : PublishPress Statuses Pro
+* Compat : PublishPress Statuses Pro (Custom Revision Statuses)
+* Compat : PublishPress Planner Calendar, Content Board, Content Overview
 * Fixed : Page Parent revision was not applied to published page
 * Fixed : Revision Archive - Schedule Revision approver was not recorded
 * Fixed : Revision Archive - Scheduled Revisions did not show scheduling time
