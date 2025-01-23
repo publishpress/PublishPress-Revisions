@@ -1130,9 +1130,9 @@ class Revisionary
 		return $data;
 	}
 
-	// @todo: confirm this is still needed
 	function flt_regulate_revision_status($data, $postarr) {
 		// Revisions are not published by wp_update_post() execution; Prevent setting to a non-revision status
+		// @todo: confirm this is still needed
 		if (rvy_get_post_meta($postarr['ID'], '_rvy_base_post_id', true) 
 		&& ('trash' != $data['post_status'])
 		) {
@@ -1164,6 +1164,18 @@ class Revisionary
 
 			if (rvy_get_option('permissions_compat_mode') && ('revision' != $data['post_type'])) {
 				$data['post_status'] = $data['post_mime_type'];
+			}
+		}
+
+		if (rvy_is_revision_status($data['post_status'])) {
+			// If post_status is set to a revision status, mirror that to post_mime_type. This is meant to support post updates from one revision status to another.
+			if ($data['post_status'] != $data['post_mime_type']) {
+				$data['post_mime_type'] = $data['post_status'];
+			}
+
+			// Prevent revision status being stored directly to post_status column unless Permissions Compat Mode is enabled.
+			if (!rvy_get_option('permissions_compat_mode')) {
+				$data['post_status'] = ('draft-revision' == $data['post_status']) ? 'draft' : 'pending';
 			}
 		}
 
