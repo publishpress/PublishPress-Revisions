@@ -565,11 +565,11 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	function correctCommentCounts() {
 		global $wpdb;
 
-		$revision_base_status_csv = implode("','", array_map('sanitize_key', rvy_revision_base_statuses()));
+		//$revision_base_status_csv = implode("','", array_map('sanitize_key', rvy_revision_base_statuses()));
 		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		if ($revision_ids = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_status IN ('$revision_base_status_csv') AND post_mime_type IN ('$revision_status_csv') AND comment_count = 0")) {
+		if ($revision_ids = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_mime_type IN ('$revision_status_csv') AND comment_count = 0")) {
 			foreach($revision_ids as $revision_id) {
 				if ($main_post_id = get_post_meta($revision_id, '_rvy_base_post_id', true)) {
 					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
