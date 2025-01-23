@@ -39,6 +39,11 @@ class PluginCompat {
 		}
 
 		add_filter('authors_default_author', [$this, 'fltAuthorsDefaultAuthor'], 10, 2);
+
+		if (defined('PUBLISHPRESS_VERSION')) {
+			require_once(dirname(__FILE__).'/Planner.php');
+			new \PublishPress\Revisions\Planner();
+		}
     }
 
 	function fltAuthorsDefaultAuthor($default_author, $post) {
