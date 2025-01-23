@@ -401,7 +401,33 @@ function pp_revisions_plugin_activation() {
 
     // convert pending / scheduled revisions to v3.0 format
     global $wpdb;
-    $revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
+    
+    $revision_statuses = array_merge(rvy_revision_statuses(), ['revision-deferred', 'revision-needs-work', 'revision-rejected']);
+    
+    if (!get_option('rvy_permissions_compat_mode', false)) {
+        if (!taxonomy_exists('pp_revision_status')) {
+            register_taxonomy(
+                'pp_revision_status',
+                'post',
+                [
+                    'hierarchical'          => false,
+                    'query_var'             => false,
+                    'rewrite'               => false,
+                    'show_ui'               => false,
+                ]
+            );
+        }
+
+        $stored_statuses = get_terms('pp_revision_status', ['hide_empty' => false, 'return' => 'name']);
+
+        foreach ($stored_statuses as $status) {
+            if (is_object($status) && property_exists($status, 'slug') && !in_array($status->slug, $revision_statuses)) {
+                $revision_statuses[] = $status->slug;
+            }
+        }
+    }
+
+    $revision_status_csv = implode("','", array_map('sanitize_key', $revision_statuses));
 
     if (!defined('REVISIONARY_DISABLE_ACTIVATION_TRASH_QUERY')) {
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -434,11 +460,12 @@ function pp_revisions_plugin_activation() {
         }
     }
 
-    if (!get_option('rvy_permissions_compat_mode')) {
+    if (!get_option('rvy_permissions_compat_mode', false)) {
         $wpdb->query("UPDATE $wpdb->posts SET post_mime_type = post_status WHERE post_status IN ('$revision_status_csv')");                             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-        $wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft', post_mime_type = 'draft-revision' WHERE post_status IN ('draft-revision')");       // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-        $wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending', post_mime_type = 'pending-revision' WHERE post_status IN ('pending-revision')"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-        $wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending', post_mime_type = 'future-revision' WHERE post_status IN ('future-revision')");   // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        
+        $wpdb->query("UPDATE $wpdb->posts SET post_status = 'pending' WHERE post_status IN ('$revision_status_csv') AND post_status != 'draft-revision'");  // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        
+        $wpdb->query("UPDATE $wpdb->posts SET post_status = 'draft' WHERE post_status IN ('draft-revision')");       // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
     }
 }
 
@@ -447,14 +474,37 @@ function pp_revisions_plugin_deactivation() {
 
     require_once(dirname(__FILE__).'/functions.php');
 
-    if (get_option('rvy_permissions_compat_mode')) {
+    if (get_option('rvy_permissions_compat_mode', false)) {
         return;
     }
 
     // Prevents pending / scheduled revisions from being listed as regular drafts / pending posts after plugin is deactivated
-    $revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
+    $revision_statuses = array_merge(rvy_revision_statuses(), ['revision-deferred', 'revision-needs-work', 'revision-rejected']);
+        
+    if (!taxonomy_exists('pp_revision_status')) {
+        register_taxonomy(
+            'pp_revision_status',
+            'post',
+            [
+                'hierarchical'          => false,
+                'query_var'             => false,
+                'rewrite'               => false,
+                'show_ui'               => false,
+            ]
+        );
+    }
+
+    $stored_statuses = get_terms('pp_revision_status', ['hide_empty' => false, 'return' => 'name']);
+
+    foreach ($stored_statuses as $status) {
+        if (is_object($status) && property_exists($status, 'slug') && !in_array($status->slug, $revision_statuses)) {
+            $revision_statuses[] = $status->slug;
+        }
+    }
+
+    $revision_status_csv = implode("','", array_map('sanitize_key', $revision_statuses));
+
     $wpdb->query("UPDATE $wpdb->posts SET post_status = post_mime_type WHERE post_mime_type IN ('$revision_status_csv')");                          // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    $wpdb->query("UPDATE $wpdb->posts SET post_mime_type = '' WHERE post_mime_type IN ('$revision_status_csv')");                                   // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
     if ($timestamp = wp_next_scheduled('rvy_mail_buffer_hook')) {
         wp_unschedule_event($timestamp,'rvy_mail_buffer_hook');
