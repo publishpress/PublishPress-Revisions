@@ -4,9 +4,10 @@ namespace PublishPress\Revisions;
 class Planner {
 	private $show_revisions;
 	private $usermeta_key;
+	private $plugin_page = '';
 
-    function __construct() {
-		global $pagenow;
+    function init($plugin_page) {
+		$this->plugin_page = $plugin_page;
 
 		if (is_admin() && defined('DOING_AJAX') && DOING_AJAX) {
 			add_filter('preview_post_link', 
@@ -33,221 +34,114 @@ class Planner {
 				},
 				10, 3
 			);
-
-		} elseif (is_admin() && !empty($pagenow) && ('admin.php' == $pagenow) && !empty($_REQUEST['page'])) {
-			$plugin_page = sanitize_key($_REQUEST['page']);
-			
-			$this->usermeta_key = 'pp_calendar_filters'; // default
-			
-			if ('pp-calendar' == $plugin_page) {
-				require_once(dirname(__FILE__).'/PlannerCalendar.php');
-				new \PublishPress\Revisions\PlannerCalendar();
-
-			} elseif ('pp-content-board' == $plugin_page) {
-				$this->usermeta_key = 'PP_Content_Board_filters';
-				
-				require_once(dirname(__FILE__).'/PlannerContentBoard.php');
-				new \PublishPress\Revisions\PlannerContentBoard();
-
-			} elseif ('pp-content-overview' == $plugin_page) {
-				$this->usermeta_key = 'PP_Content_Overview_filters';
-
-				add_action('init', function() {
-					if ($this->showingRevisions()) {
-						add_filter('PP_Content_Overview_item_actions',
-							function($actions, $post_id) {
-								// @todo: support revision trashing
-								if (rvy_in_revision_workflow($post_id)) {
-									$actions['trash'] = '<a class="submitdelete" href="' . esc_url(get_delete_post_link($post_id, false, true)) . '">' . esc_html__('Delete') . '</a>';
-								}
-
-								return $actions;
-							},
-							10, 2
-						);
+		}
+		
+		$this->usermeta_key = 'pp_calendar_filters'; // default
+		
+		if ('pp-calendar' == $plugin_page) {
+			add_filter(
+				'publishpress_item_action_links', 
+				function ($item_actions, $post, $can_edit_post) {
+					if (!empty($item_actions['trash']) && rvy_in_revision_workflow($post)) {
+						$item_actions['trash'] = get_delete_post_link($post->ID, false, true);
 					}
-				});
 
-				if (!defined('PUBLISHPRESS_STATUSES_VERSION')) {
-					// Work around plugin API bug
-					add_filter('publishpress_content_overview_column_value', 
-						function($col_val, $post, $module_url) {
-							global $pp_content_overview_last_col;
+					return $item_actions;
+				},
+				10, 3
+			);
 
-							$pp_content_overview_last_col = $col_val;
-
-							return $col_val;
-						},
-						9, 3
-					);
-
-					add_filter('publishpress_content_overview_column_value', 
-						function($col_val, $post, $module_url) {
-							global $pp_content_overview_last_col;
-
-							if (('post_status' == $pp_content_overview_last_col) && rvy_in_revision_workflow($post)) {
-								if ($status_obj = get_post_status_object($post->post_status)) {
-									$col_val = $status_obj->label;
-								}
+			add_action(
+				'admin_print_scripts',
+				function() {
+					?>
+					<script type="text/javascript">
+					/* <![CDATA[ */
+					jQuery(document).ready(function ($) {
+						setInterval(() => {
+							if ($('div.publishpress-calendar-popup-form:visible').length) {
+								$('#publishpress-calendar-field-revision_status').closest('tr').hide();
 							}
+						}, 100);
+					});
+					/* ]]> */
+					</script>
+					<?php
+				}, 50
+			);
 
-							return $col_val;
-						},
-						11, 3
-					);
-				}
-			}
+		} elseif ('pp-content-board' == $plugin_page) {
+			$this->usermeta_key = 'PP_Content_Board_filters';
+			
+			require_once(dirname(__FILE__).'/PlannerContentBoard.php');
+			new \PublishPress\Revisions\PlannerContentBoard($this);
 
-			if (in_array($plugin_page, ['pp-calendar', 'pp-content-board', 'pp-content-overview'])) {
-				add_action('init', function() {
-					if ($this->showingRevisions()) {
-						add_filter('preview_post_link',
-							function($preview_link, $post) {
-								if (rvy_in_revision_workflow($post)) {
-									$preview_link = rvy_preview_url($post);
-								}
+		} elseif ('pp-content-overview' == $plugin_page) {
+			$this->usermeta_key = 'PP_Content_Overview_filters';
 
-								return $preview_link;
-							},
-							10, 2
-						);
-					}
-				});
-				
-				add_filter(
-					'_presspermit_get_post_statuses', 
-					function($post_statuses, $status_args, $return_args, $function_args) {
-						if (!class_exists('PP_Revision_Integration')) {
-							return $post_statuses;
-						}
-		
-						$revision_statuses = rvy_revision_statuses();
-					
-						$permissions_compat_mode = rvy_get_option('permissions_compat_mode');
-		
-						foreach ($post_statuses as $k => $status) {
-							$status_name = (is_object($status)) ? $status->name : $status;
-		
-							if ($this->showingRevisions()) {
-								if ($permissions_compat_mode) {
-									if (!in_array($status_name, $revision_statuses)) {
-										unset($post_statuses[$k]);
-									}
-								}
-							} else {
-								if (in_array($status_name, $revision_statuses)) {
-									unset($post_statuses[$k]);
-								}
-							}
-						}
-		
-						return $post_statuses;
-					}, 50, 4
-				);
-			}
+			add_action('init', [$this, 'maybeFilterContentOverviewItemActions']);
 		}
 
-        add_filter('publishpress_calendar_post_statuses', 
-			function($statuses) {
-				global $pagenow;
+		if (in_array($plugin_page, ['pp-calendar', 'pp-content-overview'])) {
+			add_filter('publishpress_user_post_status_options', [$this, 'fltUserPostStatusOptions'], 20, 3);
+		}
 
-				$revision_statuses = rvy_revision_statuses();
-
-				$is_content_board = !empty($pagenow) && ('admin.php' == $pagenow) && !empty($_REQUEST['page']) && ('pp-content-board' == $_REQUEST['page']);
-
-				$permissions_compat_mode = rvy_get_option('permissions_compat_mode');
-
-				foreach ($statuses as $k => $status_obj) {
-					if (!class_exists('PP_Revision_Integration')) {
-						if (!empty($status_obj->slug) && in_array($status_obj->slug, $revision_statuses)) {
-							unset($statuses[$k]);
+		add_action('init', function() {
+			if ($this->showingRevisions()) {
+				add_filter('preview_post_link',
+					function($preview_link, $post) {
+						if (rvy_in_revision_workflow($post)) {
+							$preview_link = rvy_preview_url($post);
 						}
 
-					} elseif ($this->showingRevisions()) {
-						if (!empty($status_obj->slug) && !in_array($status_obj->slug, $revision_statuses)) {
-							unset($statuses[$k]);
+						return $preview_link;
+					},
+					10, 2
+				);
+			}
+		});
+		
+		add_filter('_presspermit_get_post_statuses', [$this, 'fltPostStatuses'], 10, 4);
+
+		add_action(
+			'admin_print_scripts',
+			function() {
+				?>
+				<script type="text/javascript">
+				/* <![CDATA[ */
+				jQuery(document).ready(function ($) {
+					<?php if ($this->showingRevisions()) :?>
+					setInterval(() => {
+						if ($('#pp-content-calendar-general-modal-container:visible, #pp-content-overview-general-modal-container:visible').length) {
+							$('div.pp-popup-modal-header div.post-delete a').html('<?php esc_html_e('Delete');?>');
 						}
-					} else {
-						if (!empty($status_obj->slug) && in_array($status_obj->slug, $revision_statuses)) {
-							unset($statuses[$k]);
-						}
-					}
-				}
-
-				// Special provision with query modification for ready-only Content Board display of Revision Statuses if Permissions Compat mode is off
-				//if ($is_content_board && $this->showingRevisions() && !$permissions_compat_mode) {
-				if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && $this->showingRevisions() && !$permissions_compat_mode) {
-					$statuses = rvy_revision_statuses(['output' => 'object']);
-
-					foreach($statuses as $k => $status) {
-						$statuses[$k]->slug = $status->name;
-					}
-				}
-
-				return $statuses;
-			}
+					}, 100);
+					<?php endif;?>
+				});
+				/* ]]> */
+				</script>
+				<?php
+			}, 50
 		);
 
-		add_filter(
-			'publishpress_post_status_options', 
-			function($status_options) {
-				if (!class_exists('PP_Revision_Integration')) {
-					return $status_options;
-				}
+		add_filter('publishpress_content_board_new_post_statuses', [$this, 'fltNewPostStatuses'], 10, 2);
+		add_filter('publishpress_content_overview_new_post_statuses', [$this, 'fltNewPostStatuses'], 10, 2);
 
-				/*
-				if (!rvy_get_option('permissions_compat_mode')) {
-					$revision_statuses = rvy_revision_statuses();
-					
-					foreach ($status_options as $k => $opt) {
-						if (isset($opt['value']) && in_array($opt['value'], $revision_statuses)) {
-							unset($status_options[$k]);
-						}
-					}
-				}
-				*/
+        add_filter('publishpress_calendar_post_statuses', [$this, 'fltCalendarPostStatuses']);
 
-				return $status_options;
-			}
-		);
-
-		add_filter(
-			'PP_Content_Board_posts_query_args',
-			function ($args) {
-				add_filter('posts_fields', [$this, 'fltQueryFields'], 10, 2);
-				add_filter('posts_where', [$this, 'fltFilterRevisions'], 10, 2);
-				return $args;
-			}
-		);
-
-		add_filter(
-			'PP_Content_Overview_posts_query_args',
-			function ($args) {
-				add_filter('posts_fields', [$this, 'fltQueryFields'], 10, 2);
-				add_filter('posts_where', [$this, 'fltFilterRevisions'], 10, 2);
-				return $args;
-			}
-		);
-
-		add_filter(
-			'pp_calendar_posts_query_args',
-			function ($args) {
-				add_filter('posts_fields', [$this, 'fltQueryFields'], 10, 2);
-				add_filter('posts_where', [$this, 'fltFilterRevisions'], 10, 2);
-				return $args;
-			}
-		);
+		add_filter('PP_Content_Overview_posts_query_args', [$this, 'fltCombinedPostsRevisionsQueryArgs'], 10, 2);
+		add_filter('pp_calendar_posts_query_args', [$this, 'fltCombinedPostsRevisionsQueryArgs'], 10, 2);
 	}
 
-	protected function showingRevisions() {
+	public function showingRevisions() {
         global $current_user;
 
 		if (!isset($this->show_revisions)) {
 			if (!class_exists('PP_Revision_Integration')) {
 				$this->show_revisions = false;
 
-			} elseif (isset($_REQUEST['hide_revision'])) {
-				$this->show_revisions = empty($_REQUEST['hide_revision']);
+			} elseif (isset($_REQUEST['hide_revision'])) {												// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$this->show_revisions = empty($_REQUEST['hide_revision']);								// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			} else {
 				$user_filters = apply_filters(
 					'pp_get_user_meta', 
@@ -264,61 +158,243 @@ class Planner {
 		return $this->show_revisions;
     }
 
-	function fltQueryFields($fields, $wp_query) {
-		global $wpdb;
-		
-		if (class_exists('PP_Revision_Integration') && $this->showingRevisions()) {
-			$fields = "ID, post_author, post_date, post_date_gmt, post_content, post_title, post_excerpt, post_mime_type AS post_status, comment_status, ping_status, post_password, post_name, to_ping, pinged, post_modified, post_modified_gmt, post_content_filtered, post_parent, guid, menu_order, post_type, post_mime_type, comment_count";
+	public function fltPostStatuses($post_statuses, $status_args, $return_args, $function_args) {
+		if (!class_exists('PP_Revision_Integration') || ('pp-content-board' != $this->plugin_page)) {
+			return $post_statuses;
 		}
 
-		return $fields;
-	}
-
-	function fltFilterRevisions($where, $wp_query) {
-		global $wpdb;
-		
 		$revision_statuses = rvy_revision_statuses();
+	
+		$permissions_compat_mode = rvy_get_option('permissions_compat_mode');
 
-		// Prevent inactive revisions from being displayed as normal posts if Statuses Pro was deactivated
-		if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && !$this->showingRevisions()) {
-			$revision_statuses = array_merge($revision_statuses, ['revision-deferred', 'revision-needs-work', 'revision-rejected']);
-			
-			if (!taxonomy_exists('pp_revision_status')) {
-				register_taxonomy(
-					'pp_revision_status',
-					'post',
-					[
-						'hierarchical'          => false,
-						'query_var'             => false,
-						'rewrite'               => false,
-						'show_ui'               => false,
-					]
-				);
-			}
-			
-			static $stored_statuses;
+		foreach ($post_statuses as $k => $status) {
+			$status_name = (is_object($status)) ? $status->name : $status;
 
-			if (!isset($stored_statuses)) {
-				$stored_statuses = get_terms('pp_revision_status', ['hide_empty' => false, 'return' => 'name']);
-			}
-
-			foreach ($stored_statuses as $status) {
-				if (!in_array($status->slug, $revision_statuses)) {
-					$revision_statuses[] = $status->slug;
+			if ($this->showingRevisions()) {
+				if ($permissions_compat_mode) {
+					if (!in_array($status_name, $revision_statuses)) {
+						unset($post_statuses[$k]);
+					}
+				}
+			} else {
+				if (in_array($status_name, $revision_statuses)) {
+					unset($post_statuses[$k]);
 				}
 			}
 		}
 
-		$revision_status_csv = implode("','", array_map('sanitize_key', $revision_statuses));
+		return $post_statuses;
+	}
 
-		$where .= ($this->showingRevisions()) ? " AND post_mime_type IN ('$revision_status_csv')" : " AND post_mime_type NOT IN ('$revision_status_csv')";
+	public function fltCalendarPostStatuses($statuses) {
+		if (('pp-content-board' == $this->plugin_page) && $this->showingRevisions()) {
+			$revision_statuses = rvy_revision_statuses();
 
-		if (class_exists('PP_Revision_Integration') && $this->showingRevisions() && !rvy_get_option('permissions_compat_mode')) {
-			$where = str_replace("(($wpdb->posts.post_status =", "(($wpdb->posts.post_mime_type =", $where);
+			foreach ($statuses as $k => $status_obj) {
+				if (!class_exists('PP_Revision_Integration')) {
+					if (!empty($status_obj->slug) && in_array($status_obj->slug, $revision_statuses)) {
+						unset($statuses[$k]);
+					}
+
+				} elseif ($this->showingRevisions()) {
+					if (!empty($status_obj->slug) && !in_array($status_obj->slug, $revision_statuses)) {
+						unset($statuses[$k]);
+					}
+				} else {
+					if (!empty($status_obj->slug) && in_array($status_obj->slug, $revision_statuses)) {
+						unset($statuses[$k]);
+					}
+				}
+			}
+		} elseif (did_action('wp_ajax_publishpress_calendar_get_post_type_fields')) {
+			$revision_statuses = rvy_revision_statuses();
+
+			foreach ($statuses as $k => $status_obj) {
+				if (!empty($status_obj->slug) && in_array($status_obj->slug, $revision_statuses)) {
+					unset($statuses[$k]);
+				}
+			}
 		}
 
-		remove_filter('posts_where', [$this, 'fltFilterRevisions'], 10, 2);
+		if ('pp-content-board' == $this->plugin_page) {
+			if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && $this->showingRevisions() && !rvy_get_option('permissions_compat_mode')) {
+				$statuses = rvy_revision_statuses(['output' => 'object']);
 
-		return $where;
+				foreach($statuses as $k => $status) {
+					$statuses[$k]->slug = $status->name;
+				}
+			}
+		}
+
+		return $statuses;
+	}
+
+	function fltNewPostStatuses($statuses, $args) {
+		$revision_statuses = rvy_revision_statuses();
+
+		foreach ($statuses as $k => $status) {
+			if (is_array($status) && in_array($status['value'], $revision_statuses)) {
+				unset($statuses[$k]);
+				$did_unset = true;
+			}
+		}
+
+		if (!empty($did_unset)) {
+			$statuses = array_values($statuses);
+		}
+
+		return $statuses;
+	}
+
+	public function maybeFilterContentOverviewItemActions() {
+		add_filter('PP_Content_Overview_item_actions', [$this, 'fltContentOverviewItemActions'], 10, 2);
+	}
+
+	public function fltContentOverviewItemActions($actions, $post_id) {
+		// @todo: support revision trashing
+		if (rvy_in_revision_workflow($post_id)) {
+			$actions['trash'] = '<a class="submitdelete" href="' . esc_url(get_delete_post_link($post_id, false, true)) . '">' . esc_html__('Delete') . '</a>';
+		}
+
+		return $actions;
+	}
+
+	public function fltCombinedPostsRevisionsQueryArgs ($args) {
+		if (!$this->showingRevisions()) {
+			return $args;
+		}
+
+		if (('pp-calendar' == $this->plugin_page) && isset($args['revision_status'])) {
+			$revision_status = sanitize_key($args['revision_status']);
+
+		} elseif (isset($_REQUEST['revision_status'])) {												// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$revision_status = sanitize_key($_REQUEST['revision_status']);								// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		} else {
+			$revision_status = '';
+		}
+
+		if (isset($args['post_status'])) {
+			$post_status = sanitize_key($args['post_status']);
+
+		} elseif (isset($_REQUEST['post_status'])) {													// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$post_status = sanitize_key($_REQUEST['post_status']);										// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		} else {
+			$post_status = '';
+		}
+
+		if ('all' == $revision_status) {
+			$revision_status = '';
+		}
+
+		// pass requested post_status, revision_status into anonymous function
+		add_filter(
+			'posts_where', 
+			function ($where, $wp_query) use ($post_status, $revision_status) {
+				global $wpdb;
+				static $done;
+
+				// only modify first posts query we see
+				if (!empty($done)) {
+					return $where;
+				}
+
+				$done = true;
+
+				$revision_statuses = rvy_revision_statuses();
+
+				$revision_status_csv = implode("','", array_map('sanitize_key', $revision_statuses));
+
+				if ('' == $post_status) {
+					global $publishpress;
+
+					$statuses = (!empty($publishpress) && method_exists($publishpress, 'getPostStatuses')) 
+					? $publishpress->getPostStatuses()
+					: get_post_stati(['internal' => false], 'object');
+
+					$status_objects = apply_filters('publishpress_calendar_post_statuses', $statuses);
+					$post_status_csv = implode("','", array_column($status_objects, 'name'));
+					$post_status_clause = "$wpdb->posts.post_status IN ('$post_status_csv') AND $wpdb->posts.post_mime_type NOT IN ('$revision_status_csv')";
+
+				} elseif ('_' == $post_status) {
+					$post_status_clause = "1=2";
+
+				} else {
+					$post_status_clause = $wpdb->prepare("$wpdb->posts.post_status = %s AND $wpdb->posts.post_mime_type NOT IN ('$revision_status_csv')", $post_status);	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				}
+
+				if ($revision_status) {
+					if (!in_array($revision_status, $revision_statuses)) {
+						$revision_status_clause = '1=2';
+					} else {
+						$revision_status_clause = $wpdb->prepare("$wpdb->posts.post_mime_type = %s", $revision_status);
+					}
+				} else {
+					$revision_status_clause = "$wpdb->posts.post_mime_type IN ('$revision_status_csv')";
+				}
+
+				$where = str_replace(
+					"($wpdb->posts.post_status = 'draft')", 
+					"(" 
+					. "($post_status_clause)"
+					. ' OR '
+					. "($revision_status_clause)"
+					. ")",
+					$where
+				);
+
+				return $where;
+			},
+			10, 2
+		);
+
+		$args['post_status'] = 'draft';
+		unset($args['revision_status']);
+		
+		return $args;
+	}
+
+	function fltUserPostStatusOptions($status_options, $post_type = false, $post = false) {
+		if (class_exists('PP_Revision_Integration') && $post) {
+			static $revision_statuses;
+
+			if (!isset($revision_statuses)) {
+				$revision_statuses = [];
+			}
+
+			if (!isset($revision_statuses[$post_type])) {
+				if (class_exists('PublishPress_Statuses') && defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
+					$revision_statuses[$post_type] = \PublishPress_Statuses::instance()->getPostStatuses(['for_revision' => true, 'post_type' => $post_type], 'object');
+				} else {
+					$revision_statuses[$post_type] = rvy_revision_statuses(['output' => 'object']);
+				}
+			}
+
+			if (rvy_in_revision_workflow($post)) {
+				$status_options = [];
+
+				foreach ($revision_statuses[$post_type] as $status_obj) {
+					$status_options [] = ['value' => $status_obj->name, 'text' => $status_obj->label];
+				}
+			} else {
+				if (isset($revision_statuses[$post_type])) {
+					$_revision_statuses = array_column($revision_statuses[$post_type], 'name');
+
+					foreach ($status_options as $k => $status) {
+						if (is_array($status) && in_array($status['value'], $_revision_statuses)) {
+							unset($status_options[$k]);
+							$did_unset = true;
+						}
+					}
+
+					if (!empty($did_unset)) {
+						$status_options = array_values($status_options);
+					}
+				}
+			}
+		}
+
+		return $status_options;
 	}
 }

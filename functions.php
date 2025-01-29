@@ -269,6 +269,20 @@ function rvy_in_revision_workflow($post, $args = []) {
     return rvy_is_revision_status($post->post_mime_type) ? $post->post_mime_type : false;
 }
 
+function rvy_status_revisions_active($post_type = '') {
+    if (defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && class_exists('PublishPress_Statuses')) {
+        if ($post_type) {
+            $status_revisions_active = in_array($post_type, \PublishPress_Statuses::getEnabledPostTypes());
+        } else {
+            $status_revisions_active = true;
+        }
+    } else {
+        $status_revisions_active = false;
+    }
+
+    return $status_revisions_active;
+}
+
 function rvy_post_id($revision_id) {
     if ($_post = get_post($revision_id)) {
         // if ID passed in is not a revision, return it as is
@@ -401,28 +415,32 @@ function pp_revisions_plugin_activation() {
 
     // convert pending / scheduled revisions to v3.0 format
     global $wpdb;
-    
-    $revision_statuses = array_merge(rvy_revision_statuses(), ['revision-deferred', 'revision-needs-work', 'revision-rejected']);
-    
-    if (!get_option('rvy_permissions_compat_mode', false)) {
-        if (!taxonomy_exists('pp_revision_status')) {
-            register_taxonomy(
-                'pp_revision_status',
-                'post',
-                [
-                    'hierarchical'          => false,
-                    'query_var'             => false,
-                    'rewrite'               => false,
-                    'show_ui'               => false,
-                ]
-            );
-        }
 
-        $stored_statuses = get_terms('pp_revision_status', ['hide_empty' => false, 'return' => 'name']);
+    $revision_statuses = rvy_revision_statuses();
+    
+    if (defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
+        $revision_statuses = array_merge($revision_statuses, ['revision-deferred', 'revision-needs-work', 'revision-rejected']);
+        
+        if (!get_option('rvy_permissions_compat_mode', false)) {
+            if (!taxonomy_exists('pp_revision_status')) {
+                register_taxonomy(
+                    'pp_revision_status',
+                    'post',
+                    [
+                        'hierarchical'          => false,
+                        'query_var'             => false,
+                        'rewrite'               => false,
+                        'show_ui'               => false,
+                    ]
+                );
+            }
 
-        foreach ($stored_statuses as $status) {
-            if (is_object($status) && property_exists($status, 'slug') && !in_array($status->slug, $revision_statuses)) {
-                $revision_statuses[] = $status->slug;
+            $stored_statuses = get_terms('pp_revision_status', ['hide_empty' => false, 'return' => 'name']);
+
+            foreach ($stored_statuses as $status) {
+                if (is_object($status) && property_exists($status, 'slug') && !in_array($status->slug, $revision_statuses)) {
+                    $revision_statuses[] = $status->slug;
+                }
             }
         }
     }

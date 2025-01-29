@@ -516,7 +516,7 @@ div.revision-q .column-author, div.revision-q .column-date, div.revision-q .colu
 width:auto;
 }
 
-#revisions-pro-descript {
+#revisions-pro-descript, .rvy-plugin-notice {
 border-width: 1px;
 border-style: solid;
 padding: 5px;

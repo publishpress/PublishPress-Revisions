@@ -280,10 +280,14 @@ class RevisionaryAdminPosts {
 	}
 
 	function fltFilterRevisions($where, $wp_query) {
+		global $typenow;
+
 		$revision_statuses = rvy_revision_statuses();
 
+		$post_type = (!empty($typenow)) ? $typenow : '';
+
 		// Prevent inactive revisions from being displayed as normal posts if Statuses Pro was deactivated
-		if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
+		if (!rvy_status_revisions_active($post_type)) {
 			$revision_statuses = array_merge($revision_statuses, ['revision-deferred', 'revision-needs-work', 'revision-rejected']);
 			
 			if (!taxonomy_exists('pp_revision_status')) {

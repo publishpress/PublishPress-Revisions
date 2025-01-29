@@ -2,7 +2,7 @@
 /**
  * @package     PublishPress\Revisions\RevisionaryAdmin
  * @author      PublishPress <help@publishpress.com>
- * @copyright   Copyright (c) 2024 PublishPress. All rights reserved.
+ * @copyright   Copyright (c) 2025 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
  *
@@ -74,15 +74,7 @@ class RevisionaryAdmin
 						require_once( dirname(__FILE__).'/edit-revision-block-ui_rvy.php' );
 						new RevisionaryEditRevisionBlockUI();
 					} else {
-						if (defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
-							if (class_exists('PublishPress_Statuses')) {
-								$status_revisions_active = in_array($post->post_type, \PublishPress_Statuses::getEnabledPostTypes());
-							}
-						} else {
-							$status_revisions_active = false;
-						}
-
-						if (empty($status_revisions_active)) {
+						if (!rvy_status_revisions_active($post->post_type)) {
 							require_once( dirname(__FILE__).'/edit-revision-classic-ui_rvy.php' );
 							new RevisionaryEditRevisionClassicUI();
 						}

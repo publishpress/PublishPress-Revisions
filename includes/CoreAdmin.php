@@ -86,6 +86,8 @@ class CoreAdmin {
                             <li><?php echo esc_html__('WooCommerce', 'revisionary'); ?></li>
                             <li><?php echo esc_html__('WPML', 'revisionary'); ?></li>
                             <li><?php echo esc_html__('WPML Translation Management', 'revisionary'); ?></li>
+                            <li><?php echo esc_html__('PublishPress Planner: Custom Notifications', 'revisionary'); ?></li>
+
                             <li class="no-icon"><a href="https://publishpress.com/knowledge-base/plugins-revisions-support/" target="__blank"><?php echo esc_html__('Plugin integration details', 'revisionary'); ?></a></li>
                         </ul>
 
