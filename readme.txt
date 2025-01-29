@@ -244,9 +244,10 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
-= 3.6.0 =
+= 3.6.0 - 29 Jan 2025 =
+* Compat : PublishPress Planner - Fix Revision Status display and selection in Calendar, Content Board, Overview (requires Planner 4.6)
 * Compat : PublishPress Statuses Pro (Custom Revision Statuses)
-* Compat : PublishPress Planner Calendar, Content Board, Content Overview
+* Compat : PublishPress Permissions Pro - Option for Access Circle restrictions to apply to Revisions
 * Fixed : Page Parent revision was not applied to published page
 * Fixed : Revision Archive - Schedule Revision approver was not recorded
 * Fixed : Revision Archive - Scheduled Revisions did not show scheduling time
