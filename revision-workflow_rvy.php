@@ -117,6 +117,11 @@ class Rvy_Revision_Workflow_UI {
     function do_notifications( $notification_type, $status, $post_arr, $args ) {
         global $revisionary, $current_user;
 
+        if (defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') && rvy_get_option('use_publishpress_notifications')
+        ) {
+            return;
+        }
+
         if ( 'pending-revision' != $notification_type ) {
             return;
         }

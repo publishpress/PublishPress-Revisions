@@ -7,7 +7,7 @@
 */
 jQuery(document).ready( function($) {
 	var RvySubmissionUI = function() {
-		var refSelector = '#rvy_compare_button';
+		var refSelector = '.rvy-misc-actions';
 
         if (!$(refSelector).length) {
             var refSelector = '#submitdiv div.misc-pub-section:last';
@@ -33,7 +33,7 @@ jQuery(document).ready( function($) {
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']) {
                 var approveButtonHTML = '';
 
-                if (rvyObjEdit.canPublish && ('pending' != rvyObjEdit.currentStatus) && ('future' != rvyObjEdit.currentStatus)) {
+                if (rvyObjEdit.canPublish && (rvyObjEdit.PendingStatus != rvyObjEdit.currentStatus) && ('future' != rvyObjEdit.currentStatus)) {
 					approveButtonHTML = '&nbsp;<a href="' + rvyObjEdit['pendingActionURL'] + '" class="button rvy-direct-approve">'
 					+ rvyObjEdit['approveCaption'] + '</a>'
 				}
@@ -45,22 +45,26 @@ jQuery(document).ready( function($) {
                     + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedLinkCaption'] + '</a>';
                 }
 
-				$(refSelector).after(
-                    '<div class="rvy-creation-ui" style="flo-at:left; padding-left:10px; margin-bottom: 10px">'
+                if (-1 !== url.indexOf('action=approve&')) {
+                    approveButtonHTML = '';
+                }
+
+                $(refSelector).after(
+                    '<div class="rvy-creation-ui" style="float:left; padding-left:10px; margin-bottom: 10px">'
 
                     + '<a href="' + url + '" class="button revision-approve">'
-					+ rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</a>'
+                    + rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</a>'
                 
                     + approveButtonHTML
 
                     + '<div class="revision-created-wrapper" style="display: none; margin: 8px 0 0 2px">'
-					+ '<span class="revision-approve revision-created" style="color:green">'
-					+ rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
+                    + '<span class="revision-approve revision-created" style="color:green">'
+                    + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
                     + rvyPreviewLink
                     + '</div>'
 
                     + '</div>'
-				);
+                );
             }
             
 			$('.edit-post-post-schedule__toggle').after('<button class="components-button is-tertiary post-schedule-footnote" disabled>' + rvyObjEdit.onApprovalCaption + '</button>');
@@ -129,7 +133,7 @@ jQuery(document).ready( function($) {
                 $('.revision-created-wrapper, .revision-created').show();
 
 				// @todo: abstract this for other workflows
-				rvyObjEdit.currentStatus = 'pending';
+				rvyObjEdit.currentStatus = rvyObjEdit.PendingStatus;
 
 				$('#post-status-display').html(rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']);
                 $('a.revision-preview').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL']).show();

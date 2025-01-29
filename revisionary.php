@@ -5,13 +5,13 @@
  * Description: Maintain published content with teamwork and precision using the Revisions model to submit, approve and schedule changes.
  * Author: PublishPress
  * Author URI: https://publishpress.com
- * Version: 3.5.16
+ * Version: 3.6.0
  * Text Domain: revisionary
  * Domain Path: /languages/
  * Min WP Version: 5.5
  * Requires PHP: 7.2.5
  * 
- * Copyright (c) 2024 PublishPress
+ * Copyright (c) 2025 PublishPress
  *
  * GNU General Public License, Free Software Foundation <https://www.gnu.org/licenses/gpl-3.0.html>
  *
@@ -30,7 +30,7 @@
  *
  * @package     PublishPress\Revisions
  * @author      PublishPress
- * @copyright   Copyright (C) 2024 PublishPress. All rights reserved.
+ * @copyright   Copyright (C) 2025 PublishPress. All rights reserved.
  *
  **/
 
@@ -39,7 +39,7 @@
 // Temporary usage within this module only; avoids multiple instances of version string
 global $pp_revisions_version;
 
-$pp_revisions_version = '3.5.16';
+$pp_revisions_version = '3.6.0';
 
 global $wp_version;
 
@@ -180,8 +180,9 @@ if (!defined('REVISIONARY_FILE') && (!$revisionary_pro_active || $revisionary_lo
 
 			if (!function_exists('revisionary')) {
 				require_once(dirname(__FILE__).'/functions.php');
-				pp_revisions_plugin_updated($pp_revisions_version);
 			}
+
+			pp_revisions_plugin_updated($pp_revisions_version);
 		},
 		2
 	);

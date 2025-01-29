@@ -227,10 +227,11 @@ padding: 0;
 .rs-agents_list_29_5 li { width: 29.5em; }
 .rs-agents_list_30_5 li { width: 30.5em; }
 
-.rs-subtext {
+.rvy-subtext {
 color: #777;
 font-style:italic;
-margin-top:2px;
+margin-top:5px;
+margin-bottom:20px;
 }
 
 .rs-warning {
@@ -422,8 +423,36 @@ body.revisions_page_revisionary-archive h1 span.dashicons {
 padding-top:5px;
 }
 
+#publishpress-revisions-settings-tabs .nav-tab {
+padding: 5px 5px;
+}
+
+div.agp-vtight_input {
+padding-top: 4px;
+padding-bottom: 4px;
+}
+
 body.revisions_page_revisionary-settings div.submit, body.revisions_page_rvy-net_options div.submit, body.revisions_page_rvy-default_options div.submit {
 padding-top:0;
+}
+
+body.revisions_page_revisionary-settings input[type="checkbox"] {
+vertical-align: middle;
+}
+
+@media only screen and (max-width: 783px) {
+  body.revisions_page_revisionary-settings #rvy-features > div > table > tbody > tr > td {
+      padding: 10px;
+  }
+
+  body.revisions_page_revisionary-settings #rvy-features div.agp-vtight_input {
+      margin-top: 12px;
+      margin-bottom: 12px;
+  }
+
+  body.revisions_page_revisionary-settings #rvy-features input[type="checkbox"] {
+      padding: 5px;
+  }
 }
 
 body.admin_page_rvy-revisions table.diff td, table.diff th {
@@ -515,7 +544,7 @@ div.revision-q .column-author, div.revision-q .column-date, div.revision-q .colu
 width:auto;
 }
 
-#revisions-pro-descript {
+#revisions-pro-descript, .rvy-plugin-notice {
 border-width: 1px;
 border-style: solid;
 padding: 5px;

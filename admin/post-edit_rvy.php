@@ -53,6 +53,8 @@ class RvyPostEdit {
 
             $args['submissionDelay'] = (defined('PUBLISHPRESS_VERSION')) ? 2000 : 200;
 
+            $args['isStatusesPro'] = rvy_status_revisions_active($post->post_type);
+
             wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
 
             if (defined('PUBLISHPRESS_VERSION')) {
@@ -125,9 +127,19 @@ class RvyPostEdit {
 
     function actPostSubmitboxActions($post) {
         ?>
+        <div id="preview-action" class="rvy-misc-actions" style="float: right; padding: 5px 10px 10px 5px">
 
-        <div id="preview-action" style="float: right; padding: 5px 10px 10px 5px">
+        <?php
+        $compare_link = rvy_admin_url("revision.php?revision=$post->ID");
+        $compare_button = _x('Compare', 'revisions', 'revisionary');
+        $compare_title = esc_html__('Compare this revision to published copy, or to other revisions', 'revisionary');
+        ?>
+
         <?php self::revision_preview_button($post); ?>
+
+        <a id="rvy_compare_button" class="preview button" href="<?php echo esc_url($compare_link); ?>" target="_blank" id="revision-compare"
+        tabindex="4" title="<?php echo esc_attr($compare_title);?>" style="float:right"><?php echo esc_html($compare_button); ?></a>
+
         </div>
 
         <?php

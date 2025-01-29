@@ -125,14 +125,8 @@ if (defined('PP_AUTHORS_VERSION')) {
 	);
 }
 
-if (defined('JREVIEWS_ROOT') && !empty($_REQUEST['preview']) 										// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
-&& ((empty($_REQUEST['preview_id']) && empty($_REQUEST['thumbnail_id']))							// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
-|| (!empty($_REQUEST['preview_id']) && rvy_in_revision_workflow((int) $_REQUEST['preview_id']))		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
-)
-) {
-	require_once('compat_rvy.php');
-	_rvy_jreviews_preview_compat();
-}
+require_once('compat_rvy.php');
+new PP_Revisions_Compat();
 
 // Default early beta testers to same revision status labeling they are already using. They will be directly notified of the new setting.
 $last_ver = get_option('revisionary_last_version');
@@ -141,6 +135,12 @@ if (version_compare($last_ver, '3.0-alpha', '>=') && version_compare($last_ver, 
 	if (!get_option('pp_revisions_beta3_option_sync_done')) {
 		update_option('rvy_revision_statuses_noun_labels', 1);
 		update_option('pp_revisions_beta3_option_sync_done', 1);
+	}
+}
+
+if (-1 === get_option('rvy_use_publishpress_notifications', -1)) {
+	if (!$last_ver || version_compare($last_ver, '3.6.0-beta', '>=')) {
+		update_option('rvy_use_publishpress_notifications', 1);
 	}
 }
 

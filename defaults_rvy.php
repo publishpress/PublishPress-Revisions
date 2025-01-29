@@ -5,7 +5,7 @@ if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_ur
 /**
  * @package     PublishPress\Revisions\RevisionaryOptions
  * @author      PublishPress <help@publishpress.com>
- * @copyright   Copyright (c) 2024 PublishPress. All rights reserved.
+ * @copyright   Copyright (c) 2025 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
  */
@@ -32,6 +32,7 @@ function rvy_default_options_sitewide() {
 		'publish_scheduled_notify_admin' => true,
 		'publish_scheduled_notify_author' => true,
 		'publish_scheduled_notify_revisor' => true,
+		'use_publishpress_notifications' => true,
 		'use_notification_buffer' => true,
 		'display_hints' => true,
 		'revisor_role_add_custom_rolecaps' => true,
@@ -64,6 +65,9 @@ function rvy_default_options_sitewide() {
 		'revision_limit_per_post' => true,
 		'revision_unfiltered_html_check' => true,
 		'revision_limit_compat_mode' => true,
+		'permissions_compat_mode' => true,
+		'planner_notifications_access_limited' => false,
+		'archive_postmeta' => true,
 	);
 
 	if ( $other_options = array_diff_key( rvy_default_options(), $def ) ) {
@@ -95,6 +99,7 @@ function rvy_default_options() {
 		'publish_scheduled_notify_admin' => 1,
 		'publish_scheduled_notify_author' => 1,
 		'publish_scheduled_notify_revisor' => 1,
+		'use_publishpress_notifications' => 0,
 		'use_notification_buffer' => 1,
 		'display_hints' => 1,
 		'revisor_role_add_custom_rolecaps' => 1,
@@ -127,6 +132,7 @@ function rvy_default_options() {
 		'revision_limit_per_post' => 0,
 		'revision_unfiltered_html_check' => 0,
 		'revision_limit_compat_mode' => 0,
+		'permissions_compat_mode' => 0,
 	);
 
 	return $def;

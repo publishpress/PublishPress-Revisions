@@ -2,7 +2,7 @@
 /**
  * @package     PublishPress\Revisions\RevisionaryAdmin
  * @author      PublishPress <help@publishpress.com>
- * @copyright   Copyright (c) 2024 PublishPress. All rights reserved.
+ * @copyright   Copyright (c) 2025 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
  *
@@ -74,8 +74,10 @@ class RevisionaryAdmin
 						require_once( dirname(__FILE__).'/edit-revision-block-ui_rvy.php' );
 						new RevisionaryEditRevisionBlockUI();
 					} else {
-						require_once( dirname(__FILE__).'/edit-revision-classic-ui_rvy.php' );
-						new RevisionaryEditRevisionClassicUI();
+						if (!rvy_status_revisions_active($post->post_type)) {
+							require_once( dirname(__FILE__).'/edit-revision-classic-ui_rvy.php' );
+							new RevisionaryEditRevisionClassicUI();
+						}
 					}
 				}
 			}
@@ -156,6 +158,27 @@ class RevisionaryAdmin
 				}
 			}
 		});
+
+		// Planner Notifications integration
+		add_filter('posts_clauses_request', [$this, 'fltPostsClauses'], 50, 2);
+	}
+
+	function fltPostsClauses($clauses, $_wp_query = false, $args = [])
+	{
+		global $pagenow, $typenow, $wpdb;
+
+		// @todo: move these into Planner
+		if (!empty($pagenow) && ('edit.php' == $pagenow) && !empty($typenow) && ('psppnotif_workflow' == $typenow)) {
+			if (!rvy_get_option('use_publishpress_notifications')) {
+				$clauses['where'] .= " AND $wpdb->posts.post_name NOT IN ('revision-scheduled-publication', 'scheduled-revision-published', 'scheduled-revision-is-published', 'revision-scheduled', 'revision-is-scheduled', 'revision-declined', 'revision-deferred-or-rejected', 'revision-submission', 'revision-is-submitted', 'new-revision', 'new-revision-created')";
+			}
+
+			if (!defined('PUBLISHPRESS_STATUSES_VERSION')) {
+				$clauses['where'] .= " AND $wpdb->posts.post_name NOT IN ('post-status-changed', 'post-deferred-or-rejected')";
+			}
+		}
+
+		return $clauses;
 	}
 
 	// Prevent Pending, Scheduled Revisions from inclusion in admin search results
@@ -322,7 +345,7 @@ class RevisionaryAdmin
 	            esc_html__('Upgrade to Pro', 'revisionary'),
 	            esc_html__('Upgrade to Pro', 'revisionary'),
 	            'read',
-	            'revisionary-pro',
+	            'revisionary',
 	            'rvy_omit_site_options'
 	        );
     	}
@@ -413,10 +436,6 @@ class RevisionaryAdmin
 		<li><a href="https://publishpress.com/documentation/revisions-start" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr('PublishPress Revisions Documentation', 'revisionary');?>"><?php esc_html_e('Documentation', 'revisionary');?>
 		</a></li>
 		<li><a href="https://publishpress.com/contact" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr('Contact the PublishPress team', 'revisionary');?>"><?php esc_html_e('Contact', 'revisionary');?>
-		</a></li>
-		<li><a href="https://twitter.com/publishpresscom" target="_blank" rel="noopener noreferrer"><span class="dashicons dashicons-twitter"></span>
-		</a></li>
-		<li><a href="https://facebook.com/publishpress" target="_blank" rel="noopener noreferrer"><span class="dashicons dashicons-facebook"></span>
 		</a></li>
 		</ul>
 		</nav>

@@ -14,6 +14,11 @@
 function rvy_metabox_notification_list() {
 		global $revisionary;
 
+		if (defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') && rvy_get_option('use_publishpress_notifications')
+		) {
+            return;
+        }
+
 		$notify_editors = (string) rvy_get_option('pending_rev_notify_admin');
 		$notify_author = (string) rvy_get_option('pending_rev_notify_author');
 	

@@ -34,6 +34,85 @@ class CoreAdmin {
         <style type="text/css">
         #toplevel_page_revisionary-q ul li:last-of-type a {font-weight: bold !important; color: #FEB123 !important;}
         #toplevel_page_revisionary-archive ul li:last-of-type a {font-weight: bold !important; color: #FEB123 !important;}
+
+        body.revisions_page_revisionary-settings div.pressshack-admin-wrapper {
+            float: left;
+            width: 100%;
+            overflow: visible;
+        }
+
+        body.revisions_page_revisionary-settings #side-info-column {
+            width: 210px;
+            float: right !important;
+            margin-left: -220px;
+            padding-right: 20px;
+        }
+
+        body.revisions_page_revisionary-settings #side-sortables {
+            width: 220px !important;
+        }
+
+        body.revisions_page_revisionary-settings #side-sortables .postbox {
+            min-width: 200px !important;
+        }
+
+        body.revisions_page_revisionary-settings .advertisement-box-content {
+            width: 215px;
+        }
+
+        body.revisions_page_revisionary-settings div.pressshack-admin-wrapper #poststuff {
+            padding-top: 0;
+        }
+
+        body.revisions_page_revisionary-settings div.pressshack-admin-wrapper #post-body {
+            margin-right: 245px !important;
+        }
+        
+        body.revisions_page_revisionary-settings .has-right-sidebar #post-body-content {
+            margin-right: 25px;
+            min-width: 500px;
+            width: 100%;
+            float: left;
+        }
+
+        body.revisions_page_revisionary-settings input[name="rvy_defaults"] {
+            margin-right: 10px;
+        }
+
+        @media only screen and (max-width: 799px) {
+            body.revisions_page_revisionary-settings #wpbody-content #poststuff #post-body {
+                margin: 0px 2px 0 2px !important;
+                padding-right: 2px;
+                padding-left: 2px;
+            }
+
+            body.revisions_page_revisionary-settings #side-info-column {
+                clear: both;
+                float: none !important;
+                margin: 0;
+                padding-top: 20px;
+                width: 600px;
+            }
+
+            body.revisions_page_revisionary-settings #side-info-column div.meta-box-sortables {
+                clear: both;
+                width: 600px;
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-rows: 1fr;
+                grid-column-gap: 20px;
+            }
+
+            body.revisions_page_revisionary-settings #side-info-column div.advertisement-box-content {
+                display: inline;
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+
+            body.revisions_page_revisionary-settings #side-info-column div.advertisement-box-content .postbox-header {
+                display: inline;
+            }
+        }
         </style>
 
 		<script type="text/javascript">
@@ -47,13 +126,11 @@ class CoreAdmin {
 
     function settingsSidebar() {
         ?>
-        <div id="side-info-column">
-            <div class="inner-sidebar">
-                <div id="side-sortables" class="meta-box-sortables ui-sortable">
-                    <div id="token-legend" class="postbox">
-                        <div>
-                            <?php $this->sidebarBannerContent();?>
-                        </div>
+        <div id="side-info-column" class="postbox-container">
+            <div id="side-sortables" class="meta-box-sortables ui-sortable">
+                <div id="token-legend" class="postbox">
+                    <div>
+                        <?php $this->sidebarBannerContent();?>
                     </div>
                 </div>
             </div>
@@ -65,12 +142,12 @@ class CoreAdmin {
         ?>
         
         <div class="pp-revisions-pro-promo-right-sidebar">
-            <div id="postbox-container-1" class="postbox-container">
+            <div id="postbox-container-pp" class="postbox-container">
             <div class="meta-box-sortables">
                 <div class="advertisement-box-content postbox">
                     <div class="postbox-header">
                         <h3 class="advertisement-box-header hndle is-non-sortable">
-                            <span><?php echo esc_html__('Upgrade to PublishPress Revisions Pro', 'revisionary'); ?></span>
+                            <span><?php echo esc_html__('Upgrade to Revisions Pro', 'revisionary'); ?></span>
                         </h3>
                     </div>
         
@@ -86,7 +163,9 @@ class CoreAdmin {
                             <li><?php echo esc_html__('WooCommerce', 'revisionary'); ?></li>
                             <li><?php echo esc_html__('WPML', 'revisionary'); ?></li>
                             <li><?php echo esc_html__('WPML Translation Management', 'revisionary'); ?></li>
-                            <li class="no-icon"><a href="https://publishpress.com/knowledge-base/plugins-revisions-support/" target="__blank"><?php echo esc_html__('plugin integration details...', 'revisionary'); ?></a></li>
+                            <li><?php echo esc_html__('PublishPress Planner: Custom Notifications', 'revisionary'); ?></li>
+
+                            <li class="no-icon"><a href="https://publishpress.com/knowledge-base/plugins-revisions-support/" target="__blank"><?php echo esc_html__('Plugin integration details', 'revisionary'); ?></a></li>
                         </ul>
 
                         <div class="upgrade-btn">
@@ -97,7 +176,7 @@ class CoreAdmin {
                 <div class="advertisement-box-content postbox">
                     <div class="postbox-header">
                         <h3 class="advertisement-box-header hndle is-non-sortable">
-                            <span><?php echo esc_html__('Need PublishPress Revisions Support?', 'revisionary'); ?></span>
+                            <span><?php echo esc_html__('Need Revisions Support?', 'revisionary'); ?></span>
                         </h3>
                     </div>
         

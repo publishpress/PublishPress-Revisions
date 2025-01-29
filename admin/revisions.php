@@ -182,7 +182,7 @@ if (!$can_fully_edit_post = current_user_can( $edit_cap, $rvy_post->ID)) {
 if ( 'diff' != $_action ) {
 	$can_edit = ( ( 'revision' == $revision->post_type ) || rvy_in_revision_workflow($revision) ) && (
 		$can_fully_edit_post || 
-		( (rvy_is_post_author($revision) || $_can_edit_others) && (in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) ))
+		( (rvy_is_post_author($revision) || $_can_edit_others) && rvy_is_revision_status($revision->post_mime_type) && ('future-revision' != $revision->post_mime_type))
 		);
 }
 ?>

@@ -122,16 +122,24 @@ jQuery(document).ready(function ($) {
         		$('button.editor-post-publish-button').hide();
         	}
         }
-        if (($('button.editor-post-publish-button').length || $('button.editor-post-publish-panel__toggle').length) 
-        && ($('button.editor-post-save-draft').filter(':visible').length || $('.is-saved').filter(':visible').length)
+
+        if (
+        (typeof window.PPCustomStatuses == 'undefined')
+        || (typeof rvyObjEdit == 'undefined')
+        || (typeof rvyObjEdit['isStatusesPro'] == 'undefined')
+        || (!rvyObjEdit.isStatusesPro)
         ) {
-            $('button.editor-post-publish-button').hide();
-            $('button.editor-post-publish-panel__toggle').hide();
-        } else {
-            if ($('button.editor-post-publish-button').length) {
-                $('button.editor-post-publish-button').show();
+            if (($('button.editor-post-publish-button').length || $('button.editor-post-publish-panel__toggle').length) 
+            && ($('button.editor-post-save-draft').filter(':visible').length || $('.is-saved').filter(':visible').length)
+            ) {
+                $('button.editor-post-publish-button').hide();
+                $('button.editor-post-publish-panel__toggle').hide();
             } else {
-                $('button.editor-post-publish-panel__toggle').show();
+                if ($('button.editor-post-publish-button').length) {
+                    $('button.editor-post-publish-button').show();
+                } else {
+                    $('button.editor-post-publish-panel__toggle').show();
+                }
             }
         }
 
@@ -140,19 +148,35 @@ jQuery(document).ready(function ($) {
 	var RvyHideInterval = setInterval(RvyHideElements, 50);
 	
     var RvySubmissionUI = function () {
+        selectedDateHTML = wp.data.select('core/editor').getEditedPostAttribute('date');
+        var selectedDate = new Date( selectedDateHTML );
+        var currentDate = new Date();
+
+        RvyTimeSelection = selectedDate.getTime() - ((currentDate.getTimezoneOffset() * 60 - rvyObjEdit.timezoneOffset) * 1000);
+
+        if (RvyTimeSelection - currentDate.getTime() > 1000) {
+            var approveCaption = rvyObjEdit['scheduleCaption'];
+        } else {
+            var approveCaption = rvyObjEdit['approveCaption'];
+        }
+        
         if (!$('div.editor-post-schedule__panel-dropdown:visible').length) {
             $('.rvy-creation-ui').remove();
         }
 
-        if ($('.rvy-creation-ui').length) {
+        /*
+        if ($('.rvy-creation-ui').length || !$('div.editor-sidebar__panel .editor-post-status').length) {
+            $('button.revision-approve').html('<span class="dashicons dashicons-yes"></span>' + approveCaption);
             return;
         }
+        */
 
         $('button.edit-post-post-visibility__toggle, div.editor-post-url__panel-dropdown, div.components-checkbox-control').closest("div.editor-post-panel__row").hide();
 
-        if ($('div.edit-post-sidebar div.edit-post-post-status div.editor-post-panel__row:last').length) {
-            var refSelector = 'div.edit-post-sidebar div.edit-post-post-status div.editor-post-panel__row:last';
-        } else {
+		// @todo: legacy support?
+        //if ($('div.edit-post-sidebar div.edit-post-post-status div.editor-post-panel__row:last').length) {
+        //    var refSelector = 'div.edit-post-sidebar div.edit-post-post-status div.editor-post-panel__row:last';
+        //} else {
             if ($('div.edit-post-post-schedule').length) {
                 var refSelector = 'div.edit-post-post-schedule';
 	        } else {
@@ -167,7 +191,7 @@ jQuery(document).ready(function ($) {
                     }
 	            }
 	        }
-        }
+        //}
 
         if (rvyObjEdit.ajaxurl && !$('div.edit-post-revision-status').length && $(refSelector).length) {
             if ($('div.editor-post-panel__row-label').length) {
@@ -180,6 +204,14 @@ jQuery(document).ready(function ($) {
                 var statusWrapperClass = '';
             }
 
+            var currentStatusCaption;
+
+            if (typeof rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption'] !== 'undefined') {
+                currentStatusCaption = rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption'];
+            } else {
+                currentStatusCaption = '';
+            }
+
             if (refSelector == 'div.editor-post-panel__section') {
                 var rvyUI = '';
 
@@ -190,7 +222,7 @@ jQuery(document).ready(function ($) {
                 }
 
                 rvyUI += '<div class="components-dropdown rvy-current-status">'
-                + rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']
+                + currentStatusCaption
                 + '</div>';
 
                 if (statusWrapperClass) {
@@ -209,7 +241,7 @@ jQuery(document).ready(function ($) {
                 }
 
                 rvyUI += '<div class="components-dropdown rvy-current-status">'
-                + rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']
+                + currentStatusCaption
                 + '</div>';
 
                 if (statusWrapperClass) {
@@ -234,10 +266,12 @@ jQuery(document).ready(function ($) {
 				var mainDashicon = '';
 				
                 if (rvyObjEdit.canPublish && ('pending' != rvyObjEdit.currentStatus) && ('future' != rvyObjEdit.currentStatus)) {
-                    approveButtonHTML = '<a href="' + rvyObjEdit['pendingActionURL'] + '" class="revision-approve">'
-                         + '<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button rvy-direct-approve">'
-                         + '<span class="dashicons dashicons-yes"></span>'
-						+ rvyObjEdit['approveCaption'] + '</button></a>';
+                    if (!rvyObjEdit.isStatusesPro) {
+	                    approveButtonHTML = '<a href="' + rvyObjEdit['pendingActionURL'] + '" class="revision-approve">'
+	                        + '<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button rvy-direct-approve">'
+	                        + '<span class="dashicons dashicons-yes"></span>'
+							+ rvyObjEdit['approveCaption'] + '</button></a>';
+	               	}
 						
                     mainDashicon = 'dashicons-upload';
                 } else {
@@ -261,23 +295,25 @@ jQuery(document).ready(function ($) {
                     divClass = '';
                 }
 				
-                $(refSelector).after('<div class="rvy-creation-ui rvy-submission-div' + divClass + '"><a href="' + url + '" class="revision-approve">'
-                    + '<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button">'
-                    + '<span class="dashicons ' + mainDashicon + '"></span>'
-                    + rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</button></a>'
-                    + approveButtonHTML
-                    + '<div class="revision-submitting" style="display: none;">'
-                    + '<span class="revision-approve revision-submitting">'
-                    + rvyObjEdit[rvyObjEdit.currentStatus + 'InProcessCaption'] + '</span><span class="spinner ppr-submission-spinner" style=""></span></div>'
-                    + '<div class="revision-approving" style="display: none;">'
-                    + '<span class="revision-approve revision-submitting">'
-                    + rvyObjEdit.approvingCaption + '</span><span class="spinner ppr-submission-spinner" style=""></span></div>'
-                    + '<div class="revision-created" style="display: none; margin-top: 15px">'
-                    + '<span class="revision-approve revision-created">'
-                    + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
-                    + rvyPreviewLink
-                    + '</div>'
-					+ '</div>');
+                if (!$('div.rvy-creation-ui a.revision-approve').length) {
+                    $(refSelector).after('<div class="rvy-creation-ui rvy-submission-div' + divClass + '"><a href="' + url + '" class="revision-approve">'
+                        + '<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button">'
+                        + '<span class="dashicons ' + mainDashicon + '"></span>'
+                        + rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</button></a>'
+                        + approveButtonHTML
+                        + '<div class="revision-submitting" style="display: none;">'
+                        + '<span class="revision-approve revision-submitting">'
+                        + rvyObjEdit[rvyObjEdit.currentStatus + 'InProcessCaption'] + '</span><span class="spinner ppr-submission-spinner" style=""></span></div>'
+                        + '<div class="revision-approving" style="display: none;">'
+                        + '<span class="revision-approve revision-submitting">'
+                        + rvyObjEdit.approvingCaption + '</span><span class="spinner ppr-submission-spinner" style=""></span></div>'
+                        + '<div class="revision-created" style="display: none; margin-top: 15px">'
+                        + '<span class="revision-approve revision-created">'
+                        + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
+                        + rvyPreviewLink
+                        + '</div>'
+                        + '</div>');
+                }
 
                 $('div.rvy-submission-div').trigger('loaded-ui');
             }
@@ -329,7 +365,7 @@ jQuery(document).ready(function ($) {
         );
 	}
 
-    $(document).on('click', 'div.postbox-container,div.acf-postbox', function() {
+    $(document).on('click', 'div.postbox-container,div.acf-postbox,.editor-post-schedule__dialog-toggle', function() {
 		rvyCreationDisabled = true;
 		$('button.revision-approve').prop('disabled', 'disabled');
 		$('button.revision-schedule').prop('disabled', 'disabled');
@@ -404,6 +440,12 @@ jQuery(document).ready(function ($) {
             $('.rvy-current-status').html(rvyObjEdit[rvyObjEdit.currentStatus + 'StatusCaption']);
             $('a.revision-preview').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedURL']).show();
             $('a.revision-edit').attr('href', rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedEditURL']).show();
+
+            if ((typeof PPCustomStatuses != 'undefined') && (typeof PPCustomStatuses.statusRestProperty != 'undefined')) {
+                var ret = new Object();
+                ret[PPCustomStatuses.statusRestProperty] = 'pending-revision';
+                dispatch('core/editor').editPost(ret);
+            }
         }
 		
         $.ajax({

@@ -25,6 +25,10 @@
     margin-left:10px;
 }
 
+.rvy_preview_msgspan a.button {
+    margin-left: 5px !important;
+}
+
 .rvy_preview_linkspan {
     margin-left: 15px;
     line-height: 50px;

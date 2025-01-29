@@ -49,6 +49,8 @@ class RevisionaryAdminPosts {
 		}
 
 		add_filter('query', [$this, 'fltPostCountQuery']);
+
+		add_filter('posts_where', [$this, 'fltFilterRevisions'], 10, 2);
     }
     
     function revision_action_notice() {
@@ -275,5 +277,49 @@ class RevisionaryAdminPosts {
 		}
 
 		return $query;
+	}
+
+	function fltFilterRevisions($where, $wp_query) {
+		global $typenow;
+
+		$revision_statuses = rvy_revision_statuses();
+
+		$post_type = (!empty($typenow)) ? $typenow : '';
+
+		// Prevent inactive revisions from being displayed as normal posts if Statuses Pro was deactivated
+		if (!rvy_status_revisions_active($post_type)) {
+			$revision_statuses = array_merge($revision_statuses, ['revision-deferred', 'revision-needs-work', 'revision-rejected']);
+			
+			if (!taxonomy_exists('pp_revision_status')) {
+				register_taxonomy(
+					'pp_revision_status',
+					'post',
+					[
+						'hierarchical'          => false,
+						'query_var'             => false,
+						'rewrite'               => false,
+						'show_ui'               => false,
+					]
+				);
+			}
+			
+			static $stored_statuses;
+
+			if (!isset($stored_statuses)) {
+				$stored_statuses = get_terms('pp_revision_status', ['hide_empty' => false, 'return' => 'name']);
+			}
+
+			foreach ($stored_statuses as $status) {
+				if (!in_array($status->slug, $revision_statuses)) {
+					$revision_statuses[] = $status->slug;
+				}
+			}
+		}
+
+		$revision_status_csv = implode("','", array_map('sanitize_key', $revision_statuses));
+
+		$where .= " AND post_mime_type NOT IN ('$revision_status_csv')";
+
+		return $where;
 	}
 }

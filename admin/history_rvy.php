@@ -7,7 +7,10 @@ class RevisionaryHistory
     private $authors = [];
 
 	function __construct() {
-        $this->revision_status = ['draft-revision', 'pending-revision'];
+        $this->revision_status = array_diff(
+            rvy_revision_statuses(),
+            ['future-revision']
+        );
 
         add_action('load-revision.php', [$this, 'actLoadRevision']);
 
@@ -166,7 +169,10 @@ class RevisionaryHistory
 
                 /* translators: %s: post title */
                 $do_h1 = true;
-                $title          = $status_obj->labels->plural;                              // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+
+                if (isset($status_obj->labels->plural)) {
+                    $title = $status_obj->labels->plural;                             // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+                }
 
                 $redirect = false;
                 break;
@@ -187,6 +193,14 @@ class RevisionaryHistory
 
         $this->actEnqueueScripts();
 
+        if (!isset($title)) {
+            $title = sprintf(                                                         // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+                esc_html__( 'Compare %s of "%s"', 'revisionary' ), 
+                __('Revisions'),
+                esc_html(_draft_or_post_title($published_post))
+            );
+        }
+
         require_once( ABSPATH . 'wp-admin/admin-header.php' );
 
         ?>
@@ -194,9 +208,11 @@ class RevisionaryHistory
         <div class="wrap">
             <h1 class="long-header"><?php 
             if (!empty($do_h1)) {
+                $status_plural = (!empty($status_obj->labels->plural)) ? $status_obj->labels->plural : __('Revisions');
+
                 printf( 
                     esc_html__( 'Compare %s of "%s"', 'revisionary' ), 
-                    esc_html($status_obj->labels->plural), 
+                    esc_html($status_plural), 
                     '<a href="' . esc_url(get_edit_post_link($published_post)) . '">' . esc_html(_draft_or_post_title($published_post)) . '</a>'
                 );
             }
@@ -216,7 +232,9 @@ class RevisionaryHistory
     }
 
     public function fltFixMimeTypeClause($where) {
-		return str_replace("-revision/%'", "-revision'", $where);
+		return preg_replace("/post_mime_type LIKE '([a-z0-9_\-]+)\/\%'/", "post_mime_type LIKE '$1'", $where);
+
+
 	}
 
     private function queryRevisions($post, $paged = false) {
@@ -553,9 +571,14 @@ class RevisionaryHistory
             'ping_status' =>    esc_html__('Ping Status', 'revisionary'),
         ];
 
+        $revision_statuses = array_diff(
+            rvy_revision_statuses(),
+            ['future-revision']
+        );
+
         if (
         ((('future-revision' == $compare_from->post_mime_type) || ('future-revision' == $compare_to->post_mime_type)) && !rvy_get_option('scheduled_revision_update_post_date'))
-        || ((in_array($compare_from->post_mime_type, ['draft-revision', 'pending-revision']) || in_array($compare_to->post_mime_type, ['draft-revision', 'pending-revision'])) && !rvy_get_option('pending_revision_update_post_date'))
+        || ((in_array($compare_from->post_mime_type, $revision_statuses) || in_array($compare_to->post_mime_type, $revision_statuses)) && !rvy_get_option('pending_revision_update_post_date'))
         ) {
             unset($compare_fields['post_date']);
         }
@@ -917,7 +940,12 @@ class RevisionaryHistory
                                                                                                     //phpcs:ignore WordPress.Security.NonceVerification.Recommended
                         $redirect_arg = ( ! empty($_REQUEST['rvy_redirect']) ) ? "&rvy_redirect=" . esc_url_raw($_REQUEST['rvy_redirect']) : '';
 
-                        if (in_array($revision->post_mime_type, ['draft-revision', 'pending-revision'])) {
+                        $revision_statuses = array_diff(
+                            rvy_revision_statuses(),
+                            ['future-revision']
+                        );
+
+                        if (in_array($revision->post_mime_type, $revision_statuses)) {
                             $restore_link = wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision={$revision->ID}&action=approve$redirect_arg"), "approve-post_$published_post_id|{$revision->ID}" );
 
                         } elseif (in_array($revision->post_mime_type, ['future-revision'])) {
@@ -933,12 +961,17 @@ class RevisionaryHistory
                 $restore_link = '';
             }
 
+            $revision_statuses = array_diff(
+                rvy_revision_statuses(),
+                ['future-revision']
+            );
+
             if ('future-revision' == $revision->post_mime_type) {
                 $date_prefix = esc_html__('Scheduled for ', 'revisionary');
                 $modified     = strtotime( $revision->post_date );
 		        $modified_gmt = strtotime( $revision->post_date_gmt . ' +0000' );
 
-            } elseif (in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && (strtotime($revision->post_date_gmt) > $now_gmt ) ) {
+            } elseif (in_array($revision->post_mime_type, $revision_statuses) && (strtotime($revision->post_date_gmt) > $now_gmt ) ) {
                 $date_prefix = esc_html__('Requested for ', 'revisionary');
                 $modified     = strtotime( $revision->post_date );
 		        $modified_gmt = strtotime( $revision->post_date_gmt . ' +0000' );

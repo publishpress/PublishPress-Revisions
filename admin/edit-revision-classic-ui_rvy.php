@@ -13,7 +13,6 @@ class RevisionaryEditRevisionClassicUI {
 		add_filter('post_updated_messages', [$this, 'fltPostUpdatedMessage']);
 
 		add_action('add_meta_boxes', [$this, 'act_replace_publish_metabox'], 10, 2);
-		add_action('post_submitbox_misc_actions', [$this, 'actSubmitMetaboxActions']);
 
 		add_filter('presspermit_editor_ui_status', [$this, 'fltEditorUIstatus'], 10, 3);
 		add_filter('presspermit_post_editor_immediate_caption', [$this, 'fltImmediateCaption'], 10, 2);
@@ -37,7 +36,7 @@ class RevisionaryEditRevisionClassicUI {
 			
 			if ($last_post 
 			&& ($last_post->post_author == $post->post_author) 
-			&& in_array($last_post->post_mime_type, ['draft-revision', 'pending-revision', 'future-revision']) 
+			&& rvy_is_revision_status($last_post->post_mime_type) 
 			&& ($last_post->comment_count == $post->comment_count)
 			) {
 				wp_delete_post($last_id);
@@ -112,19 +111,6 @@ class RevisionaryEditRevisionClassicUI {
             }
         }
 	}
-
-    public function actSubmitMetaboxActions() {
-        global $post;
-
-		$compare_link = rvy_admin_url("revision.php?revision=$post->ID");
-		$compare_button = _x('Compare', 'revisions', 'revisionary');
-		$compare_title = esc_html__('Compare this revision to published copy, or to other revisions', 'revisionary');
-		?>
-
-		<a id="rvy_compare_button" class="preview button" href="<?php echo esc_url($compare_link); ?>" target="_blank" id="revision-compare"
-		tabindex="4" title="<?php echo esc_attr($compare_title);?>" style="float:right"><?php echo esc_html($compare_button); ?></a>
-        <?php
-    }
 
 	function fltPostUpdatedMessage($messages) {
 		global $post;

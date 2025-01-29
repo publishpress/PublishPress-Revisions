@@ -30,11 +30,26 @@ class PostEditorWorkflowUI {
             'multiPreviewActive' => version_compare($wp_version, '5.5-beta', '>='),
             'statusLabel' => esc_html__('Status', 'revisionary'),
             'ajaxurl' => rvy_admin_url(''),
-            'currentStatus' => str_replace('-revision', '', $post->post_mime_type),
             'currentPostAuthor' => get_post_field('post_author', $published_post_id),
             'onApprovalCaption' => esc_html__('(on approval)', 'revisionary'),
             'canPublish' => $can_publish
         ];
+
+        // @todo: adapt Submit button to custom statuses?
+        switch ($post->post_mime_type) {
+            case 'future-revision' :
+                $vars['currentStatus'] = 'future';
+                break;
+
+            case 'draft-revision' :
+                $vars['currentStatus'] = 'draft';
+                break;
+
+            default :
+                $vars['currentStatus'] = 'pending';
+        }
+
+        $vars['pendingStatus'] = 'pending';
 
         $vars['disableRecaption'] = version_compare($wp_version, '5.9-beta', '>=') || is_plugin_active('gutenberg/gutenberg.php');
         $vars['viewTitle'] = '';
@@ -56,7 +71,7 @@ class PostEditorWorkflowUI {
                 }
 
                 if (rvy_get_option('block_editor_extra_preview_button')) {
-                    $vars['viewTitleExtra'] = esc_html__('View saved revision', 'revisionary');
+                    $vars['viewTitleExtra'] = esc_html__('View revision', 'revisionary');
                 }
 
                 $vars['viewTitle'] =  esc_html__('View / Moderate saved revision', 'revisionary');
@@ -111,8 +126,10 @@ class PostEditorWorkflowUI {
             $vars['draftActionCaption'] = '';
         }
 
-        $vars['approveCaption'] = ($can_publish) ? pp_revisions_status_label('pending-revision', 'approve_short') : '';
+        $vars['approveCaption'] = ($can_publish) ? pp_revisions_status_label('pending-revision', 'approve') : '';
         $vars['approvingCaption'] = __('Approving the Revision...', 'revisionary');
+
+        $vars['scheduleCaption'] = ($can_publish) ? pp_revisions_status_label('future-revision', 'submit') : '';
 
         $pending_obj = get_post_status_object('pending-revision');
         $vars['pendingStatusCaption'] = $pending_obj->label;
@@ -141,7 +158,7 @@ class PostEditorWorkflowUI {
         if ($block_editor) {
             $vars['updateCaption'] =  esc_html__('Update Revision', 'revisionary');
         } else {
-            if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
+            if (!rvy_status_revisions_active($post->post_type)) {
             	if (!$vars['updateCaption'] = pp_revisions_status_label($post->post_mime_type, 'update')) {
                 	$vars['updateCaption'] = pp_revisions_label('update_revision');
                 }

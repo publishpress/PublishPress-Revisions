@@ -7,7 +7,7 @@ add_action( '_wp_put_post_revision', 'rvy_review_revision' );
 /**
  * @package     PublishPress\Revisions\RevisionaryAction
  * @author      PublishPress <help@publishpress.com>
- * @copyright   Copyright (c) 2024 PublishPress. All rights reserved.
+ * @copyright   Copyright (c) 2025 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
  */
@@ -76,7 +76,9 @@ function rvy_revision_submit($revision_id = 0) {
 			break;
 		}
 
-		if (!in_array($revision->post_status, ['draft', 'pending'])) {
+		$old_revision_status = $revision->post_mime_type;
+
+		if (!in_array($revision->post_status, array_merge(['draft', 'pending'], rvy_revision_statuses()))) {
 			break;
 		}
 
@@ -100,8 +102,17 @@ function rvy_revision_submit($revision_id = 0) {
 
 		// safeguard: make sure this hasn't already been published
 		if ( empty($status_obj->public) && empty($status_obj->private) ) {
+			$revision_before = (object) (array) $revision;
+			
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->update($wpdb->posts, ['post_status' => 'pending', 'post_mime_type' => 'pending-revision'], ['ID' => $revision_id]);
+			$post_mime_type = 'pending-revision';
+			$status = (rvy_get_option('permissions_compat_mode')) ? $post_mime_type : 'pending';
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->update($wpdb->posts, ['post_status' => $status, 'post_mime_type' => $post_mime_type], ['ID' => $revision_id]);
+
+			$revision->post_status = $status;
+			$revision->post_mime_type = $post_mime_type;
 
 			if (defined('REVISIONARY_LIMIT_IGNORE_UNSUBMITTED')) {
 				rvy_update_post_meta($published_id, '_rvy_has_revisions', true);
@@ -138,7 +149,8 @@ function rvy_revision_submit($revision_id = 0) {
 
 	if (empty($approval_error)) {
 		$published_id = rvy_post_id($revision_id);
-		do_action( 'revision_submitted', $published_id, $revision_id );
+		do_action( 'revision_submitted', $published_id, $revision_id, $old_revision_status );
+		do_action( 'revisionary_submitted', $published_id, $revision, $revision_before );
 	}
 
 	if (!$batch_process) {
@@ -174,7 +186,7 @@ function rvy_revision_decline($revision_id = 0) {
 			break;
 		}
 
-		if (!in_array($revision->post_status, ['draft', 'pending'])) {
+		if (!in_array($revision->post_status, array_merge(['draft', 'pending'], rvy_revision_statuses()))) {
 			break;
 		}
 
@@ -194,10 +206,27 @@ function rvy_revision_decline($revision_id = 0) {
 			check_admin_referer('decline-revision');
 		}
 
+		$revision_before = (object) (array) $revision;
+
 		$status_obj = get_post_status_object( $revision->post_mime_type );
 
+		$post_mime_type = 'draft-revision';
+		$status = apply_filters('revisionary_post_revision_status', 'draft', $post_mime_type, $revision_id);
+
+		$status = apply_filters('revisionary_revision_decline_status', $status, $revision_id);
+
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->update($wpdb->posts, ['post_status' => 'draft', 'post_mime_type' => 'draft-revision'], ['ID' => $revision_id]);
+		$wpdb->update(
+			$wpdb->posts, 
+			[
+				'post_status' => $status, 
+				'post_mime_type' => $post_mime_type
+			], 
+			['ID' => $revision_id]
+		);
+
+		$revision->post_status = $status;
+		$revision->post_mime_type = $post_mime_type;
 
 		clean_post_cache($revision_id);
 
@@ -234,6 +263,7 @@ function rvy_revision_decline($revision_id = 0) {
 
 	if (empty($decline_error)) {
 		do_action( 'revision_declined', $revision->post_parent, $revision->ID );
+		do_action( 'revisionary_declined', $revision->post_parent, $revision, $revision_before );
 	}
 
 	if (!$batch_process) {
@@ -400,6 +430,12 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 				$db_action = true;
 				
 				clean_post_cache( $revision->ID );
+
+				$revision_before = (object) (array) $revision;
+				$revision->post_mime_type = 'future-revision';
+				$revision->status = apply_filters('revisionary_post_revision_status', 'future', 'future-revision', $revision_id);
+
+				do_action('revisionary_scheduled', $post->ID, $revision, $revision_before);
 			} else {
 				// this scheduled revision is already approved, so don't included in reported bulk approval count
 				$approval_error = true;
@@ -436,8 +472,10 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 			}
 		}
 
+		$use_pp_notifications = defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') && rvy_get_option('use_publishpress_notifications');
+
 		// Don't send approval notification on restoration of a past revision
-		if (('revision' != $revision->post_type) && empty($skip_notification)) {
+		if (('revision' != $revision->post_type) && empty($skip_notification) && !$use_pp_notifications) {
 			$type_obj = get_post_type_object( $post->post_type );
 			$type_caption = $type_obj->labels->singular_name;
 
@@ -529,6 +567,10 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 			if (($db_action || !empty($args['force_notify'])) && rvy_get_option( 'rev_approval_notify_revisor' ) ) {
 				$title = sprintf(esc_html__('[%s] Revision Approval Notice', 'revisionary' ), $blogname );
 				$message = sprintf( esc_html__('The revision you submitted for the %1$s "%2$s" has been approved.', 'revisionary' ), $type_caption, $revision->post_title ) . "\r\n\r\n";
+
+				if (!defined('REVISIONARY_LEGACY_MESSAGE_QUOTES')) {
+					$message = str_replace($message, '&quot;', '"', $message);
+				}
 
 				if ( $scheduled ) {
 					$datef = __awp( 'M j, Y @ g:i a' );
@@ -656,7 +698,7 @@ function rvy_revision_restore() {
 			$last_arg = array( 'revision_action' => 1, 'published_post' => $post->ID );
 		}
 
-		if ( empty( $_REQUEST['rvy_redirect'] ) && ! $scheduled ) {
+		if (empty($_REQUEST['rvy_redirect'])) {
 			$redirect = $published_url;
 
 		} elseif ( 'edit' == $_REQUEST['rvy_redirect'] ) {
@@ -684,6 +726,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	if ( ! $revision = get_post( $revision_id ) ) {
 		return $revision;
 	}
+
+	$original_revision_status = $revision->post_mime_type;
 
 	if (!$published_id = $revision->comment_count) {
 		if (! $published_id = rvy_post_id($revision_id)) {
@@ -726,7 +770,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	);
 
 	if (
-		(in_array($revision->post_mime_type, ['pending-revision', 'draft-revision']) && !rvy_filter_option('pending_revision_update_post_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
+		((rvy_is_revision_status($revision->post_mime_type) && ('future-revision' != $revision->post_mime_type)) && !rvy_filter_option('pending_revision_update_post_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
 		|| (('future-revision' == $revision->post_mime_type) && !rvy_filter_option('scheduled_revision_update_post_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
 	) {
 		// todo: how was post_date_gmt of published post previously set to zero?
@@ -795,7 +839,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	// Apply requested slug, if applicable. 
 	// Otherwise, work around unexplained reversion of editor-modified post slug back to default format on some sites  @todo: identify plugin interaction
-	$update_fields = ['post_name' => $set_slug, 'guid' => $published->guid, 'post_type' => $published->post_type, 'post_status' => $published->post_status, 'post_mime_type' => $published->post_mime_type, 'post_parent' => $published->post_parent];
+	$update_fields = ['post_name' => $set_slug, 'guid' => $published->guid, 'post_type' => $published->post_type, 'post_status' => $published->post_status, 'post_mime_type' => $published->post_mime_type];
 
 	// Prevent wp_insert_post() from stripping inline html styles
 	if (!defined('RVY_DISABLE_REVISION_CONTENT_PASSTHRU')) {
@@ -811,8 +855,13 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	$update_fields = apply_filters('revisionary_apply_revision_fields', $update_fields, $revision, $published, $actual_revision_status);
 
+	$revision_statuses = array_diff(
+		rvy_revision_statuses(),
+		['future-revision']
+	);
+
 	if (
-		(in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && rvy_filter_option('pending_revision_update_modified_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
+		(in_array($revision->post_mime_type, $revision_statuses) && rvy_filter_option('pending_revision_update_modified_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
 		|| (('future-revision' == $revision->post_mime_type) && rvy_filter_option('scheduled_revision_update_modified_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
 	) {
 		$post_modified = current_time('mysql');
@@ -826,7 +875,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	$update_fields['post_modified_gmt'] = $post_modified_gmt;
 
 	if (
-		(in_array($revision->post_mime_type, ['draft-revision', 'pending-revision']) && rvy_filter_option('pending_revision_update_post_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
+		(in_array($revision->post_mime_type, $revision_statuses) && rvy_filter_option('pending_revision_update_post_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
 		|| (('future-revision' == $revision->post_mime_type) && rvy_filter_option('scheduled_revision_update_post_date', ['revision_id' => $revision_id, 'post_id' => $published->ID]))
 	) {
 		$update_fields['post_date'] = current_time('mysql');
@@ -899,10 +948,12 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 			wp_delete_post($revision_id, true);
 		}
 
-		// todo: save change as past revision?
+		if (!rvy_get_option('archive_postmeta')) {
+			$approved_by = get_post_meta($revision_id, '_rvy_approved_by', true);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->delete($wpdb->postmeta, array('post_id' => $revision_id));
+		}
 	}
 	
 	rvy_update_post_meta($revision_id, '_rvy_published_gmt', $post_modified_gmt);
@@ -912,6 +963,9 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	if ('future-revision' != $actual_revision_status) {
 		global $current_user;
 		rvy_update_post_meta($revision_id, '_rvy_approved_by', $current_user->ID);
+
+	} elseif (!empty($approved_by)) {
+		rvy_update_post_meta($revision_id, '_rvy_approved_by', $approved_by);
 	}
 
 	// If published revision was the last remaining pending / scheduled, clear _rvy_has_revisions postmeta flag 
@@ -1029,6 +1083,14 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	 * @param int $revision_id The revision object.
 	 */
 	do_action( 'revision_applied', $published->ID, $revision );
+
+	if (empty($revision) || empty($revision->post_mime_type)) {
+		$revision = (object) (array) $published;
+		$revision->post_mime_type = $original_post_status;
+		$revision->ID = $revision_id;
+	}
+
+	do_action('revisionary_revision_published', $published, $revision);
 
 	return $revision;
 }
@@ -1229,7 +1291,14 @@ function rvy_revision_unschedule($revision_id) {
 		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->update( $wpdb->posts, ['post_status' => 'draft', 'post_mime_type' => 'draft-revision'], ['ID' => $revision->ID] );
+		$wpdb->update( 
+			$wpdb->posts, 
+			[
+				'post_status' => apply_filters('revisionary_post_revision_status', 'draft', 'draft-revision', $revision_id), 
+				'post_mime_type' => 'draft-revision'
+			], 
+			['ID' => $revision->ID] 
+		);
 		
 		clean_post_cache($revision->ID);
 
@@ -1356,6 +1425,8 @@ function rvy_publish_scheduled_revisions($args = []) {
 		);
 	}
 
+	$use_pp_notifications = defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=') && rvy_get_option('use_publishpress_notifications');
+
 	if ( $results ) {
 		foreach ( $results as $row ) {
 			$published_id = (!empty($row->comment_count)) ? $row->comment_count : rvy_post_id($row->ID);
@@ -1383,9 +1454,13 @@ function rvy_publish_scheduled_revisions($args = []) {
 				$type_obj = get_post_type_object( $post->post_type );
 				$type_caption = $type_obj->labels->singular_name;
 				
-				if ( rvy_get_option( 'publish_scheduled_notify_revisor' ) ) {
+				if (rvy_get_option( 'publish_scheduled_notify_revisor' ) && !$use_pp_notifications) {
 					$title = sprintf( esc_html__('[%s] %s Publication Notice', 'revisionary' ), $blogname, pp_revisions_status_label('future-revision', 'name') );
 					$message = sprintf( esc_html__('The scheduled revision you submitted for the %1$s "%2$s" has been published.', 'revisionary' ), $type_caption, $row->post_title ) . "\r\n\r\n";
+
+					if (!defined('REVISIONARY_LEGACY_MESSAGE_QUOTES')) {
+						$message = str_replace($message, '&quot;', '"', $message);
+					}
 
 					if ( ! empty($post->ID) )
 						$message .= esc_html__( 'View it online: ', 'revisionary' ) . $published_url . "\r\n";
@@ -1405,9 +1480,15 @@ function rvy_publish_scheduled_revisions($args = []) {
 				}
 
 				// Prior to 1.3, notification was sent to author even if also revision submitter
-				if ( ( ( $post->post_author != $row->post_author ) || defined( 'RVY_LEGACY_SCHEDULED_REV_POST_AUTHOR_NOTIFY' ) ) && rvy_get_option( 'publish_scheduled_notify_author' ) ) {
+				if ( ( ( $post->post_author != $row->post_author ) || defined( 'RVY_LEGACY_SCHEDULED_REV_POST_AUTHOR_NOTIFY' ) ) 
+				&& rvy_get_option( 'publish_scheduled_notify_author' ) && !$use_pp_notifications 
+				) {
 					$title = sprintf( esc_html__('[%s] %s Publication Notice', 'revisionary' ), $blogname, pp_revisions_status_label('future-revision', 'name') );
 					$message = sprintf( esc_html__('A scheduled revision to your %1$s "%2$s" has been published.', 'revisionary' ), $type_caption, $post->post_title ) . "\r\n\r\n";
+
+					if (!defined('REVISIONARY_LEGACY_MESSAGE_QUOTES')) {
+						$message = str_replace($message, '&quot;', '"', $message);
+					}
 
 					if ( $revisor = new WP_User( $row->post_author ) )
 						$message .= sprintf( esc_html__('It was submitted by %1$s.'), $revisor->display_name ) . "\r\n\r\n";
@@ -1439,7 +1520,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 					}
 				}
 				
-				if ( rvy_get_option( 'publish_scheduled_notify_admin' ) ) {
+				if ( rvy_get_option( 'publish_scheduled_notify_admin' ) && !$use_pp_notifications ) {
 
 					// Support workaround to prevent notification when an user of specified role created the revision
 					if (defined('REVISIONARY_LIMIT_ADMIN_NOTIFICATIONS')) {
@@ -1471,6 +1552,10 @@ function rvy_publish_scheduled_revisions($args = []) {
 						
 						$message = sprintf( esc_html__('A scheduled revision to the %1$s "%2$s" has been published.'), $type_caption, $row->post_title ) . "\r\n\r\n";
 	
+						if (!defined('REVISIONARY_LEGACY_MESSAGE_QUOTES')) {
+							$message = str_replace($message, '&quot;', '"', $message);
+						}
+
 						if ( $author = new WP_User( $row->post_author ) )
 							$message .= sprintf( esc_html__('It was submitted by %1$s.'), $author->display_name ) . "\r\n\r\n";
 	
@@ -1719,7 +1804,10 @@ function rvy_update_post($postarr = []) {
 	$data['guid'] = get_post_field( 'guid', $postarr['ID'] );
 
 	$data['post_type'] = (empty( $postarr['post_type'] )) ? 'post' : $postarr['post_type'];
-	$data['post_status'] = (empty( $postarr['post_status'] )) ? 'draft' : $postarr['post_status'];
+
+	$data['post_status'] = (empty( $postarr['post_status'] )) 
+	? apply_filters('revisionary_post_revision_status', 'draft', 'draft-revision', $postarr['ID'])
+	: $postarr['post_status'];
 
 	$data['post_modified']     = current_time( 'mysql' );
 	$data['post_modified_gmt'] = current_time( 'mysql', 1 );

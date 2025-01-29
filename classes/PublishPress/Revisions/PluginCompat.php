@@ -39,6 +39,39 @@ class PluginCompat {
 		}
 
 		add_filter('authors_default_author', [$this, 'fltAuthorsDefaultAuthor'], 10, 2);
+
+		if (defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6.0-beta', '>=')) {
+			global $pagenow;
+
+			if (is_admin() && !empty($pagenow) && ('admin.php' == $pagenow) && !empty($_REQUEST['page'])) {		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$plugin_page = sanitize_key($_REQUEST['page']);													// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	
+			} elseif (is_admin() && defined('DOING_AJAX') && DOING_AJAX && !empty($_REQUEST['action'])) {		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$action = sanitize_key($_REQUEST['action']);													// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+				switch ($action) {
+					case 'publishpress_calendar_get_post_type_fields':
+					case 'publishpress_calendar_get_data':
+						$plugin_page = 'pp-calendar';
+						break;
+
+					case 'publishpress_content_board_update_post_status':
+						$plugin_page = 'pp-content-board';
+						break;
+				}
+			}
+			
+			if (!empty($plugin_page) 
+			&& in_array($plugin_page, ['pp-calendar', 'pp-content-board', 'pp-content-overview'])
+			&& (apply_filters('revisionary_planner_filters', true, $plugin_page))
+			) {
+				global $revisionary_planner_compat;
+
+				require_once(dirname(__FILE__).'/Planner.php');
+				$revisionary_planner_compat = new \PublishPress\Revisions\Planner();
+				$revisionary_planner_compat->init($plugin_page);
+			}
+		}
     }
 
 	function fltAuthorsDefaultAuthor($default_author, $post) {

@@ -363,6 +363,8 @@ function rvy_status_registrations() {
 		]
 	);
 
+	$compat_mode = rvy_get_option('permissions_compat_mode');
+
 	register_post_status('draft-revision', array(
 		'label' => $labels['draft-revision']['name'],
 		'labels' => (object) $labels['draft-revision'],
@@ -370,7 +372,7 @@ function rvy_status_registrations() {
 		'internal' => true,
 		'label_count' => $labels['draft-revision']['count'],
 		'exclude_from_search' => false,
-		'show_in_admin_all_list' => false,
+		'show_in_admin_all_list' => $compat_mode,
 		'show_in_admin_status_list' => false,
 	));
 	
@@ -381,7 +383,7 @@ function rvy_status_registrations() {
 		'internal' => true,
 		'label_count' => $labels['pending-revision']['count'],
 		'exclude_from_search' => false,
-		'show_in_admin_all_list' => false,
+		'show_in_admin_all_list' => $compat_mode,
 		'show_in_admin_status_list' => false,
 	));
 
@@ -392,7 +394,7 @@ function rvy_status_registrations() {
 		'internal' => true,
 		'label_count' => $labels['future-revision']['count'],
 		'exclude_from_search' => false,
-		'show_in_admin_all_list' => false,
+		'show_in_admin_all_list' => $compat_mode,
 		'show_in_admin_status_list' => false,
 	));
 
@@ -717,7 +719,7 @@ function revisionary_refresh_postmeta($post_id, $args = []) {
 
 	$_post = get_post($post_id);
 
-	if ($set_value && (empty($_post) || empty($_post->post_mime_type) || !in_array($_post->post_mime_type, ['draft-revision', 'pending-revision', 'future-revision']))) {
+	if ($set_value && (empty($_post) || empty($_post->post_mime_type) || !rvy_is_revision_status($_post->post_mime_type))) {
 		rvy_update_post_meta($post_id, '_rvy_has_revisions', $set_value);
 
 	} elseif (empty($args['insert_only'])) { // avoid redundant deletions
@@ -1246,7 +1248,14 @@ function rvy_get_manageable_types() {
 		$types[$post_type]= $post_type;
 	}
 	
-	$types = array_diff_key($types, array('acf-field-group' => true));
+	$types = array_diff_key(
+		$types, 
+		array_fill_keys(
+			['attachment', 'psppnotif_workflow', 'tablepress_table', 'acf-field-group', 'acf-field', 'nav_menu_item', 'custom_css', 'customize_changeset', 'wp_block', 'wp_template', 'wp_template_part', 'wp_global_styles', 'wp_navigation'], 
+			true
+		)
+	);
+
 	return apply_filters('revisionary_supported_post_types', $types);
 }
 
