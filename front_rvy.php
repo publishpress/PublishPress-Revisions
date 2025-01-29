@@ -564,7 +564,7 @@ class RevisionaryFront {
 				// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 				//case 'pending-revision' :
 				default :
-				if (empty($_REQUEST['mark_current_revision']) && ('inherit' != $post->post_status)) {
+				if (empty($_REQUEST['mark_current_revision']) && ('inherit' != $post->post_status)) {						// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					if ('future-revision' != $post->post_mime_type) {
 						$approve_caption = esc_html__( 'Approve', 'revisionary' );
 

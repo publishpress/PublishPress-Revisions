@@ -194,7 +194,7 @@ class RevisionaryHistory
         $this->actEnqueueScripts();
 
         if (!isset($title)) {
-            $title = sprintf( 
+            $title = sprintf(                                                         // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
                 esc_html__( 'Compare %s of "%s"', 'revisionary' ), 
                 __('Revisions'),
                 esc_html(_draft_or_post_title($published_post))
