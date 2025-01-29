@@ -36,28 +36,20 @@ class PostEditorWorkflowUI {
         ];
 
         // @todo: adapt Submit button to custom statuses?
+        switch ($post->post_mime_type) {
+            case 'future-revision' :
+                $vars['currentStatus'] = 'future';
+                break;
 
-        //if (get_option('rvy_permissions_compat_mode')) {
-        //    $vars['currentStatus'] = $post->post_mime_type;
-        //    $vars['pendingStatus'] = 'pending-revision';
-        //} else {
-            switch ($post->post_mime_type) {
-                case 'future-revision' :
-                    $vars['currentStatus'] = 'future';
-                    break;
+            case 'draft-revision' :
+                $vars['currentStatus'] = 'draft';
+                break;
 
-                case 'draft-revision' :
-                    $vars['currentStatus'] = 'draft';
-                    break;
+            default :
+                $vars['currentStatus'] = 'pending';
+        }
 
-                default :
-                    $vars['currentStatus'] = 'pending';
-            }
-
-            $vars['pendingStatus'] = 'pending';
-        //}
-
-        //$vars['currentStatus'] = apply_filters('revisionary_post_revision_status', $vars['currentStatus'], $post->post_mime_type, $post->ID);
+        $vars['pendingStatus'] = 'pending';
 
         $vars['disableRecaption'] = version_compare($wp_version, '5.9-beta', '>=') || is_plugin_active('gutenberg/gutenberg.php');
         $vars['viewTitle'] = '';
@@ -166,7 +158,7 @@ class PostEditorWorkflowUI {
         if ($block_editor) {
             $vars['updateCaption'] =  esc_html__('Update Revision', 'revisionary');
         } else {
-            if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
+            if (!rvy_status_revisions_active($post->post_type)) {
             	if (!$vars['updateCaption'] = pp_revisions_status_label($post->post_mime_type, 'update')) {
                 	$vars['updateCaption'] = pp_revisions_label('update_revision');
                 }

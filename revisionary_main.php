@@ -5,7 +5,7 @@ if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_ur
 /**
  * @package     PublishPress\Revisions
  * @author      PublishPress <help@publishpress.com>
- * @copyright   Copyright (c) 2024 PublishPress. All rights reserved.
+ * @copyright   Copyright (c) 2025 PublishPress. All rights reserved.
  * @license     GPLv2 or later
  * @since       1.0.0
  */
@@ -1131,42 +1131,6 @@ class Revisionary
 	}
 
 	function flt_regulate_revision_status($data, $postarr) {
-		// Revisions are not published by wp_update_post() execution; Prevent setting to a non-revision status
-		// @todo: confirm this is still needed
-		if (rvy_get_post_meta($postarr['ID'], '_rvy_base_post_id', true) 
-		&& ('trash' != $data['post_status'])
-		) {
-			if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
-				if (!$revision = get_post($postarr['ID'])) {
-					return $data;
-				}
-
-				if (empty($this->enabled_post_types[$revision->post_type])) {
-					return $data;
-				}
-
-				if (!rvy_is_revision_status($postarr['post_mime_type']) || !in_array($postarr['post_status'], rvy_revision_base_statuses())) {
-					$revert_status = true;
-
-				} elseif ($revision) {
-					if (($data['post_mime_type'] != $revision->post_mime_type) || ($data['post_status'] != $revision->post_status)
-					&& (('future-revision' == $revision->post_mime_type) || ('future-revision' == $postarr['post_mime_type']))
-					) {
-						$revert_status = true;
-					}
-				}
-
-				if (!empty($revert_status) && rvy_in_revision_workflow($revision)) {
-					$data['post_status'] = $revision->post_status;
-					$data['post_mime_type'] = $revision->post_mime_type;
-				}
-			}
-
-			if (rvy_get_option('permissions_compat_mode') && ('revision' != $data['post_type'])) {
-				$data['post_status'] = $data['post_mime_type'];
-			}
-		}
-
 		if (rvy_is_revision_status($data['post_status'])) {
 			// If post_status is set to a revision status, mirror that to post_mime_type. This is meant to support post updates from one revision status to another.
 			if ($data['post_status'] != $data['post_mime_type']) {
@@ -1176,6 +1140,43 @@ class Revisionary
 			// Prevent revision status being stored directly to post_status column unless Permissions Compat Mode is enabled.
 			if (!rvy_get_option('permissions_compat_mode')) {
 				$data['post_status'] = ('draft-revision' == $data['post_status']) ? 'draft' : 'pending';
+			}
+		} else {
+			// Revisions are not published by wp_update_post() execution; Prevent setting to a non-revision status
+			// @todo: confirm this is still needed
+
+			if (rvy_get_post_meta($postarr['ID'], '_rvy_base_post_id', true) 
+			&& ('trash' != $data['post_status'])
+			) {
+				if (!$revision = get_post($postarr['ID'])) {
+					return $data;
+				}
+
+				if (!rvy_status_revisions_active($revision->post_type)) {
+					if (empty($this->enabled_post_types[$revision->post_type])) {
+						return $data;
+					}
+
+					if (!rvy_is_revision_status($postarr['post_mime_type']) || !in_array($postarr['post_status'], rvy_revision_base_statuses())) {
+						$revert_status = true;
+
+					} elseif ($revision) {
+						if (($data['post_mime_type'] != $revision->post_mime_type) || ($data['post_status'] != $revision->post_status)
+						&& (('future-revision' == $revision->post_mime_type) || ('future-revision' == $postarr['post_mime_type']))
+						) {
+							$revert_status = true;
+						}
+					}
+
+					if (!empty($revert_status) && rvy_in_revision_workflow($revision)) {
+						$data['post_status'] = $revision->post_status;
+						$data['post_mime_type'] = $revision->post_mime_type;
+					}
+				}
+
+				if (rvy_get_option('permissions_compat_mode') && ('revision' != $data['post_type'])) {
+					$data['post_status'] = $data['post_mime_type'];
+				}
 			}
 		}
 
