@@ -553,6 +553,34 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$where .= " AND $where_append";
 
+		// Also support Access Circle restrictions
+		if (defined('PRESSPERMIT_CIRCLES_VERSION')) {
+			$append_clauses = [];
+
+			if (defined('PRESSPERMIT_CLASSPATH') && file_exists(PRESSPERMIT_CLASSPATH . '/DB/Permissions.php')) {
+				include_once(PRESSPERMIT_CLASSPATH . '/DB/Permissions.php');
+			}
+
+			foreach (array_keys(array_filter($revisionary->enabled_post_types)) as $post_type) {
+				if ($append_clause = apply_filters('presspermit_append_query_clause', '', $post_type, 'edit', ['src_table' => $p])) {
+					$append_clauses[$post_type] = '(' . $wpdb->prepare("$p.post_type = %s", $post_type) . $append_clause . ')';			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+					if (class_exists('PublishPress\Permissions\DB\Permissions')) {
+						$append_clauses[$post_type] = '( ' 
+						. \PublishPress\Permissions\DB\Permissions::addExceptionClauses($append_clauses[$post_type], 'edit', $post_type, ['additions_only' => true, 'src_table' => $p]) 
+						. ' )';
+					}
+				}
+			}
+
+			if ($append_clauses) {
+				$and = (0 === strpos(trim(strtoupper($where)), 'AND')) ? ' AND' : '';
+				$one_one = ($and) ? '1=1' : '';
+
+				$where = " $and (($one_one $where) AND (" . implode(' OR ', $append_clauses) . '))';
+			}
+		}
+
 		return $where;
 	}
 
