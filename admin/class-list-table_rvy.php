@@ -593,7 +593,6 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	function correctCommentCounts() {
 		global $wpdb;
 
-		//$revision_base_status_csv = implode("','", array_map('sanitize_key', rvy_revision_base_statuses()));
 		$revision_status_csv = implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
