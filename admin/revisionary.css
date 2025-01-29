@@ -423,8 +423,36 @@ body.revisions_page_revisionary-archive h1 span.dashicons {
 padding-top:5px;
 }
 
+#publishpress-revisions-settings-tabs .nav-tab {
+padding: 5px 5px;
+}
+
+div.agp-vtight_input {
+padding-top: 4px;
+padding-bottom: 4px;
+}
+
 body.revisions_page_revisionary-settings div.submit, body.revisions_page_rvy-net_options div.submit, body.revisions_page_rvy-default_options div.submit {
 padding-top:0;
+}
+
+body.revisions_page_revisionary-settings input[type="checkbox"] {
+vertical-align: middle;
+}
+
+@media only screen and (max-width: 783px) {
+  body.revisions_page_revisionary-settings #rvy-features > div > table > tbody > tr > td {
+      padding: 10px;
+  }
+
+  body.revisions_page_revisionary-settings #rvy-features div.agp-vtight_input {
+      margin-top: 12px;
+      margin-bottom: 12px;
+  }
+
+  body.revisions_page_revisionary-settings #rvy-features input[type="checkbox"] {
+      padding: 5px;
+  }
 }
 
 body.admin_page_rvy-revisions table.diff td, table.diff th {
