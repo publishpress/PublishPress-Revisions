@@ -55,10 +55,14 @@ class PlannerContentBoard {
                     <script type="text/javascript">
                     /* <![CDATA[ */
                     jQuery(document).ready(function ($) {
-                        <?php if (!rvy_get_option('permissions_compat_mode')):?>
-                        $('div.content-board-inside div.status-future').hide();
-                        $('div.content-board-inside div.status-private').hide();
-                        <?php endif;?>
+						<?php if (defined('PUBLISHPRESS_VERSION') && version_compare('PUBLISHPRESS_VERSION', '4.6.2-beta', '<')):?>
+						$('div.pp-content-board-filters button.post_status').html('<?php esc_html_e('Revision Status', 'revisionary');?>').show();
+						<?php endif;?>
+
+						<?php if (!rvy_get_option('permissions_compat_mode')):?>
+						$('div.content-board-inside div.status-future').hide();
+						$('div.content-board-inside div.status-private').hide();
+						<?php endif;?>
                     });
                     /* ]]> */
                     </script>
@@ -70,6 +74,13 @@ class PlannerContentBoard {
                     <?php endif;?>
 
                     <style type="text/css">
+					<?php /* Hide on load to prevent caption flash from "Post Status" to "Revision Status" */
+					if (defined('PUBLISHPRESS_VERSION') && version_compare('PUBLISHPRESS_VERSION', '4.6.2-beta', '<')):?>
+					div.pp-content-board-filters button.post_status {
+						display: none;
+					}
+					<?php endif;?>
+
                     div.pp-content-board-manage div.new-post {
                         display: none !important;
                     }
