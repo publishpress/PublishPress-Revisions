@@ -130,8 +130,6 @@ class RvyPostEdit {
         <div id="preview-action" class="rvy-misc-actions" style="float: right; padding: 5px 10px 10px 5px">
 
         <?php
-        global $post;
-
         $compare_link = rvy_admin_url("revision.php?revision=$post->ID");
         $compare_button = _x('Compare', 'revisions', 'revisionary');
         $compare_title = esc_html__('Compare this revision to published copy, or to other revisions', 'revisionary');
