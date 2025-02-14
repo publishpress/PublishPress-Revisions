@@ -451,29 +451,44 @@ class RevisionaryFront {
 			$diff_url = rvy_admin_url("revision.php?revision=$revision_id");
 			$queue_url = rvy_admin_url("admin.php?page=revisionary-q&published_post={$published_post_id}&all=1");
 
-			if ((!rvy_get_option('revisor_hide_others_revisions') && !empty($type_obj) && current_user_can($type_obj->cap->edit_posts)) || current_user_can('read_post', $revision_id)) {
-				$view_published = ($published_url)
-				? sprintf(
-					apply_filters(
-						'revisionary_list_caption',
-						esc_html__("%sView Queue%s", 'revisionary'),
-						$post // revision
-					),
-					"<a href='$queue_url' class='button button-secondary' target='_revision_list'>",
-					'</a>'
-					)
-				. sprintf(
-					apply_filters(
-						'revisionary_preview_compare_view_caption',
-						esc_html__("%sCompare%s%sView Published Post%s", 'revisionary'),
-						$post // revision
-					),
-					"<a href='$diff_url' class='button button-secondary' target='_revision_diff'>",
-					'</a>',
-					"<a href='$published_url' class='button button-secondary rvy_has_empty_spacing'>",
-					'</a>'
-					)
-				: '';
+			if (((!rvy_get_option('revisor_hide_others_revisions') || current_user_can('list_others_revisions')) && !empty($type_obj) && current_user_can($type_obj->cap->edit_posts)) || current_user_can('read_post', $revision_id)) {
+				if ($published_url) {
+					$view_published = sprintf(
+						apply_filters(
+							'revisionary_list_caption',
+							esc_html__("%sView Queue%s", 'revisionary'),
+							$post // revision
+						),
+						"<a href='$queue_url' class='button button-secondary' target='_revision_list'>",
+						'</a>'
+					);
+
+					if (current_user_can('edit_post', $revision_id)) {
+						$view_published .= sprintf(
+							apply_filters(
+								'revisionary_preview_compare_view_caption',
+								esc_html__("%sCompare%s%sView Published Post%s", 'revisionary'),
+								$post // revision
+							),
+							"<a href='$diff_url' class='button button-secondary' target='_revision_diff'>",
+							'</a>',
+							"<a href='$published_url' class='button button-secondary rvy_has_empty_spacing'>",
+							'</a>'
+						);
+					} else {
+						$view_published .= sprintf(
+							apply_filters(
+								'revisionary_preview_view_caption',
+								esc_html__("%sView Published Post%s", 'revisionary'),
+								$post // revision
+							),
+							"<a href='$published_url' class='button button-secondary'>",
+							"</a>"
+						);
+					}
+				} else {
+					$view_published = '';
+				}
 			} else { // @todo
 				$view_published = ($published_url)
 				? sprintf(

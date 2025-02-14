@@ -113,6 +113,12 @@ class Revisionary
 
 		if ( ! is_content_administrator_rvy() ) {
 			add_filter( 'map_meta_cap', array($this, 'flt_post_map_meta_cap'), 5, 4);
+
+			add_filter('map_meta_cap', [$this, 'fltFixReadPreviewMetaCaps'], 99, 4 );
+			add_filter('presspermit_posts_clauses_intercept', [$this, 'fltAllowPreviewQuery'], 10, 4);
+
+			add_filter('presspermit_apply_posts_teaser', [$this, 'fltAllowTeaser'], 10, 2);
+
 			add_filter( 'user_has_cap', array( $this, 'flt_user_has_cap' ), 98, 3 );
 
 			add_filter( 'map_meta_cap', array( $this, 'flt_limit_others_drafts' ), 10, 4 );
@@ -894,6 +900,88 @@ class Revisionary
 		rvy_add_revisor_role( $blog_id );
 	}
 	
+	function fltAllowTeaser($allow, $post_id) {
+		$preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ((!empty($_REQUEST[$preview_arg]) || !empty($_GET['preview'])) 		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		&& rvy_in_revision_workflow($post_id)
+		) {
+			$allow = false;
+		}
+
+		return $allow;
+	}
+	
+	function fltAllowPreviewQuery($intercept_clauses, $clauses, $_wp_query = false, $args = []) {
+		global $current_user;
+		
+		if (is_admin() 
+		|| (defined('REST_REQUEST') && REST_REQUEST) 
+		|| (defined('DOING_AJAX') && DOING_AJAX)
+		) {
+			return $intercept_clauses;
+		}
+
+		$required_operation = (!empty($args['required_operation'])) ? $args['required_operation'] : 'read';
+
+		if ('read' != $required_operation) {
+			return $intercept_clauses;
+		}
+
+		$preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ((!empty($_REQUEST[$preview_arg]) || !empty($_GET['preview'])) 		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		&& (!empty($current_user->allcaps['preview_others_revisions']))
+		&& did_action('posts_selection') 
+		) {
+			if ($post = get_post(rvy_detect_post_id())) {
+				if (rvy_in_revision_workflow($post->ID)
+				&& ('inherit' != $post->post_status)
+				&& !empty($this->enabled_post_types[$post->post_type]) && $this->config_loaded
+				) {
+					$intercept_clauses = $clauses;
+				}
+			}
+		}
+
+		return $intercept_clauses;
+	}
+
+	function fltFixReadPreviewMetaCaps($caps, $cap, $user_id, $args) {
+		global $current_user;
+		
+		$preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if (in_array($cap, ['read_post', 'read_page'])	// WP Query imposes edit_post capability requirement for front end viewing of protected statuses 
+		&& (!empty($_REQUEST[$preview_arg]) || !empty($_GET['preview'])) 		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		&& !empty($current_user->allcaps['preview_others_revisions'])
+		&& did_action('posts_selection') 
+		) {
+			if (!empty($args[0])) {
+				$post_id = (is_object($args[0])) ? $args[0]->ID : (int) $args[0];
+			} else {
+				$post_id = 0;
+			}
+	
+			if ($post = get_post($post_id)) {
+				if (('inherit' == $post->post_status)
+				|| empty($this->enabled_post_types[$post->post_type]) && $this->config_loaded
+				) {
+					return $caps;
+				}
+			}
+
+			$type_obj = get_post_type_object($post->post_type);
+
+			// Note: preview_others_revisions capability already confirmed
+			if (!empty($type_obj->cap->read_private_posts)) {
+				$caps = array_diff($caps, [$type_obj->cap->read_private_posts]);
+				$caps []= 'read';
+			}
+		}
+
+		return $caps;
+	}
 	
 	function flt_post_map_meta_cap($caps, $cap, $user_id, $args) {
 		global $current_user;
@@ -922,7 +1010,9 @@ class Revisionary
 			}
 		}
 
-		if ($post && (('future-revision' == $post->post_mime_type) || in_array($cap, ['read_post', 'read_page']))) {
+		if ($post && (('future-revision' == $post->post_mime_type) 
+		|| (in_array($cap, ['read_post', 'read_page']) && empty($current_user->allcaps['preview_others_revisions'])))
+		) {
 			if (in_array($cap, ['read_post', 'read_page'])) {
 				return $caps;
 			}
