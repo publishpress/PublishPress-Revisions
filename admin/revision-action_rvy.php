@@ -1063,14 +1063,23 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 	if (!defined('REVISIONARY_DISABLE_SECONDARY_CACHE_FLUSH')) {
 		wp_cache_delete( $published->ID, 'posts' );
 		wp_cache_delete( $published->ID, 'post_meta' );
+		wp_cache_delete( $revision_id, 'posts' );
+		wp_cache_delete( $revision_id, 'post_meta' );
 	}
 
 	if (defined('LSCWP_V')) {
 		do_action('litespeed_purge_post', $published->ID);
+		do_action('litespeed_purge_post', $revision_id);
 	}
 
 	if (function_exists('rocket_clean_post') && !defined('REVISIONARY_DISABLE_ROCKET_CLEAN')) {
 		rocket_clean_post($published->ID);
+		rocket_clean_post($revision_id);
+	}
+
+	if (function_exists('w3tc_flush_post') && !defined('REVISIONARY_DISABLE_W3TC_CACHE_FLUSH')) {
+		w3tc_flush_post($published->ID, true);
+		w3tc_flush_post($revision_id, true);
 	}
 
 	// Passing ignore_revision_ids is not theoretically necessary here since this call occurs after deletion, but avoid any cache clearance timing issues.
