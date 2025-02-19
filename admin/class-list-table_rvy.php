@@ -291,12 +291,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		if (!rvy_get_option('pending_revisions')) {
-			$revision_status_csv = array_diff(
-				implode("','", array_map('sanitize_key', rvy_revision_statuses())),
+			$_revision_statuses = array_diff(
+				array_map('sanitize_key', rvy_revision_statuses()),
 				['future-revision']
 			);
 
-			$qr[$status_col] = array_diff($qr[$status_col], $revision_status_csv);
+			$qr[$status_col] = array_diff($qr[$status_col], $_revision_statuses);
 		}
 
 		if (!rvy_get_option('scheduled_revisions')) {
