@@ -1483,9 +1483,16 @@ function rvy_preview_url($revision, $args = []) {
 			$id_arg = 'p';
 		}
 	} else { // 'published_slug'
+		$published_post_id = rvy_post_id($revision->ID);
+		
+		if (('page' === get_option('show_on_front')) && in_array(get_option('page_on_front'), [$published_post_id, $revision->ID])) {
+			$id_arg = 'page__id';
+		} else {
+			$id_arg = 'page_id';
+		}
+
 		// default to published post url, appended with 'preview' and page_id args
-		$preview_url = add_query_arg($preview_arg, true, get_permalink(rvy_post_id($revision->ID)));
-		$id_arg = 'page_id';
+		$preview_url = add_query_arg($preview_arg, true, get_permalink($published_post_id));
 	}
 
 	if (strpos($preview_url, "{$id_arg}=")) {
