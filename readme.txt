@@ -244,6 +244,13 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
+= 3.6.1 =
+* Feature : Support view-only Revision Queue through 'preview_others_revisions' capability (Permissions plugin compatibility requires v4.1.2)
+* Fixed : Previews of home page revisions did not display correctly
+* Fixed : Compare Revisions: Slider movement did not reload comparison correctly
+* Fixed : Revision Queue: Fatal error if Revision Submission was disabled in plugin settings 
+* Compat : W3 Total Cache: Clean cache after revision publication
+
 = 3.6.0 - 29 Jan 2025 =
 * Compat : PublishPress Planner - Fix Revision Status display and selection in Calendar, Content Board, Overview (requires Planner 4.6)
 * Compat : PublishPress Statuses Pro (Custom Revision Statuses)
