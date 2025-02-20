@@ -14,6 +14,8 @@ class RevisionaryFront {
 		add_action('parse_query', [$this, 'actSetQueriedObject'], 20);
 		add_action('parse_query', [$this, 'actFlagHomeRevision'], 20);
 
+		add_filter('posts_clauses_request', [$this, 'fltHomePreviewRequest'], 99, 3);
+
 		add_filter('body_class', [$this, 'fltBodyClass'], 20, 2);
 
 		add_filter('acf/load_value', [$this, 'fltACFLoadValue'], 10, 3);
@@ -40,6 +42,28 @@ class RevisionaryFront {
 		add_action('init', [$this, 'actFixRevisionPreviewStatus'], 5);
 
 		do_action('revisionary_front_init');
+	}
+
+	function fltHomePreviewRequest($clauses, $_wp_query = false, $args = []) {
+		global $wpdb, $wp_query;
+
+		$preview_page_id = (!empty($_REQUEST['page__id'])) ? $_REQUEST['page__id'] : 0;
+
+		if (!$preview_page_id || empty($wp_query) || empty($wp_query->query_vars) || empty($wp_query->query_vars['p'])) {
+			return $clauses;
+		}
+
+		$front_page_id = $wp_query->query_vars['p'];
+
+		if (rvy_post_id($preview_page_id) == $front_page_id) {
+			$clauses['where'] = str_replace("$wpdb->posts.ID = $front_page_id", "$wpdb->posts.ID = $preview_page_id", $clauses['where']);
+			$clauses['where'] = str_replace("post_id = $front_page_id", "post_id = $preview_page_id", $clauses['where']);
+
+			$clauses['join'] = str_replace("$wpdb->posts.ID = $front_page_id", "$wpdb->posts.ID = $preview_page_id", $clauses['join']);
+			$clauses['join'] = str_replace("post_id = $front_page_id", "post_id = $preview_page_id", $clauses['join']);
+		}
+
+		return $clauses;
 	}
 
 	function actFixRevisionPreviewStatus() {
@@ -331,7 +355,9 @@ class RevisionaryFront {
 			}
 		}
 
-		if (!empty($_REQUEST['page_id'])) {													//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if (!empty($_REQUEST['page__id'])) {												//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$revision_id = (int) $_REQUEST['page__id'];										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		} elseif (!empty($_REQUEST['page_id'])) {											//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$revision_id = (int) $_REQUEST['page_id'];										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		} elseif (!empty($_REQUEST['p'])) {													//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$revision_id = (int) $_REQUEST['p'];											//phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -451,29 +477,44 @@ class RevisionaryFront {
 			$diff_url = rvy_admin_url("revision.php?revision=$revision_id");
 			$queue_url = rvy_admin_url("admin.php?page=revisionary-q&published_post={$published_post_id}&all=1");
 
-			if ((!rvy_get_option('revisor_hide_others_revisions') && !empty($type_obj) && current_user_can($type_obj->cap->edit_posts)) || current_user_can('read_post', $revision_id)) {
-				$view_published = ($published_url)
-				? sprintf(
-					apply_filters(
-						'revisionary_list_caption',
-						esc_html__("%sView Queue%s", 'revisionary'),
-						$post // revision
-					),
-					"<a href='$queue_url' class='button button-secondary' target='_revision_list'>",
-					'</a>'
-					)
-				. sprintf(
-					apply_filters(
-						'revisionary_preview_compare_view_caption',
-						esc_html__("%sCompare%s%sView Published Post%s", 'revisionary'),
-						$post // revision
-					),
-					"<a href='$diff_url' class='button button-secondary' target='_revision_diff'>",
-					'</a>',
-					"<a href='$published_url' class='button button-secondary rvy_has_empty_spacing'>",
-					'</a>'
-					)
-				: '';
+			if (((!rvy_get_option('revisor_hide_others_revisions') || current_user_can('list_others_revisions')) && !empty($type_obj) && current_user_can($type_obj->cap->edit_posts)) || current_user_can('read_post', $revision_id)) {
+				if ($published_url) {
+					$view_published = sprintf(
+						apply_filters(
+							'revisionary_list_caption',
+							esc_html__("%sView Queue%s", 'revisionary'),
+							$post // revision
+						),
+						"<a href='$queue_url' class='button button-secondary' target='_revision_list'>",
+						'</a>'
+					);
+
+					if (current_user_can('edit_post', $revision_id)) {
+						$view_published .= sprintf(
+							apply_filters(
+								'revisionary_preview_compare_view_caption',
+								esc_html__("%sCompare%s%sView Published Post%s", 'revisionary'),
+								$post // revision
+							),
+							"<a href='$diff_url' class='button button-secondary' target='_revision_diff'>",
+							'</a>',
+							"<a href='$published_url' class='button button-secondary rvy_has_empty_spacing'>",
+							'</a>'
+						);
+					} else {
+						$view_published .= sprintf(
+							apply_filters(
+								'revisionary_preview_view_caption',
+								esc_html__("%sView Published Post%s", 'revisionary'),
+								$post // revision
+							),
+							"<a href='$published_url' class='button button-secondary'>",
+							"</a>"
+						);
+					}
+				} else {
+					$view_published = '';
+				}
 			} else { // @todo
 				$view_published = ($published_url)
 				? sprintf(

@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, approve changes, scheduled chang
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.7
-Stable tag: 3.6.0
+Stable tag: 3.6.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -169,7 +169,7 @@ It is possible to schedule content updates to Elementor posts.
 - Choose the new date for these changes to go live.
 - Click the "Update Revision" button.
 
-[Click here for more on duplicate Elementor posts (https://publishpress.com/knowledge-base/publishpress-revisions-elementor/).
+[Click here for more on duplicate Elementor posts](https://publishpress.com/knowledge-base/publishpress-revisions-elementor/).
 
 = How do I duplicate The Events Calendar events? =
 
@@ -181,7 +181,7 @@ The Events Calendar plugin is one the most popular ways to create and list event
 - Your event revisions will appear in the "Revision Queue".
 - You will not be able to use the "Compare" link because The Events Calendar does not support that WordPress feature yet. However, all the other key features of PublishPress Revisions Pro will work. For example, PublishPress Revisions Pro will record changes to all your event fields and settings.
 
-[Click here for more on duplicate The Events Calendar events (https://publishpress.com/knowledge-base/revisions-events-calendar/).
+[Click here for more on duplicate The Events Calendar events](https://publishpress.com/knowledge-base/revisions-events-calendar/).
 
 = How do I duplicate posts with Advanced Custom Fields? =
 
@@ -192,7 +192,7 @@ PublishPress Revisions Pro has support for the Advanced Custom Fields (ACF) plug
 - Click "Edit" and you can update the revision, including the ACF fields.
 - Click "Compare" and you can see what's changed in this revision. The "Compare" screen will show you any changes that have happened with ACF Fields.
 
-[Click here for more on duplicate posts with Advanced Custom Fields (https://publishpress.com/knowledge-base/revisionary-acf/).
+[Click here for more on duplicate posts with Advanced Custom Fields](https://publishpress.com/knowledge-base/revisionary-acf/).
 
 = How do I duplicate posts with WPML? =
 
@@ -201,7 +201,7 @@ PublishPress Revisions Pro has support for the WPML plugin. For example, you can
 - Go to your "Posts" screen.
 - Click "New Revisions" and you can create a translated version of your content in any language. 
 
-[Click here for more on duplicate posts with WPML (https://publishpress.com/knowledge-base/revisionary-wpml/).
+[Click here for more on duplicate posts with WPML](https://publishpress.com/knowledge-base/revisionary-wpml/).
     
 = How do I duplicate posts with Yoast SEO? =
 
@@ -209,7 +209,7 @@ Yoast SEO is the most popular SEO plugin in WordPress. With PublishPress Revisio
 
 In the image below, you can Yoast SEO data. With PublishPress Revisions Pro you enter this data and it will be saved throughout the revision approval process.
 
-[Click here for more on duplicate posts with Yoast SEO (https://publishpress.com/knowledge-base/revisions-yoast-seo/).
+[Click here for more on duplicate posts with Yoast SEO](https://publishpress.com/knowledge-base/revisions-yoast-seo/).
     
 = How do I duplicate posts with Beaver Builder? =
 
@@ -226,7 +226,7 @@ It is also possible to schedule revisions to Beaver Builder content.
 - Choose the date you want your post changes to go live.
 - Click the "Submit Revision" button.
 
-[Click here for more on duplicate posts with Beaver Builder (https://publishpress.com/knowledge-base/revisionary-beaver-builder/).
+[Click here for more on duplicate posts with Beaver Builder](https://publishpress.com/knowledge-base/revisionary-beaver-builder/).
 
 = How do I duplicate posts with Divi Theme and Builder? =
 
@@ -235,7 +235,7 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 - In your WordPress admin area, click "New Revision" for a post or page that uses Divi.
 - You will see the normal editing layout in Divi, with the PublishPress Revisions buttons in the top toolbar and right sidebar. Click "Edit With The Divi Builder" to make content changes.
 
-[Click here for more on duplicate posts with Divi (https://publishpress.com/knowledge-base/divi-theme/).
+[Click here for more on duplicate posts with Divi](https://publishpress.com/knowledge-base/divi-theme/).
 
 == Upgrade Notice ==
 
@@ -243,6 +243,16 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 Fixed: Security issue. Please update.
 
 == Changelog ==
+
+= 3.6.1 - 20 Feb 2025 =
+* Feature : Support view-only Revision Queue through 'preview_others_revisions' capability (Permissions plugin compatibility requires v4.1.2)
+* Fixed : Previews of home page revisions did not display correctly
+* Fixed : Compare Revisions: Slider movement did not reload comparison correctly
+* Fixed : Revision Queue: Fatal error if Revision Submission was disabled in plugin settings 
+* Fixed : Revision Queue: Revisors could not see own revisions in queue from View link in post editor, or after clicking filtering by Published Post column
+* Compat : PublishPress Authors: If Permissions plugin is active, Revisors could not view revisions in queue if published post has multiple authors
+* Compat : PublishPress Authors: Revisors could not list their own revision after updating it, if "Editing others' revisions requires role capability" setting enabled
+* Compat : W3 Total Cache: Clean cache after revision publication
 
 = 3.6.0 - 29 Jan 2025 =
 * Compat : PublishPress Planner - Fix Revision Status display and selection in Calendar, Content Board, Overview (requires Planner 4.6)

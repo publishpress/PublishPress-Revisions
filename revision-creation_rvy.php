@@ -200,6 +200,8 @@ class RevisionCreation {
 		$data['guid'] = '';
 		$data['post_name'] = '';
 
+		do_action( 'revisionary_pre_insert_revision', $main_post_id, $data );
+
 		$revision_id = wp_insert_post(\wp_slash($data), true);
 
 		if (is_wp_error($revision_id)) {

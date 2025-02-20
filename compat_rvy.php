@@ -59,6 +59,12 @@ class PP_Revisions_Compat {
         ) {
             self::jreviews_preview_compat();
         }
+
+        add_filter('presspermit_maybe_override_authors_change', [$this, 'fltPermissionsOverrideAuthorsChange'], 10, 2);
+
+        add_action('save_post', [$this, 'actPreserveRevisionAuthor'], 1, 3);
+
+        add_action('add_meta_boxes', [$this, 'actMaybeRemoveAuthorsMetabox'], 101);
     }
 
     function fltRequireRevisionBaseStatuses($require_base_statuses) {
@@ -85,6 +91,39 @@ class PP_Revisions_Compat {
     function fltDefaultOptionScope($options) {
         $options['permissions_conmpat_mode'] = true;
         return $options;
+    }
+
+    function fltPermissionsOverrideAuthorsChange($maybe_override, $post) {
+        if (did_action('revisionary_pre_insert_revision')) {
+            $maybe_override_authors = false;
+        }
+
+        return $maybe_override_authors;
+    }
+
+    function actMaybeRemoveAuthorsMetabox() {
+        global $post;
+
+        if (!empty($post) && rvy_in_revision_workflow($post) 
+        && (!current_user_can('edit_post', rvy_post_id($post->ID)) || (rvy_get_option('revisor_lock_others_revisions') && !current_user_can('edit_others_revisions')))
+        ) {
+            remove_meta_box(
+                'ppma_authorsdiv',
+                $post->post_type,
+                'side'
+            );
+        }
+    }
+
+    function actPreserveRevisionAuthor($post_id, $post, $update) {
+        global $current_user;
+
+        if (rvy_in_revision_workflow($post) && ($current_user->ID == $post->post_author)
+        && (!current_user_can('edit_post', rvy_post_id($post->ID)) || (rvy_get_option('revisor_lock_others_revisions') && !current_user_can('edit_others_revisions')))
+        ) {
+            unset($_POST['authors']);
+            $_POST['fallback_author_user'] = $current_user->ID;
+        }
     }
 
     // JReviews plugin breaks Pending Revision / Scheduled Revision preview

@@ -84,6 +84,20 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if (!defined('REVISIONARY_DISABLE_WP_CRON_RESTORATION') && rvy_get_option('scheduled_revisions') && rvy_get_option('scheduled_publish_cron')) {
 			add_action('admin_footer', [$this, 'act_reschedule_missed_cron_revisions']);
 		}
+
+		add_filter('presspermit_skip_postmeta_filtering', [$this, 'flt_skip_cap_filtering'], 10, 3);
+	}
+
+	function flt_skip_cap_filtering($skip, $post_id, $orig_cap) {
+		global $current_user;
+		
+		if (in_array($orig_cap, ['read_post', 'read_page'])
+		&& !empty($current_user->allcaps['preview_others_revisions'])
+		) {
+			$skip = true;
+		}
+
+		return $skip;
 	}
 
 	function act_reschedule_missed_cron_revisions() {
@@ -277,12 +291,12 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		if (!rvy_get_option('pending_revisions')) {
-			$revision_status_csv = array_diff(
-				implode("','", array_map('sanitize_key', rvy_revision_statuses())),
+			$_revision_statuses = array_diff(
+				array_map('sanitize_key', rvy_revision_statuses()),
 				['future-revision']
 			);
 
-			$qr[$status_col] = array_diff($qr[$status_col], $revision_status_csv);
+			$qr[$status_col] = array_diff($qr[$status_col], $_revision_statuses);
 		}
 
 		if (!rvy_get_option('scheduled_revisions')) {
@@ -414,7 +428,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ((empty($_REQUEST['post_author']) || !empty($args['status_count'])) && empty($_REQUEST['published_post']) && empty($args['my_published_count'])) {
+		if ((empty($_REQUEST['post_author']) || !empty($args['status_count'])) && empty($args['my_published_count'])) {
 			$revision_status_csv =  implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 			$own_revision_and = '';
@@ -440,6 +454,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$status_clause = apply_filters('revisionary_require_base_statuses', true) 
 			? "$p.post_status IN ('draft', 'pending') AND " 
 			: '';
+
+			if (!empty($_REQUEST['published_post'])) {
+				$own_revision_and .= $wpdb->prepare(" AND $p.comment_count = %d", intval($_REQUEST['published_post']));
+			}
 
 			$own_revision_clause = $wpdb->prepare(
 				" OR ($status_clause $p.post_mime_type IN ('$revision_status_csv') AND $p.post_author = %d {$own_revision_and})",  // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -1391,6 +1409,8 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		$actions          = array();
 		$title            = _draft_or_post_title();
 
+		$main_post_id = rvy_post_id($post->ID);
+
 		if ( $can_edit_post && 'trash' != $post->post_status ) {
 			if ($edit_link = get_edit_post_link( $post->ID )) {
 				$actions['edit'] = sprintf(
@@ -1401,8 +1421,6 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 					esc_html__( 'Edit' )
 				);
 			}
-
-			$main_post_id = rvy_post_id($post->ID);
 
 			if ($main_post_id 
 			&& in_array($post->post_status, array_merge(['draft', 'pending'], rvy_revision_statuses()))
@@ -1461,7 +1479,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		// todo: make this work for Author with Revision exceptions
-		if ( $can_read_post || $can_edit_post ) {  
+		if ($can_edit_post) {  
 			$actions['diff'] = sprintf(
 				'<a href="%1$s" class="" title="%2$s" aria-label="%2$s" target="_revision_diff">%3$s</a>',
 				admin_url("revision.php?revision=$post->ID"),

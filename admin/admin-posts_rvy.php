@@ -280,7 +280,7 @@ class RevisionaryAdminPosts {
 	}
 
 	function fltFilterRevisions($where, $wp_query) {
-		global $typenow;
+		global $wpdb, $typenow;
 
 		$revision_statuses = rvy_revision_statuses();
 
@@ -318,7 +318,7 @@ class RevisionaryAdminPosts {
 
 		$revision_status_csv = implode("','", array_map('sanitize_key', $revision_statuses));
 
-		$where .= " AND post_mime_type NOT IN ('$revision_status_csv')";
+		$where .= " AND $wpdb->posts.post_mime_type NOT IN ('$revision_status_csv')";
 
 		return $where;
 	}
