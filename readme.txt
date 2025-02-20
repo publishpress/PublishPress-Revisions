@@ -244,7 +244,7 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
-= 3.6.1 =
+= 3.6.1 - 20 Feb 2025 =
 * Feature : Support view-only Revision Queue through 'preview_others_revisions' capability (Permissions plugin compatibility requires v4.1.2)
 * Fixed : Previews of home page revisions did not display correctly
 * Fixed : Compare Revisions: Slider movement did not reload comparison correctly
