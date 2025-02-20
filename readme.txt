@@ -249,6 +249,9 @@ Fixed: Security issue. Please update.
 * Fixed : Previews of home page revisions did not display correctly
 * Fixed : Compare Revisions: Slider movement did not reload comparison correctly
 * Fixed : Revision Queue: Fatal error if Revision Submission was disabled in plugin settings 
+* Fixed : Revision Queue: Revisors could not see own revisions in queue from View link in post editor, or after clicking filtering by Published Post column
+* Compat : PublishPress Authors: If Permissions plugin is active, Revisors could not view revisions in queue if published post has multiple authors
+* Compat : PublishPress Authors: Revisors could not list their own revision after updating it, if "Editing others' revisions requires role capability" setting enabled
 * Compat : W3 Total Cache: Clean cache after revision publication
 
 = 3.6.0 - 29 Jan 2025 =
