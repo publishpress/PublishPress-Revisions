@@ -59,6 +59,7 @@ class PP_Revisions_Compat {
         ) {
             self::jreviews_preview_compat();
         }
+        add_filter('presspermit_maybe_override_authors_change', [$this, 'fltPermissionsOverrideAuthorsChange'], 10, 2);
     }
 
     function fltRequireRevisionBaseStatuses($require_base_statuses) {
@@ -85,6 +86,13 @@ class PP_Revisions_Compat {
     function fltDefaultOptionScope($options) {
         $options['permissions_conmpat_mode'] = true;
         return $options;
+    }
+    function fltPermissionsOverrideAuthorsChange($maybe_override, $post) {
+        if (did_action('revisionary_pre_insert_revision')) {
+            $maybe_override_authors = false;
+        }
+
+        return $maybe_override_authors;
     }
 
     // JReviews plugin breaks Pending Revision / Scheduled Revision preview
