@@ -428,7 +428,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		}
 
 		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ((empty($_REQUEST['post_author']) || !empty($args['status_count'])) && empty($_REQUEST['published_post']) && empty($args['my_published_count'])) {
+		if ((empty($_REQUEST['post_author']) || !empty($args['status_count'])) && empty($args['my_published_count'])) {
 			$revision_status_csv =  implode("','", array_map('sanitize_key', rvy_revision_statuses()));
 
 			$own_revision_and = '';
@@ -454,6 +454,10 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			$status_clause = apply_filters('revisionary_require_base_statuses', true) 
 			? "$p.post_status IN ('draft', 'pending') AND " 
 			: '';
+
+			if (!empty($_REQUEST['published_post'])) {
+				$own_revision_and .= $wpdb->prepare(" AND $p.comment_count = %d", intval($_REQUEST['published_post']));
+			}
 
 			$own_revision_clause = $wpdb->prepare(
 				" OR ($status_clause $p.post_mime_type IN ('$revision_status_csv') AND $p.post_author = %d {$own_revision_and})",  // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
