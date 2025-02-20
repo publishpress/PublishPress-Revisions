@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the PublishPress Revisions plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: PublishPress Revisions 3.6.1-rc\n"
+"Project-Id-Version: PublishPress Revisions 3.6.1-rc5\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/project\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-02-19T19:28:09+00:00\n"
+"POT-Creation-Date: 2025-02-20T20:53:24+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: revisionary\n"
@@ -196,8 +196,8 @@ msgid "Search results for \"%s\""
 msgstr ""
 
 #: admin/class-list-table-archive.php:406
-#: admin/class-list-table_rvy.php:1167
-#: admin/class-list-table_rvy.php:1443
+#: admin/class-list-table_rvy.php:1171
+#: admin/class-list-table_rvy.php:1447
 #: admin/post-edit-block-ui_rvy.php:98
 #: admin/post-edit_rvy.php:52
 #: admin/RevisionEditSubmitMetabox.php:62
@@ -209,7 +209,7 @@ msgid "Count"
 msgstr ""
 
 #: admin/class-list-table-archive.php:448
-#: admin/class-list-table_rvy.php:636
+#: admin/class-list-table_rvy.php:640
 msgid "Post Type"
 msgstr ""
 
@@ -297,7 +297,7 @@ msgid "Compare Changes in %s"
 msgstr ""
 
 #: admin/class-list-table-archive.php:775
-#: admin/class-list-table_rvy.php:1484
+#: admin/class-list-table_rvy.php:1488
 #: admin/post-edit_rvy.php:134
 #: admin/post-edit_rvy.php:198
 #: admin/post-edit_rvy.php:212
@@ -307,7 +307,7 @@ msgstr ""
 
 #. translators: %s: post title
 #: admin/class-list-table-archive.php:790
-#: admin/class-list-table_rvy.php:1468
+#: admin/class-list-table_rvy.php:1472
 #: admin/post-editor-workflow-ui_rvy.php:218
 msgid "Preview Revision"
 msgstr ""
@@ -328,70 +328,70 @@ msgstr ""
 msgid "No revisions found."
 msgstr ""
 
-#: admin/class-list-table_rvy.php:635
+#: admin/class-list-table_rvy.php:639
 #: admin/post-editor-workflow-ui_rvy.php:31
 msgid "Status"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:691
-#: admin/class-list-table_rvy.php:1345
+#: admin/class-list-table_rvy.php:695
+#: admin/class-list-table_rvy.php:1349
 msgid "Y/m/d g:i:s a"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:701
-#: admin/class-list-table_rvy.php:1353
+#: admin/class-list-table_rvy.php:705
+#: admin/class-list-table_rvy.php:1357
 msgid "Y/m/d g:i a"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:708
+#: admin/class-list-table_rvy.php:712
 msgid "Scheduled publication: %s"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:711
+#: admin/class-list-table_rvy.php:715
 msgid "Requested publication: %s"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:757
+#: admin/class-list-table_rvy.php:761
 #: admin/history_rvy.php:823
 msgid "No author"
 msgstr ""
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:806
+#: admin/class-list-table_rvy.php:810
 msgid "View only revisions of %s"
 msgstr ""
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:818
-#: admin/class-list-table_rvy.php:826
+#: admin/class-list-table_rvy.php:822
+#: admin/class-list-table_rvy.php:830
 msgid "View published post"
 msgstr ""
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:852
+#: admin/class-list-table_rvy.php:856
 msgid "Compare Past Revisions"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:853
+#: admin/class-list-table_rvy.php:857
 msgid "History"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:1122
+#: admin/class-list-table_rvy.php:1126
 msgid "My Activity"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:1131
+#: admin/class-list-table_rvy.php:1135
 msgid "All %s"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:1163
+#: admin/class-list-table_rvy.php:1167
 msgid "Unschedule"
 msgstr ""
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:1167
-#: admin/class-list-table_rvy.php:1439
+#: admin/class-list-table_rvy.php:1171
 #: admin/class-list-table_rvy.php:1443
+#: admin/class-list-table_rvy.php:1447
 #: admin/post-edit-block-ui_rvy.php:98
 #: admin/post-edit_rvy.php:52
 #: admin/RevisionEditSubmitMetabox.php:62
@@ -399,11 +399,11 @@ msgid "Discard Revision"
 msgstr ""
 
 #. translators: %s: post title
-#: admin/class-list-table_rvy.php:1483
+#: admin/class-list-table_rvy.php:1487
 msgid "Compare Changes"
 msgstr ""
 
-#: admin/class-list-table_rvy.php:1492
+#: admin/class-list-table_rvy.php:1496
 msgctxt "revisions"
 msgid "Decline"
 msgstr ""
@@ -1582,7 +1582,7 @@ msgstr ""
 msgid "%1$s queries in %2$s seconds. %3$s MB used."
 msgstr ""
 
-#: revision-creation_rvy.php:206
+#: revision-creation_rvy.php:208
 msgid "Could not insert revision into the database"
 msgstr ""
 
