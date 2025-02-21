@@ -318,7 +318,7 @@ class RevisionaryAdminPosts {
 
 		$revision_status_csv = implode("','", array_map('sanitize_key', $revision_statuses));
 
-		$where .= " AND $wpdb->posts.post_mime_type NOT IN ('$revision_status_csv')";
+		$where .= " AND $wpdb->posts.post_mime_type NOT IN ('$revision_status_csv') AND $wpdb->posts.post_status NOT IN ('$revision_status_csv')";
 
 		return $where;
 	}
