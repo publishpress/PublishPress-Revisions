@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, approve changes, scheduled chang
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.7
-Stable tag: 3.6.1
+Stable tag: 3.6.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -243,6 +243,9 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 Fixed: Security issue. Please update.
 
 == Changelog ==
+
+= 3.6.2 - 24 Feb 2025 =
+* Fixed : Revisions listed on main Posts / Pages screen under some configurations
 
 = 3.6.1 - 20 Feb 2025 =
 * Feature : Support view-only Revision Queue through 'preview_others_revisions' capability (Permissions plugin compatibility requires v4.1.2)
