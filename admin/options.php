@@ -796,7 +796,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 
 	echo '<h4 style="margin-top: 30px; margin-bottom:8px">' . esc_html__('Compare Revisions Screen:', 'revisionary') . '</h4>';
 
-	if (rvy_get_option('display_hints')) {
+	if ($this->display_hints) {
 		$hint = esc_html__('The screen to compare all unpublished revisions for an individual post is linked in the post editor and preview top bar.', 'revisionary');
 		echo "<div class='rvy-subtext'>" . esc_html($hint) . "</div>";
 	}
