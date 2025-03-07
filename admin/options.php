@@ -557,7 +557,8 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 	<?php
-	$this->option_checkbox( 'revision_limit_per_post', $tab, $section, '', '' );
+	$hint = esc_html__('Prevent Revision creation if the post already has another Revision in progress.', 'revisionary');
+	$this->option_checkbox( 'revision_limit_per_post', $tab, $section, $hint, '' );
 
 	$hide = empty(rvy_get_option('revision_limit_per_post'));
 	$hint = esc_html__('Work around cache plugin conflicts by requerying for revisions before suppressing the New Revision link.', 'revisionary');
@@ -574,7 +575,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	</script>
 
 	<?php
-	$hint = sprintf(esc_html__('If the user does not have a regular Edit link, recaption the %s link as "Edit"', 'revisionary'), pp_revisions_status_label('draft-revision', 'submit_short'));
+	$hint = sprintf(esc_html__('If the user does not have a regular Edit link, recaption the %s link as "Edit."', 'revisionary'), pp_revisions_status_label('draft-revision', 'submit_short'));
 	$this->option_checkbox( 'caption_copy_as_edit', $tab, $section, $hint, '' );
 
 	$hint = esc_html__('This restriction applies to users who are not full editors for the post type. To enable a role, add capabilities: copy_posts, copy_others_pages, etc.', 'revisionary');
@@ -590,7 +591,8 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	?>
 
 	<?php
-	$this->option_checkbox( 'auto_submit_revisions', $tab, $section, '', '' );
+	$hint = esc_html__('When a user who has publishing capabilities creates a Revision, set it to "Submitted" status.', 'revisionary');
+	$this->option_checkbox( 'auto_submit_revisions', $tab, $section, $hint, '' );
 
 	do_action('revisionary_auto_submit_setting_ui', $this, $tab, $section);
 	?>
