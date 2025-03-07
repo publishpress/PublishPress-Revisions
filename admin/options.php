@@ -788,7 +788,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		<?php
 	}
 
-	echo '<h4 style="margin-top: 30px; margin-bottom:8px">' . esc_html__('Compare Revisions:', 'revisionary') . '</h4>';
+	echo '<h4 style="margin-top: 30px; margin-bottom:8px">' . esc_html__('Compare Revisions Screen:', 'revisionary') . '</h4>';
 
 	$id = 'past_revisions_order_by';
 	if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
