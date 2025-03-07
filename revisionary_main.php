@@ -1242,6 +1242,13 @@ class Revisionary
 					return $data;
 				}
 
+				// Elementor integration causes revision post_mime_type to be set to 'pending' on front end "Save Draft"
+				if (rvy_in_revision_workflow($revision)) {
+					if (in_array($data['post_mime_type'], ['draft', 'pending'])) {
+						$data['post_mime_type'] = 'draft-revision';
+					}
+				}
+
 				if (!rvy_status_revisions_active($revision->post_type)) {
 					if (empty($this->enabled_post_types[$revision->post_type])) {
 						return $data;
