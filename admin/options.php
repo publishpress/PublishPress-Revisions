@@ -174,7 +174,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'compare_revisions_direct_approval' => 		esc_html__('Approve Button on Compare screen', 'revisionary'),
 	'copy_revision_comments_to_post' => 		esc_html__('Copy revision comments to published post', 'revisionary'),
 	'past_revisions_order_by' =>				esc_html__('Past Revisions ordering:', 'revisionary'), 
-	'list_unsubmitted_revisions' => 			sprintf(esc_html__('Include %s in My Activity, Revisions to My Posts views', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
+	'list_unsubmitted_revisions' => 			sprintf(esc_html__('List %s in Revision Queue for "My Activity" or "Revisions to My Posts" view', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
 	'archive_postmeta' =>						esc_html__('Store custom fields of submitted and scheduled revisions for archive', 'revisionary'),
 	'rev_publication_delete_ed_comments' =>		esc_html__('On Revision publication, delete Editorial Comments', 'revisionary'),
 	'deletion_queue' => 						esc_html__('Enable deletion queue', 'revisionary'),
@@ -679,7 +679,7 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 			<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 			<?php
-			$hint = esc_html__('To enable a role, add the manage_unsubmitted_revisions capability', 'revisionary');
+			$hint = esc_html__('To enable a role, add the manage_unsubmitted_revisions capability.', 'revisionary');
 			$this->option_checkbox('manage_unsubmitted_capability', $tab, $section, $hint, '');
 	
 			$hint = esc_html__('This restriction applies to users who are not full editors for the post type. To enable a role, give it the edit_others_revisions capability.', 'revisionary');
@@ -698,8 +698,14 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 		?>
 
 		<?php if (!empty($_SERVER['REQUEST_URI'])):?>
-		<p style="padding-left:22px; margin-top:25px">
+		<p style="margin-top:25px">
 		<a href="<?php echo esc_url(wp_nonce_url(add_query_arg('rvy_flush_flags', 1, esc_url(esc_url_raw($_SERVER['REQUEST_URI']))), 'flush-flags') )?>"><?php esc_html_e('Regenerate "post has revision" flags', 'revisionary');?></a>
+		
+		<?php if ($this->display_hints) :
+			$hint = esc_html__('Apply this maintenance operation if "Has Revision" indicators on the Posts / Pages screen seem out of sync with the Revision Queue listing.', 'revisionary');
+			echo "<div class='rvy-subtext'>" . esc_html($hint) . "</div>";
+		endif;?>
+	
 		</p>
 		<?php endif;?>
 
