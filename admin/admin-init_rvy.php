@@ -338,12 +338,9 @@ function rvy_admin_init() {
 				break;
 
 			case 'delete':
-				$revision_status_csv = implode(
-					"','", 
-					array_diff(
-						array_map('sanitize_key', rvy_revision_statuses()),
-						['future-revision']
-					)
+				$revision_statuses = array_diff(
+					array_map('sanitize_key', rvy_revision_statuses()),
+					['future-revision']
 				);
 				
 				$deleted = 0;
@@ -355,7 +352,7 @@ function rvy_admin_init() {
 						continue;
 					
 					if ( ! current_user_can('administrator') && ! current_user_can( 'delete_post', rvy_post_id($revision->ID) ) ) {  // @todo: review Administrator cap check
-						if (!in_array($revision->post_mime_type, $revision_status_csv) || !rvy_is_post_author($revision)) {	// allow submitters to delete their own still-pending revisions
+						if (!in_array($revision->post_mime_type, $revision_statuses) || !rvy_is_post_author($revision)) {	// allow submitters to delete their own still-pending revisions
 							wp_die( esc_html__('Sorry, you are not allowed to delete this revision.', 'revisionary') );
 						}
 					} 
