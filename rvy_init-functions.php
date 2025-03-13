@@ -864,6 +864,9 @@ function rvy_refresh_options_sitewide() {
 		$rvy_options_sitewide = array_fill_keys( array_merge( $custom_options_sitewide, $unreviewed_default_sitewide ), true );
 	}
 
+	// Settings which are always controlled network-wide
+	$rvy_options_sitewide['delete_settings_on_uninstall'] = true;
+
 	$rvy_options_sitewide = array_filter( $rvy_options_sitewide );
 }
 
