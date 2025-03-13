@@ -156,10 +156,13 @@ class Revisionary
 				add_action('wp_default_scripts', array($this, 'act_new_revision_redirect'), 1);
 			}
 		}
-
 																				// check referer downstream
 		if (!empty($_REQUEST['edit_new_revision'])) {							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			add_action('wp_default_scripts', array($this, 'act_edit_revision_redirect'), 1);
+			if (did_action('wp_default_scripts')) {
+				$this->act_edit_revision_redirect();
+			} else {
+				add_action('wp_default_scripts', array($this, 'act_edit_revision_redirect'), 1);
+			}
 		}
 
 		add_filter('get_comments_number', array($this, 'flt_get_comments_number'), 10, 2);
