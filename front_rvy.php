@@ -51,7 +51,7 @@ class RevisionaryFront {
 
 		$preview_page_id = (!empty($_REQUEST['page__id'])) ? $_REQUEST['page__id'] : 0;
 
-		if (!$preview_page_id || empty($wp_query) || !$wp_query->is_main_query() || empty($wp_query->query_vars) || empty($wp_query->query_vars['p'])) {
+		if (!$preview_page_id || empty($wp_query) || empty($wp_query->query_vars) || empty($wp_query->query_vars['p'])) {
 			return $clauses;
 		}
 
