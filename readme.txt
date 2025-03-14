@@ -244,7 +244,7 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
-= 3.6.3 - 13 Mar 2025 =
+= 3.6.3 - 14 Mar 2025 =
 * Feature : Option to clear Plugin data on plugin deletion
 * Fixed : After Revision creation in editor, Edit link goes to Queue
 * Fixed : Revision bulk deletion failed with fatal error
