@@ -14,7 +14,9 @@ class RevisionaryFront {
 		add_action('parse_query', [$this, 'actSetQueriedObject'], 20);
 		add_action('parse_query', [$this, 'actFlagHomeRevision'], 20);
 
-		add_filter('posts_clauses_request', [$this, 'fltHomePreviewRequest'], 99, 3);
+		if (!defined('ET_BUILDER_VERSION') || defined('REVISIONARY_DIVI_HOME_PREVIEW_FILTER')) {
+			add_filter('posts_clauses_request', [$this, 'fltHomePreviewRequest'], 99, 3);
+		}
 
 		add_filter('body_class', [$this, 'fltBodyClass'], 20, 2);
 
@@ -49,7 +51,7 @@ class RevisionaryFront {
 
 		$preview_page_id = (!empty($_REQUEST['page__id'])) ? $_REQUEST['page__id'] : 0;
 
-		if (!$preview_page_id || empty($wp_query) || empty($wp_query->query_vars) || empty($wp_query->query_vars['p'])) {
+		if (!$preview_page_id || empty($wp_query) || !$wp_query->is_main_query() || empty($wp_query->query_vars) || empty($wp_query->query_vars['p'])) {
 			return $clauses;
 		}
 
