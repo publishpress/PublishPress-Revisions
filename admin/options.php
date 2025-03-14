@@ -166,7 +166,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'revisor_role_add_custom_rolecaps' => 		esc_html__('All custom post types available to Revisors', 'revisionary' ),
 	'require_edit_others_drafts' => 			esc_html__("Prevent Revisors from editing other user's drafts", 'revisionary' ),
 	'display_hints' => 							esc_html__('Display Hints', 'revisionary'),
-	'delete_settings_on_uninstall' => 			esc_html__('Delete settings and data if plugin is deleted', 'revisionary'),
+	'delete_settings_on_uninstall' => 			esc_html__('Delete settings and Revisions if plugin is deleted', 'revisionary'),
 	'revision_preview_links' => 				esc_html__('Show Preview Links', 'revisionary'),
 	'preview_link_type' => 						esc_html__('Preview Link Type', 'revisionary'),
 	'preview_link_alternate_preview_arg' =>		esc_html__('Modify preview link for better theme compatibility', 'revisionary'),
@@ -882,7 +882,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		$hint = esc_html__( 'Show descriptive captions for PublishPress Revisions settings', 'revisionary' );
 		$this->option_checkbox( 'display_hints', $tab, $section, $hint, '' );
 
-		$hint = esc_html__('note: Plugin settings and configuration data will be deleted, but only after the last copy of Revisions / Revisions Pro is deleted.', 'revisionary');
+		$hint = esc_html__('note: Plugin settings, Revision Queue contents and related data will be deleted, but only after the last copy of Revisions / Revisions Pro is deleted.', 'revisionary');
 		$this->option_checkbox('delete_settings_on_uninstall', $tab, $section, $hint);
 		?>
 
