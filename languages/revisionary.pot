@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-03-14T14:33:07+00:00\n"
+"POT-Creation-Date: 2025-03-14T15:20:15+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: revisionary\n"
@@ -695,7 +695,7 @@ msgid "Display Hints"
 msgstr ""
 
 #: admin/options.php:169
-msgid "Delete settings and data if plugin is deleted"
+msgid "Delete settings and Revisions if plugin is deleted"
 msgstr ""
 
 #: admin/options.php:170
@@ -1018,7 +1018,7 @@ msgid "Show descriptive captions for PublishPress Revisions settings"
 msgstr ""
 
 #: admin/options.php:885
-msgid "note: Plugin settings and configuration data will be deleted, but only after the last copy of Revisions / Revisions Pro is deleted."
+msgid "note: Plugin settings, Revision Queue contents and related data will be deleted, but only after the last copy of Revisions / Revisions Pro is deleted."
 msgstr ""
 
 #: admin/options.php:904
