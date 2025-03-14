@@ -156,10 +156,13 @@ class Revisionary
 				add_action('wp_default_scripts', array($this, 'act_new_revision_redirect'), 1);
 			}
 		}
-
 																				// check referer downstream
 		if (!empty($_REQUEST['edit_new_revision'])) {							//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			add_action('wp_default_scripts', array($this, 'act_edit_revision_redirect'), 1);
+			if (did_action('wp_default_scripts')) {
+				$this->act_edit_revision_redirect();
+			} else {
+				add_action('wp_default_scripts', array($this, 'act_edit_revision_redirect'), 1);
+			}
 		}
 
 		add_filter('get_comments_number', array($this, 'flt_get_comments_number'), 10, 2);
@@ -1240,6 +1243,13 @@ class Revisionary
 			) {
 				if (!$revision = get_post($postarr['ID'])) {
 					return $data;
+				}
+
+				// Elementor integration causes revision post_mime_type to be set to 'pending' on front end "Save Draft"
+				if (rvy_in_revision_workflow($revision)) {
+					if (in_array($data['post_mime_type'], ['draft', 'pending'])) {
+						$data['post_mime_type'] = 'draft-revision';
+					}
 				}
 
 				if (!rvy_status_revisions_active($revision->post_type)) {

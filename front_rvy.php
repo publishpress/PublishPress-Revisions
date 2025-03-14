@@ -14,7 +14,9 @@ class RevisionaryFront {
 		add_action('parse_query', [$this, 'actSetQueriedObject'], 20);
 		add_action('parse_query', [$this, 'actFlagHomeRevision'], 20);
 
-		add_filter('posts_clauses_request', [$this, 'fltHomePreviewRequest'], 99, 3);
+		if (!defined('ET_BUILDER_VERSION') || defined('REVISIONARY_DIVI_HOME_PREVIEW_FILTER')) {
+			add_filter('posts_clauses_request', [$this, 'fltHomePreviewRequest'], 99, 3);
+		}
 
 		add_filter('body_class', [$this, 'fltBodyClass'], 20, 2);
 

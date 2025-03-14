@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, approve changes, scheduled chang
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.7
-Stable tag: 3.6.2
+Stable tag: 3.6.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -243,6 +243,13 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 Fixed: Security issue. Please update.
 
 == Changelog ==
+
+= 3.6.3 - 14 Mar 2025 =
+* Feature : Option to clear Plugin data on plugin deletion
+* Fixed : After Revision creation in editor, Edit link goes to Queue
+* Fixed : Revision bulk deletion failed with fatal error
+* Fixed : Revision Queue - Database error with some third party plugins
+* Change : Revisions > Settings - Minor changes and clarifications to captions on Revision, Queue, Preview tabs
 
 = 3.6.2 - 24 Feb 2025 =
 * Fixed : Revisions listed on main Posts / Pages screen under some configurations

@@ -166,6 +166,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'revisor_role_add_custom_rolecaps' => 		esc_html__('All custom post types available to Revisors', 'revisionary' ),
 	'require_edit_others_drafts' => 			esc_html__("Prevent Revisors from editing other user's drafts", 'revisionary' ),
 	'display_hints' => 							esc_html__('Display Hints', 'revisionary'),
+	'delete_settings_on_uninstall' => 			esc_html__('Delete settings and Revisions if plugin is deleted', 'revisionary'),
 	'revision_preview_links' => 				esc_html__('Show Preview Links', 'revisionary'),
 	'preview_link_type' => 						esc_html__('Preview Link Type', 'revisionary'),
 	'preview_link_alternate_preview_arg' =>		esc_html__('Modify preview link for better theme compatibility', 'revisionary'),
@@ -174,7 +175,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'compare_revisions_direct_approval' => 		esc_html__('Approve Button on Compare screen', 'revisionary'),
 	'copy_revision_comments_to_post' => 		esc_html__('Copy revision comments to published post', 'revisionary'),
 	'past_revisions_order_by' =>				esc_html__('Past Revisions ordering:', 'revisionary'), 
-	'list_unsubmitted_revisions' => 			sprintf(esc_html__('Include %s in My Activity, Revisions to My Posts views', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
+	'list_unsubmitted_revisions' => 			sprintf(esc_html__('List %s in Revision Queue for "My Activity" or "Revisions to My Posts" view', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
 	'archive_postmeta' =>						esc_html__('Store custom fields of submitted and scheduled revisions for archive', 'revisionary'),
 	'rev_publication_delete_ed_comments' =>		esc_html__('On Revision publication, delete Editorial Comments', 'revisionary'),
 	'deletion_queue' => 						esc_html__('Enable deletion queue', 'revisionary'),
@@ -205,7 +206,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['manage_unsubmitted_capability', 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions', 'deletion_queue'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'home_preview_set_home_flag', 'block_editor_extra_preview_button', 'compare_revisions_direct_approval', 'diff_display_strip_tags', 'past_revisions_order_by'],
-	'revisions'		=>		 ['require_edit_others_drafts', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'archive_postmeta', 'rev_publication_delete_ed_comments', 'revision_archive_deletion', 'revision_restore_require_cap', 'revision_statuses_noun_labels', 'display_hints'],
+	'revisions'		=>		 ['require_edit_others_drafts', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'archive_postmeta', 'rev_publication_delete_ed_comments', 'revision_archive_deletion', 'revision_restore_require_cap', 'revision_statuses_noun_labels', 'display_hints', 'delete_settings_on_uninstall'],
 	'notification'	=>		 ['use_publishpress_notifications', 'planner_notifications_access_limited', 'pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 	'license' =>			 ['edd_key'],
 ]
@@ -556,7 +557,8 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 	<?php
-	$this->option_checkbox( 'revision_limit_per_post', $tab, $section, '', '' );
+	$hint = esc_html__('Prevent Revision creation if the post already has another Revision in progress.', 'revisionary');
+	$this->option_checkbox( 'revision_limit_per_post', $tab, $section, $hint, '' );
 
 	$hide = empty(rvy_get_option('revision_limit_per_post'));
 	$hint = esc_html__('Work around cache plugin conflicts by requerying for revisions before suppressing the New Revision link.', 'revisionary');
@@ -573,7 +575,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	</script>
 
 	<?php
-	$hint = sprintf(esc_html__('If the user does not have a regular Edit link, recaption the %s link as "Edit"', 'revisionary'), pp_revisions_status_label('draft-revision', 'submit_short'));
+	$hint = sprintf(esc_html__('If the user does not have a regular Edit link, recaption the %s link as "Edit."', 'revisionary'), pp_revisions_status_label('draft-revision', 'submit_short'));
 	$this->option_checkbox( 'caption_copy_as_edit', $tab, $section, $hint, '' );
 
 	$hint = esc_html__('This restriction applies to users who are not full editors for the post type. To enable a role, add capabilities: copy_posts, copy_others_pages, etc.', 'revisionary');
@@ -589,7 +591,8 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	?>
 
 	<?php
-	$this->option_checkbox( 'auto_submit_revisions', $tab, $section, '', '' );
+	$hint = esc_html__('When a user who has publishing capabilities creates a Revision, set it to "Submitted" status.', 'revisionary');
+	$this->option_checkbox( 'auto_submit_revisions', $tab, $section, $hint, '' );
 
 	do_action('revisionary_auto_submit_setting_ui', $this, $tab, $section);
 	?>
@@ -679,7 +682,7 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 			<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 			<?php
-			$hint = esc_html__('To enable a role, add the manage_unsubmitted_revisions capability', 'revisionary');
+			$hint = esc_html__('To enable a role, add the manage_unsubmitted_revisions capability.', 'revisionary');
 			$this->option_checkbox('manage_unsubmitted_capability', $tab, $section, $hint, '');
 	
 			$hint = esc_html__('This restriction applies to users who are not full editors for the post type. To enable a role, give it the edit_others_revisions capability.', 'revisionary');
@@ -698,8 +701,14 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 		?>
 
 		<?php if (!empty($_SERVER['REQUEST_URI'])):?>
-		<p style="padding-left:22px; margin-top:25px">
+		<p style="margin-top:25px">
 		<a href="<?php echo esc_url(wp_nonce_url(add_query_arg('rvy_flush_flags', 1, esc_url(esc_url_raw($_SERVER['REQUEST_URI']))), 'flush-flags') )?>"><?php esc_html_e('Regenerate "post has revision" flags', 'revisionary');?></a>
+		
+		<?php if ($this->display_hints) :
+			$hint = esc_html__('Apply this maintenance operation if "Has Revision" indicators on the Posts / Pages screen seem out of sync with the Revision Queue listing.', 'revisionary');
+			echo "<div class='rvy-subtext'>" . esc_html($hint) . "</div>";
+		endif;?>
+	
 		</p>
 		<?php endif;?>
 
@@ -788,7 +797,12 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		<?php
 	}
 
-	echo '<h4 style="margin-top: 30px; margin-bottom:8px">' . esc_html__('Compare Revisions:', 'revisionary') . '</h4>';
+	echo '<h4 style="margin-top: 30px; margin-bottom:8px">' . esc_html__('Compare Revisions Screen:', 'revisionary') . '</h4>';
+
+	if ($this->display_hints) {
+		$hint = esc_html__('The screen to compare all unpublished revisions for an individual post is linked in the post editor and preview top bar.', 'revisionary');
+		echo "<div class='rvy-subtext'>" . esc_html($hint) . "</div>";
+	}
 
 	$id = 'past_revisions_order_by';
 	if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
@@ -867,6 +881,9 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 
 		$hint = esc_html__( 'Show descriptive captions for PublishPress Revisions settings', 'revisionary' );
 		$this->option_checkbox( 'display_hints', $tab, $section, $hint, '' );
+
+		$hint = esc_html__('note: Plugin settings, Revision Queue contents and related data will be deleted, but only after the last copy of Revisions / Revisions Pro is deleted.', 'revisionary');
+		$this->option_checkbox('delete_settings_on_uninstall', $tab, $section, $hint);
 		?>
 
 		</td></tr></table>
