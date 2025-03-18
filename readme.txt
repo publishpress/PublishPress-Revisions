@@ -244,6 +244,9 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
+= 3.6.4 - 18 Mar 2025 =
+* Compat : PublishPress Planner 3.7.0 - Revisions Pro prevented Planner from creating its standard default Notification Workflows
+
 = 3.6.3 - 14 Mar 2025 =
 * Feature : Option to clear Plugin data on plugin deletion
 * Fixed : After Revision creation in editor, Edit link goes to Queue
