@@ -330,7 +330,7 @@ function rvy_admin_url($partial_admin_url) {
     return rvy_nc_url( admin_url($partial_admin_url) );
 }
 
-function pp_revisions_plugin_updated($current_version) {
+function pp_revisions_plugin_updated($current_version, $args = []) {
     global $wpdb;
     
     $last_ver = get_option('revisionary_last_version');
@@ -339,10 +339,9 @@ function pp_revisions_plugin_updated($current_version) {
         return;
     }
 
-    if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && version_compare($last_ver, '3.6.0-rc6', '<')) {
-        update_option('revisionary_pro_flush_notifications', true);
-        delete_option('_pp_statuses_planner_default_revision_notifications');
-        delete_option('_pp_statuses_default_revision_notifications');
+    if ((defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') || !empty($args['is_pro'])) && version_compare($last_ver, '3.6.4-beta3', '<')) {
+        update_option('revisionary_pro_fix_default_notifications_meta_key', true);
+        update_option('revisionary_pro_restore_notifications', true);
     }
 
     if (version_compare($last_ver, '3.0.12-rc4', '<')) {
