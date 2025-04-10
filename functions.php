@@ -336,8 +336,10 @@ function pp_revisions_plugin_updated($current_version, $args = []) {
         return;
     }
 
-    if ((defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') || !empty($args['is_pro'])) && version_compare($last_ver, '3.6.4-beta3', '<')) {
+    if ((defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') || !empty($args['is_pro'])) && version_compare($last_ver, '3.6.6-beta5', '<')) {
         update_option('revisionary_pro_fix_default_notifications_meta_key', true);
+    }
+    if ((defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') || !empty($args['is_pro'])) && version_compare($last_ver, '3.6.4-beta3', '<')) {
         update_option('revisionary_pro_restore_notifications', true);
     }
 
