@@ -624,8 +624,10 @@ class Revisionary
 		if (rvy_in_revision_workflow($revision)) {
 			if (empty($revision->comment_count)) {
 				if ($main_post_id = get_post_meta($revision->ID, '_rvy_base_post_id', true)) {
-					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-					$wpdb->update($wpdb->posts, ['comment_count' => $main_post_id], ['ID' => $revision->ID]);
+					if ($main_post_id != $revision->ID) {
+						// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+						$wpdb->update($wpdb->posts, ['comment_count' => $main_post_id], ['ID' => $revision->ID]);
+					}
 				}
 			}
 		}
@@ -1238,7 +1240,9 @@ class Revisionary
 			// Revisions are not published by wp_update_post() execution; Prevent setting to a non-revision status
 			// @todo: confirm this is still needed
 
-			if (rvy_get_post_meta($postarr['ID'], '_rvy_base_post_id', true) 
+			$base_post_id = rvy_get_post_meta($postarr['ID'], '_rvy_base_post_id', true);
+
+			if (($base_post_id && ($base_post_id != $postarr['ID']))
 			&& ('trash' != $data['post_status'])
 			) {
 				if (!$revision = get_post($postarr['ID'])) {
@@ -1274,7 +1278,7 @@ class Revisionary
 					}
 				}
 
-				if (rvy_get_option('permissions_compat_mode') && ('revision' != $data['post_type'])) {
+				if (rvy_get_option('permissions_compat_mode') && ('revision' != $data['post_type']) && rvy_is_revision_status($data['post_mime_type'])) {
 					$data['post_status'] = $data['post_mime_type'];
 				}
 			}
