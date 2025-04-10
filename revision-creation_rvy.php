@@ -268,7 +268,9 @@ class RevisionCreation {
 			revisionary_copy_postmeta($base_post_id, $revision_id);
 		}
 
-		rvy_update_post_meta($revision_id, '_rvy_base_post_id', $base_post_id);
+		if ($base_post_id != $revision_id) {
+			rvy_update_post_meta($revision_id, '_rvy_base_post_id', $base_post_id);
+		}
 
 		if (!defined('REVISIONARY_LIMIT_IGNORE_UNSUBMITTED')) {
 			rvy_update_post_meta($base_post_id, '_rvy_has_revisions', true);
