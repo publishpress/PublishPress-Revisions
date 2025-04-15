@@ -525,11 +525,25 @@ class Revisionary
 	}
 
 	function actSavePost($post_id, $post) {
+		global $current_user;
+		
+		// Track updaters for use with Notifications, Archive
+		if ($is_revision = rvy_in_revision_workflow($post_id)) {
+			if (!$revision_updaters = get_post_meta($post_id, '_rvy_updated_by', true)) {
+				$revision_updaters = [];
+			}
+
+			if (empty($revision_updaters[$current_user->ID])) {
+				$revision_updaters[$current_user->ID] = true;
+				rvy_update_post_meta($post_id, '_rvy_updated_by', $revision_updaters);
+			}
+		}
+		
 		if (strtotime($post->post_date_gmt) > agp_time_gmt()) {
 			require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
 			
 			if (rvy_get_option('revision_publish_cron')) {
-				if (rvy_in_revision_workflow($post_id) && ('future-revision' == $post->post_mime_type)) {
+				if ($is_revision && ('future-revision' == $post->post_mime_type)) {
 					rvy_update_next_publish_date(['revision_id' => $post_id]);
 				}
 			} else {
