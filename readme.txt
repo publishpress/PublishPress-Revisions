@@ -244,6 +244,15 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
+= 3.6.6 - 15 Apr 2025 =
+* Fixed : Updating a post caused post status to be cleared if some prior revisioning operations were performed. This may have only occurred on WPML sites.
+* API : Allow "Decline Revision" status to be filtered to a value other than draft-revision
+* Change : Adjust implementation of "revisionary_unrevisioned_postmeta" filter to prevent third party code from accidentally forcing invalid fields back into comparison display
+
+= 3.6.5 - unreleased =
+* Pro : PublishPress Planner - default Notifications for Post creation / update were triggered by Revision creation / update
+* Pro : PublishPress Planner - support Notification validation safeguards in Planner 4.7.2
+
 = 3.6.4 - 18 Mar 2025 =
 * Compat : PublishPress Planner 3.7.0 - Revisions Pro prevented Planner from creating its standard default Notification Workflows
 
