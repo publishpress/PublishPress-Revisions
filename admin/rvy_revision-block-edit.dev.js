@@ -171,6 +171,8 @@ jQuery(document).ready(function ($) {
         }
         */
 
+        $('button.rvy-direct-approve:visible span.rvy-caption').html(approveCaption);
+
         $('button.edit-post-post-visibility__toggle, div.editor-post-url__panel-dropdown, div.components-checkbox-control').closest("div.editor-post-panel__row").hide();
 
 		// @todo: legacy support?
@@ -270,7 +272,7 @@ jQuery(document).ready(function ($) {
 	                    approveButtonHTML = '<a href="' + rvyObjEdit['pendingActionURL'] + '" class="revision-approve">'
 	                        + '<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button rvy-direct-approve">'
 	                        + '<span class="dashicons dashicons-yes"></span>'
-							+ rvyObjEdit['approveCaption'] + '</button></a>';
+							+ '<span class="rvy-caption">' + rvyObjEdit['approveCaption'] + '</span></button></a>';
 	               	}
 						
                     mainDashicon = 'dashicons-upload';
