@@ -338,8 +338,12 @@ function pp_revisions_plugin_updated($current_version, $args = []) {
 
     do_action('revisionary_plugin_updated', $last_ver, $current_version);
 
-    if ((defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') || !empty($args['is_pro'])) && version_compare($last_ver, '3.6.6-beta5', '<')) {
+    if ((defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') || !empty($args['is_pro'])) && version_compare($last_ver, '3.6.6-rc3', '<')) {
+        update_option('revisionary_pro_fix_revision_scheduled_notification', true);
         update_option('revisionary_pro_fix_default_notifications_meta_key', true);
+    }
+
+    if ((defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') || !empty($args['is_pro'])) && version_compare($last_ver, '3.6.6-beta5', '<')) {
         update_option('revisionary_pro_fix_default_notification_shortcodes', true);
     }
     if ((defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') || !empty($args['is_pro'])) && version_compare($last_ver, '3.6.4-beta3', '<')) {
