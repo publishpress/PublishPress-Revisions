@@ -23,19 +23,41 @@ jQuery(document).ready( function($) {
 	        }
 	 	}
 
-		if (rvyObjEdit.ajaxurl && !$('div.rvy-creation-ui').length && $(refSelector).length) {
+		if (((rvyObjEdit.ajaxurl && !$('div.rvy-creation-ui').length && $(refSelector).length))) {
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL']) {
 				var url = rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL'];
 			} else {
 				var url = 'javascript:void(0)';
             }
-            
+
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']) {
                 var approveButtonHTML = '';
 
+                var selectedDateHTML = $('#timestamp').html();
+
+                if (/\d/.test(selectedDateHTML) ) {
+                    var dateStr = $('#mm').val() + '/' + $('#jj').val() + '/' + $('#aa').val() + ' ' +  $('#hh').val() + ':' + $('#mn').val() + ':00';
+                    var selectedDate = new Date( dateStr );
+                    
+                    var currentDate = new Date();
+
+                    RvyTimeSelection = selectedDate.getTime() - ((currentDate.getTimezoneOffset() * 60 - rvyObjEdit.timezoneOffset) * 1000);
+                    var tdiff = RvyTimeSelection - currentDate.getTime();
+
+                    RvyTimeSelection = RvyTimeSelection / 1000; // pass seconds to server
+
+                    if ((tdiff > 1000)) {
+                        var approveCaption = rvyObjEdit['scheduleCaption'];
+                    } else {
+                        var approveCaption = rvyObjEdit['approveCaption'];
+                    }
+                } else {
+                    var approveCaption = rvyObjEdit['approveCaption'];
+                }
+
                 if (rvyObjEdit.canPublish && (rvyObjEdit.PendingStatus != rvyObjEdit.currentStatus) && ('future' != rvyObjEdit.currentStatus)) {
 					approveButtonHTML = '&nbsp;<a href="' + rvyObjEdit['pendingActionURL'] + '" class="button rvy-direct-approve">'
-					+ rvyObjEdit['approveCaption'] + '</a>'
+					+ approveCaption + '</a>'
 				}
 
                 var rvyPreviewLink = '';
@@ -49,11 +71,17 @@ jQuery(document).ready( function($) {
                     approveButtonHTML = '';
                 }
 
+                if (approveButtonHTML) {
+                    actionCaption = rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'];
+                } else {
+                    actionCaption = approveCaption;
+                }
+
                 $(refSelector).after(
                     '<div class="rvy-creation-ui" style="float:left; padding-left:10px; margin-bottom: 10px">'
 
                     + '<a href="' + url + '" class="button revision-approve">'
-                    + rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</a>'
+                    + actionCaption + '</a>'
                 
                     + approveButtonHTML
 
@@ -91,6 +119,14 @@ jQuery(document).ready( function($) {
         }
 
         $('a.revision-approve, a.rvy-direct-approve').attr('disabled', 'disabled');
+
+        setTimeout(function() {
+           $('div.rvy-creation-ui').remove();
+        }, 50);
+
+        setTimeout(function() {
+            $('a.revision-approve, a.rvy-direct-approve').attr('disabled', 'disabled');
+         }, 500);
     });
 
 	$(document).on('click', 'a.save-timestamp, a.cancel-timestamp', function() {
@@ -202,7 +238,7 @@ jQuery(document).ready( function($) {
         $('.revision-created-wrapper, .revision-created').hide();
 
         if (!$('a.rvy-direct-approve').length) {
-            $('a.revision-approve').html(rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']).show().removeAttr('disabled');
+            $('a.revision-approve').show().removeAttr('disabled');
         }
     });
 });

@@ -15,7 +15,7 @@ jQuery(document).ready(function ($) {
 			document.querySelector(btnSelector).innerText = `${btnCaption}`;
 			
             if (btnIcon) {
-                document.querySelector(btnSelector).innerHTML = `<span class="dashicons dashicons-${btnIcon}"></span>${btnCaption}`;
+                document.querySelector(btnSelector).innerHTML = `<span class="dashicons dashicons-${btnIcon}"></span><span class="rvy-caption">${btnCaption}</span>`;
             }
         }
 	}
@@ -159,7 +159,7 @@ jQuery(document).ready(function ($) {
         } else {
             var approveCaption = rvyObjEdit['approveCaption'];
         }
-        
+
         if (!$('div.editor-post-schedule__panel-dropdown:visible').length) {
             $('.rvy-creation-ui').remove();
         }
@@ -170,6 +170,12 @@ jQuery(document).ready(function ($) {
             return;
         }
         */
+
+        if ($('button.rvy-direct-approve:visible').length) {
+            $('button.rvy-direct-approve:visible span.rvy-caption').html(approveCaption);
+        } else {
+            $('button.revision-approve:visible span.rvy-caption').html(approveCaption);
+        }
 
         $('button.edit-post-post-visibility__toggle, div.editor-post-url__panel-dropdown, div.components-checkbox-control').closest("div.editor-post-panel__row").hide();
 
@@ -270,7 +276,7 @@ jQuery(document).ready(function ($) {
 	                    approveButtonHTML = '<a href="' + rvyObjEdit['pendingActionURL'] + '" class="revision-approve">'
 	                        + '<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button rvy-direct-approve">'
 	                        + '<span class="dashicons dashicons-yes"></span>'
-							+ rvyObjEdit['approveCaption'] + '</button></a>';
+							+ '<span class="rvy-caption">' + rvyObjEdit['approveCaption'] + '</span></button></a>';
 	               	}
 						
                     mainDashicon = 'dashicons-upload';
@@ -299,7 +305,7 @@ jQuery(document).ready(function ($) {
                     $(refSelector).after('<div class="rvy-creation-ui rvy-submission-div' + divClass + '"><a href="' + url + '" class="revision-approve">'
                         + '<button type="button" class="components-button revision-approve is-button is-primary ppr-purple-button">'
                         + '<span class="dashicons ' + mainDashicon + '"></span>'
-                        + rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</button></a>'
+                        + '<span class="rvy-caption">' + rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</span></button></a>'
                         + approveButtonHTML
                         + '<div class="revision-submitting" style="display: none;">'
                         + '<span class="revision-approve revision-submitting">'

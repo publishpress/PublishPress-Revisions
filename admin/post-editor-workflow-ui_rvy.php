@@ -129,7 +129,11 @@ class PostEditorWorkflowUI {
         $vars['approveCaption'] = ($can_publish) ? pp_revisions_status_label('pending-revision', 'approve') : '';
         $vars['approvingCaption'] = __('Approving the Revision...', 'revisionary');
 
-        $vars['scheduleCaption'] = ($can_publish) ? pp_revisions_status_label('future-revision', 'submit') : '';
+        if ($block_editor) {
+            $vars['scheduleCaption'] = ($can_publish) ? pp_revisions_status_label('future-revision', 'submit_short') : '';
+        } else {
+            $vars['scheduleCaption'] = ($can_publish) ? pp_revisions_status_label('future-revision', 'submit') : '';
+        }
 
         $pending_obj = get_post_status_object('pending-revision');
         $vars['pendingStatusCaption'] = $pending_obj->label;
