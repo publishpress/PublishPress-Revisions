@@ -23,7 +23,7 @@ jQuery(document).ready( function($) {
 	        }
 	 	}
 
-		if ((rvyObjEdit.ajaxurl && !$('div.rvy-creation-ui').length && $(refSelector).length) || refreshSubmissionUI) {
+		if (((rvyObjEdit.ajaxurl && !$('div.rvy-creation-ui').length && $(refSelector).length))) {
 			if (rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL']) {
 				var url = rvyObjEdit[rvyObjEdit.currentStatus + 'ActionURL'];
 			} else {
@@ -71,11 +71,17 @@ jQuery(document).ready( function($) {
                     approveButtonHTML = '';
                 }
 
+                if (approveButtonHTML) {
+                    actionCaption = rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'];
+                } else {
+                    actionCaption = approveCaption;
+                }
+
                 $(refSelector).after(
                     '<div class="rvy-creation-ui" style="float:left; padding-left:10px; margin-bottom: 10px">'
 
                     + '<a href="' + url + '" class="button revision-approve">'
-                    + rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</a>'
+                    + actionCaption + '</a>'
                 
                     + approveButtonHTML
 
@@ -114,7 +120,13 @@ jQuery(document).ready( function($) {
 
         $('a.revision-approve, a.rvy-direct-approve').attr('disabled', 'disabled');
 
-        $('div.rvy-creation-ui').remove();
+        setTimeout(function() {
+           $('div.rvy-creation-ui').remove();
+        }, 50);
+
+        setTimeout(function() {
+            $('a.revision-approve, a.rvy-direct-approve').attr('disabled', 'disabled');
+         }, 500);
     });
 
 	$(document).on('click', 'a.save-timestamp, a.cancel-timestamp', function() {
@@ -226,7 +238,7 @@ jQuery(document).ready( function($) {
         $('.revision-created-wrapper, .revision-created').hide();
 
         if (!$('a.rvy-direct-approve').length) {
-            $('a.revision-approve').html(rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption']).show().removeAttr('disabled');
+            $('a.revision-approve').show().removeAttr('disabled');
         }
     });
 });
