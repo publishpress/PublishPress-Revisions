@@ -347,7 +347,7 @@ function rvy_status_registrations() {
 			'future-revision' => [
 				'name' => esc_html__('Scheduled Revision', 'revisionary'),
 				'submit' => esc_html__('Schedule Revision', 'revisionary'), 
-				'submit_short' => esc_html__('Schedule Revision', 'revisionary'), 
+				'submit_short' => esc_html__('Schedule', 'revisionary'), 
 				'submitting' => esc_html__('Scheduling Revision...', 'revisionary'),
 				'submitted' => ($block_editor) ? esc_html__('The Revision is Scheduled', 'revisionary') :  esc_html__('Revision Scheduled', 'revisionary'),
 				'approve' => esc_html__('Approve Revision', 'revisionary'), 
