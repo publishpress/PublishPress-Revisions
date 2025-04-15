@@ -55,6 +55,10 @@ class RvyPostEdit {
 
             $args['isStatusesPro'] = rvy_status_revisions_active($post->post_type);
 
+            $wp_timezone = wp_timezone();
+            $utc_time = new DateTime("now", new DateTimeZone('UTC'));
+            $args['timezoneOffset'] = 0 - $wp_timezone->getOffset($utc_time);
+
             wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
 
             if (defined('PUBLISHPRESS_VERSION')) {
