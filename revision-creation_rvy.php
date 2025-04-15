@@ -105,6 +105,8 @@ class RevisionCreation {
 
 		$revision_id = $this->insert_revision($data, $source_post->ID, $revision_status, $args);
 
+		$revision = get_post($revision_id);
+
 		if (!empty($use_autosave)) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->delete($wpdb->posts, ['ID' => $autosave_post->ID]);
@@ -113,11 +115,14 @@ class RevisionCreation {
 		if ('future-revision' == $revision_status) {
 			require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
 			rvy_update_next_publish_date(['revision_id' => $revision_id]);
+
+			$revision_before = $source_post;
+			$revision_before->post_mime_type = 'new';
+
+			do_action('revisionary_scheduled', $source_post->ID, $revision, $revision_before);
 		}
 
 		if (('pending-revision' == $revision_status) && !defined('REVISIONARY_NO_INSERT_POST_ACTION')) {
-			$revision = get_post($revision_id);
-			
 			$revision_before = $revision;
 			$revision_before->post_status = apply_filters('revisionary_post_revision_status', 'draft', 'draft-revision', $revision_id);
 			$revision_before->post_mime_type = 'draft-revision';
