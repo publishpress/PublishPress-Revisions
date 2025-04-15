@@ -6,7 +6,7 @@ Author URI: https://publishpress.com
 Tags: revision, submit changes, duplicate post, approve changes, scheduled changes
 Requires at least: 5.5
 Requires PHP: 7.2.5
-Tested up to: 6.7
+Tested up to: 6.8
 Stable tag: 3.6.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -246,6 +246,8 @@ Fixed: Security issue. Please update.
 
 = 3.6.6 - 15 Apr 2025 =
 * Fixed : Updating a post caused post status to be cleared if some prior revisioning operations were performed. This may have only occurred on WPML sites.
+* Fixed : Revision Preview showed "Approve" button if Revision is already scheduled
+* Change : When editing a Revision, recaption "Approve" button to "Schedule" if a future date is selected
 * API : Allow "Decline Revision" status to be filtered to a value other than draft-revision
 * Change : Adjust implementation of "revisionary_unrevisioned_postmeta" filter to prevent third party code from accidentally forcing invalid fields back into comparison display
 
