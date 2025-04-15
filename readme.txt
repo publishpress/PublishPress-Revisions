@@ -246,6 +246,8 @@ Fixed: Security issue. Please update.
 
 = 3.6.6 - 15 Apr 2025 =
 * Fixed : Updating a post caused post status to be cleared if some prior revisioning operations were performed. This may have only occurred on WPML sites.
+* Fixed : Revision Preview showed "Approve" button if Revision is already scheduled
+* Change : When editing a Revision, recaption "Approve" button to "Schedule" if a future date is selected
 * API : Allow "Decline Revision" status to be filtered to a value other than draft-revision
 * Change : Adjust implementation of "revisionary_unrevisioned_postmeta" filter to prevent third party code from accidentally forcing invalid fields back into comparison display
 
