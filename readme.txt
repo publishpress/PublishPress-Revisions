@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, approve changes, scheduled chang
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.8
-Stable tag: 3.6.6
+Stable tag: 3.6.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -243,6 +243,23 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 Fixed: Security issue. Please update.
 
 == Changelog ==
+
+= 3.6.7 - 1 May 2025 =
+* Fixed : Submit Revision button caption was missing for Revisors
+* Feature : Revision Archive - option to archive past updates of Pending / Scheduled Revisions, even after publication
+* Feature : Archive - Include action link "Edit Parent"
+* Feature : Archive - "Edit Parent" tool tip provides context by specifying "Parent post" or "Parent revision"
+* Change : Archive - Recaption "Method" to "Action"
+* Change : Archive - Clarify Action captions for "Revision Publication" and "Scheduled Revision Publication"
+* Change : Archive - For direct edits, show same user in Revised By and Approved By fields
+* Change : Archive - Hide Count column, which is redundant in this context
+* Fixed : Archive - Action caption for past updates of Submitted / Scheduled revisions: "Edit of Submitted Revision", etc.
+* Fixed : Archive - Published Date was displayed for past updates of Submitted / Scheduled revisions even though the revision has not been published
+* Fixed : Archive - Wrong publication date listed for direct edits
+* Fixed : Archive - Wrong publication date displayed for published revisions under some conditions
+* Fixed : Archive - Bulk deletion checkbox was displayed even if revision archive deletion is disabled 
+* Compat : Elementor - Database error on Revision update
+* Compat : Prevent PHP Notice if another plugin calls wp_schedule_event() too early
 
 = 3.6.6 - 15 Apr 2025 =
 * Fixed : Updating a post caused post status to be cleared if some prior revisioning operations were performed. This may have only occurred on WPML sites.

@@ -958,7 +958,7 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		}
 	}
 	
-	rvy_update_post_meta($revision_id, '_rvy_published_gmt', $post_modified_gmt);
+	rvy_update_post_meta($revision_id, '_rvy_published_gmt', current_time('mysql', 1));
 
 	rvy_update_post_meta($revision_id, '_rvy_prev_revision_status', $actual_revision_status);
 
@@ -1055,9 +1055,11 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 		);
 	}
 
-	rvy_delete_past_revisions($revision_id);
+	if (!rvy_get_option('extended_archive')) {
+		rvy_delete_past_revisions($revision_id);
 
-	rvy_delete_redundant_revisions($revision);
+		rvy_delete_redundant_revisions($revision);
+	}
 
 	clean_post_cache($revision_id);
 	clean_post_cache($published->ID);

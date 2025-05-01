@@ -74,8 +74,12 @@ function rvy_set_notification_buffer_cron() {
 function rvy_mail_buffer_cron_interval( $schedules ) {
     $schedules['two_minutes'] = array(
         'interval' => 120,
-        'display'  => esc_html__( 'Every 2 Minutes', 'revisionary' ),
+        'display'  => '120_sec',
     );
+
+    if (did_action('init')) {
+        $schedules['two_minutes']['display'] = esc_html__( 'Every 2 Minutes', 'revisionary' );
+    }
  
     return $schedules;
 }

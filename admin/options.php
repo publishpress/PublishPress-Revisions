@@ -177,6 +177,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'past_revisions_order_by' =>				esc_html__('Past Revisions ordering:', 'revisionary'), 
 	'list_unsubmitted_revisions' => 			sprintf(esc_html__('List %s in Revision Queue for "My Activity" or "Revisions to My Posts" view', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
 	'archive_postmeta' =>						esc_html__('Store custom fields of submitted and scheduled revisions for archive', 'revisionary'),
+	'extended_archive' =>						esc_html__('Keep an archive of revision edits, even after the revision is published', 'revisionary'),
 	'rev_publication_delete_ed_comments' =>		esc_html__('On Revision publication, delete Editorial Comments', 'revisionary'),
 	'deletion_queue' => 						esc_html__('Enable deletion queue', 'revisionary'),
 	'revision_archive_deletion' => 				esc_html__('Enable deletion in archive', 'revisionary'),
@@ -206,7 +207,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'pending_revisions'	=> 	 ['pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date'],
 	'revision_queue' =>		 ['manage_unsubmitted_capability', 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions', 'deletion_queue'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'home_preview_set_home_flag', 'block_editor_extra_preview_button', 'compare_revisions_direct_approval', 'diff_display_strip_tags', 'past_revisions_order_by'],
-	'revisions'		=>		 ['require_edit_others_drafts', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'archive_postmeta', 'rev_publication_delete_ed_comments', 'revision_archive_deletion', 'revision_restore_require_cap', 'revision_statuses_noun_labels', 'display_hints', 'delete_settings_on_uninstall'],
+	'revisions'		=>		 ['require_edit_others_drafts', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'archive_postmeta', 'extended_archive', 'rev_publication_delete_ed_comments', 'revision_archive_deletion', 'revision_restore_require_cap', 'revision_statuses_noun_labels', 'display_hints', 'delete_settings_on_uninstall'],
 	'notification'	=>		 ['use_publishpress_notifications', 'planner_notifications_access_limited', 'pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 	'license' =>			 ['edd_key'],
 ]
@@ -858,6 +859,8 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		$this->option_checkbox( 'trigger_post_update_actions', $tab, $section, $hint, '' );
 
 		echo '<h4 style="margin-top: 30px; margin-bottom:0">' . esc_html__('Revision Archive:', 'revisionary') . '</h4>';
+
+		$this->option_checkbox( 'extended_archive', $tab, $section, '', '' );
 
 		$this->option_checkbox( 'archive_postmeta', $tab, $section, '', '' );
 
