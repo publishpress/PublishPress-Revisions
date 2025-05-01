@@ -3,7 +3,7 @@
 *
 * By Kevin Behrens
 *
-* Copyright 2021, PublishPress
+* Copyright 2025, PublishPress
 */
 jQuery(document).ready(function ($) {
     function RvyRecaptionElement(btnSelector, btnCaption, btnIcon = '') {
@@ -171,10 +171,12 @@ jQuery(document).ready(function ($) {
         }
         */
 
-        if ($('button.rvy-direct-approve:visible').length) {
-            $('button.rvy-direct-approve:visible span.rvy-caption').html(approveCaption);
-        } else {
-            $('button.revision-approve:visible span.rvy-caption').html(approveCaption);
+        if (approveCaption) {
+            if ($('button.rvy-direct-approve:visible').length) {
+                $('button.rvy-direct-approve:visible span.rvy-caption').html(approveCaption);
+            } else {
+                $('button.revision-approve:visible span.rvy-caption').html(approveCaption);
+            }
         }
 
         $('button.edit-post-post-visibility__toggle, div.editor-post-url__panel-dropdown, div.components-checkbox-control').closest("div.editor-post-panel__row").hide();
