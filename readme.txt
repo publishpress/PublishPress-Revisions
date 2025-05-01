@@ -246,7 +246,6 @@ Fixed: Security issue. Please update.
 
 = 3.6.7 - 1 May 2025 =
 * Fixed : Submit Revision button caption was missing for Revisors
-* Fixed : Classic Editor - Default Submit button was displayed (but does not cause Revision to be submitted)
 * Feature : Revision Archive - option to archive past updates of Pending / Scheduled Revisions, even after publication
 * Feature : Archive - Include action link "Edit Parent"
 * Feature : Archive - "Edit Parent" tool tip provides context by specifying "Parent post" or "Parent revision"
