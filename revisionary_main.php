@@ -534,7 +534,7 @@ class Revisionary
 			}
 
 			if (empty($revision_updaters[$current_user->ID])) {
-				$revision_updaters[$current_user->ID] = true;
+				$revision_updaters[$current_user->ID] = current_time( 'mysql', 1 );
 				rvy_update_post_meta($post_id, '_rvy_updated_by', $revision_updaters);
 			}
 		}
@@ -665,7 +665,7 @@ class Revisionary
 
 		if ( $revisions = rvy_get_post_revisions( $post_id, '', array( 'order' => 'DESC', 'orderby' => 'ID' ) ) ) {  // @todo: retrieve revision_id in block editor js, pass as redirect arg
 			foreach( $revisions as $revision ) {
-				if (rvy_is_post_author($revision, $user_id)) {
+				if ((false === $user_id) || rvy_is_post_author($revision, $user_id)) {
 					return $revision;
 				}
 			}
