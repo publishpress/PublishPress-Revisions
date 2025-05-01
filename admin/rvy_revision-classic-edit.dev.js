@@ -3,7 +3,7 @@
 *
 * By Kevin Behrens
 *
-* Copyright 2024, PublishPress
+* Copyright 2025, PublishPress
 */
 jQuery(document).ready( function($) {
 	var RvySubmissionUI = function() {
@@ -71,10 +71,10 @@ jQuery(document).ready( function($) {
                     approveButtonHTML = '';
                 }
 
-                if (approveButtonHTML) {
-                    actionCaption = rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'];
-                } else {
+                if (approveButtonHTML && ('draft' != rvyObjEdit.currentStatus)) {
                     actionCaption = approveCaption;
+                } else {
+                    actionCaption = rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'];
                 }
 
                 $(refSelector).after(
