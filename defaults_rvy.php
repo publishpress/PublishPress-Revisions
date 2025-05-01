@@ -68,6 +68,7 @@ function rvy_default_options_sitewide() {
 		'permissions_compat_mode' => true,
 		'planner_notifications_access_limited' => false,
 		'archive_postmeta' => true,
+		'extended_archive' => true,
 		'delete_settings_on_uninstall' => true
 	);
 
@@ -136,6 +137,7 @@ function rvy_default_options() {
 		'permissions_compat_mode' => 0,
 		'planner_notifications_access_limited' => 0,
 		'archive_postmeta' => 0,
+		'extended_archive' => 0,
 		'delete_settings_on_uninstall' => 0,
 	);
 

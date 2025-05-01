@@ -7,8 +7,22 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	private $my_revisions_count = null;
 	private $show_approved_by_col = true;
 
+	private $post_id = 0;
+	private $direct_edit = false;
+	private $revision_published_gmt = '';
+	private $from_revision_workflow = false;
+	private $parent_in_revision_workflow = false;
+	private $parent_from_revision_workflow = false;
+
+	private $active_revision_title;
+	private $from_revision_title;
+
 	public function __construct( $args ) {
 		global $revisionary;
+
+		$this->active_revision_title = __('This was an update to a revision which is still in the workflow process.', 'revisionary');
+
+		$this->from_revision_title = __('This was an update to a revision which was published after further editing.', 'revisionary');
 
 		$args = wp_parse_args(
 			$args,
@@ -348,7 +362,9 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			$count++;
 		}
 
-		$query .= $this->having_and( $count ) . ' origin_post_type IN ("' . implode('","', $this->post_types ) . '")';
+		$query_types = array_merge($this->post_types, ['revision']);
+
+		$query .= $this->having_and( $count ) . ' origin_post_type IN ("' . implode('","', $query_types ) . '")';
 		$count++;
 
 		// Set order by and order
@@ -442,17 +458,21 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	 */
     public function get_columns() {
         $arr = array(
-            'cb'					=> '<input type="checkbox" />',
+            /*'cb'					=> '<input type="checkbox" />',*/
 			'post_title' 	=> __( 'Revision', 'revisionary' ),
 			'post_count' 	=> __( 'Count', 'revisionary' ),
 			'origin_post_type' 		=> __( 'Post Type', 'revisionary' ),
 			'post_author'	=> __( 'Revised By', 'revisionary' ),
 			'post_date' 	=> __( 'Revision Date', 'revisionary' ),
-			'publication_method' => __('Method', 'revisionary'),
+			'publication_method' => __('Action', 'revisionary'),
 			'approved_by'	=> __('Approved By', 'revisionary'),
 			'origin_post_date'		=> __( 'Published Date', 'revisionary' ),
 			'origin_post_author'	=> __( 'Published Author', 'revisionary' ),
         );
+
+		if (!rvy_get_option('revision_archive_deletion')) {
+			unset($arr['post_count']);
+		}
 
 		if (!$this->show_approved_by_col) {
 			unset($arr['approved_by']);
@@ -477,6 +497,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 		if ( $time_diff < 60 ) {
 			$result = esc_html__( 'just now', 'revisionary' );
+
 		} elseif ( $time_diff < 3600 ) {
 			$diff = floor( $time_diff / 60 );
 			
@@ -504,12 +525,38 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	 * Override WP_List_Table::column_default()
 	 */
     public function column_default( $item, $column_name ) {
-        switch ( $column_name ) {
+        if ($item->ID != $this->post_id) {
+			$this->post_id = $item->ID;
+			$this->direct_edit = false;
+			$this->from_revision_workflow = false;
+			$this->parent_in_revision_workflow = false;
+			$this->parent_from_revision_workflow = false;
+
+			if ($this->revision_published_gmt = get_post_meta($item->ID, '_rvy_published_gmt', true)) {
+				$this->from_revision_workflow = get_post_meta($item->ID, '_rvy_prev_revision_status', true);
+				
+				if (!$this->from_revision_workflow) {
+					$this->from_revision_workflow = true;
+				}
+
+			} elseif ($revision_status = rvy_in_revision_workflow($item->post_parent)) {
+				$this->parent_in_revision_workflow = $revision_status;
+			
+			} elseif ($revision_status = rvy_from_revision_workflow($item->post_parent)) {
+				$this->parent_from_revision_workflow = $revision_status;
+			} else {
+				$this->direct_edit = true;
+			}
+		}
+		
+		switch ( $column_name ) {
             case 'post_title':
 				// Are revisions enabled for the post type of this post parent?
 				$post_object 		= get_post( $item->post_parent );
-				$revisions_enabled	= wp_revisions_enabled( $post_object );
-				if( $revisions_enabled ) {
+				
+				//$revisions_enabled	= wp_revisions_enabled( $post_object );
+				
+				//if( $revisions_enabled ) {
 					// Show title with link
 					printf(
 						'<strong><a class="row-title rvy-open-popup" href="%s" data-label="%s">%s</a></strong>',
@@ -517,6 +564,8 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 						esc_attr( $item->$column_name ),
 						esc_html($item->$column_name)
 					);
+				
+				/*
 				} else {
 					// Show title WITHOUT link
 					printf(
@@ -531,17 +580,28 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 						)
 					);
 				}
+				*/
 
 				break;
 
 			case 'origin_post_type':
-				$type_obj = get_post_type_object($item->$column_name);
+				if ('revision' == $item->origin_post_type) {
+					$post_type = get_post_field('post_type', $item->post_parent);
+
+					if ('revision' == $post_type) {
+						$post_type = get_post_field('post_type', get_post_field('post_parent', $item->post_parent));
+					}
+				} else {
+					$post_type = $item->origin_post_type;
+				}
+
+				$type_obj = get_post_type_object($post_type);
 				$type_label = (!empty($type_obj)) ? $type_obj->labels->singular_name : $item->$column_name;
 
 				$this->echo_filter_link(
 					$type_label,
 					[
-						'origin_post_type' => sanitize_key( $item->$column_name )
+						'origin_post_type' => sanitize_key( $post_type )
 					]
 				);
 				break;
@@ -549,15 +609,30 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			case 'post_date':
 				$prev_revision_status = get_post_meta($item->ID, '_rvy_prev_revision_status', true);
 
-				if ('future-revision' == $prev_revision_status) {
+				//if ('future-revision' == $prev_revision_status) {
 					return $this->friendly_date($item->post_modified, $item->post_modified_gmt);
-				} else {
-					return $this->friendly_date($item->post_date, $item->post_date_gmt);
-				}
+				//} else {
+					//return $this->friendly_date($item->post_date, $item->post_date_gmt);
+				//}
 
 				break;
+
 			case 'origin_post_date':
-                return $this->friendly_date($item->origin_post_date, $item->origin_post_date_gmt);
+				if ($this->direct_edit) {
+					$published_gmt = $item->post_modified_gmt;
+
+				} elseif ($this->parent_in_revision_workflow || $this->parent_from_revision_workflow) {
+					break;
+
+				} else {
+					$published_gmt = $item->post_date_gmt;
+				}
+
+				//} elseif (!$published_gmt = get_post_meta($item->ID, '_rvy_published_gmt', true)) {
+				//	$published_gmt = $item->origin_post_date_gmt;
+				//}
+
+                return $this->friendly_date(get_date_from_gmt($published_gmt), $published_gmt);
 				break;
 
 			case 'origin_post_author':
@@ -579,31 +654,47 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				break;
 
 			case 'publication_method':
-				$revision_publication = get_post_meta($item->ID, '_rvy_published_gmt', true);
-				$prev_revision_status = get_post_meta($item->ID, '_rvy_prev_revision_status', true);
+				if ($this->from_revision_workflow) {
+					switch ($this->from_revision_workflow) {
+						case 'future-revision':
+							esc_html_e('Scheduled Revision Publication', 'revisionary');
+							break;
+	
+						default:
+							esc_html_e('Revision Publication', 'revisionary');
+					}
+				} elseif ($this->parent_in_revision_workflow) {
+					if ($status_obj = get_post_status_object($this->parent_in_revision_workflow)) {
+						$status_label = $status_obj->label;
+					} else {
+						$status_label = $status_name;
+					}
 
-				switch ($prev_revision_status) {
-					case 'future-revision':
-						esc_html_e('Scheduled Rev.', 'revisionary');
-						break;
+					printf(
+						esc_html__('Edit of %s', 'revisionary'),
+						"<span title='$this->active_revision_title'>" . $status_label . '</span>'
+					);
 
-					case 'pending-revision':
-					case 'draft-revision':
-						esc_html_e('Submitted Rev.', 'revisionary');
-						break;
-
-					default:
-						if (!empty($revision_publication)) {
-							esc_html_e('Submitted Rev.', 'revisionary');
-						} else {
-							esc_html_e('Direct Edit', 'revisionary');
-						}
+				} elseif ($this->parent_from_revision_workflow) {
+					printf("<span title='%s'>%s</span>",
+						$this->from_revision_title,
+						esc_html__('Edit of published Revision', 'revisionary')
+					);
+				} elseif ($this->direct_edit) {
+					esc_html_e('Direct Edit', 'revisionary');
 				}
 
 				break;
 
 			case 'approved_by':
-				if ($approver_id = get_post_meta($item->ID, '_rvy_approved_by', true)) {
+				if ($this->direct_edit) {
+					$approver_id = $item->post_author;
+
+				} elseif ($this->from_revision_workflow) {
+					$approver_id = get_post_meta($item->ID, '_rvy_approved_by', true);
+				}
+
+				if (!empty($approver_id)) {
 					if ($user = new WP_User($approver_id)) {
 						if (!empty($user->display_name)) {
 							echo esc_html($user->display_name);
@@ -625,7 +716,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				break;
 
 			default:
-                return '';
+                return;
         }
     }
 
@@ -749,16 +840,18 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 		$post_status_obj = get_post_status_object(get_post_field('post_status', $item->post_parent));
 		
+		$can_edit_parent = current_user_can('edit_post', $item->post_parent);
+
 		$actions 			= [];
-		$can_read_post		= !empty($post_status_obj) && current_user_can( 'read_post', $item->ID );
-		$can_edit_post		= $is_administrator || (!empty($post_status_obj && current_user_can('edit_post', $item->post_parent)));
+		$can_read_post		= !empty($post_status_obj) && ($can_edit_parent || current_user_can( 'read_post', $item->ID ) || current_user_can( 'read_post', $item->ID ));
+		$can_edit_post		= $is_administrator || (!empty($post_status_obj && $can_edit_parent));
 		
 		// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 		//$can_delete_post	= current_user_can( 'delete_post', $item->ID );
 
 		$post_type_object 	= get_post_type_object( $item->origin_post_type );
 		$post_object 		= get_post( $item->post_parent );
-		$revisions_enabled	= wp_revisions_enabled( $post_object );
+		$revisions_enabled	= true; // wp_revisions_enabled( $post_object );
 
 		if ( ( $can_read_post || $can_edit_post ) && $revisions_enabled ) {
 			$actions['diff'] = sprintf(
@@ -774,8 +867,8 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			);
 		}
 
-		if ( is_post_type_viewable( $post_type_object ) ) {
-			if ( $can_read_post && $post_type_object && ! empty( $post_type_object->public ) ) {
+		if ( is_post_type_viewable( $post_type_object ) || ('revision' == $post_type_object->name) ) {
+			if ( $can_read_post && $post_type_object && (! empty( $post_type_object->public || ('revision' == $post_type_object->name) ) ) ) {
 				if ( rvy_get_option( 'revision_preview_links' ) || $is_administrator ) {
 					do_action('pp_revisions_get_post_link', $item->ID);
 
@@ -791,6 +884,18 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 					do_action('pp_revisions_post_link_done', $item->ID);
 				}
+			}
+		}
+
+		if ($can_edit_parent) {
+			if ($edit_link = get_edit_post_link( $item->post_parent )) {
+				$actions['edit_parent'] = sprintf(
+					'<a href="%1$s" title="%2$s" aria-label="%2$s">%3$s</a>',
+					$edit_link,
+					/* translators: %s: post title */
+					(rvy_in_revision_workflow($item->post_parent)) ? esc_attr(__('Edit parent revision', 'revisionary')) : esc_attr(__('Edit parent post', 'revisionary')),
+					esc_html__( 'Edit Parent' )
+				);
 			}
 		}
 

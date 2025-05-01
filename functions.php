@@ -266,6 +266,25 @@ function rvy_in_revision_workflow($post, $args = []) {
     return rvy_is_revision_status($post->post_mime_type) ? $post->post_mime_type : false;
 }
 
+function rvy_from_revision_workflow($post, $args=[]) {
+    if (!empty($post) && is_numeric($post)) {
+		$post = get_post($post);
+	}
+
+	if (empty($post) || ('revision' != $post->post_type) || ('inherit' != $post->post_status)) {
+		return false;
+	}
+
+    if ($prev_revision_status = get_post_meta($post->ID, '_rvy_prev_revision_status', true)) {
+        return $prev_revision_status;
+    
+    } elseif (get_post_meta($post->ID, '_rvy_published_gmt', true)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function rvy_status_revisions_active($post_type = '') {
     if (defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && class_exists('PublishPress_Statuses')) {
         if ($post_type) {
@@ -325,6 +344,103 @@ function rvy_nc_url($url, $args = []) {
 // Complete an admin URL, appending a random argument for cache busting
 function rvy_admin_url($partial_admin_url) {
     return rvy_nc_url( admin_url($partial_admin_url) );
+}
+
+function publishpress_revisions_post_updated($post) {
+    global $revisionary;
+
+    if (empty($revisionary)) {
+        return false;
+    }
+
+    if (!empty($post) && is_numeric($post)) {
+		$post = get_post($post);
+	}
+
+    if (empty($post)) {
+        return 0;
+    }
+
+    $date_gmt = $post->post_modified_gmt;
+    $updated_by = 0;
+
+    if (rvy_in_revision_workflow($post)) {
+        $is_revision = $post->post_mime_type;
+
+        $updaters = get_post_meta($post->ID, '_rvy_updated_by', true);
+
+        if (!empty($updaters)) {
+            $updated_by = end($updaters);
+        }
+    } elseif ('revision' == $post->post_type) {
+        $is_revision = $post->post_status;
+        
+        if ('inherit' == $post->post_status) {
+            $is_archive = true;
+            $updated_by = $post->post_author;
+
+            $prev_revision_status = get_post_meta($post->ID, '_rvy_prev_revision_status', true);
+            $revision_publication = get_post_meta($post->ID, '_rvy_published_gmt', true);
+        }
+
+    } else {
+        if ($revisions = wp_get_post_revisions($post)) {
+            $last_revision = reset($revisions);
+
+            $updated_by = $last_revision->post_author;
+            $date_gmt = $last_revision->post_modified_gmt;
+
+            $prev_revision_status = get_post_meta($last_revision->ID, '_rvy_prev_revision_status', true);
+            $revision_publication = get_post_meta($last_revision->ID, '_rvy_published_gmt', true);
+        }
+    }
+
+    if (!empty($prev_revision_status) || !empty($revision_publication)) {
+        switch ($prev_revision_status) {
+            case 'future-revision':
+                $update_type = esc_html__('Scheduled Rev.', 'revisionary');
+                break;
+
+            case 'pending-revision':
+            case 'draft-revision':
+                $update_type = esc_html__('Submitted Rev.', 'revisionary');
+                break;
+
+            default:
+                if (!empty($revision_publication)) {
+                    $update_type = esc_html__('Submitted Rev.', 'revisionary');
+                }
+        }
+    }
+
+    if (empty($update_type)) {
+        $update_type = esc_html__('Direct Edit', 'revisionary');
+        $direct_update = true;
+    }
+
+    $user = (!empty($updated_by)) ? (array) new WP_User($updated_by) : [];
+
+    if (!empty($user) && !empty($user['data'])) {
+        $user = (object) array_merge(
+            array_intersect_key(
+                (array) $user['data'],
+                array_fill_keys(['ID', 'display_name', 'user_email', 'user_url', 'user_login', 'user_nicename'], true)
+            ),
+            ['roles' => $user['roles']]
+        );
+    } else {
+        $user = (object) ['ID' => 0, 'display_name' => '', 'user_email' => '', 'user_url' => '', 'user_login' => '', 'user_nicename' => ''];
+    }
+
+    return [
+        'user' => $user,
+        'date_gmt' => $date_gmt,
+        'date' => get_date_from_gmt($date_gmt),
+        'is_revision' => !empty($is_revision),
+        'is_archive' => !empty($is_archive),
+        'direct_update' => !empty($direct_update),
+        'update_type' => $update_type,
+    ];
 }
 
 function pp_revisions_plugin_updated($current_version, $args = []) {
