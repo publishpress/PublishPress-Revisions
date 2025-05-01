@@ -8,7 +8,7 @@ if(rvyObjEdit.canPublish&&(rvyObjEdit.PendingStatus!=rvyObjEdit.currentStatus)&&
 var rvyPreviewLink='';if(rvyObjEdit[rvyObjEdit.currentStatus+'CompletedLinkCaption']){rvyPreviewLink='&nbsp; <a href="'+rvyObjEdit[rvyObjEdit.currentStatus+'CompletedURL']+'" class="revision-preview" target="_blank">'
 +rvyObjEdit[rvyObjEdit.currentStatus+'CompletedLinkCaption']+'</a>';}
 if(-1!==url.indexOf('action=approve&')){approveButtonHTML='';}
-if(approveButtonHTML){actionCaption=rvyObjEdit[rvyObjEdit.currentStatus+'ActionCaption'];}else{actionCaption=approveCaption;}
+if(approveButtonHTML&&('draft'!=rvyObjEdit.currentStatus)){actionCaption=approveCaption;}else{actionCaption=rvyObjEdit[rvyObjEdit.currentStatus+'ActionCaption'];}
 $(refSelector).after('<div class="rvy-creation-ui" style="float:left; padding-left:10px; margin-bottom: 10px">'
 +'<a href="'+url+'" class="button revision-approve">'
 +actionCaption+'</a>'
