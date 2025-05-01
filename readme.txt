@@ -258,7 +258,6 @@ Fixed: Security issue. Please update.
 * Fixed : Archive - Wrong publication date listed for direct edits
 * Fixed : Archive - Wrong publication date displayed for published revisions under some conditions
 * Fixed : Archive - Bulk deletion checkbox was displayed even if revision archive deletion is disabled 
-* Fixed : Fatal error on revision preview under some conditions
 * Compat : Elementor - Database error on Revision update
 * Compat : Prevent PHP Notice if another plugin calls wp_schedule_event() too early
 
