@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, approve changes, scheduled chang
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.8
-Stable tag: 3.6.6
+Stable tag: 3.6.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -258,7 +258,6 @@ Fixed: Security issue. Please update.
 * Fixed : Archive - Wrong publication date listed for direct edits
 * Fixed : Archive - Wrong publication date displayed for published revisions under some conditions
 * Fixed : Archive - Bulk deletion checkbox was displayed even if revision archive deletion is disabled 
-* Fixed : Fatal error on revision preview under some conditions
 * Compat : Elementor - Database error on Revision update
 * Compat : Prevent PHP Notice if another plugin calls wp_schedule_event() too early
 
