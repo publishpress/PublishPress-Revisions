@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-05-01T22:02:43+00:00\n"
+"POT-Creation-Date: 2025-05-05T16:10:54+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: revisionary\n"
@@ -74,14 +74,14 @@ msgid "The unfiltered_html capability is required to create a revision of this p
 msgstr ""
 
 #: admin/admin-posts_rvy.php:79
-#: rvy_init-functions.php:759
+#: rvy_init-functions.php:763
 msgid "The post already has a revision in process."
 msgstr ""
 
 #: admin/admin-posts_rvy.php:161
 #: admin/class-list-table-archive.php:462
 #: admin/options.php:115
-#: rvy_init-functions.php:466
+#: rvy_init-functions.php:470
 msgid "Revision"
 msgstr ""
 
@@ -222,12 +222,12 @@ msgid "Post Type"
 msgstr ""
 
 #: admin/class-list-table-archive.php:465
-#: rvy_init-functions.php:467
+#: rvy_init-functions.php:471
 msgid "Revised By"
 msgstr ""
 
 #: admin/class-list-table-archive.php:466
-#: rvy_init-functions.php:468
+#: rvy_init-functions.php:472
 msgid "Revision Date"
 msgstr ""
 
@@ -518,11 +518,11 @@ msgstr ""
 #: front_rvy.php:593
 #: front_rvy.php:612
 #: front_rvy.php:641
-#: rvy_init-functions.php:267
-#: rvy_init-functions.php:285
-#: rvy_init-functions.php:324
-#: rvy_init-functions.php:341
-#: rvy_init-functions.php:358
+#: rvy_init-functions.php:271
+#: rvy_init-functions.php:289
+#: rvy_init-functions.php:328
+#: rvy_init-functions.php:345
+#: rvy_init-functions.php:362
 msgid "Approve"
 msgstr ""
 
@@ -1228,13 +1228,13 @@ msgid "Approving the Revision..."
 msgstr ""
 
 #: admin/post-editor-workflow-ui_rvy.php:163
-#: rvy_init-functions.php:271
-#: rvy_init-functions.php:289
-#: rvy_init-functions.php:307
-#: rvy_init-functions.php:327
-#: rvy_init-functions.php:344
-#: rvy_init-functions.php:361
-#: rvy_init-functions.php:471
+#: rvy_init-functions.php:275
+#: rvy_init-functions.php:293
+#: rvy_init-functions.php:311
+#: rvy_init-functions.php:331
+#: rvy_init-functions.php:348
+#: rvy_init-functions.php:365
+#: rvy_init-functions.php:475
 msgid "Update Revision"
 msgstr ""
 
@@ -1509,8 +1509,8 @@ msgid "%sView Published Post%s"
 msgstr ""
 
 #: front_rvy.php:586
-#: rvy_init-functions.php:281
-#: rvy_init-functions.php:337
+#: rvy_init-functions.php:285
+#: rvy_init-functions.php:341
 msgid "Submit"
 msgstr ""
 
@@ -1684,286 +1684,286 @@ msgstr ""
 msgid "Every 2 Minutes"
 msgstr ""
 
-#: rvy_init-functions.php:261
-#: rvy_init-functions.php:273
+#: rvy_init-functions.php:265
+#: rvy_init-functions.php:277
 msgid "Working Copy"
 msgstr ""
 
-#: rvy_init-functions.php:262
+#: rvy_init-functions.php:266
 msgid "Create Working Copy"
 msgstr ""
 
-#: rvy_init-functions.php:263
+#: rvy_init-functions.php:267
 msgid "Copy"
 msgstr ""
 
-#: rvy_init-functions.php:264
+#: rvy_init-functions.php:268
 msgid "Creating Working Copy..."
 msgstr ""
 
-#: rvy_init-functions.php:265
-msgid "Working Copy ready"
-msgstr ""
-
-#: rvy_init-functions.php:266
-#: rvy_init-functions.php:284
-msgid "Approve Changes"
-msgstr ""
-
-#: rvy_init-functions.php:268
-#: rvy_init-functions.php:286
-msgid "Approving Changes..."
-msgstr ""
-
 #: rvy_init-functions.php:269
-#: rvy_init-functions.php:287
-#: rvy_init-functions.php:305
-msgid "Publish Changes"
+msgid "Working Copy ready"
 msgstr ""
 
 #: rvy_init-functions.php:270
 #: rvy_init-functions.php:288
-#: rvy_init-functions.php:306
-#: rvy_init-functions.php:326
-#: rvy_init-functions.php:343
-#: rvy_init-functions.php:360
-msgid "Save Revision"
+msgid "Approve Changes"
 msgstr ""
 
 #: rvy_init-functions.php:272
-msgid "Working Copies"
+#: rvy_init-functions.php:290
+msgid "Approving Changes..."
+msgstr ""
+
+#: rvy_init-functions.php:273
+#: rvy_init-functions.php:291
+#: rvy_init-functions.php:309
+msgid "Publish Changes"
 msgstr ""
 
 #: rvy_init-functions.php:274
+#: rvy_init-functions.php:292
+#: rvy_init-functions.php:310
+#: rvy_init-functions.php:330
+#: rvy_init-functions.php:347
+#: rvy_init-functions.php:364
+msgid "Save Revision"
+msgstr ""
+
+#: rvy_init-functions.php:276
+msgid "Working Copies"
+msgstr ""
+
+#: rvy_init-functions.php:278
 msgid "Working Copies <span class=\"count\">(%d)</span>"
 msgid_plural "Working Copies <span class=\"count\">(%d)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: rvy_init-functions.php:279
-#: rvy_init-functions.php:291
+#: rvy_init-functions.php:283
+#: rvy_init-functions.php:295
 msgid "Change Request"
 msgstr ""
 
-#: rvy_init-functions.php:280
+#: rvy_init-functions.php:284
 msgid "Submit Change Request"
 msgstr ""
 
-#: rvy_init-functions.php:282
+#: rvy_init-functions.php:286
 msgid "Submitting Changes..."
 msgstr ""
 
-#: rvy_init-functions.php:283
+#: rvy_init-functions.php:287
 msgid "Changes Submitted"
 msgstr ""
 
-#: rvy_init-functions.php:290
+#: rvy_init-functions.php:294
 msgid "Change Requests"
 msgstr ""
 
-#: rvy_init-functions.php:292
+#: rvy_init-functions.php:296
 msgid "Change Requests <span class=\"count\">(%d)</span>"
 msgid_plural "Change Requests <span class=\"count\">(%d)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: rvy_init-functions.php:293
+#: rvy_init-functions.php:297
 msgid "Enable Change Requests"
 msgstr ""
 
-#: rvy_init-functions.php:298
-#: rvy_init-functions.php:309
+#: rvy_init-functions.php:302
+#: rvy_init-functions.php:313
 msgid "Scheduled Change"
 msgstr ""
 
-#: rvy_init-functions.php:299
-#: rvy_init-functions.php:300
 #: rvy_init-functions.php:303
 #: rvy_init-functions.php:304
+#: rvy_init-functions.php:307
+#: rvy_init-functions.php:308
 msgid "Schedule Changes"
 msgstr ""
 
-#: rvy_init-functions.php:301
+#: rvy_init-functions.php:305
 msgid "Scheduling Changes..."
 msgstr ""
 
-#: rvy_init-functions.php:302
+#: rvy_init-functions.php:306
 msgid "Changes are Scheduled."
 msgstr ""
 
-#: rvy_init-functions.php:308
+#: rvy_init-functions.php:312
 msgid "Scheduled Changes"
 msgstr ""
 
-#: rvy_init-functions.php:310
+#: rvy_init-functions.php:314
 msgid "Scheduled <span class=\"count\">(%d)</span>"
 msgid_plural "Scheduled <span class=\"count\">(%d)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: rvy_init-functions.php:318
+#: rvy_init-functions.php:322
 msgid "Unsubmitted Revision"
 msgstr ""
 
-#: rvy_init-functions.php:319
-#: rvy_init-functions.php:320
+#: rvy_init-functions.php:323
+#: rvy_init-functions.php:324
 msgid "New Revision"
 msgstr ""
 
-#: rvy_init-functions.php:321
+#: rvy_init-functions.php:325
 msgid "Creating Revision..."
 msgstr ""
 
-#: rvy_init-functions.php:322
+#: rvy_init-functions.php:326
 msgid "The Revision is ready to edit."
 msgstr ""
 
-#: rvy_init-functions.php:322
+#: rvy_init-functions.php:326
 msgid "Revision ready to edit."
 msgstr ""
 
-#: rvy_init-functions.php:323
-#: rvy_init-functions.php:340
-#: rvy_init-functions.php:357
+#: rvy_init-functions.php:327
+#: rvy_init-functions.php:344
+#: rvy_init-functions.php:361
 msgid "Approve Revision"
 msgstr ""
 
-#: rvy_init-functions.php:325
-#: rvy_init-functions.php:342
-#: rvy_init-functions.php:359
+#: rvy_init-functions.php:329
+#: rvy_init-functions.php:346
+#: rvy_init-functions.php:363
 msgid "Publish Revision"
 msgstr ""
 
-#: rvy_init-functions.php:328
+#: rvy_init-functions.php:332
 msgid "Unsubmitted Revisions"
 msgstr ""
 
-#: rvy_init-functions.php:329
+#: rvy_init-functions.php:333
 msgid "Not Submitted"
 msgstr ""
 
-#: rvy_init-functions.php:330
+#: rvy_init-functions.php:334
 msgid "Not Submitted <span class=\"count\">(%s)</span>"
 msgid_plural "Not Submitted <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: rvy_init-functions.php:335
+#: rvy_init-functions.php:339
 msgid "Submitted Revision"
 msgstr ""
 
-#: rvy_init-functions.php:336
-#: rvy_init-functions.php:474
+#: rvy_init-functions.php:340
+#: rvy_init-functions.php:478
 msgid "Submit Revision"
 msgstr ""
 
-#: rvy_init-functions.php:338
+#: rvy_init-functions.php:342
 msgid "Submitting Revision..."
 msgstr ""
 
-#: rvy_init-functions.php:339
+#: rvy_init-functions.php:343
 msgid "The Revision is Submitted"
 msgstr ""
 
-#: rvy_init-functions.php:339
+#: rvy_init-functions.php:343
 msgid "Revision Submitted"
 msgstr ""
 
-#: rvy_init-functions.php:345
+#: rvy_init-functions.php:349
 msgid "Submitted Revisions"
 msgstr ""
 
-#: rvy_init-functions.php:346
+#: rvy_init-functions.php:350
 msgid "Submitted"
 msgstr ""
 
-#: rvy_init-functions.php:347
+#: rvy_init-functions.php:351
 msgid "Submitted <span class=\"count\">(%s)</span>"
 msgid_plural "Submitted <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: rvy_init-functions.php:352
+#: rvy_init-functions.php:356
 msgid "Scheduled Revision"
 msgstr ""
 
-#: rvy_init-functions.php:353
+#: rvy_init-functions.php:357
 msgid "Schedule Revision"
 msgstr ""
 
-#: rvy_init-functions.php:354
+#: rvy_init-functions.php:358
 msgid "Schedule"
 msgstr ""
 
-#: rvy_init-functions.php:355
+#: rvy_init-functions.php:359
 msgid "Scheduling Revision..."
 msgstr ""
 
-#: rvy_init-functions.php:356
+#: rvy_init-functions.php:360
 msgid "The Revision is Scheduled"
 msgstr ""
 
-#: rvy_init-functions.php:356
+#: rvy_init-functions.php:360
 msgid "Revision Scheduled"
 msgstr ""
 
-#: rvy_init-functions.php:362
+#: rvy_init-functions.php:366
 msgid "Scheduled Revisions"
 msgstr ""
 
-#: rvy_init-functions.php:363
+#: rvy_init-functions.php:367
 msgid "Scheduled"
 msgstr ""
 
-#: rvy_init-functions.php:364
+#: rvy_init-functions.php:368
 msgid "Scheduled <span class=\"count\">(%s)</span>"
 msgid_plural "Scheduled <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: rvy_init-functions.php:461
+#: rvy_init-functions.php:465
 msgid "%sMy Copies & Changes%s(%s)</span>"
 msgid_plural "%sMy Copies & Changes%s(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: rvy_init-functions.php:462
+#: rvy_init-functions.php:466
 msgid "%sMy Revisions%s(%s)</span>"
 msgid_plural "%sMy Revisions%s(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: rvy_init-functions.php:464
+#: rvy_init-functions.php:468
 msgid "%sRevisions to My Posts%s(%s)</span>"
 msgid_plural "%sRevisions to My Posts%s(%s)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: rvy_init-functions.php:469
+#: rvy_init-functions.php:473
 msgid "Post Author"
 msgstr ""
 
-#: rvy_init-functions.php:470
+#: rvy_init-functions.php:474
 msgid "Published Post"
 msgstr ""
 
-#: rvy_init-functions.php:475
+#: rvy_init-functions.php:479
 msgid "Submit Changes"
 msgstr ""
 
-#: rvy_init-functions.php:679
+#: rvy_init-functions.php:683
 msgid "Revisor"
 msgstr ""
 
-#: rvy_init-functions.php:691
+#: rvy_init-functions.php:695
 msgctxt "User role"
 msgid "Revisor"
 msgstr ""
 
-#: rvy_init-functions.php:772
+#: rvy_init-functions.php:776
 msgid "The unfiltered_html capability is required to create a revision of this post."
 msgstr ""
 
-#: rvy_init-functions.php:1219
+#: rvy_init-functions.php:1223
 msgid "Revision Workflow"
 msgstr ""

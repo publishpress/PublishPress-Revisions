@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, approve changes, scheduled chang
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.8
-Stable tag: 3.6.7
+Stable tag: 3.6.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -244,6 +244,9 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
+= 3.6.8 - 4 May 2025 =
+* API : Improve support or Pro plugin's Planner Notifications integration
+
 = 3.6.7 - 1 May 2025 =
 * Fixed : Submit Revision button caption was missing for Revisors
 * Feature : Revision Archive - option to archive past updates of Pending / Scheduled Revisions, even after publication
@@ -258,7 +261,6 @@ Fixed: Security issue. Please update.
 * Fixed : Archive - Wrong publication date listed for direct edits
 * Fixed : Archive - Wrong publication date displayed for published revisions under some conditions
 * Fixed : Archive - Bulk deletion checkbox was displayed even if revision archive deletion is disabled 
-* Compat : Elementor - Database error on Revision update
 * Compat : Prevent PHP Notice if another plugin calls wp_schedule_event() too early
 
 = 3.6.6 - 15 Apr 2025 =
