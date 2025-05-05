@@ -144,6 +144,10 @@ function rvy_ajax_handler() {
 	if (!empty($_REQUEST['rvy_ajax_field']) && !empty($_REQUEST['rvy_ajax_value'])) {	// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 		if ($post_id = intval($_REQUEST['rvy_ajax_value'])) {							// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 
+			global $revisionary_revision_id;
+
+			$revisionary_revision_id = $post_id;
+
 			switch ($_REQUEST['rvy_ajax_field']) {										// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 				case 'create_revision':
 					if (current_user_can('copy_post', $post_id)) {
