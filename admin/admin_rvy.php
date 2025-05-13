@@ -394,7 +394,7 @@ class RevisionaryAdmin
 
 	public function fltCapDescriptions($cap_descripts)
 	{
-		$cap_descripts['edit_others_drafts'] = esc_html__('Bypass Revisions setting "Prevent Revisors from editing other user\'s drafts"', 'revisionary');
+		$cap_descripts['edit_others_drafts'] = esc_html__('Bypass Revisions setting "Prevent Revisors from editing other user\'s drafts."', 'revisionary');
 		$cap_descripts['edit_others_revisions'] = esc_html__('Satisfy Revisions setting "Editing others\' revisions requires role capability."', 'revisionary');
 		$cap_descripts['list_others_revisions'] = esc_html__('Satisfy Revisions setting "Editing others\' revisions requires role capability."', 'revisionary');
 		$cap_descripts['manage_unsubmitted_revisions'] = esc_html__('Satisfy Revisions setting "Additional role capability required to manage Unsubmitted Revisions."', 'revisionary');
