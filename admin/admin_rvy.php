@@ -105,6 +105,7 @@ class RevisionaryAdmin
 		add_filter('presspermit_status_control_scripts', [$this, 'fltDisableStatusControlScripts']);
 
 		add_filter('cme_plugin_capabilities', [$this, 'fltPublishPressCapsSection']);
+		add_filter('cme_capability_descriptions', [$this, 'fltCapDescriptions']);
 
 		add_filter('relevanssi_where', [$this, 'ftlRelevanssiWhere']);
 
@@ -389,6 +390,18 @@ class RevisionaryAdmin
 		}
 
 		return $section_caps;
+	}
+
+	public function fltCapDescriptions($cap_descripts)
+	{
+		$cap_descripts['edit_others_drafts'] = esc_html__('Bypass Revisions setting "Prevent Revisors from editing other user\'s drafts"', 'revisionary');
+		$cap_descripts['edit_others_revisions'] = esc_html__('Satisfy Revisions setting "Editing others\' revisions requires role capability."', 'revisionary');
+		$cap_descripts['list_others_revisions'] = esc_html__('Satisfy Revisions setting "Editing others\' revisions requires role capability."', 'revisionary');
+		$cap_descripts['manage_unsubmitted_revisions'] = esc_html__('Satisfy Revisions setting "Additional role capability required to manage Unsubmitted Revisions."', 'revisionary');
+		$cap_descripts['preview_others_revisions'] = esc_html__('Preview other user\'s Revisions (without needing editing access).', 'revisionary');
+		$cap_descripts['restore_revisions'] = esc_html__('Restore an archived Revision as the current revision.', 'revisionary');
+
+		return $cap_descripts;
 	}
 
 	public function fltDisableStatusControlScripts($enable_scripts) {
