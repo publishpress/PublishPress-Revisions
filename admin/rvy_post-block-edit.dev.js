@@ -42,12 +42,6 @@ jQuery(document).ready( function($) {
 			+ '<div class="revision-approve revision-created">' + rvyObjEdit.completedCaption + '</div> '
 
 			+ '<div class="revision-approve revision-created revision-created-buttons">';
-
-			if (rvyObjEdit.completedURL) {
-				html = html + '<button type="button" class="revision-approve revision-created ppr-clear-button" style="display: none">'
-				+ '<a href="javascript:void(0)" class="revision-approve revision-preview components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
-				+ rvyObjEdit.completedLinkCaption + '</a></button>';
-			}
 			
 			html = html + '<button type="button" class="revision-approve revision-created revision-edit ppr-clear-button" style="display: none">'
 			+ '<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'

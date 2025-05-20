@@ -2,9 +2,7 @@ jQuery(document).ready(function($){var rvyIsPublished=false;var RvySubmissionUI=
 +rvyObjEdit.actionTitle+'">'
 +rvyObjEdit.actionCaption+'</a>'
 +'<div class="revision-created-wrapper" style="display:none; margin: 10px 0 10px 5px; font-weight: bold">'
-+'<span class="revision-approve revision-created">'+rvyObjEdit.completedCaption+'</span> &nbsp;';if(rvyObjEdit.completedURL){html=html+'<a href="javascript:void(0)" class="revision-approve revision-preview" target="_blank">'
-+rvyObjEdit.completedLinkCaption+'</a>&nbsp;';}
-html=html+'<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">'
++'<span class="revision-approve revision-created">'+rvyObjEdit.completedCaption+'</span> &nbsp;';html=html+'<a href="javascript:void(0)" class="revision-approve revision-edit" target="_blank">'
 +rvyObjEdit.completedEditLinkCaption+'</a>'
 +'</div>';if(rvyObjEdit.scheduleCaption){var publishedStatuses=Object.keys(rvyObjEdit.publishedStatuses).map(function(key){return rvyObjEdit.publishedStatuses[key];});rvyIsPublished=publishedStatuses.indexOf(rvyObjEdit.currentStatus)>=0;if(rvyIsPublished){html+='<a href="javascript:void(0)" style="display: none; margin-top: 15px; margin-bottom: 15px" class="button revision-approve revision-schedule" title="'
 +rvyObjEdit.scheduleTitle+'">'
