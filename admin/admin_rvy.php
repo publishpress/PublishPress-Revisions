@@ -210,6 +210,8 @@ class RevisionaryAdmin
 		
 		if ((!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options']))) {		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			wp_enqueue_script('revisionary-settings', RVY_URLPATH . '/admin/settings.js', [], PUBLISHPRESS_REVISIONS_VERSION);
+
+			wp_enqueue_style('revisionary-tooltip', RVY_URLPATH . '/common/css/_tooltip.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
 		
 		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && ('admin.php' == $pagenow) && !empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options']) ) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -389,15 +391,31 @@ class RevisionaryAdmin
 			$section_caps['PublishPress Revisions'] []= 'restore_revisions';
 		}
 
+		if (!rvy_get_option('manage_unsubmitted_capability')) {
+			$section_caps['PublishPress Revisions'] = array_diff($section_caps['PublishPress Revisions'], ['manage_unsubmitted_revisions']);
+		}
+
+		if (!rvy_get_option('require_edit_others_drafts')) {
+			$section_caps['PublishPress Revisions'] = array_diff($section_caps['PublishPress Revisions'], ['edit_others_drafts']);
+		}
+
+		if (!rvy_get_option('revisor_hide_others_revisions')) {
+			$section_caps['PublishPress Revisions'] = array_diff($section_caps['PublishPress Revisions'], ['list_others_revisions']);
+		}
+
+		if (!rvy_get_option('revisor_lock_others_revisions')) {
+			$section_caps['PublishPress Revisions'] = array_diff($section_caps['PublishPress Revisions'], ['edit_others_revisions']);
+		}
+
 		return $section_caps;
 	}
 
 	public function fltCapDescriptions($cap_descripts)
 	{
 		$cap_descripts['edit_others_drafts'] = esc_html__('Bypass Revisions setting "Prevent Revisors from editing other user\'s drafts."', 'revisionary');
-		$cap_descripts['edit_others_revisions'] = esc_html__('Satisfy Revisions setting "Editing others\' revisions requires role capability."', 'revisionary');
-		$cap_descripts['list_others_revisions'] = esc_html__('Satisfy Revisions setting "Editing others\' revisions requires role capability."', 'revisionary');
-		$cap_descripts['manage_unsubmitted_revisions'] = esc_html__('Satisfy Revisions setting "Additional role capability required to manage Unsubmitted Revisions."', 'revisionary');
+		$cap_descripts['edit_others_revisions'] = esc_html__('Satisfy Revisions setting "Editing others\' Revisions requires role capability."', 'revisionary');
+		$cap_descripts['list_others_revisions'] = esc_html__('Satisfy Revisions setting "Listing others\' Revisions requires role capability."', 'revisionary');
+		$cap_descripts['manage_unsubmitted_revisions'] = esc_html__('Satisfy Revisions setting "Managing Unsubmitted Revisions requires role capability."', 'revisionary');
 		$cap_descripts['preview_others_revisions'] = esc_html__('Preview other user\'s Revisions (without needing editing access).', 'revisionary');
 		$cap_descripts['restore_revisions'] = esc_html__('Restore an archived Revision as the current revision.', 'revisionary');
 

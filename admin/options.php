@@ -37,6 +37,14 @@ class RvyOptionUI {
 		$this->display_hints = rvy_get_option( 'display_hints' );
     }
 
+	function tooltipText($display_text, $tip_text) {
+		return '<span data-toggle="tooltip" data-placement="top"><span class="tooltip-text"><span>' 
+		. $tip_text
+		. '</span><i></i></span>'
+		. $display_text
+		. '</span>';
+	}
+
 	function option_checkbox( $option_name, $tab_name, $section_name, $hint_text, $unused_arg = '', $args = '') {
 		$return = array( 'in_scope' => false, 'val' => '', 'subcaption' => '', 'style' => '', 'hide' => false, 'no_escape' => false );
 
@@ -68,8 +76,17 @@ class RvyOptionUI {
 
 			echo "</label>";
 
-			if ( $hint_text && $this->display_hints )
-				echo "<div class='rvy-subtext'>" . esc_html($hint_text) . "</div>";
+			if ( $hint_text && $this->display_hints ) {
+				echo "<div class='rvy-subtext'>";
+				
+				if (!empty($args['no_escape'])) {
+					echo $hint_text;
+				} else {
+					echo esc_html($hint_text);
+				}
+				
+				echo "</div>";
+			}
 
 			if ( ! empty($args['subcaption']) )
 				echo $args['subcaption'];		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -133,8 +150,8 @@ $pp_notif_url = admin_url('edit.php?post_type=psppnotif_workflow');
 $this->option_captions = apply_filters('revisionary_option_captions',
 	[
 	'revision_statuses_noun_labels' =>			esc_html__('Use alternate labeling: "Working Copy" > "Change Request" > "Scheduled Change"', 'revisionary'),
-	'manage_unsubmitted_capability' =>			sprintf(esc_html__('Additional role capability required to manage %s', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
-	'copy_posts_capability' =>					rvy_get_option('revision_statuses_noun_labels') ? esc_html__("Additional role capability required to create a Working Copy", 'revisionary') : esc_html__("Additional role capability required to create a new revision", 'revisionary'),
+	'manage_unsubmitted_capability' =>			sprintf(esc_html__('Managing %s requires role capability', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
+	'copy_posts_capability' =>					rvy_get_option('revision_statuses_noun_labels') ? esc_html__("Working Copy creation requires role capability", 'revisionary') : esc_html__("Revision creation requires role capability", 'revisionary'),
 	'caption_copy_as_edit' =>					sprintf(esc_html__('Posts / Pages list: Use "Edit" caption for %s link', 'revisionary'), pp_revisions_status_label('draft-revision', 'submit_short')),
 	'pending_revisions' => 						sprintf(esc_html__('Enable %s', 'revisionary'), $pending_revision_plural),
 	'revision_limit_per_post' =>				esc_html__("Limit to one active revision per post", 'revisionary'),
@@ -142,9 +159,9 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'revision_unfiltered_html_check' =>			esc_html__("If post contains custom html, require unfiltered_html capability", 'revisionary'),
 	'auto_submit_revisions' =>					esc_html__("Auto-submit revisions created by a user with publishing capability", 'revisionary'),
 	'scheduled_revisions' => 					sprintf(esc_html__('Enable %s', 'revisionary'), pp_revisions_status_label('future-revision', 'plural')),
-	'revise_posts_capability' =>				rvy_get_option('revision_statuses_noun_labels') ? esc_html__("Additional role capability required to submit a Change Request", 'revisionary') : esc_html__("Additional role capability required to submit a revision", 'revisionary'),
-	'revisor_lock_others_revisions' =>			esc_html__("Editing others' revisions requires role capability", 'revisionary'),
-	'revisor_hide_others_revisions' => 			esc_html__("Listing others' revisions requires role capability", 'revisionary'),
+	'revise_posts_capability' =>				rvy_get_option('revision_statuses_noun_labels') ? esc_html__("Change Request submission require role capability", 'revisionary') : esc_html__("Revision submission requires role capability", 'revisionary'),
+	'revisor_lock_others_revisions' =>			esc_html__("Editing others' Revisions requires role capability", 'revisionary'),
+	'revisor_hide_others_revisions' => 			esc_html__("Listing others' Revisions requires role capability", 'revisionary'),
 	'admin_revisions_to_own_posts' =>			esc_html__("Users can always administer revisions to their own editable posts", 'revisionary'),
 	'revision_update_notifications' =>			esc_html__('Also notify on Revision Update', 'revisionary'),
 	'trigger_post_update_actions' => 			esc_html__('Apply API actions to mimic Post Update', 'revisionary'),
@@ -164,7 +181,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'publish_scheduled_notify_revisor' => 		sprintf(esc_html__('Email the Revisor when a %s is published', 'revisionary'), $future_revision_singular),
 	'use_notification_buffer' => 				esc_html__('Enable notification buffer', 'revisionary'),
 	'revisor_role_add_custom_rolecaps' => 		esc_html__('All custom post types available to Revisors', 'revisionary' ),
-	'require_edit_others_drafts' => 			esc_html__("Prevent Revisors from editing other user's drafts", 'revisionary' ),
+	'require_edit_others_drafts' => 			esc_html__("Prevent Revisors from editing others' unpublished Posts", 'revisionary' ),
 	'display_hints' => 							esc_html__('Display Hints', 'revisionary'),
 	'delete_settings_on_uninstall' => 			esc_html__('Delete settings and Revisions if plugin is deleted', 'revisionary'),
 	'revision_preview_links' => 				esc_html__('Show Preview Links', 'revisionary'),
@@ -181,7 +198,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'rev_publication_delete_ed_comments' =>		esc_html__('On Revision publication, delete Editorial Comments', 'revisionary'),
 	'deletion_queue' => 						esc_html__('Enable deletion queue', 'revisionary'),
 	'revision_archive_deletion' => 				esc_html__('Enable deletion in archive', 'revisionary'),
-	'revision_restore_require_cap' =>			esc_html__('Additional role capability required to restore a revision', 'revisionary'),
+	'revision_restore_require_cap' =>			esc_html__('Restoring a Revision requires role capability', 'revisionary'),
 	'permissions_compat_mode' => 				esc_html__('Compatibility Mode', 'revisionary'),
 	'planner_notifications_access_limited' =>	esc_html__('Planner Notifications Access-Limited', 'revisionary'),
 	]
@@ -579,16 +596,66 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	$hint = sprintf(esc_html__('If the user does not have a regular Edit link, recaption the %s link as "Edit."', 'revisionary'), pp_revisions_status_label('draft-revision', 'submit_short'));
 	$this->option_checkbox( 'caption_copy_as_edit', $tab, $section, $hint, '' );
 
-	$hint = esc_html__('This restriction applies to users who are not full editors for the post type. To enable a role, add capabilities: copy_posts, copy_others_pages, etc.', 'revisionary');
-	
+	$checkbox_args = [];
+
+	if (defined('PUBLISHPRESS_CAPS_VERSION')) {
+		$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=copy');
+
+		$hint = sprintf(
+			__('If checked, users who cannot edit the published post will need %s.', 'revisionary'),
+			
+			$this->tooltipText(
+				"<a href='$url'>" . __('Create Revision capabilities', 'revisionary') . '</a>',
+				__('Assign capabilities to roles', 'revisionary')
+			)
+		);
+
+		$checkbox_args['no_escape'] = true;
+	} else {
+		$hint = esc_html__('If checked, users who cannot edit the published post will need Create Revision capabilities (copy_posts, copy_others_pages, etc.)', 'revisionary');
+	}
+
 	if (defined('PRESSPERMIT_VERSION')) {
-		$hint .= ' ' . esc_html__('To expand the Posts / Pages listing for non-Editors, add capabilities: list_others_pages, list_published_posts, etc.', 'revisionary');
+		if (defined('PUBLISHPRESS_CAPS_VERSION')) {
+			$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=list');
+	
+			$hint .= ' ' . sprintf(
+				__('To assign the Posts / Pages list, assign %s.', 'revisionary'),
+				
+				$this->tooltipText(
+					"<a href='$url'>" . __('Listing capabilities', 'revisionary') . '</a>',
+					__('Assign capabilities to roles', 'revisionary')
+				)
+			);
+	
+			$checkbox_args['no_escape'] = true;
+		} else {
+			$hint .= ' ' . esc_html__('To expand the Posts / Pages list, assign Listing capabilities (list_others_pages, list_published_posts, etc.)', 'revisionary');
+		}
 	}
 	
-	$this->option_checkbox( 'copy_posts_capability', $tab, $section, $hint, '' );
+	$this->option_checkbox( 'copy_posts_capability', $tab, $section, $hint, '', $checkbox_args );
 
-	$hint = esc_html__('If disabled, revision by a user who does not have the unfiltered_html capability will cause all custom html tags to be stripped out.', 'revisionary');
-	$this->option_checkbox( 'revision_unfiltered_html_check', $tab, $section, $hint, '' );
+	$checkbox_args = [];
+
+	if (defined('PUBLISHPRESS_CAPS_VERSION')) {
+		$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=admin');
+
+		$hint = sprintf(
+			__('Revision by a user who does not have the %s will cause all custom html tags to be stripped out.', 'revisionary'),
+			
+			$this->tooltipText(
+				"<a href='$url'>" . sprintf(__('%s capability', 'revisionary'), 'unfiltered_html') . '</a>',
+				__('Assign capability to roles', 'revisionary')
+			)
+		);
+
+		$checkbox_args['no_escape'] = true;
+	} else {
+		$hint = esc_html__('Revision by a user who does not have the unfiltered_html capability will cause all custom html tags to be stripped out.', 'revisionary');
+	}
+
+	$this->option_checkbox( 'revision_unfiltered_html_check', $tab, $section, $hint, '', $checkbox_args );
 	?>
 
 	<?php
@@ -622,8 +689,26 @@ $pending_revisions_available ) :
 		)
 		. "</div>";
 
-		$hint = esc_html__('This restriction applies to users who are not full editors for the post type. To enable a role, add capabilities: revise_posts, revise_others_pages, etc.', 'revisionary');
-		$this->option_checkbox( 'revise_posts_capability', $tab, $section, $hint, '' );
+		$checkbox_args = [];
+
+		if (defined('PUBLISHPRESS_CAPS_VERSION')) {
+			$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=revise');
+	
+			$hint = sprintf(
+				__('If checked, users who cannot edit the published post will need %s.', 'revisionary'),
+
+				$this->tooltipText(
+					"<a href='$url'>" . __('Submit Revision capabilities', 'revisionary') . '</a>',
+					__('Assign capabilities to roles', 'revisionary')
+				)
+			);
+
+			$checkbox_args['no_escape'] = true;
+		} else {
+			$hint = esc_html__('If checked, users who cannot edit the published post will need Submit Revision capabilities (revise_posts, revise_others_pages, etc.)', 'revisionary');
+		}
+
+		$this->option_checkbox( 'revise_posts_capability', $tab, $section, $hint, '', $checkbox_args );
 
 		$hint = sprintf(esc_html__( 'When a %s is published, update post publish date to current time.', 'revisionary' ), pp_revisions_status_label('pending-revision', 'name'));
 		$this->option_checkbox( 'pending_revision_update_post_date', $tab, $section, $hint, '' );
@@ -683,14 +768,66 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 			<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 			<?php
-			$hint = esc_html__('To enable a role, add the manage_unsubmitted_revisions capability.', 'revisionary');
-			$this->option_checkbox('manage_unsubmitted_capability', $tab, $section, $hint, '');
-	
-			$hint = esc_html__('This restriction applies to users who are not full editors for the post type. To enable a role, give it the edit_others_revisions capability.', 'revisionary');
-			$this->option_checkbox( 'revisor_lock_others_revisions', $tab, $section, $hint, '' );
+			$checkbox_args = [];
 
-			$hint = esc_html__('This restriction applies to users who are not full editors for the post type. To enable a role, give it the list_others_revisions capability.', 'revisionary');
-			$this->option_checkbox( 'revisor_hide_others_revisions', $tab, $section, $hint, '' );
+			if (defined('PUBLISHPRESS_CAPS_VERSION')) {
+				$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=publishpress-revisions');
+
+				$hint = sprintf(
+					__('Users will need the %s to edit others\' Unsubmitted Revisions.', 'revisionary'),
+
+					$this->tooltipText(
+						"<a href='$url'>" . sprintf(__('%s capability', 'revisionary'), 'manage_unsubmitted_revisions') . '</a>',
+						__('Assign capability to roles', 'revisionary')
+					)
+				);
+
+				$checkbox_args['no_escape'] = true;
+			} else {
+				$hint = esc_html__('Users will need the manage_unsubmitted_revisions capability to edit others\' Unsubmitted Revisions.', 'revisionary');
+			}
+
+			$this->option_checkbox('manage_unsubmitted_capability', $tab, $section, $hint, '', $checkbox_args);
+
+			if (defined('PUBLISHPRESS_CAPS_VERSION')) {
+				$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=publishpress-revisions');
+		
+				$hint = sprintf(
+					__('If checked, users who cannot edit the published post will need the %s.', 'revisionary'),
+					
+					$this->tooltipText(
+						"<a href='$url'>" . sprintf(__('%s capability', 'revisionary'), 'edit_others_revisions') . '</a>',
+						__('Assign capability to roles', 'revisionary')
+					)
+				);
+
+				$checkbox_args['no_escape'] = true;
+			} else {
+				$hint = esc_html__('If checked, users who cannot edit the published post will need the edit_others_revisions capability.', 'revisionary');
+			}
+
+			$this->option_checkbox( 'revisor_lock_others_revisions', $tab, $section, $hint, '', $checkbox_args );
+
+			$checkbox_args = [];
+
+			if (defined('PUBLISHPRESS_CAPS_VERSION')) {
+				$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=publishpress-revisions');
+		
+				$hint = sprintf(
+					__('If checked, users who cannot edit the published post will need the %s.', 'revisionary'),
+					
+					$this->tooltipText(
+						"<a href='$url'>" . sprintf(__('%s capability', 'revisionary'), 'list_others_revisions') . '</a>',
+						__('Assign capability to roles', 'revisionary')
+					)
+				);
+
+				$checkbox_args['no_escape'] = true;
+			} else {
+				$hint = esc_html__('If checked, users who cannot edit the published post will need the list_others_revisions capability.', 'revisionary');
+			}
+
+			$this->option_checkbox( 'revisor_hide_others_revisions', $tab, $section, $hint, '', $checkbox_args );
 
 			$hint = esc_html__('Bypass the above restrictions for others\' revisions to logged in user\'s own posts.', 'revisionary');
 			$this->option_checkbox( 'admin_revisions_to_own_posts', $tab, $section, $hint, '' );
@@ -842,8 +979,26 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
 
 		<?php
-		$hint = esc_html__('If checked, the edit_others_drafts capability will be required for users lacking site-wide publishing capabilities', 'revisionary');
-		$this->option_checkbox( 'require_edit_others_drafts', $tab, $section, $hint, '' );
+		$checkbox_args = [];
+
+		if (defined('PUBLISHPRESS_CAPS_VERSION')) {
+			$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=publishpress-revisions');
+	
+			$hint = sprintf(
+				__('If checked, users who can\'t publish will need the %s to edit others\' unpublished Posts.', 'revisionary'),
+				
+				$this->tooltipText(
+					"<a href='$url'>" . sprintf(__('%s capability', 'revisionary'), 'edit_others_drafts') . '</a>',
+					__('Assign capability to roles', 'revisionary')
+				)
+			);
+
+			$checkbox_args['no_escape'] = true;
+		} else {
+			$hint = esc_html__('If checked, users who can\'t publish will need the edit_others_drafts capability to edit others\' unpublished Posts.', 'revisionary');
+		}
+
+		$this->option_checkbox( 'require_edit_others_drafts', $tab, $section, $hint, '', $checkbox_args );
 		?>
 
 		<?php
@@ -868,8 +1023,26 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		$this->option_checkbox( 'revision_archive_deletion', $tab, $section, $hint, '' );
 
 		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
-			$hint = esc_html__('Non-Administrators cannot restore a revision without the restore_revisions capability', 'revisionary');
-			$this->option_checkbox( 'revision_restore_require_cap', $tab, $section, $hint, '' );
+			$checkbox_args = [];
+			
+			if (defined('PUBLISHPRESS_CAPS_VERSION')) {
+				$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=publishpress-revisions');
+		
+				$hint = sprintf(
+					__('If checked, non-Administrators cannot restore a revision without the %s.', 'revisionary'),
+					
+					$this->tooltipText(
+						"<a href='$url'>" . sprintf(__('%s capability', 'revisionary'), 'restore_revisions') . '</a>',
+						__('Assign capability to roles', 'revisionary')
+					)
+				);
+	
+				$checkbox_args['no_escape'] = true;
+			} else {
+				$hint = esc_html__('If checked, non-Administrators cannot restore a revision without the restore_revisions capability', 'revisionary');
+			}
+
+			$this->option_checkbox( 'revision_restore_require_cap', $tab, $section, $hint, '', $checkbox_args );
 		}
 
 		do_action('revisionary_option_ui_revision_options', $this, $sitewide, $customize_defaults);
