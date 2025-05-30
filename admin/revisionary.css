@@ -440,6 +440,13 @@ body.revisions_page_revisionary-settings input[type="checkbox"] {
 vertical-align: middle;
 }
 
+body.revisions_page_revisionary-settings .rvy-subtext a,
+body.revisions_page_revisionary-settings .rvy-subtext a:hover,
+body.revisions_page_revisionary-settings .rvy-subtext a:visited
+{
+text-decoration: underline;
+}
+
 @media only screen and (max-width: 783px) {
   body.revisions_page_revisionary-settings #rvy-features > div > table > tbody > tr > td {
       padding: 10px;
