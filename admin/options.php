@@ -601,13 +601,20 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	if (defined('PUBLISHPRESS_CAPS_VERSION')) {
 		$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=copy');
 
+		$cap_caption = __('Create Revision capabilities', 'revisionary');
+
+		if (rvy_get_option('copy_posts_capability')) {
+			$link = $this->tooltipText(
+				"<a href='$url'>" . $cap_caption . '</a>',
+				__('Assign capabilities to roles', 'revisionary')
+			);
+		} else {
+			$link = $cap_caption;
+		}
+
 		$hint = sprintf(
 			__('If checked, users who cannot edit the published post will need %s.', 'revisionary'),
-			
-			$this->tooltipText(
-				"<a href='$url'>" . __('Create Revision capabilities', 'revisionary') . '</a>',
-				__('Assign capabilities to roles', 'revisionary')
-			)
+			$link
 		);
 
 		$checkbox_args['no_escape'] = true;
@@ -641,13 +648,20 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	if (defined('PUBLISHPRESS_CAPS_VERSION')) {
 		$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=admin');
 
+		$cap_caption = sprintf(__('%s capability', 'revisionary'), 'unfiltered_html');
+
+		if (rvy_get_option('revision_unfiltered_html_check')) {
+			$link = $this->tooltipText(
+				"<a href='$url'>" . $cap_caption . '</a>',
+				__('Assign capability to roles', 'revisionary')
+			);
+		} else {
+			$link = $cap_caption;
+		}
+
 		$hint = sprintf(
 			__('Revision by a user who does not have the %s will cause all custom html tags to be stripped out.', 'revisionary'),
-			
-			$this->tooltipText(
-				"<a href='$url'>" . sprintf(__('%s capability', 'revisionary'), 'unfiltered_html') . '</a>',
-				__('Assign capability to roles', 'revisionary')
-			)
+			$link
 		);
 
 		$checkbox_args['no_escape'] = true;
@@ -694,13 +708,20 @@ $pending_revisions_available ) :
 		if (defined('PUBLISHPRESS_CAPS_VERSION')) {
 			$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=revise');
 	
+			$cap_caption = __('Submit Revision capabilities', 'revisionary');
+
+			if (rvy_get_option('revise_posts_capability')) {
+				$link = $this->tooltipText(
+					"<a href='$url'>" . $cap_caption . '</a>',
+					__('Assign capabilities to roles', 'revisionary')
+				);
+			} else {
+				$link = $cap_caption;
+			}
+
 			$hint = sprintf(
 				__('If checked, users who cannot edit the published post will need %s.', 'revisionary'),
-
-				$this->tooltipText(
-					"<a href='$url'>" . __('Submit Revision capabilities', 'revisionary') . '</a>',
-					__('Assign capabilities to roles', 'revisionary')
-				)
+				$link
 			);
 
 			$checkbox_args['no_escape'] = true;
@@ -773,13 +794,20 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 			if (defined('PUBLISHPRESS_CAPS_VERSION')) {
 				$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=publishpress-revisions');
 
+				$cap_caption = sprintf(__('%s capability', 'revisionary'), 'manage_unsubmitted_revisions');
+
+				if (rvy_get_option('manage_unsubmitted_capability')) {
+					$link = $this->tooltipText(
+						"<a href='$url'>" . $cap_caption . '</a>',
+						__('Assign capability to roles', 'revisionary')
+					);
+				} else {
+					$link = $cap_caption;
+				}
+
 				$hint = sprintf(
 					__('Users will need the %s to edit others\' Unsubmitted Revisions.', 'revisionary'),
-
-					$this->tooltipText(
-						"<a href='$url'>" . sprintf(__('%s capability', 'revisionary'), 'manage_unsubmitted_revisions') . '</a>',
-						__('Assign capability to roles', 'revisionary')
-					)
+					$link
 				);
 
 				$checkbox_args['no_escape'] = true;
@@ -792,13 +820,20 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 			if (defined('PUBLISHPRESS_CAPS_VERSION')) {
 				$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=publishpress-revisions');
 		
+				$cap_caption = sprintf(__('%s capability', 'revisionary'), 'edit_others_revisions');
+
+				if (rvy_get_option('revisor_lock_others_revisions')) {
+					$link = $this->tooltipText(
+						"<a href='$url'>" . $cap_caption . '</a>',
+						__('Assign capability to roles', 'revisionary')
+					);
+				} else {
+					$link = $cap_caption;
+				}
+
 				$hint = sprintf(
 					__('If checked, users who cannot edit the published post will need the %s.', 'revisionary'),
-					
-					$this->tooltipText(
-						"<a href='$url'>" . sprintf(__('%s capability', 'revisionary'), 'edit_others_revisions') . '</a>',
-						__('Assign capability to roles', 'revisionary')
-					)
+					$link
 				);
 
 				$checkbox_args['no_escape'] = true;
@@ -813,13 +848,20 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 			if (defined('PUBLISHPRESS_CAPS_VERSION')) {
 				$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=publishpress-revisions');
 		
+				$cap_caption = sprintf(__('%s capability', 'revisionary'), 'list_others_revisions');
+
+				if (rvy_get_option('revisor_hide_others_revisions')) {
+					$link = $this->tooltipText(
+						"<a href='$url'>" . $cap_caption . '</a>',
+						__('Assign capability to roles', 'revisionary')
+					);
+				} else {
+					$link = $cap_caption;
+				}
+
 				$hint = sprintf(
 					__('If checked, users who cannot edit the published post will need the %s.', 'revisionary'),
-					
-					$this->tooltipText(
-						"<a href='$url'>" . sprintf(__('%s capability', 'revisionary'), 'list_others_revisions') . '</a>',
-						__('Assign capability to roles', 'revisionary')
-					)
+					$link
 				);
 
 				$checkbox_args['no_escape'] = true;
@@ -984,13 +1026,20 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 		if (defined('PUBLISHPRESS_CAPS_VERSION')) {
 			$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=publishpress-revisions');
 	
+			$cap_caption = sprintf(__('%s capability', 'revisionary'), 'edit_others_drafts');
+
+			if (rvy_get_option('require_edit_others_drafts')) {
+				$link = $this->tooltipText(
+					"<a href='$url'>" . $cap_caption . '</a>',
+					__('Assign capability to roles', 'revisionary')
+				);
+			} else {
+				$link = $cap_caption;
+			}
+
 			$hint = sprintf(
 				__('If checked, users who can\'t publish will need the %s to edit others\' unpublished Posts.', 'revisionary'),
-				
-				$this->tooltipText(
-					"<a href='$url'>" . sprintf(__('%s capability', 'revisionary'), 'edit_others_drafts') . '</a>',
-					__('Assign capability to roles', 'revisionary')
-				)
+				$link
 			);
 
 			$checkbox_args['no_escape'] = true;
@@ -1028,13 +1077,20 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			if (defined('PUBLISHPRESS_CAPS_VERSION')) {
 				$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=publishpress-revisions');
 		
+				$cap_caption = sprintf(__('%s capability', 'revisionary'), 'restore_revisions');
+
+				if (rvy_get_option('revision_restore_require_cap')) {
+					$link = $this->tooltipText(
+						"<a href='$url'>" . $cap_caption . '</a>',
+						__('Assign capability to roles', 'revisionary')
+					);
+				} else {
+					$link = $cap_caption;
+				}
+
 				$hint = sprintf(
 					__('If checked, non-Administrators cannot restore a revision without the %s.', 'revisionary'),
-					
-					$this->tooltipText(
-						"<a href='$url'>" . sprintf(__('%s capability', 'revisionary'), 'restore_revisions') . '</a>',
-						__('Assign capability to roles', 'revisionary')
-					)
+					$link
 				);
 	
 				$checkbox_args['no_escape'] = true;
