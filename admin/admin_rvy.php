@@ -281,7 +281,8 @@ class RevisionaryAdmin
 		}
 
 		$types = rvy_get_manageable_types();
-		$revision_archive = true;
+
+		$revision_archive = true || current_user_can('administrator') || current_user_can('restore_revisions') || current_user_can('view_revision_archive');
 
 		$can_edit_any = false;
 
@@ -317,17 +318,19 @@ class RevisionaryAdmin
 			}
 
 			do_action('revisionary_admin_menu');
-		}
 
-		// Revision Archive page
-		add_submenu_page(
-			$menu_slug,
-			esc_html__( 'Revision Archive', 'revisionary' ),
-			esc_html__( 'Revision Archive', 'revisionary' ),
-			'read',
-			'revisionary-archive',
-			[$this, 'revision_archive']
-		);
+			if ($revision_archive) {
+				// Revision Archive page
+				add_submenu_page(
+					$menu_slug,
+					esc_html__( 'Revision Archive', 'revisionary' ),
+					esc_html__( 'Revision Archive', 'revisionary' ),
+					'read',
+					'revisionary-archive',
+					[$this, 'revision_archive']
+				);
+			}
+		}
 
 		if ( ! current_user_can( 'manage_options' ) )
 			return;
@@ -385,7 +388,7 @@ class RevisionaryAdmin
 	}
 
 	public function fltPublishPressCapsSection($section_caps) {
-		$section_caps['PublishPress Revisions'] = ['edit_others_drafts', 'edit_others_revisions', 'list_others_revisions', 'manage_unsubmitted_revisions', 'preview_others_revisions'];
+		$section_caps['PublishPress Revisions'] = ['edit_others_drafts', 'edit_others_revisions', 'list_others_revisions', 'manage_unsubmitted_revisions', 'preview_others_revisions', 'restore_revisions', 'view_revision_archive'];
 
 		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && rvy_get_option('revision_restore_require_cap')) {
 			$section_caps['PublishPress Revisions'] []= 'restore_revisions';
@@ -418,6 +421,7 @@ class RevisionaryAdmin
 		$cap_descripts['manage_unsubmitted_revisions'] = esc_html__('Satisfy Revisions setting "Managing Unsubmitted Revisions requires role capability."', 'revisionary');
 		$cap_descripts['preview_others_revisions'] = esc_html__('Preview other user\'s Revisions (without needing editing access).', 'revisionary');
 		$cap_descripts['restore_revisions'] = esc_html__('Restore an archived Revision as the current revision.', 'revisionary');
+		$cap_descripts['view_revision_archive'] = esc_html__('View the Revision Archive, a list of past Revisions.', 'revisionary');
 
 		return $cap_descripts;
 	}
