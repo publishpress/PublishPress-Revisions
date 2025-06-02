@@ -44,6 +44,20 @@ class RevisionaryAdmin
 
 		// ===== Special early exit if this is a plugin install script
 		if ( strpos($script_name, 'p-admin/plugins.php') || strpos($script_name, 'p-admin/plugin-install.php') || strpos($script_name, 'p-admin/plugin-editor.php') ) {
+			add_filter('plugin_row_meta', 
+			function ($links, $file) {
+				if (defined('REVISIONARY_FILE') && ($file == plugin_basename(REVISIONARY_FILE))
+				|| defined('REVISIONARY_PRO_FILE') && ($file == plugin_basename(REVISIONARY_PRO_FILE))
+				) {
+					$links[] = '<a href="'. esc_url(admin_url('admin.php?page=revisionary-q')) .'">' . esc_html__('Revision Queue', 'revisionary') . '</a>';
+					$links[] = '<a href="'. esc_url(admin_url('admin.php?page=revisionary-archive')) .'">' . esc_html__('Revision Archive', 'revisionary') . '</a>';
+					$links[] = '<a href="'. esc_url(admin_url('admin.php?page=revisionary-settings')) .'">' . esc_html__('Settings', 'revisionary') . '</a>';
+				}
+
+				return $links;
+			}
+			, 10, 2);
+
 			if (strpos($script_name, 'p-admin/plugin-install.php') && !empty($_SERVER['HTTP_REFERER']) && strpos(esc_url_raw($_SERVER['HTTP_REFERER']), '=rvy')) {
 				add_action('admin_print_scripts', function(){
 					echo '<style type="text/css">#plugin_update_from_iframe {display:none;}</style>';
@@ -389,6 +403,8 @@ class RevisionaryAdmin
 
 	public function fltPublishPressCapsSection($section_caps) {
 		$section_caps['PublishPress Revisions'] = ['edit_others_drafts', 'edit_others_revisions', 'list_others_revisions', 'manage_unsubmitted_revisions', 'preview_others_revisions', 'restore_revisions', 'view_revision_archive'];
+
+		// @todo: check Revisions settings for other cap requirements
 
 		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && rvy_get_option('revision_restore_require_cap')) {
 			$section_caps['PublishPress Revisions'] []= 'restore_revisions';
