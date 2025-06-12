@@ -44,20 +44,6 @@ class RevisionaryAdmin
 
 		// ===== Special early exit if this is a plugin install script
 		if ( strpos($script_name, 'p-admin/plugins.php') || strpos($script_name, 'p-admin/plugin-install.php') || strpos($script_name, 'p-admin/plugin-editor.php') ) {
-			add_filter('plugin_row_meta', 
-			function ($links, $file) {
-				if (defined('REVISIONARY_FILE') && ($file == plugin_basename(REVISIONARY_FILE))
-				|| defined('REVISIONARY_PRO_FILE') && ($file == plugin_basename(REVISIONARY_PRO_FILE))
-				) {
-					$links[] = '<a href="'. esc_url(admin_url('admin.php?page=revisionary-q')) .'">' . esc_html__('Revision Queue', 'revisionary') . '</a>';
-					$links[] = '<a href="'. esc_url(admin_url('admin.php?page=revisionary-archive')) .'">' . esc_html__('Revision Archive', 'revisionary') . '</a>';
-					$links[] = '<a href="'. esc_url(admin_url('admin.php?page=revisionary-settings')) .'">' . esc_html__('Settings', 'revisionary') . '</a>';
-				}
-
-				return $links;
-			}
-			, 10, 2);
-
 			if (strpos($script_name, 'p-admin/plugin-install.php') && !empty($_SERVER['HTTP_REFERER']) && strpos(esc_url_raw($_SERVER['HTTP_REFERER']), '=rvy')) {
 				add_action('admin_print_scripts', function(){
 					echo '<style type="text/css">#plugin_update_from_iframe {display:none;}</style>';
@@ -393,9 +379,18 @@ class RevisionaryAdmin
 
 	// adds a Settings link next to Deactivate, Edit in Plugins listing
 	function flt_plugin_action_links($links, $file) {
-		if ($file == plugin_basename(REVISIONARY_FILE)) {
+		if (defined('REVISIONARY_FILE') && ($file == plugin_basename(REVISIONARY_FILE))
+		|| defined('REVISIONARY_PRO_FILE') && ($file == plugin_basename(REVISIONARY_PRO_FILE))
+		) {
+			$links[] = '<a href="'. esc_url(admin_url('admin.php?page=revisionary-q')) .'">' . esc_html__('Revision Queue', 'revisionary') . '</a>';
+			$links[] = '<a href="'. esc_url(admin_url('admin.php?page=revisionary-archive')) .'">' . esc_html__('Revision Archive', 'revisionary') . '</a>';
+
 			$page = ( defined('RVY_NETWORK') && RVY_NETWORK ) ? 'rvy-net_options' : 'revisionary-settings';
-			$links[] = "<a href='admin.php?page=$page'>" . __awp('Settings') . "</a>";
+			$links[] = '<a href="'. esc_url(admin_url("admin.php?page=$page")) .'">' . esc_html__('Settings', 'revisionary') . '</a>';
+
+			if (!defined('REVISIONARY_PRO_FILE')) {
+				$links[] = '<a href="'. esc_url('https://publishpress.com/links/revisions-plugin-row') .'" class="pp-upgrade">' . esc_html__('Upgrade to Pro', 'revisionary') . '</a>';
+			}
 		}
 
 		return $links;
