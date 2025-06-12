@@ -695,13 +695,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				}
 
 				if (!empty($approver_id)) {
-					if ($user = new WP_User($approver_id)) {
-						if (!empty($user->display_name)) {
-							echo esc_html($user->display_name);
-						} else {
-							echo esc_html($user->user_login);
-						}
-					}
+					echo get_the_author_meta('display_name', $approver_id);
 				}
 
 				break;
