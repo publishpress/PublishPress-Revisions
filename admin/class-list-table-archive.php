@@ -262,6 +262,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$query = "SELECT
 			r.ID AS ID,
 			r.post_type AS post_type,
+			r.post_status AS post_status,
 			r.post_title AS post_title,
 			r.post_date AS post_date,
 			r.post_date_gmt as post_date_gmt,
