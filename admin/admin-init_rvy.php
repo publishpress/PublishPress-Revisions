@@ -96,6 +96,10 @@ function rvy_admin_init() {
 			$url = admin_url("admin.php?page=revisionary-archive");
 		}
 
+		if ('delete' == $doaction) {
+			$url = admin_url("admin.php?page=revisionary-archive");
+		}
+
 		$sendback = remove_query_arg( array('deleted', 'ids', 'posts', '_wp_nonce', '_wp_http_referer'), $url);
 	
 		if ( isset( $_REQUEST['ids'] ) ) {
