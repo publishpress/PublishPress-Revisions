@@ -18,7 +18,7 @@ require_once( dirname( __FILE__ ) . '/class-list-table-archive.php' );
 $wp_list_table = new Revisionary_Archive_List_Table(['screen' => 'revisionary-archive']);		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 $wp_list_table->prepare_items();
 
-if (rvy_get_option('revision_archive_deletion')) {
+if (rvy_get_option('revision_archive_deletion') && !empty($_REQUEST['deleted'])) {				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$bulk_counts = array(
 		'deleted'   => isset($_REQUEST['deleted']) ? absint( $_REQUEST['deleted'] ) : 0,		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	);
@@ -30,7 +30,6 @@ if (rvy_get_option('revision_archive_deletion')) {
 
 	$bulk_messages['page'] = $bulk_messages['post'];
 
-	$bulk_messages = apply_filters( 'bulk_post_updated_messages', $bulk_messages, $bulk_counts );
 	$bulk_counts = array_filter( $bulk_counts );
 
 
