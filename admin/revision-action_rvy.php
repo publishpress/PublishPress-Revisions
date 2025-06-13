@@ -1174,9 +1174,25 @@ function rvy_revision_delete() {
 		if ( ! $post = get_post( $revision->post_parent ) )
 			break;
 
-		if ( $type_obj = get_post_type_object( $post->post_type ) ) {
-			if ( ! current_user_can( $type_obj->cap->delete_post, $revision->post_parent ) ) {
-				break;
+		if (!is_content_administrator_rvy()) {
+			if ($type_obj = get_post_type_object( $post->post_type ) ) {
+				if ('revision' == $post->post_type) {
+					$check_parent = $post->post_parent;
+					
+					if (!$type_obj = get_post_type_object(get_post_field('post_type', $check_parent))) {
+						break;
+					}
+	
+				} elseif (rvy_in_revision_workflow($post)) {
+					$check_parent = rvy_post_id($post);
+	
+				} else {
+					$check_parent = $revision->post_parent;
+				}
+	
+				if ( !current_user_can( $type_obj->cap->delete_post, $check_parent ) ) {
+					break;
+				}
 			}
 		}
 		
