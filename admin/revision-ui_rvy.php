@@ -108,9 +108,9 @@ function rvy_post_revision_title( $revision, $link = true, $date_field = 'post_d
 			$revision_date = agp_date_i18n( $datef, strtotime( $revision->post_date ) );
 		
 			if ( 'pending-revision' == $revision->post_status ) {
-				$currentf  = esc_html__( '%1$s <span class="rvy-revision-pubish-date">(Requested publication: %2$s)</span>', 'revisionary' );
+				$currentf  = __( '%1$s <span>(Requested publication: %2$s)</span>', 'revisionary' );
 			} else {
-				$currentf  = esc_html__( '%1$s <span class="rvy-revision-pubish-date">(Publish date: %2$s)</span>', 'revisionary' );
+				$currentf  = __( '%1$s <span>(Publish date: %2$s)</span>', 'revisionary' );
 			}
 
 			$date = sprintf( $currentf, $date, $revision_date );
