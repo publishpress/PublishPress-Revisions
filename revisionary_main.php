@@ -456,7 +456,7 @@ class Revisionary
 
 		$this->enabled_post_types_archive = apply_filters(
 			'revisionary_archive_post_types', 
-			array_filter($this->enabled_post_types_archive)
+			$this->enabled_post_types_archive
 		);
 	}
 
