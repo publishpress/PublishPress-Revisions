@@ -487,8 +487,8 @@ class RevisionaryFront {
 							esc_html__("%sView Queue%s", 'revisionary'),
 							$post // revision
 						),
-						"<a href='$queue_url' class='button button-secondary' target='_revision_list'>",
-						'</a>'
+						"<a href='$queue_url' class='rvy-preview-link' target='_revision_list'>",
+						'</a> &bull; '
 					);
 
 					if (current_user_can('edit_post', $revision_id)) {
@@ -498,10 +498,10 @@ class RevisionaryFront {
 								esc_html__("%sCompare%s%sView Published Post%s", 'revisionary'),
 								$post // revision
 							),
-							"<a href='$diff_url' class='button button-secondary' target='_revision_diff'>",
-							'</a>',
-							"<a href='$published_url' class='button button-secondary rvy_has_empty_spacing'>",
-							'</a>'
+							"<a href='$diff_url' class='rvy-preview-link' target='_revision_diff'>",
+							'</a> &bull; ',
+							"<a href='$published_url' class='rvy-preview-link rvy_has_empty_spacing'>",
+							'</a> &bull; '
 						);
 					} else {
 						$view_published .= sprintf(
@@ -510,8 +510,8 @@ class RevisionaryFront {
 								esc_html__("%sView Published Post%s", 'revisionary'),
 								$post // revision
 							),
-							"<a href='$published_url' class='button button-secondary'>",
-							"</a>"
+							"<a href='$published_url' class='rvy-preview-link'>",
+							"</a> &bull; "
 						);
 					}
 				} else {
@@ -525,15 +525,15 @@ class RevisionaryFront {
 						esc_html__("%sView Published Post%s", 'revisionary'),
 						$post // revision
 					),
-					"<a href='$published_url' class='button button-secondary'>",
-					"</a>"
+					"<a href='$published_url' class='rvy-preview-link'>",
+					"</a> &bull; "
 					)
 				: '';
 			}
 
 			if (current_user_can('edit_post', $revision_id)) {
 				$edit_url = apply_filters('revisionary_preview_edit_url', rvy_admin_url("post.php?action=edit&amp;post=$revision_id"), $revision_id);
-				$edit_button = "<a href='$edit_url' class='button button-secondary rvy_has_empty_spacing'>" . esc_html__('Edit', 'revisionary') . '</a>';
+				$edit_button = "<a href='$edit_url' class='rvy-preview-link rvy_has_empty_spacing'>" . esc_html__('Edit', 'revisionary') . '</a> &bull; ';
 			} else {
 				$edit_button = '';
 			}
@@ -558,6 +558,16 @@ class RevisionaryFront {
 				}
 			} else {
 				$publish_url = '';
+			}
+
+			if (('inherit' != $post->post_status || rvy_get_option('revision_archive_deletion')) && (is_content_administrator_rvy() || current_user_can('delete_post', $post->ID)) && !defined('REVISIONARY_PREVIEW_NO_DELETE_BUTTON')) {
+				$delete_url = ('inherit' == $post->post_status)
+				? esc_url(wp_nonce_url(admin_url("admin.php?page=rvy-revisions&amp;action=delete&amp;revision={$post->ID}"), 'delete-revision_' . $post->ID ))
+				: get_delete_post_link($post->ID, '', true);
+
+				$delete_button = '<a href="' . $delete_url . '" class="button button-secondary button-delete">' . esc_html__('Delete', 'revisionary') . '</a>';
+			} else {
+				$delete_button = '';
 			}
 
 			if (('revision' == $post->post_type) 
@@ -597,7 +607,7 @@ class RevisionaryFront {
 					if (!empty($_REQUEST['elementor-preview'])) {													//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 						$message = sprintf( esc_html__('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label($post->post_mime_type, 'name'), '', '', '');
 					} else {
-						$message = sprintf( esc_html__('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label($post->post_mime_type, 'name'), $view_published, $edit_button, $publish_button );
+						$message = sprintf( esc_html__('This is a %s. %s %s %s', 'revisionary'), pp_revisions_status_label($post->post_mime_type, 'name'), $view_published, $edit_button, $publish_button . $delete_button );
 					}
 
 					break;
@@ -617,6 +627,8 @@ class RevisionaryFront {
 						} else {
 							$decline_button = '';
 						}
+
+						$decline_button .= $delete_button;
 
 						if ( strtotime( $post->post_date_gmt ) > agp_time_gmt() ) {
 							$class = 'pending_future';
@@ -707,7 +719,7 @@ class RevisionaryFront {
 							if (!empty($_REQUEST['elementor-preview'])) {											//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 								$message = sprintf( esc_html__('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, '', '' );
 							} else {
-								$message = sprintf( esc_html__('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, $view_published, $publish_button );
+								$message = sprintf( esc_html__('This is a Past Revision (from %s). %s %s', 'revisionary'), $date, $view_published, $publish_button . $delete_button );
 							}
 						}
 					}
