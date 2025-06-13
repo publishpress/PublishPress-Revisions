@@ -244,6 +244,15 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
+= 3.7.0 - 16 Jun 2025 =
+* Change : Settings - Clarify captions for capability requirement settings
+* Change : Use new Capabilities plugin filter to show capability descriptions
+* Change : Archive settings moved to a dedicated tab
+* Change : Compare settings moved to a dedicated tab
+* Change : Revision Creation, Submission and Scheduling settings combined onto a shared "New Revisions" tab
+* Change : Post Editor - Remove "Preview Revision" button after revision creation
+* Fixed : Revision Archive menu and screen were displayed to Subscribers
+
 = 3.6.8 - 4 May 2025 =
 * API : Improve support or Pro plugin's Planner Notifications integration
 
