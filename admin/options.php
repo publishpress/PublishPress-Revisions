@@ -611,13 +611,13 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			}
 
 			$hint = sprintf(
-				__('If checked, non-Administrators cannot restore a revision without the %s.', 'revisionary'),
+				__('Prevent non-Administrators from restoring a revision without the %s.', 'revisionary'),
 				$link
 			);
 
 			$checkbox_args['no_escape'] = true;
 		} else {
-			$hint = esc_html__('If checked, non-Administrators cannot restore a revision without the restore_revisions capability', 'revisionary');
+			$hint = esc_html__('Prevent non-Administrators from restoring a revision without the restore_revisions capability', 'revisionary');
 		}
 
 		$this->option_checkbox( 'revision_restore_require_cap', $tab, $section, $hint, '', $checkbox_args );
@@ -674,13 +674,13 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		}
 
 		$hint = sprintf(
-			__('If checked, users who cannot edit the published post will need %s.', 'revisionary'),
+			__('If the user can\'t edit the published post, require %s.', 'revisionary'),
 			$link
 		);
 
 		$checkbox_args['no_escape'] = true;
 	} else {
-		$hint = esc_html__('If checked, users who cannot edit the published post will need Create Revision capabilities (copy_posts, copy_others_pages, etc.)', 'revisionary');
+		$hint = esc_html__('If the user can\'t edit the published post, require Create Revision capabilities (copy_posts, copy_others_pages, etc.)', 'revisionary');
 	}
 
 	if (defined('PRESSPERMIT_VERSION')) {
@@ -688,7 +688,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=list');
 	
 			$hint .= ' ' . sprintf(
-				__('To assign the Posts / Pages list, assign %s.', 'revisionary'),
+				__('To expand the Pages list, assign %s.', 'revisionary'),
 				
 				$this->tooltipText(
 					"<a href='$url'>" . __('Listing capabilities', 'revisionary') . '</a>',
@@ -698,7 +698,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	
 			$checkbox_args['no_escape'] = true;
 		} else {
-			$hint .= ' ' . esc_html__('To expand the Posts / Pages list, assign Listing capabilities (list_others_pages, list_published_posts, etc.)', 'revisionary');
+			$hint .= ' ' . esc_html__('To expand the Pages list, assign Listing capabilities (list_others_pages, list_published_posts, etc.)', 'revisionary');
 		}
 	}
 	
@@ -911,13 +911,13 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 				}
 
 				$hint = sprintf(
-					__('If checked, users who cannot edit the published post will need the %s.', 'revisionary'),
+					__('If the user can\'t edit the published post, require the %s.', 'revisionary'),
 					$link
 				);
 
 				$checkbox_args['no_escape'] = true;
 			} else {
-				$hint = esc_html__('If checked, users who cannot edit the published post will need the edit_others_revisions capability.', 'revisionary');
+				$hint = esc_html__('If the user can\'t edit the published post, require the edit_others_revisions capability.', 'revisionary');
 			}
 
 			$this->option_checkbox( 'revisor_lock_others_revisions', $tab, $section, $hint, '', $checkbox_args );
@@ -939,13 +939,13 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 				}
 
 				$hint = sprintf(
-					__('If checked, users who cannot edit the published post will need the %s.', 'revisionary'),
+					__('If the user can\'t edit the published post, require the %s.', 'revisionary'),
 					$link
 				);
 
 				$checkbox_args['no_escape'] = true;
 			} else {
-				$hint = esc_html__('If checked, users who cannot edit the published post will need the list_others_revisions capability.', 'revisionary');
+				$hint = esc_html__('If the user can\'t edit the published post, require the list_others_revisions capability.', 'revisionary');
 			}
 
 			$this->option_checkbox( 'revisor_hide_others_revisions', $tab, $section, $hint, '', $checkbox_args );
@@ -1194,7 +1194,7 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 
 			if ($pp_notifications && defined('PRESSPERMIT_VERSION') && defined('RVY_CONTENT_ROLES')) {
 				echo '<br />';
-				$hint = __('Users matching Planner > Notifications configuration get revision notifications only if they can edit the published post', 'revisionary');
+				$hint = __('Users matching Planner > Notifications configuration get revision notifications only if they can edit the published post.', 'revisionary');
 				$this->option_checkbox( 'planner_notifications_access_limited', $tab, $section, $hint, '', ['no_escape' => true] );
 			}
 
