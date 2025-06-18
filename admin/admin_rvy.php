@@ -456,10 +456,6 @@ class RevisionaryAdmin
 	}
 
 	public function publishpressFooter() {
-		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !rvy_get_option('display_pp_branding')) {
-			return;
-		}
-
 		?>
 		<footer>
 
