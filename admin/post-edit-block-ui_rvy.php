@@ -28,12 +28,12 @@ if ($_post_id = rvy_detect_post_id()) {
                 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
                 $wpdb->update($wpdb->posts, ['post_modified_gmt' => $_post->post_modified_gmt, 'post_modified' => $_post->post_modified], ['ID' => $_post->ID]);
 
-                if (!get_transient("revisionary-post-edit-redirect-{$_post_id}")) {
-                    $uri = (isset($_SERVER['REQUEST_URI'])) ? esc_url_raw($_SERVER['REQUEST_URI']) : '';
-
-                    set_transient("revisionary-post-edit-redirect-{$_post_id}", true, 30);
-                    wp_redirect(esc_url_raw($uri));
-                    exit;
+                if (!empty($_SERVER['REQUEST_URI'])) {
+                    if (!get_transient("revisionary-post-edit-redirect-{$_post_id}")) {
+                        set_transient("revisionary-post-edit-redirect-{$_post_id}", true, 30);
+                        wp_redirect(esc_url_raw($_SERVER['REQUEST_URI']));
+                        exit;
+                    }
                 }
             }
         }
