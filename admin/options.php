@@ -129,19 +129,17 @@ $this->tab_captions = array( 'features' => esc_html__( 'Settings', 'revisionary'
 $this->section_captions = array(
 	'features' => array(
 		'post_types'			=> esc_html__('Post Types', 'revisionary'),
-		'archive'				=> esc_html__('Archive', 'revisionary'),
+		'archive'				=> esc_html__('Past Revisions', 'revisionary'),
 		'working_copy'			=> esc_html__('New Revisions', 'revisionary'),
-		'revision_queue'		=> esc_html__('Queue', 'revisionary'),
 		'preview'				=> esc_html__('Preview', 'revisionary'),
 		'compare'				=> esc_html__('Compare', 'revisionary'),
 		'revisions'				=> esc_html__('Options', 'revisionary'),
-		'notification'			=> esc_html__('Notifications', 'revisionary')
 	)
 );
 
 // TODO: replace individual _e calls with these (and section, tab captions)
 $pending_revision_singular = pp_revisions_status_label('pending-revision', 'name');
-$pending_revision_plural = rvy_get_option('revision_statuses_noun_labels') ? pp_revisions_status_label('pending-revision', 'plural') : esc_html__('Submission', 'revisionary');
+$pending_revision_plural = rvy_get_option('revision_statuses_noun_labels') ? pp_revisions_status_label('pending-revision', 'plural') : esc_html__('Revision Submission', 'revisionary');
 $pending_revision_basic = pp_revisions_status_label('pending-revision', 'basic');
 $future_revision_singular = pp_revisions_status_label('future-revision', 'name');
 
@@ -180,7 +178,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'publish_scheduled_notify_author' => 		sprintf(esc_html__('Email the original Author when a %s is published', 'revisionary'), $future_revision_singular),
 	'publish_scheduled_notify_revisor' => 		sprintf(esc_html__('Email the Revisor when a %s is published', 'revisionary'), $future_revision_singular),
 	'use_notification_buffer' => 				esc_html__('Enable notification buffer', 'revisionary'),
-	'revisor_role_add_custom_rolecaps' => 		esc_html__('All custom post types available to Revisors', 'revisionary' ),
+	'revisor_role_add_custom_rolecaps' => 		esc_html__('Revisors can create a new revision for any custom post type', 'revisionary' ),
 	'require_edit_others_drafts' => 			esc_html__("Prevent Revisors from editing others' unpublished Posts", 'revisionary' ),
 	'display_hints' => 							esc_html__('Display Hints', 'revisionary'),
 	'delete_settings_on_uninstall' => 			esc_html__('Delete settings and Revisions if plugin is deleted', 'revisionary'),
@@ -197,7 +195,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'extended_archive' =>						esc_html__('Keep an archive of revision edits, even after the revision is published', 'revisionary'),
 	'rev_publication_delete_ed_comments' =>		esc_html__('On Revision publication, delete Editorial Comments', 'revisionary'),
 	'deletion_queue' => 						esc_html__('Enable deletion queue', 'revisionary'),
-	'revision_archive_deletion' => 				esc_html__('Enable deletion in archive', 'revisionary'),
+	'revision_archive_deletion' => 				esc_html__('Allow Past Revisions to be deleted', 'revisionary'),
 	'revision_restore_require_cap' =>			esc_html__('Restoring a Revision requires role capability', 'revisionary'),
 	'permissions_compat_mode' => 				esc_html__('Compatibility Mode', 'revisionary'),
 	'planner_notifications_access_limited' =>	esc_html__('Planner Notifications Access-Limited', 'revisionary'),
@@ -218,14 +216,12 @@ if ( defined('RVY_CONTENT_ROLES') ) {
 
 $this->form_options = apply_filters('revisionary_option_sections', [
 'features' => [
-	'post_types' =>			 ['revisor_role_add_custom_rolecaps', 'enabled_post_types', 'enabled_post_types_archive', 'permissions_compat_mode'],
+	'post_types' =>			 ['revisor_role_add_custom_rolecaps', 'enabled_post_types', 'enabled_post_types_archive'],
 	'archive' =>			 ['archive_postmeta', 'extended_archive', 'revision_archive_deletion', 'revision_restore_require_cap'],
-	'working_copy' =>		 ['copy_posts_capability', 'revision_limit_per_post', 'revision_limit_compat_mode', 'revision_unfiltered_html_check', 'auto_submit_revisions', 'caption_copy_as_edit', 'pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date', 'scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'wp_cron_usage_detected', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'rev_publication_delete_ed_comments', 'revision_statuses_noun_labels'],
-	'revision_queue' =>		 ['manage_unsubmitted_capability', 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions', 'deletion_queue'],
+	'working_copy' =>		 ['copy_posts_capability', 'revision_limit_per_post', 'revision_limit_compat_mode', 'revision_unfiltered_html_check', 'auto_submit_revisions', 'caption_copy_as_edit', 'permissions_compat_mode', 'pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date', 'scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'wp_cron_usage_detected', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'rev_publication_delete_ed_comments', 'revision_statuses_noun_labels', 'manage_unsubmitted_capability', 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions', 'deletion_queue', 'use_publishpress_notifications', 'planner_notifications_access_limited', 'pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'home_preview_set_home_flag', 'block_editor_extra_preview_button'],
 	'compare' =>			 ['compare_revisions_direct_approval', 'diff_display_strip_tags', 'past_revisions_order_by'],
 	'revisions'		=>		 ['require_edit_others_drafts', 'display_hints', 'delete_settings_on_uninstall'],
-	'notification'	=>		 ['use_publishpress_notifications', 'planner_notifications_access_limited', 'pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 	'license' =>			 ['edd_key'],
 ]
 ]);
@@ -433,7 +429,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 	$section = 'post_types';				// --- POST TYPES SECTION ---
 
 	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
+		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td><div class="rvy-opt-wrap">
 
 		<table id="rvy_post_types_frame">
 		<tr>
@@ -502,7 +498,7 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 
 		} // end foreach src_otype
 		?>
-		</td></tr></table>
+		</div></td></tr></table>
 		
 		<?php
 		echo '<br >';
@@ -542,46 +538,16 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 			?>
 			</div>
 		<?php endif;
-
-		echo '<br>';
-		$id = 'permissions_compat_mode';
-
-		$this->register_option($id);
-		$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
-
-		echo esc_html($this->option_captions[$id]) . ':';
-
-		$standard_caption = (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION'))
-		? esc_html__('Broadest compat including Elementor, Divi, Beaver Builder', 'revisionary')
-		: esc_html__('Standard storage schema for broadest 3rd party compat', 'revisionary');
-
-		echo " <select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "' autocomplete='off'>";
-		$captions = [
-			'' => $standard_caption, 
-			1 => esc_html__('Enhanced Revision access control with PublishPress plugins', 'revisionary'),
-		];
-
-		foreach ( $captions as $key => $value) {
-			$selected = ( $current_setting == $key ) ? 'selected' : '';
-			echo "\n\t<option value='" . esc_attr($key) . "' " . esc_attr($selected) . ">" . esc_html($captions[$key]) . "</option>";
-		}
-		echo '</select>&nbsp;';
-
-		if (revisionary()->getOption('display_hints')) :?>
-			<div class="rvy-subtext">
-			<?php _e('In enhanced mode, a Revision\'s status is stored using the standard WordPress schema. Some plugins (including older versions of Revisions) are incompatible.', 'revisionary');?>
-			</div>
-		<?php endif;
 	?>
 
-	</td></tr></table>
+		</div></td></tr></table>
 	<?php endif; // any options accessable in this section
 
 
 $section = 'archive';				// --- ARCHIVE SECTION ---
 
 if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
+	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td><div class="rvy-opt-wrap">
 
 	<?php
 	do_action('revisionary_option_ui_archive', $this, $sitewide, $customize_defaults);
@@ -623,40 +589,60 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		$this->option_checkbox( 'revision_restore_require_cap', $tab, $section, $hint, '', $checkbox_args );
 	}
 	?>
-	</td></tr></table>
+	</div></td></tr></table>
 <?php endif; // any options accessable in this section
 
 
 $section = 'working_copy';			// --- NEW REVISIONS SECTION ---
 
 if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
-
-	<div>
-	<h3 style="margin-top:0; margin-bottom:8px"><?php esc_html_e('Revision Creation', 'revisionary');?></h3>
+	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td><div class="rvy-opt-wrap">
 
 	<?php
-	$hint = esc_html__('Prevent Revision creation if the post already has another Revision in progress.', 'revisionary');
-	$this->option_checkbox( 'revision_limit_per_post', $tab, $section, $hint, '' );
+	$pending_revisions_available = rvy_get_option( 'pending_revisions' ); // ! RVY_NETWORK || $sitewide || empty( $rvy_options_sitewide['pending_revisions'] ) || rvy_get_option( 'pending_revisions', true );
 
-	$hide = empty(rvy_get_option('revision_limit_per_post'));
-	$hint = esc_html__('Work around cache plugin conflicts by requerying for revisions before suppressing the New Revision link.', 'revisionary');
-	$this->option_checkbox( 'revision_limit_compat_mode', $tab, $section, $hint, '', compact('hide') );
+	$scheduled_revisions_available =  rvy_get_option( 'scheduled_revisions' ); // ! RVY_NETWORK || $sitewide || empty( $rvy_options_sitewide['scheduled_revisions'] ) || rvy_get_option( 'scheduled_revisions', true );
+
+	$_sections = [
+		'revision-creation' => esc_html__('Revision Creation', 'revisionary'),
+		'revision-submission' => esc_html__('Submission', 'revisionary'),
+		'revision-scheduling' => esc_html__('Scheduling', 'revisionary'),
+		'revision-publication' => esc_html__('Publication', 'revisionary'),
+		'revision-queue' => esc_html__('Revision Queue', 'revisionary'),
+		'notifications' => esc_html__('Notifications', 'revisionary'),
+	];
+
+	if (!$pending_revisions_available && !$scheduled_revisions_available) {
+		unset($_sections['revision-queue']);
+	}
 	?>
+
+	<ul class="rvy-option-section-tabs">
+	<?php foreach ($_sections as $_section => $caption) :?>
+	<?php if (!empty($first_done)) :?>
+		<li><?php echo "&nbsp;|&nbsp";?></li>
+	<?php endif;?>
+	<li class="<?php if (empty($first_done)) echo 'active';?>"><a href="javascript:void(0);" class="<?php echo $_section;?>"><?php echo esc_html($caption);?></a></li>
+	<?php 
+		$first_done = true;
+	endforeach;?>
+	</ul>
+
 	<script type="text/javascript">
 	/* <![CDATA[ */
 	jQuery(document).ready( function($) {
-		$('#revision_limit_per_post').on('click', function(e) {
-			$('#revision_limit_compat_mode').closest('div').toggle($(e).prop('checked'));
+		$('#ppr-tab-working_copy div.rvy-opt-wrap ul.rvy-option-section-tabs li a').on('click', function(e) {
+			$('#ppr-tab-working_copy div.rvy-opt-wrap ul.rvy-option-section-tabs li').removeClass('active');
+			$(this).parent().addClass('active');
+			$('#ppr-tab-working_copy div.rvy-opt-wrap > div').hide();
+			$('#ppr-tab-working_copy div.rvy-opt-wrap > div.' + $(this).attr('class')).show();
 		});
 	});
 	/* ]]> */
 	</script>
 
+	<div class="revision-creation">
 	<?php
-	$hint = sprintf(esc_html__('If the user does not have a regular Edit link, recaption the %s link as "Edit."', 'revisionary'), pp_revisions_status_label('draft-revision', 'submit_short'));
-	$this->option_checkbox( 'caption_copy_as_edit', $tab, $section, $hint, '' );
-
 	$checkbox_args = [];
 
 	if (defined('PUBLISHPRESS_CAPS_VERSION')) {
@@ -731,111 +717,161 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	}
 
 	$this->option_checkbox( 'revision_unfiltered_html_check', $tab, $section, $hint, '', $checkbox_args );
+
+	echo '<br>';
+	$id = 'permissions_compat_mode';
+
+	$this->register_option($id);
+	$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
+
+	echo esc_html($this->option_captions[$id]) . ':';
+
+	$standard_caption = (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION'))
+	? esc_html__('Broadest compat including Elementor, Divi, Beaver Builder', 'revisionary')
+	: esc_html__('Standard storage schema for broadest 3rd party compat', 'revisionary');
+
+	echo " <select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "' autocomplete='off'>";
+	$captions = [
+		'' => $standard_caption, 
+		1 => esc_html__('Enhanced Revision access control with PublishPress plugins', 'revisionary'),
+	];
+
+	foreach ( $captions as $key => $value) {
+		$selected = ( $current_setting == $key ) ? 'selected' : '';
+		echo "\n\t<option value='" . esc_attr($key) . "' " . esc_attr($selected) . ">" . esc_html($captions[$key]) . "</option>";
+	}
+	echo '</select>&nbsp;';
+
+	if (revisionary()->getOption('display_hints')) :?>
+		<div class="rvy-subtext">
+		<?php _e('In enhanced mode, a Revision\'s status is stored by standard WordPress schema. Some plugins are incompatible.', 'revisionary');?>
+		</div>
+	<?php endif;
+
+	echo '<br>';
+
+	$hint = esc_html__('Prevent Revision creation if the post already has another Revision in progress.', 'revisionary');
+	$this->option_checkbox( 'revision_limit_per_post', $tab, $section, $hint, '' );
+
+	$hide = empty(rvy_get_option('revision_limit_per_post'));
+	$hint = esc_html__('Work around cache plugin conflicts by requerying for revisions before suppressing the New Revision link.', 'revisionary');
+	$this->option_checkbox( 'revision_limit_compat_mode', $tab, $section, $hint, '', compact('hide') );
+	?>
+	<script type="text/javascript">
+	/* <![CDATA[ */
+	jQuery(document).ready( function($) {
+		$('#revision_limit_per_post').on('click', function(e) {
+			$('#revision_limit_compat_mode').closest('div').toggle($(e).prop('checked'));
+		});
+	});
+	/* ]]> */
+	</script>
+
+	<?php
+	$hint = sprintf(esc_html__('If the user does not have a regular Edit link, recaption the %s link as "Edit."', 'revisionary'), pp_revisions_status_label('draft-revision', 'submit_short'));
+	$this->option_checkbox( 'caption_copy_as_edit', $tab, $section, $hint, '' );
+
+	$hint = esc_html__('Default labels are "Not Submitted for Approval", "Submitted for Approval", "Scheduled Revision"', 'revisionary');
+	$this->option_checkbox( 'revision_statuses_noun_labels', $tab, $section, $hint, '' );
 	?>
 
 	<?php
-	$hint = esc_html__('When a user who has publishing capabilities creates a Revision, set it to "Submitted" status.', 'revisionary');
-	$this->option_checkbox( 'auto_submit_revisions', $tab, $section, $hint, '' );
-
 	do_action('revisionary_auto_submit_setting_ui', $this, $tab, $section);
 	?>
 	</div>
-	<?php
 
-	$pending_revisions_available = ! RVY_NETWORK || $sitewide || empty( $rvy_options_sitewide['pending_revisions'] ) || rvy_get_option( 'pending_revisions', true );
 
-	if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
-	$pending_revisions_available ) :?>
-		<div>
-		<h3 style="margin-top: 30px; margin-bottom:8px"><?php esc_html_e('Revision Submission', 'revisionary');?></h3>
+	<div class="revision-submission" style="display:none">
 		<?php
-		$this->option_checkbox('pending_revisions', $tab, $section, '', '', ['style' => 'margin-bottom: 0']);
-
-		echo "<div class='rvy-subtext'>"
-		. sprintf(
+		$hint = sprintf(
 			esc_html__( 'Enable published content to be copied, edited, submitted for approval and managed in %sRevision Queue%s.', 'revisionary' ),
 			"<a href='" . esc_url(rvy_admin_url('admin.php?page=revisionary-q')) . "'>",
-			'</a>'
-		)
-		. "</div>";
+			'</a>');
 
-		$checkbox_args = [];
+		$this->option_checkbox('pending_revisions', $tab, $section, $hint, '', ['no_escape' => true]);
 
-		if (defined('PUBLISHPRESS_CAPS_VERSION')) {
-			$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=revise');
-	
-			$cap_caption = __('Submit Revision capabilities', 'revisionary');
+		if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
+			$pending_revisions_available ) :
 
-			if (rvy_get_option('revise_posts_capability')) {
-				$link = $this->tooltipText(
-					"<a href='$url'>" . $cap_caption . '</a>',
-					__('Assign capabilities to roles', 'revisionary')
+			$checkbox_args = [];
+
+			if (defined('PUBLISHPRESS_CAPS_VERSION')) {
+				$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=revise');
+		
+				$cap_caption = __('Submit Revision capabilities', 'revisionary');
+
+				if (rvy_get_option('revise_posts_capability')) {
+					$link = $this->tooltipText(
+						"<a href='$url'>" . $cap_caption . '</a>',
+						__('Assign capabilities to roles', 'revisionary')
+					);
+				} else {
+					$link = $cap_caption;
+				}
+
+				$hint = sprintf(
+					__('If the user can\'t edit the published post, require %s.', 'revisionary'),
+					$link
 				);
+
+				$checkbox_args['no_escape'] = true;
 			} else {
-				$link = $cap_caption;
+				$hint = esc_html__('If the user can\'t edit the published post, require Submit Revision capabilities (revise_posts, revise_others_pages, etc.)', 'revisionary');
 			}
 
-			$hint = sprintf(
-				__('If checked, users who cannot edit the published post will need %s.', 'revisionary'),
-				$link
-			);
+			$this->option_checkbox( 'revise_posts_capability', $tab, $section, $hint, '', $checkbox_args );
 
-			$checkbox_args['no_escape'] = true;
-		} else {
-			$hint = esc_html__('If checked, users who cannot edit the published post will need Submit Revision capabilities (revise_posts, revise_others_pages, etc.)', 'revisionary');
-		}
+			$hint = sprintf(esc_html__( 'When a %s is published, update post publish date to current time.', 'revisionary' ), pp_revisions_status_label('pending-revision', 'name'));
+			$this->option_checkbox( 'pending_revision_update_post_date', $tab, $section, $hint, '' );
 
-		$this->option_checkbox( 'revise_posts_capability', $tab, $section, $hint, '', $checkbox_args );
+			$hint = sprintf(esc_html__( 'When a %s is published, update post modified date to current time.', 'revisionary' ), pp_revisions_status_label('pending-revision', 'name'));
+			$this->option_checkbox( 'pending_revision_update_modified_date', $tab, $section, $hint, '' );
 
-		$hint = sprintf(esc_html__( 'When a %s is published, update post publish date to current time.', 'revisionary' ), pp_revisions_status_label('pending-revision', 'name'));
-		$this->option_checkbox( 'pending_revision_update_post_date', $tab, $section, $hint, '' );
+			$hint = esc_html__('When a user who has publishing capabilities creates a Revision, set it to "Submitted" status.', 'revisionary');
+			$this->option_checkbox( 'auto_submit_revisions', $tab, $section, $hint, '' );
 
-		$hint = sprintf(esc_html__( 'When a %s is published, update post modified date to current time.', 'revisionary' ), pp_revisions_status_label('pending-revision', 'name'));
-		$this->option_checkbox( 'pending_revision_update_modified_date', $tab, $section, $hint, '' );
-
-		do_action('revisionary_option_ui_pending_revisions', $this, $sitewide, $customize_defaults);
+			do_action('revisionary_option_ui_pending_revisions', $this, $sitewide, $customize_defaults);
 		?>
-		</div>
 	<?php endif; // revision submission enabled
 	?>
 
-	<?php 
-	$scheduled_revisions_available = ! RVY_NETWORK || $sitewide || empty( $rvy_options_sitewide['scheduled_revisions'] ) || rvy_get_option( 'scheduled_revisions', true );
+		</div>
+	
 
-	if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
-	$scheduled_revisions_available ) :?>
-		<div>
-		<h3 style="margin-top: 30px; margin-bottom:8px"><?php esc_html_e('Revision Scheduling', 'revisionary');?></h3>
-
+		<div class="revision-scheduling" style="display:none">
 		<?php
 		$hint = esc_html__( 'If a currently published post or page is edited and a future date set, the change will not be applied until the selected date.', 'revisionary' );
 		$this->option_checkbox( 'scheduled_revisions', $tab, $section, $hint, '' );
 
-		$hint = sprintf(esc_html__( 'When a %s is published, update post publish date to current time.', 'revisionary' ), pp_revisions_status_label('future-revision', 'name'));
-		$this->option_checkbox( 'scheduled_revision_update_post_date', $tab, $section, $hint, '' );
+		if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
+		$scheduled_revisions_available ) :
 
-		$hint = sprintf(esc_html__( 'When a %s is published, update post modified date to current time.', 'revisionary' ), pp_revisions_status_label('future-revision', 'name'));
-		$this->option_checkbox( 'scheduled_revision_update_modified_date', $tab, $section, $hint, '' );
+			$hint = sprintf(esc_html__( 'When a %s is published, update post publish date to current time.', 'revisionary' ), pp_revisions_status_label('future-revision', 'name'));
+			$this->option_checkbox( 'scheduled_revision_update_post_date', $tab, $section, $hint, '' );
 
-		global $wp_version;
-		
-		$hint = esc_html__( 'Publish scheduled revisions using the WP-Cron mechanism. On some sites, publication will fail if this setting is disabled.', 'revisionary' );
-		$this->option_checkbox( 'scheduled_publish_cron', $tab, $section, $hint, '' );
+			$hint = sprintf(esc_html__( 'When a %s is published, update post modified date to current time.', 'revisionary' ), pp_revisions_status_label('future-revision', 'name'));
+			$this->option_checkbox( 'scheduled_revision_update_modified_date', $tab, $section, $hint, '' );
 
-		if (!rvy_get_option('scheduled_publish_cron')) {
-			$hint = esc_html__( 'Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
-			$this->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
-		}
+			global $wp_version;
+			
+			$hint = esc_html__( 'Publish scheduled revisions using the WP-Cron mechanism. On some sites, publication will fail if this setting is disabled.', 'revisionary' );
+			$this->option_checkbox( 'scheduled_publish_cron', $tab, $section, $hint, '' );
 
-		if (defined('DISABLE_WP_CRON') && DISABLE_WP_CRON) {
-			$hint = esc_html__( 'The WP-Cron trigger is disabled, but scheduled tasks are still excecuted using a custom trigger.', 'revisionary' );
-			$this->option_checkbox( 'wp_cron_usage_detected', $tab, $section, $hint, '' );
-		}
+			if (!rvy_get_option('scheduled_publish_cron')) {
+				$hint = esc_html__( 'Publish scheduled revisions asynchronously, via a secondary http request from the server.  This is usually best since it eliminates delay, but some servers may not support it.', 'revisionary' );
+				$this->option_checkbox( 'async_scheduled_publish', $tab, $section, $hint, '' );
+			}
+
+			if (defined('DISABLE_WP_CRON') && DISABLE_WP_CRON) {
+				$hint = esc_html__( 'The WP-Cron trigger is disabled, but scheduled tasks are still excecuted using a custom trigger.', 'revisionary' );
+				$this->option_checkbox( 'wp_cron_usage_detected', $tab, $section, $hint, '' );
+			}
+		endif; // scheduled revisions enabled
 		?>
 		</div>
-	<?php endif; // scheduled revisions enabled
 
-		echo '<h3 style="margin-top: 30px; margin-bottom:8px">' . esc_html__('Revision Publication', 'revisionary') . '</h3>';
+		<?php
+		echo '<div class="revision-publication" style="display:none">';
 
 		if (defined('PUBLISHPRESS_VERSION')) {
 			$this->option_checkbox( 'rev_publication_delete_ed_comments', $tab, $section, '', '' );
@@ -847,27 +883,16 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		$this->option_checkbox( 'trigger_post_update_actions', $tab, $section, $hint, '' );
 
 		do_action('revisionary_option_ui_revision_options', $this, $sitewide, $customize_defaults);
+		echo '</div>';
 		?>
 		<?php
-		echo '<h3 style="margin-top: 30px; margin-bottom:8px">' . esc_html__('Revision Status Labels', 'revisionary') . '</h3>';
-
-		$hint = esc_html__('Default labels are "Not Submitted for Approval", "Submitted for Approval", "Scheduled Revision"', 'revisionary');
-		$this->option_checkbox( 'revision_statuses_noun_labels', $tab, $section, $hint, '' );
-	?>
-	</td></tr></table>
-<?php endif; // any options accessable in this section
 
 
+		echo '<div class="revision-queue" style="display:none">';
 
-if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
-	$pending_revisions_available || $scheduled_revisions_available ) :
-
-		$section = 'revision_queue';			// --- REVISION QUEUE SECTION ---
-
-		if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-			<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
-
-			<?php
+		if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
+			$pending_revisions_available || $scheduled_revisions_available ) :
+		
 			$checkbox_args = [];
 
 			if (defined('PUBLISHPRESS_CAPS_VERSION')) {
@@ -957,199 +982,26 @@ if ( 	// To avoid confusion, don't display any revision settings if pending revi
 			$this->option_checkbox( 'list_unsubmitted_revisions', $tab, $section, $hint, '' );
 
 			do_action('revisionary_option_ui_revision_queue_options', $this, $sitewide, $customize_defaults);
-		?>
-
-		<?php if (!empty($_SERVER['REQUEST_URI'])):?>
-		<p style="margin-top:25px">
-		<a href="<?php echo esc_url(wp_nonce_url(add_query_arg('rvy_flush_flags', 1, esc_url(esc_url_raw($_SERVER['REQUEST_URI']))), 'flush-flags') )?>"><?php esc_html_e('Regenerate "post has revision" flags', 'revisionary');?></a>
-		
-		<?php if ($this->display_hints) :
-			$hint = esc_html__('Apply this maintenance operation if "Has Revision" indicators on the Posts / Pages screen seem out of sync with the Revision Queue listing.', 'revisionary');
-			echo "<div class='rvy-subtext'>" . esc_html($hint) . "</div>";
-		endif;?>
-	
-		</p>
-		<?php endif;?>
-
-		</td></tr></table>
-	<?php endif; // any options accessable in this section
-endif;
-
-
-$section = 'preview';			// --- PREVIEW SECTION ---
-
-if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
-
-	<?php
-	$hint = esc_html__('Some themes may block revision preview.', 'revisionary');
-	$this->option_checkbox( 'revision_preview_links', $tab, $section, $hint, '' );
-
-	$preview_links = rvy_get_option('revision_preview_links');
-
-	$id = 'preview_link_type';
-	if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
-		$this->all_options []= $id;
-		$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
-		?>
-		<div id="rvy_preview_options" style="padding-left: 25px;<?php if (!$preview_links) echo 'display: none;';?>">
-		<label for="<?php echo esc_attr($id);?>"><?php echo esc_html($this->option_captions[$id]);?>: </label>
-
-		<select name="<?php echo esc_attr($id);?>" id="<?php echo esc_attr($id);?>" autocomplete="off">
-
-		<?php
-		$captions = [
-			'' => esc_html__('Published Post Slug', 'revisionary'), 
-			'revision_slug' => esc_html__('Revision Slug', 'revisionary'), 
-			'id_only' => esc_html__('Revision ID only', 'revisionary') 
-		];
-
-		foreach ( $captions as $key => $value) {
-			$selected = ( $current_setting == $key ) ? 'selected' : '';
-			echo "\n\t<option value='" . esc_attr($key) . "' " . esc_attr($selected) . ">" . esc_html($captions[$key]) . "</option>";
-		}
-		?>
-		</select>&nbsp;
-
-		<?php
-		if ( $this->display_hints ) : ?>
-			<br />
-			<div class="rvy-subtext">
-			<?php
-			esc_html_e('Some themes or plugins may require Revision Slug or Revision ID link type for proper template loading and field display.', 'revisionary');
 			?>
-			</div>
-		<?php endif;
-
-		do_action('revisionary_option_ui_preview_options', $this, $sitewide, $customize_defaults);
-
-		if (defined('RVY_PREVIEW_ARG_LOCKED') && defined('RVY_PREVIEW_ARG')) {
-			printf(
-				esc_html__(
-					'The revision preview argument is configured by constant definition: %s',
-					'revisionary'
-				),
-				esc_html(RVY_PREVIEW_ARG)
-			);
-		} else {
-			$hint = esc_html__('Adjust preview links to use "rv_preview" argument instead of "preview". Experiment to see which works best with your theme.', 'revisionary');
-			$this->option_checkbox( 'preview_link_alternate_preview_arg', $tab, $section, $hint, '' );
-		}
-
-		$hint = esc_html__('Some themes may require this setting for correct revision preview display.', 'revisionary');
-		$this->option_checkbox( 'home_preview_set_home_flag', $tab, $section, $hint, '' );
-
-		$hint = '';
-		$this->option_checkbox( 'block_editor_extra_preview_button', $tab, $section, $hint, '' );
-		?>
-		</div>
-		
-		<script type="text/javascript">
-		/* <![CDATA[ */
-		jQuery(document).ready( function($) {
-			$('#revision_preview_links').on('click', function(e) {
-				$('#rvy_preview_options').toggle($(e).prop('checked'));
-			});
-		});
-		/* ]]> */
-		</script>
-		<?php
-	}
-	?>
-	</td></tr></table>
-<?php endif; // any options accessable in this section
-
-
-$section = 'compare';				// --- COMPARE SECTION ---
-
-if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
-
-	<?php
-	$id = 'past_revisions_order_by';
-	if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
-		echo esc_html($this->option_captions[$id]);
-
-		$this->all_options []= $id;
-		$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
-
-		echo " <select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "' autocomplete='off'>";
-		$captions = ['' => esc_html__('Post Date', 'revisionary'), 'modified' => esc_html__('Modification Date', 'revisionary')];
-		foreach ( $captions as $key => $value) {
-			$selected = ( $current_setting == $key ) ? 'selected' : '';
-			echo "\n\t<option value='" . esc_attr($key) . "' " . esc_attr($selected) . ">" . esc_html($captions[$key]) . "</option>";
-		}
-		echo '</select>&nbsp;';
-
-		echo "<br />";
-	}
-
-	$hint = '';
-	$this->option_checkbox( 'diff_display_strip_tags', $tab, $section, $hint, '' );
-
-	$hint = esc_html__('This allows immediate approval within the Compare screen. If disabled, a Preview link is provided instead.', 'revisionary');
-	$this->option_checkbox( 'compare_revisions_direct_approval', $tab, $section, $hint, '' );
-	?>
-	</td></tr></table>
-<?php endif; // any options accessable in this section
-
-
-if ( 	// To avoid confusion, don't display any revision settings if pending revisions / scheduled revisions are unavailable
-$pending_revisions_available || $scheduled_revisions_available ) :
-
-	$section = 'revisions';			// --- REVISIONS SECTION ---
-
-	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
-
-		<?php
-		$checkbox_args = [];
-
-		if (defined('PUBLISHPRESS_CAPS_VERSION')) {
-			$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=publishpress-revisions');
 	
-			$cap_caption = sprintf(__('%s capability', 'revisionary'), 'edit_others_drafts');
+			<?php if (!empty($_SERVER['REQUEST_URI'])):?>
+			<p style="margin-top:25px">
+			<a href="<?php echo esc_url(wp_nonce_url(add_query_arg('rvy_flush_flags', 1, esc_url(esc_url_raw($_SERVER['REQUEST_URI']))), 'flush-flags') )?>"><?php esc_html_e('Regenerate "post has revision" flags', 'revisionary');?></a>
+			
+			<?php if ($this->display_hints) :
+				$hint = esc_html__('Apply this maintenance operation if Has Revision labels on Posts / Pages screens mismatch the Revision Queue listing.', 'revisionary');
+				echo "<div class='rvy-subtext'>" . esc_html($hint) . "</div>";
+			endif;?>
+		
+			</p>
+			<?php endif;
+		endif;
 
-			if (rvy_get_option('require_edit_others_drafts')) {
-				$link = $this->tooltipText(
-					"<a href='$url'>" . $cap_caption . '</a>',
-					__('Assign capability to roles', 'revisionary')
-				);
-			} else {
-				$link = $cap_caption;
-			}
-
-			$hint = sprintf(
-				__('If checked, users who can\'t publish will need the %s to edit others\' unpublished Posts.', 'revisionary'),
-				$link
-			);
-
-			$checkbox_args['no_escape'] = true;
-		} else {
-			$hint = esc_html__('If checked, users who can\'t publish will need the edit_others_drafts capability to edit others\' unpublished Posts.', 'revisionary');
-		}
-
-		$this->option_checkbox( 'require_edit_others_drafts', $tab, $section, $hint, '', $checkbox_args );
-		?>
-
-		<?php
-		$hint = esc_html__( 'Show descriptive captions for PublishPress Revisions settings', 'revisionary' );
-		$this->option_checkbox( 'display_hints', $tab, $section, $hint, '' );
-
-		$hint = esc_html__('note: Plugin settings, Revision Queue contents and related data will be deleted, but only after the last copy of Revisions / Revisions Pro is deleted.', 'revisionary');
-		$this->option_checkbox('delete_settings_on_uninstall', $tab, $section, $hint);
-		?>
-
-		</td></tr></table>
-	<?php endif; // any options accessable in this section
+		echo '</div>';
 
 
-	$section = 'notification';			// --- NOTIFICATION SECTION ---
-
-	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td>
-
-		<?php
+		echo '<div class="notifications" style="display:none">';
+		
 		if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) :
 			?>
 			<div id="rvy-planner-notice" class="activating rvy-plugin-notice" style="margin-bottom: 20px">
@@ -1416,40 +1268,202 @@ $pending_revisions_available || $scheduled_revisions_available ) :
 			<a href="<?php echo esc_url(add_query_arg('ppr_tab', 'notification', add_query_arg('verbose', '1', add_query_arg('mailinfo', '1', $uri))));?>"><?php esc_html_e('Show with message content', 'revisionary');?></a>
 			</div>
 		<?php endif;
+		?>
 
+		<?php
+		echo '</div>';
+		?>
+
+	</div></td></tr></table>
+<?php endif; // any options accessable in this section
+
+
+$section = 'preview';			// --- PREVIEW SECTION ---
+
+if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
+	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td><div class="rvy-opt-wrap">
+
+	<?php
+	$hint = esc_html__('Some themes may block revision preview.', 'revisionary');
+	$this->option_checkbox( 'revision_preview_links', $tab, $section, $hint, '' );
+
+	$preview_links = rvy_get_option('revision_preview_links');
+
+	$id = 'preview_link_type';
+	if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
+		$this->all_options []= $id;
+		$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
+		?>
+		<div id="rvy_preview_options" <?php if (!$preview_links) echo 'display: none;';?>">
+		<label for="<?php echo esc_attr($id);?>"><?php echo esc_html($this->option_captions[$id]);?>: </label>
+
+		<select name="<?php echo esc_attr($id);?>" id="<?php echo esc_attr($id);?>" autocomplete="off">
+
+		<?php
+		$captions = [
+			'' => esc_html__('Published Post Slug', 'revisionary'), 
+			'revision_slug' => esc_html__('Revision Slug', 'revisionary'), 
+			'id_only' => esc_html__('Revision ID only', 'revisionary') 
+		];
+
+		foreach ( $captions as $key => $value) {
+			$selected = ( $current_setting == $key ) ? 'selected' : '';
+			echo "\n\t<option value='" . esc_attr($key) . "' " . esc_attr($selected) . ">" . esc_html($captions[$key]) . "</option>";
+		}
+		?>
+		</select>&nbsp;
+
+		<?php
+		if ( $this->display_hints ) : ?>
+			<br />
+			<div class="rvy-subtext">
+			<?php
+			esc_html_e('Some themes or plugins may require Revision Slug or Revision ID link type for proper template loading and field display.', 'revisionary');
+			?>
+			</div>
+		<?php endif;
+
+		do_action('revisionary_option_ui_preview_options', $this, $sitewide, $customize_defaults);
+
+		if (defined('RVY_PREVIEW_ARG_LOCKED') && defined('RVY_PREVIEW_ARG')) {
+			printf(
+				esc_html__(
+					'The revision preview argument is configured by constant definition: %s',
+					'revisionary'
+				),
+				esc_html(RVY_PREVIEW_ARG)
+			);
+		} else {
+			$hint = esc_html__('Adjust preview links to use "rv_preview" argument instead of "preview". Experiment to see which works best with your theme.', 'revisionary');
+			$this->option_checkbox( 'preview_link_alternate_preview_arg', $tab, $section, $hint, '' );
+		}
+
+		$hint = esc_html__('Some themes may require this setting for correct revision preview display.', 'revisionary');
+		$this->option_checkbox( 'home_preview_set_home_flag', $tab, $section, $hint, '' );
+
+		$hint = '';
+		$this->option_checkbox( 'block_editor_extra_preview_button', $tab, $section, $hint, '' );
 		?>
 		</div>
+		
+		<script type="text/javascript">
+		/* <![CDATA[ */
+		jQuery(document).ready( function($) {
+			$('#revision_preview_links').on('click', function(e) {
+				$('#rvy_preview_options').toggle($(e).prop('checked'));
+			});
+		});
+		/* ]]> */
+		</script>
+		<?php
+	}
+	?>
+	</div></td></tr></table>
+<?php endif; // any options accessable in this section
 
-		</td></tr>
+
+$section = 'compare';				// --- COMPARE SECTION ---
+
+if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
+	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td><div class="rvy-opt-wrap">
+
+	<?php
+	$id = 'past_revisions_order_by';
+	if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
+		echo esc_html($this->option_captions[$id]);
+
+		$this->all_options []= $id;
+		$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
+
+		echo " <select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "' autocomplete='off'>";
+		$captions = ['' => esc_html__('Post Date', 'revisionary'), 'modified' => esc_html__('Modification Date', 'revisionary')];
+		foreach ( $captions as $key => $value) {
+			$selected = ( $current_setting == $key ) ? 'selected' : '';
+			echo "\n\t<option value='" . esc_attr($key) . "' " . esc_attr($selected) . ">" . esc_html($captions[$key]) . "</option>";
+		}
+		echo '</select>&nbsp;';
+
+		echo "<br /><br />";
+	}
+
+	$hint = '';
+	$this->option_checkbox( 'diff_display_strip_tags', $tab, $section, $hint, '' );
+
+	$hint = esc_html__('This allows immediate approval within the Compare screen. If disabled, a Preview link is provided instead.', 'revisionary');
+	$this->option_checkbox( 'compare_revisions_direct_approval', $tab, $section, $hint, '' );
+	?>
+	</div></td></tr></table>
+<?php endif; // any options accessable in this section
+
+
+	$section = 'revisions';			// --- REVISIONS SECTION ---
+
+	if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
+		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td><div class="rvy-opt-wrap">
+
+		<?php
+		$checkbox_args = [];
+
+		if (defined('PUBLISHPRESS_CAPS_VERSION')) {
+			$url = admin_url('admin.php?page=pp-capabilities&pp_caps_tab=publishpress-revisions');
+	
+			$cap_caption = sprintf(__('%s capability', 'revisionary'), 'edit_others_drafts');
+
+			if (rvy_get_option('require_edit_others_drafts')) {
+				$link = $this->tooltipText(
+					"<a href='$url'>" . $cap_caption . '</a>',
+					__('Assign capability to roles', 'revisionary')
+				);
+			} else {
+				$link = $cap_caption;
+			}
+
+			$hint = sprintf(
+				__('If the user can\'t publish, require the %s to edit others\' unpublished Posts.', 'revisionary'),
+				$link
+			);
+
+			$checkbox_args['no_escape'] = true;
+		} else {
+			$hint = esc_html__('If the user can\'t publish, require the edit_others_drafts capability to edit others\' unpublished Posts.', 'revisionary');
+		}
+
+		$this->option_checkbox( 'require_edit_others_drafts', $tab, $section, $hint, '', $checkbox_args );
+		?>
 
 		<?php
 		if ((defined('REVISIONARY_PRO_VERSION') || defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) && defined('ICL_SITEPRESS_VERSION') && defined('WPML_TM_VERSION')) :?>
 
-		<tr><th scope="row">
-		<?php esc_html_e('WPML Translation Management', 'revisionary') ?>
-		</th></td>
-		<td>
-		<p>
-		<?php
-		$url = admin_url('admin.php?page=revisionary-settings&rvy_wpml_sync_needs_update=1');
-		?>
-		<a href="<?php echo esc_url($url);?>"><?php esc_html_e('Sync "Needs Update" flags', 'revisionary');?></a>
+		<div>
+			<h3><?php esc_html_e('WPML Translation Management', 'revisionary') ?></h3>
+			<p>
+			<?php
+			$url = admin_url('admin.php?page=revisionary-settings&rvy_wpml_sync_needs_update=1');
+			?>
+			<a href="<?php echo esc_url($url);?>"><?php esc_html_e('Sync "Needs Update" flags', 'revisionary');?></a>
 
-		<div class="rvy-subtext">
-		<?php
-		esc_html_e('Set "Needs Update" for any post with translations which was updated (possibly by revision approval) more recently than its translations.', 'revisionary');
-		?>
+			<div class="rvy-subtext">
+			<?php
+			esc_html_e('Set "Needs Update" for any post with translations which was updated (possibly by revision approval) more recently than its translations.', 'revisionary');
+			?>
+			</div>
+
+			</p>
 		</div>
-
-		</p>
-		</td></tr>
 
 		<?php endif;?>
 
-		</table>
+		<?php
+		$hint = esc_html__( 'Show descriptive captions for PublishPress Revisions settings.', 'revisionary' );
+		$this->option_checkbox( 'display_hints', $tab, $section, $hint, '' );
+
+		$hint = esc_html__('Plugin settings, Revision Queue contents and related data will be deleted, but only after the last copy of Revisions / Revisions Pro is deleted.', 'revisionary');
+		$this->option_checkbox('delete_settings_on_uninstall', $tab, $section, $hint);
+		?>
+
+	</div></td></tr></table>
 	<?php endif; // any options accessable in this section
 
-endif;
 ?>
 
 </div>
