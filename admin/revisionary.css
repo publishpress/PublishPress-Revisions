@@ -435,6 +435,10 @@ body.revisions_page_revisionary-archive h1 span.dashicons {
 padding-top:5px;
 }
 
+#publishpress-revisions-settings-tabs {
+padding-top: 0;
+}
+
 #publishpress-revisions-settings-tabs .nav-tab {
 padding: 5px 5px;
 }
@@ -442,6 +446,23 @@ padding: 5px 5px;
 div.agp-vtight_input {
 padding-top: 4px;
 padding-bottom: 4px;
+}
+
+body.revisions_page_revisionary-settings #poststuff {
+padding-top: 0;
+}
+
+body.revisions_page_revisionary-settings .form-table td {
+padding-top: 10px;
+}
+
+body.revisions_page_revisionary-settings #rvy-features > div > table > tbody > tr > td > div.rvy-opt-wrap {
+padding-left: 4px;
+padding-right: 4px;
+}
+
+body.revisions_page_revisionary-settings #rvy-features > div > table > tbody > tr > td > div.rvy-opt-wrap > div {
+padding-top: 2px;
 }
 
 body.revisions_page_revisionary-settings div.submit, body.revisions_page_rvy-net_options div.submit, body.revisions_page_rvy-default_options div.submit {
@@ -459,18 +480,41 @@ body.revisions_page_revisionary-settings .rvy-subtext a:visited
 text-decoration: underline;
 }
 
-@media only screen and (max-width: 783px) {
-  body.revisions_page_revisionary-settings #rvy-features > div > table > tbody > tr > td {
-      padding: 10px;
-  }
+body.revisions_page_revisionary-settings .rvy-option-section-tabs {
+margin-top: 0;
+margin-bottom: 4px;
+padding: 4px 4px 0 4px;
+}
 
-  body.revisions_page_revisionary-settings #rvy-features div.agp-vtight_input {
-      margin-top: 12px;
-      margin-bottom: 12px;
-  }
+body.revisions_page_revisionary-settings .rvy-option-section-tabs li {
+display: inline-table;
+padding: 4px 1px 1px 1px;
+margin-top: 2px;
+}
 
-  body.revisions_page_revisionary-settings #rvy-features input[type="checkbox"] {
-      padding: 5px;
+body.revisions_page_revisionary-settings li.active a {
+text-decoration: none;
+font-weight: bold;
+pointer-events: none;
+color: black
+}
+
+@media only screen and (max-height: 768px) {
+  div.pressshack-admin-wrapper h1 {
+  padding-top: 0;
+  padding-bottom: 0;
+  }
+}
+
+@media only screen and (max-width: 384px) {
+  body.revisions_page_revisionary-settings div.rvy-subtext {
+  display: none;
+  }
+}
+
+@media only screen and (max-height: 384px) {
+  body.revisions_page_revisionary-settings div.rvy-subtext {
+  display: none;
   }
 }
 
