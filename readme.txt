@@ -245,7 +245,9 @@ Fixed: Security issue. Please update.
 == Changelog ==
 
 = 3.7.0 - 16 Jun 2025 =
+* Change : Rearranged Settings to highlight distinction between Past Revisions and New Revisions
 * Change : Settings - Clarify captions for capability requirement settings
+* Change : Settings - Improve mobile styling
 * Change : Use new Capabilities plugin filter to show capability descriptions
 * Change : Archive settings moved to a dedicated tab
 * Change : Compare settings moved to a dedicated tab
