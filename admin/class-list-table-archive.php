@@ -34,7 +34,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 		parent::__construct( $args );
 
-		$this->post_types = array_keys( $revisionary->enabled_post_types_archive );
+		$this->post_types = array_keys(array_filter($revisionary->enabled_post_types_archive));
     }
 
 	/**
