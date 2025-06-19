@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, approve changes, scheduled chang
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.8
-Stable tag: 3.6.8
+Stable tag: 3.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -244,7 +244,7 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
-= 3.7.0 - 16 Jun 2025 =
+= 3.7.0 - 19 Jun 2025 =
 * Change : Rearranged Settings to highlight distinction between Past Revisions and New Revisions
 * Change : Settings - Clarify captions for capability requirement settings
 * Change : Settings - Improve mobile styling
