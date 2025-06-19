@@ -28,7 +28,6 @@
  */
 
 .pressshack-admin-wrapper a:link,
-.pressshack-admin-wrapper a:visited,
 .pressshack-admin-wrapper a:active,
 .pressshack-admin-wrapper a:hover {
     text-decoration: none;
@@ -78,6 +77,7 @@
 .pressshack-admin-wrapper .nav-tab-wrapper .nav-tab {
     color: inherit;
     margin-bottom: -1px;
+    margin-top: 4px;
 }
 
 .pressshack-admin-wrapper .nav-tab-wrapper .nav-tab-active,
@@ -86,6 +86,7 @@
 .pressshack-admin-wrapper .nav-tab-wrapper .nav-tab:focus {
     border-top-color: #655997;
     color: #655997;
+    border-bottom: inherit;
 }
 
 .pressshack-admin-wrapper > footer {

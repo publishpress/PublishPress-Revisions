@@ -34,7 +34,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 
 		parent::__construct( $args );
 
-		$this->post_types = array_keys( $revisionary->enabled_post_types_archive );
+		$this->post_types = array_keys(array_filter($revisionary->enabled_post_types_archive));
     }
 
 	/**
@@ -262,6 +262,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		$query = "SELECT
 			r.ID AS ID,
 			r.post_type AS post_type,
+			r.post_status AS post_status,
 			r.post_title AS post_title,
 			r.post_date AS post_date,
 			r.post_date_gmt as post_date_gmt,
@@ -695,13 +696,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 				}
 
 				if (!empty($approver_id)) {
-					if ($user = new WP_User($approver_id)) {
-						if (!empty($user->display_name)) {
-							echo esc_html($user->display_name);
-						} else {
-							echo esc_html($user->user_login);
-						}
-					}
+					echo get_the_author_meta('display_name', $approver_id);
 				}
 
 				break;

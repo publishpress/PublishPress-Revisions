@@ -105,6 +105,7 @@ class RevisionaryAdmin
 		add_filter('presspermit_status_control_scripts', [$this, 'fltDisableStatusControlScripts']);
 
 		add_filter('cme_plugin_capabilities', [$this, 'fltPublishPressCapsSection']);
+		add_filter('cme_capability_descriptions', [$this, 'fltCapDescriptions']);
 
 		add_filter('relevanssi_where', [$this, 'ftlRelevanssiWhere']);
 
@@ -209,6 +210,8 @@ class RevisionaryAdmin
 		
 		if ((!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options']))) {		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			wp_enqueue_script('revisionary-settings', RVY_URLPATH . '/admin/settings.js', [], PUBLISHPRESS_REVISIONS_VERSION);
+
+			wp_enqueue_style('revisionary-tooltip', RVY_URLPATH . '/common/css/_tooltip.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
 		
 		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && ('admin.php' == $pagenow) && !empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options']) ) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -265,7 +268,7 @@ class RevisionaryAdmin
 	}
 
 	function build_menu() {
-		global $current_user;
+		global $current_user, $revisionary;
 
 		if ( isset($_SERVER['REQUEST_URI']) && (strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'wp-admin/network/' )) )
 			return;
@@ -278,7 +281,8 @@ class RevisionaryAdmin
 		}
 
 		$types = rvy_get_manageable_types();
-		$revision_archive = true;
+
+		$revision_archive = true || current_user_can('administrator') || current_user_can('restore_revisions') || current_user_can('view_revision_archive');
 
 		$can_edit_any = false;
 
@@ -302,29 +306,34 @@ class RevisionaryAdmin
 
 			if ($can_edit_any) {
 				$menu_func = [$this, 'moderation_queue'];
-			} else {
+			} elseif ($revision_archive && array_filter($revisionary->enabled_post_types_archive)) {
 				$menu_slug = 'revisionary-archive';
 				$menu_func = [$this, 'revision_archive'];
+			} else {
+				$menu_slug = 'revisionary-settings';
+				$menu_func = 'rvy_omit_site_options';
 			}
 
 			add_menu_page( esc_html__($_menu_caption, 'pp'), esc_html__($_menu_caption, 'pp'), 'read', $menu_slug, $menu_func, 'dashicons-backup', 29 );
 
-			if ($can_edit_any) {
+			if ($can_edit_any && array_filter($revisionary->enabled_post_types)) {
 				add_submenu_page('revisionary-q', esc_html__('Revision Queue', 'revisionary'), esc_html__('Revision Queue', 'revisionary'), 'read', 'revisionary-q', [$this, 'moderation_queue']);
 			}
 
 			do_action('revisionary_admin_menu');
-		}
 
-		// Revision Archive page
-		add_submenu_page(
-			$menu_slug,
-			esc_html__( 'Revision Archive', 'revisionary' ),
-			esc_html__( 'Revision Archive', 'revisionary' ),
-			'read',
-			'revisionary-archive',
-			[$this, 'revision_archive']
-		);
+			if ($revision_archive && array_filter($revisionary->enabled_post_types_archive)) {
+				// Revision Archive page
+				add_submenu_page(
+					$menu_slug,
+					esc_html__( 'Revision Archive', 'revisionary' ),
+					esc_html__( 'Revision Archive', 'revisionary' ),
+					'read',
+					'revisionary-archive',
+					[$this, 'revision_archive']
+				);
+			}
+		}
 
 		if ( ! current_user_can( 'manage_options' ) )
 			return;
@@ -373,22 +382,62 @@ class RevisionaryAdmin
 
 	// adds a Settings link next to Deactivate, Edit in Plugins listing
 	function flt_plugin_action_links($links, $file) {
-		if ($file == plugin_basename(REVISIONARY_FILE)) {
+		if (defined('REVISIONARY_FILE') && ($file == plugin_basename(REVISIONARY_FILE))
+		|| defined('REVISIONARY_PRO_FILE') && ($file == plugin_basename(REVISIONARY_PRO_FILE))
+		) {
+			$links[] = '<a href="'. esc_url(admin_url('admin.php?page=revisionary-q')) .'">' . esc_html__('Revision Queue', 'revisionary') . '</a>';
+			$links[] = '<a href="'. esc_url(admin_url('admin.php?page=revisionary-archive')) .'">' . esc_html__('Revision Archive', 'revisionary') . '</a>';
+
 			$page = ( defined('RVY_NETWORK') && RVY_NETWORK ) ? 'rvy-net_options' : 'revisionary-settings';
-			$links[] = "<a href='admin.php?page=$page'>" . __awp('Settings') . "</a>";
+			$links[] = '<a href="'. esc_url(admin_url("admin.php?page=$page")) .'">' . esc_html__('Settings', 'revisionary') . '</a>';
+
+			if (!defined('REVISIONARY_PRO_FILE')) {
+				$links[] = '<a href="'. esc_url('https://publishpress.com/links/revisions-plugin-row') .'" class="pp-upgrade">' . esc_html__('Upgrade to Pro', 'revisionary') . '</a>';
+			}
 		}
 
 		return $links;
 	}
 
 	public function fltPublishPressCapsSection($section_caps) {
-		$section_caps['PublishPress Revisions'] = ['edit_others_drafts', 'edit_others_revisions', 'list_others_revisions', 'manage_unsubmitted_revisions', 'preview_others_revisions'];
+		$section_caps['PublishPress Revisions'] = ['edit_others_drafts', 'edit_others_revisions', 'list_others_revisions', 'manage_unsubmitted_revisions', 'preview_others_revisions', 'restore_revisions', 'view_revision_archive'];
+
+		// @todo: check Revisions settings for other cap requirements
 
 		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && rvy_get_option('revision_restore_require_cap')) {
 			$section_caps['PublishPress Revisions'] []= 'restore_revisions';
 		}
 
+		if (!rvy_get_option('manage_unsubmitted_capability')) {
+			$section_caps['PublishPress Revisions'] = array_diff($section_caps['PublishPress Revisions'], ['manage_unsubmitted_revisions']);
+		}
+
+		if (!rvy_get_option('require_edit_others_drafts')) {
+			$section_caps['PublishPress Revisions'] = array_diff($section_caps['PublishPress Revisions'], ['edit_others_drafts']);
+		}
+
+		if (!rvy_get_option('revisor_hide_others_revisions')) {
+			$section_caps['PublishPress Revisions'] = array_diff($section_caps['PublishPress Revisions'], ['list_others_revisions']);
+		}
+
+		if (!rvy_get_option('revisor_lock_others_revisions')) {
+			$section_caps['PublishPress Revisions'] = array_diff($section_caps['PublishPress Revisions'], ['edit_others_revisions']);
+		}
+
 		return $section_caps;
+	}
+
+	public function fltCapDescriptions($cap_descripts)
+	{
+		$cap_descripts['edit_others_drafts'] = esc_html__('Bypass Revisions setting "Prevent Revisors from editing other user\'s drafts."', 'revisionary');
+		$cap_descripts['edit_others_revisions'] = esc_html__('Satisfy Revisions setting "Editing others\' Revisions requires role capability."', 'revisionary');
+		$cap_descripts['list_others_revisions'] = esc_html__('Satisfy Revisions setting "Listing others\' Revisions requires role capability."', 'revisionary');
+		$cap_descripts['manage_unsubmitted_revisions'] = esc_html__('Satisfy Revisions setting "Managing Unsubmitted Revisions requires role capability."', 'revisionary');
+		$cap_descripts['preview_others_revisions'] = esc_html__('Preview other user\'s Revisions (without needing editing access).', 'revisionary');
+		$cap_descripts['restore_revisions'] = esc_html__('Restore an archived Revision as the current revision.', 'revisionary');
+		$cap_descripts['view_revision_archive'] = esc_html__('View the Revision Archive, a list of past Revisions.', 'revisionary');
+
+		return $cap_descripts;
 	}
 
 	public function fltDisableStatusControlScripts($enable_scripts) {
@@ -410,10 +459,6 @@ class RevisionaryAdmin
 	}
 
 	public function publishpressFooter() {
-		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !rvy_get_option('display_pp_branding')) {
-			return;
-		}
-
 		?>
 		<footer>
 

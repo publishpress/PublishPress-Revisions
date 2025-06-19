@@ -20,19 +20,56 @@ class RvyPostEdit {
     }
 
     function act_admin_head() {
+        global $post;
         ?>
         <script type="text/javascript">
         /* <![CDATA[ */
         jQuery(document).ready( function($) {
             var rvyNowCaption = "<?php esc_html_e( 'Current Time', 'revisionary' );?>";
             $('#publishing-action #publish').show();
+
+            <?php if (rvy_get_option('revision_archive_deletion') && (is_content_administrator_rvy() || (current_user_can('delete_post', $post->ID) && current_user_can('restore_revisions')))):
+                $revisions = wp_get_post_revisions( $post->ID );
+                ?>
+                var rvyDeleteURL = {};
+                <?php
+                foreach ($revisions as $revision) {
+                    if (!current_user_can('read_post', $revision->ID) || wp_is_post_autosave($revision)) {
+                        continue;
+                    }
+
+                    ?>
+                    rvyDeleteURL[<?php echo $revision->ID;?>] = '<?php echo esc_url(wp_nonce_url(admin_url("admin.php?page=rvy-revisions&amp;action=delete&amp;revision={$revision->ID}"), 'delete-revision_' . $revision->ID ));?>'; 
+                    <?php
+                }
+            ?>
+                $('ul.post-revisions li').each(function(i, e) {
+                    var revisionURL = $(this).find('a').attr('href');
+                    var revPos = revisionURL.indexOf('revision=');
+
+                    if (!revPos) {
+                        return;
+                    }
+
+                    revisionURL = revisionURL.substring(revPos);
+
+                    var urlParams = new URLSearchParams(revisionURL);
+                    var revisionID = urlParams.get('revision');
+
+                    if (typeof rvyDeleteURL[revisionID] != 'undefined') {
+                        $(this).append(' <a href="' + rvyDeleteURL[revisionID] + '" class="rvy-delete"><?php _e('Delete', 'revisionary');?></a>');
+                    }
+                });
+            <?php endif;?>
         });
         /* ]]> */
         </script>
 
-        <?php
-        global $post;
+        <style>
+        ul.post-revisions a.rvy-delete {text-decoration: none; color:#f44336}
+        </style>
 
+        <?php
         if (!empty($post) && !rvy_is_supported_post_type($post->post_type)) {
             return;
         }
@@ -83,7 +120,6 @@ class RvyPostEdit {
 
                     $wp_timezone = wp_timezone();
                     $utc_time = new DateTime("now", new DateTimeZone('UTC'));
-
                     $args['timezoneOffset'] = 0 - $wp_timezone->getOffset($utc_time);
 
                     wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );

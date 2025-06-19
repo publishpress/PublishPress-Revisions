@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, approve changes, scheduled chang
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.8
-Stable tag: 3.6.8
+Stable tag: 3.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -243,6 +243,17 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 Fixed: Security issue. Please update.
 
 == Changelog ==
+
+= 3.7.0 - 19 Jun 2025 =
+* Change : Rearranged Settings to highlight distinction between Past Revisions and New Revisions
+* Change : Settings - Clarify captions for capability requirement settings
+* Change : Settings - Improve mobile styling
+* Change : Use new Capabilities plugin filter to show capability descriptions
+* Change : Archive settings moved to a dedicated tab
+* Change : Compare settings moved to a dedicated tab
+* Change : Revision Creation, Submission and Scheduling settings combined onto a shared "New Revisions" tab
+* Change : Post Editor - Remove "Preview Revision" button after revision creation
+* Fixed : Revision Archive menu and screen were displayed to Subscribers
 
 = 3.6.8 - 4 May 2025 =
 * API : Improve support or Pro plugin's Planner Notifications integration

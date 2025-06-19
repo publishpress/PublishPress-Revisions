@@ -9,10 +9,7 @@ var rvyIsPublished=false;var RvySubmissionUI=function(){if(rvyObjEdit.ajaxurl&&!
 +'<span class="revision-approve revision-creating">'+rvyObjEdit.creatingCaption+'</span><span class="spinner ppr-submission-spinner" style=""></span>'
 +'</div>'
 +'<div class="revision-approve revision-created">'+rvyObjEdit.completedCaption+'</div> '
-+'<div class="revision-approve revision-created revision-created-buttons">';if(rvyObjEdit.completedURL){html=html+'<button type="button" class="revision-approve revision-created ppr-clear-button" style="display: none">'
-+'<a href="javascript:void(0)" class="revision-approve revision-preview components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
-+rvyObjEdit.completedLinkCaption+'</a></button>';}
-html=html+'<button type="button" class="revision-approve revision-created revision-edit ppr-clear-button" style="display: none">'
++'<div class="revision-approve revision-created revision-created-buttons">';html=html+'<button type="button" class="revision-approve revision-created revision-edit ppr-clear-button" style="display: none">'
 +'<a href="javascript:void(0)" class="revision-approve revision-edit components-button is-secondary ppr-purple-button" target="pp_revisions_copy">'
 +rvyObjEdit.completedEditLinkCaption+'</a>'
 +'</button>'

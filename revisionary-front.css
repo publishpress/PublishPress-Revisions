@@ -16,17 +16,34 @@
 }
 
 .rvy_preview_msgspan {
-    font-size: 0.9em;
+    font-weight: bold;
     line-height: 50px;
 }
 
 .rvy_preview_msgspan > a, .rvy_preview_msgspan > a:visited{
     color:white;
-    margin-left:10px;
+    margin-left:8px;
+    margin-right:8px;
+    font-size: 0.9em;
+}
+
+.rvy_preview_msgspan > a:first-of-type {
+    margin-left: 20px;
+}
+
+.rvy_preview_msgspan a:hover {
+    text-decoration: underline;
 }
 
 .rvy_preview_msgspan a.button {
     margin-left: 5px !important;
+}
+
+
+#pp_revisions_top_bar .button-delete {
+    background-color: #812b25 !important;
+    color: white !important;
+    min-width: 65px;
 }
 
 .rvy_preview_linkspan {

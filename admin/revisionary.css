@@ -18,7 +18,7 @@ padding: default;
 
 .agp-vspaced_input {
 margin-top: 0.2em;
-margin-bottom: 0.6em;
+margin-bottom: 1em;
 }
 
 .rs-list_horiz {
@@ -39,6 +39,18 @@ margin: 0;
 border: 1px solid #ccc;
 margin-top: 0;
 background-color: white;
+}
+
+#rvy_post_types_frame td {
+padding-top: 0;
+}
+
+#ppr-tab-working_copy > tbody > tr > td > div {
+padding-left: 10px;
+}
+
+#ppr-tab-working_copy > tbody > tr > td > div > h3 {
+margin-left: -10px;
 }
 
 .rs-form-table th {
@@ -228,7 +240,7 @@ padding: 0;
 .rs-agents_list_30_5 li { width: 30.5em; }
 
 .rvy-subtext {
-color: #777;
+color: #646464;
 font-style:italic;
 margin-top:5px;
 margin-bottom:20px;
@@ -419,8 +431,15 @@ body.revisions_page_revisionary-deletion h1 span.dashicons,
 body.revisions_page_revisionary-settings h1 span.dashicons,
 body.revisions_page_rvy-net_options h1 span.dashicons,
 body.revisions_page_rvy-default_options h1 span.dashicons,
-body.revisions_page_revisionary-archive h1 span.dashicons {
+body.revisions_page_revisionary-archive h1 span.dashicons,
+body.toplevel_page_revisionary-archive h1 span.dashicons,
+body.toplevel_page_revisionary-settings h1 span.dashicons
+{
 padding-top:5px;
+}
+
+#publishpress-revisions-settings-tabs {
+padding-top: 0;
 }
 
 #publishpress-revisions-settings-tabs .nav-tab {
@@ -432,26 +451,87 @@ padding-top: 4px;
 padding-bottom: 4px;
 }
 
-body.revisions_page_revisionary-settings div.submit, body.revisions_page_rvy-net_options div.submit, body.revisions_page_rvy-default_options div.submit {
+body.revisions_page_revisionary-settings #poststuff,
+body.toplevel_page_revisionary-settings #poststuff
+{
+padding-top: 0;
+}
+
+body.revisions_page_revisionary-settings .form-table td,
+body.toplevel_page_revisionary-settings .form-table td
+{
+padding-top: 10px;
+}
+
+#rvy-features > div > table > tbody > tr > td > div.rvy-opt-wrap {
+padding-left: 4px;
+padding-right: 4px;
+/*
+overflow: auto;
+max-height: calc(80vh - 150px);
+*/
+}
+
+#rvy-features > div > table > tbody > tr > td > div.rvy-opt-wrap > div {
+padding-top: 2px;
+}
+
+#rvy-features div.submit
+{
 padding-top:0;
 }
 
-body.revisions_page_revisionary-settings input[type="checkbox"] {
+#rvy-features input[type="checkbox"] {
 vertical-align: middle;
 }
 
-@media only screen and (max-width: 783px) {
-  body.revisions_page_revisionary-settings #rvy-features > div > table > tbody > tr > td {
-      padding: 10px;
-  }
+#rvy-features .rvy-subtext a,
+#rvy-features .rvy-subtext a:hover,
+#rvy-features .rvy-subtext a:visited
+{
+text-decoration: underline;
+}
 
-  body.revisions_page_revisionary-settings #rvy-features div.agp-vtight_input {
-      margin-top: 12px;
-      margin-bottom: 12px;
-  }
+#rvy-features .rvy-option-section-tabs {
+margin-top: 0;
+margin-bottom: 4px;
+padding: 4px 4px 0 4px;
+}
 
-  body.revisions_page_revisionary-settings #rvy-features input[type="checkbox"] {
-      padding: 5px;
+#rvy-features .rvy-option-section-tabs li {
+display: inline-table;
+padding: 4px 1px 1px 1px;
+margin-top: 2px;
+}
+
+#rvy-features li.active a {
+text-decoration: none;
+font-weight: bold;
+pointer-events: none;
+color: black
+}
+
+#ppr-tab-post_types [data-toggle="tooltip"] .tooltip-text {
+  min-width: 260px;
+  font-size: 14px;
+}
+
+@media only screen and (max-height: 768px) {
+  div.pressshack-admin-wrapper h1 {
+  padding-top: 0;
+  padding-bottom: 0;
+  }
+}
+
+@media only screen and (max-width: 384px) {
+  #rvy-features div.rvy-subtext {
+  display: none;
+  }
+}
+
+@media only screen and (max-height: 384px) {
+  #rvy-features div.rvy-subtext {
+  display: none;
   }
 }
 

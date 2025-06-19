@@ -346,8 +346,36 @@ function rvy_admin_url($partial_admin_url) {
     return rvy_nc_url( admin_url($partial_admin_url) );
 }
 
+
+// deprecated
 function publishpress_revisions_post_updated($post) {
+    return [];
+}
+
+// deprecated
+function publishpress_revisions_get_revision_author($revision_id) {
+    return false;
+}
+
+/*
+ * Get supplemental information about a revision.
+ * 
+ * @param WP_Post|int $post Revision to get information for.
+ * 
+ * @return array
+ *      'updated_by' :          WP_User User who last updated the revision
+ *      'updaters' :            array All users who updated the revision (userID => date)
+ *      'is_revision' :         boolean Is the post a revision?
+ *      'is_archive' :          boolean Is the post a past revision?
+ *      'publish_method' :      string Publication method (Revision Publication / Scheduled Revision Publication / Direct Edit / Edit of Revision)
+ *      'update_type' :         string Update type (Scheduled Rev / Submitted Rev / Direct Edit)
+ *      'approved_by' :         WP_User User who approved the revision
+ *      'main_post' :           WP_Post Main post the revision is based on
+ */
+function publishpress_get_revision_info($post) {
     global $revisionary;
+
+    $arr = [];
 
     if (empty($revisionary)) {
         return false;
@@ -358,10 +386,68 @@ function publishpress_revisions_post_updated($post) {
 	}
 
     if (empty($post)) {
-        return 0;
+        return false;
     }
 
-    $date_gmt = $post->post_modified_gmt;
+    if ($revision_published_gmt = get_post_meta($post->ID, '_rvy_published_gmt', true)) {
+        $from_revision_workflow = get_post_meta($post->ID, '_rvy_prev_revision_status', true);
+        
+        if (!$from_revision_workflow) {
+            $from_revision_workflow = true;
+        }
+
+    } elseif ($revision_status = rvy_in_revision_workflow($post->post_parent)) {
+        $parent_in_revision_workflow = $revision_status;
+    
+    } elseif ($revision_status = rvy_from_revision_workflow($post->post_parent)) {
+        $parent_from_revision_workflow = $revision_status;
+    } else {
+        $direct_edit = true;
+    }
+
+    $prev_revision_status = get_post_meta($post->ID, '_rvy_prev_revision_status', true);
+
+    $main_post_id = rvy_post_id($post->ID);
+
+    if (!empty($from_revision_workflow)) {
+        switch ($from_revision_workflow) {
+            case 'future-revision':
+                $arr['publish_method'] = esc_html__('Scheduled Revision Publication', 'revisionary');
+                break;
+
+            default:
+            $arr['publish_method'] = esc_html__('Revision Publication', 'revisionary');
+        }
+    } elseif (!empty($parent_in_revision_workflow)) {
+        if ($status_obj = get_post_status_object($parent_in_revision_workflow)) {
+            $status_label = $status_obj->label;
+        } else {
+            $status_label = $status_name;
+        }
+
+        $arr['publish_method'] = sprintf(
+            esc_html__('Edit of %s', 'revisionary'),
+            "<span title='$this->active_revision_title'>" . $status_label . '</span>'
+        );
+
+    } elseif (!empty($parent_from_revision_workflow)) {
+        $arr['publish_method'] = sprintf("<span title='%s'>%s</span>",
+            $from_revision_title,
+            esc_html__('Edit of published Revision', 'revisionary')
+        );
+    } elseif (!empty($direct_edit)) {
+        $arr['publish_method'] = esc_html__('Direct Edit', 'revisionary');
+    }
+
+    if (!empty($direct_edit)) {
+        $approver_id = $post->post_author;
+
+    } elseif ($from_revision_workflow) {
+        $approver_id = get_post_meta($post->ID, '_rvy_approved_by', true);
+    }
+
+    $approver = (!empty($approver_id)) ? new WP_User($approver_id) : false;
+
     $updated_by = 0;
 
     if (rvy_in_revision_workflow($post)) {
@@ -370,7 +456,7 @@ function publishpress_revisions_post_updated($post) {
         $updaters = get_post_meta($post->ID, '_rvy_updated_by', true);
 
         if (!empty($updaters)) {
-            $updated_by = end($updaters);
+            $updated_by = array_key_last($updaters);
         }
     } elseif ('revision' == $post->post_type) {
         $is_revision = $post->post_status;
@@ -388,7 +474,6 @@ function publishpress_revisions_post_updated($post) {
             $last_revision = reset($revisions);
 
             $updated_by = $last_revision->post_author;
-            $date_gmt = $last_revision->post_modified_gmt;
 
             $prev_revision_status = get_post_meta($last_revision->ID, '_rvy_prev_revision_status', true);
             $revision_publication = get_post_meta($last_revision->ID, '_rvy_published_gmt', true);
@@ -398,49 +483,37 @@ function publishpress_revisions_post_updated($post) {
     if (!empty($prev_revision_status) || !empty($revision_publication)) {
         switch ($prev_revision_status) {
             case 'future-revision':
-                $update_type = esc_html__('Scheduled Rev.', 'revisionary');
+                $arr['update_type'] = esc_html__('Scheduled Rev.', 'revisionary');
                 break;
 
             case 'pending-revision':
             case 'draft-revision':
-                $update_type = esc_html__('Submitted Rev.', 'revisionary');
+                $arr['update_type'] = esc_html__('Submitted Rev.', 'revisionary');
                 break;
 
             default:
                 if (!empty($revision_publication)) {
-                    $update_type = esc_html__('Submitted Rev.', 'revisionary');
+                    $arr['update_type'] = esc_html__('Submitted Rev.', 'revisionary');
                 }
         }
     }
 
     if (empty($update_type)) {
-        $update_type = esc_html__('Direct Edit', 'revisionary');
+        $arr['update_type'] = esc_html__('Direct Edit', 'revisionary');
         $direct_update = true;
     }
 
-    $user = (!empty($updated_by)) ? (array) new WP_User($updated_by) : [];
+    $updated_by_user = (!empty($updated_by)) ? new WP_User($updated_by) : false;
 
-    if (!empty($user) && !empty($user['data'])) {
-        $user = (object) array_merge(
-            array_intersect_key(
-                (array) $user['data'],
-                array_fill_keys(['ID', 'display_name', 'user_email', 'user_url', 'user_login', 'user_nicename'], true)
-            ),
-            ['roles' => $user['roles']]
-        );
-    } else {
-        $user = (object) ['ID' => 0, 'display_name' => '', 'user_email' => '', 'user_url' => '', 'user_login' => '', 'user_nicename' => ''];
-    }
-
-    return [
-        'user' => $user,
-        'date_gmt' => $date_gmt,
-        'date' => get_date_from_gmt($date_gmt),
-        'is_revision' => !empty($is_revision),
+    return array_merge($arr, [
+        'updated_by' => $updated_by_user,
+        'updaters' => !empty($updaters) ? $updaters : [],
+        'is_revision' => !empty($from_revision_workflow) || !empty($parent_from_revision_workflow),
         'is_archive' => !empty($is_archive),
         'direct_update' => !empty($direct_update),
-        'update_type' => $update_type,
-    ];
+        'approved_by' => $approver,
+        'main_post' => ($main_post_id && $main_post_id != $post->ID) ? get_post($main_post_id) : $post
+    ]);
 }
 
 function pp_revisions_plugin_updated($current_version, $args = []) {
@@ -462,6 +535,7 @@ function pp_revisions_plugin_updated($current_version, $args = []) {
     if ((defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') || !empty($args['is_pro'])) && version_compare($last_ver, '3.6.6-beta5', '<')) {
         update_option('revisionary_pro_fix_default_notification_shortcodes', true);
     }
+
     if ((defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') || !empty($args['is_pro'])) && version_compare($last_ver, '3.6.4-beta3', '<')) {
         update_option('revisionary_pro_restore_notifications', true);
     }
