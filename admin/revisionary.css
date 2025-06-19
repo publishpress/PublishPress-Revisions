@@ -431,7 +431,10 @@ body.revisions_page_revisionary-deletion h1 span.dashicons,
 body.revisions_page_revisionary-settings h1 span.dashicons,
 body.revisions_page_rvy-net_options h1 span.dashicons,
 body.revisions_page_rvy-default_options h1 span.dashicons,
-body.revisions_page_revisionary-archive h1 span.dashicons {
+body.revisions_page_revisionary-archive h1 span.dashicons,
+body.toplevel_page_revisionary-archive h1 span.dashicons,
+body.toplevel_page_revisionary-settings h1 span.dashicons
+{
 padding-top:5px;
 }
 
@@ -448,55 +451,69 @@ padding-top: 4px;
 padding-bottom: 4px;
 }
 
-body.revisions_page_revisionary-settings #poststuff {
+body.revisions_page_revisionary-settings #poststuff,
+body.toplevel_page_revisionary-settings #poststuff
+{
 padding-top: 0;
 }
 
-body.revisions_page_revisionary-settings .form-table td {
+body.revisions_page_revisionary-settings .form-table td,
+body.toplevel_page_revisionary-settings .form-table td
+{
 padding-top: 10px;
 }
 
-body.revisions_page_revisionary-settings #rvy-features > div > table > tbody > tr > td > div.rvy-opt-wrap {
+#rvy-features > div > table > tbody > tr > td > div.rvy-opt-wrap {
 padding-left: 4px;
 padding-right: 4px;
+/*
+overflow: auto;
+max-height: calc(80vh - 150px);
+*/
 }
 
-body.revisions_page_revisionary-settings #rvy-features > div > table > tbody > tr > td > div.rvy-opt-wrap > div {
+#rvy-features > div > table > tbody > tr > td > div.rvy-opt-wrap > div {
 padding-top: 2px;
 }
 
-body.revisions_page_revisionary-settings div.submit, body.revisions_page_rvy-net_options div.submit, body.revisions_page_rvy-default_options div.submit {
+#rvy-features div.submit
+{
 padding-top:0;
 }
 
-body.revisions_page_revisionary-settings input[type="checkbox"] {
+#rvy-features input[type="checkbox"] {
 vertical-align: middle;
 }
 
-body.revisions_page_revisionary-settings .rvy-subtext a,
-body.revisions_page_revisionary-settings .rvy-subtext a:hover,
-body.revisions_page_revisionary-settings .rvy-subtext a:visited
+#rvy-features .rvy-subtext a,
+#rvy-features .rvy-subtext a:hover,
+#rvy-features .rvy-subtext a:visited
 {
 text-decoration: underline;
 }
 
-body.revisions_page_revisionary-settings .rvy-option-section-tabs {
+#rvy-features .rvy-option-section-tabs {
 margin-top: 0;
 margin-bottom: 4px;
 padding: 4px 4px 0 4px;
 }
 
-body.revisions_page_revisionary-settings .rvy-option-section-tabs li {
+#rvy-features .rvy-option-section-tabs li {
 display: inline-table;
 padding: 4px 1px 1px 1px;
 margin-top: 2px;
 }
 
-body.revisions_page_revisionary-settings li.active a {
+#rvy-features li.active a {
 text-decoration: none;
 font-weight: bold;
 pointer-events: none;
 color: black
+}
+
+#ppr-tab-post_types [data-toggle="tooltip"] .tooltip-text {
+  min-width: 260px;
+  font-size: 14px;
 }
 
 @media only screen and (max-height: 768px) {
@@ -507,13 +524,13 @@ color: black
 }
 
 @media only screen and (max-width: 384px) {
-  body.revisions_page_revisionary-settings div.rvy-subtext {
+  #rvy-features div.rvy-subtext {
   display: none;
   }
 }
 
 @media only screen and (max-height: 384px) {
-  body.revisions_page_revisionary-settings div.rvy-subtext {
+  #rvy-features div.rvy-subtext {
   display: none;
   }
 }

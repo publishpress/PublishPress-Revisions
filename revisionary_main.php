@@ -360,9 +360,11 @@ class Revisionary
 			'revisionary_enabled_post_types', 
 			array_diff_key(
 				$enabled_post_types,
-				['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true]
+				['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'acf-post-type' => true, 'acf-taxonomy' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true, 'ppma_boxes' => true, 'ppmacf_field' => true, 'psppnotif_workflow' => true]
 			)
 		);
+
+		$enabled_post_types = array_intersect_key($enabled_post_types, array_fill_keys(get_post_types([], 'names'), true));
 
 		$this->enabled_post_types = array_merge($this->enabled_post_types, $enabled_post_types);
 
@@ -454,6 +456,11 @@ class Revisionary
 			$enabled_post_types_archive
 		);
 
+		$this->enabled_post_types_archive = array_diff_key(
+			$this->enabled_post_types_archive,
+			['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'acf-post-type' => true, 'acf-taxonomy' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true, 'ppma_boxes' => true, 'ppmacf_field' => true, 'psppnotif_workflow' => true]
+		);
+		
 		$this->enabled_post_types_archive = apply_filters(
 			'revisionary_archive_post_types', 
 			$this->enabled_post_types_archive
