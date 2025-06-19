@@ -326,9 +326,18 @@ class Revisionary
 		$enabled_post_types = get_option('rvy_enabled_post_types', false);
 
 		if (false === $enabled_post_types) {
-			$enabled_post_types = array_fill_keys(
-				get_post_types(['public' => true]), true
-			);
+			$enabled_post_types = array_fill_keys(['post', 'page'], true);
+			
+			$available_post_types = get_post_types(['public' => true], 'object');
+
+			// by default, enable public post types that have type-specific capabilities defined
+			foreach($available_post_types as $post_type => $type_obj) {
+				if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages']))
+				|| defined('REVISIONARY_ENABLE_' . strtoupper($post_type) . '_TYPE')
+				) {
+					$enabled_post_types[$post_type] = true;
+				}
+			}
 
 			if (class_exists('WooCommerce')) {
 				$enabled_post_types['product'] = true;
@@ -345,7 +354,7 @@ class Revisionary
 					get_post_types(['public' => null], 'object')
 				);
 				
-				// by default, enable non-public post types that have type-specific capabilities defined
+				// by default, enable private post types that have type-specific capabilities defined
 				foreach($private_types as $post_type => $type_obj) {
 					if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages']))
 					|| defined('REVISIONARY_ENABLE_' . strtoupper($post_type) . '_TYPE')
@@ -435,21 +444,6 @@ class Revisionary
 				'shop_order_refund' => true
 			]
 		);
-
-		// Remove the post_types that doesn't have a valid object (null)
-		foreach( array_keys( $enabled_post_types_archive ) as $type ) :
-			$type_obj = get_post_type_object( $type );
-			if( ! $type_obj ) :
-				unset( $enabled_post_types_archive[$type] );
-			endif;
-
-			if (
-			(!empty($type_obj->cap->edit_others_posts) && empty($current_user->allcaps[$type_obj->cap->edit_others_posts]))
-			|| (!empty($type_obj->cap->edit_published_posts) && empty($current_user->allcaps[$type_obj->cap->edit_published_posts]))
-			) {
-				unset($enabled_post_types_archive[$type]);
-			}
-		endforeach;
 
 		$this->enabled_post_types_archive = array_merge(
 			$this->enabled_post_types_archive,
