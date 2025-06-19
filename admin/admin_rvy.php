@@ -268,7 +268,7 @@ class RevisionaryAdmin
 	}
 
 	function build_menu() {
-		global $current_user;
+		global $current_user, $revisionary;
 
 		if ( isset($_SERVER['REQUEST_URI']) && (strpos( esc_url_raw($_SERVER['REQUEST_URI']), 'wp-admin/network/' )) )
 			return;
@@ -306,20 +306,23 @@ class RevisionaryAdmin
 
 			if ($can_edit_any) {
 				$menu_func = [$this, 'moderation_queue'];
-			} else {
+			} elseif ($revision_archive && array_filter($revisionary->enabled_post_types_archive)) {
 				$menu_slug = 'revisionary-archive';
 				$menu_func = [$this, 'revision_archive'];
+			} else {
+				$menu_slug = 'revisionary-settings';
+				$menu_func = 'rvy_omit_site_options';
 			}
 
 			add_menu_page( esc_html__($_menu_caption, 'pp'), esc_html__($_menu_caption, 'pp'), 'read', $menu_slug, $menu_func, 'dashicons-backup', 29 );
 
-			if ($can_edit_any) {
+			if ($can_edit_any && array_filter($revisionary->enabled_post_types)) {
 				add_submenu_page('revisionary-q', esc_html__('Revision Queue', 'revisionary'), esc_html__('Revision Queue', 'revisionary'), 'read', 'revisionary-q', [$this, 'moderation_queue']);
 			}
 
 			do_action('revisionary_admin_menu');
 
-			if ($revision_archive) {
+			if ($revision_archive && array_filter($revisionary->enabled_post_types_archive)) {
 				// Revision Archive page
 				add_submenu_page(
 					$menu_slug,

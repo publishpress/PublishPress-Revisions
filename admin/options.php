@@ -381,6 +381,19 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 	</div>
 	<?php
 }
+
+if (empty(array_filter($revisionary->enabled_post_types_archive))) {
+	unset($this->section_captions['features']['archive']);
+}
+
+if (empty(array_filter($revisionary->enabled_post_types))) {
+	unset($this->section_captions['features']['working_copy']);
+}
+
+if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter($revisionary->enabled_post_types_archive))) {
+	unset($this->section_captions['features']['preview']);
+	unset($this->section_captions['features']['compare']);
+}
 ?>
 
 <ul id="publishpress-revisions-settings-tabs" class="nav-tab-wrapper">
