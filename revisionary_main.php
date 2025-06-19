@@ -173,6 +173,8 @@ class Revisionary
 		add_action('post_updated', [$this, 'actUpdateRevision'], 10, 2);
 		add_action('post_updated', [$this, 'actUpdateRevisionFixCommentCount'], 999, 2);
 
+		add_filter('wp_revisions_to_keep', [$this, 'fltNumRevisions'], 10, 2);
+
 		add_filter('posts_clauses', [$this, 'fltPostsClauses'], 10, 2);
 
 		if (!is_admin()) {
@@ -460,6 +462,20 @@ class Revisionary
 			$this->enabled_post_types_archive
 		);
 	}
+
+	function fltNumRevisions ($num, $post) {
+        if (isset($this->enabled_post_types_archive[$post->post_type]) && empty($this->enabled_post_types_archive[$post->post_type])) {
+            $num = 0;
+        } else {
+            $num = rvy_get_option('num_revisions');
+
+            if (in_array($num, [true, ''], true)) {
+                $num = -1;
+            }
+        }
+
+        return $num;
+    }
 
 	function canEditPost($post, $args = []) {
 		global $current_user;

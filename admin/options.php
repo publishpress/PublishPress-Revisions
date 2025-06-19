@@ -212,6 +212,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'revision_restore_require_cap' =>			esc_html__('Restoring a Revision requires role capability', 'revisionary'),
 	'permissions_compat_mode' => 				esc_html__('Compatibility Mode', 'revisionary'),
 	'planner_notifications_access_limited' =>	esc_html__('Planner Notifications Access-Limited', 'revisionary'),
+	'num_revisions' =>							esc_html__('Maximum Revisions per post', 'revisionary'),
 	]
 );
 
@@ -230,7 +231,7 @@ if ( defined('RVY_CONTENT_ROLES') ) {
 $this->form_options = apply_filters('revisionary_option_sections', [
 'features' => [
 	'post_types' =>			 ['enabled_post_types', 'enabled_post_types_archive'],
-	'archive' =>			 ['archive_postmeta', 'extended_archive', 'revision_archive_deletion', 'revision_restore_require_cap'],
+	'archive' =>			 ['num_revisions', 'archive_postmeta', 'extended_archive', 'revision_archive_deletion', 'revision_restore_require_cap'],
 	'working_copy' =>		 ['copy_posts_capability', 'revisor_role_add_custom_rolecaps', 'revision_limit_per_post', 'revision_limit_compat_mode', 'revision_unfiltered_html_check', 'auto_submit_revisions', 'caption_copy_as_edit', 'permissions_compat_mode', 'pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date', 'scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'wp_cron_usage_detected', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'rev_publication_delete_ed_comments', 'revision_statuses_noun_labels', 'manage_unsubmitted_capability', 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions', 'deletion_queue', 'use_publishpress_notifications', 'planner_notifications_access_limited', 'pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'home_preview_set_home_flag', 'block_editor_extra_preview_button'],
 	'compare' =>			 ['compare_revisions_direct_approval', 'diff_display_strip_tags', 'past_revisions_order_by'],
@@ -460,7 +461,108 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 		<table id="rvy_post_types_frame">
 		<tr>
 
-		<?php do_action('revisionary_option_ui_post_types_top', $this, $sitewide, $customize_defaults);?>
+		<?php
+        $option_name = 'enabled_post_types_archive';
+
+		$this->register_option($option_name);
+
+		?>
+		<td style="padding-right: 100px">
+		<h3 style="margin-top:0; margin-bottom:8px"><?php esc_html_e('Past Revisions', 'revisionary');?>
+        <?php 
+		echo $this->tooltipText(
+			'',
+			__('Past Revisions are earlier versions of a post. They are listed in the Revision Archive.', 'revisionary'),
+			true
+		);
+		?>
+        </h3>
+		<?php
+
+		//$hidden_types = ['attachment' => true, 'psppnotif_workflow' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true];
+		$hidden_types = [
+			'attachment' => true,
+            'psppnotif_workflow' => true,
+			'tablepress_table' => true,
+			'acf-field-group' => true,
+			'acf-field' => true,
+            'acf-post-type' => true,
+            'acf-taxonomy' => true,
+			'nav_menu_item' => true,
+			'custom_css' => true,
+			'customize_changeset' => true,
+			'wp_block' => true,
+			'wp_template' => true,
+			'wp_template_part' => true,
+			'wp_global_styles' => true,
+			'wp_navigation' => true,
+			'product_variation' => true,
+			'shop_order_refund' => true,
+            'ppma_boxes' => true, 
+            'ppmacf_field' => true,
+		];
+		
+		$locked_types = [];
+		$no_revision_types = [];
+
+		$types = get_post_types(['public' => true, 'show_ui' => true], 'object', 'or');
+
+		$types = rvy_order_types($types);
+
+		foreach ($types as $key => $obj) {
+			if (!$key) {
+				continue;
+			}
+
+			if (!post_type_supports($key, 'revisions')) {
+			    unset($revisionary->enabled_post_types_archive[$key]);
+			    $locked_types[$key] = true;
+			    $no_revision_types[$key] = true;
+			}
+
+			$id = $option_name . '-' . $key;
+			$name = $option_name . "[$key]";
+			?>
+
+			<?php if ('nav_menu' == $key) : ?>
+				<input name="<?php echo esc_attr($name); ?>" type="hidden" id="<?php echo esc_attr($id); ?>" value="1"/>
+			<?php else : ?>
+			<?php if (isset($hidden_types[$key])) : ?>
+				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="<?php echo esc_attr($hidden_types[$key]); ?>"/>
+			<?php else : 
+					$locked = (!empty($locked_types[$key])) ? ' disabled ' : '';
+				?>
+			<div class="agp-vtight_input">
+				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="<?php echo (empty($locked_types[$key])) ? '0' : '1';?>"/>
+				<label for="<?php echo esc_attr($id); ?>" title="<?php if (!empty($no_revision_types[$key])) esc_attr_e('This post type does not support Past Revisions.', 'revisionary'); else echo esc_attr($key); ?>">
+					<input name="<?php if (empty($locked_types[$key])) echo esc_attr($name); ?>" type="checkbox" id="<?php echo esc_attr($id); ?>"
+						value="1" <?php checked('1', !empty($revisionary->enabled_post_types_archive[$key])); echo esc_attr($locked); ?> />
+
+					<?php
+					if (isset($obj->labels_pp)) {
+						echo esc_html($obj->labels_pp->name);
+					} elseif (isset($obj->labels->name)) {
+						echo esc_html($obj->labels->name);
+					} else {
+						echo esc_html($key);
+					}
+
+					echo '</label>';
+					
+					if ((!isset($revisionary->enabled_post_types_archive[$key]) || !empty($revisionary->enabled_post_types_archive[$key])) && isset($obj->capability_type) && !in_array($obj->capability_type, [$obj->name, 'post', 'page'])) {
+						if ($cap_type_obj = get_post_type_object($obj->capability_type)) {
+							echo '&nbsp;(' . esc_html(sprintf(__('%s capabilities'), $cap_type_obj->labels->singular_name)) . ')';
+						}
+					}
+
+					echo '</div>';
+				endif;
+			endif; // displaying checkbox UI
+
+		} // end foreach src_otype
+
+		?>
+		</td>
 
 		<?php
 		$option_name = 'enabled_post_types';
@@ -578,6 +680,48 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td><div class="rvy-opt-wrap">
 
 	<?php
+	$option_name = 'num_revisions';
+	$wp_num_revisions = (defined('WP_POST_REVISIONS')) ? WP_POST_REVISIONS : 0;
+
+	$opt_val = get_option('rvy_num_revisions', $wp_num_revisions);
+
+	$class_name = '';
+	$this->register_option($option_name);
+	?>
+	<div class=agp-vspaced_input style="vertical-align: middle;">
+	<label for="<?php echo esc_html($option_name);?>">
+	<?php esc_html_e('Maximum revisions per post:', 'revisionary-pro');?></label>
+	<input class="<?php echo esc_attr($class_name); ?>" name="<?php echo esc_attr($option_name); ?>" type="text" id="<?php echo esc_attr($option_name); ?>" size="10" 
+	value="<?php echo (in_array($opt_val, [true, ''], true)) ? '' : intval($opt_val);?>" placeholder="<?php echo (true === $wp_num_revisions) ? esc_html__('(unlimited)', 'revisionary-pro') : '';?>" 
+	style="vertical-align:middle" autocomplete="off" />
+
+	<?php
+	if (rvy_get_option('display_hints')) :?>
+		<div class="rvy-subtext">
+		<?php
+		printf(
+			esc_html__('Note that archiving can also be disabled by %1$sPost Type%2$s.', 'revisionary-pro'),
+			'<a class="rvyTabPostTypes" href="javascript:void(0)">',
+			'</a>'
+		);
+		?>
+		</div>
+
+		<script>
+		/* <![CDATA[ */
+		jQuery(document).ready( function($) {
+			$('a.rvyTabPostTypes').on('click', function() {
+				$('#publishpress-revisions-settings-tabs li a[href="#ppr-tab-post_types"]').trigger('click');
+			});
+		});
+		/* ]]> */
+		</script>
+	<?php endif;
+
+	?>
+	</div>
+	<?php
+
 	do_action('revisionary_option_ui_archive', $this, $sitewide, $customize_defaults);
 
 	$this->option_checkbox( 'extended_archive', $tab, $section, '', '' );
