@@ -499,12 +499,6 @@ if ( rvy_get_option('display_hints', $sitewide, $customize_defaults) ) {
 		} // end foreach src_otype
 		?>
 		</div></td></tr></table>
-		
-		<?php
-		echo '<br >';
-		$hint = esc_html__('The user role "Revisor" role is now available. Include capabilities for all custom post types in this role?', 'revisionary');
-		$this->option_checkbox( 'revisor_role_add_custom_rolecaps', $tab, $section, $hint, '' );
-		?>
 
 	<div class="rvy-subtext">
 	<?php
@@ -689,6 +683,9 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	}
 	
 	$this->option_checkbox( 'copy_posts_capability', $tab, $section, $hint, '', $checkbox_args );
+
+	$hint = esc_html__('This plugin introduces a new user role, "Revisor."', 'revisionary');
+	$this->option_checkbox( 'revisor_role_add_custom_rolecaps', $tab, $section, $hint, '' );
 
 	$checkbox_args = [];
 
