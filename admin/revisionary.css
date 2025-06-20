@@ -512,7 +512,7 @@ color: black
 }
 
 #ppr-tab-post_types [data-toggle="tooltip"] .tooltip-text {
-  min-width: 260px;
+  min-width: 250px;
   font-size: 14px;
 }
 
