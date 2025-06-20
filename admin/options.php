@@ -478,30 +478,6 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 		?>
         </h3>
 		<?php
-
-		//$hidden_types = ['attachment' => true, 'psppnotif_workflow' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true];
-		$hidden_types = [
-			'attachment' => true,
-            'psppnotif_workflow' => true,
-			'tablepress_table' => true,
-			'acf-field-group' => true,
-			'acf-field' => true,
-            'acf-post-type' => true,
-            'acf-taxonomy' => true,
-			'nav_menu_item' => true,
-			'custom_css' => true,
-			'customize_changeset' => true,
-			'wp_block' => true,
-			'wp_template' => true,
-			'wp_template_part' => true,
-			'wp_global_styles' => true,
-			'wp_navigation' => true,
-			'product_variation' => true,
-			'shop_order_refund' => true,
-            'ppma_boxes' => true, 
-            'ppmacf_field' => true,
-		];
-		
 		$locked_types = [];
 		$no_revision_types = [];
 
@@ -524,20 +500,15 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 			$name = $option_name . "[$key]";
 			?>
 
-			<?php if ('nav_menu' == $key) : ?>
-				<input name="<?php echo esc_attr($name); ?>" type="hidden" id="<?php echo esc_attr($id); ?>" value="1"/>
-			<?php else : ?>
-			<?php if (isset($hidden_types[$key])) : ?>
-				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="<?php echo esc_attr($hidden_types[$key]); ?>"/>
-			<?php else : 
+			<?php if (!isset($revisionary->hidden_post_types_archive[$key])) :
 					$locked = (!empty($locked_types[$key])) ? ' disabled ' : '';
 				?>
 			<div class="agp-vtight_input">
-				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="<?php echo (empty($locked_types[$key])) ? '0' : '1';?>"/>
+				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="0"/>
 				<label for="<?php echo esc_attr($id); ?>">
 					<?php if (!empty($locked_types[$key])):
 						echo $this->tooltipText(
-							'<input name="' . esc_attr($name) . '" type="checkbox" id="' . esc_attr($id) . ' value="1" disabled />',
+							'<input name="' . esc_attr($name) . '" type="checkbox" id="' . esc_attr($id) . '" value="0" disabled />',
 							esc_html__('This post type does not support Past Revisions.', 'revisionary')
 						);
 					?>
@@ -565,7 +536,6 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 
 					echo '</div>';
 				endif;
-			endif; // displaying checkbox UI
 
 		} // end foreach src_otype
 
@@ -589,7 +559,7 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 		</h3>
 		<?php
 
-		$hidden_types = ['attachment' => true, 'psppnotif_workflow' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'acf-post-type' => true, 'acf-taxonomy' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true, 'ppma_boxes' => true, 'ppmacf_field' => true];
+		$hidden_types = ['attachment' => false, 'psppnotif_workflow' => false, 'tablepress_table' => false, 'acf-field-group' => false, 'acf-field' => false, 'acf-post-type' => false, 'acf-taxonomy' => false, 'nav_menu_item' => false, 'custom_css' => false, 'customize_changeset' => false, 'wp_block' => false, 'wp_template' => false, 'wp_template_part' => false, 'wp_global_styles' => false, 'wp_navigation' => false, 'ppma_boxes' => false, 'ppmacf_field' => false];
 		$locked_types = [];
 
 		$types = get_post_types(['public' => true, 'show_ui' => true], 'object', 'or');
