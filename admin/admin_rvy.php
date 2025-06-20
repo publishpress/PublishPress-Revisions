@@ -24,6 +24,7 @@ class RevisionaryAdmin
 		$script_name = (isset($_SERVER['SCRIPT_NAME'])) ? esc_url_raw($_SERVER['SCRIPT_NAME']) : '';
 
 		add_action('admin_head', [$this, 'admin_head']);
+		add_filter('admin_body_class', [$this, 'fltAdminBodyClass'], 20);
 		add_action('admin_enqueue_scripts', [$this, 'admin_scripts']);
 		add_action('revisionary_admin_footer', [$this, 'publishpressFooter']);
 
@@ -219,6 +220,35 @@ class RevisionaryAdmin
 		}
  	}
 
+	 function fltAdminBodyClass($classes) {
+
+		if (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion', 'revisionary-archive'])) {
+			$classes .= ' revisionary';
+			
+			switch ($_REQUEST['page']) {
+				case 'revisionary-archive':
+					$classes .= ' revisionary-archive';
+					break;
+
+				case 'revisionary-settings':
+				case 'rvy-net_options':
+				case 'rvy-default_options':
+					$classes .= ' revisionary-settings';
+					break;
+
+				case 'revisionary-q':
+					$classes .= ' revisionary-q';
+					break;
+
+				case 'revisionary-deletion':
+					$classes .= ' revisionary-deletion';
+					break;
+			}
+		}
+
+		return $classes;
+	}
+
 	function admin_head() {
 		global $pagenow;
 
@@ -304,9 +334,14 @@ class RevisionaryAdmin
 		if ($revision_archive || $can_edit_any || current_user_can('manage_options')) {
 			$_menu_caption = ( defined( 'RVY_MODERATION_MENU_CAPTION' ) ) ? RVY_MODERATION_MENU_CAPTION : esc_html__('Revisions');
 
+			$active_post_types_archive = array_diff_key(
+				$enabled_post_types_archive = array_filter($revisionary->enabled_post_types_archive),
+				$revisionary->getHiddenPostTypesArchive()
+			);
+
 			if ($can_edit_any) {
 				$menu_func = [$this, 'moderation_queue'];
-			} elseif ($revision_archive && array_filter($revisionary->enabled_post_types_archive)) {
+			} elseif ($revision_archive && $enabled_post_types_archive) {
 				$menu_slug = 'revisionary-archive';
 				$menu_func = [$this, 'revision_archive'];
 			} else {
@@ -322,7 +357,7 @@ class RevisionaryAdmin
 
 			do_action('revisionary_admin_menu');
 
-			if ($revision_archive && array_filter($revisionary->enabled_post_types_archive)) {
+			if ($revision_archive && $active_post_types_archive) {
 				// Revision Archive page
 				add_submenu_page(
 					$menu_slug,
