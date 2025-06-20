@@ -1754,10 +1754,9 @@ echo "javascript:if (confirm('"
 
 </div>
 
-</div>
-
-
 <?php do_action('publishpress_revisions_settings_sidebar');?>
+
+</div>
 
 </div>
 
