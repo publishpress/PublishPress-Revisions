@@ -534,9 +534,17 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 				?>
 			<div class="agp-vtight_input">
 				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="<?php echo (empty($locked_types[$key])) ? '0' : '1';?>"/>
-				<label for="<?php echo esc_attr($id); ?>" title="<?php if (!empty($no_revision_types[$key])) esc_attr_e('This post type does not support Past Revisions.', 'revisionary'); else echo esc_attr($key); ?>">
-					<input name="<?php if (empty($locked_types[$key])) echo esc_attr($name); ?>" type="checkbox" id="<?php echo esc_attr($id); ?>"
-						value="1" <?php checked('1', !empty($revisionary->enabled_post_types_archive[$key])); echo esc_attr($locked); ?> />
+				<label for="<?php echo esc_attr($id); ?>">
+					<?php if (!empty($locked_types[$key])):
+						echo $this->tooltipText(
+							'<input name="' . esc_attr($name) . '" type="checkbox" id="' . esc_attr($id) . ' value="1" disabled />',
+							esc_html__('This post type does not support Past Revisions.', 'revisionary')
+						);
+					?>
+					<?php else: ?>
+					<input name="<?php echo esc_attr($name); ?>" type="checkbox" id="<?php echo esc_attr($id); ?>"
+						value="1" <?php checked('1', !empty($revisionary->enabled_post_types_archive[$key])); ?> />
+					<?php endif;?>
 
 					<?php
 					if (isset($obj->labels_pp)) {
