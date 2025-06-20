@@ -244,6 +244,10 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
+= 3.7.1 - 23 Jun 2025 =
+* Feature : Setting to control maximum Past Revisions per post
+* Feature : Setting to disable Archive by post type
+
 = 3.7.0 - 19 Jun 2025 =
 * Change : Rearranged Settings to highlight distinction between Past Revisions and New Revisions
 * Change : Settings - Clarify captions for capability requirement settings
