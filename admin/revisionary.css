@@ -2,7 +2,6 @@
  * This file is licensed under the GNU GPL.
  */
 
-
 #submitdiv a.now-timestamp {
 margin-left:10px;
 }
@@ -426,14 +425,7 @@ width: 99%;
 vertical-align: top;
 }
 
-body.toplevel_page_revisionary-q h1 span.dashicons,
-body.revisions_page_revisionary-deletion h1 span.dashicons,
-body.revisions_page_revisionary-settings h1 span.dashicons,
-body.revisions_page_rvy-net_options h1 span.dashicons,
-body.revisions_page_rvy-default_options h1 span.dashicons,
-body.revisions_page_revisionary-archive h1 span.dashicons,
-body.toplevel_page_revisionary-archive h1 span.dashicons,
-body.toplevel_page_revisionary-settings h1 span.dashicons
+body.revisionary h1 span.dashicons
 {
 padding-top:5px;
 }
@@ -451,14 +443,12 @@ padding-top: 4px;
 padding-bottom: 4px;
 }
 
-body.revisions_page_revisionary-settings #poststuff,
-body.toplevel_page_revisionary-settings #poststuff
+body.revisionary-settings #poststuff
 {
 padding-top: 0;
 }
 
-body.revisions_page_revisionary-settings .form-table td,
-body.toplevel_page_revisionary-settings .form-table td
+body.revisionary-settings .form-table td
 {
 padding-top: 10px;
 }
@@ -533,10 +523,6 @@ color: black
   #rvy-features div.rvy-subtext {
   display: none;
   }
-}
-
-body.admin_page_rvy-revisions table.diff td, table.diff th {
-max-width: 400px;
 }
 
 body.admin_page_rvy-revisions #title {
@@ -649,7 +635,7 @@ margin-right: 6px;
 margin-top: 2px;
 }
 
-.toplevel_page_revisionary-q .pressshack-admin-wrapper a, .revisions_page_revisionary-deletion .pressshack-admin-wrapper a {
+body.revisionary-q .pressshack-admin-wrapper a, body.revisionary-deletion .pressshack-admin-wrapper a {
 color: #2271B1;
 }
 
@@ -831,7 +817,7 @@ font-weight: bold;
 }
 
 .pp-revisions-pro-promo-right-sidebar div.upgrade-btn {
-  margin-top: 25px;
+  margin-top: 15px;
 }
 
 .pp-revisions-pro-promo-right-sidebar .upgrade-btn {
@@ -879,15 +865,11 @@ margin-bottom: 5px;
   line-height: 1.4;
 }
 
-.pp-revisions-pro-promo-right-sidebar .postbox-container .inside ul {
-  margin-bottom: 20px;
-}
-
 .pp-revisions-pro-promo-right-sidebar .postbox-container .inside ul li {
   position: relative;
   padding-left: 22px;
   font-weight: 600;
-  font-size: 1em;
+  font-size: 0.9em;
 }
 
 .pp-revisions-pro-promo-right-sidebar .postbox-container .inside ul li:before {
