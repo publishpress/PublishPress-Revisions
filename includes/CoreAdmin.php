@@ -10,9 +10,7 @@ class CoreAdmin {
 
         add_filter(\PPVersionNotices\Module\TopNotice\Module::SETTINGS_FILTER, function ($settings) {
             $settings['revisionary'] = [
-                'message' => (!defined('WP_LANG') || (0 === strpos(WP_LANG, 'en_')))
-                ? esc_html__("Upgrade to PublishPress Revisions Pro for more features and support. %sUpgrade to Pro%s", 'revisionary')
-                : esc_html__("You're using PublishPress Revisions Free. The Pro version has more features and support. %sUpgrade to Pro%s", 'revisionary'),
+                'message' => esc_html__("You're using PublishPress Revisions Free. The Pro version has more features and support. %sUpgrade to Pro%s", 'revisionary'),
                 'link'    => 'https://publishpress.com/links/revisions-banner',
                 'screens' => [
                     ['base' => 'toplevel_page_revisionary-q'],
@@ -148,20 +146,6 @@ class CoreAdmin {
             #wpbody {
                 padding-top: 0;
             }
-        }
-
-        body.revisionary .pp-version-notice-bold-purple
-        {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
-            column-gap: 5px;
-        }
-
-        body.revisionary .pp-version-notice-bold-purple-button
-        {
-            margin-top: 0;
-            padding-right: 5px;
         }
         </style>
 
