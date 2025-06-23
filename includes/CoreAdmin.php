@@ -17,6 +17,7 @@ class CoreAdmin {
                     ['base' => 'revisions_page_revisionary-settings'],
                     ['base' => 'revisions_page_revisionary-archive'],
                     ['base' => 'toplevel_page_revisionary-archive'],
+                    ['base' => 'toplevel_page_revisionary-settings'],
                 ]
             ];
 
@@ -35,58 +36,54 @@ class CoreAdmin {
         #toplevel_page_revisionary-q ul li:last-of-type a {font-weight: bold !important; color: #FEB123 !important;}
         #toplevel_page_revisionary-archive ul li:last-of-type a {font-weight: bold !important; color: #FEB123 !important;}
 
-        body.revisions_page_revisionary-settings div.pressshack-admin-wrapper {
+        body.revisionary-settings div.pressshack-admin-wrapper {
             float: left;
             width: 100%;
             overflow: visible;
         }
 
-        body.revisions_page_revisionary-settings #side-info-column {
-            width: 210px;
-            float: right !important;
-            margin-left: -220px;
+        body.revisionary-settings #side-info-column {
+            float: left !important;
             padding-right: 20px;
+            width: calc( 25% - 20px );
         }
 
-        body.revisions_page_revisionary-settings #side-sortables {
-            width: 220px !important;
+        body.revisionary-settings #side-sortables .postbox {
+            min-width: 240px !important;
         }
 
-        body.revisions_page_revisionary-settings #side-sortables .postbox {
-            min-width: 200px !important;
-        }
-
-        body.revisions_page_revisionary-settings .advertisement-box-content {
-            width: 215px;
-        }
-
-        body.revisions_page_revisionary-settings div.pressshack-admin-wrapper #poststuff {
+        body.revisionary-settings div.pressshack-admin-wrapper #poststuff {
             padding-top: 0;
         }
-
-        body.revisions_page_revisionary-settings div.pressshack-admin-wrapper #post-body {
-            margin-right: 245px !important;
-        }
         
-        body.revisions_page_revisionary-settings .has-right-sidebar #post-body-content {
-            margin-right: 25px;
-            min-width: 500px;
+        body.revisionary-settings .has-right-sidebar {
+            display: table;
             width: 100%;
+        }
+
+        body.revisionary-settings .has-right-sidebar #post-body-content {
+            margin-right: 15px;
+            width: calc( 75% - 20px );
             float: left;
         }
 
-        body.revisions_page_revisionary-settings input[name="rvy_defaults"] {
+        body.revisionary-settings input[name="rvy_defaults"] {
             margin-right: 10px;
         }
 
-        @media only screen and (max-width: 799px) {
-            body.revisions_page_revisionary-settings #wpbody-content #poststuff #post-body {
+        @media only screen and (max-width: 1199px) {
+            body.revisionary-settings #wpbody-content #poststuff #post-body {
                 margin: 0px 2px 0 2px !important;
                 padding-right: 2px;
                 padding-left: 2px;
+                width: 99%;
             }
 
-            body.revisions_page_revisionary-settings #side-info-column {
+            body.revisionary-settings .has-right-sidebar #post-body-content {
+                width: 99%;
+            }
+
+            body.revisionary-settings #side-info-column {
                 clear: both;
                 float: none !important;
                 margin: 0;
@@ -94,23 +91,60 @@ class CoreAdmin {
                 width: 600px;
             }
 
-            body.revisions_page_revisionary-settings #side-info-column div.meta-box-sortables {
+            body.revisionary-settings #side-info-column div.meta-box-sortables {
                 clear: both;
-                width: 600px;
+                width: 610px;
                 display: grid;
-                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-columns: 1fr 1fr;
                 grid-template-rows: 1fr;
                 grid-column-gap: 20px;
             }
 
-            body.revisions_page_revisionary-settings #side-info-column div.advertisement-box-content {
+            body.revisionary-settings #side-info-column div.advertisement-box-content {
                 display: inline;
                 margin-top: 0;
                 margin-bottom: 0;
             }
 
-            body.revisions_page_revisionary-settings #side-info-column div.advertisement-box-content .postbox-header {
+            body.revisionary-settings #side-info-column div.advertisement-box-content .postbox-header {
                 display: inline;
+            }
+        }
+
+        @media only screen and (max-width: 799px) {
+            body.revisionary-settings #wpbody-content #poststuff #post-body {
+                margin: 0px 2px 0 2px !important;
+                padding-right: 2px;
+                padding-left: 2px;
+            }
+        }
+
+        @media only screen and (max-width: 639px) {
+            body.revisionary-settings #side-sortables,
+            body.revisionary-settings #token-legend {
+                background-color: transparent;
+                border: none;
+            }
+
+            body.revisionary-settings #side-info-column {
+                clear: both;
+                float: none !important;
+                width: 99%;
+            }
+
+            body.revisionary-settings #side-info-column div.meta-box-sortables {
+                width: 99%;
+                grid-template-columns: 1fr;
+            }
+
+            body.revisionary-settings #side-info-column div.advertisement-box-content {
+                margin-bottom: 30px;
+            }
+        }
+
+        @media screen and (max-width: 600px) {
+            #wpbody {
+                padding-top: 0;
             }
         }
         </style>

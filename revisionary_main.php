@@ -22,6 +22,8 @@ class Revisionary
 	var $config_loaded = false;		// configuration related to post types and statuses must be loaded late on the init action
 	var $enabled_post_types = [];	// enabled_post_types property is set (keyed by post type slug) late on the init action. 
 	var $enabled_post_types_archive = [];	// enabled_post_types_archive property is set (keyed by post type slug) late on the init action.
+	var $hidden_post_types_archive = [];
+
 	var $post_edit_ui;
 
 	// minimal config retrieval to support pre-init usage by WP_Scoped_User before text domain is loaded
@@ -172,6 +174,8 @@ class Revisionary
 
 		add_action('post_updated', [$this, 'actUpdateRevision'], 10, 2);
 		add_action('post_updated', [$this, 'actUpdateRevisionFixCommentCount'], 999, 2);
+
+		add_filter('wp_revisions_to_keep', [$this, 'fltNumRevisions'], 10, 2);
 
 		add_filter('posts_clauses', [$this, 'fltPostsClauses'], 10, 2);
 
@@ -381,8 +385,18 @@ class Revisionary
 		$this->enabled_post_types = array_filter($this->enabled_post_types);
 	}
 
+	function getHiddenPostTypesArchive() {
+		return $this->hidden_post_types_archive;
+	}
+
+	private function setHiddenPostTypesArchive() {
+		$this->hidden_post_types_archive = ['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'acf-post-type' => true, 'acf-taxonomy' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true, 'ppma_boxes' => true, 'ppmacf_field' => true, 'psppnotif_workflow' => true];
+	}
+
 	public function setPostTypesArchive() {
 		global $current_user;
+
+		$this->setHiddenPostTypesArchive();
 
 	    $enabled_post_types_archive = get_option('rvy_enabled_post_types_archive', false);
 
@@ -450,16 +464,25 @@ class Revisionary
 			$enabled_post_types_archive
 		);
 
-		$this->enabled_post_types_archive = array_diff_key(
-			$this->enabled_post_types_archive,
-			['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'acf-post-type' => true, 'acf-taxonomy' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true, 'ppma_boxes' => true, 'ppmacf_field' => true, 'psppnotif_workflow' => true]
-		);
-		
 		$this->enabled_post_types_archive = apply_filters(
 			'revisionary_archive_post_types', 
 			$this->enabled_post_types_archive
 		);
 	}
+
+	function fltNumRevisions ($num, $post) {
+        if (isset($this->enabled_post_types_archive[$post->post_type]) && empty($this->enabled_post_types_archive[$post->post_type])) {
+            $num = 0;
+        } else {
+            $num = rvy_get_option('num_revisions');
+
+            if (in_array($num, [true, ''], true)) {
+                $num = -1;
+            }
+        }
+
+        return $num;
+    }
 
 	function canEditPost($post, $args = []) {
 		global $current_user;
