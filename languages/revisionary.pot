@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the PublishPress Revisions plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: PublishPress Revisions 3.7.1-rc3\n"
+"Project-Id-Version: PublishPress Revisions 3.7.1-rc5\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/project\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-06-20T19:51:35+00:00\n"
+"POT-Creation-Date: 2025-06-23T19:51:00+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: revisionary\n"
@@ -147,7 +147,7 @@ msgstr ""
 #: admin/admin_rvy.php:389
 #: admin/admin_rvy.php:390
 #: admin/admin_rvy.php:430
-#: includes/CoreAdmin.php:222
+#: includes/CoreAdmin.php:206
 msgid "Upgrade to Pro"
 msgstr ""
 
@@ -1236,7 +1236,7 @@ msgid "If the user can't publish, require the edit_others_drafts capability to e
 msgstr ""
 
 #: admin/options.php:1591
-#: includes/CoreAdmin.php:215
+#: includes/CoreAdmin.php:199
 msgid "WPML Translation Management"
 msgstr ""
 
@@ -1690,75 +1690,71 @@ msgstr ""
 msgid "Submitted Rev."
 msgstr ""
 
-#: includes/CoreAdmin.php:14
-msgid "Upgrade to PublishPress Revisions Pro for more features and support. %sUpgrade to Pro%s"
-msgstr ""
-
-#: includes/CoreAdmin.php:15
+#: includes/CoreAdmin.php:13
 msgid "You're using PublishPress Revisions Free. The Pro version has more features and support. %sUpgrade to Pro%s"
 msgstr ""
 
-#: includes/CoreAdmin.php:200
+#: includes/CoreAdmin.php:184
 msgid "Upgrade to Revisions Pro"
 msgstr ""
 
-#: includes/CoreAdmin.php:205
+#: includes/CoreAdmin.php:189
 msgid "Upgrade to PublishPress Revisions Pro for integration with key features of these plugins:"
 msgstr ""
 
-#: includes/CoreAdmin.php:208
+#: includes/CoreAdmin.php:192
 msgid "Elementor"
 msgstr ""
 
-#: includes/CoreAdmin.php:209
+#: includes/CoreAdmin.php:193
 msgid "Divi Builder"
 msgstr ""
 
-#: includes/CoreAdmin.php:210
+#: includes/CoreAdmin.php:194
 msgid "Beaver Builder"
 msgstr ""
 
-#: includes/CoreAdmin.php:211
+#: includes/CoreAdmin.php:195
 msgid "Advanced Custom Fields"
 msgstr ""
 
-#: includes/CoreAdmin.php:212
+#: includes/CoreAdmin.php:196
 msgid "Pods"
 msgstr ""
 
-#: includes/CoreAdmin.php:213
+#: includes/CoreAdmin.php:197
 msgid "WooCommerce"
 msgstr ""
 
-#: includes/CoreAdmin.php:214
+#: includes/CoreAdmin.php:198
 msgid "WPML"
 msgstr ""
 
-#: includes/CoreAdmin.php:216
+#: includes/CoreAdmin.php:200
 msgid "PublishPress Planner: Custom Notifications"
 msgstr ""
 
-#: includes/CoreAdmin.php:218
+#: includes/CoreAdmin.php:202
 msgid "Plugin integration details"
 msgstr ""
 
-#: includes/CoreAdmin.php:229
+#: includes/CoreAdmin.php:213
 msgid "Need Revisions Support?"
 msgstr ""
 
-#: includes/CoreAdmin.php:234
+#: includes/CoreAdmin.php:218
 msgid "If you need help or have a new feature request, let us know."
 msgstr ""
 
-#: includes/CoreAdmin.php:236
+#: includes/CoreAdmin.php:220
 msgid "Request Support"
 msgstr ""
 
-#: includes/CoreAdmin.php:245
+#: includes/CoreAdmin.php:229
 msgid "Detailed documentation is also available on the plugin website."
 msgstr ""
 
-#: includes/CoreAdmin.php:247
+#: includes/CoreAdmin.php:231
 msgid "View Knowledge Base"
 msgstr ""
 
