@@ -198,7 +198,6 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'revision_preview_links' => 				esc_html__('Show Preview Links', 'revisionary'),
 	'preview_link_type' => 						esc_html__('Preview Link Type', 'revisionary'),
 	'preview_link_alternate_preview_arg' =>		esc_html__('Modify preview link for better theme compatibility', 'revisionary'),
-	'block_editor_extra_preview_button' =>		esc_html__('Extra preview button in Gutenberg Editor top bar', 'revisionary'),
 	'home_preview_set_home_flag' =>				esc_html__('Theme Compat: For front page revision preview, set home flag', 'revisionary'),
 	'compare_revisions_direct_approval' => 		esc_html__('Approve Button on Compare screen', 'revisionary'),
 	'copy_revision_comments_to_post' => 		esc_html__('Copy revision comments to published post', 'revisionary'),
@@ -233,7 +232,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'post_types' =>			 ['enabled_post_types', 'enabled_post_types_archive'],
 	'archive' =>			 ['num_revisions', 'archive_postmeta', 'extended_archive', 'revision_archive_deletion', 'revision_restore_require_cap'],
 	'working_copy' =>		 ['copy_posts_capability', 'revisor_role_add_custom_rolecaps', 'revision_limit_per_post', 'revision_limit_compat_mode', 'revision_unfiltered_html_check', 'auto_submit_revisions', 'caption_copy_as_edit', 'permissions_compat_mode', 'pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date', 'scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'wp_cron_usage_detected', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'rev_publication_delete_ed_comments', 'revision_statuses_noun_labels', 'manage_unsubmitted_capability', 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions', 'deletion_queue', 'use_publishpress_notifications', 'planner_notifications_access_limited', 'pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
-	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'home_preview_set_home_flag', 'block_editor_extra_preview_button'],
+	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'home_preview_set_home_flag'],
 	'compare' =>			 ['compare_revisions_direct_approval', 'diff_display_strip_tags', 'past_revisions_order_by'],
 	'revisions'		=>		 ['require_edit_others_drafts', 'display_hints', 'delete_settings_on_uninstall'],
 	'license' =>			 ['edd_key'],
@@ -1493,9 +1492,6 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 
 		$hint = esc_html__('Some themes may require this setting for correct revision preview display.', 'revisionary');
 		$this->option_checkbox( 'home_preview_set_home_flag', $tab, $section, $hint, '' );
-
-		$hint = '';
-		$this->option_checkbox( 'block_editor_extra_preview_button', $tab, $section, $hint, '' );
 		?>
 		</div>
 		
