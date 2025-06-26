@@ -78,12 +78,6 @@ class RevisionaryEditRevisionUI {
 				text-align: right;
 				white-space: nowrap;
 			}
-
-			<?php if (rvy_get_option('block_editor_extra_preview_button')) :?>
-			div.editor-header__settings {
-				width: 500px !important;
-			}
-			<?php endif;?>
 		</style>
 		<?php
 	}
