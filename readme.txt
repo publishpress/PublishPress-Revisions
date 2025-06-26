@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, approve changes, scheduled chang
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.8
-Stable tag: 3.7.0
+Stable tag: 3.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -247,7 +247,7 @@ Fixed: Security issue. Please update.
 = 3.7.1 - 23 Jun 2025 =
 * Feature : Setting to control maximum Past Revisions per post
 * Feature : Setting to disable Archive by post type
-* Change : Imporove styling of Features tab tool tips
+* Change : Improve styling of Features tab tool tips
 
 = 3.7.0 - 19 Jun 2025 =
 * Change : Rearranged Settings to highlight distinction between Past Revisions and New Revisions
