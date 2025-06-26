@@ -373,7 +373,7 @@ class Revisionary
 			'revisionary_enabled_post_types', 
 			array_diff_key(
 				$enabled_post_types,
-				['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'acf-post-type' => true, 'acf-taxonomy' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true, 'ppma_boxes' => true, 'ppmacf_field' => true, 'psppnotif_workflow' => true]
+				['attachment' => true, 'tablepress_table' => true, 'acf-field-group' => true, 'acf-field' => true, 'acf-post-type' => true, 'acf-taxonomy' => true, 'nav_menu_item' => true, 'custom_css' => true, 'customize_changeset' => true, 'wp_block' => true, 'wp_template' => true, 'wp_template_part' => true, 'wp_global_styles' => true, 'wp_navigation' => true, 'ppma_boxes' => true, 'ppmacf_field' => true, 'psppnotif_workflow' => true, 'wpcf7_contact_form' => true]
 			)
 		);
 
