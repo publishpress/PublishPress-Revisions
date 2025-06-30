@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, approve changes, scheduled chang
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.8
-Stable tag: 3.7.1
+Stable tag: 3.7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -243,6 +243,12 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 Fixed: Security issue. Please update.
 
 == Changelog ==
+
+= 3.7.2 - 30 Jun 2025 =
+* Compat : Better support for custom post types registered as non-public
+* Compat : PublishPress Planner - Error on activation under some conditions
+* Fixed : PHP Warnings on Edit Posts screen for Revisors and other roles which cannot edit published posts
+* Change : Revisions > Settings > Compare tab removed, options moved to other tabs
 
 = 3.7.1 - 23 Jun 2025 =
 * Feature : Setting to control maximum Past Revisions per post

@@ -41,6 +41,7 @@ background-color: white;
 }
 
 #rvy_post_types_frame td {
+vertical-align: top;
 padding-top: 0;
 }
 

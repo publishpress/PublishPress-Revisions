@@ -145,7 +145,6 @@ $this->section_captions = array(
 		'archive'				=> esc_html__('Past Revisions', 'revisionary'),
 		'working_copy'			=> esc_html__('New Revisions', 'revisionary'),
 		'preview'				=> esc_html__('Preview', 'revisionary'),
-		'compare'				=> esc_html__('Compare', 'revisionary'),
 		'revisions'				=> esc_html__('Options', 'revisionary'),
 	)
 );
@@ -198,11 +197,10 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'revision_preview_links' => 				esc_html__('Show Preview Links', 'revisionary'),
 	'preview_link_type' => 						esc_html__('Preview Link Type', 'revisionary'),
 	'preview_link_alternate_preview_arg' =>		esc_html__('Modify preview link for better theme compatibility', 'revisionary'),
-	'block_editor_extra_preview_button' =>		esc_html__('Extra preview button in Gutenberg Editor top bar', 'revisionary'),
 	'home_preview_set_home_flag' =>				esc_html__('Theme Compat: For front page revision preview, set home flag', 'revisionary'),
 	'compare_revisions_direct_approval' => 		esc_html__('Approve Button on Compare screen', 'revisionary'),
 	'copy_revision_comments_to_post' => 		esc_html__('Copy revision comments to published post', 'revisionary'),
-	'past_revisions_order_by' =>				esc_html__('Past Revisions ordering:', 'revisionary'), 
+	'past_revisions_order_by' =>				esc_html__('Compare Past Revisions ordering:', 'revisionary'), 
 	'list_unsubmitted_revisions' => 			sprintf(esc_html__('List %s in Revision Queue for "My Activity" or "Revisions to My Posts" view', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
 	'archive_postmeta' =>						esc_html__('Store custom fields of submitted and scheduled revisions for archive', 'revisionary'),
 	'extended_archive' =>						esc_html__('Keep an archive of revision edits, even after the revision is published', 'revisionary'),
@@ -231,11 +229,10 @@ if ( defined('RVY_CONTENT_ROLES') ) {
 $this->form_options = apply_filters('revisionary_option_sections', [
 'features' => [
 	'post_types' =>			 ['enabled_post_types', 'enabled_post_types_archive'],
-	'archive' =>			 ['num_revisions', 'archive_postmeta', 'extended_archive', 'revision_archive_deletion', 'revision_restore_require_cap'],
-	'working_copy' =>		 ['copy_posts_capability', 'revisor_role_add_custom_rolecaps', 'revision_limit_per_post', 'revision_limit_compat_mode', 'revision_unfiltered_html_check', 'auto_submit_revisions', 'caption_copy_as_edit', 'permissions_compat_mode', 'pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date', 'scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'wp_cron_usage_detected', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'rev_publication_delete_ed_comments', 'revision_statuses_noun_labels', 'manage_unsubmitted_capability', 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions', 'deletion_queue', 'use_publishpress_notifications', 'planner_notifications_access_limited', 'pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
-	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'home_preview_set_home_flag', 'block_editor_extra_preview_button'],
-	'compare' =>			 ['compare_revisions_direct_approval', 'diff_display_strip_tags', 'past_revisions_order_by'],
-	'revisions'		=>		 ['require_edit_others_drafts', 'display_hints', 'delete_settings_on_uninstall'],
+	'archive' =>			 ['num_revisions', 'archive_postmeta', 'extended_archive', 'revision_archive_deletion', 'revision_restore_require_cap', 'past_revisions_order_by'],
+	'working_copy' =>		 ['copy_posts_capability', 'revisor_role_add_custom_rolecaps', 'revision_limit_per_post', 'revision_limit_compat_mode', 'revision_unfiltered_html_check', 'auto_submit_revisions', 'caption_copy_as_edit', 'permissions_compat_mode', 'pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date', 'scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'wp_cron_usage_detected', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'rev_publication_delete_ed_comments', 'revision_statuses_noun_labels', 'manage_unsubmitted_capability', 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions', 'deletion_queue', 'use_publishpress_notifications', 'planner_notifications_access_limited', 'pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer', 'compare_revisions_direct_approval'],
+	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'home_preview_set_home_flag'],
+	'revisions'		=>		 ['require_edit_others_drafts', 'diff_display_strip_tags', 'display_hints', 'delete_settings_on_uninstall'],
 	'license' =>			 ['edd_key'],
 ]
 ]);
@@ -501,8 +498,8 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 			?>
 
 			<?php if (!isset($revisionary->hidden_post_types_archive[$key])) :
-					$locked = (!empty($locked_types[$key])) ? ' disabled ' : '';
-				?>
+				$locked = (!empty($locked_types[$key])) ? ' disabled ' : '';
+			?>
 			<div class="agp-vtight_input">
 				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="0"/>
 				<label for="<?php echo esc_attr($id); ?>">
@@ -538,7 +535,6 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 				endif;
 
 		} // end foreach src_otype
-
 		?>
 		</td>
 
@@ -559,10 +555,35 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 		</h3>
 		<?php
 
-		$hidden_types = ['attachment' => false, 'psppnotif_workflow' => false, 'tablepress_table' => false, 'acf-field-group' => false, 'acf-field' => false, 'acf-post-type' => false, 'acf-taxonomy' => false, 'nav_menu_item' => false, 'custom_css' => false, 'customize_changeset' => false, 'wp_block' => false, 'wp_template' => false, 'wp_template_part' => false, 'wp_global_styles' => false, 'wp_navigation' => false, 'ppma_boxes' => false, 'ppmacf_field' => false];
+		$hidden_types = ['attachment' => false, 'psppnotif_workflow' => false, 'tablepress_table' => false, 'acf-field-group' => false, 'acf-field' => false, 'acf-post-type' => false, 'acf-taxonomy' => false, 'nav_menu_item' => false, 'custom_css' => false, 'customize_changeset' => false, 'wp_block' => false, 'wp_template' => false, 'wp_template_part' => false, 'wp_global_styles' => false, 'wp_navigation' => false, 'wp_font_family' => false, 'wp_font_face' => false, 'ppma_boxes' => false, 'ppmacf_field' => false, 'product_variation' => false, 'shop_order_refund' => false, 'wpcf7_contact_form' => false];
 		$locked_types = [];
 
 		$types = get_post_types(['public' => true, 'show_ui' => true], 'object', 'or');
+
+		if (!defined('REVISIONARY_NO_PRIVATE_TYPES')) {
+			$available_private_types = [];
+			
+			$private_types = array_merge(
+				get_post_types(['public' => false], 'object'),
+				get_post_types(['public' => null], 'object')
+			);
+
+			// by default, enable non-public post types that have type-specific capabilities defined
+			foreach($private_types as $post_type => $type_obj) {
+				if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages']) && !in_array($post_type, $hidden_types))
+				|| defined('REVISIONARY_ENABLE_' . strtoupper($post_type) . '_TYPE')
+				) {
+					$available_private_types[$post_type] = $type_obj;
+				}
+			}
+
+			$available_private_types = array_intersect_key(
+				$available_private_types,
+				(array) apply_filters('revisionary_available_private_types', array_fill_keys(array_keys($available_private_types), true))
+			);
+
+			$types = array_merge($types, $available_private_types);
+		}
 
 		$types = rvy_order_types($types);
 
@@ -734,6 +755,26 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			$checkbox_args['no_escape'] = true;
 		} else {
 			$hint = esc_html__('Prevent non-Administrators from restoring a revision without the restore_revisions capability', 'revisionary');
+		}
+
+		echo '<br><br>';
+
+		$id = 'past_revisions_order_by';
+		if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
+			echo esc_html($this->option_captions[$id]);
+	
+			$this->all_options []= $id;
+			$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
+	
+			echo " <select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "' autocomplete='off' style='vertical-align: baseline'>";
+			$captions = ['' => esc_html__('Post Date', 'revisionary'), 'modified' => esc_html__('Modification Date', 'revisionary')];
+			foreach ( $captions as $key => $value) {
+				$selected = ( $current_setting == $key ) ? 'selected' : '';
+				echo "\n\t<option value='" . esc_attr($key) . "' " . esc_attr($selected) . ">" . esc_html($captions[$key]) . "</option>";
+			}
+			echo '</select>&nbsp;';
+	
+			echo "<br /><br />";
 		}
 
 		$this->option_checkbox( 'revision_restore_require_cap', $tab, $section, $hint, '', $checkbox_args );
@@ -982,6 +1023,9 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 
 			$hint = esc_html__('When a user who has publishing capabilities creates a Revision, set it to "Submitted" status.', 'revisionary');
 			$this->option_checkbox( 'auto_submit_revisions', $tab, $section, $hint, '' );
+
+			$hint = esc_html__('This allows immediate approval within the Compare screen. If disabled, a Preview link is provided instead.', 'revisionary');
+			$this->option_checkbox( 'compare_revisions_direct_approval', $tab, $section, $hint, '' );
 
 			do_action('revisionary_option_ui_pending_revisions', $this, $sitewide, $customize_defaults);
 		?>
@@ -1426,7 +1470,6 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		<?php
 		echo '</div>';
 		?>
-
 	</div></td></tr></table>
 <?php endif; // any options accessable in this section
 
@@ -1493,9 +1536,6 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 
 		$hint = esc_html__('Some themes may require this setting for correct revision preview display.', 'revisionary');
 		$this->option_checkbox( 'home_preview_set_home_flag', $tab, $section, $hint, '' );
-
-		$hint = '';
-		$this->option_checkbox( 'block_editor_extra_preview_button', $tab, $section, $hint, '' );
 		?>
 		</div>
 		
@@ -1510,40 +1550,6 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		</script>
 		<?php
 	}
-	?>
-	</div></td></tr></table>
-<?php endif; // any options accessable in this section
-
-
-$section = 'compare';				// --- COMPARE SECTION ---
-
-if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
-	<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td><div class="rvy-opt-wrap">
-
-	<?php
-	$id = 'past_revisions_order_by';
-	if ( in_array( $id, $this->form_options[$tab][$section] ) ) {
-		echo esc_html($this->option_captions[$id]);
-
-		$this->all_options []= $id;
-		$current_setting = rvy_get_option($id, $sitewide, $customize_defaults);
-
-		echo " <select name='" . esc_attr($id) . "' id='" . esc_attr($id) . "' autocomplete='off'>";
-		$captions = ['' => esc_html__('Post Date', 'revisionary'), 'modified' => esc_html__('Modification Date', 'revisionary')];
-		foreach ( $captions as $key => $value) {
-			$selected = ( $current_setting == $key ) ? 'selected' : '';
-			echo "\n\t<option value='" . esc_attr($key) . "' " . esc_attr($selected) . ">" . esc_html($captions[$key]) . "</option>";
-		}
-		echo '</select>&nbsp;';
-
-		echo "<br /><br />";
-	}
-
-	$hint = '';
-	$this->option_checkbox( 'diff_display_strip_tags', $tab, $section, $hint, '' );
-
-	$hint = esc_html__('This allows immediate approval within the Compare screen. If disabled, a Preview link is provided instead.', 'revisionary');
-	$this->option_checkbox( 'compare_revisions_direct_approval', $tab, $section, $hint, '' );
 	?>
 	</div></td></tr></table>
 <?php endif; // any options accessable in this section
@@ -1582,9 +1588,10 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		}
 
 		$this->option_checkbox( 'require_edit_others_drafts', $tab, $section, $hint, '', $checkbox_args );
-		?>
+		
+		$hint = '';
+		$this->option_checkbox( 'diff_display_strip_tags', $tab, $section, $hint, '' );
 
-		<?php
 		if ((defined('REVISIONARY_PRO_VERSION') || defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) && defined('ICL_SITEPRESS_VERSION') && defined('WPML_TM_VERSION')) :?>
 
 		<div>
