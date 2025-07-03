@@ -766,6 +766,21 @@ color: #070;
 font-weight: bold;
 }
 
+.pp-version-notice-bold-purple-button a, .pp-version-notice-bold-purple-button a:active, .pp-version-notice-bold-purple-button a:visited {
+text-decoration: none !important;
+color: black !important;
+}
+
+@media only screen and (max-width: 600px) {
+  .pp-version-notice-bold-purple-message {
+  width: auto !important;
+  }
+
+  .pp-version-notice-bold-purple-button {
+  width: auto !important;
+  }
+}
+
 /* Primary button in purple requires these 3 classes together for <button> and <a> tags */
 .ppr-purple-button.components-button.is-primary {
   background: #655997;
@@ -818,7 +833,8 @@ font-weight: bold;
 }
 
 .pp-revisions-pro-promo-right-sidebar div.upgrade-btn {
-  margin-top: 15px;
+  margin-top: 25px;
+  text-align: center;
 }
 
 .pp-revisions-pro-promo-right-sidebar .upgrade-btn {
