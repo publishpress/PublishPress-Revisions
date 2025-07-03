@@ -244,10 +244,11 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
-= 3.7.2 - 30 Jun 2025 =
+= 3.7.2 - 3 Jul 2025 =
 * Compat : Better support for custom post types registered as non-public
 * Fixed : PHP Warnings on Edit Posts screen for Revisors and other roles which cannot edit published posts
 * Change : Revisions > Settings > Compare tab removed, options moved to other tabs
+* Change : wordpress-version-notices 2.1.4
 
 = 3.7.1 - 23 Jun 2025 =
 * Feature : Setting to control maximum Past Revisions per post
