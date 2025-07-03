@@ -168,6 +168,8 @@ if (!defined('REVISIONARY_FILE') && !$revisionary_loaded_by_pro) {
     ) {
         require_once REVISIONS_INTERNAL_VENDORPATH . '/autoload.php';
     }
+
+	include_once REVISIONS_INTERNAL_VENDORPATH . '/publishpress/wordpress-version-notices/src/include.php';
 }
 
 if (!defined('REVISIONARY_FILE') && (!$revisionary_pro_active || $revisionary_loaded_by_pro)) {
