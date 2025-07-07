@@ -60,23 +60,31 @@ class RevisionaryAdminPosts {
     }
 
 	public function actProductsCol($column) {
+		global $post;
+
 		if ('thumb' == $column) {
-			add_filter('user_has_cap', [$this, 'actUserHasCap'], 999, 3);
-			$this->filtering_edit_link = true;
+			if (!current_user_can('edit_post', $post->ID)) {
+				add_filter('user_has_cap', [$this, 'actUserHasCap'], 999, 3);
+				$this->filtering_edit_link = true;
+			}
 		}
 	}
 
 	public function fltTitle($title) {
-		add_filter('user_has_cap', [$this, 'actUserHasCap'], 999, 3);
+		global $post;
 
-		$this->filtering_edit_link = true;
+		if (!current_user_can('edit_post', $post->ID)) {
+			add_filter('user_has_cap', [$this, 'actUserHasCap'], 999, 3);
 
+			$this->filtering_edit_link = true;
+		}
+	
 		return $title;
 	}
 
 	public function actUserHasCap($wp_blogcaps, $reqd_caps, $args) {
 		if (array_diff($reqd_caps, array_keys(array_filter($wp_blogcaps)))) {
-			if (!empty($args[0]) && ('copy_post' != $args[0]) && (false === strpos($args[0], 'copy_others_'))) {
+			if (!empty($args[0]) && ('edit_post' == $args[0])) {
 				$wp_blogcaps = array_merge($wp_blogcaps, array_fill_keys($reqd_caps, true));
 				remove_filter('user_has_cap', [$this, 'actUserHasCap'], 10, 3);
 			}
