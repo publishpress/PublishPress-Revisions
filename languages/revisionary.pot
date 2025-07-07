@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the PublishPress Revisions plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: PublishPress Revisions 3.7.2\n"
+"Project-Id-Version: PublishPress Revisions 3.7.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/project\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-07-03T19:28:49+00:00\n"
+"POT-Creation-Date: 2025-07-07T21:01:12+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: revisionary\n"
@@ -57,39 +57,39 @@ msgstr ""
 msgid "Sorry, you are not allowed to decline this revision."
 msgstr ""
 
-#: admin/admin-posts_rvy.php:110
+#: admin/admin-posts_rvy.php:122
 msgid "The revision was restored."
 msgstr ""
 
-#: admin/admin-posts_rvy.php:115
+#: admin/admin-posts_rvy.php:127
 msgid "The revision was scheduled for publication."
 msgstr ""
 
-#: admin/admin-posts_rvy.php:120
+#: admin/admin-posts_rvy.php:132
 msgid "The revision was published."
 msgstr ""
 
-#: admin/admin-posts_rvy.php:125
+#: admin/admin-posts_rvy.php:137
 #, php-format
 msgid "The unfiltered_html capability is required to create a revision of this post. See %sdocumentation%s."
 msgstr ""
 
-#: admin/admin-posts_rvy.php:130
+#: admin/admin-posts_rvy.php:142
 #: rvy_init-functions.php:763
 msgid "The post already has a revision in process."
 msgstr ""
 
-#: admin/admin-posts_rvy.php:212
+#: admin/admin-posts_rvy.php:224
 #: admin/class-list-table-archive.php:463
 #: rvy_init-functions.php:470
 msgid "Revision"
 msgstr ""
 
-#: admin/admin-posts_rvy.php:229
+#: admin/admin-posts_rvy.php:241
 msgid "Has Revision"
 msgstr ""
 
-#: admin/admin-posts_rvy.php:244
+#: admin/admin-posts_rvy.php:256
 #: admin/admin_rvy.php:355
 #: admin/admin_rvy.php:423
 #: admin/options.php:802
