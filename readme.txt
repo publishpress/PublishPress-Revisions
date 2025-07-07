@@ -245,6 +245,10 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
+= 3.7.3 - 7 Jul 2025 =
+* Compat : WooCommerce - Administrators and Editors did not have Edit links on Products screen
+* Compat : CMS Tree Page View - JSON output on Page Tree View screen
+
 = 3.7.2 - 3 Jul 2025 =
 * Compat : Better support for custom post types registered as non-public
 * Fixed : PHP Warnings on Edit Posts screen for Revisors and other roles which cannot edit published posts
