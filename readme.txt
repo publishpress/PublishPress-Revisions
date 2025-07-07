@@ -95,19 +95,20 @@ By upgrading to Revisions Pro, you also gain advanced permissions control throug
 
 The Pro versions of the PublishPress plugins are well worth your investment. The Pro versions have extra features and faster support. [Click here to join PublishPress](https://publishpress.com/pricing/).
 
-Join PublishPress and you'll get access to these nine Pro plugins:
+Join PublishPress and you'll get access to these ten Pro plugins:
 
 * [PublishPress Authors Pro](https://publishpress.com/authors) allows you to add multiple authors and guest authors to WordPress posts.
 * [PublishPress Blocks Pro](https://publishpress.com/blocks) has everything you need to build professional websites with the WordPress block editor.
 * [PublishPress Capabilities Pro](https://publishpress.com/capabilities) is the plugin to manage your WordPress user roles, permissions, and capabilities.
 * [PublishPress Checklists Pro](https://publishpress.com/checklists) enables you to define tasks that must be completed before content is published.
 * [PublishPress Future Pro](https://publishpress.com/future)  is the plugin for scheduling changes to your posts.
-* [PublishPress Permissions Pro](https://publishpress.com/permissions) is the plugin for advanced WordPress permissions.
+* [PublishPress Permissions Pro](https://publishpress.com/permissions)  is the plugin for restricted content and advanced WordPress permissions.
 * [PublishPress Planner Pro](https://publishpress.com/publishpress) is the plugin for managing and scheduling WordPress content.
 * [PublishPress Revisions Pro](https://publishpress.com/revisions) allows you to update your published pages with teamwork and precision.
-* [PublishPress Series Pro](https://publishpress.com/series) enables you to group content together into a series 
+* [PublishPress Series Pro](https://publishpress.com/series) enables you to group content together into a series.
+* [PublishPress Statuses Pro](https://publishpress.com/series) enables you to create additional publishing steps for your posts.
 
-Together, these plugins are a suite of powerful publishing tools for WordPress. If you need to create a professional workflow in WordPress, with moderation, revisions, permissions and more... then you should try PublishPress.
+Together, these plugins are a suite of powerful publishing tools for WordPress. If you need to create a professional workflow in WordPress, with moderation, revisions, permissions and more, then you should try PublishPress.
 
 ## Bug Reports ## 
 Bug reports for PublishPress Revisions are welcomed in our [repository on GitHub](https://github.com/publishpress/publishpress-revisions). Please note that GitHub is not a support forum, and that issues that aren't properly qualified as bugs will be closed.
