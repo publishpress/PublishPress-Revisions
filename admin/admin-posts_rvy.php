@@ -54,9 +54,11 @@ class RevisionaryAdminPosts {
 
 		add_filter('posts_where', [$this, 'fltFilterRevisions'], 10, 2);
 
-		add_filter('the_title', [$this, 'fltTitle'], 10, 1);
-		add_filter('manage_product_posts_custom_column', [$this, 'actProductsCol'], 10, 1);
-		add_filter('get_edit_post_link', [$this, 'fltGetEditPostLink'], 50, 3);
+	    if (empty($_REQUEST['page']) || (0 !== strpos($_REQUEST['page'], 'cms-tpv'))) {
+		  add_filter('the_title', [$this, 'fltTitle'], 10, 1);
+		  add_filter('manage_product_posts_custom_column', [$this, 'actProductsCol'], 10, 1);
+		  add_filter('get_edit_post_link', [$this, 'fltGetEditPostLink'], 50, 3);
+	    }
     }
 
 	public function actProductsCol($column) {
@@ -78,7 +80,7 @@ class RevisionaryAdminPosts {
 
 			$this->filtering_edit_link = true;
 		}
-	
+
 		return $title;
 	}
 
@@ -102,7 +104,9 @@ class RevisionaryAdminPosts {
 			<script type="text/javascript">
 			/* <![CDATA[ */
 			jQuery(document).ready( function($) {
-				$('td.column-name a[href="<?php echo str_replace('&amp;', '&', $link);?>"]').attr('href', '').closest('div.row-actions').find('span.edit').hide().parent().find('span.trash').hide().parent().find('span.inline').hide();
+				if ($('#the-list').length) {
+				    $('td.column-name a[href="<?php echo str_replace('&amp;', '&', $link);?>"]').attr('href', '').closest('div.row-actions').find('span.edit,span.inline,span.trash').hide();
+				}
 			});
 			/* ]]> */
 			</script>
