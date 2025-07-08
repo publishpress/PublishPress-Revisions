@@ -245,6 +245,10 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
+= 3.7.4 - 8 Jul 2025 =
+* Compat : WooCommerce - Edit links on Products screen (and other Woo post types) were hidden under some conditions
+* Compat : Various third party plugins - invalid data output on posts listing screen for custom post type
+
 = 3.7.3 - 7 Jul 2025 =
 * Compat : WooCommerce - Administrators and Editors did not have Edit links on Products screen
 * Compat : CMS Tree Page View - JSON output on Page Tree View screen
