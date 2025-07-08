@@ -114,17 +114,22 @@ class RevisionaryAdminPosts {
 		if (!empty($this->filtering_edit_link[$post_id])) {
 			remove_filter('user_has_cap', [$this, 'actUserHasCap'], 10, 3);
 
-			?>
-			<script type="text/javascript">
-			/* <![CDATA[ */
-			jQuery(document).ready( function($) {
-				if ($('#the-list').length) {
-				    $('td.column-name a[href="<?php echo str_replace('&amp;', '&', $link);?>"]').attr('href', '').closest('div.row-actions').find('span.edit,span.inline,span.trash').hide();
+			add_action(
+				'admin_print_footer_scripts',
+				function () use ($link) {
+    			?>
+        			<script type="text/javascript">
+        			/* <![CDATA[ */
+        			jQuery(document).ready( function($) {
+        				if ($('#the-list').length) {
+        				    $('td.column-name a[href="<?php echo str_replace('&amp;', '&', $link);?>"]').attr('href', '').closest('div.row-actions').find('span.edit,span.inline,span.trash').hide();
+        				}
+        			});
+        			/* ]]> */
+        			</script>
+    			<?php
 				}
-			});
-			/* ]]> */
-			</script>
-			<?php
+			);
 		}
 
 		return $link;
