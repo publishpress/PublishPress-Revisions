@@ -62,6 +62,7 @@ class RevisionaryAdminPosts {
 	    }
     }
 
+	// Ensure that the thumbnail is displayed without a PHP warning, even for Revisors who can't edit published posts
 	public function actProductsCol($column) {
 		global $post;
 
@@ -70,6 +71,8 @@ class RevisionaryAdminPosts {
 
 			if (!current_user_can('edit_post', $post->ID)) {
 				add_filter('user_has_cap', [$this, 'actUserHasCap'], 999, 3);
+
+				// Trigger javascript to remove the non-functional Edit link which this filtering will cause
 				$this->filtering_edit_link[$post->ID] = true;
 			}
 
@@ -77,6 +80,7 @@ class RevisionaryAdminPosts {
 		}
 	}
 
+	// Ensure that the title is displayed without a PHP warning, even for Revisors who can't edit published posts
 	public function fltTitle($title) {
 		global $post;
 
@@ -85,6 +89,7 @@ class RevisionaryAdminPosts {
 		if (!current_user_can('edit_post', $post->ID)) {
 			add_filter('user_has_cap', [$this, 'actUserHasCap'], 999, 3);
 
+			// Trigger javascript to remove the non-functional Edit link which this filtering will cause
 			$this->filtering_edit_link[$post->ID] = true;
 		}
 
@@ -93,6 +98,7 @@ class RevisionaryAdminPosts {
 		return $title;
 	}
 
+	// Prevent PHP warnings for Revisors who can't edit published posts (but should still see the post listed with New Revision link)
 	public function actUserHasCap($wp_blogcaps, $reqd_caps, $args) {
 		if (!$this->skip_has_cap_filtering && array_diff($reqd_caps, array_keys(array_filter($wp_blogcaps)))) {
 			if (!empty($args[0]) && ('edit_post' == $args[0])) {
