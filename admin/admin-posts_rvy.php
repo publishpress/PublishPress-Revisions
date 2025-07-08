@@ -2,7 +2,8 @@
 class RevisionaryAdminPosts {
     private $post_revision_count = array();
 	private $trashed_revisions;
-	private $filtering_edit_link = false;
+	private $filtering_edit_link = [];
+	private $skip_has_cap_filtering = false;
 
     function __construct() {
         if ( ! empty( $_REQUEST['revision_action'] ) ) {								//phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -61,31 +62,45 @@ class RevisionaryAdminPosts {
 	    }
     }
 
+	// Ensure that the thumbnail is displayed without a PHP warning, even for Revisors who can't edit published posts
 	public function actProductsCol($column) {
 		global $post;
 
 		if ('thumb' == $column) {
+			$this->skip_has_cap_filtering = true;
+
 			if (!current_user_can('edit_post', $post->ID)) {
 				add_filter('user_has_cap', [$this, 'actUserHasCap'], 999, 3);
-				$this->filtering_edit_link = true;
+
+				// Trigger javascript to remove the non-functional Edit link which this filtering will cause
+				$this->filtering_edit_link[$post->ID] = true;
 			}
+
+			$this->skip_has_cap_filtering = false;
 		}
 	}
 
+	// Ensure that the title is displayed without a PHP warning, even for Revisors who can't edit published posts
 	public function fltTitle($title) {
 		global $post;
+
+		$this->skip_has_cap_filtering = true;
 
 		if (!current_user_can('edit_post', $post->ID)) {
 			add_filter('user_has_cap', [$this, 'actUserHasCap'], 999, 3);
 
-			$this->filtering_edit_link = true;
+			// Trigger javascript to remove the non-functional Edit link which this filtering will cause
+			$this->filtering_edit_link[$post->ID] = true;
 		}
+
+		$this->skip_has_cap_filtering = false;
 
 		return $title;
 	}
 
+	// Prevent PHP warnings for Revisors who can't edit published posts (but should still see the post listed with New Revision link)
 	public function actUserHasCap($wp_blogcaps, $reqd_caps, $args) {
-		if (array_diff($reqd_caps, array_keys(array_filter($wp_blogcaps)))) {
+		if (!$this->skip_has_cap_filtering && array_diff($reqd_caps, array_keys(array_filter($wp_blogcaps)))) {
 			if (!empty($args[0]) && ('edit_post' == $args[0])) {
 				$wp_blogcaps = array_merge($wp_blogcaps, array_fill_keys($reqd_caps, true));
 				remove_filter('user_has_cap', [$this, 'actUserHasCap'], 10, 3);
@@ -96,21 +111,25 @@ class RevisionaryAdminPosts {
 	}
 
 	public function fltGetEditPostLink($link, $post_id, $context) {
-		if ($this->filtering_edit_link) {
-			$this->filtering_edit_link = true;
+		if (!empty($this->filtering_edit_link[$post_id])) {
 			remove_filter('user_has_cap', [$this, 'actUserHasCap'], 10, 3);
 
-			?>
-			<script type="text/javascript">
-			/* <![CDATA[ */
-			jQuery(document).ready( function($) {
-				if ($('#the-list').length) {
-				    $('td.column-name a[href="<?php echo str_replace('&amp;', '&', $link);?>"]').attr('href', '').closest('div.row-actions').find('span.edit,span.inline,span.trash').hide();
+			add_action(
+				'admin_print_footer_scripts',
+				function () use ($link) {
+    			?>
+        			<script type="text/javascript">
+        			/* <![CDATA[ */
+        			jQuery(document).ready( function($) {
+        				if ($('#the-list').length) {
+        				    $('td.column-name a[href="<?php echo str_replace('&amp;', '&', $link);?>"]').attr('href', '').closest('div.row-actions').find('span.edit,span.inline,span.trash').hide();
+        				}
+        			});
+        			/* ]]> */
+        			</script>
+    			<?php
 				}
-			});
-			/* ]]> */
-			</script>
-			<?php
+			);
 		}
 
 		return $link;
