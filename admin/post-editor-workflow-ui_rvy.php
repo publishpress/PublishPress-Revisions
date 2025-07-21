@@ -33,14 +33,14 @@ class PostEditorWorkflowUI {
             'currentPostAuthor' => get_post_field('post_author', $published_post_id),
             'onApprovalCaption' => esc_html__('(on approval)', 'revisionary'),
             'saveRevisionTooltip' =>  htmlEntities(
-                '<div class="rvy-save-revision-tip" style="display:none">' 
-                . '<span style="font-style:italic">' . __('Save changes to continue', 'revisionary') . '</span> '
-                . $revisionary->admin->tooltipText(
-                    '',
+                wp_get_admin_notice(
+                    $revisionary->admin->tooltipText(
+                        __('Save changes to continue.', 'revisionary'),
                     __('Please save changes to the revision before submitting it.', 'revisionary'),
-                    true
+                        false
+                    ),
+                    ['type' => 'info', 'additional_classes' => ['rvy-save-revision-tip']]
                 ) 
-                . '</div>'
             ),
             'canPublish' => $can_publish
         ];
