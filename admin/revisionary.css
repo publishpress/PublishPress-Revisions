@@ -507,6 +507,10 @@ color: black
   font-size: 14px;
 }
 
+.rvy-save-revision-tip [data-toggle="tooltip"] .tooltip-text {
+ width: 175px !important;
+ min-width: 175px !important;
+}
 @media only screen and (max-height: 768px) {
   div.pressshack-admin-wrapper h1 {
   padding-top: 0;

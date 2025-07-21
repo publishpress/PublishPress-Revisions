@@ -467,7 +467,7 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 		<td style="padding-right: 100px">
 		<h3 style="margin-top:0; margin-bottom:8px"><?php esc_html_e('Past Revisions', 'revisionary');?>
         <?php 
-		echo $this->tooltipText(
+		echo $revisionary->admin->tooltipText(
 			'',
 			__('Past Revisions are earlier versions of a post. They are listed in the Revision Archive.', 'revisionary'),
 			true
@@ -504,7 +504,7 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="0"/>
 				<label for="<?php echo esc_attr($id); ?>">
 					<?php if (!empty($locked_types[$key])):
-						echo $this->tooltipText(
+						echo $revisionary->admin->tooltipText(
 							'<input name="' . esc_attr($name) . '" type="checkbox" id="' . esc_attr($id) . '" value="0" disabled />',
 							esc_html__('This post type does not support Past Revisions.', 'revisionary')
 						);
@@ -546,7 +546,7 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 		<td>
 		<h3 style="margin-top:0; margin-bottom:8px"><?php esc_html_e('New Revisions', 'revisionary');?>
 		<?php 
-		echo $this->tooltipText(
+		echo $revisionary->admin->tooltipText(
 			'',
 			__('New Revisions are changes which are not yet published. They are listed in the Revision Queue.', 'revisionary'),
 			true
@@ -739,7 +739,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			$cap_caption = sprintf(__('%s capability', 'revisionary'), 'restore_revisions');
 
 			if (rvy_get_option('revision_restore_require_cap')) {
-				$link = $this->tooltipText(
+				$link = $revisionary->admin->tooltipText(
 					"<a href='$url'>" . $cap_caption . '</a>',
 					__('Assign capability to roles', 'revisionary')
 				);
@@ -842,7 +842,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		$cap_caption = __('Create Revision capabilities', 'revisionary');
 
 		if (rvy_get_option('copy_posts_capability')) {
-			$link = $this->tooltipText(
+			$link = $revisionary->admin->tooltipText(
 				"<a href='$url'>" . $cap_caption . '</a>',
 				__('Assign capabilities to roles', 'revisionary')
 			);
@@ -867,7 +867,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			$hint .= ' ' . sprintf(
 				__('To expand the Pages list, assign %s.', 'revisionary'),
 				
-				$this->tooltipText(
+				$revisionary->admin->tooltipText(
 					"<a href='$url'>" . __('Listing capabilities', 'revisionary') . '</a>',
 					__('Assign capabilities to roles', 'revisionary')
 				)
@@ -892,7 +892,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		$cap_caption = sprintf(__('%s capability', 'revisionary'), 'unfiltered_html');
 
 		if (rvy_get_option('revision_unfiltered_html_check')) {
-			$link = $this->tooltipText(
+			$link = $revisionary->admin->tooltipText(
 				"<a href='$url'>" . $cap_caption . '</a>',
 				__('Assign capability to roles', 'revisionary')
 			);
@@ -995,7 +995,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 				$cap_caption = __('Submit Revision capabilities', 'revisionary');
 
 				if (rvy_get_option('revise_posts_capability')) {
-					$link = $this->tooltipText(
+					$link = $revisionary->admin->tooltipText(
 						"<a href='$url'>" . $cap_caption . '</a>',
 						__('Assign capabilities to roles', 'revisionary')
 					);
@@ -1098,7 +1098,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 				$cap_caption = sprintf(__('%s capability', 'revisionary'), 'manage_unsubmitted_revisions');
 
 				if (rvy_get_option('manage_unsubmitted_capability')) {
-					$link = $this->tooltipText(
+					$link = $revisionary->admin->tooltipText(
 						"<a href='$url'>" . $cap_caption . '</a>',
 						__('Assign capability to roles', 'revisionary')
 					);
@@ -1124,7 +1124,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 				$cap_caption = sprintf(__('%s capability', 'revisionary'), 'edit_others_revisions');
 
 				if (rvy_get_option('revisor_lock_others_revisions')) {
-					$link = $this->tooltipText(
+					$link = $revisionary->admin->tooltipText(
 						"<a href='$url'>" . $cap_caption . '</a>',
 						__('Assign capability to roles', 'revisionary')
 					);
@@ -1152,7 +1152,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 				$cap_caption = sprintf(__('%s capability', 'revisionary'), 'list_others_revisions');
 
 				if (rvy_get_option('revisor_hide_others_revisions')) {
-					$link = $this->tooltipText(
+					$link = $revisionary->admin->tooltipText(
 						"<a href='$url'>" . $cap_caption . '</a>',
 						__('Assign capability to roles', 'revisionary')
 					);
@@ -1569,7 +1569,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			$cap_caption = sprintf(__('%s capability', 'revisionary'), 'edit_others_drafts');
 
 			if (rvy_get_option('require_edit_others_drafts')) {
-				$link = $this->tooltipText(
+				$link = $revisionary->admin->tooltipText(
 					"<a href='$url'>" . $cap_caption . '</a>',
 					__('Assign capability to roles', 'revisionary')
 				);

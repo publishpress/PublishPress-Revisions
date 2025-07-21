@@ -62,3 +62,8 @@ padding-left: 12px;
 div.rvy-author-selection {
 padding-bottom: 10px;
 }
+
+.rvy-creation-ui .rvy-save-revision-tip {
+margin-top: 5px;
+margin-left: 2px;
+}

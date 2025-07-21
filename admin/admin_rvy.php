@@ -202,6 +202,7 @@ class RevisionaryAdmin
 			|| (!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options', 'revisionary-q', 'revisionary-deletion', 'revisionary-archive']))  //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		) {
 			wp_enqueue_style('revisionary', RVY_URLPATH . '/admin/revisionary.css', [], PUBLISHPRESS_REVISIONS_VERSION);
+			wp_enqueue_style('revisionary-tooltip', RVY_URLPATH . '/common/css/_tooltip.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
 
 		if (in_array($pagenow, ['post.php', 'post-new.php']) 						
@@ -211,8 +212,6 @@ class RevisionaryAdmin
 		
 		if ((!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options']))) {		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			wp_enqueue_script('revisionary-settings', RVY_URLPATH . '/admin/settings.js', [], PUBLISHPRESS_REVISIONS_VERSION);
-
-			wp_enqueue_style('revisionary-tooltip', RVY_URLPATH . '/common/css/_tooltip.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
 		
 		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && ('admin.php' == $pagenow) && !empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options']) ) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -559,4 +558,25 @@ class RevisionaryAdmin
             <?php
         }
     }
+
+	function tooltipText($display_text, $tip_text, $use_icon = false) {
+		$icon = '';
+		
+		if ($use_icon) :
+			ob_start();
+		?>
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 50 50" style="margin-left: 3px; vertical-align: baseline;">
+				<path d="M 25 2 C 12.264481 2 2 12.264481 2 25 C 2 37.735519 12.264481 48 25 48 C 37.735519 48 48 37.735519 48 25 C 48 12.264481 37.735519 2 25 2 z M 25 4 C 36.664481 4 46 13.335519 46 25 C 46 36.664481 36.664481 46 25 46 C 13.335519 46 4 36.664481 4 25 C 4 13.335519 13.335519 4 25 4 z M 25 11 A 3 3 0 0 0 25 17 A 3 3 0 0 0 25 11 z M 21 21 L 21 23 L 23 23 L 23 36 L 21 36 L 21 38 L 29 38 L 29 36 L 27 36 L 27 21 L 21 21 z"></path>
+			</svg>
+		<?php 
+			$icon = ob_get_clean();
+		endif;
+		
+		return '<span data-toggle="tooltip" data-placement="top"><span class="tooltip-text"><span>' 
+		. $tip_text
+		. '</span><i></i></span>'
+		. $display_text
+		. $icon
+		. '</span>';
+	}
 } // end class RevisionaryAdmin
