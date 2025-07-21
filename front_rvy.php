@@ -533,7 +533,11 @@ class RevisionaryFront {
 
 			if (current_user_can('edit_post', $revision_id)) {
 				$edit_url = apply_filters('revisionary_preview_edit_url', rvy_admin_url("post.php?action=edit&amp;post=$revision_id"), $revision_id);
-				$edit_button = "<a href='$edit_url' class='rvy-preview-link rvy_has_empty_spacing'>" . esc_html__('Edit', 'revisionary') . '</a> &bull; ';
+				$edit_button = "<a href='$edit_url' class='rvy-preview-link rvy_has_empty_spacing'>" . esc_html__('Edit', 'revisionary') . '</a>';
+
+				if (empty($_REQUEST['mark_current_revision'])) {
+					$edit_button .= ' &bull; ';
+				}
 			} else {
 				$edit_button = '';
 			}
