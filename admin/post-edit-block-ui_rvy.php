@@ -100,6 +100,9 @@ class RVY_PostBlockEditUI {
             if (!empty($type_obj->cap->edit_others_posts) && current_user_can($type_obj->cap->edit_others_posts)) {
                 add_action('admin_print_footer_scripts', ['RVY_PostBlockEditUI', 'author_ui'], 20);
             }
+
+            $args['disableSubmitUntilSave'] = !defined('ET_BUILDER_PLUGIN_VERSION') && (false === stripos(get_template(), 'divi')) && !defined('REVISIONARY_EDITOR_NO_BUTTON_DISABLE');
+
         } elseif (current_user_can('edit_post', $post->ID)) {
             $status_obj = get_post_status_object($post->post_status);
 
