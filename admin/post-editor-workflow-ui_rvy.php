@@ -7,7 +7,7 @@ class PostEditorWorkflowUI {
         $args = array_merge( $defaults, $args );
         foreach( array_keys($defaults) as $var ) { $$var = $args[$var]; }
 
-        global $wp_version;
+        global $wp_version, $revisionary;
 
         if (empty($post)) {
             return [];
@@ -32,6 +32,16 @@ class PostEditorWorkflowUI {
             'ajaxurl' => rvy_admin_url(''),
             'currentPostAuthor' => get_post_field('post_author', $published_post_id),
             'onApprovalCaption' => esc_html__('(on approval)', 'revisionary'),
+            'saveRevisionTooltip' =>  htmlEntities(
+                '<div class="rvy-save-revision-tip" style="display:none">' 
+                . '<span style="font-style:italic">' . __('Save changes to continue', 'revisionary') . '</span> '
+                . $revisionary->admin->tooltipText(
+                    '',
+                    __('Please save changes to the revision before submitting it.', 'revisionary'),
+                    true
+                ) 
+                . '</div>'
+            ),
             'canPublish' => $can_publish
         ];
 
