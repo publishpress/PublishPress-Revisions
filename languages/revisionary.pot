@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-07-21T20:31:47+00:00\n"
+"POT-Creation-Date: 2025-07-21T21:22:22+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: revisionary\n"
@@ -367,7 +367,7 @@ msgstr ""
 #. translators: %s: post title
 #: admin/class-list-table-archive.php:877
 #: admin/class-list-table_rvy.php:1474
-#: admin/post-editor-workflow-ui_rvy.php:225
+#: admin/post-editor-workflow-ui_rvy.php:222
 msgid "Preview Revision"
 msgstr ""
 
@@ -586,9 +586,9 @@ msgstr ""
 
 #: admin/history_rvy.php:1130
 #: admin/options.php:172
-#: admin/post-editor-workflow-ui_rvy.php:80
-#: admin/post-editor-workflow-ui_rvy.php:121
-#: admin/post-editor-workflow-ui_rvy.php:225
+#: admin/post-editor-workflow-ui_rvy.php:77
+#: admin/post-editor-workflow-ui_rvy.php:118
+#: admin/post-editor-workflow-ui_rvy.php:222
 #: admin/RevisionEditSubmitMetabox.php:123
 msgid "Preview"
 msgstr ""
@@ -1342,57 +1342,61 @@ msgstr ""
 msgid "(on approval)"
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:36
+#: admin/post-editor-workflow-ui_rvy.php:38
+msgid "Save changes to continue."
+msgstr ""
+
+#: admin/post-editor-workflow-ui_rvy.php:39
 msgid "Please save changes to the revision before submitting it."
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:80
-#: admin/post-editor-workflow-ui_rvy.php:121
+#: admin/post-editor-workflow-ui_rvy.php:77
+#: admin/post-editor-workflow-ui_rvy.php:118
 msgid "Preview this Revision"
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:82
+#: admin/post-editor-workflow-ui_rvy.php:79
 msgid "View / Publish"
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:82
+#: admin/post-editor-workflow-ui_rvy.php:79
 msgid "View / Approve"
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:85
+#: admin/post-editor-workflow-ui_rvy.php:82
 msgid "View / Moderate saved revision"
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:88
+#: admin/post-editor-workflow-ui_rvy.php:85
 msgid "View / Submit saved revision"
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:97
+#: admin/post-editor-workflow-ui_rvy.php:94
 msgid "View unsaved changes"
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:101
+#: admin/post-editor-workflow-ui_rvy.php:98
 #, php-format
 msgid "%s%s Revision Edit"
 msgid_plural "%s%s Revision Edits"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/post-editor-workflow-ui_rvy.php:112
+#: admin/post-editor-workflow-ui_rvy.php:109
 msgid "Revision Submission Error"
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:126
-#: admin/post-editor-workflow-ui_rvy.php:226
+#: admin/post-editor-workflow-ui_rvy.php:123
+#: admin/post-editor-workflow-ui_rvy.php:223
 #: front_rvy.php:536
 msgid "Edit"
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:133
+#: admin/post-editor-workflow-ui_rvy.php:130
 msgid "Approving the Revision..."
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:166
+#: admin/post-editor-workflow-ui_rvy.php:163
 #: rvy_init-functions.php:275
 #: rvy_init-functions.php:293
 #: rvy_init-functions.php:311
@@ -1403,25 +1407,25 @@ msgstr ""
 msgid "Update Revision"
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:226
+#: admin/post-editor-workflow-ui_rvy.php:223
 msgid "Edit Revision"
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:232
+#: admin/post-editor-workflow-ui_rvy.php:229
 #, php-format
 msgid "Update post before creating %s."
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:239
+#: admin/post-editor-workflow-ui_rvy.php:236
 msgid "Error Creating Revision"
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:241
-#: admin/post-editor-workflow-ui_rvy.php:261
+#: admin/post-editor-workflow-ui_rvy.php:238
+#: admin/post-editor-workflow-ui_rvy.php:258
 msgid "Update"
 msgstr ""
 
-#: admin/post-editor-workflow-ui_rvy.php:255
+#: admin/post-editor-workflow-ui_rvy.php:252
 #, php-format
 msgid "For custom field changes, edit a scheduled %s."
 msgstr ""
