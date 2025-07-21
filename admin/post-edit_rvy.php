@@ -96,6 +96,8 @@ class RvyPostEdit {
             $utc_time = new DateTime("now", new DateTimeZone('UTC'));
             $args['timezoneOffset'] = 0 - $wp_timezone->getOffset($utc_time);
 
+            $args['disableSubmitUntilSave'] = !defined('ET_BUILDER_PLUGIN_VERSION') && (false === stripos(get_template(), 'divi')) && !defined('REVISIONARY_EDITOR_NO_BUTTON_DISABLE');
+
             wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
 
             if (defined('PUBLISHPRESS_VERSION')) {
