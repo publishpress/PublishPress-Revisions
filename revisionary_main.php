@@ -11,6 +11,7 @@ if (!empty($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_ur
  */
 class Revisionary
 {
+	var $admin;
 	var $content_roles;			// object ref - instance of RevisionaryContentRoles subclass, set by external plugin
 	var $doing_rest = false;
 	var $rest = '';				// object ref - Revisionary_REST
@@ -128,7 +129,7 @@ class Revisionary
 
 		if ( is_admin() ) {
 			require_once( dirname(__FILE__).'/admin/admin_rvy.php');
-			new RevisionaryAdmin();
+			$this->admin = new RevisionaryAdmin();
 		}
 		
 		add_action( 'wpmu_new_blog', array( $this, 'act_new_blog'), 10, 2 );
