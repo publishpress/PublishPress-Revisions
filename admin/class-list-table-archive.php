@@ -459,9 +459,9 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	 */
     public function get_columns() {
         $arr = array(
-            /*'cb'					=> '<input type="checkbox" />',*/
+            'cb'			=> '<input type="checkbox" />',
 			'post_title' 	=> __( 'Revision', 'revisionary' ),
-			'post_count' 	=> __( 'Count', 'revisionary' ),
+			/*'post_count' 	=> __( 'Count', 'revisionary' ),*/
 			'origin_post_type' 		=> __( 'Post Type', 'revisionary' ),
 			'post_author'	=> __( 'Revised By', 'revisionary' ),
 			'post_date' 	=> __( 'Revision Date', 'revisionary' ),
@@ -472,7 +472,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
         );
 
 		if (!rvy_get_option('revision_archive_deletion')) {
-			unset($arr['post_count']);
+			unset($arr['cb']);
 		}
 
 		if (!$this->show_approved_by_col) {
@@ -652,6 +652,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 						'post_author' => (int) $item->$column_name
 					]
 				);
+
 				break;
 
 			case 'publication_method':
