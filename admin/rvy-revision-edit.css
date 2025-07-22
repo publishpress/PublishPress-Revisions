@@ -74,6 +74,7 @@ margin-top: 10px;
 
 .rvy-creation-ui .rvy-save-revision-tip p {
 margin-top: 2px !important;
+margin-bottom: 2px !important;
 }
 
 .rvy-creation-ui .rvy-save-revision-tip [data-toggle="tooltip"] .tooltip-text {
