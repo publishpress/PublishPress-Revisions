@@ -31,7 +31,6 @@ a.editor-post-preview, a.editor-post-preview.components-button.is-large {
 margin-right: 5px;
 }
 
-
 #rvy_compare_button {
 margin: 0 10px 8px 10px;
 }
@@ -61,4 +60,29 @@ padding-left: 12px;
 
 div.rvy-author-selection {
 padding-bottom: 10px;
+}
+
+.rvy-creation-ui .rvy-save-revision-tip {
+margin-top: 0;
+margin-left: 2px;
+display: none;
+}
+
+#side-sortables .rvy-creation-ui .rvy-save-revision-tip {
+margin-top: 10px;
+}
+
+.rvy-creation-ui .rvy-save-revision-tip p {
+margin-top: 2px !important;
+margin-bottom: 2px !important;
+}
+
+.rvy-creation-ui .rvy-save-revision-tip [data-toggle="tooltip"] .tooltip-text {
+width: 175px !important;
+min-width: 175px !important;
+}
+
+#side-sortables .rvy-creation-ui .rvy-save-revision-tip p {
+margin-top: 1px !important;
+margin-bottom: 1px !important;
 }

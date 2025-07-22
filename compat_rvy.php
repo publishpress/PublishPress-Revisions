@@ -38,13 +38,14 @@ class PP_Revisions_Compat {
             function($caps, $cap, $user_id, $args) {
                 global $current_user;
 
-                $args = (array)$args;
-                $post_id = (isset($args[0]) && !is_object($args[0])) ? intval($args[0]) : 0;
+                if (in_array($cap, ['edit_post', 'edit_page'])) {
+                    $args = (array)$args;
+                    $post_id = (isset($args[0]) && !is_object($args[0])) ? intval($args[0]) : 0;
 
-                // @todo: where is edit_published cap requirement being applied?
-                if ($post_id && rvy_in_revision_workflow($post_id)) {
-                    $caps = array_diff($caps, ['edit_published_pages']);
-
+                    // @todo: where is edit_published cap requirement being applied?
+                    if ($post_id && rvy_in_revision_workflow($post_id)) {
+                        $caps = array_diff($caps, ['edit_published_pages']);
+                    }
                 }
 
                 return $caps;

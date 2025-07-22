@@ -507,6 +507,30 @@ color: black
   font-size: 14px;
 }
 
+#publishpress-revisions-settings-tabs .nav-tab span.pp-integrations {
+display: inline-block;
+vertical-align: top;
+box-sizing: border-box;
+margin: 1px 0 -1px 0;
+padding: 0 5px;
+min-width: 18px;
+height: 18px;
+border-radius: 9px;
+color: #fff;
+font-size: 11px;
+line-height: 1.6;
+text-align: center;
+z-index: 26;
+}
+
+#publishpress-revisions-settings-tabs .nav-tab span.pp-integrations-missing {
+background-color: #d63638;
+}
+
+#publishpress-revisions-settings-tabs .nav-tab span.pp-integrations-active {
+background-color: #3f971675;
+}
+
 @media only screen and (max-height: 768px) {
   div.pressshack-admin-wrapper h1 {
   padding-top: 0;

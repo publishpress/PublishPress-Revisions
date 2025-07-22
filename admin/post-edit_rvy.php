@@ -96,6 +96,8 @@ class RvyPostEdit {
             $utc_time = new DateTime("now", new DateTimeZone('UTC'));
             $args['timezoneOffset'] = 0 - $wp_timezone->getOffset($utc_time);
 
+            $args['disableSubmitUntilSave'] = !defined('ET_BUILDER_PLUGIN_VERSION') && (false === stripos(get_template(), 'divi')) && !defined('REVISIONARY_EDITOR_NO_BUTTON_DISABLE');
+
             wp_localize_script( 'rvy_object_edit', 'rvyObjEdit', $args );
 
             if (defined('PUBLISHPRESS_VERSION')) {
@@ -164,6 +166,13 @@ class RvyPostEdit {
     }
 
     function actPostSubmitboxActions($post) {
+        global $revisionary;
+
+        if ((rvy_in_revision_workflow($post) && empty($revisionary->enabled_post_types[$post->post_type]))
+        || (!rvy_in_revision_workflow($post) && empty($revisionary->enabled_post_types_archive[$post->post_type]))
+        ) {
+            return;
+        }
         ?>
         <div id="preview-action" class="rvy-misc-actions" style="float: right; padding: 5px 10px 10px 5px">
 

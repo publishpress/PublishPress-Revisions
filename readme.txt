@@ -7,7 +7,7 @@ Tags: revision, submit changes, duplicate post, approve changes, scheduled chang
 Requires at least: 5.5
 Requires PHP: 7.2.5
 Tested up to: 6.8
-Stable tag: 3.7.4
+Stable tag: 3.7.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -244,6 +244,13 @@ Divi is one of the most popular page-builders in WordPress, and it does integrat
 Fixed: Security issue. Please update.
 
 == Changelog ==
+
+= 3.7.5 - 21 Jul 2025 =
+* Fixed : Scheduled Revision publication failed under some configurations
+* Fixed : Revision Preview of Current Revision had an extra trailing bullet after Edit link
+* Fixed : Unnecessary database queries on Edit Tags screen
+* Change : Edit Revision - If revision submit / approve buttons are disabled, display explanatory tooltip
+* Change : Edit Revision - Don't disable submission buttons prior to post save if Divi plugin is active
 
 = 3.7.4 - 8 Jul 2025 =
 * Compat : WooCommerce - Edit links on Products screen (and other Woo post types) were hidden under some conditions

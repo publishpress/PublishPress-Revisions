@@ -6,6 +6,18 @@
 * Copyright 2025, PublishPress
 */
 jQuery(document).ready( function($) {
+    var rvySaveClicked = false;
+    
+    var RvyDisableSubmitButtons = function() {
+        if (rvyObjEdit.disableSubmitUntilSave) {
+            $('a.revision-approve, a.rvy-direct-approve').attr('disabled', 'disabled');
+
+            if (!rvySaveClicked) {
+                $('div.rvy-save-revision-tip').show();
+            }
+        }
+    }
+
 	var RvySubmissionUI = function() {
 		var refSelector = '.rvy-misc-actions';
 
@@ -85,6 +97,8 @@ jQuery(document).ready( function($) {
                 
                     + approveButtonHTML
 
+                    + rvyObjEdit.saveRevisionTooltip
+
                     + '<div class="revision-created-wrapper" style="display: none; margin: 8px 0 0 2px">'
                     + '<span class="revision-approve revision-created" style="color:green">'
                     + rvyObjEdit[rvyObjEdit.currentStatus + 'CompletedCaption'] + '</span> '
@@ -118,14 +132,14 @@ jQuery(document).ready( function($) {
         	$('#save-post').val(rvyObjEdit.updateCaption);
         }
 
-        $('a.revision-approve, a.rvy-direct-approve').attr('disabled', 'disabled');
+        RvyDisableSubmitButtons();
 
         setTimeout(function() {
            $('div.rvy-creation-ui').remove();
         }, 50);
 
         setTimeout(function() {
-            $('a.revision-approve, a.rvy-direct-approve').attr('disabled', 'disabled');
+            RvyDisableSubmitButtons();
          }, 500);
     });
 
@@ -138,14 +152,14 @@ jQuery(document).ready( function($) {
     }
     
     $(document).on('click', 'div.postbox-container', function() {
-		$('a.revision-approve, a.rvy-direct-approve').attr('disabled', 'disabled');
+		RvyDisableSubmitButtons();
 	});
 
     var rvyThumbnail = $('#set-post-thumbnail img').attr('src');
 
     setInterval(function() {
         if ($('#set-post-thumbnail img').attr('src') != rvyThumbnail) {
-            $('a.revision-approve, a.rvy-direct-approve').attr('disabled', 'disabled');
+            RvyDisableSubmitButtons();
         }
      }, 500);
 
@@ -239,6 +253,12 @@ jQuery(document).ready( function($) {
 
         if (!$('a.rvy-direct-approve').length) {
             $('a.revision-approve').show().removeAttr('disabled');
+            $('div.rvy-save-revision-tip').hide();
         }
+    });
+
+    $(document).on('click', '#save-post', function() {
+        rvySaveClicked = true;
+        $('div.rvy-save-revision-tip').hide();
     });
 });

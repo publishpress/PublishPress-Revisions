@@ -309,6 +309,7 @@ jQuery(document).ready(function ($) {
                         + '<span class="dashicons ' + mainDashicon + '"></span>'
                         + '<span class="rvy-caption">' + rvyObjEdit[rvyObjEdit.currentStatus + 'ActionCaption'] + '</span></button></a>'
                         + approveButtonHTML
+                        + rvyObjEdit.saveRevisionTooltip
                         + '<div class="revision-submitting" style="display: none;">'
                         + '<span class="revision-approve revision-submitting">'
                         + rvyObjEdit[rvyObjEdit.currentStatus + 'InProcessCaption'] + '</span><span class="spinner ppr-submission-spinner" style=""></span></div>'
@@ -373,23 +374,26 @@ jQuery(document).ready(function ($) {
         );
 	}
 
-    $(document).on('click', 'div.postbox-container,div.acf-postbox,.editor-post-schedule__dialog-toggle', function() {
-		rvyCreationDisabled = true;
-		$('button.revision-approve').prop('disabled', 'disabled');
-		$('button.revision-schedule').prop('disabled', 'disabled');
-		$('a.revision-approve').attr('title', rvyObjEdit.actionDisabledTitle);
-		$('a.revision-schedule').attr('title', rvyObjEdit.scheduleDisabledTitle);
-	});
+    if (rvyObjEdit.disableSubmitUntilSave) {
+        $(document).on('click', 'div.postbox-container,div.acf-postbox,.editor-post-schedule__dialog-toggle', function() {
+            rvyCreationDisabled = true;
+            $('button.revision-approve, button.revision-schedule').attr('disabled', 'disabled');
+            $('div.rvy-save-revision-tip').show();
+            $('a.revision-approve').attr('title', rvyObjEdit.actionDisabledTitle);
+            $('a.revision-schedule').attr('title', rvyObjEdit.scheduleDisabledTitle);
+        });
 
-    var intSaveWatch = setInterval(() => {
-		if (wp.data.select('core/editor').isSavingPost()) {
-			rvyCreationDisabled = false;
-            $('button.revision-approve').prop('disabled', false);
-            $('button.revision-schedule').prop('disabled', false);
-            $('a.revision-approve').attr('title', rvyObjEdit.actionTitle);
-            $('a.revision-schedule').attr('title', rvyObjEdit.scheduleTitle);
-		}
-	}, 5000);
+        var intSaveWatch = setInterval(() => {
+            if (wp.data.select('core/editor').isSavingPost()) {
+                rvyCreationDisabled = false;
+                $('button.revision-approve').prop('disabled', false);
+                $('button.revision-schedule').prop('disabled', false);
+                $('div.rvy-save-revision-tip').hide();
+                $('a.revision-approve').attr('title', rvyObjEdit.actionTitle);
+                $('a.revision-schedule').attr('title', rvyObjEdit.scheduleTitle);
+            }
+        }, 5000);
+    }
 
 	var rvyRedirectURL = '';
 
