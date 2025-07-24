@@ -1465,7 +1465,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 		remove_action( 'wp_insert_post', 'relevanssi_insert_edit', 99, 1 );
 	}
 
-	if (defined('async_scheduled_publish') && !rvy_get_option('scheduled_publish_cron') && !rvy_get_option('wp_cron_usage_detected')) {
+	if (rvy_get_option('async_scheduled_publish') && !rvy_get_option('scheduled_publish_cron') && !rvy_get_option('wp_cron_usage_detected')) {
 		rvy_confirm_async_execution( 'publish_scheduled_revisions' );
 	
 		// Prevent this function from being triggered simultaneously by another site request
