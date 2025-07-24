@@ -245,6 +245,9 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
+= 3.7.6 - 24 Jul 2025 =
+* Fixed : Scheduled Revisions publication failed if asynchronous setting enabled
+
 = 3.7.5 - 21 Jul 2025 =
 * Fixed : Scheduled Revision publication failed under some configurations
 * Fixed : Revision Preview of Current Revision had an extra trailing bullet after Edit link
