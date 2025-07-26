@@ -622,6 +622,8 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 	
 	clean_post_cache($revision_id);
 
+	delete_metadata('post', $post->ID, '_elementor_element_cache');
+
 	if (!empty($update_next_publish_date)) {
 		rvy_update_next_publish_date(['revision_id' => $revision_id]);
 	}
@@ -691,6 +693,8 @@ function rvy_revision_restore() {
 
 		clean_post_cache($revision->ID);
 		clean_post_cache($post->ID);
+
+		delete_metadata('post', $post->ID, '_elementor_element_cache');
 
 		rvy_format_content( $revision->post_content, $revision->post_content_filtered, $post->ID );
 
@@ -1111,6 +1115,8 @@ function rvy_apply_revision( $revision_id, $actual_revision_status = '' ) {
 
 	clean_post_cache($revision_id);
 	clean_post_cache($published->ID);
+
+	delete_metadata('post', $published->ID, '_elementor_element_cache');
 
 	if (!defined('REVISIONARY_DISABLE_SECONDARY_CACHE_FLUSH')) {
 		wp_cache_delete( $published->ID, 'posts' );
