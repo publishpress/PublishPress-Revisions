@@ -373,6 +373,12 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 
 		$published_url = get_permalink($post->ID);
 
+		$type_obj = get_post_type_object($post->post_type);
+
+		if ( empty( $_REQUEST['rvy_redirect'] ) && is_post_type_viewable($type_obj) ) {
+			$redirect = $published_url;
+		}
+
 		$db_action = false;
 		
 		// If requested publish date is in the past or now, publish the revision
