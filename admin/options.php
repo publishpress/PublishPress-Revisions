@@ -7,6 +7,8 @@ do_action('revisionary_load_options_ui');
 class RvyOptionUI {
 	private static $instance = null;
 
+	private const UPGRADE_PRO_URL = 'https://publishpress.com/revisions/';
+
 	private $sitewide;
 	private $customize_defaults;
 	var $form_options;
@@ -17,6 +19,9 @@ class RvyOptionUI {
 	private $all_otype_options;
 	private $def_otype_options;
 	private $display_hints = true;
+
+	var $defined_integrations = [];
+	var $available_integrations = [];
 
 	public static function instance($args = [])
     {
@@ -35,6 +40,8 @@ class RvyOptionUI {
 		$this->sitewide = $args['sitewide'];
 		$this->customize_defaults = $args['customize_defaults'];
 		$this->display_hints = rvy_get_option( 'display_hints' );
+		
+		$this->loadIntegrations();
     }
 
 	function tooltipText($display_text, $tip_text, $use_icon = false) {
@@ -146,6 +153,7 @@ $this->section_captions = array(
 		'working_copy'			=> esc_html__('New Revisions', 'revisionary'),
 		'preview'				=> esc_html__('Preview', 'revisionary'),
 		'revisions'				=> esc_html__('Options', 'revisionary'),
+		'integrations'			=> esc_html__('Integrations', 'revisionary'),
 	)
 );
 
@@ -233,6 +241,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'working_copy' =>		 ['copy_posts_capability', 'revisor_role_add_custom_rolecaps', 'revision_limit_per_post', 'revision_limit_compat_mode', 'revision_unfiltered_html_check', 'auto_submit_revisions', 'caption_copy_as_edit', 'permissions_compat_mode', 'pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date', 'scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'wp_cron_usage_detected', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'rev_publication_delete_ed_comments', 'revision_statuses_noun_labels', 'manage_unsubmitted_capability', 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions', 'deletion_queue', 'use_publishpress_notifications', 'planner_notifications_access_limited', 'pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer', 'compare_revisions_direct_approval'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'home_preview_set_home_flag'],
 	'revisions'		=>		 ['require_edit_others_drafts', 'diff_display_strip_tags', 'display_hints', 'delete_settings_on_uninstall'],
+	'integrations' =>		 [true],
 	'license' =>			 ['edd_key'],
 ]
 ]);
@@ -414,6 +423,10 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 			<a href="#ppr-tab-<?php echo esc_attr($section_name) ?>">
 				<?php echo esc_html($label) ?>
 			</a>
+
+			<?php if (('integrations' == $section_name) && !empty($this->available_integrations)) :?>
+				<span class="pp-integrations <?php echo (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) ? 'pp-integrations-active' : 'pp-integrations-missing';?> count-<?php echo intval(count($this->available_integrations));?>"><span class="plugin-count"><?php echo intval(count($this->available_integrations));?></span></span>
+			<?php endif;?>
 		</li>
 		<?php
 			if (empty($setActiveTab)) {
@@ -1624,8 +1637,113 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	</div></td></tr></table>
 	<?php endif; // any options accessable in this section
 
-?>
 
+	$section = 'integrations';			// --- INTEGRATIONS SECTION ---
+
+	/*if ( ! empty( $this->form_options[$tab][$section] ) ) :*/?>
+		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td><div class="rvy-opt-wrap">
+
+		<?php
+			do_action('revisionary_integrations_ui', $this);
+		?>
+
+		<?php if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')): ?>
+			<div class="pp-integrations-upgrade-cta">
+				<div class="pp-pro-banner">
+					<div>
+						<h2><?php esc_html_e('Unlock Premium Integrations', 'revisionary');?></h2>
+						<p><?php esc_html_e("Upgrade to the Pro version for optimal compatibility and prompt, professional support.", 'revisionary');?></p>
+					</div>
+					<div class="pp-pro-badge-banner">
+						<a href="<?php echo self::UPGRADE_PRO_URL; ?>" target="_blank" class="pp-upgrade-btn">
+							<?php esc_html_e('Upgrade to Pro Now', 'revisionary'); ?>
+						</a>
+					</div>
+				</div>
+			</div>
+		<?php endif; ?>
+
+		<div class="pp-integrations-container">
+			<!-- Category Filters -->
+			<div class="pp-category-labels">
+				<div class="pp-category-label active" data-category="all">
+					<?php esc_html_e('All', 'revisionary'); ?>
+				</div>
+				<div class="pp-category-label" data-category="builder">
+					<?php esc_html_e('Builders', 'revisionary'); ?>
+				</div>
+				<div class="pp-category-label" data-category="cache">
+					<?php esc_html_e('Cache', 'revisionary'); ?>
+				</div>
+				<div class="pp-category-label" data-category="ecommerce">
+					<?php esc_html_e('E-Commerce', 'revisionary'); ?>
+				</div>
+				<div class="pp-category-label" data-category="fields">
+					<?php esc_html_e('Fields', 'revisionary'); ?>
+				</div>
+				<div class="pp-category-label" data-category="multilingual">
+					<?php esc_html_e('Multilingual', 'revisionary'); ?>
+				</div>
+				<div class="pp-category-label" data-category="seo"><?php esc_html_e('SEO', 'revisionary'); ?>
+				</div>
+			</div>
+
+			<div class="pp-integrations-grid">
+				<?php
+					// Fallback to hardcoded integrations if registry not available
+					$this->renderIntegrations();
+?>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			jQuery(function ($) {
+				// Category filtering
+				$(".pp-category-label").on("click", function () {
+					$(".pp-category-label").removeClass("active");
+					$(this).addClass("active");
+					const category = $(this).data("category");
+					$(".pp-integration-card").each(function () {
+						const categories = ($(this).data("categories") || "all")
+							.toString()
+							.split(",");
+						if (category === "all" || categories.includes(category)) {
+							$(this).removeClass("pp-hidden");
+						} else {
+							$(this).addClass("pp-hidden");
+						}
+					});
+				});
+
+				// Disabled checkbox upgrade message
+				$('.pp-integration-card.pp-disabled input[type="checkbox"]').on(
+					"click",
+					function (e) {
+						e.preventDefault();
+						const card = $(this).closest(".pp-integration-card");
+						card
+							.find(".pp-upgrade-overlay")
+							.css("opacity", "1")
+							.delay(3000)
+							.animate({ opacity: "0" }, 500);
+						if (!card.find(".pp-temp-message").length) {
+							$(
+								'<div class="pp-temp-message" style="position:absolute;top:10px;right:10px;background:#ff5722;color:white;padding:5px 10px;border-radius:3px;font-size:12px;z-index:999;">Pro Feature</div>'
+							)
+								.appendTo(card)
+								.delay(2000)
+								.fadeOut(500, function () {
+									$(this).remove();
+								});
+						}
+					}
+				);
+			});
+		</script>
+
+		</div></td></tr></table>
+	<?php /*endif;*/ // any options accessable in this section
+	?>
 </div>
 
 </div>
@@ -1747,6 +1865,150 @@ do_action('revisionary_admin_footer');
 
 <?php
 } // end function
+
+
+private function loadIntegrations() {
+	// Fallback integrations when CompatibilityRegistry is not available
+	$this->defined_integrations = \PublishPress\Revisions::getDefinedIntegrations();
+	
+	$this->available_integrations = [];
+
+	foreach ($this->defined_integrations as $i => $integration) {
+		if ($this->defined_integrations[$i]['available']) {
+			$this->available_integrations[$integration['id']] = true;
+		}
+	}
+}
+
+private function renderCompatibilityPack($integration)
+{
+	$is_pro = defined('PUBLISHPRESS_REVISIONS_PRO_VERSION');
+	$is_enabled = $is_pro;
+
+	$is_disabled = !$is_pro || !$integration['available'];
+	$is_checked = true;
+	$card_class = $is_disabled ? 'pp-integration-card pp-disabled' : 'pp-integration-card';
+
+	if ($integration['available']) {
+		$card_class .= ' pp-available';
+	}
+
+	if ($integration['free']) {
+		$card_class .= ' pp-free';
+	}
+
+	$icon_class = 'pp-integration-icon ' . $integration['icon_class'];
+	$categories_string = implode(',', $integration['categories']);
+
+	// Determine category tag
+	$category_tag = '';
+	if (in_array('builder', $integration['categories'])) {
+		$category_tag = '<div class="pp-category-tag pp-tag-builder">' . esc_html__('Builder', 'revisionary') . '</div>';
+	} elseif (in_array('cache', $integration['categories'])) {
+		$category_tag = '<div class="pp-category-tag pp-tag-cache">' . esc_html__('Cache', 'revisionary') . '</div>';
+	} elseif (in_array('seo', $integration['categories'])) {
+		$category_tag = '<div class="pp-category-tag pp-tag-seo">' . esc_html__('SEO', 'revisionary') . '</div>';
+	} elseif (in_array('ecommerce', $integration['categories'])) {
+		$category_tag = '<div class="pp-category-tag pp-tag-ecommerce">' . esc_html__('E-Commerce', 'revisionary') . '</div>';
+	} elseif (in_array('fields', $integration['categories'])) {
+		$category_tag = '<div class="pp-category-tag pp-tag-fields">' . esc_html__('Fields', 'revisionary') . '</div>';
+	} elseif (in_array('multilingual', $integration['categories'])) {
+		$category_tag = '<div class="pp-category-tag pp-tag-multilingual">' . esc_html__('Multilingual', 'revisionary') . '</div>';
+	} elseif (in_array('community', $integration['categories'])) {
+		$category_tag = '<div class="pp-category-tag pp-tag-community">' . esc_html__('Community', 'revisionary') . '</div>';
+	}
+	?>
+	<div class="<?php echo esc_attr($card_class); ?>" data-categories="<?php echo esc_attr($categories_string); ?>">
+		<div>
+			<div class="pp-integration-icon <?php echo esc_attr($integration['icon_class']); ?>">
+			</div>
+
+			<?php echo $category_tag; ?>
+		</div>
+
+		<div class="pp-integration-content">
+			<h3 class="pp-integration-title">
+				<?php echo esc_html($integration['title']); ?>
+				
+				<?php if (!$is_pro && !$integration['free']): ?>
+					<span class="pp-pro-badge"><?php esc_html_e('Pro', 'revisionary');?></span>
+				<?php endif; ?>
+
+				<?php if (!$integration['available']): ?>
+					<span class="pp-pro-badge"
+						style="background: #9e9e9e;"><?php esc_html_e('Supported Plugin', 'revisionary'); ?></span>
+				<?php else: ?>
+					<span class="pp-pro-badge"
+						style="background: #4caf50;"><?php esc_html_e('Active Plugin', 'revisionary'); ?></span>
+				<?php endif; ?>
+			</h3>
+
+			<?php if (strlen($integration['description']) > 1):?>
+			<p class="pp-integration-description"><?php echo esc_html($integration['description']); ?></p>
+			<?php endif;?>
+
+			<div class="pp-integration-features">
+				<ul>
+					<?php if (!empty($integration['free'])) :?>
+						<li><?php esc_html_e('Supported by PublishPress Revisions', 'revisionary');?></li>
+					<?php else :?>
+						<li><?php esc_html_e('Supported by Revisions Pro', 'revisionary');?></li>
+					<?php endif;?>
+
+					<?php foreach ($integration['features'] as $feature): ?>
+						<li><?php echo esc_html($feature); ?></li>
+					<?php endforeach; ?>
+				</ul>
+			</div>
+
+			<?php if (!$integration['free'] && $integration['available']):?>
+				<div class="pp-settings-toggle">
+					<?php if ($is_pro && $is_enabled): ?>
+						<div class="pp-integration-status active"><?php esc_html_e('Integration Active', 'revisionary'); ?></div>
+					<?php else: ?>
+						<div class="pp-integration-status disabled"><?php esc_html_e('Integration Missing', 'revisionary'); ?></div>
+					<?php endif; ?>
+				</div>
+			<?php endif;?>
+		</div>
+
+		<?php if (!$is_pro && !$integration['free']): ?>
+			<div class="pp-upgrade-overlay">
+				<h4><?php esc_html_e('Premium Feature', 'revisionary'); ?></h4>
+				<p><?php echo esc_html(sprintf(__('Unlock %s integration to enhance your revisions solution.', 'revisionary'), $integration['title'])); ?>
+				</p>
+				<div class="pp-upgrade-buttons">
+					<?php if (!empty($integration['learn_more_url'])): ?>
+						<a href="<?php echo esc_url($integration['learn_more_url']); ?>" target="_blank" class="pp-upgrade-btn-secondary">
+							<?php esc_html_e('Learn More', 'revisionary'); ?>
+						</a>
+					<?php endif; ?>
+					<a href="<?php echo esc_url(self::UPGRADE_PRO_URL); ?>" target="_blank" class="pp-upgrade-btn-primary">
+						<?php esc_html_e('Upgrade Now', 'revisionary'); ?>
+					</a>
+				</div>
+			</div>
+		<?php endif; ?>
+	</div>
+	<?php
+}
+
+private function renderIntegrations()
+{
+	$int = array_merge(
+		wp_filter_object_list($this->defined_integrations, ['available' => true, 'free' => false]),
+		wp_filter_object_list($this->defined_integrations, ['available' => false, 'free' => false]),
+		wp_filter_object_list($this->defined_integrations, ['available' => true, 'free' => true]),
+		wp_filter_object_list($this->defined_integrations, ['available' => false, 'free' => true])
+	);
+
+	// Render each fallback integration
+	foreach ($int as $integration) {
+		$this->renderCompatibilityPack($integration);
+	}
+}
+
+
 } // end class RvyOptionUI
 
 
