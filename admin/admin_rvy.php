@@ -212,6 +212,7 @@ class RevisionaryAdmin
 		
 		if ((!empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options']))) {		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			wp_enqueue_script('revisionary-settings', RVY_URLPATH . '/admin/settings.js', [], PUBLISHPRESS_REVISIONS_VERSION);
+			wp_enqueue_style('revisionary-settings', RVY_URLPATH . '/admin/revisionary-settings.css', [], PUBLISHPRESS_REVISIONS_VERSION);
 		}
 		
 		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && ('admin.php' == $pagenow) && !empty($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-settings', 'rvy-net_options', 'rvy-default_options']) ) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended

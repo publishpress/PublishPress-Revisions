@@ -14,10 +14,8 @@ class CoreAdmin {
                 'link'    => 'https://publishpress.com/links/revisions-banner',
                 'screens' => [
                     ['base' => 'toplevel_page_revisionary-q'],
-                    ['base' => 'revisions_page_revisionary-settings'],
                     ['base' => 'revisions_page_revisionary-archive'],
                     ['base' => 'toplevel_page_revisionary-archive'],
-                    ['base' => 'toplevel_page_revisionary-settings'],
                 ]
             ];
 
@@ -56,15 +54,9 @@ class CoreAdmin {
             padding-top: 0;
         }
         
-        body.revisionary-settings .has-right-sidebar {
+        body.revisionary-settings {
             display: table;
-            width: 100%;
-        }
-
-        body.revisionary-settings .has-right-sidebar #post-body-content {
-            margin-right: 15px;
-            width: calc( 75% - 20px );
-            float: left;
+            width: 99%;
         }
 
         body.revisionary-settings input[name="rvy_defaults"] {
@@ -79,7 +71,7 @@ class CoreAdmin {
                 width: 99%;
             }
 
-            body.revisionary-settings .has-right-sidebar #post-body-content {
+            body.revisionary-settings #post-body-content {
                 width: 99%;
             }
 
