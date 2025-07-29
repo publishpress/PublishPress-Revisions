@@ -245,6 +245,11 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
+= 3.7.7 - 29 Jul 2025 =
+* Fixed : Elementor - Revision previews and appproved revisions did not display changes if Element Cache feature enabled
+* Fixed : Elementor - Redirected to Pages screen after revision approval
+* Change : Settings > Integration tab detailing active or available third party plugin compatibility
+
 = 3.7.6 - 24 Jul 2025 =
 * Fixed : Scheduled Revisions publication failed if asynchronous setting enabled
 
