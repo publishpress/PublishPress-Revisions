@@ -463,10 +463,6 @@ max-height: calc(80vh - 150px);
 */
 }
 
-#rvy-features > div > table > tbody > tr > td > div.rvy-opt-wrap > div {
-padding-top: 2px;
-}
-
 #rvy-features div.submit
 {
 padding-top:0;

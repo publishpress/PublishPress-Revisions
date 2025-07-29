@@ -297,7 +297,7 @@ else
 </header>
 
 <?php
-$div_class = apply_filters('publishpress_revisions_settings_sidebar_class', '');
+$div_class = '';
 ?>
 
 <div id="poststuff">
@@ -1730,8 +1730,6 @@ echo "javascript:if (confirm('"
 </p>
 
 </div>
-
-<?php do_action('publishpress_revisions_settings_sidebar');?>
 
 </div>
 
