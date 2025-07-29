@@ -30,7 +30,7 @@ class RvyOptionUI {
         }
 
         return self::$instance;
-    }
+	}
 
     private function __construct($args = [])
     {
@@ -40,7 +40,7 @@ class RvyOptionUI {
 		$this->sitewide = $args['sitewide'];
 		$this->customize_defaults = $args['customize_defaults'];
 		$this->display_hints = rvy_get_option( 'display_hints' );
-		
+
 		$this->loadIntegrations();
     }
 
@@ -1656,7 +1656,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 					</div>
 					<div class="pp-pro-badge-banner">
 						<a href="<?php echo self::UPGRADE_PRO_URL; ?>" target="_blank" class="pp-upgrade-btn">
-							<?php esc_html_e('Upgrade to Pro Now', 'revisionary'); ?>
+							<?php esc_html_e('Upgrade to Pro', 'revisionary'); ?>
 						</a>
 					</div>
 				</div>
@@ -1692,7 +1692,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 				<?php
 					// Fallback to hardcoded integrations if registry not available
 					$this->renderIntegrations();
-?>
+				?>
 			</div>
 		</div>
 
@@ -1936,7 +1936,7 @@ private function renderCompatibilityPack($integration)
 
 				<?php if (!$integration['available']): ?>
 					<span class="pp-pro-badge"
-						style="background: #9e9e9e;"><?php esc_html_e('Supported Plugin', 'revisionary'); ?></span>
+						style="background: #9e9e9e;"><?php esc_html_e('Supported', 'revisionary'); ?></span>
 				<?php else: ?>
 					<span class="pp-pro-badge"
 						style="background: #4caf50;"><?php esc_html_e('Active Plugin', 'revisionary'); ?></span>
@@ -1984,7 +1984,7 @@ private function renderCompatibilityPack($integration)
 						</a>
 					<?php endif; ?>
 					<a href="<?php echo esc_url(self::UPGRADE_PRO_URL); ?>" target="_blank" class="pp-upgrade-btn-primary">
-						<?php esc_html_e('Upgrade Now', 'revisionary'); ?>
+						<?php esc_html_e('Upgrade to Pro', 'revisionary'); ?>
 					</a>
 				</div>
 			</div>
