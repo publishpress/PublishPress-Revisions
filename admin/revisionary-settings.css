@@ -597,6 +597,7 @@ input:disabled + .pp-slider {
     .pp-integrations-upgrade-cta h3 {
         font-size: 20px;
     }
+}
 @media (max-width: 455px) {
   .pp-integrations-grid {
     grid-template-columns: 1fr;
