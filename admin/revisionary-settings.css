@@ -592,7 +592,7 @@ input:disabled + .pp-slider {
         margin-bottom: 10px !important;
     }
     .pp-integrations-upgrade-cta {
-        padding: 20px;
+        padding: 5px;
     }
     .pp-integrations-upgrade-cta h3 {
         font-size: 20px;
