@@ -65,7 +65,7 @@ class RvyOptionUI {
 			
 			echo ">";
 
-			echo "<label for='" . esc_attr($option_name) . "'><input name='" . esc_attr($option_name) . "' type='checkbox' id='" . esc_attr($option_name) . "' value='1' " . checked('1', $return['disabled'], false) . disabled('1', !empty($args['disabled']), false) . " autocomplete='off' " . " /> ";
+			echo "<label for='" . esc_attr($option_name) . "'><input name='" . esc_attr($option_name) . "' type='checkbox' id='" . esc_attr($option_name) . "' value='1' " . checked('1', $return['val'], false) . disabled('1', !empty($args['disabled']), false) . " autocomplete='off' " . " /> ";
 
 			if (!empty($args['no_escape'])) {
 				echo $this->option_captions[$option_name];	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
