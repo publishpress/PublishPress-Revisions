@@ -45,7 +45,7 @@ class RvyOptionUI {
     }
 
 	function option_checkbox( $option_name, $tab_name, $section_name, $hint_text, $unused_arg = '', $args = '') {
-		$return = array( 'in_scope' => false, 'val' => '', 'subcaption' => '', 'style' => '', 'hide' => false, 'no_escape' => false );
+		$return = array( 'in_scope' => false, 'val' => '', 'subcaption' => '', 'style' => '', 'hide' => false, 'no_escape' => false, 'disabled' => false );
 
 		if ( ! is_array($args) )
 			$args = array();
@@ -65,7 +65,7 @@ class RvyOptionUI {
 			
 			echo ">";
 
-			echo "<label for='" . esc_attr($option_name) . "'><input name='" . esc_attr($option_name) . "' type='checkbox' id='" . esc_attr($option_name) . "' value='1' " . checked('1', $return['val'], false) . " autocomplete='off' " . " /> ";
+			echo "<label for='" . esc_attr($option_name) . "'><input name='" . esc_attr($option_name) . "' type='checkbox' id='" . esc_attr($option_name) . "' value='1' " . checked('1', $return['disabled'], false) . disabled('1', !empty($args['disabled']), false) . " autocomplete='off' " . " /> ";
 
 			if (!empty($args['no_escape'])) {
 				echo $this->option_captions[$option_name];	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -170,7 +170,11 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'pending_revision_update_post_date' => 		esc_html__('Update Publish Date', 'revisionary'),
 	'scheduled_revision_update_modified_date' => esc_html__('Update Modified Date', 'revisionary'),
 	'pending_revision_update_modified_date' => 	esc_html__('Update Modified Date', 'revisionary'),
-	'use_publishpress_notifications' =>			sprintf(__('Use %1$sPlanner Notifications%2$s', 'revisionary'), "<strong><a href='$pp_notif_url'>", '</a></strong>'),
+
+	'use_publishpress_notifications' =>			(defined('PUBLISHPRESS_VERSION'))
+												? sprintf(__('Use %1$sPlanner Notifications%2$s', 'revisionary'), "<strong><a class='planner-notif-link' href='$pp_notif_url'>", '</a></strong>')
+												: sprintf(__('Use %1$sPlanner Notifications%2$s', 'revisionary'), '', ''),
+	
 	'pending_rev_notify_author' => 				sprintf(esc_html__('Email original Author when a %s is submitted', 'revisionary'), $pending_revision_basic),
 	'rev_approval_notify_author' => 			sprintf(esc_html__('Email the original Author when a %s is approved', 'revisionary'), $pending_revision_singular),
 	'rev_approval_notify_revisor' => 			sprintf(esc_html__('Email the Revisor when a %s is approved', 'revisionary'), $pending_revision_singular),
@@ -200,7 +204,6 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'num_revisions' =>							esc_html__('Maximum Revisions per post', 'revisionary'),
 	]
 );
-
 
 if ( defined('RVY_CONTENT_ROLES') ) {
 	$this->option_captions['pending_rev_notify_admin'] = 		sprintf(esc_html__('Email designated Publishers when a %s is submitted', 'revisionary'), $pending_revision_basic);
@@ -634,18 +637,21 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 	</div>
 
 	<?php
-		if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) :
+		if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION')) {
 			?>
-			<div id="statuses-pro-notice" class="activating rvy-plugin-notice" style="margin-top: 20px;">
-			<?php
-			printf(
-				esc_html__('For custom Revision statuses, install %sPublishPress Statuses Pro%s.', 'revisionary'),
-				'<a href="https://publishpress.com/statuses/" target="_blank">',
-				'</a>'
-			);
-			?>
+			<div class="pp-promo-upgrade-notice">
+				<p>
+					<?php esc_html_e('For custom Revision statuses, install PublishPress Statuses Pro.', 'revisionary');
+					?>
+				</p>
+				<p>
+					<a href="https://publishpress.com/statuses/" target="_blank">
+						<?php esc_html_e('Get Statuses Pro', 'revisionary');?>
+					</a>
+				</p>
 			</div>
-		<?php endif;
+			<?php
+		}
 
 		if (defined('PUBLISHPRESS_PRO_VERSION') && version_compare(PUBLISHPRESS_PRO_VERSION, '4.6.0-rc', '<')) :
 			?>
@@ -1191,19 +1197,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 
 		echo '<div class="notifications" style="display:none">';
 		
-		if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) :
-			?>
-			<div id="rvy-planner-notice" class="activating rvy-plugin-notice" style="margin-bottom: 20px">
-			<?php
-			printf(
-				esc_html__('For enhanced notifications, upgrade to %sPublishPress Revisions Pro%s.', 'revisionary'),
-				'<a href="https:/publishpress.com/revisions" target="_blank">',
-				'</a>'
-			);
-			?>
-			</div>
-		<?php
-		elseif (!defined('PUBLISHPRESS_VERSION')) :
+		if (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !defined('PUBLISHPRESS_VERSION')) :
 			?>
 			<div id="rvy-planner-notice" class="activating rvy-plugin-notice" style="margin-bottom: 20px">
 			<?php
@@ -1214,7 +1208,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			);
 			?>
 			</div>
-		<?php elseif (!version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=')) :
+		<?php elseif (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=')) :
 			?>
 			<div id="rvy-planner-notice" class="activating rvy-plugin-notice" style="margin-bottom: 20px">
 			<?php
@@ -1227,11 +1221,39 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			</div>
 		<?php endif;
 
-		if (defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=')) {
-			$hint = '';
-			$this->option_checkbox( 'use_publishpress_notifications', $tab, $section, $hint, '', ['no_escape' => true] );
-
+		if ((defined('PUBLISHPRESS_VERSION') && version_compare(PUBLISHPRESS_VERSION, '4.6-beta', '>=')) || !defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
+			echo '<br />';
+			
 			$pp_notifications = rvy_get_option('use_publishpress_notifications');
+
+			$chk_args = ['no_escape' => true];
+
+			if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !$pp_notifications) {
+				$chk_args['disabled'] = true;
+			}
+
+			$hint = __("Send revision action notifications using PublishPress Planner plugin's customizable Notifications system.", 'revisionary');
+			$this->option_checkbox( 'use_publishpress_notifications', $tab, $section, $hint, '', $chk_args);
+
+			if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
+				?>
+				<div class="pp-promo-upgrade-notice" style="le-ft: calc(50% - 145px);">
+					<p>
+						<?php if ($pp_notifications) {
+							esc_html_e('Planner Notifications have been switched on, but will not work until you upgrade to Revisions Pro.', 'revisionary');
+						} else {
+							esc_html_e('To unlock enhanced notifications for revision submission, approval, scheduling and other actions, upgrade to Revisions Pro.', 'revisionary');
+						}
+						?>
+					</p>
+					<p>
+						<a href="https://publishpress.com/links/revisions-banner" target="_blank">
+							<?php esc_html_e('Upgrade to Pro', 'revisionary');?>
+						</a>
+					</p>
+				</div>
+				<?php
+			}
 
 			if ($pp_notifications && defined('PRESSPERMIT_VERSION') && defined('RVY_CONTENT_ROLES')) {
 				echo '<br />';

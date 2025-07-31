@@ -6,6 +6,52 @@ body.revisionary-settings #side-info-column {
   display: none;
 }
 
+#ppr-tab-working_copy .planner-notif-link {
+  text-decoration: underline !important;
+}
+
+#rvy-features .pp-promo-upgrade-notice {
+  margin: 10px 0 20px 30px;
+  text-align: center;
+  background: #655897;
+  padding: 0 20px 20px 20px;
+  border-radius: 6px;
+  width: 400px;
+  box-sizing: border-box;
+  box-shadow: 0 0 25px #ccc;
+  color: white;
+}
+
+#ppr-tab-post_types .pp-promo-upgrade-notice {
+  width: 450px;
+}
+
+#rvy-features .pp-promo-upgrade-notice a {
+  font-size: 17px;
+  background: #FCB223;
+  color: #000;
+  font-weight: normal;
+  text-decoration: none;
+  padding: 9px 12px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  border: 1px solid #fca871;
+  break-inside: avoid;
+  white-space: nowrap;
+}
+
+#rvy-features .pp-promo-upgrade-notice a:hover {
+  color: #000;
+  background: #fcca46;
+}
+
+#rvy-features .pp-promo-upgrade-notice p {
+  display: inline-flex;
+  margin-top: 20px;
+}
+
 .pp-integrations-container {
   max-width: 100%;
   margin: 0;
