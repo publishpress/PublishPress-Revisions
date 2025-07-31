@@ -709,7 +709,7 @@ if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && ! empty( $this->form_option
 	</div>
 
 	<div class="pp-integration-card">
-	<div style="opacity:60%; border: 1px solid #ccc; border-radius: 8px">
+	<div style="border: 1px solid #ccc; border-radius: 8px">
 	<img src="<?php echo esc_url(plugins_url('', REVISIONARY_FILE) . '/admin/revision-statuses.png');?>" style="width: 100%" />
 	</div>
 
@@ -1570,7 +1570,7 @@ if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !empty( $this->form_option
 	</div>
 
 	<div class="pp-integration-card">
-	<div style="opacity:60%; border: 1px solid #ccc; border-radius: 8px">
+	<div style="border: 1px solid #ccc; border-radius: 8px">
 	<img src="<?php echo esc_url(plugins_url('', REVISIONARY_FILE) . '/admin/revision-notifications.png');?>" style="width: 100%" />
 	</div>
 
