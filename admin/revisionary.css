@@ -463,10 +463,6 @@ max-height: calc(80vh - 150px);
 */
 }
 
-#rvy-features > div > table > tbody > tr > td > div.rvy-opt-wrap > div {
-padding-top: 2px;
-}
-
 #rvy-features div.submit
 {
 padding-top:0;
@@ -528,7 +524,7 @@ background-color: #d63638;
 }
 
 #publishpress-revisions-settings-tabs .nav-tab span.pp-integrations-active {
-background-color: #3f971675;
+background-color: #3f9716;
 }
 
 @media only screen and (max-height: 768px) {
@@ -788,6 +784,10 @@ line-height: 2.1;
 #submitpost div.rvy-revision-approve a, #submitpost div.rvy-revision-approve a:link, #submitpost div.rvy-revision-approve a:visited {
 color: #070;
 font-weight: bold;
+}
+
+.pp-version-notice-bold-purple {
+margin-right: -20px
 }
 
 .pp-version-notice-bold-purple-button a, .pp-version-notice-bold-purple-button a:active, .pp-version-notice-bold-purple-button a:visited {

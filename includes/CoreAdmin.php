@@ -56,9 +56,14 @@ class CoreAdmin {
             padding-top: 0;
         }
         
-        body.revisionary-settings .has-right-sidebar {
+        body.revisionary-settings {
             display: table;
             width: 100%;
+        }
+
+        body.revisionary-settings .has-right-sidebar {
+            display: table;
+            width: 100% !important;
         }
 
         body.revisionary-settings .has-right-sidebar #post-body-content {
@@ -79,8 +84,8 @@ class CoreAdmin {
                 width: 99%;
             }
 
-            body.revisionary-settings .has-right-sidebar #post-body-content {
-                width: 99%;
+            body.revisionary-settings #post-body-content {
+                width: 99% !important;
             }
 
             body.revisionary-settings #side-info-column {
