@@ -115,7 +115,7 @@ class Revisions {
                 ],
                 'enabled' => false,
                 'available' => function_exists('acf'),
-                'learn_more_url' => 'https://publishpress.com/knowledge-base/acf-publishpress-revisions/',
+                'learn_more_url' => 'https://publishpress.com/knowledge-base/revisionary-acf/',
             ],
             [
                 'id' => 'acfe_compatibility',
@@ -129,7 +129,7 @@ class Revisions {
                 ],
                 'enabled' => false,
                 'available' => class_exists('ACFE'),
-                'learn_more_url' => 'https://publishpress.com/knowledge-base/acfe-publishpress-revisions/',
+                'learn_more_url' => '',
             ],
             [
                 'id' => 'beaver_compatibility',
@@ -144,7 +144,7 @@ class Revisions {
                 ],
                 'enabled' => false,
                 'available' => defined('FL_BUILDER_VERSION'),
-                'learn_more_url' => 'https://publishpress.com/knowledge-base/beaver-builder-publishpress-revisions/'
+                'learn_more_url' => 'https://publishpress.com/knowledge-base/revisionary-beaver-builder/'
             ],
             [
                 'id' => 'divi_compatibility',
@@ -159,7 +159,7 @@ class Revisions {
                 ],
                 'enabled' => false,
                 'available' => defined('ET_BUILDER_PLUGIN_VERSION') || (false !== stripos(get_template(), 'divi')),
-                'learn_more_url' => 'https://publishpress.com/knowledge-base/divi-publishpress-revisions/',
+                'learn_more_url' => 'https://publishpress.com/knowledge-base/divi-theme/',
             ],
             [
                 'id' => 'elementor_compatibility',
@@ -174,7 +174,7 @@ class Revisions {
                 ],
                 'enabled' => false,
                 'available' => defined('ELEMENTOR_VERSION'),
-                'learn_more_url' => 'https://publishpress.com/knowledge-base/elementor-publishpress-revisions/',
+                'learn_more_url' => 'https://publishpress.com/knowledge-base/publishpress-revisions-elementor/',
             ],
             [
                 'id' => 'nitropack_compatibility',
@@ -188,7 +188,7 @@ class Revisions {
                 ],
                 'enabled' => false,
                 'available' => defined('NITROPACK_VERSION'),
-                'learn_more_url' => 'https://publishpress.com/knowledge-base/nitropack-publishpress-revisions/'
+                'learn_more_url' => ''
             ],
             [
                 'id' => 'pods_compatibility',
@@ -203,7 +203,7 @@ class Revisions {
                 ],
                 'enabled' => false,
                 'available' => defined('PODS_VERSION'),
-                'learn_more_url' => 'https://publishpress.com/knowledge-base/pods-publishpress-revisions/'
+                'learn_more_url' => 'https://publishpress.com/knowledge-base/publishpress-revisions-pods/'
             ],
             [
                 'id' => 'polylang_compatibility',
@@ -217,21 +217,21 @@ class Revisions {
                 ],
                 'enabled' => false,
                 'available' => defined('POLYLANG_VERSION'),
-                'learn_more_url' => 'https://publishpress.com/knowledge-base/polylang-publishpress-revisions/'
+                'learn_more_url' => 'https://publishpress.com/knowledge-base/publishpress-revisions-polylang/'
             ],
             [
                 'id' => 'planner_compatibility',
                 'title' => esc_html__('PublishPress Planner', 'revisionary'),
                 'description' => esc_html__('PublishPress Planner Integration.', 'revisionary'),
                 'icon_class' => 'planner',
-                'categories' => ['all'],
+                'categories' => ['all', 'workflow'],
                 'features' => [
                     esc_html__('Planner Notifications for revision actions', 'revisionary'),
                     esc_html__('Revision schedule shown in Calendar', 'revisionary'),
                 ],
                 'enabled' => false,
                 'available' => defined('PUBLISHPRESS_VERSION'),
-                'learn_more_url' => 'https://publishpress.com/knowledge-base/planner-publishpress-revisions/'
+                'learn_more_url' => 'https://publishpress.com/knowledge-base/show-revisions-on-the-content-calendar/'
             ],
             [
                 'id' => 'woocommerce_compatibility',
@@ -246,7 +246,7 @@ class Revisions {
                 ],
                 'enabled' => false,
                 'available' => class_exists('WooCommerce'),
-                'learn_more_url' => 'https://publishpress.com/knowledge-base/woocommerce-publishpress-revisions/'
+                'learn_more_url' => 'https://publishpress.com/knowledge-base/revisions-woocommerce/'
             ],
             [
                 'id' => 'wpml_compatibility',
@@ -260,7 +260,7 @@ class Revisions {
                 ],
                 'enabled' => false,
                 'available' => defined('ICL_SITEPRESS_VERSION'),
-                'learn_more_url' => 'https://publishpress.com/knowledge-base/wpml-publishpress-revisions/'
+                'learn_more_url' => 'https://publishpress.com/knowledge-base/revisionary-wpml/'
             ],
             [
                 'id' => 'yoast_seo_compatibility',
@@ -275,7 +275,7 @@ class Revisions {
                 ],
                 'enabled' => false,
                 'available' => defined('WPSEO_VERSION'),
-                'learn_more_url' => 'https://publishpress.com/knowledge-base/yoast-seo-publishpress-revisions/'
+                'learn_more_url' => 'https://publishpress.com/knowledge-base/revisions-yoast-seo/'
             ],
 
             [
@@ -367,6 +367,71 @@ class Revisions {
                 'enabled' => false,
                 'available' => defined('AIOSEO_FILE'),
                 'learn_more_url' => '',
+                'free' => true
+            ],
+            [
+                'id' => 'capabilities',
+                'title' => esc_html__('PublishPress Capabilities', 'revisionary'),
+                'description' => esc_html__('.', 'revisionary'),
+                'icon_class' => 'capabilities',
+                'categories' => ['all', 'admin'],
+                'features' => [
+                ],
+                'enabled' => false,
+                'available' => defined('PUBLISHPRESS_CAPS_VERSION'),
+                'learn_more_url' => 'https://publishpress.com/capabilities/',
+                'free' => true
+            ],
+            [
+                'id' => 'authors',
+                'title' => esc_html__('PublishPress Authors', 'revisionary'),
+                'description' => esc_html__('.', 'revisionary'),
+                'icon_class' => 'authors',
+                'categories' => ['all', 'workflow'],
+                'features' => [
+                ],
+                'enabled' => false,
+                'available' => defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION'),
+                'learn_more_url' => 'https://publishpress.com/authors/',
+                'free' => true
+            ],
+            [
+                'id' => 'revisions',
+                'title' => esc_html__('PublishPress Revisions', 'revisionary'),
+                'description' => esc_html__('.', 'revisionary'),
+                'icon_class' => 'revisions',
+                'categories' => ['all', 'workflow'],
+                'features' => [
+                ],
+                'enabled' => false,
+                'available' => defined('PUBLISHPRESS_REVISONS_VERSION'),
+                'learn_more_url' => 'https://publishpress.com/revisions/',
+                'free' => true
+            ],
+            [
+                'id' => 'checklists',
+                'title' => esc_html__('PublishPress Checklists', 'revisionary'),
+                'description' => esc_html__('.', 'revisionary'),
+                'icon_class' => 'checklists',
+                'categories' => ['all', 'workflow'],
+                'features' => [
+                ],
+                'enabled' => false,
+                'available' => defined('PUBLISHPRESS_CHECKLISTS_VERSION'),
+                'learn_more_url' => 'https://publishpress.com/checklists/',
+                'free' => true
+            ],
+            [
+                'id' => 'taxopress',
+                'title' => esc_html__('Taxopress', 'revisionary'),
+                'description' => esc_html__('.', 'revisionary'),
+                'icon_class' => 'taxopress',
+                'categories' => ['all', 'admin'],
+                'features' => [
+                ],
+                'enabled' => false,
+                'available' => defined('STAGS_VERSION'),
+                'learn_more_url' => 'https://taxopress.com/',
                 'free' => true
             ],
         ];

@@ -1,3 +1,10 @@
+body.revisionary-settings #side-info-column {
+  padding-top: 44px;
+}
+
+.pp-revisions-pro-promo-right-sidebar .meta-box-sortables > :first-child {
+  display: none;
+}
 .pp-integrations-container {
   max-width: 100%;
   margin: 0;
@@ -310,7 +317,70 @@
   background-repeat: no-repeat;
   vertical-align: middle;
 }
+.pp-integration-icon.capabilities::before {
+  content: "";
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background-image: url("../common/img/capabilities.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+.pp-integration-icon.authors::before {
+  content: "";
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background-image: url("../common/img/authors.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+.pp-integration-icon.revisions::before {
+  content: "";
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background-image: url("../common/img/revisions.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+.pp-integration-icon.planner::before {
+  content: "";
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background-image: url("../common/img/planner.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+.pp-integration-icon.checklists::before {
+  content: "";
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background-image: url("../common/img/checklists.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+.pp-integration-icon.taxopress::before {
+  content: "";
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background-image: url("../common/img/taxopress.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
 
+.pp-integration-icon-wrap {
+  min-width: 100px;
+}
 .pp-integration-content {
   flex: 1;
 }
@@ -361,8 +431,20 @@
   background-color: #ffa726;
   color: white;
 }
-.pp-pro-badge {
-  background: #6950bd;
+.pp-tag-admin {
+  background-color: #858a8a;
+  color: white;
+}
+.pp-tag-events {
+  background-color: #674c0a;
+  color: white;
+}
+.pp-tag-workflow {
+  background-color: #68589b;
+  color: white;
+}
+
+.pp-badge {
   color: white;
   font-size: 11px;
   padding: 3px 6px;
@@ -371,6 +453,9 @@
   font-weight: 600;
   text-transform: uppercase;
   white-space: nowrap;
+}
+.pp-pro-badge {
+  background: #6950bd;
 }
 .pp-integration-description {
   color: #757575;
@@ -539,7 +624,7 @@ input:disabled + .pp-slider {
 .pp-integrations-upgrade-cta .pp-upgrade-btn {
   background: #FEB123;
   color: #000000 !important;
-  font-weight: 600;
+  font-weight: normal;
   text-decoration: none;
   padding: 8px 12px;
   -webkit-border-radius: 4px;

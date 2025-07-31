@@ -1669,8 +1669,11 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 				<div class="pp-category-label active" data-category="all">
 					<?php esc_html_e('All', 'revisionary'); ?>
 				</div>
+				<div class="pp-category-label" data-category="admin">
+					<?php esc_html_e('Admin', 'revisionary'); ?>
+				</div>
 				<div class="pp-category-label" data-category="builder">
-					<?php esc_html_e('Builders', 'revisionary'); ?>
+					<?php esc_html_e('Builder', 'revisionary'); ?>
 				</div>
 				<div class="pp-category-label" data-category="cache">
 					<?php esc_html_e('Cache', 'revisionary'); ?>
@@ -1683,6 +1686,12 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 				</div>
 				<div class="pp-category-label" data-category="multilingual">
 					<?php esc_html_e('Multilingual', 'revisionary'); ?>
+				</div>
+				<div class="pp-category-label" data-category="seo">
+					<?php esc_html_e('SEO', 'press-permit-core'); ?>
+				</div>
+				<div class="pp-category-label" data-category="workflow">
+					<?php esc_html_e('Workflow', 'revisionary'); ?>
 				</div>
 				<div class="pp-category-label" data-category="seo"><?php esc_html_e('SEO', 'revisionary'); ?>
 				</div>
@@ -1849,6 +1858,8 @@ echo "javascript:if (confirm('"
 
 </div>
 
+<?php do_action('publishpress_revisions_settings_sidebar');?>
+
 </div>
 
 </div>
@@ -1904,22 +1915,26 @@ private function renderCompatibilityPack($integration)
 	$category_tag = '';
 	if (in_array('builder', $integration['categories'])) {
 		$category_tag = '<div class="pp-category-tag pp-tag-builder">' . esc_html__('Builder', 'revisionary') . '</div>';
+	}  elseif (in_array('admin', $integration['categories'])) {
+		$category_tag = '<span class="pp-category-tag pp-tag-admin">' . esc_html__('Admin', 'press-permit-core') . '</span>';
 	} elseif (in_array('cache', $integration['categories'])) {
 		$category_tag = '<div class="pp-category-tag pp-tag-cache">' . esc_html__('Cache', 'revisionary') . '</div>';
 	} elseif (in_array('seo', $integration['categories'])) {
 		$category_tag = '<div class="pp-category-tag pp-tag-seo">' . esc_html__('SEO', 'revisionary') . '</div>';
 	} elseif (in_array('ecommerce', $integration['categories'])) {
-		$category_tag = '<div class="pp-category-tag pp-tag-ecommerce">' . esc_html__('E-Commerce', 'revisionary') . '</div>';
+		$category_tag = '<div class="pp-category-tag pp-tag-ecommerce">' . esc_html__('Commerce', 'revisionary') . '</div>';
 	} elseif (in_array('fields', $integration['categories'])) {
 		$category_tag = '<div class="pp-category-tag pp-tag-fields">' . esc_html__('Fields', 'revisionary') . '</div>';
 	} elseif (in_array('multilingual', $integration['categories'])) {
-		$category_tag = '<div class="pp-category-tag pp-tag-multilingual">' . esc_html__('Multilingual', 'revisionary') . '</div>';
+		$category_tag = '<div class="pp-category-tag pp-tag-multilingual">' . esc_html__('Multilang', 'revisionary') . '</div>';
 	} elseif (in_array('community', $integration['categories'])) {
 		$category_tag = '<div class="pp-category-tag pp-tag-community">' . esc_html__('Community', 'revisionary') . '</div>';
+	} elseif (in_array('workflow', $integration['categories'])) {
+		$category_tag = '<span class="pp-category-tag pp-tag-workflow">' . esc_html__('Workflow', 'press-permit-core') . '</span>';
 	}
 	?>
 	<div class="<?php echo esc_attr($card_class); ?>" data-categories="<?php echo esc_attr($categories_string); ?>">
-		<div>
+		<div class="pp-integration-icon-wrap">
 			<div class="pp-integration-icon <?php echo esc_attr($integration['icon_class']); ?>">
 			</div>
 
@@ -1931,14 +1946,14 @@ private function renderCompatibilityPack($integration)
 				<?php echo esc_html($integration['title']); ?>
 				
 				<?php if (!$is_pro && !$integration['free']): ?>
-					<span class="pp-pro-badge"><?php esc_html_e('Pro', 'revisionary');?></span>
+					<span class="pp-badge pp-pro-badge"><?php esc_html_e('Pro', 'revisionary');?></span>
 				<?php endif; ?>
 
 				<?php if (!$integration['available']): ?>
-					<span class="pp-pro-badge"
+					<span class="pp-badge"
 						style="background: #9e9e9e;"><?php esc_html_e('Supported', 'revisionary'); ?></span>
 				<?php else: ?>
-					<span class="pp-pro-badge"
+					<span class="pp-badge"
 						style="background: #4caf50;"><?php esc_html_e('Active Plugin', 'revisionary'); ?></span>
 				<?php endif; ?>
 			</h3>
@@ -1986,6 +2001,36 @@ private function renderCompatibilityPack($integration)
 					<a href="<?php echo esc_url(self::UPGRADE_PRO_URL); ?>" target="_blank" class="pp-upgrade-btn-primary">
 						<?php esc_html_e('Upgrade to Pro', 'revisionary'); ?>
 					</a>
+				</div>
+			</div>
+
+		<?php elseif ($is_pro && $integration['available'] && !empty($integration['learn_more_url'])): ?>
+			<div class="pp-upgrade-overlay">
+				<h4><?php $integration['free'] ? esc_html_e('Active Plugin', 'revisionary') : esc_html_e('Active Plugin Integration', 'revisionary'); ?></h4>
+				<div class="pp-upgrade-buttons">
+						<a href="<?php echo esc_url($integration['learn_more_url']); ?>" target="_blank" class="pp-upgrade-btn-secondary">
+							<?php esc_html_e('Learn More', 'revisionary'); ?>
+						</a>
+				</div>
+			</div>
+
+		<?php elseif (!$integration['free'] && !empty($integration['learn_more_url'])): ?>
+			<div class="pp-upgrade-overlay">
+				<h4><?php esc_html_e('Supported Plugin Integration', 'revisionary'); ?></h4>
+				<div class="pp-upgrade-buttons">
+						<a href="<?php echo esc_url($integration['learn_more_url']); ?>" target="_blank" class="pp-upgrade-btn-secondary">
+							<?php esc_html_e('Learn More', 'revisionary'); ?>
+						</a>
+				</div>
+			</div>
+
+		<?php elseif ($integration['free'] && !empty($integration['learn_more_url'])): ?>
+			<div class="pp-upgrade-overlay">
+				<h4><?php esc_html_e('Supported Plugin', 'revisionary'); ?></h4>
+				<div class="pp-upgrade-buttons">
+						<a href="<?php echo esc_url($integration['learn_more_url']); ?>" target="_blank" class="pp-upgrade-btn-secondary">
+							<?php esc_html_e('Learn More', 'revisionary'); ?>
+						</a>
 				</div>
 			</div>
 		<?php endif; ?>
