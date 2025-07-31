@@ -188,7 +188,7 @@ class Revisions {
                 ],
                 'enabled' => false,
                 'available' => defined('NITROPACK_VERSION'),
-                'learn_more_url' => 'https://publishpress.com/knowledge-base/nitropack-publishpress-revisions/'
+                'learn_more_url' => ''
             ],
             [
                 'id' => 'pods_compatibility',
@@ -367,6 +367,84 @@ class Revisions {
                 'enabled' => false,
                 'available' => defined('AIOSEO_FILE'),
                 'learn_more_url' => '',
+                'free' => true
+            ],
+            [
+                'id' => 'capabilities',
+                'title' => esc_html__('PublishPress Capabilities', 'revisionary'),
+                'description' => esc_html__('.', 'revisionary'),
+                'icon_class' => 'capabilities',
+                'categories' => ['all', 'admin'],
+                'features' => [
+                ],
+                'enabled' => false,
+                'available' => defined('PUBLISHPRESS_CAPS_VERSION'),
+                'learn_more_url' => 'https://publishpress.com/capabilities/',
+                'free' => true
+            ],
+            [
+                'id' => 'authors',
+                'title' => esc_html__('PublishPress Authors', 'revisionary'),
+                'description' => esc_html__('.', 'revisionary'),
+                'icon_class' => 'authors',
+                'categories' => ['all', 'workflow'],
+                'features' => [
+                ],
+                'enabled' => false,
+                'available' => defined('PUBLISHPRESS_MULTIPLE_AUTHORS_VERSION'),
+                'learn_more_url' => 'https://publishpress.com/authors/',
+                'free' => true
+            ],
+            [
+                'id' => 'revisions',
+                'title' => esc_html__('PublishPress Revisions', 'revisionary'),
+                'description' => esc_html__('.', 'revisionary'),
+                'icon_class' => 'revisions',
+                'categories' => ['all', 'workflow'],
+                'features' => [
+                ],
+                'enabled' => false,
+                'available' => defined('PUBLISHPRESS_REVISONS_VERSION'),
+                'learn_more_url' => 'https://publishpress.com/revisions/',
+                'free' => true
+            ],
+            [
+                'id' => 'planner',
+                'title' => esc_html__('PublishPress Planner', 'revisionary'),
+                'description' => esc_html__('.', 'revisionary'),
+                'icon_class' => 'planner',
+                'categories' => ['all', 'workflow'],
+                'features' => [
+                ],
+                'enabled' => false,
+                'available' => defined('PUBLISHPRESS_VERSION'),
+                'learn_more_url' => 'https://publishpress.com/planner/',
+                'free' => true
+            ],
+            [
+                'id' => 'checklists',
+                'title' => esc_html__('PublishPress Checklists', 'revisionary'),
+                'description' => esc_html__('.', 'revisionary'),
+                'icon_class' => 'checklists',
+                'categories' => ['all', 'workflow'],
+                'features' => [
+                ],
+                'enabled' => false,
+                'available' => defined('PUBLISHPRESS_CHECKLISTS_VERSION'),
+                'learn_more_url' => 'https://publishpress.com/checklists/',
+                'free' => true
+            ],
+            [
+                'id' => 'taxopress',
+                'title' => esc_html__('Taxopress', 'revisionary'),
+                'description' => esc_html__('.', 'revisionary'),
+                'icon_class' => 'taxopress',
+                'categories' => ['all', 'admin'],
+                'features' => [
+                ],
+                'enabled' => false,
+                'available' => defined('STAGS_VERSION'),
+                'learn_more_url' => 'https://taxopress.com/',
                 'free' => true
             ],
         ];
