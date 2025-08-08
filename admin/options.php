@@ -2056,8 +2056,8 @@ private function renderCompatibilityPack($integration)
 				<?php endif; ?>
 
 				<?php if (!$integration['available']): ?>
-					<span class="pp-badge"
-						style="background: #9e9e9e;"><?php esc_html_e('Supported', 'revisionary'); ?></span>
+					<!--<span class="pp-badge"
+						style="background: #9e9e9e;"><?php esc_html_e('Supported', 'revisionary'); ?></span>-->
 				<?php else: ?>
 					<span class="pp-badge"
 						style="background: #4caf50;"><?php esc_html_e('Active Plugin', 'revisionary'); ?></span>
@@ -2070,11 +2070,13 @@ private function renderCompatibilityPack($integration)
 
 			<div class="pp-integration-features">
 				<ul>
+					<!--
 					<?php if (!empty($integration['free'])) :?>
 						<li><?php esc_html_e('Supported by PublishPress Revisions', 'revisionary');?></li>
 					<?php else :?>
 						<li><?php esc_html_e('Supported by Revisions Pro', 'revisionary');?></li>
 					<?php endif;?>
+					-->
 
 					<?php foreach ($integration['features'] as $feature): ?>
 						<li><?php echo esc_html($feature); ?></li>
@@ -2148,9 +2150,9 @@ private function renderIntegrations()
 {
 	$int = array_merge(
 		wp_filter_object_list($this->defined_integrations, ['available' => true, 'free' => false]),
-		wp_filter_object_list($this->defined_integrations, ['available' => false, 'free' => false]),
-		wp_filter_object_list($this->defined_integrations, ['available' => true, 'free' => true]),
-		wp_filter_object_list($this->defined_integrations, ['available' => false, 'free' => true])
+		wp_filter_object_list($this->defined_integrations, ['available' => false, 'free' => false])
+		//wp_filter_object_list($this->defined_integrations, ['available' => true, 'free' => true]),
+		//wp_filter_object_list($this->defined_integrations, ['available' => false, 'free' => true])
 	);
 
 	// Render each fallback integration
