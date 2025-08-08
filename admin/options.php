@@ -128,12 +128,12 @@ $this->tab_captions = array( 'features' => esc_html__( 'Settings', 'revisionary'
 $this->section_captions = array(
 	'features' => array(
 		'post_types'			=> esc_html__('Features', 'revisionary'),
-		'statuses'				=> esc_html__('Statuses', 'revisionary'),
 		'archive'				=> esc_html__('Past Revisions', 'revisionary'),
 		'working_copy'			=> esc_html__('New Revisions', 'revisionary'),
-		'notifications'			=> esc_html__('Notifications', 'revisionary'),
-		'integrations'			=> esc_html__('Integrations', 'revisionary'),
 		'revisions'				=> esc_html__('Options', 'revisionary'),
+		'integrations'			=> esc_html__('Integrations', 'revisionary'),
+		'statuses'				=> esc_html__('Statuses', 'revisionary'),
+		'notifications'			=> esc_html__('Notifications', 'revisionary'),
 	)
 );
 
