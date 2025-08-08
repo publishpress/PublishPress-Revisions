@@ -245,6 +245,10 @@ Fixed: Security issue. Please update.
 
 == Changelog ==
 
+= 3.7.9 =
+* Compat : PublishPress Permissions - Permissions assigned directly to revisions were not applied (also requires Permissions 4.4.3)
+* Compat : PublishPress Permissions - Option for Post Permissions to be applied to revisions (also requires Permissions 4.4.3)
+
 = 3.7.8 - 31 Jul 2025 =
 * Change : Improvements to Settings > Integration tab contents
 * Change : Settings screen includes more descriptive contextual promo nudges for Pro plugin
