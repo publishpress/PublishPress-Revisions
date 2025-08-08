@@ -1249,6 +1249,8 @@ class Revisionary
 	private function filter_caps($wp_blogcaps, $reqd_caps, $args, $internal_args = array()) {
 		global $current_user;
 
+		static $additional_ids;
+
 		if (!empty($this->skip_filtering) || !rvy_get_option('pending_revisions')) {
 			return $wp_blogcaps;
 		}
@@ -1269,7 +1271,29 @@ class Revisionary
 			$object_type_obj = get_post_type_object($post->post_type);
 
 			if (('draft-revision' == $post->post_mime_type) && !rvy_is_post_author($post) && rvy_get_option('manage_unsubmitted_capability') && empty($wp_blogcaps['manage_unsubmitted_revisions'])) {
-				unset($wp_blogcaps[$object_type_obj->cap->edit_others_posts]);
+				if (defined('PRESSPERMIT_VERSION') && version_compare(PRESSPERMIT_VERSION, '4.4.3-beta2', '>=')) {
+					if (!isset($additional_ids)) {
+						$additional_ids = [];
+					}
+
+					if (!isset($additional_ids[$post->post_type])) {
+						$user = presspermit()->getUser();
+
+						if ($ids = $user->getExceptionPosts('edit', 'additional', $post->post_type, ['status' => true])) {
+							if (isset($ids[''])) {
+								$additional_ids[$post->post_type] = $ids[''];
+							}
+						}
+					}
+
+					if (isset($additional_ids[$post->post_type]) && in_array($post->ID, $additional_ids[$post->post_type])) {
+						$bypass_cap = true;
+					}
+				}
+				
+				if (empty($bypass_cap)) {
+					unset($wp_blogcaps[$object_type_obj->cap->edit_others_posts]);
+				}
 			} else {
 				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				if (defined('DOING_AJAX') && DOING_AJAX && !empty($_REQUEST['action']) && (false !== strpos(sanitize_key($_REQUEST['action']), 'query-attachments'))) {
