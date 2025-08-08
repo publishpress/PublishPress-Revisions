@@ -126,7 +126,7 @@ class Revisionary
 
 			add_filter( 'map_meta_cap', array( $this, 'flt_limit_others_drafts' ), 10, 4 );
 
-			if (defined('PRESSPERMIT_VERSION') && version_compare(PRESSPERMIT_VERSION, '4.4.3-beta2')) {
+			if (defined('PRESSPERMIT_VERSION') && version_compare(PRESSPERMIT_VERSION, '4.4.3-beta2', '>=')) {
 				add_filter(
 					'presspermit_exception_clause', 
 					function($clause, $required_operation, $post_type, $args) {
@@ -1185,7 +1185,7 @@ class Revisionary
 							if (!empty($current_user->allcaps['edit_others_revisions'])) {
 								$caps[] = 'edit_others_revisions';
 							} else {
-								if (defined('PRESSPERMIT_VERSION') && version_compare(PRESSPERMIT_VERSION, '4.4.3-beta2')) {
+								if (defined('PRESSPERMIT_VERSION') && version_compare(PRESSPERMIT_VERSION, '4.4.3-beta2', '>=')) {
 									if (!isset($additional_ids)) {
 										$additional_ids = [];
 									}
@@ -1200,7 +1200,7 @@ class Revisionary
 										}
 									}
 
-									if (isset($additional_ids[$post->post_type]) && in_array($post_id, $additional_ids[$post->post_type])) {
+									if (isset($additional_ids[$post->post_type]) && in_array($post->ID, $additional_ids[$post->post_type])) {
 										$bypass_edit_others_cap = true;
 									}
 								}
