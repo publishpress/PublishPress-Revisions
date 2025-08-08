@@ -2060,7 +2060,7 @@ private function renderCompatibilityPack($integration)
 						style="background: #9e9e9e;"><?php esc_html_e('Supported', 'revisionary'); ?></span>-->
 				<?php else: ?>
 					<span class="pp-badge"
-						style="background: #4caf50;"><?php esc_html_e('Active Plugin', 'revisionary'); ?></span>
+						style="background: #5e92c4;"><?php esc_html_e('Active Plugin', 'revisionary'); ?></span>
 				<?php endif; ?>
 			</h3>
 
