@@ -715,7 +715,7 @@ if (!defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && ! empty( $this->form_option
 	</div>
 
 	<div class="pp-upgrade-overlay">
-		<h4><?php esc_html_e('Premium Plugin', 'revisionary'); ?></h4>
+		<h4><?php esc_html_e('Pro Plugin', 'revisionary'); ?></h4>
 		<p><?php esc_html_e('Install Statuses Pro to unlock custom revision statuses.', 'revisionary');?></p>
 		<p><?php esc_html_e('Configure for any post type and role to match your editing workflow.', 'revisionary');?></p>
 		<div class="pp-upgrade-buttons">
@@ -1576,7 +1576,7 @@ if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !empty( $this->form_option
 	</div>
 
 	<div class="pp-upgrade-overlay">
-		<h4><?php esc_html_e('Premium Feature', 'revisionary'); ?></h4>
+		<h4><?php esc_html_e('Pro Feature', 'revisionary'); ?></h4>
 		<p><?php esc_html_e('Upgrade to Revisions Pro to unlock Planner Notifications integration.', 'revisionary');?></p>
 		<p><?php esc_html_e('Customize notification content and recipients for each notification type.', 'revisionary');?></p>
 		<div class="pp-upgrade-buttons">
@@ -1757,7 +1757,7 @@ if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !empty( $this->form_option
 			<div class="pp-integrations-upgrade-cta">
 				<div class="pp-pro-banner">
 					<div>
-						<h2><?php esc_html_e('Unlock Premium Integrations', 'revisionary');?></h2>
+						<h2><?php esc_html_e('Unlock Pro Integrations', 'revisionary');?></h2>
 						<p><?php esc_html_e("Upgrade to the Pro version for optimal compatibility and prompt, professional support.", 'revisionary');?></p>
 					</div>
 					<div class="pp-pro-badge-banner">
@@ -2095,7 +2095,7 @@ private function renderCompatibilityPack($integration)
 
 		<?php if (!$is_pro && !$integration['free']): ?>
 			<div class="pp-upgrade-overlay">
-				<h4><?php esc_html_e('Premium Feature', 'revisionary'); ?></h4>
+				<h4><?php esc_html_e('Pro Feature', 'revisionary'); ?></h4>
 				<p><?php echo esc_html(sprintf(__('Unlock %s integration to enhance your revisions solution.', 'revisionary'), $integration['title'])); ?>
 				</p>
 				<div class="pp-upgrade-buttons">
