@@ -125,6 +125,55 @@ class Revisionary
 			add_filter( 'user_has_cap', array( $this, 'flt_user_has_cap' ), 98, 3 );
 
 			add_filter( 'map_meta_cap', array( $this, 'flt_limit_others_drafts' ), 10, 4 );
+
+			if (defined('PRESSPERMIT_VERSION') && version_compare(PRESSPERMIT_VERSION, '4.4.3-beta2')) {
+				add_filter(
+					'presspermit_exception_clause', 
+					function($clause, $required_operation, $post_type, $args) {
+						global $pagenow;
+
+						//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+						if (
+							('exclude' == $args['mod'])
+							&& rvy_get_option('apply_post_exceptions')
+							&& (
+								(($pagenow == 'admin.php') && isset($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-q', 'revisionary-archive']))
+								|| (in_array($pagenow, ['post.php', 'post-new.php']) && rvy_in_revision_workflow(rvy_detect_post_id()))
+							)
+						) {
+							$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+
+							$clause .= " AND ({$args['src_table']}.comment_count {$args['logic']} ('" . implode("','", $args['ids']) . "') OR {$args['src_table']}.post_mime_type NOT IN ($revision_status_csv))";
+						}
+
+						return $clause;
+					},
+					10, 4
+				);
+
+				add_filter(
+					'presspermit_additions_clause', 
+					function($clause, $required_operation, $post_type, $args) {
+						global $pagenow;
+
+						//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+						if (
+							rvy_get_option('apply_post_exceptions')
+							&& (
+								(($pagenow == 'admin.php') && isset($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-q', 'revisionary-archive']))
+								|| (in_array($pagenow, ['post.php', 'post-new.php']) && rvy_in_revision_workflow(rvy_detect_post_id()))
+							)
+						) {
+							$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+
+							$clause = " (($clause) OR ({$args['src_table']}.comment_count IN ('" . implode("','", $args['ids']) . "') AND {$args['src_table']}.post_mime_type IN ($revision_status_csv)))";
+						}
+
+						return $clause;
+					},
+					10, 4
+				);
+			}
 		}
 
 		if ( is_admin() ) {
