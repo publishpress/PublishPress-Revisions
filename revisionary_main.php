@@ -1035,6 +1035,7 @@ class Revisionary
 		global $current_user;
 
 		static $busy;
+        static $additional_ids;
 
 		if (!empty($busy) || !empty($this->skip_filtering)) {
 			return $caps;
@@ -1135,7 +1136,29 @@ class Revisionary
 							if (!empty($current_user->allcaps['edit_others_revisions'])) {
 								$caps[] = 'edit_others_revisions';
 							} else {
-								$caps []= 'do_not_allow';	// @todo: implement this within user_has_cap filters?
+								if (defined('PRESSPERMIT_VERSION') && version_compare(PRESSPERMIT_VERSION, '4.4.3-beta2')) {
+									if (!isset($additional_ids)) {
+										$additional_ids = [];
+									}
+
+									if (!isset($additional_ids[$post->post_type])) {
+										$user = presspermit()->getUser();
+
+										if ($ids = $user->getExceptionPosts('edit', 'additional', $post->post_type, ['status' => true])) {
+											if (isset($ids[''])) {
+												$additional_ids[$post->post_type] = $ids[''];
+											}
+										}
+									}
+
+									if (isset($additional_ids[$post->post_type]) && in_array($post_id, $additional_ids[$post->post_type])) {
+										$bypass_edit_others_cap = true;
+									}
+								}
+
+								if (empty($bypass_edit_others_cap)) {
+									$caps []= 'do_not_allow';	// @todo: implement this within user_has_cap filters?
+								}
 							}
 						}
 					}
