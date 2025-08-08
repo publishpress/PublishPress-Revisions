@@ -599,6 +599,34 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			}
 		}
 
+		if (defined('PRESSPERMIT_VERSION') && version_compare(PRESSPERMIT_VERSION, '4.4.3-beta2', '>=')
+		&& !is_content_administrator_rvy() && class_exists('PublishPress\Permissions\DB\Permissions')
+		) {
+			$defaults = [
+				'has_cap_check' => false,   // TRUE: this function call is to determine per-post editing / deletion capability;  FALSE: just determining which posts to list
+				'post_types' => [],
+				'source_alias' => (!empty($args['alias'])) ? sanitize_text_field($args['alias']) : '',
+				'src_table' => '',
+				'apply_term_restrictions' => true,
+				'include_trash' => 0,
+				'required_operation' => 'edit',
+				'limit_statuses' => false,
+				'skip_teaser' => false,
+				'query_contexts' => [],
+				'force_types' => false,
+				'limit_post_types' => false,
+				'join' => '',
+				'append_post_type_clause' => false,
+			];
+
+			$args = array_merge($defaults, (array)$args);
+
+
+			foreach(array_keys($revisionary->enabled_post_types) as $_post_type) {
+				$where = \PublishPress\Permissions\DB\Permissions::addExceptionClauses($where, 'edit', $_post_type, $args);
+			}
+		}
+
 		return $where;
 	}
 

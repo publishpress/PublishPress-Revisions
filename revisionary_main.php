@@ -125,6 +125,55 @@ class Revisionary
 			add_filter( 'user_has_cap', array( $this, 'flt_user_has_cap' ), 98, 3 );
 
 			add_filter( 'map_meta_cap', array( $this, 'flt_limit_others_drafts' ), 10, 4 );
+
+			if (defined('PRESSPERMIT_VERSION') && version_compare(PRESSPERMIT_VERSION, '4.4.3-beta2')) {
+				add_filter(
+					'presspermit_exception_clause', 
+					function($clause, $required_operation, $post_type, $args) {
+						global $pagenow;
+
+						//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+						if (
+							('exclude' == $args['mod'])
+							&& rvy_get_option('apply_post_exceptions')
+							&& (
+								(($pagenow == 'admin.php') && isset($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-q', 'revisionary-archive']))
+								|| (in_array($pagenow, ['post.php', 'post-new.php']) && rvy_in_revision_workflow(rvy_detect_post_id()))
+							)
+						) {
+							$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+
+							$clause .= " AND ({$args['src_table']}.comment_count {$args['logic']} ('" . implode("','", $args['ids']) . "') OR {$args['src_table']}.post_mime_type NOT IN ($revision_status_csv))";
+						}
+
+						return $clause;
+					},
+					10, 4
+				);
+
+				add_filter(
+					'presspermit_additions_clause', 
+					function($clause, $required_operation, $post_type, $args) {
+						global $pagenow;
+
+						//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+						if (
+							rvy_get_option('apply_post_exceptions')
+							&& (
+								(($pagenow == 'admin.php') && isset($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-q', 'revisionary-archive']))
+								|| (in_array($pagenow, ['post.php', 'post-new.php']) && rvy_in_revision_workflow(rvy_detect_post_id()))
+							)
+						) {
+							$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
+
+							$clause = " (($clause) OR ({$args['src_table']}.comment_count IN ('" . implode("','", $args['ids']) . "') AND {$args['src_table']}.post_mime_type IN ($revision_status_csv)))";
+						}
+
+						return $clause;
+					},
+					10, 4
+				);
+			}
 		}
 
 		if ( is_admin() ) {
@@ -1035,6 +1084,7 @@ class Revisionary
 		global $current_user;
 
 		static $busy;
+        static $additional_ids;
 
 		if (!empty($busy) || !empty($this->skip_filtering)) {
 			return $caps;
@@ -1135,7 +1185,29 @@ class Revisionary
 							if (!empty($current_user->allcaps['edit_others_revisions'])) {
 								$caps[] = 'edit_others_revisions';
 							} else {
-								$caps []= 'do_not_allow';	// @todo: implement this within user_has_cap filters?
+								if (defined('PRESSPERMIT_VERSION') && version_compare(PRESSPERMIT_VERSION, '4.4.3-beta2')) {
+									if (!isset($additional_ids)) {
+										$additional_ids = [];
+									}
+
+									if (!isset($additional_ids[$post->post_type])) {
+										$user = presspermit()->getUser();
+
+										if ($ids = $user->getExceptionPosts('edit', 'additional', $post->post_type, ['status' => true])) {
+											if (isset($ids[''])) {
+												$additional_ids[$post->post_type] = $ids[''];
+											}
+										}
+									}
+
+									if (isset($additional_ids[$post->post_type]) && in_array($post_id, $additional_ids[$post->post_type])) {
+										$bypass_edit_others_cap = true;
+									}
+								}
+
+								if (empty($bypass_edit_others_cap)) {
+									$caps []= 'do_not_allow';	// @todo: implement this within user_has_cap filters?
+								}
 							}
 						}
 					}

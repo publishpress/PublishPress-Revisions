@@ -85,7 +85,7 @@ class CoreAdmin {
             }
 
             body.revisionary-settings #post-body-content {
-                width: 99%;
+                width: 99% !important;
             }
 
             body.revisionary-settings #side-info-column {
