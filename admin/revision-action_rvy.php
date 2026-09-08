@@ -417,7 +417,7 @@ function rvy_revision_approve($revision_id = 0, $args = []) {
 
 		$db_action = false;
 		
-		// If requested publish date is in the past or now, publish the revision
+	// If requested publish date is in the past or within the scheduling limit, publish the revision
 		if ( strtotime( $revision->post_date_gmt ) <= agp_time_gmt() + 120 ) {
 			$status_obj = get_post_status_object( $revision->post_mime_type );
 
