@@ -273,9 +273,8 @@
 	}
 
 	function plainTextFromRaw(rawBlock) {
-		const html = rawBlock && rawBlock.innerHTML ? rawBlock.innerHTML : '';
 		const node = document.createElement('div');
-		node.innerHTML = html;
+		node.innerHTML = rawBlock && rawBlock.innerHTML ? rawBlock.innerHTML : '';
 		return node.textContent || '';
 	}
 
