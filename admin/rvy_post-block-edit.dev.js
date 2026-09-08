@@ -244,8 +244,8 @@ jQuery(document).ready( function($) {
 			$('div.revision-creating').hide();
 			$('div.revision-scheduled').show();
 
-			$('button.revision-scheduled a.revision-preview').attr('href', rvyObjEdit.scheduledURL);
-			$('button.revision-scheduled a.revision-edit').attr('href', rvyObjEdit.scheduledEditURL);
+			$('div.revision-scheduled a.revision-preview').attr('href', rvyObjEdit.scheduledURL);
+			$('div.revision-scheduled a.revision-edit').attr('href', rvyObjEdit.scheduledEditURL);
 
 			wp.data.dispatch('core/editor').editPost({date: wp.data.select('core/editor').getCurrentPostAttribute('date')});
 		}
