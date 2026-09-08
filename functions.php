@@ -758,14 +758,7 @@ function pp_revisions_plugin_activation() {
     // force this timestamp to be regenerated, in case something went wrong before
     delete_option( 'rvy_next_rev_publish_gmt' );
 
-    if (!class_exists('RevisionaryActivation')) {
-        require_once(dirname(__FILE__).'/activation_rvy.php');
-    }
-
     require_once(dirname(__FILE__).'/functions.php');
-
-    // import from Revisionary 1.x
-    new RevisionaryActivation(['import_legacy' => true]);
 
     if (!defined('REVISIONARY_DISABLE_ACTIVATION_TRASH_QUERY')) {
         $revision_status_csv = implode("','", array_map('sanitize_key', pp_revisions_get_revision_statuses()));
