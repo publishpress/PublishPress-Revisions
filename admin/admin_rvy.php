@@ -159,25 +159,6 @@ class RevisionaryAdmin
 
 		add_action('init', function() { // late execution avoids clash with autoloaders in other plugins
 			global $pagenow;
-		
-			if (
-			($pagenow == 'admin.php') && isset($_GET['page']) 												//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			&& in_array($_GET['page'], ['revisionary-q', 'revisionary-deletion', 'revisionary-settings'])	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			) {
-				global $wp_version;
-
-				if (defined('DISABLE_WP_CRON') && DISABLE_WP_CRON && rvy_get_option('scheduled_revisions') 
-				&& rvy_get_option('scheduled_publish_cron') && !rvy_get_option('wp_cron_usage_detected') && apply_filters('revisionary_wp_cron_disabled', true)
-				) {
-					rvy_notice(
-						sprintf(
-							__('Scheduled Revisions are unavailable because WP-Cron is disabled. If you are triggering WP-Cron externally, see %sRevisions > Settings > New Revisions > Scheduling%s.', 'revisionary'),
-							'<a href="' . admin_url("admin.php?page=revisionary-settings&ppr_tab=working_copy&ppr_subtab=revision-scheduling") . '">',
-							'</a>'
-						)
-					);
-				}
-			}
 
 			if ((
 			($pagenow == 'admin.php') 

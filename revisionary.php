@@ -148,6 +148,12 @@ if (! defined('REVISIONS_INTERNAL_VENDORPATH')) {
 	define('REVISIONS_INTERNAL_VENDORPATH', __DIR__ . '/lib/vendor');
 }
 
+// Load the bundled Action Scheduler library before plugins_loaded priority 0.
+$action_scheduler_path = REVISIONS_INTERNAL_VENDORPATH . '/woocommerce/action-scheduler/action-scheduler.php';
+if (file_exists($action_scheduler_path)) {
+	require_once $action_scheduler_path;
+}
+
 if (!defined('REVISIONARY_FILE') && !$revisionary_loaded_by_pro) {
 	$includeFileRelativePath = REVISIONS_INTERNAL_VENDORPATH . '/publishpress/publishpress-instance-protection/include.php';
 	if (file_exists($includeFileRelativePath)) {
