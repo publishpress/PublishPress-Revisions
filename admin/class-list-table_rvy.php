@@ -1,4 +1,7 @@
 <?php
+if (isset($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw(wp_unslash($_SERVER['SCRIPT_FILENAME']))) )
+	die();
+
 require_once( ABSPATH . 'wp-admin/includes/class-wp-posts-list-table.php' );
 
 class Revisionary_List_Table extends WP_Posts_List_Table {
@@ -99,7 +102,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	function flt_skip_cap_filtering($skip, $post_id, $orig_cap) {
 		global $current_user;
 		
-		if (in_array($orig_cap, ['read_post', 'read_page'])
+		if (in_array($orig_cap, ['read_post', 'read_page'], true)
 		&& !empty($current_user->allcaps['preview_others_revisions'])
 		) {
 			$skip = true;
@@ -153,7 +156,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$qp['cat'] = isset($q['cat']) ? (int) $q['cat'] : 0;
 
-		if ( isset($q['post_type']) && in_array( $q['post_type'], $this->post_types ) )
+		if ( isset($q['post_type']) && in_array( $q['post_type'], $this->post_types, true ) )
 			$qp['post_type'] = $q['post_type'];
 		else
 			$qp['post_type'] = $this->post_types;
@@ -272,13 +275,13 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			unset($qr['m']);
 		}
 
-		if ( isset( $q['orderby'] ) && !in_array($q['orderby'], ['post_mime_type', 'post_type']) ) {
+		if ( isset( $q['orderby'] ) && !in_array($q['orderby'], ['post_mime_type', 'post_type'], true) ) {
 			$qr['orderby'] = $q['orderby'];
 		} else {
 			$qr['orderby'] = ( ! empty($_REQUEST['post_mime_type']) && 'future-revision' == $_REQUEST['post_mime_type'] ) ? 'date' : 'modified';			//phpcs:ignore WordPress.Security.NonceVerification.Recommended									
 		}
 
-		if ( isset( $q['order'] ) && !in_array($q['orderby'], ['post_mime_type', 'post_type'] ) ) {
+		if ( isset( $q['order'] ) && !in_array($q['orderby'], ['post_mime_type', 'post_type'], true ) ) {
 			$qr['order'] = $q['order'];
 		} else {
 			$qr['order'] = 'DESC';
@@ -843,7 +846,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 							$h_time = "<div class='rvy-requested-date'>[$h_time]</div>";
 							$t_time = sprintf(esc_html__('Requested publication: %s', 'revisionary'), $t_time);
 
-							$t_time .= '<br><br>' . __('This revision is not scheduled yet. It must be approved.', 'revisionary');
+							$t_time .= '<br><br>' . esc_html__('This revision is not scheduled yet. It must be approved.', 'revisionary');
 						}
 
 						if ( $time_diff > 0 ) {
@@ -1286,7 +1289,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 				) : $status;
 
 				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				if (!empty($_REQUEST['post_status']) && ($status == sanitize_key($_REQUEST['post_status'])) && empty($_REQUEST['post_type']) && empty($_REQUEST['author']) && empty($_REQUEST['post_author']) && empty($_REQUEST['published_post'])) {
+				if (!empty($_REQUEST['post_status']) && (sanitize_key($_REQUEST['post_status']) == $status) && empty($_REQUEST['post_type']) && empty($_REQUEST['author']) && empty($_REQUEST['post_author']) && empty($_REQUEST['published_post'])) {
 					$current_link_class = $status;
 					$link_class = " class='current'";
 				} else {
@@ -1373,7 +1376,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		echo "</select>\n";
 
-		submit_button( __( 'Apply' ), 'action', 'bulk_action', false, array( 'id' => "doaction$two" ) );
+		submit_button( esc_html__( 'Apply' ), 'action', 'bulk_action', false, array( 'id' => "doaction$two" ) );
 		echo "\n";
 	}
 
@@ -1458,7 +1461,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			}
 
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$selected = ((!empty($_REQUEST['post_status'])) && ($status_obj->name == sanitize_key($_REQUEST['post_status']))) ? ' selected' : '';
+			$selected = ((!empty($_REQUEST['post_status'])) && (sanitize_key($_REQUEST['post_status']) == $status_obj->name)) ? ' selected' : '';
 			echo "\t" . '<option value="' . esc_attr($status_obj->name) . '"' . esc_attr($selected) . '>' . esc_html($status_obj->label) . "</option>\n";
 		}
 
@@ -1469,7 +1472,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		foreach(array_keys($revisionary->enabled_post_types) as $post_type) {
 			if ($type_obj = get_post_type_object($post_type)) {
-				$selected = ((!empty($_REQUEST['post_type'])) && ($post_type == sanitize_key($_REQUEST['post_type']))) ? ' selected' : '';		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$selected = ((!empty($_REQUEST['post_type'])) && (sanitize_key($_REQUEST['post_type']) == $post_type)) ? ' selected' : '';		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				echo "\t" . '<option value="' . esc_attr($post_type) . '"' . esc_attr($selected) . '>' . esc_html($type_obj->labels->singular_name) . "</option>";
 			}
 		}
@@ -1498,7 +1501,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		?>
 		<select name="author" class="postform" style="float:none">
-			<option <?php echo $current_option === '' ? 'selected' : '' ?>
+			<option <?php echo '' === $current_option ? 'selected' : '' ?>
 				value="">
 				<?php esc_html_e( 'All Revision Authors', 'revisionary' ) ?>
 			</option>
@@ -1533,7 +1536,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		arsort($post_dates);
 		?>
 		<select name="modified" class="postform" style="float:none">
-			<option <?php echo $current_option === '' ? 'selected' : '' ?>
+			<option <?php echo '' === $current_option ? 'selected' : '' ?>
 				value="">
 				<?php esc_html_e( 'All Revision Dates', 'revisionary' ) ?>
 			</option>
@@ -1569,7 +1572,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		?>
 		<select name="published_post" class="postform" style="float:none">
-			<option <?php echo $current_option === '' ? 'selected' : '' ?>
+			<option <?php echo '' === $current_option ? 'selected' : '' ?>
 				value="">
 				<?php esc_html_e( 'All Posts', 'revisionary' ) ?>
 			</option>
@@ -1604,7 +1607,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		?>
 
 		<select name="post_author" class="postform" style="float:none">
-			<option <?php echo $current_option === '' ? 'selected' : '' ?>
+			<option <?php echo '' === $current_option ? 'selected' : '' ?>
 				value="">
 				<?php esc_html_e( 'All Authors', 'revisionary' ) ?>
 			</option>
@@ -1622,7 +1625,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		</select>
 
 		<?php
-		submit_button( __( 'Filter' ), '', 'filter_action', false, array( 'id' => 'post-query-submit' ) );
+		submit_button( esc_html__( 'Filter' ), '', 'filter_action', false, array( 'id' => 'post-query-submit' ) );
 		?>
 
 		<script type="text/javascript">
@@ -1705,13 +1708,13 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		foreach ( $columns as $column_key => $column_display_name ) {
 			$class = array( 'manage-column', "column-$column_key" );
 
-			if ( in_array( $column_key, $hidden ) ) {
+			if ( in_array( $column_key, $hidden, true ) ) {
 				$class[] = 'hidden';
 			}
 
 			if ( 'cb' === $column_key ) {
 				$class[] = 'check-column';
-			} elseif ( in_array( $column_key, array( 'posts', 'comments', 'links' ) ) ) {
+			} elseif ( in_array( $column_key, array( 'posts', 'comments', 'links' ), true ) ) {
 				$class[] = 'num';
 			}
 
@@ -1782,7 +1785,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$title = _draft_or_post_title($post);
 
-		if ( $can_edit_post && $post->post_status != 'trash' && $edit_link = get_edit_post_link( $post->ID )) {
+		if ( $can_edit_post && 'trash' != $post->post_status && $edit_link = get_edit_post_link( $post->ID )) {
 			printf(
 				'<a class="row-title" href="%s" aria-label="%s">%s%s</a>',
 				esc_url($edit_link),
@@ -1862,7 +1865,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			}
 
 			if ($main_post_id 
-			&& in_array($post->post_status, array_merge(['draft', 'pending'], rvy_revision_statuses()))
+			&& in_array($post->post_status, array_merge(['draft', 'pending'], rvy_revision_statuses()), true)
 			&& current_user_can('copy_post', $main_post_id)
 			) {
 				//phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -1929,14 +1932,14 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		if (current_user_can('approve_revision', $post->ID)) {
 			$revision_id = $post->ID;
 
-			if ( !in_array( $post->post_mime_type, array( 'future-revision', 'inherit' ) ) ) {
+			if ( !in_array( $post->post_mime_type, array( 'future-revision', 'inherit' ), true ) ) {
 				$actions['publish'] = sprintf(
 					'<a href="%1$s" class="" target="_revision_approve">%2$s</a>',
 					wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision=$revision_id&action=approve"), "approve-post_$main_post_id|$revision_id" ),
 					_x( 'Approve', 'revisions', 'revisionary' )
 				);
 			
-			} elseif ( in_array( $post->post_mime_type, array( 'future-revision' ) ) ) {
+			} elseif ( in_array( $post->post_mime_type, array( 'future-revision' ), true ) ) {
 				$actions['publish'] = sprintf(
 					'<a href="%1$s" class="" target="_revision_approve">%2$s</a>',
 					wp_nonce_url( rvy_admin_url("admin.php?page=rvy-revisions&revision=$revision_id&action=publish"), "publish-post_$main_post_id|$revision_id" ),

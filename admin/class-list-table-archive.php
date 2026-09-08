@@ -1,4 +1,7 @@
 <?php
+if (isset($_SERVER['SCRIPT_FILENAME']) && basename(__FILE__) == basename(esc_url_raw(wp_unslash($_SERVER['SCRIPT_FILENAME']))) )
+	die();
+
 require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 
 class Revisionary_Archive_List_Table extends WP_List_Table {
@@ -19,9 +22,9 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	public function __construct( $args ) {
 		global $revisionary;
 
-		$this->active_revision_title = __('This was an update to a revision which is still in the workflow process.', 'revisionary');
+		$this->active_revision_title = esc_html__('This was an update to a revision which is still in the workflow process.', 'revisionary');
 
-		$this->from_revision_title = __('This was an update to a revision which was published after further editing.', 'revisionary');
+		$this->from_revision_title = esc_html__('This was an update to a revision which was published after further editing.', 'revisionary');
 
 		$args = wp_parse_args(
 			$args,
@@ -54,12 +57,12 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 					'post_date',
 					'post_modified',
 					'post_count'
-				]
+				], true
 			)
 			? sanitize_key( $_REQUEST['orderby'] )														//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			: 'post_modified';
 																										//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$order = isset( $_REQUEST['order'] ) && ! empty( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], ['asc', 'desc'] )
+		$order = isset( $_REQUEST['order'] ) && ! empty( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], ['asc', 'desc'], true )
 			? strtoupper(sanitize_key($_REQUEST['order']))												//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			: 'DESC';
 
@@ -160,7 +163,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	public function filters_in_heading() {
 		$count = 0;
 
-		$any_filters = ( isset( $_REQUEST['origin_post'] ) && ! empty( $_REQUEST['origin_post'] )		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$any_filters = ( isset( $_REQUEST['origin_post'] ) && ! empty( $_REQUEST['origin_post'] ) )		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		|| ( isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] ) )		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		|| ( isset( $_REQUEST['post_author'] ) && ! empty( $_REQUEST['post_author'] ) )					//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		|| ( isset( $_REQUEST['post_parent'] ) && ! empty( $_REQUEST['post_parent'] ) )					//phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -168,8 +171,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		|| ( isset( $_REQUEST['revision_date'] ) && ! empty( $_REQUEST['revision_date'] ) )					//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		|| ( isset( $_REQUEST['origin_post_author'] ) && ! empty( $_REQUEST['origin_post_author'] ) )	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		|| ( isset( $_REQUEST['origin_post_date'] ) && ! empty( $_REQUEST['origin_post_date'] ) )	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		|| ( isset( $_REQUEST['approved_by'] ) && ! empty( $_REQUEST['approved_by'] ) )	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		);
+		|| ( isset( $_REQUEST['approved_by'] ) && ! empty( $_REQUEST['approved_by'] ) );	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		if ($any_filters) {
 			echo ' (';
@@ -186,7 +188,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		} else {
 			// Post type
 			if( isset( $_REQUEST['origin_post_type'] ) && ! empty( $_REQUEST['origin_post_type'] )	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				&& in_array( $_REQUEST['origin_post_type'], $this->post_types )						//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				&& in_array( $_REQUEST['origin_post_type'], $this->post_types, true )						//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			) {
 				$obj = get_post_type_object( sanitize_key( $_REQUEST['origin_post_type'] ) );		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$this->heading_spacing( $count );
@@ -577,14 +579,14 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
     public function get_columns() {
         $arr = array(
             'cb'			=> '<input type="checkbox" />',
-			'post_title' 	=> __( 'Revision', 'revisionary' ),
-			'origin_post_type' 		=> __( 'Post Type', 'revisionary' ),
-			'post_author'	=> __( 'Revised By', 'revisionary' ),
-			'post_modified' 	=> __( 'Revision Date', 'revisionary' ),
-			'publication_method' => __('Action', 'revisionary'),
-			'approved_by'	=> __('Approved By', 'revisionary'),
-			'origin_post_date'		=> __( 'Published Date', 'revisionary' ),
-			'origin_post_author'	=> __( 'Published Author', 'revisionary' ),
+			'post_title' 	=> esc_html__( 'Revision', 'revisionary' ),
+			'origin_post_type' 		=> esc_html__( 'Post Type', 'revisionary' ),
+			'post_author'	=> esc_html__( 'Revised By', 'revisionary' ),
+			'post_modified' 	=> esc_html__( 'Revision Date', 'revisionary' ),
+			'publication_method' => esc_html__('Action', 'revisionary'),
+			'approved_by'	=> esc_html__('Approved By', 'revisionary'),
+			'origin_post_date'		=> esc_html__( 'Published Date', 'revisionary' ),
+			'origin_post_author'	=> esc_html__( 'Published Author', 'revisionary' ),
         );
 
 		if (!rvy_get_option('revision_archive_deletion')) {
@@ -834,7 +836,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			: '';
 			?>
 			<select name="origin_post_type" class="postform">
-				<option <?php echo $current_option === '' ? 'selected' : '' ?>
+				<option <?php echo '' === $current_option ? 'selected' : '' ?>
 					value="">
 					<?php esc_html_e( 'All Post Types', 'revisionary' ) ?>
 				</option>
@@ -867,7 +869,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			asort($authors, SORT_STRING | SORT_FLAG_CASE);
 			?>
 			<select name="post_author" class="postform">
-				<option <?php echo $current_option === '' ? 'selected' : '' ?>
+				<option <?php echo '' === $current_option ? 'selected' : '' ?>
 					value="">
 					<?php esc_html_e( 'All Revision Authors', 'revisionary' ) ?>
 				</option>
@@ -901,7 +903,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			arsort($post_dates);
 			?>
 			<select name="revision_date" class="postform">
-				<option <?php echo $current_option === '' ? 'selected' : '' ?>
+				<option <?php echo '' === $current_option ? 'selected' : '' ?>
 					value="">
 					<?php esc_html_e( 'All Revision Dates', 'revisionary' ) ?>
 				</option>
@@ -959,7 +961,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			$post_dates = array_slice($post_dates, 0, 30, true);
 			?>
 			<select name="origin_post_date" class="postform">
-				<option <?php echo $current_option === '' ? 'selected' : '' ?>
+				<option <?php echo '' === $current_option ? 'selected' : '' ?>
 					value="">
 					<?php esc_html_e( 'All Publish Dates', 'revisionary' ) ?>
 				</option>
@@ -995,7 +997,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			asort($approvers, SORT_STRING | SORT_FLAG_CASE);
 			?>
 			<select name="approved_by" class="postform">
-				<option <?php echo $current_option === '' ? 'selected' : '' ?>
+				<option <?php echo '' === $current_option ? 'selected' : '' ?>
 					value="">
 					<?php esc_html_e( 'All Approvers', 'revisionary' ) ?>
 				</option>
@@ -1031,7 +1033,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			asort($authors, SORT_STRING | SORT_FLAG_CASE);
 			?>
 			<select name="origin_post_author" class="postform">
-				<option <?php echo $current_option === '' ? 'selected' : '' ?>
+				<option <?php echo '' === $current_option ? 'selected' : '' ?>
 					value="">
 					<?php esc_html_e( 'All Authors', 'revisionary' ) ?>
 				</option>
@@ -1049,7 +1051,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 			</select>
 			<?php
 
-			submit_button( __( 'Filter' ), '', 'filter_action', false, array( 'id' => 'post-query-submit' ) );
+			submit_button( esc_html__( 'Filter' ), '', 'filter_action', false, array( 'id' => 'post-query-submit' ) );
 
 			if( count( $_REQUEST ) > 1 ) :		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				?>
@@ -1290,7 +1292,7 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 		echo '<a href="' . esc_url(add_query_arg( $args, admin_url( 'admin.php?page=revisionary-archive' ) ) ) . '" class="' . esc_attr($v) . '">'
 		. $label;																		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-		if ($count ==! null) echo ' <span class="count">(' . esc_html($count) . ')</span>';
+		if (true == $count) echo ' <span class="count">(' . esc_html($count) . ')</span>';
 		
 		echo '</a>';
 	}
@@ -1299,6 +1301,6 @@ class Revisionary_Archive_List_Table extends WP_List_Table {
 	 * Override WP_List_Table::no_items()
 	 */
 	public function no_items() {
-		_e( 'No revisions found.', 'revisionary' );
+		esc_html_e( 'No revisions found.', 'revisionary' );
 	}
 }

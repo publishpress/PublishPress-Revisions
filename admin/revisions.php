@@ -99,7 +99,7 @@ default :
 		if ( ! $rvy_post = get_post( $revision_id) )
 			break;
 
-		if ( ! in_array( $rvy_post->post_type, array_keys($revisionary->enabled_post_types) ) ) {
+		if ( ! in_array( $rvy_post->post_type, array_keys($revisionary->enabled_post_types), true ) ) {
 			$rvy_post = '';  // todo: is this necessary?
 			break;
 		}

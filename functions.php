@@ -154,7 +154,7 @@ function revisionary_copy_postmeta($from_post, $to_post_id, $args = []) {
 
         $meta_keys = [];
         foreach ( $source_meta_keys as $meta_key ) {
-            if (!in_array($meta_key, $meta_excludelist)
+            if (!in_array($meta_key, $meta_excludelist, true)
             && !preg_match( '#^' . $meta_excludelist_string . '$#', $meta_key ) 
             ) {
                 $meta_keys[] = $meta_key;
@@ -194,7 +194,7 @@ function revisionary_copy_postmeta($from_post, $to_post_id, $args = []) {
 
     foreach ( $meta_keys as $meta_key ) {
         if ($empty_target_only && !empty($target_meta_keys) && is_array($target_meta_keys)) {
-            if (in_array($meta_key, $target_meta_keys)) {
+            if (in_array($meta_key, $target_meta_keys, true)) {
                 continue;
             }
         }
@@ -224,7 +224,7 @@ function revisionary_copy_postmeta($from_post, $to_post_id, $args = []) {
         }
         
         foreach($delete_meta_keys as $meta_key) {
-            if (in_array($meta_key, $deletable_keys) || !empty($args['apply_deletions']) || defined('PP_REVISIONS_APPLY_POSTMETA_DELETION')) {
+            if (in_array($meta_key, $deletable_keys, true) || !empty($args['apply_deletions']) || defined('PP_REVISIONS_APPLY_POSTMETA_DELETION')) {
                 delete_post_meta($to_post_id, $meta_key);
             }
         }
@@ -296,7 +296,7 @@ function rvy_revision_statuses($args = []) {
 }
 
 function rvy_is_revision_status($post_status) {
-	return in_array($post_status, rvy_revision_statuses());
+	return in_array($post_status, rvy_revision_statuses(), true);
 }
 
 function rvy_in_revision_workflow($post, $args = []) {
@@ -333,7 +333,7 @@ function rvy_from_revision_workflow($post, $args=[]) {
 function rvy_status_revisions_active($post_type = '') {
     if (defined('PUBLISHPRESS_STATUSES_PRO_VERSION') && class_exists('PublishPress_Statuses')) {
         if ($post_type) {
-            $status_revisions_active = in_array($post_type, \PublishPress_Statuses::getEnabledPostTypes());
+            $status_revisions_active = in_array($post_type, \PublishPress_Statuses::getEnabledPostTypes(), true);
         } else {
             $status_revisions_active = true;
         }
@@ -699,7 +699,7 @@ function pp_revisions_get_revision_statuses() {
         $stored_statuses = get_terms(['taxonomy' => 'pp_revision_status', 'hide_empty' => false]);
 
         foreach ($stored_statuses as $status) {
-            if (is_object($status) && property_exists($status, 'slug') && !in_array($status->slug, $revision_statuses)) {
+            if (is_object($status) && property_exists($status, 'slug') && !in_array($status->slug, $revision_statuses, true)) {
                 $revision_statuses[] = $status->slug;
             }
         }
@@ -742,7 +742,7 @@ function rvy_bulk_apply_revision_statuses() {
     $stored_statuses = get_terms(['taxonomy' => 'pp_revision_status', 'hide_empty' => false]);
 
     foreach ($stored_statuses as $status) {
-        if (is_object($status) && property_exists($status, 'slug') && !in_array($status->slug, $revision_statuses)) {
+        if (is_object($status) && property_exists($status, 'slug') && !in_array($status->slug, $revision_statuses, true)) {
             $revision_statuses[] = $status->slug;
         }
     }

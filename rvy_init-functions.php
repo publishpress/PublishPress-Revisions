@@ -470,7 +470,7 @@ function pp_revisions_status_label($status_name, $label_property) {
 	global $wp_post_statuses;
 
 	if (('future-revision' == $status_name) && ('publish' == $label_property)) {
-		return __('Publish Now', 'revisionary');
+		return esc_html__('Publish Now', 'revisionary');
 	
 	} elseif (!empty($wp_post_statuses[$status_name]) && !empty($wp_post_statuses[$status_name]->labels->$label_property)) {
 		return $wp_post_statuses[$status_name]->labels->$label_property;
@@ -616,7 +616,7 @@ function rvy_add_revisor_custom_caps() {
 	global $current_user;
 
 	foreach(['contributor', 'revisor'] as $role_name) {
-		if (in_array($role_name, $current_user->roles)) {
+		if (in_array($role_name, $current_user->roles, true)) {
 			$current_user->allcaps = array_merge($current_user->allcaps, $wp_roles->role_objects[$role_name]->capabilities);
 		}
 	}
@@ -712,7 +712,7 @@ function rvy_add_revisor_role( $requested_blog_id = '' ) {
 }
 
 function rvy_apply_role_translation($translations, $text, $context, $domain) {
-	if (('User role' === $context) && ('Revisor' == $text) && ($domain !== 'revisionary')) {
+	if (('User role' === $context) && ('Revisor' == $text) && ('revisionary' !== $domain)) {
 		return translate_with_gettext_context($text, $context, 'revisionary');
 	}
 
@@ -811,7 +811,7 @@ function rvy_post_revision_blocked($post, $args = []) {
 			
 			return [
 				'code' => 'blocked_revision_limit',
-				'description' => __('The post already has a revision in process.', 'revisionary')
+				'description' => esc_html__('The post already has a revision in process.', 'revisionary')
 			];
 		}
 	}
@@ -824,7 +824,7 @@ function rvy_post_revision_blocked($post, $args = []) {
 		if (!empty($post) && is_object($post) && !empty($post->post_content && (wp_filter_post_kses($post->post_content) != $post->post_content))) {
 			return [
 				'code' => 'blocked_unfiltered',
-				'description' => __('The unfiltered_html capability is required to create a revision of this post.', 'revisionary')
+				'description' => esc_html__('The unfiltered_html capability is required to create a revision of this post.', 'revisionary')
 			];
 		}
 	}
@@ -1451,7 +1451,7 @@ function rvy_is_full_editor($post, $args = []) {
 			return false;
 		}
 
-		if (in_array($post->post_status, ['draft', 'pending', 'publish', 'private'])) {
+		if (in_array($post->post_status, ['draft', 'pending', 'publish', 'private'], true)) {
 			return $revisionary->canEditPost($post, ['simple_cap_check' => true]);
 		} else {
 			return current_user_can('edit_post', $post->ID);
@@ -1578,7 +1578,7 @@ function rvy_preview_url($revision, $args = []) {
 	} else { // 'published_slug'
 		$published_post_id = rvy_post_id($revision->ID);
 		
-		if (('page' === get_option('show_on_front')) && in_array(get_option('page_on_front'), [$published_post_id, $revision->ID]) && !defined('REVISIONARY_NORMAL_HOME_REVISION_PREVIEW')) {
+		if (('page' === get_option('show_on_front')) && in_array(get_option('page_on_front'), [$published_post_id, $revision->ID], true) && !defined('REVISIONARY_NORMAL_HOME_REVISION_PREVIEW')) {
 			$use_revision_slug = true;
 			$home_id_arg = 'page__id';
 		} else {

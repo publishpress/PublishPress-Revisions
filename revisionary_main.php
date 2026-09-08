@@ -285,8 +285,8 @@ class Revisionary
 							('exclude' == $args['mod'])
 							&& rvy_get_option('apply_post_exceptions')
 							&& (
-								(($pagenow == 'admin.php') && isset($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-q', 'revisionary-archive']))	// //phpcs:ignore WordPress.Security.NonceVerification.Recommended
-								|| (in_array($pagenow, ['post.php', 'post-new.php']) && rvy_in_revision_workflow(rvy_detect_post_id()))
+								(('admin.php' == $pagenow) && isset($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-q', 'revisionary-archive'], true))	// //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+								|| (in_array($pagenow, ['post.php', 'post-new.php'], true) && rvy_in_revision_workflow(rvy_detect_post_id()))
 							)
 						) {
 							$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
@@ -318,8 +318,8 @@ class Revisionary
 						if (
 							rvy_get_option('apply_post_exceptions')
 							&& (
-								(($pagenow == 'admin.php') && isset($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-q', 'revisionary-archive']))	// //phpcs:ignore WordPress.Security.NonceVerification.Recommended
-								|| (in_array($pagenow, ['post.php', 'post-new.php']) && rvy_in_revision_workflow(rvy_detect_post_id()))
+								(('admin.php' == $pagenow) && isset($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-q', 'revisionary-archive'], true))	// //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+								|| (in_array($pagenow, ['post.php', 'post-new.php'], true) && rvy_in_revision_workflow(rvy_detect_post_id()))
 							)
 						) {
 							$revision_status_csv = rvy_revision_statuses(['return' => 'csv']);
@@ -554,7 +554,7 @@ class Revisionary
 
 			// by default, enable public post types that have type-specific capabilities defined
 			foreach($available_post_types as $post_type => $type_obj) {
-				if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages']))
+				if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages'], true))
 				|| defined('REVISIONARY_ENABLE_' . strtoupper($post_type) . '_TYPE')
 				) {
 					$enabled_post_types[$post_type] = true;
@@ -610,7 +610,7 @@ class Revisionary
 
 			// by default, enable non-public post types that have type-specific capabilities defined
 			foreach($private_types as $post_type => $type_obj) {
-				if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages']) && !isset($hidden_types[$post_type]))
+				if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages'], true) && !isset($hidden_types[$post_type]))
 				|| defined('REVISIONARY_ENABLE_' . strtoupper($post_type) . '_TYPE')
 				) {
 					$available_private_types[$post_type] = $type_obj;
@@ -662,7 +662,7 @@ class Revisionary
 
 	            // by default, enable non-public post types that have type-specific capabilities defined
 	            foreach($private_types as $post_type => $type_obj) {
-	                if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages']))
+	                if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages'], true))
 	                || defined('REVISIONARY_ENABLE_' . strtoupper($post_type) . '_TYPE')
 	                ) {
 	                    $enabled_post_types_archive[$post_type] = true;
@@ -747,7 +747,7 @@ class Revisionary
 
 	            // by default, enable non-public post types that have type-specific capabilities defined
 	            foreach($private_types as $post_type => $type_obj) {
-	                if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages']))
+	                if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages'], true))
 	                || defined('REVISIONARY_ENABLE_' . strtoupper($post_type) . '_TYPE')
 	                ) {
 	                    $enabled_post_types_copy[$post_type] = true;
@@ -903,7 +903,7 @@ class Revisionary
 			}
 		}
 		
-		if (strtotime($post->post_date_gmt) > agp_time_gmt()) {
+		if (strtotime($post->post_date_gmt) > agp_time_gmt() + 30) {
 			require_once( dirname(__FILE__).'/admin/revision-action_rvy.php');
 			
 			if (rvy_get_option('revision_publish_cron')) {
@@ -1091,12 +1091,12 @@ class Revisionary
 
 			$preview_link = (!empty($type_obj) && !empty($type_obj->public)) ? rvy_preview_url($revision, $args) : admin_url("post.php?post={$published_post_id}&action=edit");
 
-			wp_redirect($preview_link);
+			wp_safe_redirect($preview_link);
 			exit;
 		}
 
 		// If logged user does not have a pending revision of this post, redirect to published permalink
-		wp_redirect($published_url);
+		wp_safe_redirect($published_url);
 		exit;
 	}
 
@@ -1121,12 +1121,12 @@ class Revisionary
 			}
 
 			$edit_link = admin_url("post.php?post={$revision->ID}&action=edit&nc={$args['nc']}");
-			wp_redirect($edit_link);
+			wp_safe_redirect($edit_link);
 			exit;
 		}
 
 		// If logged user does not have a pending revision of this post, redirect to published permalink
-		wp_redirect($published_url);
+		wp_safe_redirect($published_url);
 		exit;
 	}
 
@@ -1148,7 +1148,7 @@ class Revisionary
 			return $caps;
 		}
 
-		if ( ! in_array( $meta_cap, array( 'edit_post', 'edit_page' ) ) )
+		if ( ! in_array( $meta_cap, array( 'edit_post', 'edit_page' ), true ) )
 			return $caps;
 		
 		$object_id = ( is_array($args) && ! empty($args[0]) ) ? (int) $args[0] : $args;
@@ -1181,7 +1181,7 @@ class Revisionary
 						$stati = array_diff( $stati, array( 'future' ) );
 					}
 
-					if ( in_array( $post->post_status, $stati ) ) {	// isset check because doing_cap_check property was undefined prior to Permissions 3.3.8
+					if ( in_array( $post->post_status, $stati, true ) ) {	// isset check because doing_cap_check property was undefined prior to Permissions 3.3.8
 						if ((!function_exists('presspermit') || (isset(presspermit()->doing_cap_check) && !presspermit()->doing_cap_check)) && $post_type_obj) {
 							if (!empty($post_type_obj->cap->edit_others_posts)) {
 								$caps[] = str_replace('edit_', 'list_', $post_type_obj->cap->edit_others_posts);
@@ -1368,7 +1368,7 @@ class Revisionary
 			if ($can_submit = apply_filters('revisionary_can_submit', $can_submit, $post_id, 'pending', $revision_status, $filter_args)) {
 				$caps = ['read'];
 			}
-		} elseif ($cap == 'approve_revision') {
+		} elseif ('approve_revision' == $cap) {
 			if (!empty($args[0])) {
 				$post_id = (is_object($args[0])) ? $args[0]->ID : (int) $args[0];
 			} else {
@@ -1477,7 +1477,7 @@ class Revisionary
 		
 		$preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		if (in_array($cap, ['read_post', 'read_page'])	// WP Query imposes edit_post capability requirement for front end viewing of protected statuses 
+		if (in_array($cap, ['read_post', 'read_page'], true)	// WP Query imposes edit_post capability requirement for front end viewing of protected statuses 
 		&& (!empty($_REQUEST[$preview_arg]) || !empty($_GET['preview'])) 		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		&& !empty($current_user->allcaps['preview_others_revisions'])
 		&& did_action('posts_selection') 
@@ -1490,7 +1490,7 @@ class Revisionary
 	
 			if ($post = get_post($post_id)) {
 				if (('inherit' == $post->post_status)
-				|| empty($this->enabled_post_types[$post->post_type]) && $this->config_loaded
+				|| (empty($this->enabled_post_types[$post->post_type]) && $this->config_loaded)
 				) {
 					return $caps;
 				}
@@ -1518,7 +1518,7 @@ class Revisionary
 			return $caps;
 		}
 
-		if (!in_array($cap, array('read_post', 'read_page', 'edit_post', 'edit_page', 'delete_post', 'delete_page'))) {
+		if (!in_array($cap, array('read_post', 'read_page', 'edit_post', 'edit_page', 'delete_post', 'delete_page'), true)) {
 			return $caps;
 		}
 
@@ -1530,16 +1530,16 @@ class Revisionary
 
 		if ($post = get_post($post_id)) {
 			if (('inherit' == $post->post_status)
-			|| empty($this->enabled_post_types[$post->post_type]) && $this->config_loaded
+			|| (empty($this->enabled_post_types[$post->post_type]) && $this->config_loaded)
 			) {
 				return $caps;
 			}
 		}
 
 		if ($post && (('future-revision' == $post->post_mime_type) 
-		|| (in_array($cap, ['read_post', 'read_page']) && empty($current_user->allcaps['preview_others_revisions'])))
+		|| (in_array($cap, ['read_post', 'read_page'], true) && empty($current_user->allcaps['preview_others_revisions'])))
 		) {
-			if (in_array($cap, ['read_post', 'read_page'])) {
+			if (in_array($cap, ['read_post', 'read_page'], true)) {
 				return $caps;
 			}
  
@@ -1552,7 +1552,7 @@ class Revisionary
 			) {
 				if ($type_obj = get_post_type_object( $post->post_type )) {
 					if (isset($type_obj->cap->edit_published_posts)) {
-						$check_cap = in_array($cap, ['delete_post', 'delete_page']) ? $type_obj->cap->delete_published_posts : $type_obj->cap->edit_published_posts;
+						$check_cap = in_array($cap, ['delete_post', 'delete_page'], true) ? $type_obj->cap->delete_published_posts : $type_obj->cap->edit_published_posts;
 						return array_merge($caps, [$check_cap]);
 					} else {
 						return $caps;
@@ -1565,10 +1565,10 @@ class Revisionary
 
 		$preview_arg = (defined('RVY_PREVIEW_ARG')) ? sanitize_key(constant('RVY_PREVIEW_ARG')) : 'rv_preview';	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		if (in_array($cap, ['read_post', 'read_page'])	// WP Query imposes edit_post capability requirement for front end viewing of protected statuses 
+		if (in_array($cap, ['read_post', 'read_page'], true)	// WP Query imposes edit_post capability requirement for front end viewing of protected statuses 
 			|| (
 				(!empty($_REQUEST[$preview_arg]) || !empty($_GET['preview'])) 		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				&& in_array($cap, array('edit_post', 'edit_page')) 
+				&& in_array($cap, array('edit_post', 'edit_page'), true) 
 				&& did_action('posts_selection') 
 				&& !did_action('template_redirect')
 			)
@@ -1605,7 +1605,7 @@ class Revisionary
 			&& rvy_get_option('revisor_lock_others_revisions') && !rvy_is_post_author($post) && !rvy_is_full_editor(rvy_post_id($post->ID))
 		) {
 			if ($type_obj = get_post_type_object( $post->post_type )) {
-				if (in_array($type_obj->cap->edit_others_posts, $caps)) {	
+				if (in_array($type_obj->cap->edit_others_posts, $caps, true)) {	
 					if ((!empty($type_obj->cap->edit_others_posts) && empty($current_user->allcaps[$type_obj->cap->edit_others_posts])) 
 					|| (!empty($type_obj->cap->edit_published_posts) && empty($current_user->allcaps[$type_obj->cap->edit_published_posts]))
 					) {
@@ -1628,7 +1628,7 @@ class Revisionary
 										}
 									}
 
-									if (isset($additional_ids[$post->post_type]) && in_array($post->ID, $additional_ids[$post->post_type])) {
+									if (isset($additional_ids[$post->post_type]) && in_array($post->ID, $additional_ids[$post->post_type], true)) {
 										$bypass_edit_others_cap = true;
 									}
 								}
@@ -1643,9 +1643,9 @@ class Revisionary
 			}
 		}
 
-		if (in_array($cap, array('edit_post', 'edit_page'))) {
+		if (in_array($cap, array('edit_post', 'edit_page'), true)) {
 			if ($post && !empty($post->post_status)) {
-				if (!in_array($post->post_status, rvy_filtered_statuses())) {
+				if (!in_array($post->post_status, rvy_filtered_statuses(), true)) {
 					$busy = false;
 					return $caps;
 				}
@@ -1690,7 +1690,7 @@ class Revisionary
 		$post_id = ( ! empty($args[2]) ) ? $args[2] : rvy_detect_post_id();
 
 		if (!$post = get_post($post_id)) {
-			if (($post_id == -1) && defined('PRESSPERMIT_PRO_VERSION') && !empty(presspermit()->meta_cap_post)) {  // wp_cache_add(-1) does not work for map_meta_cap call on get-revision-diffs ajax call 
+			if ((-1 == $post_id) && defined('PRESSPERMIT_PRO_VERSION') && !empty(presspermit()->meta_cap_post)) {  // wp_cache_add(-1) does not work for map_meta_cap call on get-revision-diffs ajax call 
 				$post = presspermit()->meta_cap_post;
 			}
 		}
@@ -1718,7 +1718,7 @@ class Revisionary
 						}
 					}
 
-					if (isset($additional_ids[$post->post_type]) && in_array($post->ID, $additional_ids[$post->post_type])) {
+					if (isset($additional_ids[$post->post_type]) && in_array($post->ID, $additional_ids[$post->post_type], true)) {
 						$bypass_cap = true;
 					}
 				}
@@ -1735,7 +1735,7 @@ class Revisionary
 				}
 
 				// If edit_others capability is being required for this post type, apply edit_others_revisions capability
-				if (!empty($object_type_obj->cap) && in_array($object_type_obj->cap->edit_others_posts, $reqd_caps)) {
+				if (!empty($object_type_obj->cap) && in_array($object_type_obj->cap->edit_others_posts, $reqd_caps, true)) {
 					if (!empty($current_user->allcaps['edit_others_revisions']) || !rvy_get_option('revisor_lock_others_revisions')) {
 						$wp_blogcaps[$object_type_obj->cap->edit_others_posts] = true;
 					
@@ -1822,7 +1822,7 @@ class Revisionary
 
 				// Elementor integration causes revision post_mime_type to be set to 'pending' on front end "Save Draft"
 				if (rvy_in_revision_workflow($revision)) {
-					if (in_array($data['post_mime_type'], ['draft', 'pending'])) {
+					if (in_array($data['post_mime_type'], ['draft', 'pending'], true)) {
 						$data['post_mime_type'] = 'draft-revision';
 					}
 				}
@@ -1832,11 +1832,11 @@ class Revisionary
 						return $data;
 					}
 
-					if (!rvy_is_revision_status($postarr['post_mime_type']) || !in_array($postarr['post_status'], rvy_revision_base_statuses())) {
+					if (!rvy_is_revision_status($postarr['post_mime_type']) || !in_array($postarr['post_status'], rvy_revision_base_statuses(), true)) {
 						$revert_status = true;
 
 					} elseif ($revision) {
-						if (($data['post_mime_type'] != $revision->post_mime_type) || ($data['post_status'] != $revision->post_status)
+						if ((($data['post_mime_type'] != $revision->post_mime_type) || ($data['post_status'] != $revision->post_status))
 						&& (('future-revision' == $revision->post_mime_type) || ('future-revision' == $postarr['post_mime_type']))
 						) {
 							$revert_status = true;

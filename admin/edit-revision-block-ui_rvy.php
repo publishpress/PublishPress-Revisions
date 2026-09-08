@@ -44,7 +44,7 @@ class RevisionaryEditRevisionBlockUI {
         global $pagenow;
 
         // Return if not a post editor request
-        if (!in_array($pagenow, ['post.php', 'post-new.php'])) {
+        if (!in_array($pagenow, ['post.php', 'post-new.php'], true)) {
             return;
         }
 
