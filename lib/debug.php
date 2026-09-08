@@ -33,13 +33,6 @@ if ( ! function_exists('rvy_bt_die') ) {
 function rvy_bt_die( $die = true ) {
 	if ( ! defined('RS_DEBUG') )
 		return;
-
-    if (defined('REVISIONARY_NO_DUMP_FUNCTION')) {
-        $bt = debug_backtrace();
-        var_dump($bt);
-    } else {
-	    dump(debug_backtrace(),false,false);
-    }
 	
 	if ( $die )
 		die;
@@ -78,22 +71,10 @@ function rvy_log_mem_usage( $label, $display_total = true ) {
 }
 }
 
-
-////////////////////////////////////////////////////////
-// Function:         dump
-// Inspired from:     PHP.net Contributions
-// Description: Helps with php debugging
-//
-// Revision by PublishPress
-//		* display_objects optional arg 
-//		* htmlspecialchars filtering if variable is a string containing '<'
-//
-// highstrike at gmail dot com
-// http://us2.php.net/manual/en/function.print-r.php#80289
 if ( ! function_exists('dump') && !defined('REVISIONARY_NO_DUMP_FUNCTION') ) {
 function dump(&$var, $info = FALSE, $display_objects = true)
 {	
-	return var_dump($var);
+
 }
 }
 
