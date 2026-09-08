@@ -1,7 +1,7 @@
 /**
 * Block Editor Modifications
 *
-* Copyright 2021, PublishPress
+* Copyright 2026, PublishPress
 */
 
 jQuery(document).ready( function($) {
