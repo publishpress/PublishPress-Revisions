@@ -737,6 +737,7 @@ class RevisionaryFront {
 
 			var rvyTotalHeight = $('div.rvy_view_revision').height() + rvyAdminBarHeight;
 			var rvyTopBarZindex = $('div.rvy_view_revision').css('z-index');
+			var rvyAdminBarZindex = $('#wpadminbar').css('z-index');
 			var rvyOtherElemZindex = 0;
 
 			$('div.rvy_view_revision').css('top', rvyAdminBarHeight);
@@ -754,6 +755,11 @@ class RevisionaryFront {
 
 						if (rvyOtherElemZindex >= rvyTopBarZindex) {
 							rvyTopBarZindex = rvyOtherElemZindex + 1;
+
+							if (rvyTopBarZindex > rvyAdminBarZindex) {
+								rvyTopBarZindex = rvyAdminBarZindex - 1;
+							}
+
 							$('div.rvy_view_revision').css('z-index', rvyTopBarZindex);
 						}
 
