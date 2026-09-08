@@ -45,7 +45,7 @@ if (('preview' != RVY_PREVIEW_ARG) && !empty($_REQUEST['preview']) && !empty($_R
 	$url = $arr['scheme'] . '://' . $arr['host'] . $url;
 
 	$url = str_replace('preview=', RVY_PREVIEW_ARG . '=', $url);
-	wp_redirect($url);
+	wp_safe_redirect($url);
 	exit;
 }
 
