@@ -31,10 +31,7 @@ if (get_option('rvy_delete_settings_on_uninstall')) {
             }
 
             if (!empty($wpdb->options)) {
-                @$wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE 'rvy_%'");
-                @$wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_rvy_%'");
-                @$wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '%_rvy'");
-                @$wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '%revisionary_%'");
+                @$wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE 'rvy_%' OR option_name LIKE '_rvy_%' OR option_name LIKE '%_rvy' OR option_name LIKE '%revisionary_%'");
             }
 
             delete_option('revisionary_last_version');
