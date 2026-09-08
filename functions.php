@@ -603,14 +603,6 @@ function pp_revisions_plugin_updated($current_version, $args = []) {
         update_option('revisionary_pro_restore_notifications', true);
     }
 
-    if (version_compare($last_ver, '3.0.12-rc4', '<')) {
-        global $wp_version;
-
-        if (class_exists('WpeCommon') || version_compare($wp_version, '5.9', '>=')) {
-            update_option('rvy_scheduled_publish_cron', 1);  // trigger generation of cron schedules for existing scheduled revisions
-        }
-    }
-
     if (version_compare($last_ver, '3.8.2', '<')) {
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $wpdb->query( 

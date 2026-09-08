@@ -1602,7 +1602,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 		remove_action( 'wp_insert_post', 'relevanssi_insert_edit', 99, 1 );
 	}
 
-	if (rvy_get_option('async_scheduled_publish') && !rvy_get_option('scheduled_publish_cron') && !rvy_get_option('wp_cron_usage_detected')) {
+	if (rvy_get_option('async_scheduled_publish') && rvy_get_option('legacy_scheduled_publication')) {
 		rvy_confirm_async_execution( 'publish_scheduled_revisions' );
 	
 		// Prevent this function from being triggered simultaneously by another site request
@@ -1872,7 +1872,7 @@ function rvy_publish_scheduled_revisions($args = []) {
 		}
 	}
 
-	if (!rvy_get_option('scheduled_publish_cron')) {
+	if (rvy_get_option('legacy_scheduled_publication')) {
 		rvy_update_next_publish_date();
 	}
 
@@ -1890,9 +1890,19 @@ function rvy_publish_scheduled_revisions($args = []) {
 function rvy_update_next_publish_date($args = []) {
 	global $wpdb, $wp_version;
 	
-	if ($args && !empty($args['revision_id']) && rvy_get_option('scheduled_publish_cron')) {
+	if ($args && !empty($args['revision_id'])) {
 		if ($revision = get_post($args['revision_id'])) {
-			wp_schedule_single_event(strtotime( $revision->post_date_gmt ), 'publish_revision_rvy', [$args['revision_id']]);
+			if (rvy_get_option('scheduled_publish_cron')) {
+				wp_schedule_single_event(strtotime( $revision->post_date_gmt ), 'publish_revision_rvy', [$revision->ID]);
+			} else {
+				// Action Scheduler: schedule event for time specified by $revision->post_date_gmt, passing $revision->ID
+				as_schedule_single_action(
+					strtotime($revision->post_date_gmt . ' UTC'),
+					'publish_revision_rvy_action_scheduler',
+					[$revision->ID],
+					'revisionary'
+				);
+			}
 		}
 	}
 

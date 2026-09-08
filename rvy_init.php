@@ -63,7 +63,10 @@ add_filter('cron_schedules', 'rvy_mail_buffer_cron_interval');			// phpcs:ignore
 // wp-cron hook
 add_action('publish_revision_rvy', '_revisionary_publish_scheduled_cron');
 
-add_action("update_option_rvy_scheduled_publish_cron", '_rvy_existing_schedules_to_cron', 10, 2);
+// Action Scheduler hook
+add_action('publish_revision_rvy_action_scheduler', '_revisionary_action_scheduler_publish_scheduled');
+
+//add_action("update_option_rvy_scheduled_publish_cron", '_rvy_existing_schedules_to_cron', 10, 2);
 
 add_action('before_delete_post', 
 	function($delete_post_id) {
