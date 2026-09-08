@@ -1,4 +1,8 @@
 <?php
+if (!defined('WP_UNINSTALL_PLUGIN')) {
+    exit;
+}
+
 if (get_option('rvy_delete_settings_on_uninstall')) {
     global $wpdb;
 
