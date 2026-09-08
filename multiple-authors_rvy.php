@@ -20,6 +20,7 @@ function _rvy_set_ma_post_authors_custom_field($post_id, $authors)
 	if (empty($authors)) {
 		delete_post_meta($post_id, $metadata);
 	} else {
+		$author_term_ids = [];
 		$names = [];
 
 		foreach ($authors as $author) {
@@ -32,28 +33,30 @@ function _rvy_set_ma_post_authors_custom_field($post_id, $authors)
 				$author = $author->term_id;
 			}
 
-			$taxonomy = (!empty($multiple_authors_addon) && !empty($multiple_authors_addon->coauthor_taxonomy)) 
-			? $multiple_authors_addon->coauthor_taxonomy 
-			: 'author';
-
 			// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 			//$author = Author::get_by_term_id($author);  // this returns an object with term_id property and no name
 
 			// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 			//$author = get_term($author, 'author');	  // 'author' is actually an invalid taxonomy name per WP API
 			
+			$author_term_ids []= $author;
+		}
+
+		if ($author_term_ids) {
+			$taxonomy = (!empty($multiple_authors_addon) && !empty($multiple_authors_addon->coauthor_taxonomy)) 
+			? $multiple_authors_addon->coauthor_taxonomy 
+			: 'author';
+
+			$term_id_csv = implode( ',', array_map('intval', $author_term_ids) );
+
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$author = $wpdb->get_row(
+			$names = $wpdb->get_col(
 				$wpdb->prepare(
-					"SELECT * FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON t.term_id = tt.term_id"
-					. " WHERE tt.taxonomy = %s AND t.term_id = %d"
-					, $taxonomy, $author
+					"SELECT name FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON t.term_id = tt.term_id"
+					. " WHERE tt.taxonomy = %s AND t.term_id IN (" . $term_id_csv . ")"
+					, $taxonomy
 				)
 			);
-
-			if (!empty($author->name)) {
-				$names[] = $author->name;
-			}
 		}
 
 		if (!empty($names)) {
