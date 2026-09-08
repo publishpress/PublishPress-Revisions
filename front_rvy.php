@@ -682,11 +682,7 @@ class RevisionaryFront {
 					}
 				}
 
-				if (defined('REVISIONARY_LEGACY_PREVIEW_OUTPUT')) {
-					add_action('wp_head', [$this, 'rvyFrontCSS']);
-				} else {
-					add_action('wp_enqueue_scripts', [$this, 'rvyEnqueueStyle'], 50);
-				}
+				add_action('wp_enqueue_scripts', [$this, 'rvyEnqueueStyle'], 50);
 
 				add_action('wp_enqueue_scripts', [$this, 'rvyEnqueuePreviewJS']);
 
@@ -706,10 +702,6 @@ class RevisionaryFront {
 				}
 			}
 		}
-	}
-
-	function rvyFrontCSS() {
-		echo '<link rel="stylesheet" href="' . esc_url(plugins_url('', REVISIONARY_FILE)) . '/revisionary-front.css" type="text/css" />'."\n";
 	}
 
 	function rvyEnqueueStyle() {
