@@ -1892,7 +1892,7 @@ function rvy_update_next_publish_date($args = []) {
 	}
 
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-	$next_publish_date_gmt = $wpdb->get_var( "SELECT post_date_gmt FROM $wpdb->posts WHERE post_mime_type = 'future-revision' ORDER BY post_date_gmt ASC LIMIT 1" ) );
+	$next_publish_date_gmt = $wpdb->get_var( "SELECT post_date_gmt FROM $wpdb->posts WHERE post_mime_type = 'future-revision' ORDER BY post_date_gmt ASC LIMIT 1" );
 
 	if (! $next_publish_date_gmt ) {
 		$next_publish_date_gmt = '2035-01-01 00:00:00';
